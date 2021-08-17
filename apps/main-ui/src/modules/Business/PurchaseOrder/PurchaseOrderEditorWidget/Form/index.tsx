@@ -1,0 +1,615 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable array-callback-return */
+import React, { FC, useCallback, useEffect, useRef, useState } from "react";
+import { WrapperPurchaseOrderForm } from "./styles";
+import { Button, Row, Select, Col, Form, Input, Spin, Checkbox } from "antd";
+import { CommonTable } from "./../../../../../components/Table/index";
+import { FormLabel } from "../../../../../components/FormLabel";
+import { TableCard } from "../../../../../components/TableCard";
+import { getAllContacts, getPurchasesById } from "../../../../../api";
+import { queryCache, useMutation, useQuery } from "react-query";
+import { PItem } from "./PItem";
+import TextArea from "antd/lib/input/TextArea";
+import { Link } from "react-router-dom";
+import {
+  IContactType,
+  IContactTypes,
+  NOTIFICATIONTYPE,
+} from "../../../../../modal";
+import { useGlobalContext } from "../../../../../hooks/globalContext/globalContext";
+import { ISupportedRoutes } from "../../../../../modal/routing";
+import { DragableBodyRow } from "./draggable";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import update from "immutability-helper";
+import { createDndContext, DndProvider } from "react-dnd";
+import dayjs from "dayjs";
+import { DatePicker } from "../../../../../components/DatePicker";
+import { LoadingOutlined } from "@ant-design/icons";
+import { IItemsResult } from "../../../../../modal/items";
+import { PrintFormat } from "../../../../../components/PrintFormat";
+import { PrintViewPurchaseWidget } from "../../../../../components/PurchasesWidget/PrintViewPurchaseWidget";
+import printDiv, { DownloadPDF } from "../../../../../utils/Print";
+import { ConfirmModal } from "../../../../../components/ConfirmModal";
+import scrollIntoView from "scroll-into-view";
+import {
+  PurchaseOrderWidgetManager,
+  usePurchaseOrderContext,
+} from "./PurchaseOrderWidgetManager";
+import { CreatePurchaseOrderAPI } from "../../../../../api/purchaseOrder";
+
+const RNDContext = createDndContext(HTML5Backend);
+const antIcon = <LoadingOutlined style={{ fontSize: 30 }} spin />;
+
+const { Option } = Select;
+
+interface IProps {
+  id?: number | string;
+}
+
+const Editor: FC<IProps> = ({ id }) => {
+  const [mutatePO, resPO] = useMutation(CreatePurchaseOrderAPI);
+  const {
+    notificationCallback,
+    handleUploadPDF,
+    routeHistory,
+    userDetails,
+  } = useGlobalContext();
+  const { history } = routeHistory;
+  const { state, setState, columns, items, reset } = usePurchaseOrderContext();
+  const [contactList, setContactList] = useState<IContactType[]>([]);
+
+  const [printModal, setPrintModal] = useState(false);
+  const [status, setStatus] = useState(1);
+
+  const { data: purchaseViewData, isLoading: purchaseItemsFetching } = useQuery(
+    [`PO-view-${id}`, id],
+    getPurchasesById,
+    {
+      cacheTime: Infinity,
+      enabled: id,
+    }
+  );
+
+  /*Query hook for  Fetching all accounts against ID */
+  const { isLoading: allContactsLoading, data: contactsData } = useQuery(
+    [`all-contacts`, "ALL"],
+    getAllContacts,
+    {
+      cacheTime: Infinity,
+    }
+  );
+
+  useEffect(() => {
+    if (contactsData && contactsData.data && contactsData.data.result) {
+      const { result } = contactsData.data;
+      const filtered = result.filter(
+        (contact) => contact.contactType === IContactTypes.SUPPLIER
+      );
+      setContactList(filtered);
+    }
+  }, [contactsData]);
+
+  const Printref = useRef();
+
+  useEffect(() => {
+    if (
+      purchaseViewData &&
+      purchaseViewData.data &&
+      purchaseViewData.data.result
+    ) {
+      const { result } = purchaseViewData.data;
+      form.setFieldsValue({
+        ...result,
+        dueDate: dayjs(result.dueDate),
+        issueDate: dayjs(result.issueDate),
+      });
+      const { purchase_items } = result;
+      let sortedItems = purchase_items.sort((a, b) => {
+        return a.sequence - b.sequence;
+      });
+      setState(sortedItems);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [purchaseViewData]);
+
+  const [form] = Form.useForm();
+
+  /* Scroll to last added item */
+
+  const handleScroll = () => {
+    let ele = document.querySelector(".scrollViewLastItem");
+    if (ele) {
+      scrollIntoView(ele, {
+        align: {
+          top: 0,
+        },
+      });
+    }
+  };
+
+  const handleAddRow = () => {
+    setState((prev) => {
+      return prev.concat({
+        itemId: null,
+        quantity: 1,
+        description: "",
+        index: prev.length,
+      });
+    });
+  };
+
+  useEffect(() => {
+    handleScroll();
+  }, [state.length]);
+
+  const ClearAll = () => {
+    form.resetFields();
+    form.setFieldsValue({ issueDate: dayjs(), dueDate: dayjs() });
+    reset();
+  };
+
+  const onCancelPrint = () => {
+    setPrintModal(false);
+
+    if (id) {
+      queryCache.removeQueries(`PO-view-${id}`);
+      let route = history.location.pathname.split("/");
+      if (route.length > 3) {
+        let removeIndex = route.length - 1;
+        route.splice(removeIndex, 1);
+        route = route.join("/");
+      } else {
+        route = route.join("/");
+      }
+
+      history.push(route);
+    }
+  };
+
+  const onPrint = () => {
+    const printItem = Printref.current;
+    printDiv(printItem);
+  };
+
+  const onSendPDF = (contactId, message) => {
+    const printItem = Printref.current;
+    let email = ``;
+
+    let [filteredContact] =
+      contactList && contactList.filter((cont) => cont.id === contactId);
+
+    if (filteredContact) {
+      email = filteredContact.email;
+    }
+
+    let pdf = DownloadPDF(printItem);
+    let payload = {
+      email,
+      html: `${pdf}`,
+      message,
+    };
+    handleUploadPDF(payload);
+  };
+
+  useEffect(() => {
+    form.setFieldsValue({ issueDate: dayjs(), dueDate: dayjs() });
+  }, []);
+
+  const onFinish = async (value) => {
+    let invId = id && typeof id === "string" ? parseInt(id) : id;
+
+    let payload = {
+      invoice: {
+        ...value,
+        status: value?.status?.status,
+        invoiceType: "PO",
+        isNewRecord: true,
+      },
+      invoice_items: state.map((item, index) => {
+        if (id) {
+          delete item.item;
+        }
+        return { ...item, sequence: index };
+      }),
+    };
+    if (id) {
+      payload = {
+        ...payload,
+        invoice: { ...payload.invoice, id: invId, isNewRecord: false },
+      };
+    }
+    try {
+      await mutatePO(payload, {
+        onSuccess: () => {
+          notificationCallback(
+            NOTIFICATIONTYPE.SUCCESS,
+            `Purchase Order ${
+              payload.invoice.status === 1 ? "Created" : "Saved"
+            }`
+          );
+          if (value.email_pdf) {
+            const message = `Purchase Order From ${userDetails?.organization?.name}, Branch ${userDetails?.branch?.name} \n Reference: ${value.referance}`;
+
+            onSendPDF(value.contactId, message);
+          }
+          setState([
+            {
+              itemId: null,
+              quantity: 0,
+              description: "",
+              index: 0,
+            },
+          ]);
+          [
+            "invoices",
+            "transactions?page",
+            "items?page",
+            "invoice-view",
+            "ledger-contact",
+            "all-items",
+          ].forEach((key) => {
+            queryCache.invalidateQueries((q) =>
+              q.queryKey[0].toString().startsWith(key)
+            );
+          });
+          if (value?.status?.type === 2) {
+            setPrintModal(true);
+          }
+          form.resetFields();
+          form.setFieldsValue({ issueDate: dayjs(), dueDate: dayjs() });
+          ClearAll();
+        },
+      });
+    } catch (error) {
+      notificationCallback(NOTIFICATIONTYPE.ERROR, "Purchase Order Failed ");
+    }
+  };
+
+  const onFinishFailed = (errorInfo) => {
+    console.log(errorInfo);
+  };
+
+  const handleAddItem = (id, index) => {
+    let allItems = [...state];
+    let filterIndex = state.findIndex((item) => item.itemId === id);
+    let lastIndex = allItems.length - 1;
+
+    if (state.length && filterIndex !== -1) {
+      allItems[filterIndex].quantity = allItems[filterIndex].quantity + 1;
+
+      // allItems.splice(filterIndex, 1, {
+      //   ...state[filterIndex],
+      //   quantity: allItems[filterIndex].quantity + 1,
+      // });
+    }
+    if (state.length && state[lastIndex].itemId === null) {
+      allItems.splice(lastIndex, 1, {
+        ...state[lastIndex],
+        itemId: id,
+        quantity: 1,
+      });
+    }
+    if (state.length && filterIndex === -1 && state[lastIndex].itemId) {
+      allItems.push({
+        itemId: id,
+        quantity: 1,
+        description: "",
+        index: allItems.length,
+      });
+    }
+    if (!state.length) {
+      allItems.push({
+        itemId: id,
+        quantity: 1,
+        description: "",
+        index: allItems.length,
+      });
+    }
+    setState(allItems);
+  };
+
+  const components = {
+    body: {
+      row: DragableBodyRow,
+    },
+  };
+
+  const moveRow: any = useCallback(
+    (dragIndex, hoverIndex) => {
+      const dragRow = state[dragIndex];
+      setState(
+        update(state, {
+          $splice: [
+            [dragIndex, 1],
+            [hoverIndex, 0, dragRow],
+          ],
+        })
+      );
+    },
+    [state]
+  );
+
+  const manager = useRef(RNDContext);
+
+  return (
+    <WrapperPurchaseOrderForm>
+      <div ref={Printref} className="_visibleOnPrint">
+        <PrintFormat>
+          <PrintViewPurchaseWidget
+            heading={"Purchase Order"}
+            type={"PO"}
+            hideCalculation={true}
+            data={
+              (resPO &&
+                resPO.data &&
+                resPO.data.data &&
+                resPO.data.data.result) ||
+              {}
+            }
+          />
+        </PrintFormat>
+      </div>
+      <TableCard>
+        <Row gutter={24}>
+          <Col span={18}>
+            <div className="flex alignFEnd justifySpaceBetween pv-13">
+              <div></div>
+              <h4 className="bold m-reset">
+                Already Purchased? &nbsp;
+                <Link to={`/app${ISupportedRoutes.CREATE_PURCHASE_Entry}`}>
+                  Enter Purchases Here
+                </Link>
+              </h4>
+            </div>
+            <Form
+              form={form}
+              onFinish={onFinish}
+              onFinishFailed={onFinishFailed}
+            >
+              <div className="ref_header">
+                <Row gutter={24}>
+                  <Col span={5} className="custom_col">
+                    <FormLabel>Vendor</FormLabel>
+                    <Form.Item
+                      name="contactId"
+                      rules={[{ required: true, message: "Required !" }]}
+                    >
+                      <Select
+                        loading={allContactsLoading}
+                        size="middle"
+                        showSearch
+                        style={{ width: "100%" }}
+                        placeholder="Select Contact"
+                        optionFilterProp="children"
+                      >
+                        {contactList.map((contact, index) => {
+                          return (
+                            <Option key={index} value={contact.id}>
+                              {contact.name}
+                            </Option>
+                          );
+                        })}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col span={4} className="custom_col">
+                    <FormLabel>Issue Date</FormLabel>
+                    <Form.Item
+                      name="issueDate"
+                      rules={[{ required: true, message: "Required !" }]}
+                    >
+                      <DatePicker
+                        onChange={(val) =>
+                          form.setFieldsValue({
+                            dueDate: val,
+                          })
+                        }
+                        style={{ width: "100%" }}
+                        size="middle"
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={4} className="custom_col">
+                    <FormLabel>Delivery Date</FormLabel>
+                    <Form.Item
+                      name="dueDate"
+                      rules={[{ required: true, message: "Required !" }]}
+                    >
+                      <DatePicker
+                        disabledDate={(current) => {
+                          return (
+                            current &&
+                            current < dayjs(form.getFieldValue("issueDate"))
+                          );
+                        }}
+                        style={{ width: "100%" }}
+                        size="middle"
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={3} className="custom_col">
+                    <FormLabel>Order Number</FormLabel>
+                    <Form.Item
+                      name="invoiceNumber"
+                      rules={[{ required: false, message: "Required !" }]}
+                    >
+                      <Input disabled={true} size="middle" type="number" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={4} className="custom_col">
+                    <FormLabel>Reference</FormLabel>
+                    <Form.Item
+                      name="reference"
+                      rules={[{ required: false, message: "Required !" }]}
+                    >
+                      <Input size="middle" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={4} className="custom_col">
+                    <FormLabel>Currency</FormLabel>
+                    <Form.Item
+                      name="currency"
+                      rules={[{ required: false, message: "Required !" }]}
+                    >
+                      <Select
+                        disabled
+                        size="middle"
+                        showSearch
+                        style={{ width: "100%" }}
+                        placeholder="Select Currency"
+                        optionFilterProp="children"
+                      >
+                        {["PKR", " USD", " CND", "EUR"].map((curr, index) => {
+                          return <Option value={curr}>{curr}</Option>;
+                        })}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </div>
+              <div className="table">
+                <DndProvider manager={manager.current.dragDropManager}>
+                  <CommonTable
+                    loading={purchaseItemsFetching}
+                    rowClassName={(record, index) =>
+                      `${
+                        index === state.length - 1 ? "scrollViewLastItem" : ""
+                      }`
+                    }
+                    size="middle"
+                    columns={columns}
+                    dataSource={state}
+                    pagination={false}
+                    components={components}
+                    scroll={{ y: 350 }}
+                    onRow={(record: any, index: any) => {
+                      let row: any = {
+                        index,
+                        moveRow,
+                      };
+                      return {
+                        ...row,
+                      };
+                    }}
+                  />
+                </DndProvider>
+              </div>
+              <div className="add_purcahseitem  pv-20">
+                <Button onClick={handleAddRow} type="default">
+                  Add new purchase item
+                </Button>
+              </div>
+              <Col span={12}>
+                <div className="pv-10">
+                  <FormLabel>Comment or special instructions</FormLabel>
+                  <Form.Item name="comment">
+                    <TextArea rows={4} />
+                  </Form.Item>
+                </div>
+              </Col>
+              <div className="mt-10 actions textRight flex alignCenter justifyFlexEnd ">
+                <Form.Item
+                  className="mr-10"
+                  name="email_pdf"
+                  valuePropName="checked"
+                >
+                  <Checkbox>Send to Email</Checkbox>
+                </Form.Item>
+                <Form.Item name="status">
+                  <Button
+                    onClick={() => {
+                      form.setFieldsValue({
+                        status: {
+                          status: 2,
+                          type: 1,
+                        },
+                      });
+                      setStatus(2);
+                    }}
+                    loading={resPO.isLoading && status === 2}
+                    type="default"
+                    size="middle"
+                    className="mr-10"
+                    htmlType="submit"
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      form.setFieldsValue({
+                        status: {
+                          status: 2,
+                          type: 2,
+                        },
+                      });
+                      setStatus(2);
+                    }}
+                    loading={resPO.isLoading && status === 2}
+                    type="primary"
+                    size="middle"
+                    className="mr-10"
+                    htmlType="submit"
+                  >
+                    Save & Print
+                  </Button>
+                </Form.Item>
+              </div>
+            </Form>
+          </Col>
+          <Col span={6} className="_col_border_lft">
+            <div className="quick_access">
+              <p className="quick_access_head">Recommended items</p>
+              <div
+                className={`quick_item_wrapper ${
+                  items.itemsLoading ? "flex alignCenter justifyCenter" : ""
+                } `}
+              >
+                {items.itemsLoading ? (
+                  <div className="flex alignItems justifyCenter">
+                    <Spin indicator={antIcon} />
+                  </div>
+                ) : (
+                  <>
+                    {items?.data?.map((item: IItemsResult, index: number) => {
+                      if (index < 5) {
+                        return (
+                          <PItem
+                            key={index}
+                            title={item.name}
+                            stock={"5"}
+                            description={item.description}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAddItem(item.id, index);
+                            }}
+                          />
+                        );
+                      }else{
+                        return null
+                      }
+                    })}
+                  </>
+                )}
+              </div>
+            </div>
+          </Col>
+        </Row>
+      </TableCard>
+      <ConfirmModal
+        visible={printModal}
+        onCancel={onCancelPrint}
+        onConfirm={onPrint}
+        type="info"
+        text="Do you want to print?"
+      />
+    </WrapperPurchaseOrderForm>
+  );
+};
+
+export const PurchaseOrderForm: FC<IProps> = ({ id }) => {
+  return (
+    <PurchaseOrderWidgetManager>
+      <Editor id={id} />
+    </PurchaseOrderWidgetManager>
+  );
+};

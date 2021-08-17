@@ -1,0 +1,32 @@
+/* @media print {
+  table {
+    width: 100%;
+    border: 1px solid #333;
+    border-bottom: 0px;
+  }
+
+  table thead tr {
+    border: 1px solid #333;
+    background: #dadada;
+  }
+  table thead tr th {
+    font-size: 11px;
+    padding: 4px 3px 4px 8px;
+    border: 1px solid #333;
+    background: #b8b8b8 !important;
+  }
+
+  table tbody tr td {
+    font-size: 11px;
+    padding: 4px 3px 4px 8px;
+    white-space: nowrap;
+    border: 1px solid #333;
+  }
+
+  .ant-table-selection-column,
+  .table_top,
+  .ant-pagination,
+  .footer {
+    display: none !important;
+  }
+} */
