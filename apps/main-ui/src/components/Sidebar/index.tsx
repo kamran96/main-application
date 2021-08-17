@@ -112,7 +112,7 @@ const WrapperSidebar: any = styled.aside`
   .toggle {
     position: fixed;
     z-index: 111;
-    top: 44px;
+    top: 75px;
     height: 30px;
     width: 30px;
     background: ${(props: IThemeProps) => props.theme.colors.layoutBg};

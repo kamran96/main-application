@@ -11,12 +11,6 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import { sentryInit } from "../utils/integrations";
 
-/* integrations */
-
-sentryInit();
-
-require("dotenv").config();
-
 const rqConfig = {
   queries: {
     staleTime: 1000 * 2 * 60, // that's one min.

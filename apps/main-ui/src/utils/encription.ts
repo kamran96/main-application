@@ -9,6 +9,8 @@ const EncriptData = (data) => {
 };
 
 const DecriptionData = (data) => {
+
+  console.log(process.env.REACT_APP_ENCRIPTION_KEY, "what is key")
   let bytes = CryptoJS.AES.decrypt(
     data,
     `${process.env.REACT_APP_ENCRIPTION_KEY}`
