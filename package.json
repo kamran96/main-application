@@ -1,11 +1,12 @@
 {
   "name": "invyce",
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "author": "zeeshan@invyce.com",
   "license": "MIT",
   "scripts": {
     "nx": "nx",
     "start": "nx serve",
-    "build": "nx build",
+    "build": "nx build && nest build",
     "test": "nx test",
     "lint": "nx workspace-lint && nx lint",
     "e2e": "nx e2e",
@@ -55,6 +56,7 @@
     "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
     "cookie-parser": "^1.4.5",
+    "dotenv": "^8.2.0",
     "google-auth-library": "^7.3.0",
     "googleapis": "^82.0.0",
     "intuit-oauth": "^3.0.2",
@@ -80,6 +82,7 @@
   },
   "devDependencies": {
     "@nestjs/schematics": "^7.0.0",
+    "@nestjs/cli": "^7.0.0",
     "@nestjs/testing": "^7.0.0",
     "@nrwl/cli": "12.7.0",
     "@nrwl/eslint-plugin-nx": "12.7.0",
@@ -94,7 +97,6 @@
     "@types/node": "14.14.33",
     "@typescript-eslint/eslint-plugin": "~4.28.3",
     "@typescript-eslint/parser": "~4.28.3",
-    "dotenv": "~10.0.0",
     "eslint": "7.22.0",
     "eslint-config-prettier": "8.1.0",
     "jest": "27.0.3",

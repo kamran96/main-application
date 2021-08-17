@@ -1,11 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-  JoinColumn,
-} from 'typeorm';
-import { RolePermissions } from './RolePermission.entity';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
 export class Permissions {
@@ -18,6 +11,8 @@ export class Permissions {
   @Column()
   module: string;
   @Column()
+  status: number;
+  @Column()
   organizationId: number;
   @Column()
   branchId: number;
@@ -25,8 +20,6 @@ export class Permissions {
   createdById: number;
   @Column()
   updatedById: number;
-  @Column()
-  status: number;
   @Column()
   createdAt: string;
   @Column()

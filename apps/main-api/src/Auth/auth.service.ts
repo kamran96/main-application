@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { getCustomRepository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import * as queryString from 'query-string';
@@ -15,14 +15,14 @@ import { EmailService } from '../Common/services/email.service';
 
 const client = redis.createClient();
 
-client.on('error', function(error) {
+client.on('error', function (error) {
   console.log(error);
 });
 
 const get = promisify(client.get).bind(client);
 const set = promisify(client.set).bind(client);
 
-const generateRandomNDigits = n => {
+const generateRandomNDigits = (n) => {
   return Math.floor(Math.random() * (9 * Math.pow(10, n))) + Math.pow(10, n);
 };
 
@@ -32,9 +32,8 @@ export class AuthService {
 
   async CheckUser(authDto) {
     try {
-      const userRepository = getCustomRepository(UserRepository);
-
       let user_arr = [];
+      const userRepository = getCustomRepository(UserRepository);
       const user = await userRepository
         .createQueryBuilder('users')
         .where('users.username = :username', { username: authDto?.username })
@@ -81,9 +80,7 @@ export class AuthService {
         phoneNumber: authDto.phoneNumber,
       });
 
-      const time = Moment(new Date())
-        .add(1, 'h')
-        .calendar();
+      const time = Moment(new Date()).add(1, 'h').calendar();
 
       let generateOtp: any = generateRandomNDigits(4);
       parseInt(generateOtp);
@@ -138,7 +135,7 @@ export class AuthService {
       if (user.status === 0) {
         throw new HttpException(
           'Sorry, you are no longer active.',
-          HttpStatus.BAD_REQUEST,
+          HttpStatus.BAD_REQUEST
         );
       }
       if (bcrypt.compareSync(authDto.password, user.password)) {
@@ -172,14 +169,14 @@ export class AuthService {
         if (format && format < getOneHour) {
           throw new HttpException(
             'Verification code is expired, Click on resend to generate new verification code.',
-            HttpStatus.BAD_REQUEST,
+            HttpStatus.BAD_REQUEST
           );
         } else {
           await getCustomRepository(UserRepository).update(
             {
               email: body.email,
             },
-            { isVerified: true },
+            { isVerified: true }
           );
           response = {
             status: true,
@@ -199,9 +196,7 @@ export class AuthService {
   }
 
   async ResendOtp(body) {
-    const time = Moment(new Date())
-      .add(1, 'h')
-      .calendar();
+    const time = Moment(new Date()).add(1, 'h').calendar();
 
     const [user] = await getCustomRepository(UserRepository).find({
       where: {
@@ -237,7 +232,7 @@ export class AuthService {
     usr: any = null,
     resend: boolean = false,
     otp = false,
-    generateOtp = null,
+    generateOtp = null
   ) {
     const userRepository = getCustomRepository(UserRepository);
     const [user] = await userRepository.find({
@@ -273,7 +268,7 @@ export class AuthService {
           user.organization ? user.organization.name : null
         }`,
         link,
-        'no-reply@invyce.com',
+        'no-reply@invyce.com'
       )
       .send();
   }
@@ -305,7 +300,7 @@ export class AuthService {
         user.email,
         `Invite user request from ${user.organization.name}`,
         link,
-        'no-reply@invyce.com',
+        'no-reply@invyce.com'
       )
       .send();
   }
@@ -350,7 +345,7 @@ export class AuthService {
         user.email,
         'Password change request',
         link,
-        'no-reply@invyce.com',
+        'no-reply@invyce.com'
       )
       .send();
   }
@@ -385,7 +380,7 @@ export class AuthService {
 
       await getCustomRepository(UserRepository).update(
         { id: verify.id },
-        updatedUser,
+        updatedUser
       );
       return updatedUser;
     } catch (err) {

@@ -3,6 +3,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { EntityManager, getCustomRepository, In } from 'typeorm';
 import { RolePermissions } from '../entities';
@@ -38,7 +39,7 @@ export class RbacService {
 
           await roleRepo.update(
             { id: roleDto.id },
-            { name: roleDto.name, description: roleDto.description },
+            { name: roleDto.name, description: roleDto.description }
           );
         }
 
@@ -56,7 +57,7 @@ export class RbacService {
         if (Array.isArray(role) && role.length > 0) {
           throw new HttpException(
             'Role already exists.',
-            HttpStatus.BAD_REQUEST,
+            HttpStatus.BAD_REQUEST
           );
         }
 
@@ -66,8 +67,10 @@ export class RbacService {
           },
         });
 
-        const roleToUpdate = findAllRoles.find(r => r.level === roleDto.level);
-        const parentRole = findAllRoles.filter(r => r.level > roleDto.level);
+        const roleToUpdate = findAllRoles.find(
+          (r) => r.level === roleDto.level
+        );
+        const parentRole = findAllRoles.filter((r) => r.level > roleDto.level);
 
         const newRole = await roleRepo.save({
           name: roleDto.name,
@@ -80,7 +83,7 @@ export class RbacService {
 
         await roleRepo.update(
           { id: roleToUpdate.id },
-          { parentId: newRole.id, level: roleDto.level + 1 },
+          { parentId: newRole.id, level: roleDto.level + 1 }
         );
 
         if (parentRole.length > 0) {
@@ -143,8 +146,7 @@ export class RbacService {
   }
 
   async GetDistinctModule(user): Promise<any> {
-    const permissionRepo = getCustomRepository(PermissionRepository);
-    const module = await permissionRepo
+    const module = await getCustomRepository(PermissionRepository)
       .createQueryBuilder()
       .select('module')
       .distinct(true)
@@ -189,7 +191,7 @@ export class RbacService {
           order by rp.id asc
           `);
 
-    const parentRole = parentRoles.map(r => r.role);
+    const parentRole = parentRoles.map((r) => r.role);
     return { parentRole, roles };
   }
 
@@ -206,7 +208,7 @@ export class RbacService {
     const pagination = await this.pagination.paginate(
       permission,
       page_size,
-      page_no,
+      page_no
     );
 
     return {
@@ -233,13 +235,13 @@ export class RbacService {
       }
 
       for (let i of roles) {
-        const parentRole = role_arr.find(r => r.name === i.parent);
-        const role = role_arr.find(r => r.name === i.name);
+        const parentRole = role_arr.find((r) => r.name === i.parent);
+        const role = role_arr.find((r) => r.name === i.name);
 
         if (parentRole) {
           await roleRepo.update(
             { id: role.id },
-            { name: role.name, parentId: parentRole.id },
+            { name: role.name, parentId: parentRole.id }
           );
         }
       }
@@ -249,11 +251,11 @@ export class RbacService {
           where: { id: userId },
         });
 
-        const [adminRole] = role_arr.filter(r => r.name === 'admin');
+        const [adminRole] = role_arr.filter((r) => r.name === 'admin');
 
         await getCustomRepository(UserRepository).update(
           { id: user.id },
-          { roleId: adminRole.id },
+          { roleId: adminRole.id }
         );
       }
 
@@ -299,9 +301,9 @@ export class RbacService {
 
     for (let permission of permissions) {
       const pId = globalPermissions.find(
-        gp => gp.description === permission.description,
+        (gp) => gp.description === permission.description
       );
-      const roleId = roles.find(r => r.name === permission.roles[0]);
+      const roleId = roles.find((r) => r.name === permission.roles[0]);
 
       await rolePermissionRepo.save({
         roleId: roleId.id,
@@ -314,7 +316,7 @@ export class RbacService {
   }
 
   async FilterRole(roles, role_type) {
-    const [role] = roles.filter(r => r.name == role_type);
+    const [role] = roles.filter((r) => r.name == role_type);
     return role;
   }
 
@@ -339,7 +341,7 @@ export class RbacService {
         for (let i of rolePermissions) {
           await rolePermissionRepo.update(
             { id: i.id },
-            { roleId: role.parentId },
+            { roleId: role.parentId }
           );
         }
       }
@@ -404,7 +406,7 @@ export class RbacService {
         hasPermission: data.hasPermission,
         organizationId: user.organizationId,
         status: 1,
-      },
+      }
     );
 
     const [rolePermission] = await rolePermissionRepo.find({

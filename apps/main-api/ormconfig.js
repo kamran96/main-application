@@ -1,4 +1,5 @@
 require('dotenv').config();
+const { getMetadataArgsStorage } = require('typeorm');
 
 module.exports = {
   type: 'postgres',
@@ -7,7 +8,7 @@ module.exports = {
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  entities: ['./dist/**/*.entity{.ts,.js}'],
+  entities: getMetadataArgsStorage().tables.map((tbl) => tbl.target),
   migrationsTableName: 'custom_migration_table',
   migrations: ['./apps/main-api/migrations/**/*.ts'],
   connectTimeoutMS: 100000000,
