@@ -14,6 +14,7 @@ import { IRolePermissions } from "../../modal/rbac";
 import { DecriptionData, EncriptData } from "../../utils/encription";
 import { useTheme } from "../useTheme";
 import { globalContext } from "./globalContext";
+import { useHistory } from "react-router-dom";
 
 interface IProps {
   children: React.ReactElement<any>;
@@ -42,7 +43,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   const [auth, setAuth] = useState<IAuth>(null);
   const [userDetails, setUserDetails] = useState<IUser | any>(null);
   const [userInviteModal, setUserInviteModal] = useState<boolean>(false);
-  const [history, setHistory] = useState(null);
   const [itemsModalConfig, setItemsModalConfig] = useState<any>({
     visibility: false,
     id: null,
@@ -106,6 +106,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   const [rolePermissions, setRolePermissions] = useState<IRolePermissions[]>(
     []
   );
+  
 
   const [verifiedModal, setVerifiedModal] = useState(false);
 
@@ -145,6 +146,8 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
       },
     });
   };
+
+const history = useHistory();
 
   const handleLogin = (action: IAction) => {
     switch (action.type) {
@@ -314,9 +317,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   //   });
   // }, []);
 
-  const handleRouteHistory = (history) => {
-    setHistory(history);
-  };
+ 
 
   message.config({
     top: 101,
@@ -344,6 +345,8 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const { theme: appTheme, themeLoading } = useTheme(theme);
 
+  
+
   const checkingUser =
     isFetched && permissionsFetched ? false : isLoading || permissionsFetching;
 
@@ -356,8 +359,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         userDetails, // user details
         setUserDetails, // to set user details
         handleLogin, // handle login from signup and login page
-        handleRouteHistory, // sets route history
-        routeHistory: history, // to get route history
+        routeHistory: {history}, // to get route history
         userInviteModal, // gets user invite model config
         setUserInviteModal, // sets user invite modal config
         notificationCallback, // responsible for notifications callbacs
@@ -448,6 +450,8 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         {/* <div className="network-problem">
         Check your internet connection 
       </div> */}
+      <div onClick={()=>setTheme('dark')}>dark mode</div>
+      <div onClick={()=>setTheme('light')}>light mode</div>
 
         {children}
       </WrapperChildren>

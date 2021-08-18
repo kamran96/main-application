@@ -11,9 +11,9 @@ export const RootLayout = (props: RouteConfigComponentProps) => {
   const { handleRouteHistory, isCheckingLoginUser } = useGlobalContext();
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    handleRouteHistory(props);
-  });
+  // useEffect(() => {
+  //   handleRouteHistory(props);
+  // });
 
   const getLoading = () => {
     if (loading) {

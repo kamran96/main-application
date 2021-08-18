@@ -1,12 +1,10 @@
-import React from "react";
-import { renderRoutes } from "react-router-config";
-import { BrowserRouter } from "react-router-dom";
-import { routes } from "../../routes/index";
-import { ReactQueryConfigProvider } from "react-query";
-import { Color } from "../../modal";
-import styled, { ThemeProvider } from "styled-components";
-import { ITheme, Themes } from "../../hooks/useTheme/themeColors";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
+import { renderRoutes } from 'react-router-config';
+import { routes } from '../../routes/index';
+import { ReactQueryConfigProvider } from 'react-query';
+import { Color } from '../../modal';
+import styled, { ThemeProvider } from 'styled-components';
+import { ITheme, Themes } from '../../hooks/useTheme/themeColors';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 
 const AppContainer = () => {
   // react query config
@@ -17,25 +15,29 @@ const AppContainer = () => {
     },
   };
 
-  // const { theme } = useGlobalContext();
+  const { theme } = useGlobalContext();
   // let layoutTheme: ITheme = {
   //   colors: Themes[theme],
   // };
 
+  console.log(theme, "theme is here")
+
   return (
-    <BrowserRouter>
-      <ReactQueryConfigProvider config={rqConfig}>
-        {/* <ThemeProvider theme={{ ...layoutTheme }}> */}
-        <ThemeWrapper>{renderRoutes(routes())}</ThemeWrapper>
-        {/* </ThemeProvider> */}
-      </ReactQueryConfigProvider>
-    </BrowserRouter>
+    <ReactQueryConfigProvider config={rqConfig}>
+      {/* <ThemeProvider theme={{ ...layoutTheme }}> */}
+      <ThemeWrapper theme={theme}>{renderRoutes(routes())}</ThemeWrapper>
+      {/* </ThemeProvider> */}
+    </ReactQueryConfigProvider>
   );
 };
 
 export default AppContainer;
 
-const ThemeWrapper = styled.div`
+interface IThemeWrapperProps {
+  theme: 'dark' | 'light';
+}
+
+const ThemeWrapper = styled.div<IThemeWrapperProps>`
   .clr-primary {
     color: ${Color.$PRIMARY};
   }
@@ -43,4 +45,5 @@ const ThemeWrapper = styled.div`
   .pointer {
     cursor: pointer;
   }
+
 `;

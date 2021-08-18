@@ -327,7 +327,7 @@ const ListOrganizations = styled.li`
 const ListWrapper: any = styled.div`
   padding: ${convertToRem(6)} 0;
   position: fixed;
-  top: ${convertToRem(42)};
+  top: ${convertToRem(77)};
   background: ${(props: IThemeProps) =>
     props?.theme?.theme === "dark"
       ? props?.theme?.colors?.topbar
