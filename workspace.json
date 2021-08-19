@@ -1,6 +1,56 @@
 {
   "version": 2,
   "projects": {
+    "contacts": {
+      "root": "apps/contacts",
+      "sourceRoot": "apps/contacts/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/contacts",
+            "main": "apps/contacts/src/main.ts",
+            "tsConfig": "apps/contacts/tsconfig.app.json",
+            "assets": ["apps/contacts/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/contacts/src/environments/environment.ts",
+                  "with": "apps/contacts/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "contacts:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/contacts/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/contacts"],
+          "options": {
+            "jestConfig": "apps/contacts/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "main-api": {
       "root": "apps/main-api",
       "sourceRoot": "apps/main-api/src",

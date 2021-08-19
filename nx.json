@@ -28,6 +28,9 @@
     ]
   },
   "projects": {
+    "contacts": {
+      "tags": []
+    },
     "main-api": {
       "tags": []
     },
