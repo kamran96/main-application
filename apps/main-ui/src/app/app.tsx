@@ -5,7 +5,7 @@ import AppContainer from "../Containers/App/AppContainer";
 import { ReactQueryConfigProvider } from "react-query";
 
 /* Ant design css */
-import "antd/dist/antd.css";
+// import "antd/dist/antd.css";
 import { GlobalManager } from "../hooks/globalContext/globalManager";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";

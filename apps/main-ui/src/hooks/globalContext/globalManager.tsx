@@ -1,28 +1,50 @@
-import { message } from "antd";
-import React, { FC, useEffect, useState } from "react";
-import { queryCache, useMutation, useQuery } from "react-query";
-import styled from "styled-components";
-import { getAllRolesWithPermission, getUserAPI, uploadPdfAPI } from "../../api";
+import { message } from 'antd';
+import React, { FC, useEffect, useState } from 'react';
+import { queryCache, useMutation, useQuery } from 'react-query';
+import styled from 'styled-components';
+import { getAllRolesWithPermission, getUserAPI, uploadPdfAPI } from '../../api';
 import {
   IBaseAPIError,
   IErrorMessages,
   IServerError,
   NOTIFICATIONTYPE,
-} from "../../modal";
-import { IAuth, IUser } from "../../modal/auth";
-import { IRolePermissions } from "../../modal/rbac";
-import { DecriptionData, EncriptData } from "../../utils/encription";
-import { useTheme } from "../useTheme";
-import { globalContext } from "./globalContext";
-import { useHistory } from "react-router-dom";
+} from '../../modal';
+import { IAuth, IUser } from '../../modal/auth';
+import { IRolePermissions } from '../../modal/rbac';
+import { DecriptionData, EncriptData } from '../../utils/encription';
+import { useTheme } from '../useTheme';
+import { globalContext } from './globalContext';
+import { useHistory } from 'react-router-dom';
+
+type Theme = 'light' | 'dark';
+
+const stylesheets = {
+  light: `https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.12/antd.min.css`,
+  dark: `https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.12/antd.dark.min.css`,
+};
+
+const createStylesheetLink = (): HTMLLinkElement => {
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.id = 'antd-stylesheet';
+  document.head.appendChild(link);
+  return link;
+};
+
+const getStylesheetLink = (): HTMLLinkElement =>
+  document.head.querySelector('#antd-stylesheet') || createStylesheetLink();
+
+const toggleTheme = (t: Theme) => {
+  getStylesheetLink().href = stylesheets[t];
+};
 
 interface IProps {
   children: React.ReactElement<any>;
 }
 
 export enum ILoginActions {
-  LOGIN = "SET_LOGIN",
-  LOGOUT = "SET_LOGOUT",
+  LOGIN = 'SET_LOGIN',
+  LOGOUT = 'SET_LOGOUT',
 }
 
 interface IAction {
@@ -37,7 +59,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     { isLoading: sendingPDF, isSuccess: pdfUploaded, reset: resetUPloadPDF },
   ] = useMutation(uploadPdfAPI);
   const [isOnline, setIsOnline] = useState(true);
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState<Theme>('light');
 
   const [isUserLogin, setIsUserLogin] = useState(false);
   const [auth, setAuth] = useState<IAuth>(null);
@@ -106,16 +128,15 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   const [rolePermissions, setRolePermissions] = useState<IRolePermissions[]>(
     []
   );
-  
 
   const [verifiedModal, setVerifiedModal] = useState(false);
 
   const [toggle, setToggle] = useState(true);
 
-  window.addEventListener("offline", (event) => {
+  window.addEventListener('offline', (event) => {
     setIsOnline(false);
   });
-  window.addEventListener("online", (event) => {
+  window.addEventListener('online', (event) => {
     setIsOnline(true);
   });
 
@@ -124,7 +145,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
       onSuccess: () => {
         notificationCallback(
           NOTIFICATIONTYPE.SUCCESS,
-          "Uploaded PDF successfully"
+          'Uploaded PDF successfully'
         );
       },
 
@@ -147,18 +168,18 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     });
   };
 
-const history = useHistory();
+  const history = useHistory();
 
   const handleLogin = (action: IAction) => {
     switch (action.type) {
       case ILoginActions.LOGIN:
         setIsUserLogin(true);
         setAuth(action.payload);
-        localStorage.setItem("auth", EncriptData(action.payload));
+        localStorage.setItem('auth', EncriptData(action.payload));
 
         break;
       case ILoginActions.LOGOUT:
-        localStorage.removeItem("auth");
+        localStorage.removeItem('auth');
         setAuth(null);
         setIsUserLogin(false);
         queryCache.clear();
@@ -168,8 +189,8 @@ const history = useHistory();
     }
   };
 
-  const checkIsAuthSaved = localStorage.getItem("auth");
-  const isSidebarOpen: boolean = JSON.parse(localStorage.getItem("isToggle"));
+  const checkIsAuthSaved = localStorage.getItem('auth');
+  const isSidebarOpen: boolean = JSON.parse(localStorage.getItem('isToggle'));
 
   useEffect(() => {
     if (isSidebarOpen !== null) {
@@ -212,6 +233,10 @@ const history = useHistory();
       },
     }
   );
+
+  useEffect(() => {
+    toggleTheme(theme);
+  }, [theme]);
 
   const {
     data: allRolesAndPermissionsData,
@@ -256,7 +281,7 @@ const history = useHistory();
         setTheme(result?.theme);
       }
       setUserDetails({ ...userData });
-    } else if (errResp?.message === "Network Error") {
+    } else if (errResp?.message === 'Network Error') {
       notificationCallback(
         NOTIFICATIONTYPE.ERROR,
         `${errResp.message} please check your Internet Connection`
@@ -317,8 +342,6 @@ const history = useHistory();
   //   });
   // }, []);
 
- 
-
   message.config({
     top: 101,
   });
@@ -345,10 +368,10 @@ const history = useHistory();
 
   const { theme: appTheme, themeLoading } = useTheme(theme);
 
-  
-
   const checkingUser =
     isFetched && permissionsFetched ? false : isLoading || permissionsFetching;
+
+  console.log(checkingUser, 'user check');
 
   return (
     <globalContext.Provider
@@ -359,7 +382,7 @@ const history = useHistory();
         userDetails, // user details
         setUserDetails, // to set user details
         handleLogin, // handle login from signup and login page
-        routeHistory: {history}, // to get route history
+        routeHistory: { history, location: history?.location }, // to get route history
         userInviteModal, // gets user invite model config
         setUserInviteModal, // sets user invite modal config
         notificationCallback, // responsible for notifications callbacs
@@ -377,7 +400,7 @@ const history = useHistory();
         setOrganizationConfig: (visibility: boolean, id: number = null) => {
           setOrganizationConfig({ visibility: visibility, id: id });
         },
-        isCheckingLoginUser: checkingUser,
+        isCheckingLoginUser: false,
         pricingModalConfig,
         setPricingModalConfig: (
           visibility: boolean,
@@ -443,15 +466,16 @@ const history = useHistory();
         setTheme: (payload) => {
           setTheme(payload);
         },
-        verifiedModal, setVerifiedModal
+        verifiedModal,
+        setVerifiedModal,
       }}
     >
       <WrapperChildren>
         {/* <div className="network-problem">
         Check your internet connection 
       </div> */}
-      <div onClick={()=>setTheme('dark')}>dark mode</div>
-      <div onClick={()=>setTheme('light')}>light mode</div>
+        {/* <div onClick={()=>setTheme('dark')}>dark mode</div>
+      <div onClick={()=>setTheme('light')}>light mode</div> */}
 
         {children}
       </WrapperChildren>

@@ -1,28 +1,30 @@
-import React, { FC, useState } from "react";
-import styled from "styled-components";
-import { Color, NOTIFICATIONTYPE } from "../../../modal";
-import { Icon } from "@iconify/react";
-import addAlt from "@iconify/icons-carbon/add-alt";
-import arrowDown from "@iconify-icons/fe/arrow-down";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import convertToRem from "../../../utils/convertToRem";
-import { Link } from "react-router-dom";
-import { ISupportedRoutes } from "../../../modal/routing";
-import { UserOutlined } from "@ant-design/icons";
-import { Avatar, Button } from "antd";
-import { OrganizationMenu } from "./OrganizationMenu";
-import Clickoutside from "../../Clickoutside";
-import { getOrganizations } from "../../../api/organizations";
-import { queryCache, useMutation, useQuery } from "react-query";
-import { IOrganizations, IOrganizationType } from "../../../modal/organization";
-import { P } from "../../Typography";
-import { activeBranchAPI, updateThemeAPI } from "../../../api";
-import checkIcon from "@iconify-icons/fe/check";
-import { Rbac } from "../../Rbac";
-import { PERMISSIONS } from "../../Rbac/permissions";
-import { Switch } from "antd";
-import { IThemeProps } from "../../../hooks/useTheme/themeColors";
-import { ILoginActions } from "../../../hooks/globalContext/globalManager";
+import React, { FC, useRef, useState } from 'react';
+import styled from 'styled-components';
+import { Color, NOTIFICATIONTYPE } from '../../../modal';
+import { Icon } from '@iconify/react';
+import addAlt from '@iconify/icons-carbon/add-alt';
+import settings from '@iconify-icons/feather/settings';
+import arrowDown from '@iconify-icons/fe/arrow-down';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import convertToRem from '../../../utils/convertToRem';
+import { Link } from 'react-router-dom';
+import { ISupportedRoutes } from '../../../modal/routing';
+import { UserOutlined } from '@ant-design/icons';
+import { Avatar, Button, Menu, Popover } from 'antd';
+import { OrganizationMenu } from './OrganizationMenu';
+import Clickoutside from '../../Clickoutside';
+import { getOrganizations } from '../../../api/organizations';
+import { queryCache, useMutation, useQuery } from 'react-query';
+import { IOrganizations, IOrganizationType } from '../../../modal/organization';
+import { H2, H3, P } from '../../Typography';
+import { activeBranchAPI, updateThemeAPI } from '../../../api';
+import checkIcon from '@iconify-icons/fe/check';
+import { Rbac } from '../../Rbac';
+import { PERMISSIONS } from '../../Rbac/permissions';
+import { Switch } from 'antd';
+import { IThemeProps } from '../../../hooks/useTheme/themeColors';
+import { ILoginActions } from '../../../hooks/globalContext/globalManager';
+import { Seprator } from '../../Seprator';
 
 export const UserAccountArea: FC = () => {
   const [mutateActiveBranch] = useMutation(activeBranchAPI);
@@ -66,13 +68,12 @@ export const UserAccountArea: FC = () => {
   };
 
   const getActiveBranch = (id: Number | string) => {
-    const activeOrgBranches =
-      getActiveOrganization(organizationId)?.branches;
+    const activeOrgBranches = getActiveOrganization(organizationId)?.branches;
     if (activeOrgBranches?.length > 0) {
       const [filtered] = activeOrgBranches.filter((item) => item.id === id);
       return filtered;
-    }else{
-      return null
+    } else {
+      return null;
     }
   };
 
@@ -90,7 +91,7 @@ export const UserAccountArea: FC = () => {
     try {
       await mutateActiveBranch(payload, {
         onSuccess: () => {
-          notificationCallback(NOTIFICATIONTYPE.SUCCESS, "Branch Updated");
+          notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Branch Updated');
           queryCache.clear();
 
           setTimeout(() => {
@@ -111,75 +112,133 @@ export const UserAccountArea: FC = () => {
 
   const activeBranch = organizationId && branchId && getActiveBranch(branchId);
 
-
+  const menu = (
+    <WrapperUserMenu>
+      <div className="flex alignStart ">
+        <div className="mr-10">
+          {attachment && attachment.path ? (
+            <Avatar size={28} src={attachment.path} />
+          ) : (
+            <Avatar size={28} icon={<UserOutlined size={28} />} />
+          )}
+        </div>
+        <div >
+          {userDetails?.profile?.fullName} <br />
+          <Link
+            to={`/app${ISupportedRoutes.SETTINGS}${ISupportedRoutes.PROFILE_SETTING}`}
+          >
+            Edit Profile
+          </Link>
+        </div>
+      </div>
+      <hr />
+      <div>
+        <Link
+          className="link_item flex alignCenter pointer"
+          to={`/app${ISupportedRoutes.SETTINGS}${ISupportedRoutes.ACCOUNT_SETTING}`}
+        >
+          <div className="link_icon">
+            {' '}
+            <Icon icon={settings} />
+          </div>{' '}
+          Settings
+        </Link>
+      </div>
+      <div onClick={handleLogout} className="mt-10 flex alignCenter pointer">
+        <div className="link_icon">
+          {' '}
+          <Icon icon={settings} />
+        </div>{' '}
+        <div className="link_item">Log Out</div>
+      </div>
+      <div className="mt-10 flex alignCenter justifiyFlexEnd" >
+        Dark Mode
+        <Switch
+          className="ml-10"
+          checked={theme === 'dark' ? true : false}
+          onChange={(checked) => handleThemeSwitch(checked ? 'dark' : 'light')}
+        />
+      </div>
+    </WrapperUserMenu>
+  );
 
   return (
     <WrapperUserAccountArea>
       <Clickoutside onClickOutSide={() => setBranchMenu(false)}>
-        {organizationId && getActiveOrganization(organizationId) && branchId && organization?.organizationType!==IOrganizationType.SAAS && (
-          <BranchesMenu
-            onClick={() => setBranchMenu(!branchMenu)}
-            isOpen={branchMenu}
-          >
-            <div className="active_store">
-              <div className="branch_wrapper flex alignCenter justifySpaceBetween">
-                <P className="flex alignCenter justifySpaceBetween">
-                  {activeBranch ? <>{activeBranch.name}</> : ""}
-                </P>
-                <i className="branch_cheveron_icon flex alignCenter ml-5">
-                  <Rbac permission={PERMISSIONS.BRANCHES_CREATE}>
-                    <Icon icon={arrowDown} />
-                  </Rbac>
-                </i>
+        {organizationId &&
+          getActiveOrganization(organizationId) &&
+          branchId &&
+          organization?.organizationType !== IOrganizationType.SAAS && (
+            <BranchesMenu
+              onClick={() => setBranchMenu(!branchMenu)}
+              isOpen={branchMenu}
+            >
+              <div className="active_store">
+                <div className="branch_wrapper flex alignCenter justifySpaceBetween">
+                  <P className="flex alignCenter justifySpaceBetween">
+                    {activeBranch ? <>{activeBranch.name}</> : ''}
+                  </P>
+                  <i className="branch_cheveron_icon flex alignCenter ml-5">
+                    <Rbac permission={PERMISSIONS.BRANCHES_CREATE}>
+                      <Icon icon={arrowDown} />
+                    </Rbac>
+                  </i>
+                </div>
               </div>
-            </div>
-            <Rbac permission={PERMISSIONS.BRANCHES_CREATE}>
-              <ul className="branches_list">
-                {organizationId &&
-                  getActiveOrganization(organizationId) &&
-                  getActiveOrganization(organizationId).branches.map(
-                    (branch, index) => {
-                      return (
-                        <li
-                          onClick={() => {
-                            handleActiveBranch(
-                              branch.id,
-                              branch.organizationId
-                            );
-                          }}
-                          className={`${
-                            branch.id === branchId
-                              ? "active-branch flex alignItems justifySpaceBetween"
-                              : ""
-                          }`}
-                          key={index}
-                        >
-                          {branch.name}
-                          <i className="_branch_active_icon">
-                            {branch.id === branchId && (
-                              <Icon icon={checkIcon} />
-                            )}
-                          </i>
-                        </li>
-                      );
-                    }
-                  )}
-                <li
-                  onClick={() => {
-                    setBranchModalConfig(true, organizationId);
-                  }}
-                  className="flex alignCenter justifyCenter"
-                >
-                  <Button type="link" size="small">
-                    Add Store
-                  </Button>
-                </li>
-              </ul>
-            </Rbac>
-          </BranchesMenu>
-        )}
+              <Rbac permission={PERMISSIONS.BRANCHES_CREATE}>
+                <ul className="branches_list">
+                  {organizationId &&
+                    getActiveOrganization(organizationId) &&
+                    getActiveOrganization(organizationId).branches.map(
+                      (branch, index) => {
+                        return (
+                          <li
+                            onClick={() => {
+                              handleActiveBranch(
+                                branch.id,
+                                branch.organizationId
+                              );
+                            }}
+                            className={`${
+                              branch.id === branchId
+                                ? 'active-branch flex alignItems justifySpaceBetween'
+                                : ''
+                            }`}
+                            key={index}
+                          >
+                            {branch.name}
+                            <i className="_branch_active_icon">
+                              {branch.id === branchId && (
+                                <Icon icon={checkIcon} />
+                              )}
+                            </i>
+                          </li>
+                        );
+                      }
+                    )}
+                  <li
+                    onClick={() => {
+                      setBranchModalConfig(true, organizationId);
+                    }}
+                    className="flex alignCenter justifyCenter"
+                  >
+                    <Button type="link" size="small">
+                      Add Store
+                    </Button>
+                  </li>
+                </ul>
+              </Rbac>
+            </BranchesMenu>
+          )}
       </Clickoutside>
-      <Clickoutside onClickOutSide={() => setDropdownVisible(false)}>
+
+      <Popover
+        className="user_popup"
+        placement="bottomRight"
+        content={menu}
+        title={false}
+        trigger="click"
+      >
         <div
           onClick={() => setDropdownVisible(true)}
           className="userDropdown flex alignCenter pointer"
@@ -192,19 +251,17 @@ export const UserAccountArea: FC = () => {
             )}
           </div>
           <P
-            style={{ lineHeight: "1" }}
+            style={{ lineHeight: '1' }}
             className="ml-5 flex alignCenter justifySpaceBetween login_user_details"
           >
             <div>
-              {userDetails &&
-              userDetails.profile &&
-              userDetails.profile.fullName
+              {userDetails?.profile?.fullName
                 ? userDetails.profile.fullName
                 : userDetails.name}
               <br />
               <span className={` online-check`}>
-                <div className={`dot ${isOnline ? "online" : "offline"}`}></div>
-                {isOnline ? "Online" : "Offline"}
+                <div className={`dot ${isOnline ? 'online' : 'offline'}`}></div>
+                {isOnline ? 'Online' : 'Offline'}
               </span>
             </div>
 
@@ -213,53 +270,7 @@ export const UserAccountArea: FC = () => {
             </i>
           </P>
         </div>
-        <ListWrapper isVisible={dropdownVisible}>
-          <ul className="list_wrapper">
-            <Link to={`/app${ISupportedRoutes.SETTINGS}${ISupportedRoutes.PROFILE_SETTING}`}>
-              <li>Edit Profile</li>
-            </Link>
-            <hr className="seprator" />
-            <Link to={`/app${ISupportedRoutes.SETTINGS}${ISupportedRoutes.ACCOUNT_SETTING}`}>
-              <li>Edit Account</li>
-            </Link>
-            <li onClick={handleLogout}>Logout</li>
-            <hr className="seprator" />
-            {/* <div className="org_list_wrapper">
-              {organizations.map((org, index) => {
-                return (
-                  <OrganizationMenu key={index} organizationDetails={org} />
-                );
-              })}
-            </div> */}
-            {/* <Rbac permission={PERMISSIONS.ORGANIZATIONS_CREATE}>
-              <ListOrganizations onClick={() => setOrganizationConfig(true)}>
-                <i className="add_organization">
-                  <Icon className="add_org_icon" icon={addAlt} />
-                  Add Organization
-                </i>
-              </ListOrganizations>
-            </Rbac> */}
-            <hr className="seprator" />
-            <ListOrganizations>Files</ListOrganizations>
-            <Link to={`/app${ISupportedRoutes.SETTINGS}`}>
-              <li>Setting</li>
-            </Link>
-            <ListOrganizations>Subscriptions and Bills</ListOrganizations>
-            <hr className="seprator" />
-            <ListOrganizations>Phunar App Store</ListOrganizations>
-            <ListOrganizations className="flex alignCenter justifySpaceBetween">
-              Dark Mode
-              <Switch
-                className="mr-10"
-                checked={theme === "dark" ? true : false}
-                onChange={(checked) =>
-                  handleThemeSwitch(checked ? "dark" : "light")
-                }
-              />
-            </ListOrganizations>
-          </ul>
-        </ListWrapper>
-      </Clickoutside>
+      </Popover>
     </WrapperUserAccountArea>
   );
 };
@@ -329,7 +340,7 @@ const ListWrapper: any = styled.div`
   position: fixed;
   top: ${convertToRem(77)};
   background: ${(props: IThemeProps) =>
-    props?.theme?.theme === "dark"
+    props?.theme?.theme === 'dark'
       ? props?.theme?.colors?.topbar
       : props?.theme?.colors.$WHITE};
   border: ${convertToRem(1)} solid transparent;
@@ -339,7 +350,7 @@ const ListWrapper: any = styled.div`
   border-radius: ${convertToRem(3)};
   width: ${convertToRem(233)};
   transition: 0.3s all ease-in-out;
-  right: ${(props: any) => (props.isVisible ? `${convertToRem(3)}` : "-600px")};
+  right: ${(props: any) => (props.isVisible ? `${convertToRem(3)}` : '-600px')};
   .list_wrapper {
     list-style: none;
     margin: 0;
@@ -409,7 +420,7 @@ const BranchesMenu = styled.div`
     list-style: none;
     left: 0;
     top: 40px;
-    height: ${(props: any) => (props.isOpen ? "auto" : 0)};
+    height: ${(props: any) => (props.isOpen ? 'auto' : 0)};
     padding: 0;
     overflow: hidden;
     transition: 1s all ease-in-out;
@@ -460,4 +471,30 @@ const BranchesMenu = styled.div`
       height: max-content;
     }
   } */
+`;
+
+const WrapperUserMenu = styled.div`
+  border-right: none !important;
+  background: none !important;
+  width: 230px;
+
+  .ant-menu-item {
+    width: 190px;
+  }
+  .link_item {
+    color: ${(props: IThemeProps) => props?.theme?.colors.textTd};
+  }
+
+  .link_icon {
+    color: #6a6a6a;
+    margin-right: 10px;
+    width: 28px;
+    height: 28px;
+    background-color: #f8f8f8;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
 `;

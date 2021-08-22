@@ -61,10 +61,12 @@ export const CustomDateRange: FC<IProps> = ({
   //   };
   // };
 
+  console.log(value, "check value")
+
   return (
     <WrapperParent>
       <RangePicker
-        value={value}
+        // value={value}
         style={style}
         format={format}
         dropdownClassName="customized-dropdown"
