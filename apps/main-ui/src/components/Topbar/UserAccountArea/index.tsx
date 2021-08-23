@@ -26,6 +26,7 @@ import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 import { ILoginActions } from '../../../hooks/globalContext/globalManager';
 import { Seprator } from '../../Seprator';
 import LogOutIcon from '@iconify-icons/feather/log-out';
+import { BOLDTEXT } from '../../Para/BoldText';
 
 export const UserAccountArea: FC = () => {
   const [mutateActiveBranch] = useMutation(activeBranchAPI);
@@ -124,7 +125,7 @@ export const UserAccountArea: FC = () => {
           )}
         </div>
         <div>
-          {userDetails?.profile?.fullName} <br />
+          <BOLDTEXT>{userDetails?.profile?.fullName}</BOLDTEXT> <br />
           <Link
             className="link_item flex alignCenter pointer"
             to={`/app${ISupportedRoutes.SETTINGS}${ISupportedRoutes.PROFILE_SETTING}`}
