@@ -127,6 +127,7 @@ export const LoginForm: FC = () => {
                   style={{ width: "100%" }}
                   type="primary"
                   size="middle"
+                  loading={isLoading}
                 >
                   Sign In
                 </Button>
