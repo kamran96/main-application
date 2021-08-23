@@ -1,5 +1,5 @@
 import React, { FC, useRef, useState } from 'react';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import { Color, NOTIFICATIONTYPE } from '../../../modal';
 import { Icon } from '@iconify/react';
 import addAlt from '@iconify/icons-carbon/add-alt';
@@ -25,6 +25,7 @@ import { Switch } from 'antd';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 import { ILoginActions } from '../../../hooks/globalContext/globalManager';
 import { Seprator } from '../../Seprator';
+import LogOutIcon from '@iconify-icons/feather/log-out';
 
 export const UserAccountArea: FC = () => {
   const [mutateActiveBranch] = useMutation(activeBranchAPI);
@@ -122,13 +123,15 @@ export const UserAccountArea: FC = () => {
             <Avatar size={28} icon={<UserOutlined size={28} />} />
           )}
         </div>
-        <div >
+        <div>
           {userDetails?.profile?.fullName} <br />
           <Link
+            className="link_item flex alignCenter pointer"
             to={`/app${ISupportedRoutes.SETTINGS}${ISupportedRoutes.PROFILE_SETTING}`}
           >
             Edit Profile
-          </Link>
+            </Link>
+          
         </div>
       </div>
       <hr />
@@ -147,12 +150,12 @@ export const UserAccountArea: FC = () => {
       <div onClick={handleLogout} className="mt-10 flex alignCenter pointer">
         <div className="link_icon">
           {' '}
-          <Icon icon={settings} />
+          <Icon icon={LogOutIcon} />
         </div>{' '}
         <div className="link_item">Log Out</div>
       </div>
-      <div className="mt-10 flex alignCenter justifiyFlexEnd" >
-        Dark Mode
+      <div className="mt-10 flex alignCenter justifiyFlexEnd">
+        <p className="mr-10 mb-0">Dark Mode</p>
         <Switch
           className="ml-10"
           checked={theme === 'dark' ? true : false}
@@ -231,13 +234,13 @@ export const UserAccountArea: FC = () => {
             </BranchesMenu>
           )}
       </Clickoutside>
-
+      <GlobalStyled />
       <Popover
         className="user_popup"
         placement="bottomRight"
         content={menu}
         title={false}
-        trigger="click"
+        trigger="hover"
       >
         <div
           onClick={() => setDropdownVisible(true)}
@@ -497,4 +500,11 @@ const WrapperUserMenu = styled.div`
     justify-content: center;
     font-size: 18px;
   }
+`;
+
+const GlobalStyled = createGlobalStyle`
+.ant-popover{
+  max-width: 265px
+}
+
 `;
