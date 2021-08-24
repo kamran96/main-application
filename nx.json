@@ -31,6 +31,9 @@
     "contacts": {
       "tags": []
     },
+    "email-service": {
+      "tags": []
+    },
     "main-api": {
       "tags": []
     },

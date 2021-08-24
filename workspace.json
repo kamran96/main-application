@@ -51,6 +51,56 @@
         }
       }
     },
+    "email-service": {
+      "root": "apps/email-service",
+      "sourceRoot": "apps/email-service/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/email-service",
+            "main": "apps/email-service/src/main.ts",
+            "tsConfig": "apps/email-service/tsconfig.app.json",
+            "assets": ["apps/email-service/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/email-service/src/environments/environment.ts",
+                  "with": "apps/email-service/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "email-service:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/email-service/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/email-service"],
+          "options": {
+            "jestConfig": "apps/email-service/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "main-api": {
       "root": "apps/main-api",
       "sourceRoot": "apps/main-api/src",
