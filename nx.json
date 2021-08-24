@@ -40,6 +40,9 @@
     "main-ui-e2e": {
       "tags": [],
       "implicitDependencies": ["main-ui"]
+    },
+    "users-service": {
+      "tags": []
     }
   }
 }
