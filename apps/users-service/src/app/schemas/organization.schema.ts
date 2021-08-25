@@ -13,7 +13,7 @@ export class Organization {
   @Prop()
   website: string;
   @Prop()
-  organizationType: number;
+  organizationType: string;
   @Prop()
   phoneNumber: string;
   @Prop()
