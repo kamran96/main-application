@@ -4,12 +4,14 @@ const client = new postmark.Client(process.env.POSTMARK_TOKEN);
 
 @Injectable()
 export class AppService {
+  constructor() {}
+
   async SendEmail(data) {
-    client.sendEmail({
+    client.sendEmailWithTemplate({
       From: 'zeeshan@invyce.com',
-      To: 'zeeshan@invyce.com',
-      Subject: 'Test',
-      TextBody: 'Test message',
+      To: 'zeesan@invyce.com',
+      TemplateAlias: data.TemplateAlias,
+      TemplateModel: data.TemplateModel,
     });
   }
 }

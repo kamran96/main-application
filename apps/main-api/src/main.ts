@@ -9,25 +9,11 @@ import * as cookieParser from 'cookie-parser';
 import * as bodyParser from 'body-parser';
 import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 const port = process.env.PORT || 8081;
 
 async function bootstrap() {
-  const app: any = await NestFactory.createMicroservice<MicroserviceOptions>(
-    AppModule,
-    {
-      transport: Transport.RMQ,
-      options: {
-        urls: ['amqp://localhost:5672'],
-        queue: 'email_queue',
-        queueOptions: {
-          durable: false,
-        },
-      },
-    }
-  );
-
+  const app = await NestFactory.create(AppModule);
   app.use(bodyParser.json({ limit: '5mb' }));
   app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
   app.enableCors();

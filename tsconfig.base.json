@@ -15,7 +15,9 @@
     "skipDefaultLibCheck": true,
     "resolveJsonModule": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@invyce/send-email": ["libs/send-email/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

@@ -1,10 +1,18 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
+import { ClientProxy } from '@nestjs/microservices';
 import * as bcrypt from 'bcryptjs';
 import * as Moment from 'moment';
 import * as queryString from 'query-string';
 import { User } from '../schemas/user.schema';
+import { SEND_CUSTOMER_EMAIL } from '@invyce/send-email';
 import { UserToken } from '../schemas/userToken.schema';
 
 const generateRandomNDigits = (n) => {
@@ -16,8 +24,10 @@ export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel,
     @InjectModel(UserToken.name) private userTokenModel,
+    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy,
     private jwtService: JwtService
   ) {}
+
   async CheckUser(authDto) {
     try {
       const user = await this.userModel.find({
@@ -154,6 +164,15 @@ export class AuthService {
     const link = `<h1>OTP for account verification is 
       <h4>${otp}<h4>
     </h1>`;
+
+    const payload = {
+      email: 'zeeshan@invyce.com',
+      subject: 'For test',
+      message: 'Account verification',
+      from: 'zeeshan@invyce.com',
+    };
+
+    await this.emailService.emit(SEND_CUSTOMER_EMAIL, payload);
 
     // await this.email
     //   .compose(

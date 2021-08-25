@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { JwtModule } from '@nestjs/jwt';
 import { User, UserSchema } from '../schemas/user.schema';
 import { AuthController } from './auth.controller';
@@ -17,6 +18,19 @@ import { UserToken, UserTokenSchema } from '../schemas/userToken.schema';
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: UserToken.name, schema: UserTokenSchema },
+    ]),
+    ClientsModule.register([
+      {
+        name: 'EMAIL_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://localhost:5672'],
+          queue: 'email_queue',
+          queueOptions: {
+            durable: false,
+          },
+        },
+      },
     ]),
   ],
   controllers: [AuthController],

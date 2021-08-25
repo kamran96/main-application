@@ -28,7 +28,7 @@
     ]
   },
   "projects": {
-    "contacts": {
+    "contacts-service": {
       "tags": []
     },
     "email-service": {
@@ -43,6 +43,9 @@
     "main-ui-e2e": {
       "tags": [],
       "implicitDependencies": ["main-ui"]
+    },
+    "send-email": {
+      "tags": []
     },
     "users-service": {
       "tags": []

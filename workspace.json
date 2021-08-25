@@ -1,19 +1,19 @@
 {
   "version": 2,
   "projects": {
-    "contacts": {
-      "root": "apps/contacts",
-      "sourceRoot": "apps/contacts/src",
+    "contacts-service": {
+      "root": "apps/contacts-service",
+      "sourceRoot": "apps/contacts-service/src",
       "projectType": "application",
       "targets": {
         "build": {
           "executor": "@nrwl/node:build",
           "outputs": ["{options.outputPath}"],
           "options": {
-            "outputPath": "dist/apps/contacts",
-            "main": "apps/contacts/src/main.ts",
-            "tsConfig": "apps/contacts/tsconfig.app.json",
-            "assets": ["apps/contacts/src/assets"]
+            "outputPath": "dist/apps/contacts-service",
+            "main": "apps/contacts-service/src/main.ts",
+            "tsConfig": "apps/contacts-service/tsconfig.app.json",
+            "assets": ["apps/contacts-service/src/assets"]
           },
           "configurations": {
             "production": {
@@ -22,8 +22,8 @@
               "inspect": false,
               "fileReplacements": [
                 {
-                  "replace": "apps/contacts/src/environments/environment.ts",
-                  "with": "apps/contacts/src/environments/environment.prod.ts"
+                  "replace": "apps/contacts-service/src/environments/environment.ts",
+                  "with": "apps/contacts-service/src/environments/environment.prod.ts"
                 }
               ]
             }
@@ -32,20 +32,20 @@
         "serve": {
           "executor": "@nrwl/node:execute",
           "options": {
-            "buildTarget": "contacts:build"
+            "buildTarget": "contacts-service:build"
           }
         },
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["apps/contacts/**/*.ts"]
+            "lintFilePatterns": ["apps/contacts-service/**/*.ts"]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/contacts"],
+          "outputs": ["coverage/apps/contacts-service"],
           "options": {
-            "jestConfig": "apps/contacts/jest.config.js",
+            "jestConfig": "apps/contacts-service/jest.config.js",
             "passWithNoTests": true
           }
         }
@@ -249,6 +249,27 @@
           "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["apps/main-ui-e2e/**/*.{js,ts}"]
+          }
+        }
+      }
+    },
+    "send-email": {
+      "root": "libs/send-email",
+      "sourceRoot": "libs/send-email/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/send-email/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/send-email"],
+          "options": {
+            "jestConfig": "libs/send-email/jest.config.js",
+            "passWithNoTests": true
           }
         }
       }
