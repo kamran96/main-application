@@ -175,7 +175,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
       case ILoginActions.LOGIN:
         setIsUserLogin(true);
         setAuth(action.payload);
-        localStorage.setItem('auth', EncriptData(action.payload));
+        localStorage.setItem('auth', EncriptData(action.payload) as any);
 
         break;
       case ILoginActions.LOGOUT:

@@ -152,6 +152,159 @@
           }
         }
       }
+    },
+    "pixels-to-rem": {
+      "root": "libs/pixels-to-rem",
+      "sourceRoot": "libs/pixels-to-rem/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/pixels-to-rem/**/*.{ts,tsx,js,jsx}"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/pixels-to-rem"],
+          "options": {
+            "jestConfig": "libs/pixels-to-rem/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "review-invyce-theme": {
+      "root": "libs/review/invyce-theme",
+      "sourceRoot": "libs/review/invyce-theme/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/review/invyce-theme/**/*.{ts,tsx,js,jsx}"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/review/invyce-theme"],
+          "options": {
+            "jestConfig": "libs/review/invyce-theme/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "shared-global-state-manager": {
+      "root": "libs/shared/global-state-manager",
+      "sourceRoot": "libs/shared/global-state-manager/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/shared/global-state-manager/**/*.{ts,tsx,js,jsx}"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/shared/global-state-manager"],
+          "options": {
+            "jestConfig": "libs/shared/global-state-manager/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "shared-invyce-theme": {
+      "root": "libs/shared/invyce-theme",
+      "sourceRoot": "libs/shared/invyce-theme/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/shared/invyce-theme/**/*.{ts,tsx,js,jsx}"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/shared/invyce-theme"],
+          "options": {
+            "jestConfig": "libs/shared/invyce-theme/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "shared-types": {
+      "root": "libs/shared/types",
+      "sourceRoot": "libs/shared/types/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/shared/types/**/*.{ts,tsx,js,jsx}"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/shared/types"],
+          "options": {
+            "jestConfig": "libs/shared/types/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "shared-utils": {
+      "root": "libs/shared/utils",
+      "sourceRoot": "libs/shared/utils/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/shared/utils/**/*.{ts,tsx,js,jsx}"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/shared/utils"],
+          "options": {
+            "jestConfig": "libs/shared/utils/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "sidebar-ui": {
+      "root": "libs/sidebar-ui",
+      "sourceRoot": "libs/sidebar-ui/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/sidebar-ui/**/*.{ts,tsx,js,jsx}"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/sidebar-ui"],
+          "options": {
+            "jestConfig": "libs/sidebar-ui/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
   "cli": {
