@@ -149,6 +149,9 @@ h6 {
 .flex {
   display: flex !important;
 }
+.d-none {
+  display: none !important;
+}
 
 .alignCenter {
   align-items: center !important;

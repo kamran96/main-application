@@ -1,21 +1,21 @@
-import styled, { createGlobalStyle } from 'styled-components';
 import { convertToRem } from '@invyce/pixels-to-rem';
 import { IThemeProps } from '@invyce/shared/invyce-theme';
 import { DivProps } from '@invyce/shared/types';
+import styled, { createGlobalStyle } from 'styled-components';
 
 interface ISidebarWrapperProps extends DivProps {
   toggle: boolean;
 }
 
 export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
-  top: ${convertToRem(39)};
-  height: calc(100vh - 28px);
+  position: relative;
+  height: calc(100vh - 0px);
   background: ${(props: IThemeProps) => props.theme.colors.sidebarBg};
   /* max-width:  */
   padding-top: ${convertToRem(10)};
-  padding-bottom: ${convertToRem(52)};
+  padding-bottom: ${convertToRem(10)};
   z-index: 1;
-  transition: 0.4s all ease-in-out;
+  transition: 0.3s all ease-in-out;
   left: 0;
   width: ${(props: IThemeProps) =>
     props?.toggle ? convertToRem(206) : convertToRem(65)};
@@ -27,21 +27,20 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
   .head {
     position: relative;
     padding: 0.5rem 0.5rem 0.5rem 1.5625rem;
-    transition: 0.4s all ease-in-out;
+    transition: 0.3s all ease-in-out;
 
     visibility: ${(props: IThemeProps) =>
       props?.toggle ? 'visible' : 'hidden'};
-    opacity: ${(props: IThemeProps) =>
-      props?.toggle ? 1 : 0};
+    opacity: ${(props: IThemeProps) => (props?.toggle ? 1 : 0)};
     white-space: nowrap;
     opacity: ${(props: IThemeProps) => (props?.toggle ? '1' : '0')};
     left: ${(props: IThemeProps) => (props?.toggle ? '0' : convertToRem(-200))};
-    transition: 0.4s all ease-in-out;
+    transition: 0.3s all ease-in-out;
   }
 
   .logo_area {
     flex-direction: ${(props: ISidebarWrapperProps) =>
-      !props?.toggle ? 'column-reverse' : 'row'};
+      !props?.toggle ? 'column' : 'row'};
   }
   .logo_area span {
     margin-left: ${(props: ISidebarWrapperProps) =>
@@ -49,15 +48,27 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
   }
 
   .collapse {
+    background: ${(props: IThemeProps) =>
+      props?.theme?.theme === 'light' ? `#f6f8fa` : `#383838`};
+    height: 26px;
+    width: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
     color: #7d7d7d;
     position: relative;
-    transition: 0.5s all ease-in-out;
+    transition: 0.3s all ease-in-out;
+    box-shadow: 0px 0px 4px 0px transparent;
     ${(props: ISidebarWrapperProps) =>
       props?.toggle
-      ? ` 
+        ? ` 
       left: 20px;
       transform: rotateY(180deg) `
-        : ``}
+        : ``};
+    &:hover {
+      box-shadow: 0px 0px 4px 0px #1e75f159;
+    }
   }
 
   .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
@@ -79,6 +90,12 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
 
   /* Main Routes Settings */
 
+  .routes {
+    height: calc(100vh - 160px);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
   .route_list {
     list-style: none;
     padding: 0;
@@ -87,7 +104,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
       padding: 6px 24px;
       min-height: 34px;
       width: 100%;
-      transition: 0.4s all ease-in-out;
+      transition: 0.3s all ease-in-out;
       color: ${(props: IThemeProps) =>
         props?.theme?.colors?.sidebarDefaultText};
       &:hover {
@@ -102,7 +119,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
         padding: 6px 24px;
         min-height: 34px;
         width: 100%;
-        transition: 0.4s all ease-in-out;
+        transition: 0.3s all ease-in-out;
         color: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarDefaultText};
 
@@ -141,7 +158,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
     white-space: nowrap;
     opacity: ${(props: IThemeProps) => (props?.toggle ? '1' : '0')};
     left: ${(props: IThemeProps) => (props?.toggle ? '0' : convertToRem(-200))};
-    transition: 0.4s all ease-in-out;
+    transition: 0.3s all ease-in-out;
   }
   .quickaccess_routes {
     .route_list {
@@ -152,8 +169,66 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
     }
   }
 
-  hr{
-    border-color: ${(props: IThemeProps)=> props?.theme?.colors?.seprator}
+  .sidebar_bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+  }
+  .sidebar_bottom .route_list_item {
+    padding: 6px 24px;
+
+    min-height: 34px;
+    max-width: 100%;
+    transition: 0.3s all ease-in-out;
+    color: ${(props: IThemeProps) => props?.theme?.colors?.sidebarDefaultText};
+  }
+
+  .sidebar_bottom .theme_changer {
+    ${(props: ISidebarWrapperProps) =>
+      !props?.toggle
+        ? `
+        padding-left: 17px !important;
+    `
+        : `
+        
+        `}
+  }
+
+  .sidebar_bottom .theme_button {
+    display: flex;
+    align-items: center;
+    border-radius: 50px;
+    ${(props: ISidebarWrapperProps) =>
+      !props?.toggle
+        ? `
+        width: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        span{
+          margin: 0 !important
+        }
+    `
+        : `
+        
+        `}
+
+    .title {
+      ${(props: ISidebarWrapperProps) =>
+        props?.toggle
+          ? `
+      display: block;
+      
+      `
+          : `
+          display: none
+      `}
+    }
+  }
+
+  hr {
+    border: 1px solid ${(props: IThemeProps) => props?.theme?.colors?.seprator};
   }
 `;
 
@@ -167,7 +242,7 @@ export const PopOverListWrapper = styled.ul`
       padding: 6px 24px;
       min-height: 34px;
       width: 100%;
-      transition: 0.4s all ease-in-out;
+      transition: 0.3s all ease-in-out;
       color: ${(props: IThemeProps) =>
         props?.theme?.colors?.sidebarDefaultText};
 
