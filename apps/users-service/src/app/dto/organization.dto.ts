@@ -15,6 +15,8 @@ export class OrganizationDto {
   phoneNumber: string;
   faxNumber: string;
   prefix: string;
+  userId: number;
+  roleId: number;
   address: {
     description: string;
     city: string;

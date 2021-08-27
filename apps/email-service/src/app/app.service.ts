@@ -7,9 +7,9 @@ export class AppService {
   constructor() {}
 
   async SendEmail(data) {
-    client.sendEmailWithTemplate({
+    await client.sendEmailWithTemplate({
       From: 'zeeshan@invyce.com',
-      To: 'zeesan@invyce.com',
+      To: 'zeeshan@invyce.com',
       TemplateAlias: data.TemplateAlias,
       TemplateModel: data.TemplateModel,
     });

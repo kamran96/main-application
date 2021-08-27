@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { RbacService } from '../rbac/rbac.service';
 import { Branch } from '../schemas/branch.schema';
 import { Organization } from '../schemas/organization.schema';
 import { OrganizationUser } from '../schemas/organizationUser.schema';
@@ -11,7 +12,8 @@ export class OrganizationService {
     @InjectModel(Organization.name) private organizationModel,
     @InjectModel(OrganizationUser.name) private organizationUserModel,
     @InjectModel(Branch.name) private branchModel,
-    @InjectModel(User.name) private userModel
+    @InjectModel(User.name) private userModel,
+    private rbacService: RbacService
   ) {}
 
   async CreateOrUpdateOrganization(
@@ -94,10 +96,10 @@ export class OrganizationService {
 
         const organizationUser = await this.organizationUserModel();
         organizationUser.organizationId = organization.id;
-        organizationUser.userId = organizationData.userId;
-        organizationUser.roleId = organizationData.roleId;
-        organizationUser.createdById = organizationData.userId;
-        organizationUser.updatedById = organizationData.userId;
+        organizationUser.userId = organizationDto.userId;
+        organizationUser.roleId = organizationDto.roleId;
+        organizationUser.createdById = organizationDto.userId;
+        organizationUser.updatedById = organizationDto.userId;
         organizationUser.status = 1;
         await organizationUser.save();
 
@@ -111,20 +113,23 @@ export class OrganizationService {
 
         // await this.accountService.initAccounts(organization, organizationData);
 
-        // const roles = await this.rbacService.InsertRoles(organization.id);
-        // await this.rbacService.InsertRolePermission(organization.id);
+        const roles = await this.rbacService.InsertRoles(
+          organization._id,
+          '61278a50d0f0f487be7b73a8'
+        );
+        await this.rbacService.InsertRolePermission(organization._id);
 
-        // const [adminRole] = roles.filter((r) => r.name === 'admin');
+        const [adminRole] = roles.filter((r) => r.name === 'admin');
 
         // if (organizationData.organizationId === null) {
-        // await this.userModel.updateOne(
-        // { id: organizationData.userId },
-        // {
-        // organizationId: organization.id,
-        //   roleId: adminRole.id,
-        // branchId: branchArr.length > 0 ? branchArr[0].id : null,
-        // }
-        // );
+        await this.userModel.updateOne(
+          { id: '61278a50d0f0f487be7b73a8' },
+          {
+            organizationId: organization._id,
+            roleId: adminRole._id,
+            // branchId: branchArr.length > 0 ? branchArr[0].id : null,
+          }
+        );
 
         //   const new_user = await this.authService.CheckUser({
         //     username: organizationData.user_name,
@@ -132,7 +137,7 @@ export class OrganizationService {
 
         //   const user_with_organization = await this.authService.Login(new_user);
 
-        //   return user_with_organization;
+        // return user_with_organization;
         // } else {
         // return organization;
         // }

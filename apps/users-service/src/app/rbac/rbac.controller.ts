@@ -103,34 +103,37 @@ export class RbacController {
   // @UseGuards(JwtAuthGuard)
   @Get('/permission/show')
   async showPermission(@Query() { type }, @Req() req: Request) {
-    // const permission = await this.rbacService.ShowPermission(type);
-    // if (permission) {
-    //   return {
-    //     message: 'Successfull',
-    //     status: 1,
-    //     result: permission,
-    //   };
-    // }
+    const permission = await this.rbacService.ShowPermission(type);
+    if (permission) {
+      return {
+        message: 'Successfull',
+        status: 1,
+        result: permission,
+      };
+    }
   }
 
   // @UseGuards(JwtAuthGuard)
   @Get('/role-with-permission')
   async roleWithPermission(@Req() req: Request) {
-    // const permission = await this.rbacService.GetRoleWithPermissions(req.user);
-    // if (permission) {
-    //   return {
-    //     message: 'Successfull',
-    //     status: 1,
-    //     result: permission,
-    //   };
-    // }
+    const permission = await this.rbacService.GetRoleWithPermissions();
+    if (permission) {
+      return {
+        message: 'Successfull',
+        status: 1,
+        result: permission,
+      };
+    }
   }
 
   // @UseGuards(JwtAuthGuard)
   @Post('role')
   async createRole(@Body() roleDto: RoleDto, @Req() req: Request) {
     try {
-      const role = await this.rbacService.CreateRole(roleDto);
+      const role = await this.rbacService.CreateRole(
+        roleDto,
+        '612793a5afc58999fe3c7d5c'
+      );
 
       if (role) {
         return {

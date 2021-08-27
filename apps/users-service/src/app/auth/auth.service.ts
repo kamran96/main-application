@@ -11,8 +11,9 @@ import { ClientProxy } from '@nestjs/microservices';
 import * as bcrypt from 'bcryptjs';
 import * as Moment from 'moment';
 import * as queryString from 'query-string';
+import * as os from 'os';
 import { User } from '../schemas/user.schema';
-import { SEND_CUSTOMER_EMAIL } from '@invyce/send-email';
+import { SEND_CUSTOMER_EMAIL, SEND_FORGOT_PASSWORD } from '@invyce/send-email';
 import { UserToken } from '../schemas/userToken.schema';
 
 const generateRandomNDigits = (n) => {
@@ -30,9 +31,11 @@ export class AuthService {
 
   async CheckUser(authDto) {
     try {
-      const user = await this.userModel.find({
-        $or: [{ username: authDto.username }, { email: authDto.email }],
-      });
+      const user = await this.userModel
+        .find({
+          $or: [{ username: authDto.username }, { email: authDto.username }],
+        })
+        .populate('organizationId');
 
       return user;
     } catch (error) {
@@ -219,8 +222,8 @@ export class AuthService {
   }
 
   async ForgetPassword(userDto): Promise<boolean> {
-    const user = await this.userModel.find({
-      $or: [{ username: userDto?.username }, { email: userDto?.email }],
+    const user = await this.userModel.findOne({
+      $or: [{ username: userDto?.username }, { email: userDto?.username }],
     });
 
     if (user) {
@@ -239,16 +242,26 @@ export class AuthService {
 
   async SendForgetPassword(user, code): Promise<any> {
     const baseUrl = 'http://localhost:3000';
-
     const _code = queryString.stringify({ code });
-
     const a = `${baseUrl}/page/forgot-password?${_code}&type=reset-password`;
+    const operating_system = os.type();
 
-    const link = `
-    <p>We've received a password changed request on your account. </p>
-    <p>Please <a href='${a}'>click here</a> to reset your password. Or copy below text in your browser's address bar.</p.
-    <p style="margin-top: 8px; font-size: 10px; color: blue;">${a}</p>
-  `;
+    const payload = {
+      TemplateAlias: 'password-reset',
+      TemplateModel: {
+        product_url: '',
+        product_name: 'invyce',
+        name: user.profile.fullName,
+        action_url: a,
+        operating_system,
+        // browser_name: browser.name,
+        support_url: 'support@invyce.com',
+        company_name: 'invyce',
+        company_address: 'ZS plaza jutial giltit, Pakistan',
+      },
+    };
+
+    await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
     // await this.email
     //   .compose(
     //     user.email,

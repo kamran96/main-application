@@ -14,7 +14,7 @@ export class RbacService {
     @InjectModel(User.name) private userModel
   ) {}
 
-  async CreateRole(roleDto) {
+  async CreateRole(roleDto, organizationId) {
     const role = await this.roleModel.find({
       name: roleDto.name,
       //   organizationId: roleData.organizationId
@@ -25,7 +25,7 @@ export class RbacService {
     }
 
     const findAllRoles = await this.roleModel.find({
-      //   organizationId: roleData.organizationId,
+      organizationId: organizationId,
     });
 
     const roleToUpdate = findAllRoles.find((r) => r.level === roleDto.level);
@@ -36,22 +36,43 @@ export class RbacService {
     newRole.description = roleDto.description;
     newRole.level = roleDto.level;
     newRole.parentId = roleDto.parentId;
-    // newRole.organizationId = roleData.organizationId;
+    newRole.organizationId = organizationId;
     newRole.status = 1;
     await newRole.save();
 
     await this.roleModel.updateOne(
-      { _id: roleToUpdate.id },
-      { parentId: newRole.id, level: roleDto.level + 1 }
+      { _id: roleToUpdate._id },
+      { parentId: newRole._id, level: roleDto.level + 1 }
     );
 
     if (parentRole.length > 0) {
       for (let i of parentRole) {
-        await this.roleModel.updateOne({ _id: i.id }, { level: i.level + 1 });
+        await this.roleModel.updateOne({ _id: i._id }, { level: i.level + 1 });
       }
     }
 
     return newRole;
+  }
+
+  async ShowPermission(type) {
+    const queryRoles = await this.rolePermissionModel
+      .find({
+        organizationId: '612793a5afc58999fe3c7d5c',
+      })
+      .populate('roleId')
+      .populate('permissionId', { module: type });
+
+    const roles = queryRoles.map((r) => ({
+      roleId: r.roleId._id,
+      role: r.roleId.name,
+      permissionId: r.permissionId._id,
+      parentId: r.roleId.parentId || null,
+      hasPermission: r.hasPermission,
+      title: r.permissionId.title,
+      description: r.permissionId.description,
+      module: r.permissionId.module,
+    }));
+    return roles;
   }
 
   async GetRole(roleId, organizationId) {
@@ -96,43 +117,45 @@ export class RbacService {
   }
 
   async GetDistinctModule(): Promise<any> {
-    return await this.permissionModel.find().distinct();
+    return await this.permissionModel.find().distinct('module');
   }
 
   async GetRoles(): Promise<any> {
-    //     const role = await this.manager.query(`
-    //     with recursive ce as (
-    //       select r.id as "roleId", r.name ,r."parentId" as parent, r.description
-    //       from roles r
-    //       where "organizationId"=${user.organizationId} and "parentId" is null
-    //       union all
-    //       select rl.id, rl.name, "parentId", rl.description from roles rl
-    //        join ce on "roleId" = rl."parentId"
-    //     )
-    //     select * from ce`);
-    //     return role;
-    //   }
-    //   async GetRoleWithPermissions(user) {
-    //     const parentRoles = await this.manager.query(`
-    //     with recursive ce as (
-    //       select r.id as "rId", r.name as role, r."parentId" as parent
-    //       from roles r
-    //       where "organizationId"=${user.organizationId} and "parentId" is null
-    //       union all
-    //       select rl.id, name, "parentId" from roles rl
-    //        join ce on "rId" = rl."parentId"
-    //     )
-    //     select * from ce`);
-    //     const roles = await this.manager.query(`
-    //           select r.id as "roleId", r.name as role, p.id as "permissionId", r."parentId", rp."hasPermission", p.title, p.description, p.module
-    //           from roles r
-    //           left join role_permissions rp on r.id = rp."roleId"
-    //           left join permissions p on p.id = rp."permissionId"
-    //           where rp."organizationId" = ${user.organizationId}
-    //           order by rp.id asc
-    //           `);
-    //     const parentRole = parentRoles.map((r) => r.role);
-    //     return { parentRole, roles };
+    const role = await this.roleModel
+      .find({
+        organizationId: '612793a5afc58999fe3c7d5c',
+      })
+      .sort({ level: 'ASC' });
+
+    return role;
+  }
+
+  async GetRoleWithPermissions() {
+    const parentRoles = await this.roleModel
+      .find({ organizationId: '612793a5afc58999fe3c7d5c' })
+      .sort({ level: 'ASC' });
+
+    const parentRole = parentRoles.map((r) => r.name);
+
+    const queryRoles = await this.rolePermissionModel
+      .find({
+        organizationId: '612793a5afc58999fe3c7d5c',
+      })
+      .populate('roleId')
+      .populate('permissionId')
+      .sort({ id: 'asc' });
+
+    const roles = queryRoles.map((r) => ({
+      roleId: r.roleId._id,
+      role: r.roleId.name,
+      permissionId: r.permissionId._id,
+      parentId: r.roleId.parentId || null,
+      hasPermission: r.hasPermission,
+      title: r.permissionId.title,
+      description: r.permissionId.description,
+      module: r.permissionId.module,
+    }));
+    return { parentRole, roles };
   }
 
   async GetPermissions(page_no, page_size): Promise<any> {
@@ -177,28 +200,29 @@ export class RbacService {
         const role = role_arr.find((r) => r.name === i.name);
 
         if (parentRole) {
-          await this.roleModel.updateOne(
-            { id: role.id },
-            { name: role.name, parentId: parentRole.id }
-          );
+          const updateRole = {
+            name: role.name,
+            parentId: parentRole._id || null,
+          };
+
+          await this.roleModel.updateOne({ _id: role._id }, updateRole);
         }
       }
 
       if (userId) {
-        const user = await this.userModel.findOne({
-          id: userId,
-        });
+        const user = await this.userModel.findById(userId);
 
         const [adminRole] = role_arr.filter((r) => r.name === 'admin');
 
         await this.userModel.updateOne(
-          { id: user.id },
-          { roleId: adminRole.id }
+          { id: user._id },
+          { roleId: adminRole._id }
         );
       }
 
       return role_arr;
     } catch (error) {
+      console.log(error);
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -212,7 +236,6 @@ export class RbacService {
       permission.title = i.title;
       permission.description = i.description;
       permission.module = i.module;
-      // organizationId: organizationId,
       permission.status = 1;
       await permission.save();
 
@@ -226,11 +249,9 @@ export class RbacService {
 
     const roles = await this.roleModel.find({ organizationId });
 
-    const globalPermissions = await this.permissionModel.find({
-      order: {
-        id: 'ASC',
-      },
-    });
+    const globalPermissions = await this.permissionModel
+      .find()
+      .sort({ id: 'ASC' });
 
     for (let permission of permissions) {
       const pId = globalPermissions.find(
@@ -239,8 +260,8 @@ export class RbacService {
       const roleId = roles.find((r) => r.name === permission.roles[0]);
 
       const rolePermission = new this.rolePermissionModel();
-      rolePermission.roleId = roleId.id;
-      rolePermission.permissionId = pId.id;
+      rolePermission.roleId = roleId._id;
+      rolePermission.permissionId = pId._id;
       rolePermission.organizationId = organizationId;
       rolePermission.hasPermission = true;
       rolePermission.status = 1;

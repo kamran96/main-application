@@ -20,6 +20,7 @@ import { RbacService } from './rbac.service';
     ]),
   ],
   providers: [RbacService],
+  exports: [RbacService],
   controllers: [RbacController],
 })
 export class RbacModule {}
