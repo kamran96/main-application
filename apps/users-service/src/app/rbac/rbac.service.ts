@@ -15,43 +15,58 @@ export class RbacService {
   ) {}
 
   async CreateRole(roleDto, organizationId) {
-    const role = await this.roleModel.find({
-      name: roleDto.name,
-      //   organizationId: roleData.organizationId
-    });
+    if (roleDto && roleDto.isNewRecord === false) {
+      const role = await this.GetRole(roleDto.id, organizationId);
+      if (Array.isArray(role) && role.length > 0) {
+        await this.roleModel.updateOne(
+          { _id: roleDto.id },
+          { name: roleDto.name, description: roleDto.description }
+        );
 
-    if (Array.isArray(role) && role.length > 0) {
-      throw new HttpException('Role already exists.', HttpStatus.BAD_REQUEST);
-    }
-
-    const findAllRoles = await this.roleModel.find({
-      organizationId: organizationId,
-    });
-
-    const roleToUpdate = findAllRoles.find((r) => r.level === roleDto.level);
-    const parentRole = findAllRoles.filter((r) => r.level > roleDto.level);
-
-    const newRole = new this.roleModel();
-    newRole.name = roleDto.name;
-    newRole.description = roleDto.description;
-    newRole.level = roleDto.level;
-    newRole.parentId = roleDto.parentId;
-    newRole.organizationId = organizationId;
-    newRole.status = 1;
-    await newRole.save();
-
-    await this.roleModel.updateOne(
-      { _id: roleToUpdate._id },
-      { parentId: newRole._id, level: roleDto.level + 1 }
-    );
-
-    if (parentRole.length > 0) {
-      for (let i of parentRole) {
-        await this.roleModel.updateOne({ _id: i._id }, { level: i.level + 1 });
+        return await this.GetRole(roleDto.id, organizationId);
       }
-    }
+    } else {
+      const role = await this.roleModel.find({
+        name: roleDto.name,
+        //   organizationId: roleData.organizationId
+      });
 
-    return newRole;
+      if (Array.isArray(role) && role.length > 0) {
+        throw new HttpException('Role already exists.', HttpStatus.BAD_REQUEST);
+      }
+
+      const findAllRoles = await this.roleModel.find({
+        organizationId: organizationId,
+      });
+
+      const roleToUpdate = findAllRoles.find((r) => r.level === roleDto.level);
+      const parentRole = findAllRoles.filter((r) => r.level > roleDto.level);
+
+      const newRole = new this.roleModel();
+      newRole.name = roleDto.name;
+      newRole.description = roleDto.description;
+      newRole.level = roleDto.level;
+      newRole.parentId = roleDto.parentId;
+      newRole.organizationId = organizationId;
+      newRole.status = 1;
+      await newRole.save();
+
+      await this.roleModel.updateOne(
+        { _id: roleToUpdate._id },
+        { parentId: newRole._id, level: roleDto.level + 1 }
+      );
+
+      if (parentRole.length > 0) {
+        for (let i of parentRole) {
+          await this.roleModel.updateOne(
+            { _id: i._id },
+            { level: i.level + 1 }
+          );
+        }
+      }
+
+      return newRole;
+    }
   }
 
   async ShowPermission(type) {

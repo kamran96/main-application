@@ -34,6 +34,9 @@
     "email-service": {
       "tags": []
     },
+    "items-service": {
+      "tags": []
+    },
     "main-api": {
       "tags": []
     },
