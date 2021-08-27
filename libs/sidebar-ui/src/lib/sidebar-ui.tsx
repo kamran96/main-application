@@ -3,7 +3,7 @@ import {
   PopupGlobalStyles,
   SidebarWrapper,
 } from './styles';
-import { Avatar, Popover } from 'antd';
+import { Avatar, Button, Popover } from 'antd';
 import { IRoutesSchema, IRoutingSchema } from '@invyce/shared/types';
 import { FC } from 'hoist-non-react-statics/node_modules/@types/react';
 import { Link, useHistory } from 'react-router-dom';
@@ -11,6 +11,9 @@ import Icon from '@iconify/react';
 import { ReactElement, useState } from 'react';
 import { AppLogoWithoutText, InyvceDarkTextIcon } from './applogo';
 import sidebarCollapse24 from '@iconify/icons-octicon/sidebar-collapse-24';
+import LogOut from '@iconify-icons/feather/log-out';
+import Sun from '@iconify-icons/feather/sun';
+import Moon from '@iconify-icons/feather/moon';
 /* eslint-disable-next-line */
 
 export interface IActiveUserInfo {
@@ -25,6 +28,8 @@ export interface SidebarUiProps {
   activeUserInfo: IActiveUserInfo;
   routes: IRoutingSchema;
   appLogo?: ReactElement<any>;
+  onLogOut?: () => void;
+  onThemeButtonClick?: () => void;
 }
 
 interface IPopOverProps {
@@ -84,23 +89,33 @@ const MenuPopOver: FC<IPopOverProps> = ({ route }) => {
   );
 };
 
-export const SidebarUi: FC<SidebarUiProps> = ({ activeUserInfo, routes }) => {
+export const SidebarUi: FC<SidebarUiProps> = ({
+  activeUserInfo,
+  routes,
+  onLogOut,
+  onThemeButtonClick,
+}) => {
   const history = useHistory();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
-    <SidebarWrapper theme={activeUserInfo?.theme} toggle={sidebarOpen}>
+    <SidebarWrapper toggle={sidebarOpen}>
       <div className="logo_area flex alignCenter">
         <span>
           {sidebarOpen ? <InyvceDarkTextIcon /> : <AppLogoWithoutText />}{' '}
         </span>
-        <span onClick={()=> {
-          setSidebarOpen(!sidebarOpen);
-        }}  className="collapse pointer"><Icon className="fs-25" icon={sidebarCollapse24} /></span>
+        <span
+          onClick={() => {
+            setSidebarOpen(!sidebarOpen);
+          }}
+          className="collapse pointer"
+        >
+          <Icon className="fs-20" icon={sidebarCollapse24} />
+        </span>
       </div>
-      <hr className="mt-10"/>
-      <div className="sidebar-userinfo flex alignCenter ph-10">
+      <hr className="mt-10" />
+      <div className="sidebar-userinfo flex alignCenter pointer ph-10">
         <div className="avatar_area">
           <Avatar
             className="user_avatar"
@@ -183,6 +198,38 @@ export const SidebarUi: FC<SidebarUiProps> = ({ activeUserInfo, routes }) => {
             </ul>
           </div>
         </div>
+      </div>
+      <div className="sidebar_bottom">
+        <li
+          className={`route_list_item flex alignCenter pointer mv-4   
+                    `}
+        >
+          <Button
+            onClick={onThemeButtonClick}
+            className="theme_button"
+            type="default"
+          >
+            <span className="mr-10 flex alignCenter">
+              <Icon
+                className=" fs-16  icon"
+                icon={activeUserInfo?.theme === 'dark' ? Moon : Sun}
+              />
+            </span>
+            <span className="title">
+              {activeUserInfo?.theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+            </span>
+          </Button>
+        </li>
+        <li
+          onClick={onLogOut}
+          className={`route_list_item flex alignCenter pointer mv-4   
+                    `}
+        >
+          <span className="mr-10 flex alignCenter">
+            <Icon className=" fs-16  icon" icon={LogOut} />
+          </span>
+          <span className="route_tag">Log Out</span>
+        </li>
       </div>
     </SidebarWrapper>
   );

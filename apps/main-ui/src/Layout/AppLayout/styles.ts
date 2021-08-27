@@ -5,15 +5,16 @@ import convertToRem from "../../utils/convertToRem";
 
 export const ContentArea = styled.section`
   background: ${(props: IThemeProps) => props.theme.colors.layoutBg};
-  padding-top: ${convertToRem(22)};
-  height: calc(100vh - 28px);
+ 
+  height: calc(100vh - 0);
   transition: 0.4s all ease-in-out;
   /* margin-left: ${(props: IThemeProps) =>
     props?.theme?.toggle ? convertToRem(206) : convertToRem(65)}; */
   width: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
   .content {
-    padding: 0rem 1.25rem 1.125rem 1.25rem;
+    padding: ${convertToRem(22)} 1.25rem 1.125rem 1.25rem;
     transition: 0.2s all ease-in-out;
   }
 
@@ -24,6 +25,41 @@ export const ContentArea = styled.section`
   @media (max-width: 1365px) {
     padding-top: ${convertToRem(40)};
   }
+
+  .unverified_topbar{
+    height: 34px;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  width: 100%;
+
+  background: #c23934;
+
+  p {
+    font-style: normal;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 18px;
+    /* identical to box height */
+
+
+    color: #ffffff;
+
+    .ant-btn-link {
+      font-style: normal;
+      font-weight: 600;
+      font-size: 12px;
+      line-height: 18px;
+      /* identical to box height */
+
+      text-transform: capitalize;
+
+      color: #ffffff;
+    }
+  }
+  }
+
+  
 `;
 
 const animateRotate = keyframes`
@@ -48,7 +84,7 @@ export const WrapperApplayout = styled.div<IApplayoutWrapperProps>`
 
   .dark-mode-loading {
     transition: 0.2s all ease-in-out;
-    position: absolute;
+    position: fixed;
     left: 0;
     top: 0;
     width: 100%;

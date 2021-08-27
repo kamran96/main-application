@@ -79,6 +79,14 @@ function createMargin() {
             margin-bottom: ${convertToRem(i)};
 
         };
+        .mr-${i}{
+            margin-right: ${convertToRem(i)};
+
+        };
+        .ml-${i}{
+            margin-left: ${convertToRem(i)};
+
+        };
         `;
   }
  
