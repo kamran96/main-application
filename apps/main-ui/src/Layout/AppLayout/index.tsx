@@ -1,19 +1,17 @@
-import React, { FC, useState } from 'react';
-import { Sidebar } from '../../components/Sidebar';
-import { Topbar } from '../../components/Topbar';
-import { useGlobalContext } from '../../hooks/globalContext/globalContext';
-import { InvyceCmdPalette } from './CommandPalette';
-import { ContentArea, NewUserContentArea, WrapperApplayout } from './styles';
 import brightnessContrast from '@iconify-icons/carbon/brightness-contrast';
+import Moon from '@iconify-icons/feather/moon';
 import Icon from '@iconify/react';
 import { SidebarUi } from '@invyce/sidebar-ui';
-import { RoutingSchema } from '../../Schema/routingSchema';
-import { InyvceDarkTextIcon } from '../../assets/icons';
-import { ILoginActions } from '../../hooks/globalContext/globalManager';
+import { Button } from 'antd';
+import React, { FC } from 'react';
 import { useMutation } from 'react-query';
 import { updateThemeAPI } from '../../api';
-import { Button } from 'antd';
-import Moon from '@iconify-icons/feather/moon';
+import { InyvceDarkTextIcon } from '../../assets/icons';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { ILoginActions } from '../../hooks/globalContext/globalManager';
+import { RoutingSchema } from '../../Schema/routingSchema';
+import { InvyceCmdPalette } from './CommandPalette';
+import { ContentArea, NewUserContentArea, WrapperApplayout } from './styles';
 
 interface IProps {
   children: React.ReactElement<any>;
