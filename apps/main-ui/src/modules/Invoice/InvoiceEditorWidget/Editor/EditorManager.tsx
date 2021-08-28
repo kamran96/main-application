@@ -854,7 +854,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
            {children}
            </Card>
           </div>
-         <div className="sider"><EmailSider/></div>
+         {/* <div className="sider"><EmailSider/></div> */}
          {/* {children} */}
        
        </LayoutWrapper>

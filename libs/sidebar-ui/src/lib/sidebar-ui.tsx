@@ -201,7 +201,7 @@ export const SidebarUi: FC<SidebarUiProps> = ({
       </div>
       <div className="sidebar_bottom">
         <li
-          className={`route_list_item flex alignCenter pointer mv-4   
+          className={`route_list_item theme_changer flex alignCenter pointer mv-4   
                     `}
         >
           <Button
