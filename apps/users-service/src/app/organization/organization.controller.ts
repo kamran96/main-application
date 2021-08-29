@@ -7,7 +7,12 @@ import {
   Param,
   Post,
   Req,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { Request, Response } from 'express';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { OrganizationDto } from '../dto/organization.dto';
 import { OrganizationService } from './organization.service';
 
@@ -15,41 +20,18 @@ import { OrganizationService } from './organization.service';
 export class OrganizationController {
   constructor(private organizationService: OrganizationService) {}
 
-  // @UseGuards(JwtAuthGuard)
-  // @Get()
-  // async index(@Req() req: Request) {
-  //   try {
-  //     const organization = await this.organizationService.ListOrganizations(
-  //       req.user,
-  //     );
-
-  //     if (organization) {
-  //       return {
-  //         message: 'Organization fetched successfully',
-  //         result: organization,
-  //       };
-  //     }
-  //   } catch (error) {
-  //     throw new HttpException(
-  //       `Sorry! Something went wrong, ${error.message}`,
-  //       error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
-  //     );
-  //   }
-  // }
-
-  // @UseGuards(JwtAuthGuard)
-  @Post()
-  async create(@Body() organizationDto: OrganizationDto, @Req() req: Request) {
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  async index(@Req() req: Request) {
     try {
-      const organization =
-        await this.organizationService.CreateOrUpdateOrganization(
-          organizationDto
-          // req.user,
-        );
+      const organization = await this.organizationService.ListOrganizations(
+        req.user
+      );
 
       if (organization) {
         return {
-          message: 'Organization created successfully',
+          message: 'Organization fetched successfully',
+          status: true,
           result: organization,
         };
       }
@@ -61,8 +43,38 @@ export class OrganizationController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @Post()
+  @UseGuards(JwtAuthGuard)
+  async create(
+    @Body() organizationDto: OrganizationDto,
+    @Req() req: Request,
+    @Res() res: Response
+  ) {
+    try {
+      const organization =
+        await this.organizationService.CreateOrUpdateOrganization(
+          organizationDto,
+          req.user,
+          res
+        );
+
+      if (organization) {
+        return {
+          message: 'Organization created successfully',
+          status: true,
+          result: organization,
+        };
+      }
+    } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   @Get(':id')
+  @UseGuards(AuthGuard('jwt'))
   async view(@Param() params, @Req() req: Request) {
     try {
       const organization = await this.organizationService.ViewOrganization(
@@ -72,6 +84,7 @@ export class OrganizationController {
       if (organization) {
         return {
           message: 'Organization recieved successfully',
+          status: true,
           result: organization,
         };
       }

@@ -193,7 +193,7 @@ export class RbacService {
     // };
   }
 
-  async InsertRoles(organizationId, userId = null): Promise<any> {
+  async InsertRoles(organizationId): Promise<any> {
     try {
       const { roles } = await import('../rbac');
 
@@ -222,17 +222,6 @@ export class RbacService {
 
           await this.roleModel.updateOne({ _id: role._id }, updateRole);
         }
-      }
-
-      if (userId) {
-        const user = await this.userModel.findById(userId);
-
-        const [adminRole] = role_arr.filter((r) => r.name === 'admin');
-
-        await this.userModel.updateOne(
-          { id: user._id },
-          { roleId: adminRole._id }
-        );
       }
 
       return role_arr;

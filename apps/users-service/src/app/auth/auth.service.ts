@@ -35,7 +35,9 @@ export class AuthService {
         .find({
           $or: [{ username: authDto.username }, { email: authDto.username }],
         })
-        .populate('organizationId');
+        .populate('role')
+        .populate('organization')
+        .populate('branch');
 
       return user;
     } catch (error) {
@@ -49,13 +51,14 @@ export class AuthService {
     user.email = authDto.email;
     user.password =
       authDto.password !== '' ? bcrypt.hashSync(authDto.password) : null;
-    user.organizationId = authDto.organizationId;
-    user.branchId = authDto.branchId;
-    user.roleId = authDto.roleId;
+    user.organizationId = authDto.organizationId || null;
+    user.branchId = authDto.branchId || null;
+    user.roleId = authDto.roleId || null;
     user.prefix = authDto.prefix;
     user.profile = authDto.profile;
     user.terms = authDto.terms;
     user.marketing = authDto.marketing;
+    user.status = 1;
     await user.save();
 
     const time = Moment(new Date()).add(1, 'h').calendar();
@@ -74,28 +77,37 @@ export class AuthService {
     return user;
   }
 
-  async Login(user) {
+  async Login(user, res) {
     const [newUser] = user;
 
     const payload = {
       username: newUser.username,
       id: newUser.id,
-      // organizationId: newUser.organizationId,
-      // roleId: newUser.roleId,
-      // branchId: newUser.branchId,
+      organizationId: newUser.organizationId,
+      roleId: newUser.roleId,
+      branchId: newUser.branchId,
     };
 
     // when added an organization then return new access_token
 
     const token = this.jwtService.sign(payload);
 
-    return {
-      users: newUser,
-      access_token: token,
-    };
+    res
+      .cookie('access_token', token, {
+        httpOnly: true,
+        domain: 'localhost',
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+      })
+      .send({
+        message: 'Login successfully',
+        status: true,
+        result: { user: newUser },
+      });
+
+    return newUser;
   }
 
-  async ValidateUser(authDto) {
+  async ValidateUser(authDto, res) {
     const users = await this.CheckUser(authDto);
 
     if (Array.isArray(users) && users[0] !== undefined) {
@@ -108,7 +120,7 @@ export class AuthService {
         );
       }
       if (bcrypt.compareSync(authDto.password, user.password)) {
-        const user = await this.Login(users);
+        const user = await this.Login(users, res);
         return user;
       }
       throw new HttpException('Incorrect Password', HttpStatus.BAD_REQUEST);

@@ -34,9 +34,9 @@ export class Organization {
   @Prop()
   status: number;
   @Prop()
-  createdById: number;
+  createdById: string;
   @Prop()
-  updatedById: number;
+  updatedById: string;
   @Prop({ type: Date, default: Date.now })
   createdAt: string;
   @Prop({ type: Date, default: Date.now })
@@ -44,3 +44,12 @@ export class Organization {
 }
 
 export const OrganizationSchema = SchemaFactory.createForClass(Organization);
+
+OrganizationSchema.virtual('branches', {
+  ref: 'Branch',
+  localField: '_id',
+  foreignField: 'organizationId',
+});
+
+OrganizationSchema.set('toObject', { virtuals: true });
+OrganizationSchema.set('toJSON', { virtuals: true });

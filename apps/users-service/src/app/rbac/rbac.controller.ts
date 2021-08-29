@@ -54,10 +54,7 @@ export class RbacController {
   // @UseGuards(JwtAuthGuard)
   @Post('/test')
   async test(@Req() req: any) {
-    await this.rbacService.InsertRoles(
-      req.user.organizationId,
-      req.user.userId
-    );
+    await this.rbacService.InsertRoles(req.user.organizationId);
     await this.rbacService.InsertRolePermission(req.user.organizationId);
 
     return {

@@ -23,13 +23,13 @@ export class Item {
   @Prop()
   status: number;
   @Prop()
-  organizationId: number;
+  organizationId: string;
   @Prop()
-  branchId: number;
+  branchId: string;
   @Prop()
-  createdById: number;
+  createdById: string;
   @Prop()
-  updatedById: number;
+  updatedById: string;
   @Prop({ type: Date, default: Date.now })
   createdAt: string;
   @Prop({ type: Date, default: Date.now })

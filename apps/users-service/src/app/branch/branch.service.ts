@@ -41,6 +41,7 @@ export class BranchService {
           updatedBranch.fax_no = branchDto.fax_no || branch.fax_no;
           updatedBranch.isMain = branchDto.isMain || branch.isMain;
           updatedBranch.address = branchDto.address || branch.address;
+          // updatedBranch.organizationId = '';
           updatedBranch.status = 1;
 
           await this.branchModel.updateOne({ id: branchDto.id }, updatedBranch);
@@ -53,10 +54,10 @@ export class BranchService {
     } else {
       try {
         // code goese for create
-        const user = await this.userModel.findOne({
-          id: branchData.userId,
-          //   relations: ['role'],
-        });
+        // const user = await this.userModel.findOne({
+        // id: branchData.userId,
+        //   relations: ['role'],
+        // });
 
         const branch = new this.branchModel();
         branch.name = branchDto.name;
@@ -68,24 +69,25 @@ export class BranchService {
         branch.organizationId = branchDto.organizationId;
         branch.isMain = branchDto.isMain;
         branch.status = 1;
-        branch.createdById = branchData.userId;
-        branch.updatedById = branchData.userId;
+        // branch.createdById = branchData.userId;
+        // branch.updatedById = branchData.userId;
         await branch.save();
 
-        if (branchData.branchId === null) {
-          await this.userModel.updateOne(
-            { id: branchData.userId },
-            { branchId: branch.id }
-          );
+        // if (branchData.branchId === null) {
+        // await this.userModel.updateOne(
+        // { id: branchData.userId },
+        // { branchId: branch.id }
+        // );
 
-          //   const new_user = await this.authService.CheckUser({
-          //     username: user.username,
-          //   });
+        //   const new_user = await this.authService.CheckUser({
+        //     username: user.username,
+        //   });
 
-          //   const user_with_organization = await this.authService.Login(new_user);
+        //   const user_with_organization = await this.authService.Login(new_user);
 
-          //   return user_with_organization;
-        } else return branch;
+        //   return user_with_organization;
+        // } else
+        return branch;
       } catch (error) {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
@@ -93,13 +95,10 @@ export class BranchService {
   }
 
   async FindBranchById(params) {
-    const branch = await this.branchModel.find({
-      id: params.id,
-      status: 1,
+    return await this.branchModel.find({
+      _id: params.id,
       //   organizationId: branchData.organizationId
     });
-
-    return branch;
   }
 
   async deleteBranch(params) {

@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { AuthService } from '../auth/auth.service';
 import { RbacService } from '../rbac/rbac.service';
 import { Branch } from '../schemas/branch.schema';
 import { Organization } from '../schemas/organization.schema';
@@ -13,12 +14,30 @@ export class OrganizationService {
     @InjectModel(OrganizationUser.name) private organizationUserModel,
     @InjectModel(Branch.name) private branchModel,
     @InjectModel(User.name) private userModel,
-    private rbacService: RbacService
+    private rbacService: RbacService,
+    private authService: AuthService
   ) {}
+
+  async ListOrganizations(organizationData) {
+    const org = await this.organizationUserModel.find({
+      userId: { $in: organizationData.id },
+    });
+
+    const orgIds = org.map((ids) => ids.organizationId);
+    const organization = await this.organizationModel
+      .find({
+        _id: { $in: orgIds },
+        status: 1,
+      })
+      .populate('branches');
+
+    return organization;
+  }
 
   async CreateOrUpdateOrganization(
     organizationDto,
-    organizationData = null
+    organizationData = null,
+    res
   ): Promise<any> {
     if (organizationDto && organizationDto.isNewRecord === false) {
       // we need to update organization
@@ -91,58 +110,59 @@ export class OrganizationService {
         organization.faxNumber = organizationDto.faxNumber;
         organization.attachmentId = organizationDto.attachmentId;
         organization.address = organizationDto.address;
+        organization.createdById = organizationData.id;
+        organization.updatedById = organizationData.id;
         organization.status = 1;
         await organization.save();
 
-        const organizationUser = await this.organizationUserModel();
+        const organizationUser = new this.organizationUserModel();
         organizationUser.organizationId = organization.id;
-        organizationUser.userId = organizationDto.userId;
-        organizationUser.roleId = organizationDto.roleId;
-        organizationUser.createdById = organizationDto.userId;
-        organizationUser.updatedById = organizationDto.userId;
+        organizationUser.userId = organizationData.id;
         organizationUser.status = 1;
         await organizationUser.save();
 
-        // let branchArr = [];
-        // if (organization.organizationType === 'SAAS') {
-        // const branch = new this.branchModel();
+        let branchArr = [];
+        if (
+          organizationData.organizationId === null &&
+          organization.organizationType === 'SAAS'
+        ) {
+          const branch = new this.branchModel();
+          branch.organizationId = organization._id;
+          await branch.save();
 
-        // (branch.organizationId = organization.id), await branch.save();
-        // branchArr.push(branch);
-        // }
+          branchArr.push(branch);
+        }
 
         // await this.accountService.initAccounts(organization, organizationData);
 
-        const roles = await this.rbacService.InsertRoles(
-          organization._id,
-          '61278a50d0f0f487be7b73a8'
-        );
+        const roles = await this.rbacService.InsertRoles(organization._id);
         await this.rbacService.InsertRolePermission(organization._id);
 
         const [adminRole] = roles.filter((r) => r.name === 'admin');
 
-        // if (organizationData.organizationId === null) {
-        await this.userModel.updateOne(
-          { id: '61278a50d0f0f487be7b73a8' },
-          {
-            organizationId: organization._id,
-            roleId: adminRole._id,
-            // branchId: branchArr.length > 0 ? branchArr[0].id : null,
-          }
-        );
+        if (organizationData.organizationId === null) {
+          await this.userModel.updateOne(
+            { _id: organizationData.id },
+            {
+              organizationId: organization._id,
+              roleId: adminRole._id,
+              branchId: branchArr.length > 0 ? branchArr[0]._id : null,
+            }
+          );
 
-        //   const new_user = await this.authService.CheckUser({
-        //     username: organizationData.user_name,
-        //   });
+          const new_user = await this.authService.CheckUser({
+            username: organizationData.username,
+          });
 
-        //   const user_with_organization = await this.authService.Login(new_user);
+          const user_with_organization = await this.authService.Login(
+            new_user,
+            res
+          );
 
-        // return user_with_organization;
-        // } else {
-        // return organization;
-        // }
-
-        return organization;
+          return user_with_organization;
+        } else {
+          return organization;
+        }
       } catch (error) {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
@@ -150,9 +170,11 @@ export class OrganizationService {
   }
 
   async ViewOrganization(params) {
-    const organization = await this.organizationModel.findOne({
-      id: params.id,
-    });
+    const organization = await this.organizationModel
+      .findOne({
+        _id: params.id,
+      })
+      .populate('branches');
 
     return organization;
   }

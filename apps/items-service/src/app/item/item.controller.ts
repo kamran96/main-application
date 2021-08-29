@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ItemDto } from '../dto/item.dto';
 import { ItemService } from './item.service';
 
@@ -15,6 +15,19 @@ export class ItemController {
         message: 'Item created successfull',
         status: true,
         result: item,
+      };
+    }
+  }
+
+  @Get('/:id')
+  async show(@Param() params) {
+    const item = await this.itemService.FindById(params.id);
+
+    if (item) {
+      return {
+        message: 'Item created successfull',
+        status: true,
+        result: item[0] || [],
       };
     }
   }

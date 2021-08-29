@@ -64,7 +64,7 @@ export class AuthService {
         password:
           authDto.password !== '' ? bcrypt.hashSync(authDto.password) : null,
         status: 1,
-        organizationId: orgId,
+        organizationId: orgId || null,
         branchId: authDto.branchId !== undefined ? authDto.branchId : null,
         roleId: authDto.roleId,
         prefix: authDto.prefix,

@@ -6,7 +6,9 @@ import {
   HttpStatus,
   Logger,
   Post,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import {
   ForgetPasswordDto,
   PasswordDto,
@@ -20,9 +22,9 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post()
-  async Login(@Body() authDto: UserLoginDto) {
+  async Login(@Body() authDto: UserLoginDto, @Res() res: Response) {
     try {
-      const user: any = await this.authService.ValidateUser(authDto);
+      const user: any = await this.authService.ValidateUser(authDto, res);
 
       return {
         message: 'Login Successfull.',
@@ -37,7 +39,7 @@ export class AuthController {
   }
 
   @Post('/register')
-  async Register(@Body() authDto: UserRegisterDto) {
+  async Register(@Body() authDto: UserRegisterDto, @Res() res: Response) {
     try {
       const users = await this.authService.CheckUser(authDto);
       if (Array.isArray(users) && users.length > 0) {
@@ -47,7 +49,7 @@ export class AuthController {
         );
       }
       await this.authService.AddUser(authDto);
-      const user = await this.authService.ValidateUser(authDto);
+      const user = await this.authService.ValidateUser(authDto, res);
       if (user) {
         return {
           message: 'Successfull',

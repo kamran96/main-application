@@ -31,9 +31,9 @@ export class Branch {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Organization' })
   organizationId: Organization;
   @Prop()
-  createdById: number;
+  createdById: string;
   @Prop()
-  updatedById: number;
+  updatedById: string;
   @Prop({ type: Date, default: Date.now })
   createdAt: string;
   @Prop({ type: Date, default: Date.now })

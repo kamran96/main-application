@@ -9,20 +9,18 @@ export class Category {
   description: string;
   @Prop({ type: mongoose.Schema.Types.ObjectId, schema: 'Categroy' })
   parentId: Category;
-  @Prop()
-  attachmentId: number;
-  @Prop()
+  @Prop({ default: false })
   isLeaf: boolean;
   @Prop()
   status: number;
   @Prop()
-  organizationId: number;
+  organizationId: string;
   @Prop()
-  branchId: number;
+  branchId: string;
   @Prop()
-  createdById: number;
+  createdById: string;
   @Prop()
-  updatedById: number;
+  updatedById: string;
   @Prop({ type: Date, default: Date.now })
   createdAt: string;
   @Prop({ type: Date, default: Date.now })
@@ -30,3 +28,12 @@ export class Category {
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
+
+CategorySchema.virtual('attributes', {
+  ref: 'Attribute',
+  localField: '_id',
+  foreignField: 'categoryId',
+});
+
+CategorySchema.set('toObject', { virtuals: true });
+CategorySchema.set('toJSON', { virtuals: true });

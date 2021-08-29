@@ -1,4 +1,4 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { Category } from './category.schema';
 
@@ -9,8 +9,8 @@ export class Attribute {
   @Prop()
   description: string;
   @Prop()
-  valueType: number;
-  @Prop()
+  valueType: string;
+  @Prop(raw({}))
   values: object;
   @Prop({ type: mongoose.Schema.Types.ObjectId, schema: 'Category' })
   categoryId: Category;

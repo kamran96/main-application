@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from '../auth/auth.module';
 import { RbacModule } from '../rbac/rbac.module';
 import { Branch, BranchSchema } from '../schemas/branch.schema';
 import {
@@ -23,6 +24,7 @@ import { OrganizationService } from './organization.service';
       { name: User.name, schema: UserSchema },
     ]),
     RbacModule,
+    AuthModule,
   ],
   providers: [OrganizationService],
   controllers: [OrganizationController],
