@@ -18,6 +18,14 @@ export class Item {
   isActive: boolean;
   @Prop()
   stock: number;
+  @Prop()
+  openingStock: number;
+  @Prop()
+  minimumStock: number;
+  @Prop()
+  hasCategory: boolean;
+  @Prop()
+  hasInventory: boolean;
   @Prop({ type: mongoose.Schema.Types.ObjectId, schema: 'Category' })
   categoryId: Category;
   @Prop()

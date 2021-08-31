@@ -6,9 +6,11 @@ import {
   HttpStatus,
   Logger,
   Post,
+  Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import {
   ForgetPasswordDto,
   PasswordDto,
@@ -16,6 +18,7 @@ import {
   UserRegisterDto,
 } from '../dto/user.dto';
 import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -61,6 +64,40 @@ export class AuthController {
         `Sorry! Something went wrong, ${error.message}`,
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('access-controll')
+  async access(@Body() body, @Req() req: Request) {
+    try {
+      const user = await this.authService.AccessControll(body, req);
+
+      if (user) {
+        return {
+          result: user,
+        };
+      }
+      throw new HttpException('Authentication Falied', HttpStatus.BAD_REQUEST);
+    } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/check')
+  async check(@Req() req: Request, @Res() res: Response) {
+    const user = await this.authService.Check(req.user, res);
+
+    if (user) {
+      return {
+        message: 'Validated successfully',
+        status: true,
+        result: user,
+      };
     }
   }
 

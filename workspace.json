@@ -1,6 +1,27 @@
 {
   "version": 2,
   "projects": {
+    "auth-middleware": {
+      "root": "libs/auth-middleware",
+      "sourceRoot": "libs/auth-middleware/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/auth-middleware/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/auth-middleware"],
+          "options": {
+            "jestConfig": "libs/auth-middleware/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "contacts-service": {
       "root": "apps/contacts-service",
       "sourceRoot": "apps/contacts-service/src",
@@ -96,6 +117,27 @@
           "outputs": ["coverage/apps/email-service"],
           "options": {
             "jestConfig": "apps/email-service/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "global-auth-guard": {
+      "root": "libs/global-auth-guard",
+      "sourceRoot": "libs/global-auth-guard/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/global-auth-guard/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/global-auth-guard"],
+          "options": {
+            "jestConfig": "libs/global-auth-guard/jest.config.js",
             "passWithNoTests": true
           }
         }

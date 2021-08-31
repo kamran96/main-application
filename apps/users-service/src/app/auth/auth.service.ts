@@ -12,6 +12,7 @@ import * as bcrypt from 'bcryptjs';
 import * as Moment from 'moment';
 import * as queryString from 'query-string';
 import * as os from 'os';
+import * as ip from 'ip';
 import { User } from '../schemas/user.schema';
 import { SEND_CUSTOMER_EMAIL, SEND_FORGOT_PASSWORD } from '@invyce/send-email';
 import { UserToken } from '../schemas/userToken.schema';
@@ -40,6 +41,48 @@ export class AuthService {
         .populate('branch');
 
       return user;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async AccessControll(data, req) {
+    try {
+      const userId = req.user.id;
+
+      const findToken = await this.userTokenModel.findOne({
+        userId: userId,
+        code: req.cookies.access_token,
+      });
+
+      const newTime = Moment(new Date())
+        .add(process.env.EXPIRES, 'h')
+        .calendar();
+      const time = Moment(new Date()).calendar();
+
+      if (findToken === null) {
+        const token = new this.userTokenModel();
+        token.code = req.cookies.access_token;
+        token.expiresAt = newTime;
+        token.brower = req.headers['user-agent'];
+        token.ipAddress = ip.address();
+        token.userId = userId;
+        await token.save();
+      }
+
+      if (time > findToken?.expiresAt) {
+        return {
+          message: 'Token is expired, Please try again later.',
+          statusCode: HttpStatus.FORBIDDEN,
+        };
+      }
+
+      const user = await this.userModel.findById(userId);
+
+      return {
+        user,
+        statusCode: HttpStatus.OK,
+      };
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -83,9 +126,6 @@ export class AuthService {
     const payload = {
       username: newUser.username,
       id: newUser.id,
-      organizationId: newUser.organizationId,
-      roleId: newUser.roleId,
-      branchId: newUser.branchId,
     };
 
     // when added an organization then return new access_token
@@ -101,10 +141,17 @@ export class AuthService {
       .send({
         message: 'Login successfully',
         status: true,
-        result: { user: newUser },
+        result: { user: newUser, token },
       });
 
-    return newUser;
+    return {
+      tokens: token,
+    };
+  }
+
+  async Check(userData, res) {
+    const user = await this.CheckUser(userData);
+    return await this.Login(user, res);
   }
 
   async ValidateUser(authDto, res) {

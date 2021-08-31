@@ -13,14 +13,14 @@ import {
 } from '../repositories';
 import { EmailService } from '../Common/services/email.service';
 
-const client = redis.createClient();
+// const client = redis.createClient();
 
-client.on('error', function (error) {
-  console.log(error);
-});
+// client.on('error', function (error) {
+//   console.log(error);
+// });
 
-const get = promisify(client.get).bind(client);
-const set = promisify(client.set).bind(client);
+// const get = promisify(client.get).bind(client);
+// const set = promisify(client.set).bind(client);
 
 const generateRandomNDigits = (n) => {
   return Math.floor(Math.random() * (9 * Math.pow(10, n))) + Math.pow(10, n);
@@ -90,7 +90,7 @@ export class AuthService {
         email: authDto.email,
       };
 
-      await client.set(`${generateOtp}`, JSON.stringify(values));
+      // await client.set(`${generateOtp}`, JSON.stringify(values));
 
       await getCustomRepository(UserCodeRepository).save({
         code: generateOtp,
@@ -154,40 +154,40 @@ export class AuthService {
         status: false,
       };
 
-      const data = await get(body.otp);
+      // const data = await get(body.otp);
 
-      if (data) {
-        const [user_code] = await getCustomRepository(UserCodeRepository).find({
-          where: {
-            code: body.otp,
-          },
-        });
+      // if (data) {
+      //   const [user_code] = await getCustomRepository(UserCodeRepository).find({
+      //     where: {
+      //       code: body.otp,
+      //     },
+      //   });
 
-        const format = Moment(user_code.expiresAt, 'hmm').format('HH:mm');
-        const getOneHour = Moment(new Date()).format('HH:mm');
+      //   const format = Moment(user_code.expiresAt, 'hmm').format('HH:mm');
+      //   const getOneHour = Moment(new Date()).format('HH:mm');
 
-        if (format && format < getOneHour) {
-          throw new HttpException(
-            'Verification code is expired, Click on resend to generate new verification code.',
-            HttpStatus.BAD_REQUEST
-          );
-        } else {
-          await getCustomRepository(UserRepository).update(
-            {
-              email: body.email,
-            },
-            { isVerified: true }
-          );
-          response = {
-            status: true,
-          };
-          return response;
-        }
-      } else {
-        response = {
-          status: false,
-        };
-      }
+      //   if (format && format < getOneHour) {
+      //     throw new HttpException(
+      //       'Verification code is expired, Click on resend to generate new verification code.',
+      //       HttpStatus.BAD_REQUEST
+      //     );
+      //   } else {
+      //     await getCustomRepository(UserRepository).update(
+      //       {
+      //         email: body.email,
+      //       },
+      //       { isVerified: true }
+      //     );
+      //     response = {
+      //       status: true,
+      // //     };
+      // //     return response;
+      // //   }
+      // } else {
+      //   response = {
+      //     status: false,
+      //   };
+      // }
 
       return response;
     } catch (error) {
@@ -212,7 +212,7 @@ export class AuthService {
     let generateOtp: any = generateRandomNDigits(4);
     parseInt(generateOtp);
 
-    await client.set(`${generateOtp}`, JSON.stringify(values));
+    // await client.set(`${generateOtp}`, JSON.stringify(values));
 
     await getCustomRepository(UserCodeRepository).save({
       code: generateOtp,

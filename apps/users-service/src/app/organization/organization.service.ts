@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { performance } from 'perf_hooks';
 import { AuthService } from '../auth/auth.service';
 import { RbacService } from '../rbac/rbac.service';
 import { Branch } from '../schemas/branch.schema';
@@ -37,7 +38,7 @@ export class OrganizationService {
   async CreateOrUpdateOrganization(
     organizationDto,
     organizationData = null,
-    res
+    res = null
   ): Promise<any> {
     if (organizationDto && organizationDto.isNewRecord === false) {
       // we need to update organization
@@ -133,14 +134,13 @@ export class OrganizationService {
           branchArr.push(branch);
         }
 
-        // await this.accountService.initAccounts(organization, organizationData);
-
         const roles = await this.rbacService.InsertRoles(organization._id);
         await this.rbacService.InsertRolePermission(organization._id);
-
         const [adminRole] = roles.filter((r) => r.name === 'admin');
 
-        if (organizationData.organizationId === null) {
+        if (organizationData?.organizationId !== null) {
+          return res.send(organization);
+        } else {
           await this.userModel.updateOne(
             { _id: organizationData.id },
             {
@@ -160,10 +160,9 @@ export class OrganizationService {
           );
 
           return user_with_organization;
-        } else {
-          return organization;
         }
       } catch (error) {
+        console.log(error);
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
     }

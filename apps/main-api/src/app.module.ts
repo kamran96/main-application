@@ -23,6 +23,7 @@ import { XeroModule } from '../src/Integration/modules/xero.module';
 import { QuickbooksModule } from '../src/Integration/modules/quickbooks.module';
 import { EmailModule } from '../src/Integration/modules/email.model';
 
+console.log(process.env.DB_NAME);
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),

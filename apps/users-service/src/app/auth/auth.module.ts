@@ -20,9 +20,9 @@ import { AuthStrategy } from './auth.strategy';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('SECRET'),
+        secret: configService.get('JWT_SECRET'),
         signOptions: {
-          expiresIn: '12h',
+          expiresIn: process.env.EXPIRES + 'h',
         },
       }),
     }),

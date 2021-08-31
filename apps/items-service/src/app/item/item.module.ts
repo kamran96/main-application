@@ -7,6 +7,7 @@ import {
 import { Item, ItemSchema } from '../schemas/item.schema';
 import { ItemController } from './item.controller';
 import { ItemService } from './item.service';
+import { Authenticate } from '@invyce/auth-middleware';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { ItemService } from './item.service';
       { name: AttributeValue.name, schema: AttributeValueSchema },
     ]),
   ],
-  providers: [ItemService],
+  providers: [ItemService, Authenticate],
   controllers: [ItemController],
 })
 export class ItemModule {}

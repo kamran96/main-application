@@ -28,10 +28,16 @@
     ]
   },
   "projects": {
+    "auth-middleware": {
+      "tags": []
+    },
     "contacts-service": {
       "tags": []
     },
     "email-service": {
+      "tags": []
+    },
+    "global-auth-guard": {
       "tags": []
     },
     "items-service": {

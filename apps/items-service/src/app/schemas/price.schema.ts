@@ -28,6 +28,8 @@ export class Price {
   discount: string;
   @Prop({ type: mongoose.Schema.Types.ObjectId, schema: 'Item' })
   itemId: Item;
+  @Prop()
+  initialPurchasePrice: number;
 }
 
 export const PriceSchema = SchemaFactory.createForClass(Price);
