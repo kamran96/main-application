@@ -22,6 +22,8 @@ import { ReportModule } from '../src/Report/report.module';
 import { XeroModule } from '../src/Integration/modules/xero.module';
 import { QuickbooksModule } from '../src/Integration/modules/quickbooks.module';
 import { EmailModule } from '../src/Integration/modules/email.model';
+import { AccountsController } from './accounts/accounts.controller';
+import { AccountsController } from './accounts/accounts.controller';
 
 @Module({
   imports: [
@@ -72,7 +74,7 @@ import { EmailModule } from '../src/Integration/modules/email.model';
     QuickbooksModule,
     EmailModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, AccountsController],
   providers: [AppService],
 })
 export class AppModule {}

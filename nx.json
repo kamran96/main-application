@@ -28,6 +28,9 @@
     ]
   },
   "projects": {
+    "accounting-service": {
+      "tags": []
+    },
     "contacts-service": {
       "tags": []
     },
