@@ -32,12 +32,10 @@ export class UserLoginDto {
   @IsNotEmpty()
   username: string;
   password: string;
-  email: string;
 }
 
 export class ForgetPasswordDto {
   username: string;
-  email: string;
 }
 
 export class PasswordDto {

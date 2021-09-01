@@ -22,9 +22,8 @@ import { ReportModule } from '../src/Report/report.module';
 import { XeroModule } from '../src/Integration/modules/xero.module';
 import { QuickbooksModule } from '../src/Integration/modules/quickbooks.module';
 import { EmailModule } from '../src/Integration/modules/email.model';
-import { AccountsController } from './accounts/accounts.controller';
-import { AccountsController } from './accounts/accounts.controller';
 
+console.log(process.env.DB_NAME);
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -35,7 +34,7 @@ import { AccountsController } from './accounts/accounts.controller';
         ({
           type: 'postgres',
           host: configService.get('DB_HOST', process.env.DB_HOST),
-          port: configService.get<any>('DB_PORT', process.env.DB_PORT),
+          port: configService.get('DB_PORT',parseInt(process.env.DB_PORT)),
           username: configService.get('DB_USER', process.env.DB_USER),
           password: configService.get('DB_PASSWORD', process.env.DB_PASSWORD),
           database: configService.get('DB_NAME', process.env.DB_NAME),
@@ -74,7 +73,7 @@ import { AccountsController } from './accounts/accounts.controller';
     QuickbooksModule,
     EmailModule,
   ],
-  controllers: [AppController, AccountsController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}

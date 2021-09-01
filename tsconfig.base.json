@@ -16,6 +16,8 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
+      "@invyce/auth-middleware": ["libs/auth-middleware/src/index.ts"],
+      "@invyce/global-auth-guard": ["libs/global-auth-guard/src/index.ts"],
       "@invyce/send-email": ["libs/send-email/src/index.ts"]
     }
   },

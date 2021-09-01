@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AccountRepository, PrimaryAccountRepository, SecondaryAccountRepository } from '../../repositories';
 import { EntityManager, getCustomRepository, UpdateResult } from 'typeorm';
-// import { Pagination } from './pagination.service';
+import { Pagination } from './pagination.service';
 // import { PrimaryAccounts } from 'apps/accounting-service/entities';
 import { Accounts } from '../../entities';
 

@@ -5,9 +5,17 @@ export class UserToken {
   @Prop()
   code: string;
   @Prop()
-  userId: number;
+  userId: string;
   @Prop()
-  expiresAt: Date;
+  expiresAt: string;
+  @Prop()
+  brower: string;
+  @Prop()
+  ipAddress: string;
+  @Prop({ type: Date, default: Date.now })
+  createdAt: string;
+  @Prop({ type: Date, default: Date.now })
+  updatedAt: string;
 }
 
 export const UserTokenSchema = SchemaFactory.createForClass(UserToken);

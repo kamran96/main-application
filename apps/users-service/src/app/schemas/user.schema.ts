@@ -1,4 +1,8 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
+import * as mongoose from 'mongoose';
+import { Branch } from './branch.schema';
+import { Organization } from './organization.schema';
+import { Role } from './role.schema';
 
 @Schema()
 export class User {
@@ -33,12 +37,12 @@ export class User {
     })
   )
   profile: object;
-  @Prop()
-  organizationId: number;
-  @Prop()
-  roleId: number;
-  @Prop()
-  branchId: number;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Organization' })
+  organizationId: Organization;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Role' })
+  roleId: Role;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Branch' })
+  branchId: Branch;
   @Prop()
   status: number;
   @Prop({ type: Date, default: Date.now })
@@ -48,3 +52,27 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.virtual('organization', {
+  ref: 'Organization',
+  localField: 'organizationId',
+  foreignField: '_id',
+  justOne: true,
+});
+
+UserSchema.virtual('branch', {
+  ref: 'Branch',
+  localField: 'branchId',
+  foreignField: '_id',
+  justOne: true,
+});
+
+UserSchema.virtual('role', {
+  ref: 'Role',
+  localField: 'roleId',
+  foreignField: '_id',
+  justOne: true,
+});
+
+UserSchema.set('toObject', { virtuals: true });
+UserSchema.set('toJSON', { virtuals: true });

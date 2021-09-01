@@ -1,4 +1,6 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
+import * as mongoose from 'mongoose';
+import { Organization } from './organization.schema';
 
 @Schema()
 export class Branch {
@@ -26,12 +28,12 @@ export class Branch {
   isMain: boolean;
   @Prop()
   status: number;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Organization' })
+  organizationId: Organization;
   @Prop()
-  organizationId: number;
+  createdById: string;
   @Prop()
-  createdById: number;
-  @Prop()
-  updatedById: number;
+  updatedById: string;
   @Prop({ type: Date, default: Date.now })
   createdAt: string;
   @Prop({ type: Date, default: Date.now })

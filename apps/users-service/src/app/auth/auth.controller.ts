@@ -6,7 +6,11 @@ import {
   HttpStatus,
   Logger,
   Post,
+  Req,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
+import { Request, Response } from 'express';
 import {
   ForgetPasswordDto,
   PasswordDto,
@@ -14,15 +18,16 @@ import {
   UserRegisterDto,
 } from '../dto/user.dto';
 import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post()
-  async Login(@Body() authDto: UserLoginDto) {
+  async Login(@Body() authDto: UserLoginDto, @Res() res: Response) {
     try {
-      const user: any = await this.authService.ValidateUser(authDto);
+      const user: any = await this.authService.ValidateUser(authDto, res);
 
       return {
         message: 'Login Successfull.',
@@ -37,7 +42,7 @@ export class AuthController {
   }
 
   @Post('/register')
-  async Register(@Body() authDto: UserRegisterDto) {
+  async Register(@Body() authDto: UserRegisterDto, @Res() res: Response) {
     try {
       const users = await this.authService.CheckUser(authDto);
       if (Array.isArray(users) && users.length > 0) {
@@ -47,7 +52,7 @@ export class AuthController {
         );
       }
       await this.authService.AddUser(authDto);
-      const user = await this.authService.ValidateUser(authDto);
+      const user = await this.authService.ValidateUser(authDto, res);
       if (user) {
         return {
           message: 'Successfull',
@@ -59,6 +64,40 @@ export class AuthController {
         `Sorry! Something went wrong, ${error.message}`,
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('access-controll')
+  async access(@Body() body, @Req() req: Request) {
+    try {
+      const user = await this.authService.AccessControll(body, req);
+
+      if (user) {
+        return {
+          result: user,
+        };
+      }
+      throw new HttpException('Authentication Falied', HttpStatus.BAD_REQUEST);
+    } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/check')
+  async check(@Req() req: Request, @Res() res: Response) {
+    const user = await this.authService.Check(req.user, res);
+
+    if (user) {
+      return {
+        message: 'Validated successfully',
+        status: true,
+        result: user,
+      };
     }
   }
 

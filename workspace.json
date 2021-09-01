@@ -41,12 +41,25 @@
             "lintFilePatterns": ["apps/accounting-service/**/*.ts"]
           }
         },
-        "test": {
-          "executor": "@nrwl/jest:jest",
+        "test":{
+          "executor":"@nrwl/jest:jest",
           "outputs": ["coverage/apps/accounting-service"],
           "options": {
             "jestConfig": "apps/accounting-service/jest.config.js",
             "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "auth-middleware": {
+      "root": "libs/auth-middleware",
+      "sourceRoot": "libs/auth-middleware/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/auth-middleware/**/*.ts"]
           }
         }
       }
@@ -146,6 +159,77 @@
           "outputs": ["coverage/apps/email-service"],
           "options": {
             "jestConfig": "apps/email-service/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "global-auth-guard": {
+      "root": "libs/global-auth-guard",
+      "sourceRoot": "libs/global-auth-guard/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/global-auth-guard/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/global-auth-guard"],
+          "options": {
+            "jestConfig": "libs/global-auth-guard/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "items-service": {
+      "root": "apps/items-service",
+      "sourceRoot": "apps/items-service/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/items-service",
+            "main": "apps/items-service/src/main.ts",
+            "tsConfig": "apps/items-service/tsconfig.app.json",
+            "assets": ["apps/items-service/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/items-service/src/environments/environment.ts",
+                  "with": "apps/items-service/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "items-service:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/items-service/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/items-service"],
+          "options": {
+            "jestConfig": "apps/items-service/jest.config.js",
             "passWithNoTests": true
           }
         }
@@ -378,7 +462,7 @@
   "cli": {
     "defaultCollection": "@nrwl/nest"
   },
-  "defaultProject": "accounting-service",
+  "defaultProject": "main-api",
   "generators": {
     "@nrwl/react": {
       "application": {
@@ -396,3 +480,4 @@
     }
   }
 }
+

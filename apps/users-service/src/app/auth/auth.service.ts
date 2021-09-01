@@ -11,8 +11,10 @@ import { ClientProxy } from '@nestjs/microservices';
 import * as bcrypt from 'bcryptjs';
 import * as Moment from 'moment';
 import * as queryString from 'query-string';
+import * as os from 'os';
+import * as ip from 'ip';
 import { User } from '../schemas/user.schema';
-import { SEND_CUSTOMER_EMAIL } from '@invyce/send-email';
+import { SEND_CUSTOMER_EMAIL, SEND_FORGOT_PASSWORD } from '@invyce/send-email';
 import { UserToken } from '../schemas/userToken.schema';
 
 const generateRandomNDigits = (n) => {
@@ -30,11 +32,57 @@ export class AuthService {
 
   async CheckUser(authDto) {
     try {
-      const user = await this.userModel.find({
-        $or: [{ username: authDto.username }, { email: authDto.email }],
-      });
+      const user = await this.userModel
+        .find({
+          $or: [{ username: authDto.username }, { email: authDto.username }],
+        })
+        .populate('role')
+        .populate('organization')
+        .populate('branch');
 
       return user;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async AccessControll(data, req) {
+    try {
+      const userId = req.user.id;
+
+      const findToken = await this.userTokenModel.findOne({
+        userId: userId,
+        code: req.cookies.access_token,
+      });
+
+      const newTime = Moment(new Date())
+        .add(process.env.EXPIRES, 'h')
+        .calendar();
+      const time = Moment(new Date()).calendar();
+
+      if (findToken === null) {
+        const token = new this.userTokenModel();
+        token.code = req.cookies.access_token;
+        token.expiresAt = newTime;
+        token.brower = req.headers['user-agent'];
+        token.ipAddress = ip.address();
+        token.userId = userId;
+        await token.save();
+      }
+
+      if (time > findToken?.expiresAt) {
+        return {
+          message: 'Token is expired, Please try again later.',
+          statusCode: HttpStatus.FORBIDDEN,
+        };
+      }
+
+      const user = await this.userModel.findById(userId);
+
+      return {
+        user,
+        statusCode: HttpStatus.OK,
+      };
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -46,13 +94,14 @@ export class AuthService {
     user.email = authDto.email;
     user.password =
       authDto.password !== '' ? bcrypt.hashSync(authDto.password) : null;
-    user.organizationId = authDto.organizationId;
-    user.branchId = authDto.branchId;
-    user.roleId = authDto.roleId;
+    user.organizationId = authDto.organizationId || null;
+    user.branchId = authDto.branchId || null;
+    user.roleId = authDto.roleId || null;
     user.prefix = authDto.prefix;
     user.profile = authDto.profile;
     user.terms = authDto.terms;
     user.marketing = authDto.marketing;
+    user.status = 1;
     await user.save();
 
     const time = Moment(new Date()).add(1, 'h').calendar();
@@ -71,28 +120,41 @@ export class AuthService {
     return user;
   }
 
-  async Login(user) {
+  async Login(user, res) {
     const [newUser] = user;
 
     const payload = {
       username: newUser.username,
       id: newUser.id,
-      // organizationId: newUser.organizationId,
-      // roleId: newUser.roleId,
-      // branchId: newUser.branchId,
     };
 
     // when added an organization then return new access_token
 
     const token = this.jwtService.sign(payload);
 
+    res
+      .cookie('access_token', token, {
+        httpOnly: true,
+        domain: 'localhost',
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+      })
+      .send({
+        message: 'Login successfully',
+        status: true,
+        result: { user: newUser, token },
+      });
+
     return {
-      users: newUser,
-      access_token: token,
+      tokens: token,
     };
   }
 
-  async ValidateUser(authDto) {
+  async Check(userData, res) {
+    const user = await this.CheckUser(userData);
+    return await this.Login(user, res);
+  }
+
+  async ValidateUser(authDto, res) {
     const users = await this.CheckUser(authDto);
 
     if (Array.isArray(users) && users[0] !== undefined) {
@@ -105,7 +167,7 @@ export class AuthService {
         );
       }
       if (bcrypt.compareSync(authDto.password, user.password)) {
-        const user = await this.Login(users);
+        const user = await this.Login(users, res);
         return user;
       }
       throw new HttpException('Incorrect Password', HttpStatus.BAD_REQUEST);
@@ -219,8 +281,8 @@ export class AuthService {
   }
 
   async ForgetPassword(userDto): Promise<boolean> {
-    const user = await this.userModel.find({
-      $or: [{ username: userDto?.username }, { email: userDto?.email }],
+    const user = await this.userModel.findOne({
+      $or: [{ username: userDto?.username }, { email: userDto?.username }],
     });
 
     if (user) {
@@ -239,16 +301,26 @@ export class AuthService {
 
   async SendForgetPassword(user, code): Promise<any> {
     const baseUrl = 'http://localhost:3000';
-
     const _code = queryString.stringify({ code });
-
     const a = `${baseUrl}/page/forgot-password?${_code}&type=reset-password`;
+    const operating_system = os.type();
 
-    const link = `
-    <p>We've received a password changed request on your account. </p>
-    <p>Please <a href='${a}'>click here</a> to reset your password. Or copy below text in your browser's address bar.</p.
-    <p style="margin-top: 8px; font-size: 10px; color: blue;">${a}</p>
-  `;
+    const payload = {
+      TemplateAlias: 'password-reset',
+      TemplateModel: {
+        product_url: '',
+        product_name: 'invyce',
+        name: user.profile.fullName,
+        action_url: a,
+        operating_system,
+        // browser_name: browser.name,
+        support_url: 'support@invyce.com',
+        company_name: 'invyce',
+        company_address: 'ZS plaza jutial giltit, Pakistan',
+      },
+    };
+
+    await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
     // await this.email
     //   .compose(
     //     user.email,
