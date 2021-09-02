@@ -33,7 +33,7 @@ import { EmailModule } from '../src/Integration/modules/email.model';
         ({
           type: 'postgres',
           host: configService.get('DB_HOST', process.env.DB_HOST),
-          port: configService.get<any>('DB_PORT', process.env.DB_PORT),
+          port: configService.get('DB_PORT',parseInt(process.env.DB_PORT)),
           username: configService.get('DB_USER', process.env.DB_USER),
           password: configService.get('DB_PASSWORD', process.env.DB_PASSWORD),
           database: configService.get('DB_NAME', process.env.DB_NAME),

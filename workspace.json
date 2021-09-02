@@ -1,6 +1,56 @@
 {
   "version": 2,
   "projects": {
+    "accounting-service": {
+      "root": "apps/accounting-service",
+      "sourceRoot": "apps/accounting-service/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/accounting-service",
+            "main": "apps/accounting-service/src/main.ts",
+            "tsConfig": "apps/accounting-service/tsconfig.app.json",
+            "assets": ["apps/accounting-service/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/accounting-service/src/environments/environment.ts",
+                  "with": "apps/accounting-service/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "accounting-service:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/accounting-service/**/*.ts"]
+          }
+        },
+        "test":{
+          "executor":"@nrwl/jest:jest",
+          "outputs": ["coverage/apps/accounting-service"],
+          "options": {
+            "jestConfig": "apps/accounting-service/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "auth-middleware": {
       "root": "libs/auth-middleware",
       "sourceRoot": "libs/auth-middleware/src",
@@ -10,14 +60,6 @@
           "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["libs/auth-middleware/**/*.ts"]
-          }
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/auth-middleware"],
-          "options": {
-            "jestConfig": "libs/auth-middleware/jest.config.js",
-            "passWithNoTests": true
           }
         }
       }
@@ -488,3 +530,4 @@
     }
   }
 }
+

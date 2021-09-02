@@ -28,6 +28,9 @@
     ]
   },
   "projects": {
+    "accounting-service": {
+      "tags": []
+    },
     "auth-middleware": {
       "tags": []
     },
