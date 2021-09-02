@@ -75,7 +75,7 @@ export class AccountsService {
     on sa.id = a."secondaryAccountId"
     left join primary_accounts pa
     on pa.id = sa."primaryAccountId"
-    where a."organizationId" = 1
+    where a."organizationId" = ${accountData.organizationId}
     `;
 
       if (purpose === 'all') {

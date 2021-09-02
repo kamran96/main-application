@@ -1,18 +1,24 @@
 import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import {Request} from 'express';
 import { AccountsService } from './accounts.service';
 // import { JwtAuthGuard } from '../jwt-auth.guard';
 import { AccountDto, AccountIdsDto } from '../../dto/account.dto';
+import {GlobalAuthGuard} from '@invyce/global-auth-guard'
 
 @Controller('accounts')
 export class AccountsController {
     constructor(private readonly accountService: AccountsService){}
+
     @Get()
+    @UseGuards(GlobalAuthGuard)
     async index(
       @Req() req: Request,
       @Query() { take, page_no, sort, query, purpose },
     ) {
+
+      console.log(req.user, 'user')
       const account = await this.accountService.ListAccounts(
-        req,
+        req.user,
         take,
         page_no,
         sort,
