@@ -1,4 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import * as mongoosePaginate from 'mongoose-paginate-v2';
 
 @Schema()
 export class Contact {
@@ -33,19 +34,17 @@ export class Contact {
   @Prop()
   openingBalance: number;
   @Prop()
-  transactionId: number;
-  @Prop()
   importedFrom: string;
   @Prop()
   importedContactId: string;
   @Prop()
-  organizationId: number;
+  organizationId: string;
   @Prop()
-  branchId: number;
+  branchId: string;
   @Prop({ required: true })
-  createdById: number;
+  createdById: string;
   @Prop({ required: true })
-  updatedById: number;
+  updatedById: string;
   @Prop()
   status: number;
   @Prop({ type: Date, default: Date.now })
@@ -55,3 +54,4 @@ export class Contact {
 }
 
 export const ContactSchema = SchemaFactory.createForClass(Contact);
+ContactSchema.plugin(mongoosePaginate);

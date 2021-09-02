@@ -49,7 +49,6 @@ export class AuthService {
   async AccessControll(data, req) {
     try {
       const userId = req.user.id;
-
       const findToken = await this.userTokenModel.findOne({
         userId: userId,
         code: req.cookies.access_token,
@@ -131,12 +130,13 @@ export class AuthService {
     // when added an organization then return new access_token
 
     const token = this.jwtService.sign(payload);
+    // const address = ip.address();
 
     res
       .cookie('access_token', token, {
         httpOnly: true,
         domain: 'localhost',
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        expires: new Date(Moment().add(process.env.EXPIRES, 'h').toDate()),
       })
       .send({
         message: 'Login successfully',
@@ -149,9 +149,24 @@ export class AuthService {
     };
   }
 
-  async Check(userData, res) {
-    const user = await this.CheckUser(userData);
-    return await this.Login(user, res);
+  async Check(req) {
+    try {
+      const user = await this.CheckUser(req.user);
+      const access_token = req.cookies['access_token'];
+
+      if (user?.length) {
+        return {
+          message: 'Authenticated',
+          result: {
+            user: user[0],
+            token: access_token,
+          },
+        };
+      }
+      throw new HttpException('Authentication Failed', HttpStatus.BAD_REQUEST);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   async ValidateUser(authDto, res) {

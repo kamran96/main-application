@@ -10,7 +10,76 @@ export class ItemService {
     @InjectModel(AttributeValue.name) private attributeValueModel
   ) {}
 
-  async CreateItem(itemDto) {
+  async ListItems(itemData, query) {
+    const { page_size, page_no, filters, purpose } = query;
+
+    let items;
+    if (purpose === 'ALL') {
+      items = await this.itemModel.find({
+        status: 1,
+        organizationId: itemData.organizationId,
+      });
+    } else {
+      if (filters) {
+        const filterData: any = Buffer.from(filters, 'base64').toString();
+        const data = JSON.parse(filterData);
+
+        for (let i in data) {
+          if (data[i].type === 'search') {
+            const val = data[i].value?.split('%')[1];
+            items = await this.itemModel.find({
+              status: 1,
+              organizationId: itemData.organizationId,
+              [i]: { $regex: val },
+            });
+          } else if (data[i].type === 'date-between') {
+            const start_date = i[1]['value'][0];
+            const end_date = i[1]['value'][1];
+            items = await this.itemModel.find({
+              status: 1,
+              organizationId: itemData.organizationId,
+              [i]: { $gt: start_date, $lt: end_date },
+            });
+          } else if (data[i].type === 'compare') {
+            items = await this.itemModel.find({
+              status: 1,
+              organization: itemData.organizationId,
+              [i]: { $in: i[1]['value'] },
+            });
+          } else if (data[i].type === 'in') {
+            items = await this.itemModel.find({
+              status: 1,
+              organization: itemData.organizationId,
+              [i]: { $in: i[1]['value'] },
+            });
+          }
+        }
+      } else {
+        const myCustomLabels = {
+          docs: 'items',
+          limit: 'pageSize',
+          page: 'currentPage',
+          nextPage: 'next',
+          prevPage: 'prev',
+          totalPages: 'totalPages',
+          pagingCounter: 'slNo',
+          meta: 'pagination',
+        };
+
+        items = await this.itemModel.paginate(
+          { status: 1, organizationId: itemData.organizationId },
+          {
+            offset: page_no * page_size - page_size,
+            limit: page_size,
+            customLabels: myCustomLabels,
+          }
+        );
+      }
+    }
+    return items;
+  }
+
+  async CreateItem(itemDto, itemData) {
     try {
       let find_item = [];
       if (itemDto.isNewRecord === true) {
@@ -24,7 +93,7 @@ export class ItemService {
       if (find_item?.length > 0) {
         throw new HttpException(
           'Item with specified code alreay exists',
-          HttpStatus.BAD_REQUEST
+          HttpStatus.FORBIDDEN
         );
       } else {
         if (itemDto?.isNewRecord === false) {
@@ -43,7 +112,7 @@ export class ItemService {
               stock: itemDto.stock || item.stock,
               organizationId: item.organizationId,
               createdById: item.name,
-              updatedById: itemDto.updatedById,
+              updatedById: itemData._id,
             };
 
             await this.itemModel.updateOne({ _id: itemDto.id }, updatedItem);
@@ -73,9 +142,9 @@ export class ItemService {
           item.type = itemDto.type;
           item.isActive = itemDto.isActive;
           item.stock = itemDto.stock;
-          item.organizationId = itemDto.organizationId;
-          item.createdById = itemDto.createdById;
-          item.updatedById = itemDto.updatedById;
+          item.organizationId = itemData.organizationId;
+          item.createdById = itemData._id;
+          item.updatedById = itemData._id;
           item.status = 1;
           await item.save();
 
@@ -92,11 +161,16 @@ export class ItemService {
         }
       }
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.BAD_REQUEST
+      );
     }
   }
 
   async FindById(itemId) {
     return await this.itemModel.find({ _id: itemId });
   }
+
+  async;
 }

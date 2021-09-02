@@ -89,8 +89,9 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/check')
-  async check(@Req() req: Request, @Res() res: Response) {
-    const user = await this.authService.Check(req.user, res);
+  async check(@Req() req: Request) {
+   try {
+    const user = await this.authService.Check(req);
 
     if (user) {
       return {
@@ -99,6 +100,12 @@ export class AuthController {
         result: user,
       };
     }
+   } catch (error) {
+    throw new HttpException(
+      `Sorry! Something went wrong, ${error.message}`,
+      error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+    );
+   }
   }
 
   @Post('/resend-otp')

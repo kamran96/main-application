@@ -9,9 +9,6 @@ export class ItemDto {
   isActive: boolean;
   stock: number;
   isNewRecord: boolean;
-  organizationId: number;
-  createdById: number;
-  updatedById: number;
   hasInventory: boolean;
   hasCategory: boolean;
   attribute_values: Array<AttributeValuesDto>;

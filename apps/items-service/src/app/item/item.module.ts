@@ -10,6 +10,7 @@ import { ItemService } from './item.service';
 import { Authenticate } from '@invyce/auth-middleware';
 
 @Module({
+  controllers: [ItemController],
   imports: [
     MongooseModule.forFeature([
       { name: Item.name, schema: ItemSchema },
@@ -17,6 +18,5 @@ import { Authenticate } from '@invyce/auth-middleware';
     ]),
   ],
   providers: [ItemService, Authenticate],
-  controllers: [ItemController],
 })
 export class ItemModule {}

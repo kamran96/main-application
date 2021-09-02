@@ -7,17 +7,23 @@ import {
   Put,
   HttpException,
   HttpStatus,
+  UseGuards,
+  Req,
+  Query,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { ContactDto, ContactIds } from '../dto/contact.dto';
 import { ContactService } from './contact.service';
+import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 
 @Controller('contact')
 export class ContactController {
   constructor(private contactService: ContactService) {}
 
   @Get()
-  async index() {
-    const contact = await this.contactService.FindAll();
+  @UseGuards(GlobalAuthGuard)
+  async index(@Req() req: Request, @Query() query) {
+    const contact = await this.contactService.FindAll(req.user, query);
 
     if (contact) {
       return {
@@ -29,9 +35,13 @@ export class ContactController {
   }
 
   @Post()
-  async create(@Body() contactDto: ContactDto) {
+  @UseGuards(GlobalAuthGuard)
+  async create(@Body() contactDto: ContactDto, @Req() req: Request) {
     try {
-      const contact = await this.contactService.CreateContact(contactDto);
+      const contact = await this.contactService.CreateContact(
+        contactDto,
+        req.user
+      );
 
       if (contact) {
         return {
@@ -49,6 +59,7 @@ export class ContactController {
   }
 
   @Get('/:id')
+  @UseGuards(GlobalAuthGuard)
   async show(@Param() params) {
     const contact = await this.contactService.FindById(params.id);
 
@@ -62,6 +73,7 @@ export class ContactController {
   }
 
   @Put()
+  @UseGuards(GlobalAuthGuard)
   async delete(@Body() deletedIds: ContactIds) {
     const contact = await this.contactService.Remove(deletedIds);
 
