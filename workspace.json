@@ -143,6 +143,56 @@
         }
       }
     },
+    "invoices-service": {
+      "root": "apps/invoices-service",
+      "sourceRoot": "apps/invoices-service/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/invoices-service",
+            "main": "apps/invoices-service/src/main.ts",
+            "tsConfig": "apps/invoices-service/tsconfig.app.json",
+            "assets": ["apps/invoices-service/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/invoices-service/src/environments/environment.ts",
+                  "with": "apps/invoices-service/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "invoices-service:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/invoices-service/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/invoices-service"],
+          "options": {
+            "jestConfig": "apps/invoices-service/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "items-service": {
       "root": "apps/items-service",
       "sourceRoot": "apps/items-service/src",

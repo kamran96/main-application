@@ -40,6 +40,9 @@
     "global-auth-guard": {
       "tags": []
     },
+    "invoices-service": {
+      "tags": []
+    },
     "items-service": {
       "tags": []
     },
