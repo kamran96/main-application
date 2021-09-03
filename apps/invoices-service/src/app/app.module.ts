@@ -5,7 +5,8 @@ import { getMetadataArgsStorage } from 'typeorm';
 require('dotenv').config();
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-console.log(process.env.INVOICE_DB_USER);
+import { InvoiceModule } from './invoice/inovice.module';
+import { Authenticate } from '@invyce/auth-middleware';
 
 @Module({
   imports: [
@@ -16,32 +17,21 @@ console.log(process.env.INVOICE_DB_USER);
       useFactory: async (configService: ConfigService) =>
         ({
           type: 'postgres',
-          host: configService.get(
-            'INVOICE_DB_HOST',
-            process.env.INVOICE_DB_HOST
-          ),
-          port: configService.get<any>(
-            'INVOICE_DB_PORT',
-            process.env.INVOICE_DB_PORT
-          ),
-          username: configService.get(
-            'INVOICE_DB_USER',
-            process.env.INVOICE_DB_USER
-          ),
+          host: configService.get('INV_DB_HOST', process.env.INV_DB_HOST),
+          port: configService.get<any>('INV_DB_PORT', process.env.INV_DB_PORT),
+          username: configService.get('INV_DB_USER', process.env.INV_DB_USER),
           password: configService.get(
-            'INVOICE_DB_PASSWORD',
-            process.env.INVOICE_DB_PASSWORD
+            'INV_DB_PASSWORD',
+            process.env.INV_DB_PASSWORD
           ),
-          database: configService.get(
-            'INVOICE_DB_NAME',
-            process.env.INVOICE_DB_NAME
-          ),
+          database: configService.get('INV_DB_NAME', process.env.INV_DB_NAME),
           entities: getMetadataArgsStorage().tables.map((tbl) => tbl.target),
           ssl: { rejectUnauthorized: false },
         } as TypeOrmModuleOptions),
     }),
+    InvoiceModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, Authenticate],
 })
 export class AppModule {}

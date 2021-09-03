@@ -11,12 +11,10 @@ import { AppModule } from './app/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const globalPrefix = 'accounting-service';
-  app.setGlobalPrefix(globalPrefix);
   const port = process.env.APP_PORT || 3336;
   app.use(cookieParser());
   await app.listen(port, () => {
-    Logger.log('Listening at http://localhost:' + port + '/' + globalPrefix);
+    Logger.log('Listening at http://localhost:' + port);
   });
 }
 

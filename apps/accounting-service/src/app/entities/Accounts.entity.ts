@@ -1,17 +1,14 @@
-import { join } from 'path';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToOne,
   JoinColumn,
-  ManyToMany,
   ManyToOne,
 } from 'typeorm';
 import { PrimaryAccounts } from './PrimaryAccount.entity';
 import { SecondaryAccounts } from './SecondaryAccount.entity';
 
-@Entity()
+@Entity('accounts')
 export class Accounts {
   @PrimaryGeneratedColumn()
   id: number;
@@ -30,9 +27,9 @@ export class Accounts {
   @Column()
   taxRate: number;
   @Column()
-  branchId: number;
+  branchId: string;
   @Column()
-  organizationId: number;
+  organizationId: string;
   @Column()
   status: number;
   @Column()
@@ -42,17 +39,17 @@ export class Accounts {
   @Column()
   importedAccountId: string;
   @Column()
-  createdById: number;
+  createdById: string;
   @Column()
   updatedAt: string;
   @Column()
-  updatedById: number;
+  updatedById: string;
 
-  @ManyToOne(type => SecondaryAccounts)
+  @ManyToOne((type) => SecondaryAccounts)
   @JoinColumn({ name: 'secondaryAccountId', referencedColumnName: 'id' })
   secondaryAccount: SecondaryAccounts;
 
-  @ManyToOne(type => PrimaryAccounts)
+  @ManyToOne((type) => PrimaryAccounts)
   @JoinColumn({ name: 'secondaryAccountId', referencedColumnName: 'id' })
   primaryAccount: PrimaryAccounts;
 }

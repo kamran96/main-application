@@ -1,16 +1,19 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { AccountRepository, PrimaryAccountRepository, SecondaryAccountRepository } from '../../repositories';
+import {
+  AccountRepository,
+  PrimaryAccountRepository,
+  SecondaryAccountRepository,
+} from '../repositories';
 import { EntityManager, getCustomRepository, UpdateResult } from 'typeorm';
-import { Pagination } from './pagination.service';
 // import { PrimaryAccounts } from 'apps/accounting-service/entities';
-import { Accounts } from '../../entities';
-
+import { Accounts } from '../entities';
 
 @Injectable()
 export class AccountsService {
   constructor(private entitymanager: EntityManager) {}
-  async ListAccounts(accountData, take, page_no, sort, query, purpose) {
+  async ListAccounts(accountData, query) {
     try {
+      const { purpose } = query;
       const accountRepository = getCustomRepository(AccountRepository);
       const sql = `
       select 
@@ -94,9 +97,10 @@ export class AccountsService {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
+
   async SecondaryAccountName(organizationId) {
     const secondaryAccountRepository = getCustomRepository(
-      SecondaryAccountRepository,
+      SecondaryAccountRepository
     );
 
     const account = await secondaryAccountRepository.find({
@@ -114,13 +118,13 @@ export class AccountsService {
     try {
       const accountRepository = getCustomRepository(AccountRepository);
       const primaryAccountRepository = getCustomRepository(
-        PrimaryAccountRepository,
+        PrimaryAccountRepository
       );
       const secondaryAccountRepository = getCustomRepository(
-        SecondaryAccountRepository,
+        SecondaryAccountRepository
       );
-      const { primary, secondary } = await import('../accounts');
-      for(const account of primary) {
+      const { primary, secondary } = await import('../../accounts');
+      for (const account of primary) {
         const accountModel = {
           name: account.name,
           status: 1,
@@ -130,10 +134,10 @@ export class AccountsService {
           updatedById: userId, // need to be change later
         };
         const primaryAccount = await primaryAccountRepository.save(
-          accountModel,
+          accountModel
         );
         const secondaryAccounts = secondary.filter(
-          item => item.primary_account_id === account.oldId,
+          (item) => item.primary_account_id === account.oldId
         );
         for (const secondaryAccount of secondaryAccounts) {
           const secondaryModel = {
@@ -146,9 +150,9 @@ export class AccountsService {
             createdById: userId,
           };
           const insertSecondary = await secondaryAccountRepository.save(
-            secondaryModel,
+            secondaryModel
           );
-          if(secondaryAccount.accounts.length > 0){
+          if (secondaryAccount.accounts.length > 0) {
             for (const account of secondaryAccount.accounts) {
               const accountModel = {
                 name: account.name,
@@ -157,14 +161,14 @@ export class AccountsService {
                 isSystemAccount: account.isSystemAccount,
                 secondaryAccountId: insertSecondary.id,
                 primaryAccountId: primaryAccount.id,
-                importedFrom : 'init',
+                importedFrom: 'init',
                 organizationId: organizationId,
                 createdById: userId,
                 updatedById: userId,
               };
               await accountRepository.save(accountModel);
             }
-          }  
+          }
         }
       }
     } catch (error) {
@@ -172,7 +176,7 @@ export class AccountsService {
     }
   }
 
-  async CreateOrUpdateAccount(accountDto) {
+  async CreateOrUpdateAccount(accountDto, accountData) {
     const accountRepository = getCustomRepository(AccountRepository);
     if (accountDto && accountDto.isNewRecord === false) {
       // we need to update account
@@ -194,15 +198,15 @@ export class AccountsService {
           updatedAccount.primaryAccountId =
             accountDto.parimaryAccountId || account.primaryAccountId;
           updatedAccount.status = account.status;
-          updatedAccount.branchId = account.branchId;
+          // updatedAccount.branchId = account.branchId;
+          updatedAccount.organizationId = account.organizationId;
           updatedAccount.createdById = account.createdById;
-          updatedAccount.updatedById =
-            accountDto.userId || account.updatedById;
+          updatedAccount.updatedById = accountData._id;
 
           await this.entitymanager.update(
             Accounts,
             { id: accountDto.accountId },
-            updatedAccount,
+            updatedAccount
           );
 
           const [updated] = await accountRepository.find({
@@ -225,11 +229,11 @@ export class AccountsService {
           secondaryAccountId: accountDto.secondaryAccountId,
           primaryAccountId: accountDto.primaryAccountId,
           taxRate: accountDto.taxRate,
-          branchId: accountDto.branchId,
-          organizationId: accountDto.organizationId,
+          // branchId: accountDto.branchId,
+          organizationId: accountData.id,
           status: 1,
-          createdById: accountDto.userId,
-          updatedById: accountDto.userId,
+          createdById: accountData.id,
+          updatedById: accountData.id,
         });
 
         return account;
@@ -249,21 +253,21 @@ export class AccountsService {
     return account;
   }
 
-//   async DeleteAccount(accountDto) {
-//     try {
-//       for (let i of accountDto.ids) {
-//         await this.manager.update(Accounts, { id: i }, { status: 0 });
-//       }
-//       const accountRepository = getCustomRepository(AccountRepository);
-//       const [account] = await accountRepository.find({
-//         where: {
-//           id: accountDto.ids[0],
-//         },
-//       });
+  //   async DeleteAccount(accountDto) {
+  //     try {
+  //       for (let i of accountDto.ids) {
+  //         await this.manager.update(Accounts, { id: i }, { status: 0 });
+  //       }
+  //       const accountRepository = getCustomRepository(AccountRepository);
+  //       const [account] = await accountRepository.find({
+  //         where: {
+  //           id: accountDto.ids[0],
+  //         },
+  //       });
 
-//       return account;
-//     } catch (error) {
-//       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-//     }
-//   }
+  //       return account;
+  //     } catch (error) {
+  //       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+  //     }
+  //   }
 }
