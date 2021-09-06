@@ -5,10 +5,10 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Invoices } from './invoice.entity';
+import { Bills } from './bill.entity';
 
 @Entity()
-export class InvoiceItems {
+export class BillItems {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
@@ -38,7 +38,7 @@ export class InvoiceItems {
   @Column()
   status: number;
 
-  @ManyToOne(() => Invoices, (invoice) => invoice.id)
-  @JoinColumn({ name: 'invoiceId', referencedColumnName: 'id' })
-  invoice: Invoices;
+  @ManyToOne(() => Bills, (bill) => bill.id)
+  @JoinColumn({ name: 'billId', referencedColumnName: 'id' })
+  bill: Bills;
 }

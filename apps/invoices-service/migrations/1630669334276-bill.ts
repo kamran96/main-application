@@ -1,10 +1,10 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-export class invoice1630587629484 implements MigrationInterface {
+export class bill1630669334276 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'invoices',
+        name: 'bills',
         columns: [
           { name: 'id', type: 'serial', isPrimary: true },
           { name: 'reference', type: 'varchar', isNullable: true },
@@ -23,7 +23,7 @@ export class invoice1630587629484 implements MigrationInterface {
           { name: 'currency', type: 'varchar', isNullable: true },
           { name: 'comment', type: 'varchar', isNullable: true },
           { name: 'importedFrom', type: 'varchar', isNullable: true },
-          { name: 'importedInvoiceId', type: 'varchar', isNullable: true },
+          { name: 'importedBillId', type: 'varchar', isNullable: true },
           { name: 'branchId', type: 'varchar', isNullable: true },
           { name: 'organizationId', type: 'varchar', isNullable: true },
           { name: 'createdById', type: 'varchar', isNullable: true },
@@ -38,6 +38,6 @@ export class invoice1630587629484 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('invoices');
+    await queryRunner.dropTable('bills');
   }
 }

@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -39,6 +40,35 @@ export class InvoiceController {
         HttpStatus.BAD_REQUEST
       );
     } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @UseGuards(GlobalAuthGuard)
+  @Get('number')
+  async getInvoiceNumber(@Query() { type }, @Req() req: Request) {
+    try {
+      const invoice = await this.invoiceService.GetInvoiceNumber(
+        type,
+        req.user
+      );
+
+      if (invoice) {
+        return {
+          message: 'Invoice fetched successfully.',
+          status: true,
+          result: invoice,
+        };
+      }
+      throw new HttpException(
+        'Failed to create invoice',
+        HttpStatus.BAD_REQUEST
+      );
+    } catch (error) {
+      console.log(error);
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR

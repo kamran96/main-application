@@ -1,6 +1,5 @@
-export class InvoiceDto {
+export class CreditNoteDto {
   id: number;
-  isNewRecord: boolean;
   reference: string;
   contactId: string;
   issueDate: string;
@@ -12,15 +11,11 @@ export class InvoiceDto {
   netTotal: number;
   date: string;
   type: string;
-  directTax: number;
-  indirectTax: number;
-  isTaxIncluded: number;
-  isReturn: boolean;
   comment: string;
-  invoice_items: Array<InvoiceItemsDto>;
+  credit_note_items: Array<CreditNoteItemDto>;
 }
 
-class InvoiceItemsDto {
+class CreditNoteItemDto {
   id: number;
   itemId: string;
   description: string;

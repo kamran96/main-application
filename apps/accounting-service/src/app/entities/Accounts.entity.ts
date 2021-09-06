@@ -8,7 +8,7 @@ import {
 import { PrimaryAccounts } from './PrimaryAccount.entity';
 import { SecondaryAccounts } from './SecondaryAccount.entity';
 
-@Entity('accounts')
+@Entity()
 export class Accounts {
   @PrimaryGeneratedColumn()
   id: number;

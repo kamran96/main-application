@@ -43,14 +43,9 @@ export class AccountsController {
 
   @UseGuards(GlobalAuthGuard)
   @Get('/init')
-  async initAccounts(@Req() req: Request, @Query() { organizationId, userId }) {
+  async initAccounts(@Req() req: Request) {
     try {
-      // first param is organizationId
-      // second param is branchId
-      const initialAccounts = await this.accountService.initAccounts(
-        organizationId,
-        userId
-      );
+      const initialAccounts = await this.accountService.initAccounts(req.user);
 
       if (initialAccounts) {
         return {
@@ -114,29 +109,29 @@ export class AccountsController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Get(':id')
-  // async view(@Param() params, @Req() req) {
-  //   try {
-  //     const account = await this.accountService.FindAccountById(
-  //       params,
-  //       req.user,
-  //     );
+  @Get('/:id')
+  @UseGuards(GlobalAuthGuard)
+  async show(@Param() params, @Req() req) {
+    try {
+      const account = await this.accountService.FindAccountById(
+        params,
+        req.user
+      );
 
-  //     if (account) {
-  //       return {
-  //         message: 'Account fetched successfull',
-  //         result: account[0],
-  //       };
-  //     }
-  //     throw new HttpException('Failed to get Account', HttpStatus.BAD_REQUEST);
-  //   } catch (error) {
-  //     throw new HttpException(
-  //       `Sorry! Something went wrong, ${error.message}`,
-  //       error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
-  //     );
-  //   }
-  // }
+      if (account) {
+        return {
+          message: 'Account fetched successfull',
+          result: account[0],
+        };
+      }
+      throw new HttpException('Failed to get Account', HttpStatus.BAD_REQUEST);
+    } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 
   // @UseGuards(JwtAuthGuard)
   // @Put()

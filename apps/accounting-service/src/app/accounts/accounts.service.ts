@@ -10,11 +10,9 @@ import { Accounts } from '../entities';
 
 @Injectable()
 export class AccountsService {
-  constructor(private entitymanager: EntityManager) {}
   async ListAccounts(accountData, query) {
     try {
       const { purpose } = query;
-      const accountRepository = getCustomRepository(AccountRepository);
       const sql = `
       select 
       a.id, a.name, a.description, a.code, sa.name as "type", pa.name as "primary", 
@@ -82,7 +80,7 @@ export class AccountsService {
     `;
 
       if (purpose === 'all') {
-        const result = await this.entitymanager.query(sql);
+        const result = await getCustomRepository(AccountRepository).query(sql);
         return result;
       }
 
@@ -114,7 +112,7 @@ export class AccountsService {
     return account;
   }
 
-  async initAccounts(organizationId, userId): Promise<any> {
+  async initAccounts(user): Promise<any> {
     try {
       const accountRepository = getCustomRepository(AccountRepository);
       const primaryAccountRepository = getCustomRepository(
@@ -123,15 +121,15 @@ export class AccountsService {
       const secondaryAccountRepository = getCustomRepository(
         SecondaryAccountRepository
       );
-      const { primary, secondary } = await import('../../accounts');
+      const { primary, secondary } = await import('../accounts');
       for (const account of primary) {
         const accountModel = {
           name: account.name,
           status: 1,
           code: account.code,
-          organizationId: organizationId,
-          createdById: userId, // need to be change later
-          updatedById: userId, // need to be change later
+          organizationId: user.organizationId,
+          createdById: user.id, // need to be change later
+          updatedById: user.id, // need to be change later
         };
         const primaryAccount = await primaryAccountRepository.save(
           accountModel
@@ -145,9 +143,9 @@ export class AccountsService {
             code: secondaryAccount.code,
             status: 1,
             primaryAccountId: primaryAccount.id,
-            organizationId: organizationId,
-            updatedById: userId,
-            createdById: userId,
+            organizationId: user.organizationId,
+            updatedById: user.id,
+            createdById: user.id,
           };
           const insertSecondary = await secondaryAccountRepository.save(
             secondaryModel
@@ -162,9 +160,9 @@ export class AccountsService {
                 secondaryAccountId: insertSecondary.id,
                 primaryAccountId: primaryAccount.id,
                 importedFrom: 'init',
-                organizationId: organizationId,
-                createdById: userId,
-                updatedById: userId,
+                organizationId: user.organizationId,
+                createdById: user.id,
+                updatedById: user.id,
               };
               await accountRepository.save(accountModel);
             }
@@ -203,11 +201,11 @@ export class AccountsService {
           updatedAccount.createdById = account.createdById;
           updatedAccount.updatedById = accountData._id;
 
-          await this.entitymanager.update(
-            Accounts,
-            { id: accountDto.accountId },
-            updatedAccount
-          );
+          // await this.entitymanager.update(
+          //   Accounts,
+          //   { id: accountDto.accountId },
+          //   updatedAccount
+          // );
 
           const [updated] = await accountRepository.find({
             where: { id: accountDto.accountId, status: 1 },
@@ -244,9 +242,8 @@ export class AccountsService {
   }
 
   async FindAccountById(params, accountData) {
-    const accountRepository = getCustomRepository(AccountRepository);
-    const account = await accountRepository.find({
-      where: { status: 1 },
+    const account = await getCustomRepository(AccountRepository).find({
+      where: { id: params.id, status: 1 },
       relations: ['secondaryAccount', 'secondaryAccount.primaryAccount'],
     });
 

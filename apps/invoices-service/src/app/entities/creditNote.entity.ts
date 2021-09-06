@@ -1,8 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { BillItems } from './billItem.entity';
+import { CreditNoteItems } from './creditNoteItem.entity';
 import { InvoiceItems } from './invoiceItem.entity';
 
 @Entity()
-export class Invoices {
+export class CreditNotes {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
@@ -28,32 +30,23 @@ export class Invoices {
   @Column()
   type: string;
   @Column()
-  directTax: number;
-  @Column()
-  indirectTax: number;
-  @Column()
-  isTaxIncluded: number;
-  @Column()
   branchId: string;
   @Column()
   organizationId: string;
   @Column()
   status: number;
   @Column()
-  isReturn: string;
-  @Column()
   createdAt: string;
   @Column()
   updatedAt: string;
-  @Column()
-  importedFrom: string;
-  @Column()
-  importedInvoiceId: string;
   @Column()
   createdById: string;
   @Column()
   updatedById: string;
 
-  @OneToMany((type) => InvoiceItems, (invoiceItem) => invoiceItem.invoice)
-  invoiceItems: InvoiceItems[];
+  @OneToMany(
+    () => CreditNoteItems,
+    (creditNoteItem) => creditNoteItem.creditNote
+  )
+  creditNoteItems: CreditNoteItems[];
 }

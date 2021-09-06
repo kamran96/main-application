@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { InvoiceItems } from './invoiceItem.entity';
+import { BillItems } from './billItem.entity';
 
 @Entity()
-export class Invoices {
+export class Bills {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
@@ -48,12 +48,12 @@ export class Invoices {
   @Column()
   importedFrom: string;
   @Column()
-  importedInvoiceId: string;
+  importedBillId: string;
   @Column()
   createdById: string;
   @Column()
   updatedById: string;
 
-  @OneToMany((type) => InvoiceItems, (invoiceItem) => invoiceItem.invoice)
-  invoiceItems: InvoiceItems[];
+  @OneToMany(() => BillItems, (billItem) => billItem.bill)
+  billItems: BillItems[];
 }

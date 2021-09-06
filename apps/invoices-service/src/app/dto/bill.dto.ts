@@ -1,6 +1,5 @@
-export class InvoiceDto {
+export class BillDto {
   id: number;
-  isNewRecord: boolean;
   reference: string;
   contactId: string;
   issueDate: string;
@@ -17,10 +16,10 @@ export class InvoiceDto {
   isTaxIncluded: number;
   isReturn: boolean;
   comment: string;
-  invoice_items: Array<InvoiceItemsDto>;
+  invoice_items: Array<BillItemsDto>;
 }
 
-class InvoiceItemsDto {
+class BillItemsDto {
   id: number;
   itemId: string;
   description: string;

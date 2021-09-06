@@ -7,6 +7,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { InvoiceModule } from './invoice/inovice.module';
 import { Authenticate } from '@invyce/auth-middleware';
+import { BillModule } from './bill/bill.module';
+import { CreditNoteModule } from './credit-note/credit-note.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { Authenticate } from '@invyce/auth-middleware';
         } as TypeOrmModuleOptions),
     }),
     InvoiceModule,
+    BillModule,
+    CreditNoteModule,
   ],
   controllers: [AppController],
   providers: [AppService, Authenticate],
