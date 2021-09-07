@@ -59,11 +59,11 @@ export const Editable: FC<IProps> = ({
   const [isEditable, setIsEditable] = useState(false);
   const [inputVal, setInputValue] = useState(value);
 
-  // useEffect(() => {
-  //   if (value !== inputVal) {
-  //     setInputValue(value);
-  //   }
-  // }, [value]);
+  useEffect(() => {
+    if (value !== inputVal) {
+      setInputValue(value);
+    }
+  }, [value]);
 
   let styles = {
     border: isEditable ? "1px solid transparent" : "1px solid transparent",
@@ -112,7 +112,7 @@ export const Editable: FC<IProps> = ({
                 className="rendered-text"
                 onClick={() => setIsEditable(true)}
               >
-                {inputVal ? inputVal : placeholder ? placeholder : 0}
+                {inputVal ? inputVal : placeholder ? placeholder : 0} 
               </span>
             )
           ) : isEditable ? (
@@ -133,7 +133,7 @@ export const Editable: FC<IProps> = ({
             />
           ) : (
             <span className="rendered-text" onClick={() => setIsEditable(true)}>
-              {inputVal ? inputVal : placeholder}
+              {inputVal ? inputVal : placeholder} 
             </span>
           )}
         </>
@@ -280,7 +280,7 @@ export const EditableSelect: FC<IEditableSelectProps> = ({
           </Select>
         ) : (
           <span onClick={() => setIsEditable(true)} className="rendered-text">
-            {renderValue()}
+            {renderValue()} 
           </span>
         )}
       </WrapperEditableSelect>

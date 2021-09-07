@@ -37,6 +37,27 @@
     "main-ui-e2e": {
       "tags": [],
       "implicitDependencies": ["main-ui"]
+    },
+    "pixels-to-rem": {
+      "tags": []
+    },
+    "review-invyce-theme": {
+      "tags": []
+    },
+    "shared-global-state-manager": {
+      "tags": []
+    },
+    "shared-invyce-theme": {
+      "tags": []
+    },
+    "shared-types": {
+      "tags": []
+    },
+    "shared-utils": {
+      "tags": []
+    },
+    "sidebar-ui": {
+      "tags": []
     }
   }
 }

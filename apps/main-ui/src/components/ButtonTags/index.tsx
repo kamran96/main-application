@@ -75,10 +75,18 @@ const WrapperButtonTag = styled.div`
   ._customized_button {
     background: ${(props: IThemeProps) => props?.theme?.colors?.buttonTagBg};
     color: ${(props: IThemeProps) => props?.theme?.colors?.buttonTagColor};
+    span{
+      color: ${(props: IThemeProps) => props?.theme?.colors?.buttonTagColor};
+
+    }
 
     &:hover {
-      background: ${Color.$Secondary};
+      background: ${Color.$Secondary} !important;
       color: ${Color.$WHITE};
+      span{
+        color: ${Color.$WHITE};
+
+    }
     }
   }
 `;

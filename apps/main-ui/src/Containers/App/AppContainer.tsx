@@ -1,6 +1,7 @@
 import { renderRoutes } from 'react-router-config';
 import styled from 'styled-components';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
 import { Color } from '../../modal';
 import { routes } from '../../routes/index';
 
@@ -12,10 +13,11 @@ const AppContainer = () => {
   //   colors: Themes[theme],
   // };
 
-
-    return (
-        <ThemeWrapper theme={theme}>{renderRoutes(routes())}</ThemeWrapper>
-    )
+  return (
+    <ThemeWrapper theme={theme}>
+      {renderRoutes(routes())}
+    </ThemeWrapper>
+  );
 };
 
 export default AppContainer;
@@ -33,3 +35,5 @@ const ThemeWrapper = styled.div<IThemeWrapperProps>`
     cursor: pointer;
   }
 `;
+
+

@@ -1,4 +1,5 @@
-import CryptoJS from "crypto-js";
+const CryptoJS = require('crypto-js');
+
 
 const EncriptData = (data) => {
   let encription = CryptoJS.AES.encrypt(

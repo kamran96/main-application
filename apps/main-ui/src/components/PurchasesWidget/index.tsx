@@ -4,7 +4,7 @@ import Icon from "@iconify/react";
 import { Button, Col, Form, Input, InputNumber, Row, Select } from "antd";
 import TextArea from "antd/lib/input/TextArea";
 import dayjs from "dayjs";
-import React, { FC, useRef, useState } from "react";
+import { FC, useRef, useState } from "react";
 import { createDndContext, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { queryCache, useMutation } from "react-query";
@@ -17,9 +17,8 @@ import {
   NOTIFICATIONTYPE,
   PaymentMode
 } from "../../modal";
-import { IInvoiceType, ITaxTypes } from "../../modal/invoice";
+import { IInvoiceStatus, IInvoiceType, ITaxTypes } from "../../modal/invoice";
 import { IOrganizationType } from "../../modal/organization";
-import { IInvoiceStatus } from "../../modal/invoice";
 import { addition } from "../../utils/helperFunctions";
 import moneyFormat from "../../utils/moneyFormat";
 import printDiv, { DownloadPDF } from "../../utils/Print";
@@ -152,6 +151,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   const onFinish = async (value) => {
+ 
     let InvoiceItemsValidation = [];
 
     organization?.organizationType !== IOrganizationType.ENTERPRISE &&
@@ -557,6 +557,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
             </Row>
           </div>
           <Form>
+           
             <DndProvider manager={manager.current.dragDropManager}>
               <CommonTable
                 rowClassName={(record, index) =>
@@ -567,6 +568,8 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                   } `
                 }
                 loading={isFetching}
+                
+              
                 dataSource={invoiceItems}
                 columns={__columns}
                 pagination={false}

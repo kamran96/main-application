@@ -41,8 +41,7 @@ import { DragableBodyRow } from "./draggable";
 import { WrapperInvoiceForm } from "./styles";
 import { PurchaseManager, usePurchaseWidget } from "./EditorManager";
 import { PrintViewPurchaseWidget } from "../../../../components/PurchasesWidget/PrintViewPurchaseWidget";
-import scrollIntoView from "scroll-into-view";
-import { EmailSider } from "../../../../components/EmailSider";
+
 
 const RNDContext = createDndContext(HTML5Backend);
 
@@ -561,7 +560,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                 dataSource={invoiceItems}
                 columns={__columns}
                 pagination={false}
-                scroll={{ y: 350 }}
+                scroll={{ y: 240 }}
                 // scroll={{ y: 350, x: 0 }}
                 components={components}
                 onRow={(record: any, index: any) => {

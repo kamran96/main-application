@@ -15,7 +15,17 @@
     "skipDefaultLibCheck": true,
     "resolveJsonModule": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@invyce/pixels-to-rem": ["libs/pixels-to-rem/src/index.ts"],
+      "@invyce/review/invyce-theme": ["libs/review/invyce-theme/src/index.ts"],
+      "@invyce/shared/global-state-manager": [
+        "libs/shared/global-state-manager/src/index.ts"
+      ],
+      "@invyce/shared/invyce-theme": ["libs/shared/invyce-theme/src/index.ts"],
+      "@invyce/shared/types": ["libs/shared/types/src/index.ts"],
+      "@invyce/shared/utils": ["libs/shared/utils/src/index.ts"],
+      "@invyce/sidebar-ui": ["libs/sidebar-ui/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
