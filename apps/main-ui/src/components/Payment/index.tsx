@@ -163,7 +163,7 @@ export const Payment: FC<IProps> = ({
                     { value: 1, name: "Bank" },
                     { value: 2, name: "Cash" },
                   ].map((type, index) => {
-                    return <Option value={type.value}>{type.name}</Option>;
+                    return <Option key={index} value={type.value}>{type.name}</Option>;
                   })}
                 </Select>
               </Form.Item>
@@ -186,7 +186,7 @@ export const Payment: FC<IProps> = ({
                       optionFilterProp="children"
                     >
                       {banksList.map((bank, index) => {
-                        return <Option value={bank.id}>{bank.name}</Option>;
+                        return <Option key={index} value={bank.id}>{bank.name}</Option>;
                       })}
                     </Select>
                   </Form.Item>
@@ -248,7 +248,7 @@ export const Payment: FC<IProps> = ({
                     { value: 1, name: "Bank" },
                     { value: 2, name: "Cash" },
                   ].map((type, index) => {
-                    return <Option value={type.value}>{type.name}</Option>;
+                    return <Option key={index} value={type.value}>{type.name}</Option>;
                   })}
                 </Select>
               </Form.Item>
@@ -270,7 +270,7 @@ export const Payment: FC<IProps> = ({
                       optionFilterProp="children"
                     >
                       {banksList.map((bank, index) => {
-                        return <Option value={bank.id}>{bank.name}</Option>;
+                        return <Option key={index} value={bank.id}>{bank.name}</Option>;
                       })}
                     </Select>
                   </Form.Item>

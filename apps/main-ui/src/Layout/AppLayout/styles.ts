@@ -6,7 +6,7 @@ import convertToRem from "../../utils/convertToRem";
 export const ContentArea = styled.section`
   background: ${(props: IThemeProps) => props.theme.colors.layoutBg};
  
-  height: calc(100vh - 0);
+ 
   transition: 0.4s all ease-in-out;
   /* margin-left: ${(props: IThemeProps) =>
     props?.theme?.toggle ? convertToRem(206) : convertToRem(65)}; */
@@ -14,8 +14,11 @@ export const ContentArea = styled.section`
   overflow-y: auto;
   overflow-x: hidden;
   .content {
-    padding: ${convertToRem(22)} 1.25rem 1.125rem 1.25rem;
+    height: calc(100vh - 10px);
+    padding: ${convertToRem(22)} 1.25rem 2.4rem 1.25rem;
     transition: 0.2s all ease-in-out;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .rightbar-space-370px {
@@ -89,7 +92,7 @@ export const WrapperApplayout = styled.div<IApplayoutWrapperProps>`
     top: 0;
     width: 100%;
     height: 100%;
-    background: ${(props: IThemeProps) => props.theme.colors.$WHITE};
+    background: ${(props: IThemeProps) => props.theme.colors?.layoutBg};
     z-index: ${(props: IThemeProps) => (props.darkModeLoading ? 11111 : -1)};
     /* opacity: 1; */
     display: ${(props: IThemeProps) =>

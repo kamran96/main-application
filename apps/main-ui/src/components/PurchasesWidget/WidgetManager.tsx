@@ -325,11 +325,12 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
       width: 30,
       className: "drag-visible textCenter",
       render: () => <DragHandle />,
+      shouldCellUpdate: (record, prevRecord)=> record.toString()!==prevRecord.toString()
     },
     {
       title: "#",
       width: 48,
-
+      
       render: (value, record, index) => {
         return <>{index + 1}</>;
       },
@@ -342,13 +343,13 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
       width: width > 1500 ? 220 : 190,
       align: "left",
       className: `select-column`,
-
+      
       render: (value, record, index) => {
         return (
           <EditableSelect
-            onClick={() => setSelectedIndex(index)}
-            className={`border-less-select ${
-              index === invoiceItems.length - 1 ? "scrollIntoView" : ""
+          onClick={() => setSelectedIndex(index)}
+          className={`border-less-select ${
+            index === invoiceItems.length - 1 ? "scrollIntoView" : ""
             }`}
             loading={itemsLoading}
             size="middle"
@@ -356,12 +357,12 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
               value: value !== null ? value : "",
               label: `${
                 value !== null && items.length
-                  ? items &&
-                    getItemWithItemId(value) &&
-                    `${getItemWithItemId(value).code} / ${
-                      getItemWithItemId(value).name
-                    }`
-                  : "Select Item"
+                ? items &&
+                getItemWithItemId(value) &&
+                `${getItemWithItemId(value).code} / ${
+                  getItemWithItemId(value).name
+                }`
+                : "Select Item"
               }`,
             }}
             labelInValue={true}
@@ -373,35 +374,35 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
               if (val.value !== "new_item") {
                 let [selectedItem] = items.filter(
                   (item) => item.id === val.value
-                );
-                let allItems = [...invoiceItems];
-                let unitPrice =
+                  );
+                  let allItems = [...invoiceItems];
+                  let unitPrice =
                   (selectedItem &&
                     selectedItem.price &&
                     selectedItem.price.salePrice) ||
-                  0;
+                    0;
                 let purchasePrice =
-                  (selectedItem &&
-                    selectedItem.price &&
-                    selectedItem.price.purchasePrice) ||
+                (selectedItem &&
+                  selectedItem.price &&
+                  selectedItem.price.purchasePrice) ||
                   0;
-                let itemDiscount =
+                  let itemDiscount =
                   (selectedItem &&
                     selectedItem.price &&
                     selectedItem.price.discount) ||
-                  "0";
-                let tax =
-                  (selectedItem &&
+                    "0";
+                    let tax =
+                    (selectedItem &&
                     selectedItem.price &&
                     selectedItem.price.tax) ||
-                  "0";
-                let costOfGoodAmount = purchasePrice * allItems[index].quantity;
-
-                if (
-                  type === IInvoiceType.INVOICE &&
-                  selectedItem.stock < record.quantity
-                ) {
-                  let allErrors = [...rowsErrors];
+                    "0";
+                    let costOfGoodAmount = purchasePrice * allItems[index].quantity;
+                    
+                    if (
+                      type === IInvoiceType.INVOICE &&
+                      selectedItem.stock < record.quantity
+                      ) {
+                        let allErrors = [...rowsErrors];
                   allErrors[index] = { hasError: true };
                   setRowsErrors(allErrors);
                   notificationCallback(
@@ -413,14 +414,14 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                   allErrors[index] = { hasError: false };
                   setRowsErrors(allErrors);
                 }
-
+                
                 let description = `${selectedItem?.category?.title || ""}/`;
-
+                
                 let total =
-                  type === IInvoiceType.PURCHASE_ENTRY
-                    ? calculateInvoice(purchasePrice, tax, itemDiscount)
-                    : calculateInvoice(unitPrice, tax, itemDiscount);
-
+                type === IInvoiceType.PURCHASE_ENTRY
+                ? calculateInvoice(purchasePrice, tax, itemDiscount)
+                : calculateInvoice(unitPrice, tax, itemDiscount);
+                
                 allItems[index] = {
                   ...allItems[index],
                   itemId: val.value,
@@ -440,7 +441,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                 setInvoiceItems(allItems);
               }
             }}
-          >
+            >
             <>
               {/* <Rbac permission={PERMISSIONS.ITEMS_CREATE}> */}
               <Option value={"new_item"}>
@@ -450,7 +451,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                   onClick={() => {
                     setItemsModalConfig(true);
                   }}
-                >
+                  >
                   {" "}
                   <Icon icon={addLine} />{" "}
                   <span className="ml-10">New Item</span>
@@ -475,7 +476,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                     );
                   }else{
                     return null
-
+                    
                   }
                 })}
             </>
@@ -483,23 +484,23 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         );
       },
     },
-
+    
     {
       title: "Description",
       dataIndex: "description",
       key: "description",
       width: width > 1500 ? 670 : 230,
-
+      
       render: (data, record, index) => {
         return (
           <Editable
-            onChange={(e) => {
-              let value = e.target.value;
-              e.preventDefault();
-              clearTimeout(setStateTimeOut);
-              setStateTimeOut = setTimeout(() => {
-                if (value) {
-                  let allItems = [...invoiceItems];
+          onChange={(e) => {
+            let value = e.target.value;
+            e.preventDefault();
+            clearTimeout(setStateTimeOut);
+            setStateTimeOut = setTimeout(() => {
+              if (value) {
+                let allItems = [...invoiceItems];
                   allItems[index] = { ...allItems[index], description: value };
                   setInvoiceItems(allItems);
                 }
@@ -508,62 +509,62 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
             placeholder="Description"
             size={"middle"}
             value={data}
-          />
-        );
-      },
-    },
+            />
+            );
+          },
+        },
     {
       title: "Qty",
       dataIndex: "quantity",
       key: "quantity",
       // width: width > 1500 ? 150 : 120,
-
+      
       render: (value, record, index) => {
         return (
           <Editable
-            disabled={!record.itemId}
-            onChange={(value: number) => {
-              clearTimeout(setStateTimeOut);
-              setStateTimeOut = setTimeout(() => {
-                if (value) {
+          disabled={!record.itemId}
+          onChange={(value: number) => {
+            clearTimeout(setStateTimeOut);
+            setStateTimeOut = setTimeout(() => {
+              if (value) {
                   let [selectedItem] = items.filter(
                     (item) => item.id === record.itemId
-                  );
-                  let quantity = value;
-                  if (quantity === null || quantity === undefined) {
-                    quantity = 0;
-                  }
-                  let allItems = [...invoiceItems];
-                  let unitPrice = record.unitPrice;
-                  let purchasePrice = record.purchasePrice;
-                  let itemDiscount = record.itemDiscount;
-
-                  let costOfGoodAmount = record.purchasePrice * quantity;
-                  let tax = record.tax;
-
-                  if (
-                    type === IInvoiceType.INVOICE &&
-                    selectedItem.stock < value
-                  ) {
-                    let allErrors = [...rowsErrors];
-                    allErrors[index] = { hasError: true };
-                    setRowsErrors(allErrors);
-                    notificationCallback(
-                      NOTIFICATIONTYPE.WARNING,
-                      `You are out of stock! Only ${selectedItem.stock} items left in your stock`
                     );
-                  } else {
-                    let allErrors = [...rowsErrors];
+                    let quantity = value;
+                    if (quantity === null || quantity === undefined) {
+                      quantity = 0;
+                    }
+                    let allItems = [...invoiceItems];
+                    let unitPrice = record.unitPrice;
+                    let purchasePrice = record.purchasePrice;
+                    let itemDiscount = record.itemDiscount;
+                    
+                    let costOfGoodAmount = record.purchasePrice * quantity;
+                    let tax = record.tax;
+                    
+                    if (
+                      type === IInvoiceType.INVOICE &&
+                      selectedItem.stock < value
+                      ) {
+                        let allErrors = [...rowsErrors];
+                        allErrors[index] = { hasError: true };
+                        setRowsErrors(allErrors);
+                        notificationCallback(
+                          NOTIFICATIONTYPE.WARNING,
+                          `You are out of stock! Only ${selectedItem.stock} items left in your stock`
+                          );
+                        } else {
+                          let allErrors = [...rowsErrors];
                     allErrors[index] = { hasError: false };
                     setRowsErrors(allErrors);
                   }
-
+                  
                   let total =
-                    type === IInvoiceType.PURCHASE_ENTRY
-                      ? calculateInvoice(purchasePrice, tax, itemDiscount) *
-                        quantity
-                      : calculateInvoice(unitPrice, tax, itemDiscount) *
-                        quantity;
+                  type === IInvoiceType.PURCHASE_ENTRY
+                  ? calculateInvoice(purchasePrice, tax, itemDiscount) *
+                  quantity
+                  : calculateInvoice(unitPrice, tax, itemDiscount) *
+                  quantity;
                   allItems[index] = {
                     ...allItems[index],
                     quantity,
@@ -578,7 +579,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
             type="number"
             value={value}
             size={"middle"}
-          />
+            />
         );
       },
     },
@@ -587,59 +588,59 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
       dataIndex: "unitPrice",
       key: "unitPrice",
       // width: width > 1500 ? 150 : "",
-
+      
       render: (value, record, index) => {
         return (
           <Editable
-            onChange={(value) => {
-              clearTimeout(setStateTimeOut);
-              setStateTimeOut = setTimeout(() => {
-                let allItems = [...invoiceItems];
-                let unitPrice = value;
+          onChange={(value) => {
+            clearTimeout(setStateTimeOut);
+            setStateTimeOut = setTimeout(() => {
+              let allItems = [...invoiceItems];
+              let unitPrice = value;
                 let purchasePrice = record.purchasePrice;
                 let itemDiscount = record.itemDiscount;
                 let tax = record.tax;
                 let total =
-                  type === IInvoiceType.PURCHASE_ENTRY
+                type === IInvoiceType.PURCHASE_ENTRY
                     ? calculateInvoice(purchasePrice, tax, itemDiscount) *
-                      parseInt(record.quantity)
+                    parseInt(record.quantity)
                     : calculateInvoice(unitPrice, tax, itemDiscount) *
-                      parseInt(record.quantity);
-
-                allItems[index] = {
-                  ...allItems[index],
-                  unitPrice,
-                  total,
-                };
-                setInvoiceItems(allItems);
-              }, 500);
-            }}
-            type="number"
-            value={value}
-            size={"middle"}
-          />
-        );
-      },
-    },
+                    parseInt(record.quantity);
+                    
+                    allItems[index] = {
+                      ...allItems[index],
+                      unitPrice,
+                      total,
+                    };
+                    setInvoiceItems(allItems);
+                  }, 500);
+                }}
+                type="number"
+                value={value}
+                size={"middle"}
+                />
+                );
+              },
+            },
     {
       title: "Disc %",
       dataIndex: "itemDiscount",
       key: "itemDiscount",
       // width: width > 1500 ? 150 : "",
-
+      
       render: (value, record, index) => {
         return (
           <Editable
-            disabled={!record.itemId}
-            type="text"
-            value={value}
+          disabled={!record.itemId}
+          type="text"
+          value={value}
             onChange={(e) => {
               const { value } = e.target;
               clearTimeout(setStateTimeOut);
               setStateTimeOut = setTimeout(() => {
                 let allItems = [...invoiceItems];
                 let itemDiscount = value.replace(/\b0+/g, "");
-
+                
                 if (itemDiscount === "") {
                   itemDiscount = "0";
                 }
@@ -647,41 +648,41 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                 let purchasePrice = record.purchasePrice;
                 let tax = record.tax;
                 let total =
-                  type === IInvoiceType.PURCHASE_ENTRY
+                type === IInvoiceType.PURCHASE_ENTRY
                     ? calculateInvoice(purchasePrice, tax, itemDiscount) *
-                      parseInt(record.quantity)
+                    parseInt(record.quantity)
                     : calculateInvoice(unitPrice, tax, itemDiscount) *
-                      parseInt(record.quantity);
-
-                allItems[index] = {
-                  ...allItems[index],
-                  itemDiscount,
-                  total,
-                };
-                setInvoiceItems(allItems);
-              }, 400);
-            }}
-            size={"middle"}
-          />
+                    parseInt(record.quantity);
+                    
+                    allItems[index] = {
+                      ...allItems[index],
+                      itemDiscount,
+                      total,
+                    };
+                    setInvoiceItems(allItems);
+                  }, 400);
+                }}
+                size={"middle"}
+                />
         );
       },
     },
     enableAccountColumn
-      ? {
-          title: "Account",
-          dataIndex: "accountId",
-          width: width > 1500 ? 220 : 150,
-          render: (value, row, index) => {
-            console.log(value);
-            return (
-              <CommonSelect
-                onClick={() => setAccountRowSelectedIndex(index)}
-                className={`border-less-select`}
-                value={{
-                  value: value !== null ? value : "",
+    ? {
+      title: "Account",
+      dataIndex: "accountId",
+      width: width > 1500 ? 220 : 150,
+      render: (value, row, index) => {
+        console.log(value);
+        return (
+          <CommonSelect
+          onClick={() => setAccountRowSelectedIndex(index)}
+          className={`border-less-select`}
+          value={{
+            value: value !== null ? value : "",
                   label:
-                    (accountsList?.length && getAccountNameByID(value)) ||
-                    "Select Account",
+                  (accountsList?.length && getAccountNameByID(value)) ||
+                  "Select Account",
                 }}
                 labelInValue={true}
                 loading={accountsLoading}
@@ -698,7 +699,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                   };
                   setInvoiceItems(allItems);
                 }}
-              >
+                >
                 <>
                   {accountRowSelectedIndex === index &&
                     accountsList.map((acc: IAccountsResult, index: number) => {
@@ -713,16 +714,16 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
             );
           },
         }
-      : {
+        : {
           width: 0,
         },
-    {
+        {
       title: "Tax",
       dataIndex: "tax",
       key: "tax",
       // width: width > 1500 ? 150 : 130,
       align: "center",
-
+      
       render: (value, record, index) => {
         return <>{value}</>;
       },
@@ -735,15 +736,16 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
       align: "center",
       render: (value, record, index) => (
         <>{typeof value === "number" ? moneyFormat(value) : value}</>
-      ),
-    },
-    {
-      title: "",
-      key: "action",
-      // width: 50,
-      render: (value, record, index) => {
-        return (
-          <i
+        ),
+      },
+      {
+        title: "",
+        key: "action",
+
+        // width: 50,
+        render: (value, record, index) => {
+          return (
+            <i
             onClick={() => {
               if (record.id) {
                 let allDeleteIds = [...deleteIds];
@@ -755,7 +757,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
               setRowsErrors(allErrors);
               handleDelete(index);
             }}
-          >
+            >
             {" "}
             <Icon
               style={{
