@@ -62,6 +62,9 @@
     "send-email": {
       "tags": []
     },
+    "sorting": {
+      "tags": []
+    },
     "users-service": {
       "tags": []
     }

@@ -24,13 +24,12 @@ export class AccountsController {
   @Get()
   @UseGuards(GlobalAuthGuard)
   async index(@Req() req: Request, @Query() query) {
-    const account = await this.accountService.ListAccounts(req.user, query);
     try {
+      const account = await this.accountService.ListAccounts(req.user, query);
       if (account) {
         return {
           message: 'Account Fetched successfull',
           result: account,
-          pagination: account.pagination,
         };
       }
     } catch (error) {
@@ -41,8 +40,8 @@ export class AccountsController {
     }
   }
 
+  @Post('/init')
   @UseGuards(GlobalAuthGuard)
-  @Get('/init')
   async initAccounts(@Req() req: Request) {
     try {
       const initialAccounts = await this.accountService.initAccounts(req.user);
@@ -61,13 +60,12 @@ export class AccountsController {
     }
   }
 
-  @UseGuards(GlobalAuthGuard)
   @Get('/secondary-accounts')
-  async secondaryAccounts(@Req() req: Request, @Query() { organizationId }) {
+  @UseGuards(GlobalAuthGuard)
+  async secondaryAccounts(@Req() req: Request) {
     try {
       const secondaryAccounts = await this.accountService.SecondaryAccountName(
-        // req, // must be fetched against req.user.organiztrionId
-        organizationId
+        req.user // must be fetched against req.user.organiztrionId
       );
 
       if (secondaryAccounts) {
@@ -84,8 +82,8 @@ export class AccountsController {
     }
   }
 
-  @UseGuards(GlobalAuthGuard)
   @Post()
+  @UseGuards(GlobalAuthGuard)
   async create(@Req() req: Request, @Body() accountDto: AccountDto) {
     try {
       const account = await this.accountService.CreateOrUpdateAccount(
@@ -95,9 +93,10 @@ export class AccountsController {
 
       if (account) {
         return {
-          message: accountDto.isNewRecord
-            ? 'Account created successfull'
-            : 'Account Updated Successfully',
+          message:
+            accountDto.isNewRecord !== false
+              ? 'Account created successfull'
+              : 'Account Updated Successfully',
           result: account,
         };
       }
@@ -113,10 +112,7 @@ export class AccountsController {
   @UseGuards(GlobalAuthGuard)
   async show(@Param() params, @Req() req) {
     try {
-      const account = await this.accountService.FindAccountById(
-        params,
-        req.user
-      );
+      const account = await this.accountService.FindAccountById(params.id);
 
       if (account) {
         return {

@@ -7,6 +7,7 @@ require('dotenv').config();
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AccountsModule } from './accounts/accounts.module';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { AccountsModule } from './accounts/accounts.module';
         } as TypeOrmModuleOptions),
     }),
     AccountsModule,
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

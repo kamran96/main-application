@@ -39,7 +39,7 @@ export class Transactions {
   updatedById: number;
   @OneToMany(
     () => TransactionItems,
-    transactionItems => transactionItems.transactionId,
+    (transactionItems) => transactionItems.transaction
   )
-  transactionItems: TransactionItems;
+  transactionItems: TransactionItems[];
 }

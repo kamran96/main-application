@@ -4,16 +4,21 @@ import {
   PrimaryAccountRepository,
   SecondaryAccountRepository,
 } from '../repositories';
-import { EntityManager, getCustomRepository, UpdateResult } from 'typeorm';
-// import { PrimaryAccounts } from 'apps/accounting-service/entities';
-import { Accounts } from '../entities';
+import { getCustomRepository } from 'typeorm';
+import { Sorting } from '@invyce/sorting';
 
 @Injectable()
 export class AccountsService {
-  async ListAccounts(accountData, query) {
+  async ListAccounts(user, query) {
     try {
-      const { purpose } = query;
-      const sql = `
+      const { purpose, page_size, page_no, sort, filters } = query;
+
+      if (purpose === 'ALL') {
+        return await getCustomRepository(AccountRepository).find({
+          where: { status: 1, organizationId: user.organizationId },
+        });
+      } else {
+        let sql = `
       select 
       a.id, a.name, a.description, a.code, sa.name as "type", pa.name as "primary", 
       pa.id as "primaryAccountId", sa.id as "secondaryAccountId",
@@ -76,51 +81,92 @@ export class AccountsService {
     on sa.id = a."secondaryAccountId"
     left join primary_accounts pa
     on pa.id = sa."primaryAccountId"
-    where a."organizationId" = ${accountData.organizationId}
+    where a."organizationId" = '${user.organizationId}'
     `;
 
-      if (purpose === 'all') {
-        const result = await getCustomRepository(AccountRepository).query(sql);
-        return result;
-      }
+        if (filters) {
+          const filterData: any = Buffer.from(filters, 'base64').toString();
+          const data = JSON.parse(filterData);
 
-      // return await this.pagination.ListApi(
-      //   accountRepository,
-      //   take,
-      //   page_no,
-      //   sort,
-      //   sql,
-      // );
+          for (let i in data) {
+            if (data[i].type === 'search') {
+              const val = data[i].value.toLowerCase();
+              return await getCustomRepository(AccountRepository).query(
+                (sql += `and lower(a.${i}) like '${val}'`)
+              );
+            } else if (data[i].type === 'in') {
+              return await getCustomRepository(AccountRepository).query(
+                (sql += `and a."${i}" in (${data[i].value})`)
+              );
+            }
+          }
+        }
+
+        const { sort_column, sort_order } = await Sorting(sort);
+
+        const page = `
+        limit ${page_size || 20}
+        offset ${page_no * page_size - page_size || 1}
+      `;
+
+        // const secondaryAccounts = await getCustomRepository(
+        //   SecondaryAccountRepository
+        // ).find({
+        //   where: { status: 1, organizationId: user.organizationId },
+        // });
+        const accounts = await getCustomRepository(AccountRepository).query(
+          (sql += `order by ${sort_column} ${sort_order}  ${page}`)
+        );
+
+        // let newAccountArr = [];
+        // for (let i of accounts) {
+        //   for (let j of secondaryAccounts) {
+        //     if (i.secondaryAccountId === j.id) {
+        //       let resp = {
+        //         ...i,
+        //         secondaryAccounts: j,
+        //       };
+
+        //       newAccountArr.push(resp);
+        //     }
+        //   }
+        // }
+
+        const total = await getCustomRepository(AccountRepository).count({
+          status: 1,
+          organizationId: user.organizationId,
+        });
+
+        return {
+          pagination: {
+            total,
+            total_pages: Math.ceil(total / page_size),
+            page_size: parseInt(page_size) || 20,
+            // page_total: null,
+            page_no: parseInt(page_no),
+            sort_column: sort_column,
+            sort_order: sort_order,
+          },
+          accounts,
+        };
+      }
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
-  async SecondaryAccountName(organizationId) {
-    const secondaryAccountRepository = getCustomRepository(
-      SecondaryAccountRepository
-    );
-
-    const account = await secondaryAccountRepository.find({
+  async SecondaryAccountName(user) {
+    return await getCustomRepository(SecondaryAccountRepository).find({
       where: {
         status: 1,
-        organizationId: organizationId,
+        organizationId: user.organizationId,
       },
       relations: ['primaryAccount'],
     });
-
-    return account;
   }
 
   async initAccounts(user): Promise<any> {
     try {
-      const accountRepository = getCustomRepository(AccountRepository);
-      const primaryAccountRepository = getCustomRepository(
-        PrimaryAccountRepository
-      );
-      const secondaryAccountRepository = getCustomRepository(
-        SecondaryAccountRepository
-      );
       const { primary, secondary } = await import('../accounts');
       for (const account of primary) {
         const accountModel = {
@@ -131,9 +177,9 @@ export class AccountsService {
           createdById: user.id, // need to be change later
           updatedById: user.id, // need to be change later
         };
-        const primaryAccount = await primaryAccountRepository.save(
-          accountModel
-        );
+        const primaryAccount = await getCustomRepository(
+          PrimaryAccountRepository
+        ).save(accountModel);
         const secondaryAccounts = secondary.filter(
           (item) => item.primary_account_id === account.oldId
         );
@@ -147,9 +193,9 @@ export class AccountsService {
             updatedById: user.id,
             createdById: user.id,
           };
-          const insertSecondary = await secondaryAccountRepository.save(
-            secondaryModel
-          );
+          const insertSecondary = await getCustomRepository(
+            SecondaryAccountRepository
+          ).save(secondaryModel);
           if (secondaryAccount.accounts.length > 0) {
             for (const account of secondaryAccount.accounts) {
               const accountModel = {
@@ -164,7 +210,7 @@ export class AccountsService {
                 createdById: user.id,
                 updatedById: user.id,
               };
-              await accountRepository.save(accountModel);
+              await getCustomRepository(AccountRepository).save(accountModel);
             }
           }
         }
@@ -180,7 +226,7 @@ export class AccountsService {
       // we need to update account
       try {
         const result = await accountRepository.find({
-          where: { id: accountDto.accountId, status: 1 },
+          where: { id: accountDto.id, status: 1 },
         });
         if (Array.isArray(result) && result.length > 0) {
           const [account] = result;
@@ -201,17 +247,9 @@ export class AccountsService {
           updatedAccount.createdById = account.createdById;
           updatedAccount.updatedById = accountData._id;
 
-          // await this.entitymanager.update(
-          //   Accounts,
-          //   { id: accountDto.accountId },
-          //   updatedAccount
-          // );
+          await accountRepository.update({ id: accountDto.id }, updatedAccount);
 
-          const [updated] = await accountRepository.find({
-            where: { id: accountDto.accountId, status: 1 },
-          });
-
-          return updated;
+          return await this.FindAccountById(accountDto.id);
         }
         throw new HttpException('Invalid params', HttpStatus.BAD_REQUEST);
       } catch (error) {
@@ -228,7 +266,7 @@ export class AccountsService {
           primaryAccountId: accountDto.primaryAccountId,
           taxRate: accountDto.taxRate,
           // branchId: accountDto.branchId,
-          organizationId: accountData.id,
+          organizationId: accountData.organizationId,
           status: 1,
           createdById: accountData.id,
           updatedById: accountData.id,
@@ -241,9 +279,9 @@ export class AccountsService {
     }
   }
 
-  async FindAccountById(params, accountData) {
+  async FindAccountById(accountId) {
     const account = await getCustomRepository(AccountRepository).find({
-      where: { id: params.id, status: 1 },
+      where: { id: accountId, status: 1 },
       relations: ['secondaryAccount', 'secondaryAccount.primaryAccount'],
     });
 

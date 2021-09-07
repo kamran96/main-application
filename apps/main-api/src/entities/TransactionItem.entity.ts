@@ -3,9 +3,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Transactions } from './Transaction.entity';
+import { Accounts } from './Accounts.entity';
 
 @Entity()
 export class TransactionItems {
@@ -35,9 +37,10 @@ export class TransactionItems {
   updatedAt: string;
   @Column()
   updatedById: number;
-  @ManyToOne(
-    () => Transactions,
-    transaction => transaction.id,
-  )
+  @ManyToOne(() => Transactions, (transaction) => transaction.id)
   transaction: Transactions;
+
+  @OneToOne(() => Accounts)
+  @JoinColumn()
+  account: Accounts;
 }

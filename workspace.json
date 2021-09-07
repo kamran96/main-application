@@ -41,8 +41,8 @@
             "lintFilePatterns": ["apps/accounting-service/**/*.ts"]
           }
         },
-        "test":{
-          "executor":"@nrwl/jest:jest",
+        "test": {
+          "executor": "@nrwl/jest:jest",
           "outputs": ["coverage/apps/accounting-service"],
           "options": {
             "jestConfig": "apps/accounting-service/jest.config.js",
@@ -458,6 +458,27 @@
         }
       }
     },
+    "sorting": {
+      "root": "libs/sorting",
+      "sourceRoot": "libs/sorting/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/sorting/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/sorting"],
+          "options": {
+            "jestConfig": "libs/sorting/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "users-service": {
       "root": "apps/users-service",
       "sourceRoot": "apps/users-service/src",
@@ -530,4 +551,3 @@
     }
   }
 }
-

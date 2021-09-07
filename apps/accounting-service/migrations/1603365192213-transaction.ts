@@ -14,7 +14,7 @@ export class transaction1603365192213 implements MigrationInterface {
         columns: [
           { name: 'id', type: 'serial', isPrimary: true },
           { name: 'amount', isNullable: true, type: 'float' },
-          { name: 'ref', isNullable: false, type: 'varchar(255)' },
+          { name: 'ref', isNullable: true, type: 'varchar(255)' },
           { name: 'narration', isNullable: true, type: 'varchar(255)' },
           { name: 'date', isNullable: true, type: 'date' },
           { name: 'branchId', isNullable: true, type: 'int' },
@@ -26,7 +26,7 @@ export class transaction1603365192213 implements MigrationInterface {
           { name: 'updatedById', type: 'int', isNullable: true },
         ],
       }),
-      true,
+      true
     );
 
     // await queryRunner.createForeignKey(
@@ -48,14 +48,17 @@ export class transaction1603365192213 implements MigrationInterface {
     //     onDelete: 'CASCADE',
     //   }),
     // );
-    await queryRunner.createIndex("transactions", new TableIndex({
-      name: "transactions_indexes",
-      columnNames: ["branchId", "organizationId"]
-    }));
+    await queryRunner.createIndex(
+      'transactions',
+      new TableIndex({
+        name: 'transactions_indexes',
+        columnNames: ['branchId', 'organizationId'],
+      })
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropTable('transactions');
-    await queryRunner.dropIndex('transactions','transactions_indexes');
+    await queryRunner.dropIndex('transactions', 'transactions_indexes');
   }
 }

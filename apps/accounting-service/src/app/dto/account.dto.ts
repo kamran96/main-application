@@ -9,7 +9,8 @@ export class AccountDto {
   primaryAccountId: number;
   importedFrom: string;
   taxRate: number;
-  isNewRecord:boolean;
+  id: number;
+  isNewRecord: boolean;
 }
 
 export class AccountIdsDto {
