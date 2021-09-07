@@ -91,7 +91,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
   /* Main Routes Settings */
 
   .routes {
-    height: calc(100vh - 160px);
+    height: calc(100vh - 214px);
     overflow-y: auto;
     overflow-x: hidden;
   }
@@ -229,6 +229,19 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
 
   hr {
     border: 1px solid ${(props: IThemeProps) => props?.theme?.colors?.seprator};
+  }
+
+  .dot {
+    height: 8px;
+    width: 8px;
+    border-radius: 25px;
+    margin-right: 4px;
+  }
+  .dot.offline {
+    background: #ff9b20;
+  }
+  .dot.online {
+    background: #009a1a;
   }
 `;
 

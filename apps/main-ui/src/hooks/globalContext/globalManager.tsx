@@ -180,6 +180,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         break;
       case ILoginActions.LOGOUT:
         localStorage.removeItem('auth');
+        setTheme('light');
         setAuth(null);
         setIsUserLogin(false);
         queryCache.clear();
@@ -371,7 +372,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   const checkingUser =
     isFetched && permissionsFetched ? false : isLoading || permissionsFetching;
 
-  console.log(checkingUser, 'user check');
 
   return (
     <globalContext.Provider
@@ -400,7 +400,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         setOrganizationConfig: (visibility: boolean, id: number = null) => {
           setOrganizationConfig({ visibility: visibility, id: id });
         },
-        isCheckingLoginUser: false,
+        isCheckingLoginUser: checkingUser,
         pricingModalConfig,
         setPricingModalConfig: (
           visibility: boolean,

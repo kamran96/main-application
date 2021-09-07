@@ -14,6 +14,7 @@ import sidebarCollapse24 from '@iconify/icons-octicon/sidebar-collapse-24';
 import LogOut from '@iconify-icons/feather/log-out';
 import Sun from '@iconify-icons/feather/sun';
 import Moon from '@iconify-icons/feather/moon';
+import { UserOutlined } from '@ant-design/icons';
 /* eslint-disable-next-line */
 
 export interface IActiveUserInfo {
@@ -30,6 +31,7 @@ export interface SidebarUiProps {
   appLogo?: ReactElement<any>;
   onLogOut?: () => void;
   onThemeButtonClick?: () => void;
+  userOnline?: boolean;
 }
 
 interface IPopOverProps {
@@ -94,6 +96,7 @@ export const SidebarUi: FC<SidebarUiProps> = ({
   routes,
   onLogOut,
   onThemeButtonClick,
+  userOnline,
 }) => {
   const history = useHistory();
 
@@ -117,17 +120,29 @@ export const SidebarUi: FC<SidebarUiProps> = ({
       <hr className="mt-10" />
       <div className="sidebar-userinfo flex alignCenter pointer ph-10">
         <div className="avatar_area">
-          <Avatar
-            className="user_avatar"
-            size={41}
-            src={activeUserInfo?.userImage}
-          />
+          {activeUserInfo?.userImage ? (
+            <Avatar
+              className="user_avatar"
+              size={41}
+              src={activeUserInfo?.userImage}
+            />
+          ) : (
+            <Avatar  size={41} className="user_avatar flex alignCenter justifyCenter" icon={<UserOutlined size={28} />} />
+          )}
         </div>
-        <div className="sidebar_userinfo_detail ml-10 ">
-          <h4 className="capitalize fs-14 fw-500 m-reset">
-            {activeUserInfo?.username}
-          </h4>
-          <h6 className="fs-11">{activeUserInfo?.userEmail}</h6>
+        <div className="sidebar_userinfo_detail ml-10  route_tag">
+          <div>
+            {' '}
+            <h4 className="capitalize fs-14 fw-500 m-reset">
+              {activeUserInfo?.username}
+            </h4>
+            <span className={` online-check flex alignCenter fs-13 fw-500`}>
+              <div
+                className={`dot  ${userOnline ? 'online' : 'offline'}`}
+              ></div>
+              {userOnline ? 'Online' : 'Offline'}
+            </span>
+          </div>
         </div>
       </div>
       <div className="routes mt-10">

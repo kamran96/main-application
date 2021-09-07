@@ -5,9 +5,9 @@ const GlobalStyle = createGlobalStyle`
 body{
     background-color: ${(props: IThemeProps) => props.theme.colors.layoutBg};
     overflow: hidden !important;
-    .ant-card{
+    .ant-card, .ant-popover-inner{
   background: ${(props: IThemeProps) =>
-    props?.theme?.colors?.cardBg} !important;
+    props?.theme?.colors?.sidebarBg} !important;
 }
 }
 
@@ -224,11 +224,14 @@ a, .ant-menu-submenu-title{
 
 .ant-select-item-option-active:not(.ant-select-item-option-disabled){
   background-color: ${(props: IThemeProps) =>
-    props?.theme?.colors?.selectHoverList} !important;
+    props?.theme?.colors?.sidebarListActive};
+color: ${(props: IThemeProps) => props?.theme?.colors?.sidebarListActiveText}
 }
 .ant-select-item-option-selected:not(.ant-select-item-option-disabled){
   background-color: ${(props: IThemeProps) =>
-    props?.theme?.colors?.sidebarListActive} !important;
+    props?.theme?.colors?.sidebarListActive} ;
+    color: ${(props: IThemeProps) =>
+      props?.theme?.colors?.sidebarListActiveText}
   
 }
 }
@@ -250,6 +253,11 @@ a, .ant-menu-submenu-title{
 .bold{
   font-weight: 600;
 }
+.ant-select-dropdown{
+  background-color: ${(props: IThemeProps) =>
+    props?.theme?.colors?.cardBg} !important;
+}
+
 
 
 `;
