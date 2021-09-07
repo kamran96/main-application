@@ -14,7 +14,6 @@ import { ILoginActions } from '../../hooks/globalContext/globalManager';
 import { RoutingSchema } from '../../Schema/routingSchema';
 import { InvyceCmdPalette } from './CommandPalette';
 import { ContentArea, NewUserContentArea, WrapperApplayout } from './styles';
-import { RecoilRoot } from 'recoil';
 
 interface IProps {
   children: React.ReactElement<any>;
@@ -68,7 +67,6 @@ export const AppLayout: FC<IProps> = ({ children }) => {
   };
 
   return (
-    <RecoilRoot>
       <WrapperApplayout darkModeLoading={darkModeLoading}>
         <div className="dark-mode-loading">
           <span className="icon-darkmode">
@@ -120,6 +118,5 @@ export const AppLayout: FC<IProps> = ({ children }) => {
           </NewUserContentArea>
         )}
       </WrapperApplayout>
-    </RecoilRoot>
   );
 };
