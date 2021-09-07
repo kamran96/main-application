@@ -341,9 +341,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         return (
           <EditableSelect
             onClick={() => setSelectedIndex(index)}
-            className={`border-less-select ${
-              index === invoiceItems.length - 1 ? "scrollIntoView" : ""
-            }`}
+           
             loading={itemsLoading}
             size="middle"
             value={{
@@ -748,9 +746,9 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     },
   ];
   const handleScroll = () => {
-    scrollIntoView(document.querySelector(".scroll-row")!, {
+    scrollIntoView(document.querySelector('.scroll-row'), {
       align: {
-        top: 0,
+        bottom: 0,
       },
     });
   };
@@ -767,10 +765,14 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     let items = [...invoiceItems];
     items.push({ ...defaultItems, index: items.length });
     setInvoiceItems(items);
+
     setTimeout(() => {
-      handleScroll();
-    }, 600);
+        handleScroll();
+    }, 1000);
+   
   };
+
+
 
   /* This function is responsible to remove invoice item from last index like (LIFO) */
   const removeRowFromLastIndex = () => {
@@ -854,7 +856,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
            {children}
            </Card>
           </div>
-         <div className="sider"><EmailSider/></div>
+         {/* <div className="sider"><EmailSider/></div> */}
          {/* {children} */}
        
        </LayoutWrapper>

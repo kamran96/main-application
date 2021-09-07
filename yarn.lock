@@ -1572,6 +1572,11 @@
   resolved "https://registry.yarnpkg.com/@iconify/icons-ic/-/icons-ic-1.1.9.tgz#dddfc9a50bf266105ec1d5b5ec73ecfcad5ac3d1"
   integrity sha512-nuFTK+nqHpEyzICkNiqqCrDjunVqbO7ptgqznXRwi+i1H8FsxIyVGJUkLjL+/f4pKQHY5Zpvzq4PH1cLUctyJQ==
 
+"@iconify/icons-octicon@^1.1.10":
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/@iconify/icons-octicon/-/icons-octicon-1.1.10.tgz#b3e09e8774da8dd831f23d34e8cc99afb6a06700"
+  integrity sha512-qdq3vyBzW0U3xlcOwP9jMS9IieL1fx+sw/RKWA3c0ZdvDXbVu+NMg1BwlB6GnC3qYYIGWO/bUB4zNgO/Tkcvpw==
+
 "@iconify/icons-ri@^1.0.1":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@iconify/icons-ri/-/icons-ri-1.1.0.tgz#04fceec48db35484e91c7eb6a0790d75455bd1d3"
@@ -3298,6 +3303,11 @@
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@types/cookiejar/-/cookiejar-2.1.2.tgz#66ad9331f63fe8a3d3d9d8c6e3906dd10f6446e8"
   integrity sha512-t73xJJrvdTjXrn4jLS9VSGRbz0nUY3cl2DMGDU48lKl+HR9dbbjW2A9r3g40VA++mQpy6uuHg33gy7du2BKpog==
+
+"@types/crypto-js@^4.0.2":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@types/crypto-js/-/crypto-js-4.0.2.tgz#4524325a175bf819fec6e42560c389ce1fb92c97"
+  integrity sha512-sCVniU+h3GcGqxOmng11BRvf9TfN9yIs8KKjB8C8d75W69cpTfZG80gau9yTx5SxF3gvHGbJhdESzzvnjtf3Og==
 
 "@types/eslint-scope@^3.7.0":
   version "3.7.1"
@@ -9906,6 +9916,11 @@ gzip-size@^6.0.0:
   integrity sha512-ax7ZYomf6jqPTQ4+XCpUGyXKHk5WweS+e05MBO4/y3WJ5RkmPXNKvX+bx1behVILVwr6JSQvZAku021CHPXG3Q==
   dependencies:
     duplexer "^0.1.2"
+
+hamt_plus@1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/hamt_plus/-/hamt_plus-1.0.2.tgz#e21c252968c7e33b20f6a1b094cd85787a265601"
+  integrity sha1-4hwlKWjH4zsg9qGwlM2FeHomVgE=
 
 handle-thing@^2.0.0:
   version "2.0.1"
@@ -16896,6 +16911,13 @@ rechoir@^0.6.2:
   integrity sha1-hSBLVNuoLVdC4oyWdW70OvUOM4Q=
   dependencies:
     resolve "^1.1.6"
+
+recoil@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/recoil/-/recoil-0.4.1.tgz#1cb2171bc98d41361507131a059d7c3525d8c4fe"
+  integrity sha512-vp6KPwlHOjJ4bJofmdDchmgI9ilMTCoUisK8/WYLl8dThH7e7KmtZttiLgvDb2Em99dUfTEsk8vT8L1nUMgqXQ==
+  dependencies:
+    hamt_plus "1.0.2"
 
 recursive-readdir@2.2.2:
   version "2.2.2"

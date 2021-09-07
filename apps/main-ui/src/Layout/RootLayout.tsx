@@ -24,6 +24,8 @@ export const RootLayout = (props: RouteConfigComponentProps) => {
     }, 2500);
   }, []);
 
+  console.log(getLoading(), "loading value")
+
   if (getLoading()) {
     return (
       <WrapperLoader>

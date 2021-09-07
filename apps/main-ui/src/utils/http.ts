@@ -1,7 +1,7 @@
 import axios from "axios";
 import { DecriptionData } from "./encription";
 
-let localIP = `http://192.168.6.109`;
+let localIP = `http://192.168.6.120`;
 let RailsBaseURL = "";
 let NodeBaseURL = ``;
 let cancelToken = axios.CancelToken;
@@ -15,7 +15,7 @@ if (host && host === "app.invyce.com") {
 
   RailsBaseURL = `https://api.rails.invyce.com/`;
   NodeBaseURL = `https://api.node.invyce.com/`;
-} else if (host && host === "dev.app.invyce.com") {
+} else if (host && host !== "dev.app.invyce.com") {
   // Staging server endpoints
 
   RailsBaseURL = `https://dev.api.rails.invyce.com/`;
