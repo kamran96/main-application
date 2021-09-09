@@ -1,6 +1,84 @@
 {
   "version": 2,
   "projects": {
+    "editable-table": {
+      "root": "libs/editable-table",
+      "sourceRoot": "libs/editable-table/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/editable-table/**/*.{ts,tsx,js,jsx}"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/editable-table"],
+          "options": {
+            "jestConfig": "libs/editable-table/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "storybook": {
+          "executor": "@nrwl/storybook:storybook",
+          "options": {
+            "uiFramework": "@storybook/react",
+            "port": 4400,
+            "config": {
+              "configFolder": "libs/editable-table/.storybook"
+            }
+          },
+          "configurations": {
+            "ci": {
+              "quiet": true
+            }
+          }
+        },
+        "build-storybook": {
+          "executor": "@nrwl/storybook:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "uiFramework": "@storybook/react",
+            "outputPath": "dist/storybook/editable-table",
+            "config": {
+              "configFolder": "libs/editable-table/.storybook"
+            }
+          },
+          "configurations": {
+            "ci": {
+              "quiet": true
+            }
+          }
+        }
+      }
+    },
+    "editable-table-e2e": {
+      "root": "apps/editable-table-e2e",
+      "sourceRoot": "apps/editable-table-e2e/src",
+      "projectType": "application",
+      "targets": {
+        "e2e": {
+          "executor": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/editable-table-e2e/cypress.json",
+            "tsConfig": "apps/editable-table-e2e/tsconfig.e2e.json",
+            "devServerTarget": "editable-table:storybook"
+          },
+          "configurations": {
+            "ci": {
+              "devServerTarget": "editable-table:storybook:ci"
+            }
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/editable-table-e2e/**/*.{js,ts}"]
+          }
+        }
+      }
+    },
     "main-api": {
       "root": "apps/main-api",
       "sourceRoot": "apps/main-api/src",

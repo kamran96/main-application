@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, memo, useEffect, useState } from "react";
 import { Form, Input, Select, Tabs } from "antd";
 import styled from "styled-components";
 import { FormLabel } from "../FormLabel";
@@ -19,7 +19,7 @@ interface IProps {
   issueDate?: any;
 }
 
-export const Payment: FC<IProps> = ({
+const _Payment: FC<IProps> = ({
   initialValues,
   onChange,
   reset,
@@ -283,5 +283,11 @@ export const Payment: FC<IProps> = ({
     </WrapperPayment>
   );
 };
+
+export const Payment = memo(_Payment, (prevProps, nextProps)=>{
+
+  
+  return JSON.stringify(prevProps.initialValues)===JSON.stringify(nextProps.initialValues)
+});
 
 const WrapperPayment = styled.div``;

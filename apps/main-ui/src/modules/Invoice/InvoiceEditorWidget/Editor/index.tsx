@@ -1,61 +1,61 @@
-import bxPlus from "@iconify-icons/bx/bx-plus";
-import printIcon from "@iconify-icons/bytesize/print";
-import Icon from "@iconify/react";
-import { Button, Col, Form, Input, InputNumber, Row, Select } from "antd";
-import TextArea from "antd/lib/input/TextArea";
-import dayjs from "dayjs";
-import React, { FC, useRef, useState, useEffect } from "react";
-import { createDndContext, DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { queryCache, useMutation, useQuery } from "react-query";
+import bxPlus from '@iconify-icons/bx/bx-plus';
+import printIcon from '@iconify-icons/bytesize/print';
+import Icon from '@iconify/react';
+import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
+import TextArea from 'antd/lib/input/TextArea';
+import dayjs from 'dayjs';
+import React, { FC, useRef, useState, useEffect } from 'react';
+import { createDndContext, DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { queryCache, useMutation, useQuery } from 'react-query';
 
 import {
   createPurchaseEntryAPI,
   getInvoiceNumber,
   InvoiceCreateAPI,
-} from "../../../../api";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
+} from '../../../../api';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import {
   IErrorMessages,
   IServerError,
   ISupportedRoutes,
   NOTIFICATIONTYPE,
   PaymentMode,
-} from "../../../../modal";
-import { IInvoiceType, ITaxTypes } from "../../../../modal/invoice";
-import { IOrganizationType } from "../../../../modal/organization";
-import { addition } from "../../../../utils/helperFunctions";
-import moneyFormat from "../../../../utils/moneyFormat";
-import printDiv, { DownloadPDF } from "../../../../utils/Print";
-import { ConfirmModal } from "../../../../components/ConfirmModal";
-import { DatePicker } from "../../../../components/DatePicker";
-import { FormLabel } from "../../../../components/FormLabel";
-import { Payment } from "../../../../components/Payment";
-import { PrintFormat } from "../../../../components/PrintFormat";
-import { Rbac } from "../../../../components/Rbac";
-import { PERMISSIONS } from "../../../../components/Rbac/permissions";
-import { Seprator } from "../../../../components/Seprator";
-import { CommonTable } from "../../../../components/Table";
-import defaultItems from "./defaultStates";
-import { DragableBodyRow } from "./draggable";
-import { WrapperInvoiceForm } from "./styles";
-import { PurchaseManager, usePurchaseWidget } from "./EditorManager";
-import { PrintViewPurchaseWidget } from "../../../../components/PurchasesWidget/PrintViewPurchaseWidget";
-
+} from '../../../../modal';
+import { IInvoiceType, ITaxTypes } from '../../../../modal/invoice';
+import { IOrganizationType } from '../../../../modal/organization';
+import { addition } from '../../../../utils/helperFunctions';
+import moneyFormat from '../../../../utils/moneyFormat';
+import printDiv, { DownloadPDF } from '../../../../utils/Print';
+import { ConfirmModal } from '../../../../components/ConfirmModal';
+import { DatePicker } from '../../../../components/DatePicker';
+import { FormLabel } from '../../../../components/FormLabel';
+import { Payment } from '../../../../components/Payment';
+import { PrintFormat } from '../../../../components/PrintFormat';
+import { Rbac } from '../../../../components/Rbac';
+import { PERMISSIONS } from '../../../../components/Rbac/permissions';
+import { Seprator } from '../../../../components/Seprator';
+import { CommonTable } from '../../../../components/Table';
+import defaultItems from './defaultStates';
+import { DragableBodyRow } from './draggable';
+import { WrapperInvoiceForm } from './styles';
+import { PurchaseManager, usePurchaseWidget } from './EditorManager';
+import { PrintViewPurchaseWidget } from '../../../../components/PurchasesWidget/PrintViewPurchaseWidget';
+import { EditableTable } from '@invyce/editable-table';
 
 const RNDContext = createDndContext(HTML5Backend);
 
 const { Option } = Select;
 
 enum ISUBMITTYPE {
-  RETURN = "RETURN",
-  APPROVE_PRINT = "APPROVE&PRINT",
-  ONLYAPPROVE = "ONLYAPPROVE",
-  DRAFT = "DRAFT",
+  RETURN = 'RETURN',
+  APPROVE_PRINT = 'APPROVE&PRINT',
+  ONLYAPPROVE = 'ONLYAPPROVE',
+  DRAFT = 'DRAFT',
 }
 
 interface IProps {
-  type?: "SI" | "QO";
+  type?: 'SI' | 'QO';
   id?: number;
   onSubmit?: (payload: any) => void;
 }
@@ -106,7 +106,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
 
   const __columns =
     taxType === ITaxTypes.NO_TAX
-      ? columns.filter((item) => item.dataIndex !== "tax")
+      ? columns.filter((item) => item.dataIndex !== 'tax')
       : columns;
 
   const printRef = useRef();
@@ -118,7 +118,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   const APISTAKE = InvoiceCreateAPI;
   /* React Query useMutation hook and ASYNC method to create invoice */
   const [muatateCreateInvoice, resMutateInvoice] = useMutation(APISTAKE);
-  const [submitType, setSubmitType] = useState("");
+  const [submitType, setSubmitType] = useState('');
   /* ********** HOOKS ENDS HERE ************** */
 
   const { data: invoiceNumberData } = useQuery([], getInvoiceNumber);
@@ -188,7 +188,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
           discount: addition(invoiceDiscount, TotalDiscount),
           netTotal: NetTotal,
           grossTotal: GrossTotal,
-          total: "",
+          total: '',
           isNewRecord: true,
         },
         invoice_items: invoiceItems.map((item, index) => {
@@ -230,7 +230,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
       try {
         await muatateCreateInvoice(payload, {
           onSuccess: () => {
-            notificationCallback(NOTIFICATIONTYPE.SUCCESS, "Invoice Created");
+            notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Invoice Created');
             if (value && value.status.print) {
               setPrintModal(true);
             }
@@ -256,12 +256,12 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
             setInvoiceItems([{ ...defaultItems }]);
 
             [
-              "invoices",
-              "transactions?page",
-              "items?page",
-              "invoice-view",
-              "ledger-contact",
-              "all-items",
+              'invoices',
+              'transactions?page',
+              'items?page',
+              'invoice-view',
+              'ledger-contact',
+              'all-items',
             ].forEach((key) => {
               queryCache.invalidateQueries((q) =>
                 q.queryKey[0].toString().startsWith(key)
@@ -293,13 +293,13 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     ClearAll();
     if (id) {
       queryCache.removeQueries(`${type}-${id}-view`);
-      let route = history.location.pathname.split("/");
+      let route = history.location.pathname.split('/');
       if (route.length > 3) {
         let removeIndex = route.length - 1;
         route.splice(removeIndex, 1);
-        route = route.join("/");
+        route = route.join('/');
       } else {
-        route = route.join("/");
+        route = route.join('/');
       }
 
       history.push(route);
@@ -312,21 +312,21 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
 
   /* Conditional Rendereing form lables for specific inputs */
   const formLabels = {
-    to: type === IInvoiceType.INVOICE ? `To` : "Contact",
-    ref: "Reference",
+    to: type === IInvoiceType.INVOICE ? `To` : 'Contact',
+    ref: 'Reference',
     issue_date:
       type === IInvoiceType.INVOICE
-        ? "Issue Date"
+        ? 'Issue Date'
         : type === IInvoiceType.QUOTE
-        ? "Date"
-        : "Issue Date",
+        ? 'Date'
+        : 'Issue Date',
     due_date:
       type === IInvoiceType.INVOICE
-        ? "Due Date"
+        ? 'Due Date'
         : type === IInvoiceType.QUOTE
-        ? "Expiry"
-        : "Due Date",
-    orderNo: type === IInvoiceType.INVOICE ? "Invoice #" : "Order No",
+        ? 'Expiry'
+        : 'Due Date',
+    orderNo: type === IInvoiceType.INVOICE ? 'Invoice #' : 'Order No',
   };
 
   const components = {
@@ -346,24 +346,23 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
             type={type}
             heading={
               type === IInvoiceType.INVOICE
-              ? "Sale Invoice"
+                ? 'Sale Invoice'
                 : type === IInvoiceType.QUOTE
-                ? "Quotation"
-                : ""
-              }
-              hideCalculation={type === IInvoiceType.INVOICE ? false : true}
-              data={
+                ? 'Quotation'
+                : ''
+            }
+            hideCalculation={type === IInvoiceType.INVOICE ? false : true}
+            data={
               (resMutateInvoice &&
                 resMutateInvoice.data &&
                 resMutateInvoice.data.data &&
                 resMutateInvoice.data.data.result) ||
               {}
             }
-            />
+          />
         </PrintFormat>
       </div>
       <div className=" _disable_print">
-          
         <Form
           onSubmitCapture={(e) => {}}
           form={AntForm}
@@ -383,22 +382,22 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                     <FormLabel>{formLabels.to}</FormLabel>
                     <Form.Item
                       name="contactId"
-                      rules={[{ required: true, message: "Required !" }]}
+                      rules={[{ required: true, message: 'Required !' }]}
                     >
                       <Select
                         loading={isFetching}
                         size="middle"
                         showSearch
-                        style={{ width: "100%" }}
+                        style={{ width: '100%' }}
                         placeholder="Select Contact"
                         optionFilterProp="children"
                         onChange={(val) => {
-                          if (val !== "newContact") {
+                          if (val !== 'newContact') {
                             AntForm.setFieldsValue({ contactId: val });
                           }
                         }}
                       >
-                        <Option value={"contact-create"}>
+                        <Option value={'contact-create'}>
                           <Button
                             onClick={() => {
                               history.push(
@@ -426,7 +425,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                     <FormLabel>{formLabels.ref}</FormLabel>
                     <Form.Item
                       name="reference"
-                      rules={[{ required: true, message: "Required !" }]}
+                      rules={[{ required: true, message: 'Required !' }]}
                     >
                       <Input size="middle" />
                     </Form.Item>
@@ -435,7 +434,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                     <FormLabel>{formLabels.issue_date}</FormLabel>
                     <Form.Item
                       name="issueDate"
-                      rules={[{ required: true, message: "Required !" }]}
+                      rules={[{ required: true, message: 'Required !' }]}
                     >
                       <DatePicker
                         onChange={(date) => {
@@ -443,9 +442,9 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                           setPayment({ ...payment, dueDate: date });
                         }}
                         disabledDate={(current) => {
-                          return current > dayjs().endOf("day");
+                          return current > dayjs().endOf('day');
                         }}
-                        style={{ width: "100%" }}
+                        style={{ width: '100%' }}
                         size="middle"
                       />
                     </Form.Item>
@@ -455,7 +454,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                     <FormLabel>{formLabels.orderNo}</FormLabel>
                     <Form.Item
                       name="invoiceNumber"
-                      rules={[{ required: false, message: "Required !" }]}
+                      rules={[{ required: false, message: 'Required !' }]}
                     >
                       <Input disabled size="middle" type="text" />
                     </Form.Item>
@@ -468,17 +467,17 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                     <FormLabel>Currency</FormLabel>
                     <Form.Item
                       name="currency"
-                      rules={[{ required: false, message: "Required !" }]}
+                      rules={[{ required: false, message: 'Required !' }]}
                     >
                       <Select
                         disabled
                         size="middle"
                         showSearch
-                        style={{ width: "100%" }}
+                        style={{ width: '100%' }}
                         placeholder="Select Currency"
                         optionFilterProp="children"
                       >
-                        {["PKR", " USD", " CND", "EUR"].map((curr, index) => {
+                        {['PKR', ' USD', ' CND', 'EUR'].map((curr, index) => {
                           return (
                             <Option key={index} value={curr}>
                               {curr}
@@ -492,25 +491,25 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                     <FormLabel>Amount Are</FormLabel>
                     <Form.Item
                       name="isTaxIncluded"
-                      rules={[{ required: false, message: "Required !" }]}
+                      rules={[{ required: false, message: 'Required !' }]}
                     >
                       <Select
                         size="middle"
                         showSearch
-                        style={{ width: "100%" }}
+                        style={{ width: '100%' }}
                         placeholder="Select Tax"
                         optionFilterProp="children"
                       >
                         {[
                           {
-                            name: "Tax Included",
+                            name: 'Tax Included',
                             val: ITaxTypes.TAX_INCLUSIVE,
                           },
                           {
-                            name: " Tax Exempted",
+                            name: ' Tax Exempted',
                             val: ITaxTypes.TAX_EXCLUSIVE,
                           },
-                          { name: "No Tax", val: ITaxTypes.NO_TAX },
+                          { name: 'No Tax', val: ITaxTypes.NO_TAX },
                         ].map((tax, index) => {
                           return (
                             <Option key={index} value={tax.val}>
@@ -544,7 +543,14 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
               );
             })} */}
             <div className="table_area">
-            <DndProvider manager={manager.current.dragDropManager}>
+              <EditableTable
+                loading={isFetching}
+                dragable={(data) => setInvoiceItems(data)}
+                columns={__columns}
+                data={invoiceItems}
+                scrollable={{ offsetY: 400, offsetX: 0 }}
+              />
+              {/* <DndProvider manager={manager.current.dragDropManager}>
               <CommonTable
                 rowClassName={(record, index) =>
                   ` ${
@@ -573,7 +579,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                   };
                 }}
               />
-            </DndProvider>
+            </DndProvider> */}
             </div>
           </Form>
           <div className="add_item">
@@ -609,7 +615,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                     <Form.Item
                       name="comment"
                       rules={[
-                        { required: true, message: "Comment is required" },
+                        { required: true, message: 'Comment is required' },
                       ]}
                     >
                       <TextArea className="mh-10" rows={4} />
@@ -707,7 +713,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                     onClick={() => {
                       AntForm.resetFields();
                     }}
-                    size={"middle"}
+                    size={'middle'}
                     type="default"
                   >
                     Cancel
@@ -719,7 +725,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                     }
                     disabled={resMutateInvoice.isLoading}
                     htmlType="submit"
-                    size={"middle"}
+                    size={'middle'}
                     onClick={() => {
                       setSubmitType(ISUBMITTYPE.DRAFT);
                       AntForm.setFieldsValue({
@@ -730,7 +736,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                       });
                     }}
                   >
-                    {type === IInvoiceType.QUOTE ? "Save" : "Draft"}
+                    {type === IInvoiceType.QUOTE ? 'Save' : 'Draft'}
                   </Button>
                   {type !== IInvoiceType.QUOTE && (
                     <Rbac
@@ -750,7 +756,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                             submitType === ISUBMITTYPE.RETURN
                           }
                           htmlType="submit"
-                          size={"middle"}
+                          size={'middle'}
                           onClick={() => {
                             setSubmitType(ISUBMITTYPE.RETURN);
                             AntForm.setFieldsValue({
@@ -771,7 +777,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                             submitType === ISUBMITTYPE.APPROVE_PRINT
                           }
                           htmlType="submit"
-                          size={"middle"}
+                          size={'middle'}
                           type="primary"
                           onClick={() => {
                             setSubmitType(ISUBMITTYPE.APPROVE_PRINT);
@@ -795,7 +801,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                             submitType === ISUBMITTYPE.ONLYAPPROVE
                           }
                           htmlType="submit"
-                          size={"middle"}
+                          size={'middle'}
                           type="primary"
                           onClick={() => {
                             setSubmitType(ISUBMITTYPE.ONLYAPPROVE);

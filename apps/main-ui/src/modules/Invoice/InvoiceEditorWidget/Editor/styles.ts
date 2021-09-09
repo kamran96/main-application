@@ -7,9 +7,9 @@ export const WrapperInvoiceForm = styled.div`
   padding-bottom: ${convertToRem(40)};
   border-radius: ${convertToRem(8)};
 
-  table {
+  /* table {
     border-spacing: 0;
-  }
+  } */
   .refrence-header {
     /* background: #f8f8f8;
     border: ${convertToRem(1)} solid #e4e4e4;
@@ -89,9 +89,7 @@ export const WrapperInvoiceForm = styled.div`
     margin: ${convertToRem(20)} ${convertToRem(15)};
   }
 
-  .ant-table-body {
-    overflow-y: auto !important;
-  }
+ 
 
   tbody > tr > td {
     padding: ${convertToRem(4)} ${convertToRem(2)};
