@@ -28,6 +28,13 @@
     ]
   },
   "projects": {
+    "editable-table": {
+      "tags": []
+    },
+    "editable-table-e2e": {
+      "tags": [],
+      "implicitDependencies": ["editable-table"]
+    },
     "main-api": {
       "tags": []
     },
