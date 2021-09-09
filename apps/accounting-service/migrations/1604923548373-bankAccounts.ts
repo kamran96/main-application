@@ -18,16 +18,16 @@ export class bankAccounts1604923548373 implements MigrationInterface {
           { name: 'accountType', isNullable: true, type: 'smallint' },
           { name: 'bankId', isNullable: false, type: 'int' },
           { name: 'organizationId', isNullable: true, type: 'int' },
+          { name: 'status', isNullable: true, type: 'int' },
           { name: 'createdById', type: 'int', isNullable: true },
           { name: 'updatedById', type: 'int', isNullable: true },
           { name: 'createdAt', type: 'timestamp', default: 'NOW()' },
           { name: 'updatedAt', type: 'timestamp', default: 'NOW()' },
         ],
       }),
-      true,
+      true
     );
 
-  
     await queryRunner.createForeignKey(
       'bank_accounts',
       new TableForeignKey({
@@ -35,7 +35,7 @@ export class bankAccounts1604923548373 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'banks',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 
