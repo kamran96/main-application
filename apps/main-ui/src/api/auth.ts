@@ -1,6 +1,6 @@
 import http, { railsHttp } from "../utils/http";
 
-export const LoginAPI = (payload) => http.post(`/auth`, payload);
+export const LoginAPI = (payload) => http.post(`users/auth`, payload);
 
 export const RegisterAPI = (payload) => http.post(`auth/register`, payload);
 
@@ -21,3 +21,7 @@ export const resetPasswordAPI = (payload:any)=> http?.post(`auth/change-password
 export const verifyAccountAPI = (payload: any)=>http?.post(`auth/verify-otp`, payload);
 
 export const resendVerificationCodeAPI = (payload: any)=> http?.post(`auth/resend-otp`, payload);
+
+export const CheckAuthAPI = (key?:string)=> http.get(`users/auth/check`);
+
+export const LogoutAPI = (key?:string)=> http.post(`users/auth/logout`);

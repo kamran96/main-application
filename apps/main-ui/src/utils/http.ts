@@ -15,19 +15,20 @@ if (host && host === "app.invyce.com") {
 
   RailsBaseURL = `https://api.rails.invyce.com/`;
   NodeBaseURL = `https://api.node.invyce.com/`;
-} else if (host && host !== "dev.app.invyce.com") {
+} else if (host && host === "dev.app.invyce.com") {
   // Staging server endpoints
 
   RailsBaseURL = `https://dev.api.rails.invyce.com/`;
   NodeBaseURL = `https://dev.api.node.invyce.com/`;
 } else {
   // local development
-  RailsBaseURL = localIP + ":4000";
-  NodeBaseURL = localIP + ":8081";
+  RailsBaseURL = localIP; // + ":4000"
+  NodeBaseURL = localIP ; //+ ":8081"
 }
 
 const http = axios.create({
   baseURL: NodeBaseURL,
+  withCredentials: true,
   cancelToken: new cancelToken(function executor(c) {
     CancelRequest = c;
   }),
