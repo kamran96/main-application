@@ -2,7 +2,7 @@ import { message } from 'antd';
 import React, { FC, useEffect, useState } from 'react';
 import { queryCache, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
-import { getAllRolesWithPermission, getUserAPI, uploadPdfAPI } from '../../api';
+import { CheckAuthAPI, getAllRolesWithPermission, getUserAPI, LogoutAPI, uploadPdfAPI } from '../../api';
 import {
   IBaseAPIError,
   IErrorMessages,
@@ -58,7 +58,12 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     mutateSendPDF,
     { isLoading: sendingPDF, isSuccess: pdfUploaded, reset: resetUPloadPDF },
   ] = useMutation(uploadPdfAPI);
+
+  const [mutateLogout, resLogout] = useMutation(LogoutAPI);
+
+
   const [isOnline, setIsOnline] = useState(true);
+  const [checkAutherized, setAutherized] = useState(true);
   const [theme, setTheme] = useState<Theme>('light');
 
   const [isUserLogin, setIsUserLogin] = useState(false);
@@ -131,6 +136,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const [verifiedModal, setVerifiedModal] = useState(false);
 
+
   const [toggle, setToggle] = useState(true);
 
   window.addEventListener('offline', (event) => {
@@ -173,17 +179,38 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   const handleLogin = (action: IAction) => {
     switch (action.type) {
       case ILoginActions.LOGIN:
-        setIsUserLogin(true);
-        setAuth(action.payload);
-        localStorage.setItem('auth', EncriptData(action.payload) as any);
+      debugger;  
+      setAutherized(true);
+
+        // setAuth(action.payload);
+        // localStorage.setItem('auth', EncriptData(action.payload) as any);
 
         break;
       case ILoginActions.LOGOUT:
-        localStorage.removeItem('auth');
-        setTheme('light');
-        setAuth(null);
-        setIsUserLogin(false);
-        queryCache.clear();
+        // await mutateLogout("", {
+        //   onSuccess: (data)=>{
+        //     notificationCallback(NOTIFICATIONTYPE.INFO, 'Logout Successfully');
+        //     setTheme('light');
+        //     setIsUserLogin(false);
+        //     queryCache.clear();
+        //   },
+        //   onError: (err: IBaseAPIError)=>{
+        //     if(err?.response?.data.message){
+        //       notificationCallback(NOTIFICATIONTYPE.INFO, `${err.response.data.message}`)
+
+        //     }else{
+        //       notificationCallback(
+        //         NOTIFICATIONTYPE.ERROR,
+        //         IErrorMessages.NETWORK_ERROR
+        //       );
+        //     }
+        //   }
+        // })
+        // localStorage.removeItem('auth');
+        // setTheme('light');
+        // setAuth(null);
+        // setIsUserLogin(false);
+        // queryCache.clear();
         break;
       default:
         break;
@@ -210,138 +237,104 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   let userId = (auth && auth.users && auth.users.id) || null;
 
-  const { isLoading, data, error, isFetched } = useQuery(
-    [`loggedInUser`, userId],
-    getUserAPI,
-    {
-      enabled: userId,
-      staleTime: Infinity,
-      cacheTime: Infinity,
-      onSuccess: () => {
-        setIsUserLogin(true);
-      },
-      onError: (error: IBaseAPIError) => {
-        setIsUserLogin(false);
-        if (
-          error &&
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
-          const { message } = error.response.data;
-          notificationCallback(NOTIFICATIONTYPE.ERROR, `${message}`);
-        }
-      },
+
+
+  
+
+/* LoggedInUser is Fetched */
+  const {isLoading, data, error, isFetched} = useQuery([`loggedInUser`], CheckAuthAPI, {
+ 
+    cacheTime: Infinity,
+    enabled: checkAutherized,
+    onSuccess: (data)=>{
+      setUserDetails(data?.data.result);
+      setIsUserLogin(true);
+    },
+    onError: ()=>{
+      setAutherized(false);
     }
-  );
+  })
+
+  // const { isLoading, data, error, isFetched } = useQuery(
+  //   [`loggedInUser`, userId],
+  //   getUserAPI,
+  //   {
+  //     enabled: userId,
+  //     staleTime: Infinity,
+  //     cacheTime: Infinity,
+  //     onSuccess: () => {
+  //       setIsUserLogin(true);
+  //     },
+  //     onError: (error: IBaseAPIError) => {
+  //       setIsUserLogin(false);
+  //       if (
+  //         error &&
+  //         error.response &&
+  //         error.response.data &&
+  //         error.response.data.message
+  //       ) {
+  //         const { message } = error.response.data;
+  //         notificationCallback(NOTIFICATIONTYPE.ERROR, `${message}`);
+  //       }
+  //     },
+  //   }
+  // );
 
   useEffect(() => {
     toggleTheme(theme);
   }, [theme]);
 
-  const {
-    data: allRolesAndPermissionsData,
-    isLoading: permissionsFetching,
-    isFetched: permissionsFetched,
-  } = useQuery([`roles-permissions`], getAllRolesWithPermission, {
-    enabled: isUserLogin,
-    cacheTime: Infinity,
-    staleTime: Infinity,
-  });
-
-  useEffect(() => {
-    if (allRolesAndPermissionsData?.data?.result) {
-      const { result } = allRolesAndPermissionsData.data;
-      const { parentRole } = result;
-      const roles: IRolePermissions[] =
-        allRolesAndPermissionsData.data.result.roles;
-      const newResult = roles.map((item) => {
-        let roleIndex = parentRole.findIndex((i) => i === item.role);
-        let parents = [];
-        for (let index = 0; index <= roleIndex; index++) {
-          parents.push(parentRole[index]);
-        }
-
-        return {
-          ...item,
-          action: `${item.module}/${item.title}`,
-          parents,
-        };
-      });
-      setRolePermissions(newResult);
-    }
-  }, [allRolesAndPermissionsData]);
-
-  const errResp: any = error;
-
-  useEffect(() => {
-    if (data?.data) {
-      const userData: IUser = data.data.result;
-      const { result } = data?.data;
-      if (result?.theme) {
-        setTheme(result?.theme);
-      }
-      setUserDetails({ ...userData });
-    } else if (errResp?.message === 'Network Error') {
-      notificationCallback(
-        NOTIFICATIONTYPE.ERROR,
-        `${errResp.message} please check your Internet Connection`
-      );
-    }
-  }, [data, checkIsAuthSaved, errResp]);
+  // const {
+  //   data: allRolesAndPermissionsData,
+  //   isLoading: permissionsFetching,
+  //   isFetched: permissionsFetched,
+  // } = useQuery([`roles-permissions`], getAllRolesWithPermission, {
+  //   enabled: isUserLogin,
+  //   cacheTime: Infinity,
+  //   staleTime: Infinity,
+  // });
 
   // useEffect(() => {
-  //   setIsUserLogin(true);
-  //   setUserDetails({
-  //     id: 81,
-  //     roleId: 54,
-  //     name: "Raymundo Friesen",
-  //     password: "$2a$12$5wayqyjIF.nU402JAyrP8uM4dtDWyzNeNBL.jQ1PyeCHqM1eUnM3y",
-  //     branchId: 104,
-  //     organizationId: 94,
-  //     status: 1,
-  //     createdAt: "2020-10-27T07:09:46.112Z",
-  //     updatedAt: "2020-10-27T07:09:46.112Z",
-  //     createdById: null,
-  //     updatedById: null,
-  //     profile: {
-  //       id: 44,
-  //       userId: 81,
-  //       fullName: "Shawn Crooks",
-  //       email: "bonny@mann-gleason.org",
-  //       country: "Guatemala",
-  //       attachmentId: null,
-  //       phoneNumber: "1-429-387-3404 x703",
-  //       landLine: "1-107-359-5570",
-  //       cnic: "066819947",
-  //       website: "http://turcotte.biz/denver_ryan",
-  //       location: "Schuster Walks",
-  //       bio: "Randall Hodkiewicz Parker",
-  //       jobTitle: "General",
-  //       marketingStatus: 1,
-  //       attachment: null,
-  //     },
-  //     organization: {
-  //       id: 94,
-  //       name: "phunar",
-  //       permanentAddress: "gilgit",
-  //       niche: "bussiness software",
-  //       residentialAddress: "gilgit",
-  //       financialEnding: "asf",
-  //       status: 1,
-  //       createdAt: "2020-10-27T12:15:06.361Z",
-  //       updatedAt: "2020-10-27T12:15:06.361Z",
-  //     },
-  //     role: {
-  //       id: 54,
-  //       branchId: null,
-  //       name: "admin",
-  //       status: 1,
-  //       createdAt: "2020-10-27T07:09:45.794Z",
-  //       updatedAt: "2020-10-27T07:09:45.794Z",
-  //     },
-  //   });
-  // }, []);
+  //   if (allRolesAndPermissionsData?.data?.result) {
+  //     const { result } = allRolesAndPermissionsData.data;
+  //     const { parentRole } = result;
+  //     const roles: IRolePermissions[] =
+  //       allRolesAndPermissionsData.data.result.roles;
+  //     const newResult = roles.map((item) => {
+  //       let roleIndex = parentRole.findIndex((i) => i === item.role);
+  //       let parents = [];
+  //       for (let index = 0; index <= roleIndex; index++) {
+  //         parents.push(parentRole[index]);
+  //       }
+
+  //       return {
+  //         ...item,
+  //         action: `${item.module}/${item.title}`,
+  //         parents,
+  //       };
+  //     });
+  //     setRolePermissions(newResult);
+  //   }
+  // }, [allRolesAndPermissionsData]);
+
+  // const errResp: any = error;
+
+  // useEffect(() => {
+  //   if (data?.data) {
+  //     const userData: IUser = data.data.result;
+  //     const { result } = data?.data;
+  //     if (result?.theme) {
+  //       setTheme(result?.theme);
+  //     }
+  //     setUserDetails({ ...userData });
+  //   } else if (errResp?.message === 'Network Error') {
+  //     notificationCallback(
+  //       NOTIFICATIONTYPE.ERROR,
+  //       `${errResp.message} please check your Internet Connection`
+  //     );
+  //   }
+  // }, [data, checkIsAuthSaved, errResp]);
+
 
   message.config({
     top: 101,
@@ -369,13 +362,14 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const { theme: appTheme, themeLoading } = useTheme(theme);
 
-  const checkingUser =
-    isFetched && permissionsFetched ? false : isLoading || permissionsFetching;
+  const checkingUser = false;
 
 
   return (
     <globalContext.Provider
       value={{
+        checkAutherized,
+        setAutherized,
         rolePermissions, // Will return all permissions from BE
         isOnline, // gets info about online and offline network
         isUserLogin, // true or false

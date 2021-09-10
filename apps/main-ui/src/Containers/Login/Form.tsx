@@ -1,51 +1,38 @@
-import React, { FC, useEffect } from "react";
-import styled from "styled-components";
-import { Form, Input, Button, Row, Col } from "antd";
-import { FormLabel } from "../../components/FormLabel";
-import { useMutation } from "react-query";
-import { LoginAPI } from "../../api";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { ILoginActions } from "../../hooks/globalContext/globalManager";
-import { updateToken } from "../../utils/http";
-import { ISupportedRoutes, NOTIFICATIONTYPE } from "../../modal";
-import { IBaseAPIError } from "../../modal/base";
-import { HeadingTemplate1 } from "../../components/HeadingTemplates";
-import Checkbox from "antd/lib/checkbox/Checkbox";
-import { Link } from "react-router-dom";
-import { BOLDTEXT } from "../../components/Para/BoldText";
+import React, { FC, useEffect } from 'react';
+import styled from 'styled-components';
+import { Form, Input, Button, Row, Col } from 'antd';
+import { FormLabel } from '../../components/FormLabel';
+import { useMutation } from 'react-query';
+import { LoginAPI } from '../../api';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { ILoginActions } from '../../hooks/globalContext/globalManager';
+import { updateToken } from '../../utils/http';
+import { ISupportedRoutes, NOTIFICATIONTYPE } from '../../modal';
+import { IBaseAPIError } from '../../modal/base';
+import { HeadingTemplate1 } from '../../components/HeadingTemplates';
+import Checkbox from 'antd/lib/checkbox/Checkbox';
+import { Link } from 'react-router-dom';
+import { BOLDTEXT } from '../../components/Para/BoldText';
 
 export const LoginForm: FC = () => {
   const [mutateLogin, responseMutateLogin] = useMutation(LoginAPI);
 
-  const { data, isError, isLoading, error } = responseMutateLogin;
-  const errorRes: IBaseAPIError = error;
-
-  const { setUserDetails, handleLogin, notificationCallback, routeHistory }: any =
+  const {  notificationCallback, routeHistory, setAutherized }: any =
     useGlobalContext();
-    const {history} = routeHistory;
+  const { history } = routeHistory;
 
   const onFinish = async (values) => {
     try {
       await mutateLogin(values, {
         onSuccess: () => {
+          setAutherized(true);
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
             `Logged in SuccessFully`
           );
         },
       });
-    } catch (error) {
-      console.log(error, "error is here");
-    }
-  };
-
-  useEffect(() => {
-    if (data && data.data && data.data.result) {
-      const { result } = data.data;
-      updateToken(result.access_token);
-      setUserDetails(result.users);
-      handleLogin({ type: ILoginActions.LOGIN, payload: result });
-    } else if (errorRes && isError) {
+    } catch (errorRes: IBaseAPIError | any) {
       if (errorRes && errorRes.response && errorRes.response.data) {
         const { message } = errorRes.response.data;
         notificationCallback(NOTIFICATIONTYPE.ERROR, `${message}`);
@@ -56,45 +43,50 @@ export const LoginForm: FC = () => {
         );
       }
     }
-  }, [
-    data,
-    isError,
-    errorRes,
-    handleLogin,
-    notificationCallback,
-    setUserDetails,
-  ]);
+  };
 
   const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
+    console.log('Failed:', errorInfo);
   };
 
   return (
     <LoginFormWrapper>
       <div className="login_wrapper">
-       <Row gutter={24}>
-         <Col xxl={{ span: 18, offset: 3 }} xl={{ span: 18, offset: 3 }} md={{span:24}} sm={{span:24}} xs={{span:24}}>
-         <HeadingTemplate1
-          title="Login to your account"
-          paragraph={
-            "Thank you for get back to Invyce, let access out the best recommendation for you"
-          }
-        />
-         </Col>
-       </Row>
+        <Row gutter={24}>
+          <Col
+            xxl={{ span: 18, offset: 3 }}
+            xl={{ span: 18, offset: 3 }}
+            md={{ span: 24 }}
+            sm={{ span: 24 }}
+            xs={{ span: 24 }}
+          >
+            <HeadingTemplate1
+              title="Login to your account"
+              paragraph={
+                'Thank you for get back to Invyce, let access out the best recommendation for you'
+              }
+            />
+          </Col>
+        </Row>
         <Form
-        className="mt-20"
+          className="mt-20"
           initialValues={{ remember: true }}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
         >
           <Row gutter={24}>
-            <Col xxl={{ span: 18, offset: 3 }} xl={{ span: 18, offset: 3 }} md={{span:24}} sm={{span:24}} xs={{span:24}}>
+            <Col
+              xxl={{ span: 18, offset: 3 }}
+              xl={{ span: 18, offset: 3 }}
+              md={{ span: 24 }}
+              sm={{ span: 24 }}
+              xs={{ span: 24 }}
+            >
               <FormLabel>Email/Username</FormLabel>
               <Form.Item
                 name="username"
                 rules={[
-                  { required: true, message: "Please input your username!" },
+                  { required: true, message: 'Please input your username!' },
                 ]}
               >
                 <Input size="large" />
@@ -104,7 +96,7 @@ export const LoginForm: FC = () => {
               <Form.Item
                 name="password"
                 rules={[
-                  { required: true, message: "Please input your password!" },
+                  { required: true, message: 'Please input your password!' },
                 ]}
               >
                 <Input.Password size="large" />
@@ -116,7 +108,12 @@ export const LoginForm: FC = () => {
                 <Button
                   type="link"
                   htmlType="button"
-                  onClick={() => history?.push(ISupportedRoutes.DEFAULT_LAYOUT+ISupportedRoutes.FORGOT_PASSWORD)}
+                  onClick={() =>
+                    history?.push(
+                      ISupportedRoutes.DEFAULT_LAYOUT +
+                        ISupportedRoutes.FORGOT_PASSWORD
+                    )
+                  }
                 >
                   Forgot Password?
                 </Button>
@@ -124,23 +121,27 @@ export const LoginForm: FC = () => {
               <Form.Item className="m-reset">
                 <Button
                   htmlType="submit"
-                  style={{ width: "100%" }}
+                  style={{ width: '100%' }}
                   type="primary"
                   size="middle"
-                  loading={isLoading}
+                  loading={responseMutateLogin.isLoading}
                 >
                   Sign In
                 </Button>
               </Form.Item>
-              <h5 className="textCenter mt-10"><BOLDTEXT>OR</BOLDTEXT></h5>
+              <h5 className="textCenter mt-10">
+                <BOLDTEXT>OR</BOLDTEXT>
+              </h5>
               <Form.Item className="m-reset">
                 <Button
-                
-                  style={{ width: "100%" }}
+                  style={{ width: '100%' }}
                   type="default"
                   size="middle"
-                  onClick={()=>{
-                    history?.push(ISupportedRoutes?.DEFAULT_LAYOUT+ISupportedRoutes?.SIGNUP)
+                  onClick={() => {
+                    history?.push(
+                      ISupportedRoutes?.DEFAULT_LAYOUT +
+                        ISupportedRoutes?.SIGNUP
+                    );
                   }}
                 >
                   Sign Up
@@ -150,7 +151,6 @@ export const LoginForm: FC = () => {
           </Row>
         </Form>
       </div>
-     
     </LoginFormWrapper>
   );
 };
