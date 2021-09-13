@@ -4,6 +4,7 @@ import {
   Inject,
   Injectable,
   Logger,
+  Res,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
@@ -16,6 +17,7 @@ import * as ip from 'ip';
 import { User } from '../schemas/user.schema';
 import { SEND_CUSTOMER_EMAIL, SEND_FORGOT_PASSWORD } from '@invyce/send-email';
 import { UserToken } from '../schemas/userToken.schema';
+import { Response } from 'express';
 
 const generateRandomNDigits = (n) => {
   return Math.floor(Math.random() * (9 * Math.pow(10, n))) + Math.pow(10, n);
@@ -119,7 +121,7 @@ export class AuthService {
     return user;
   }
 
-  async Login(user, res) {
+  async Login(user, @Res() res: Response) {
     const [newUser] = user;
 
     const payload = {
@@ -135,18 +137,29 @@ export class AuthService {
     res
       .cookie('access_token', token, {
         httpOnly: true,
-        domain: 'localhost',
+        sameSite: 'strict',
+        secure: true,
+        domain: '127.0.0.1',
         expires: new Date(Moment().add(process.env.EXPIRES, 'h').toDate()),
       })
       .send({
         message: 'Login successfully',
         status: true,
-        result: { user: newUser, token },
+        result: newUser,
       });
 
     return {
-      tokens: token,
+      user,
     };
+  }
+
+  async Logout(res) {
+    // return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
+
+    return res.clearCookie('access_token').send({
+      message: 'Logout successfully.',
+      status: true,
+    });
   }
 
   async Check(req) {
@@ -156,11 +169,8 @@ export class AuthService {
 
       if (user?.length) {
         return {
-          message: 'Authenticated',
-          result: {
-            user: user[0],
-            token: access_token,
-          },
+          user: user[0],
+          token: access_token,
         };
       }
       throw new HttpException('Authentication Failed', HttpStatus.BAD_REQUEST);

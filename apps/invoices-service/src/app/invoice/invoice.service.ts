@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { getCustomRepository, ILike } from 'typeorm';
+import axios from 'axios';
+require('dotenv').config();
 import { InvoiceRepository } from '../repositories/invoice.repository';
 import { InvoiceItemRepository } from '../repositories/invoiceItem.repository';
 
@@ -93,5 +95,29 @@ export class InvoiceService {
     }
 
     return invoiceNo;
+  }
+
+  async Pdf() {
+    console.log('Sending pdf please wait...');
+    console.log(process.env.PDF_GENERATOR_KEY);
+
+    const requestObj: any = {
+      url: 'https://api.pdfmonkey.io/api/v1/documents',
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + process.env.PDF_GENERATOR_KEY,
+        Accept: 'application/json',
+      },
+      data: {
+        document: {
+          document_template_id: 'D4319ECC-9529-4498-BCFD-EE15DA865B52',
+          // "payload": "{ \"name\": \"Jane Doe\" }",
+          // "status": "pending"
+        },
+      },
+    };
+
+    const data = await axios(requestObj);
+    console.log(data.data);
   }
 }

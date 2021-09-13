@@ -19,6 +19,11 @@ import { InvoiceDto } from '../dto/invoice.dto';
 export class InvoiceController {
   constructor(private invoiceService: InvoiceService) {}
 
+  @Get('pdf')
+  async pdf() {
+    return await this.invoiceService.Pdf();
+  }
+
   @UseGuards(GlobalAuthGuard)
   @Post()
   async create(@Body() invoiceDto: InvoiceDto, @Req() req: Request) {

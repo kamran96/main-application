@@ -27,12 +27,7 @@ export class AuthController {
   @Post()
   async Login(@Body() authDto: UserLoginDto, @Res() res: Response) {
     try {
-      const user: any = await this.authService.ValidateUser(authDto, res);
-
-      return {
-        message: 'Login Successfull.',
-        result: user,
-      };
+      await this.authService.ValidateUser(authDto, res);
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
@@ -90,22 +85,23 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('/check')
   async check(@Req() req: Request) {
-   try {
-    const user = await this.authService.Check(req);
+    try {
+      const user = await this.authService.Check(req);
 
-    if (user) {
-      return {
-        message: 'Validated successfully',
-        status: true,
-        result: user,
-      };
+      if (user) {
+        return {
+          message: 'Validated successfully',
+          status: true,
+          result: user.user,
+          token: user.token,
+        };
+      }
+    } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
-   } catch (error) {
-    throw new HttpException(
-      `Sorry! Something went wrong, ${error.message}`,
-      error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
-    );
-   }
   }
 
   @Post('/resend-otp')
@@ -125,6 +121,12 @@ export class AuthController {
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  @Post('logout')
+  async logout(@Res() res: Response) {
+    // res.setHeader('Set-Cookie', this.authService.Logout());
+    return await this.authService.Logout(res);
   }
 
   @Post('/forget-password')
