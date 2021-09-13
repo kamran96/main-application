@@ -1,16 +1,20 @@
-import { IThemeProps } from "./../hooks/useTheme/themeColors";
-import { createGlobalStyle } from "styled-components";
+import { IThemeProps } from './../hooks/useTheme/themeColors';
+import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
 body{
     background-color: ${(props: IThemeProps) => props.theme.colors.layoutBg};
     overflow: hidden !important;
+    .ant-card, .ant-popover-inner{
+  background: ${(props: IThemeProps) =>
+    props?.theme?.colors?.sidebarBg} !important;
+}
 }
 
 .ant-input, .ant-input-number, .ant-select:not(.ant-select-customize-input) .ant-select-selector{
   box-shadow: none;
        ${(props: IThemeProps) =>
-         props?.theme?.theme === "dark"
+         props?.theme?.theme === 'dark'
            ? `
         background-color: ${(props: IThemeProps) =>
           props?.theme?.colors?.inputColorBg} !important;
@@ -24,13 +28,7 @@ body{
     
     }
 
-    .ant-picker-input > input, .ant-picker{
-        background-color: ${(props: IThemeProps) =>
-          props?.theme?.colors?.inputColorBg} !important;
-        color: ${(props: IThemeProps) =>
-          props?.theme?.colors?.inputColor} !important;
-    
-    }
+  
 
     .ant-picker-cell-disabled::before{
       background: ${(props: IThemeProps) => props?.theme?.colors?.disabled}
@@ -57,9 +55,9 @@ body{
 
 .ant-picker-cell{
   color: ${(props: IThemeProps) =>
-    props?.theme?.theme === "dark"
-      ? "rgb(154 154 154 / 25%)  "
-      : "rgba(0, 0, 0, 0.25)"}
+    props?.theme?.theme === 'dark'
+      ? 'rgb(154 154 154 / 25%)  '
+      : 'rgba(0, 0, 0, 0.25)'}
 }
 .ant-picker-panel{
   border: 1px solid ${(props: IThemeProps) => props?.theme?.colors?.seprator}
@@ -129,7 +127,7 @@ body{
     box-shadow: none;
 
     ${(props: IThemeProps) =>
-      props?.theme?.theme === "dark" &&
+      props?.theme?.theme === 'dark' &&
       `
     border-color: ${props?.theme?.colors?.seprator}
     `}
@@ -226,11 +224,14 @@ a, .ant-menu-submenu-title{
 
 .ant-select-item-option-active:not(.ant-select-item-option-disabled){
   background-color: ${(props: IThemeProps) =>
-    props?.theme?.colors?.selectHoverList} !important;
+    props?.theme?.colors?.sidebarListActive};
+color: ${(props: IThemeProps) => props?.theme?.colors?.sidebarListActiveText}
 }
 .ant-select-item-option-selected:not(.ant-select-item-option-disabled){
   background-color: ${(props: IThemeProps) =>
-    props?.theme?.colors?.sidebarListActive} !important;
+    props?.theme?.colors?.sidebarListActive} ;
+    color: ${(props: IThemeProps) =>
+      props?.theme?.colors?.sidebarListActiveText}
   
 }
 }
@@ -252,6 +253,11 @@ a, .ant-menu-submenu-title{
 .bold{
   font-weight: 600;
 }
+.ant-select-dropdown{
+  background-color: ${(props: IThemeProps) =>
+    props?.theme?.colors?.cardBg} !important;
+}
+
 
 
 `;

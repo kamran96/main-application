@@ -1,27 +1,50 @@
-import { message } from "antd";
-import React, { FC, useEffect, useState } from "react";
-import { queryCache, useMutation, useQuery } from "react-query";
-import styled from "styled-components";
-import { getAllRolesWithPermission, getUserAPI, uploadPdfAPI } from "../../api";
+import { message } from 'antd';
+import React, { FC, useEffect, useState } from 'react';
+import { queryCache, useMutation, useQuery } from 'react-query';
+import styled from 'styled-components';
+import { CheckAuthAPI, getAllRolesWithPermission, getUserAPI, LogoutAPI, uploadPdfAPI } from '../../api';
 import {
   IBaseAPIError,
   IErrorMessages,
   IServerError,
   NOTIFICATIONTYPE,
-} from "../../modal";
-import { IAuth, IUser } from "../../modal/auth";
-import { IRolePermissions } from "../../modal/rbac";
-import { DecriptionData, EncriptData } from "../../utils/encription";
-import { useTheme } from "../useTheme";
-import { globalContext } from "./globalContext";
+} from '../../modal';
+import { IAuth, IUser } from '../../modal/auth';
+import { IRolePermissions } from '../../modal/rbac';
+import { DecriptionData, EncriptData } from '../../utils/encription';
+import { useTheme } from '../useTheme';
+import { globalContext } from './globalContext';
+import { useHistory } from 'react-router-dom';
+
+type Theme = 'light' | 'dark';
+
+const stylesheets = {
+  light: `https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.12/antd.min.css`,
+  dark: `https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.12/antd.dark.min.css`,
+};
+
+const createStylesheetLink = (): HTMLLinkElement => {
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.id = 'antd-stylesheet';
+  document.head.appendChild(link);
+  return link;
+};
+
+const getStylesheetLink = (): HTMLLinkElement =>
+  document.head.querySelector('#antd-stylesheet') || createStylesheetLink();
+
+const toggleTheme = (t: Theme) => {
+  getStylesheetLink().href = stylesheets[t];
+};
 
 interface IProps {
   children: React.ReactElement<any>;
 }
 
 export enum ILoginActions {
-  LOGIN = "SET_LOGIN",
-  LOGOUT = "SET_LOGOUT",
+  LOGIN = 'SET_LOGIN',
+  LOGOUT = 'SET_LOGOUT',
 }
 
 interface IAction {
@@ -35,14 +58,18 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     mutateSendPDF,
     { isLoading: sendingPDF, isSuccess: pdfUploaded, reset: resetUPloadPDF },
   ] = useMutation(uploadPdfAPI);
+
+  const [mutateLogout, resLogout] = useMutation(LogoutAPI);
+
+
   const [isOnline, setIsOnline] = useState(true);
-  const [theme, setTheme] = useState("light");
+  const [checkAutherized, setAutherized] = useState(true);
+  const [theme, setTheme] = useState<Theme>('light');
 
   const [isUserLogin, setIsUserLogin] = useState(false);
   const [auth, setAuth] = useState<IAuth>(null);
   const [userDetails, setUserDetails] = useState<IUser | any>(null);
   const [userInviteModal, setUserInviteModal] = useState<boolean>(false);
-  const [history, setHistory] = useState(null);
   const [itemsModalConfig, setItemsModalConfig] = useState<any>({
     visibility: false,
     id: null,
@@ -109,12 +136,13 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const [verifiedModal, setVerifiedModal] = useState(false);
 
+
   const [toggle, setToggle] = useState(true);
 
-  window.addEventListener("offline", (event) => {
+  window.addEventListener('offline', (event) => {
     setIsOnline(false);
   });
-  window.addEventListener("online", (event) => {
+  window.addEventListener('online', (event) => {
     setIsOnline(true);
   });
 
@@ -123,7 +151,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
       onSuccess: () => {
         notificationCallback(
           NOTIFICATIONTYPE.SUCCESS,
-          "Uploaded PDF successfully"
+          'Uploaded PDF successfully'
         );
       },
 
@@ -146,27 +174,51 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     });
   };
 
+  const history = useHistory();
+
   const handleLogin = (action: IAction) => {
     switch (action.type) {
       case ILoginActions.LOGIN:
-        setIsUserLogin(true);
-        setAuth(action.payload);
-        localStorage.setItem("auth", EncriptData(action.payload));
+      debugger;  
+      setAutherized(true);
+
+        // setAuth(action.payload);
+        // localStorage.setItem('auth', EncriptData(action.payload) as any);
 
         break;
       case ILoginActions.LOGOUT:
-        localStorage.removeItem("auth");
-        setAuth(null);
-        setIsUserLogin(false);
-        queryCache.clear();
+        // await mutateLogout("", {
+        //   onSuccess: (data)=>{
+        //     notificationCallback(NOTIFICATIONTYPE.INFO, 'Logout Successfully');
+        //     setTheme('light');
+        //     setIsUserLogin(false);
+        //     queryCache.clear();
+        //   },
+        //   onError: (err: IBaseAPIError)=>{
+        //     if(err?.response?.data.message){
+        //       notificationCallback(NOTIFICATIONTYPE.INFO, `${err.response.data.message}`)
+
+        //     }else{
+        //       notificationCallback(
+        //         NOTIFICATIONTYPE.ERROR,
+        //         IErrorMessages.NETWORK_ERROR
+        //       );
+        //     }
+        //   }
+        // })
+        // localStorage.removeItem('auth');
+        // setTheme('light');
+        // setAuth(null);
+        // setIsUserLogin(false);
+        // queryCache.clear();
         break;
       default:
         break;
     }
   };
 
-  const checkIsAuthSaved = localStorage.getItem("auth");
-  const isSidebarOpen: boolean = JSON.parse(localStorage.getItem("isToggle"));
+  const checkIsAuthSaved = localStorage.getItem('auth');
+  const isSidebarOpen: boolean = JSON.parse(localStorage.getItem('isToggle'));
 
   useEffect(() => {
     if (isSidebarOpen !== null) {
@@ -185,138 +237,104 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   let userId = (auth && auth.users && auth.users.id) || null;
 
-  const { isLoading, data, error, isFetched } = useQuery(
-    [`loggedInUser`, userId],
-    getUserAPI,
-    {
-      enabled: userId,
-      staleTime: Infinity,
-      cacheTime: Infinity,
-      onSuccess: () => {
-        setIsUserLogin(true);
-      },
-      onError: (error: IBaseAPIError) => {
-        setIsUserLogin(false);
-        if (
-          error &&
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
-          const { message } = error.response.data;
-          notificationCallback(NOTIFICATIONTYPE.ERROR, `${message}`);
-        }
-      },
-    }
-  );
 
-  const {
-    data: allRolesAndPermissionsData,
-    isLoading: permissionsFetching,
-    isFetched: permissionsFetched,
-  } = useQuery([`roles-permissions`], getAllRolesWithPermission, {
-    enabled: isUserLogin,
+
+  
+
+/* LoggedInUser is Fetched */
+  const {isLoading, data, error, isFetched} = useQuery([`loggedInUser`], CheckAuthAPI, {
+ 
     cacheTime: Infinity,
-    staleTime: Infinity,
-  });
+    enabled: checkAutherized,
+    onSuccess: (data)=>{
+      setUserDetails(data?.data.result);
+      setIsUserLogin(true);
+    },
+    onError: ()=>{
+      setAutherized(false);
+    }
+  })
+
+  // const { isLoading, data, error, isFetched } = useQuery(
+  //   [`loggedInUser`, userId],
+  //   getUserAPI,
+  //   {
+  //     enabled: userId,
+  //     staleTime: Infinity,
+  //     cacheTime: Infinity,
+  //     onSuccess: () => {
+  //       setIsUserLogin(true);
+  //     },
+  //     onError: (error: IBaseAPIError) => {
+  //       setIsUserLogin(false);
+  //       if (
+  //         error &&
+  //         error.response &&
+  //         error.response.data &&
+  //         error.response.data.message
+  //       ) {
+  //         const { message } = error.response.data;
+  //         notificationCallback(NOTIFICATIONTYPE.ERROR, `${message}`);
+  //       }
+  //     },
+  //   }
+  // );
 
   useEffect(() => {
-    if (allRolesAndPermissionsData?.data?.result) {
-      const { result } = allRolesAndPermissionsData.data;
-      const { parentRole } = result;
-      const roles: IRolePermissions[] =
-        allRolesAndPermissionsData.data.result.roles;
-      const newResult = roles.map((item) => {
-        let roleIndex = parentRole.findIndex((i) => i === item.role);
-        let parents = [];
-        for (let index = 0; index <= roleIndex; index++) {
-          parents.push(parentRole[index]);
-        }
+    toggleTheme(theme);
+  }, [theme]);
 
-        return {
-          ...item,
-          action: `${item.module}/${item.title}`,
-          parents,
-        };
-      });
-      setRolePermissions(newResult);
-    }
-  }, [allRolesAndPermissionsData]);
-
-  const errResp: any = error;
-
-  useEffect(() => {
-    if (data?.data) {
-      const userData: IUser = data.data.result;
-      const { result } = data?.data;
-      if (result?.theme) {
-        setTheme(result?.theme);
-      }
-      setUserDetails({ ...userData });
-    } else if (errResp?.message === "Network Error") {
-      notificationCallback(
-        NOTIFICATIONTYPE.ERROR,
-        `${errResp.message} please check your Internet Connection`
-      );
-    }
-  }, [data, checkIsAuthSaved, errResp]);
+  // const {
+  //   data: allRolesAndPermissionsData,
+  //   isLoading: permissionsFetching,
+  //   isFetched: permissionsFetched,
+  // } = useQuery([`roles-permissions`], getAllRolesWithPermission, {
+  //   enabled: isUserLogin,
+  //   cacheTime: Infinity,
+  //   staleTime: Infinity,
+  // });
 
   // useEffect(() => {
-  //   setIsUserLogin(true);
-  //   setUserDetails({
-  //     id: 81,
-  //     roleId: 54,
-  //     name: "Raymundo Friesen",
-  //     password: "$2a$12$5wayqyjIF.nU402JAyrP8uM4dtDWyzNeNBL.jQ1PyeCHqM1eUnM3y",
-  //     branchId: 104,
-  //     organizationId: 94,
-  //     status: 1,
-  //     createdAt: "2020-10-27T07:09:46.112Z",
-  //     updatedAt: "2020-10-27T07:09:46.112Z",
-  //     createdById: null,
-  //     updatedById: null,
-  //     profile: {
-  //       id: 44,
-  //       userId: 81,
-  //       fullName: "Shawn Crooks",
-  //       email: "bonny@mann-gleason.org",
-  //       country: "Guatemala",
-  //       attachmentId: null,
-  //       phoneNumber: "1-429-387-3404 x703",
-  //       landLine: "1-107-359-5570",
-  //       cnic: "066819947",
-  //       website: "http://turcotte.biz/denver_ryan",
-  //       location: "Schuster Walks",
-  //       bio: "Randall Hodkiewicz Parker",
-  //       jobTitle: "General",
-  //       marketingStatus: 1,
-  //       attachment: null,
-  //     },
-  //     organization: {
-  //       id: 94,
-  //       name: "phunar",
-  //       permanentAddress: "gilgit",
-  //       niche: "bussiness software",
-  //       residentialAddress: "gilgit",
-  //       financialEnding: "asf",
-  //       status: 1,
-  //       createdAt: "2020-10-27T12:15:06.361Z",
-  //       updatedAt: "2020-10-27T12:15:06.361Z",
-  //     },
-  //     role: {
-  //       id: 54,
-  //       branchId: null,
-  //       name: "admin",
-  //       status: 1,
-  //       createdAt: "2020-10-27T07:09:45.794Z",
-  //       updatedAt: "2020-10-27T07:09:45.794Z",
-  //     },
-  //   });
-  // }, []);
+  //   if (allRolesAndPermissionsData?.data?.result) {
+  //     const { result } = allRolesAndPermissionsData.data;
+  //     const { parentRole } = result;
+  //     const roles: IRolePermissions[] =
+  //       allRolesAndPermissionsData.data.result.roles;
+  //     const newResult = roles.map((item) => {
+  //       let roleIndex = parentRole.findIndex((i) => i === item.role);
+  //       let parents = [];
+  //       for (let index = 0; index <= roleIndex; index++) {
+  //         parents.push(parentRole[index]);
+  //       }
 
-  const handleRouteHistory = (history) => {
-    setHistory(history);
-  };
+  //       return {
+  //         ...item,
+  //         action: `${item.module}/${item.title}`,
+  //         parents,
+  //       };
+  //     });
+  //     setRolePermissions(newResult);
+  //   }
+  // }, [allRolesAndPermissionsData]);
+
+  // const errResp: any = error;
+
+  // useEffect(() => {
+  //   if (data?.data) {
+  //     const userData: IUser = data.data.result;
+  //     const { result } = data?.data;
+  //     if (result?.theme) {
+  //       setTheme(result?.theme);
+  //     }
+  //     setUserDetails({ ...userData });
+  //   } else if (errResp?.message === 'Network Error') {
+  //     notificationCallback(
+  //       NOTIFICATIONTYPE.ERROR,
+  //       `${errResp.message} please check your Internet Connection`
+  //     );
+  //   }
+  // }, [data, checkIsAuthSaved, errResp]);
+
 
   message.config({
     top: 101,
@@ -344,20 +362,21 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const { theme: appTheme, themeLoading } = useTheme(theme);
 
-  const checkingUser =
-    isFetched && permissionsFetched ? false : isLoading || permissionsFetching;
+  const checkingUser = false;
+
 
   return (
     <globalContext.Provider
       value={{
+        checkAutherized,
+        setAutherized,
         rolePermissions, // Will return all permissions from BE
         isOnline, // gets info about online and offline network
         isUserLogin, // true or false
         userDetails, // user details
         setUserDetails, // to set user details
         handleLogin, // handle login from signup and login page
-        handleRouteHistory, // sets route history
-        routeHistory: history, // to get route history
+        routeHistory: { history, location: history?.location }, // to get route history
         userInviteModal, // gets user invite model config
         setUserInviteModal, // sets user invite modal config
         notificationCallback, // responsible for notifications callbacs
@@ -441,13 +460,16 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         setTheme: (payload) => {
           setTheme(payload);
         },
-        verifiedModal, setVerifiedModal
+        verifiedModal,
+        setVerifiedModal,
       }}
     >
       <WrapperChildren>
         {/* <div className="network-problem">
         Check your internet connection 
       </div> */}
+        {/* <div onClick={()=>setTheme('dark')}>dark mode</div>
+      <div onClick={()=>setTheme('light')}>light mode</div> */}
 
         {children}
       </WrapperChildren>

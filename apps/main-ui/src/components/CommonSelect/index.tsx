@@ -16,6 +16,7 @@ interface IProps {
   children?: ReactElement<any>;
   onClick?: () => void;
   value?: any;
+  [key: string] : any
 }
 
 export const Option = Select.Option;
@@ -33,6 +34,7 @@ export const CommonSelect: FC<IProps> = ({
   children,
   onClick,
   value,
+  ...rest
 }) => {
   return (
     <Select
@@ -48,6 +50,7 @@ export const CommonSelect: FC<IProps> = ({
       optionFilterProp={optionFilterProp}
       onChange={onChange}
       value={value}
+      {...rest}
     >
       {children}
     </Select>

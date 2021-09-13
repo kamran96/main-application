@@ -1,5 +1,6 @@
 import { IThemeProps } from "./../../hooks/useTheme/themeColors";
 import styled from "styled-components";
+import { DivProps } from "../../modal";
 
 export const H4 = styled.h4`
   font-style: normal;
@@ -21,7 +22,7 @@ export const H3 = styled.div`
   color: ${(props: IThemeProps) => props?.theme?.colors?.textTd || "#303030"};
 `;
 
-export const H2 = styled.div`
+export const H2 = styled.h2<DivProps>`
   font-style: normal;
   font-weight: 500;
   font-size: 26px;

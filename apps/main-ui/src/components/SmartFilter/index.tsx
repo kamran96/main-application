@@ -1,24 +1,25 @@
 /* eslint-disable no-useless-escape */
-import React, { FC, useEffect, useState } from "react";
-import styled from "styled-components";
-import { Color, FilterType, IVariants } from "../../modal";
-import { Drawer, Button, Space, Menu, Popover, Form } from "antd";
-import { FormLabel } from "../FormLabel";
-import convertToRem from "../../utils/convertToRem";
-import DynamicFilteringForm from "./DynamicForm";
-import { Search } from "../../components/Search/Search";
-import { Icon } from "@iconify/react";
-import deleteIcon from "@iconify/icons-carbon/delete";
-import editSolid from "@iconify/icons-clarity/edit-solid";
+import React, { FC, useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { Color, FilterType, IVariants } from '../../modal';
+import { Drawer, Button, Space, Menu, Popover, Form } from 'antd';
+import { FormLabel } from '../FormLabel';
+import convertToRem from '../../utils/convertToRem';
+import DynamicFilteringForm from './DynamicForm';
+import { Search } from '../../components/Search/Search';
+import { Icon } from '@iconify/react';
+import deleteIcon from '@iconify/icons-carbon/delete';
+import editSolid from '@iconify/icons-clarity/edit-solid';
 
-import { Tabs } from "antd";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import bxFilter from "@iconify-icons/bx/bx-filter";
+import { Tabs } from 'antd';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import bxFilter from '@iconify-icons/bx/bx-filter';
 
-import tickIcon from "@iconify/icons-subway/tick";
-import dayjs from "dayjs";
-import { DynamicForm } from "../../modules/Items/ItemsEditorWidget/DynamicForm";
-import { IThemeProps } from "../../hooks/useTheme/themeColors";
+import tickIcon from '@iconify/icons-subway/tick';
+import dayjs from 'dayjs';
+import { DynamicForm } from '../../modules/Items/ItemsEditorWidget/DynamicForm';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
+import { getItemByIDAPI } from '../../api';
 
 const { TabPane } = Tabs;
 
@@ -47,9 +48,9 @@ export const SmartFilter: FC<IProps> = ({
 
   useEffect(() => {
     if (search) {
-      let schema = search.split("query=");
+      let schema = search.split('query=');
       if (schema && schema[1] && schema[1] !== undefined) {
-        let initialState = atob(schema[1]).replace(/\%/g, "");
+        let initialState = atob(schema[1]).replace(/\%/g, '');
         setFilter(JSON.parse(initialState));
         setIsFiltered(true);
       }
@@ -93,7 +94,7 @@ export const SmartFilter: FC<IProps> = ({
 
   const ClearAll = () => {
     setFilter({});
-    onFilter("");
+    onFilter('');
     setIsFiltered(false);
     setAttributeValues([]);
   };
@@ -115,7 +116,7 @@ export const SmartFilter: FC<IProps> = ({
           );
         })}
         <Menu.Item className="button_item">
-          <Button onClick={ClearAll} type="primary" size={"small"}>
+          <Button  onClick={ClearAll} type="primary" size={'small'}>
             Clear All
           </Button>
         </Menu.Item>
@@ -166,11 +167,11 @@ export const SmartFilter: FC<IProps> = ({
       </div>
       <Drawer
         title="Smart Filter"
-        placement={"right"}
+        placement={'right'}
         closable={false}
         onClose={() => setVisibility(false)}
         visible={visible}
-        key={"right"}
+        key={'right'}
         width={convertToRem(436)}
       >
         <Tabs defaultActiveKey="2">
@@ -185,24 +186,24 @@ export const SmartFilter: FC<IProps> = ({
                 <div className="filter-item flex alignCenter justifySpaceBetween">
                   <p>Filter 1</p>
                   <div className="actions flex alignCenter">
-                    <i className="mr-10" onClick={() => console.log("edit")}>
-                      {" "}
+                    <i className="mr-10" onClick={() => console.log('edit')}>
+                      {' '}
                       <Icon
                         style={{
                           fontSize: convertToRem(16),
                           color: Color.$GRAY,
-                          cursor: "pointer",
+                          cursor: 'pointer',
                         }}
                         icon={editSolid}
                       />
                     </i>
-                    <i onClick={() => console.log("delete")}>
-                      {" "}
+                    <i onClick={() => console.log('delete')}>
+                      {' '}
                       <Icon
                         style={{
                           fontSize: convertToRem(16),
                           color: Color.$GRAY,
-                          cursor: "pointer",
+                          cursor: 'pointer',
                         }}
                         icon={deleteIcon}
                       />
@@ -215,22 +216,24 @@ export const SmartFilter: FC<IProps> = ({
           <TabPane tab="New Filter" key="2">
             <Form onFinish={() => handleFilter()}>
               <WrapperSmartFilter>
-                {Object?.keys(formSchema)?.map((item:any, index:number) => {
+                {Object?.keys(formSchema)?.map((item: any, index: number) => {
                   const formItem = formSchema[item];
-                  let initialState = null;
-                  if (filter && filter[item]) {
-                    initialState = filter[item].value;
-                    
-                    if (filter[item].type === "date-between") {
-                      initialState = initialState.map((item) => {
-                        return dayjs(item);
-                      });
-                    }else{
-                      return null
+
+                  const initialStateValue = () => {
+                    let initialState = null;
+                    if (filter && filter[item]) {
+                      initialState = filter[item].value;
+                      if (filter[item].type === 'date-between') {
+                        initialState = initialState.map((item) => {
+                          return dayjs(item);
+                        });
+                      } else {
+                        return filter[item].value;
+                      }
+                      return initialState;
                     }
-                    return initialState
-                  }
-                  else if (formItem.type === "NESTED_FORM") {
+                  };
+                  if (formItem.type === 'NESTED_FORM') {
                     const getVariantsWithId = (id) => {
                       let [filtered] =
                         formSchema &&
@@ -267,7 +270,7 @@ export const SmartFilter: FC<IProps> = ({
                                   <FormLabel>{vari.title}</FormLabel>
                                   <DynamicForm
                                     value={
-                                      filteredItem ? filteredItem.value : ""
+                                      filteredItem ? filteredItem.value : ''
                                     }
                                     onChange={(value) => {
                                       if (value !== undefined) {
@@ -276,7 +279,7 @@ export const SmartFilter: FC<IProps> = ({
                                           attributeId: vari.id,
                                           value: value,
                                         };
-                                        if (value === null || value === "") {
+                                        if (value === null || value === '') {
                                           let indexed = allValue.findIndex(
                                             (item) =>
                                               item.attributeId === vari.id
@@ -325,7 +328,7 @@ export const SmartFilter: FC<IProps> = ({
                       <div key={index}>
                         {DynamicFilteringForm(
                           formItem,
-                          initialState,
+                          initialStateValue(),
                           (value) => {
                             handleChange(item, value, formItem);
                           }
@@ -381,7 +384,9 @@ export const WrapperMenu = styled.div`
     .filter_name {
       margin: 0 !important;
     }
-
+    .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected{
+      background: transparent !important;
+    }
     .ant-menu-item {
       display: flex;
       justify-content: space-between;
@@ -396,6 +401,12 @@ export const WrapperMenu = styled.div`
         padding: 0;
         margin: 0;
       }
+      .ant-menu-title-content {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        align-items: center;
+      }
       i {
         color: ${Color.$PRIMARY};
         font-size: ${convertToRem(11)};
@@ -403,6 +414,11 @@ export const WrapperMenu = styled.div`
       p {
         color: ${Color.$GRAY};
       }
+    }
+
+    .ant-menu-item:last-child .ant-menu-title-content{
+      display: flex;
+      justify-content: flex-end;
     }
     .heading {
       padding: ${convertToRem(10)} ${convertToRem(10)};
@@ -424,7 +440,7 @@ export const ParentWrapper: any = styled.div`
     background: ${(props: IThemeProps) => props?.theme?.colors?.buttonTagBg};
     color: ${(props: IThemeProps) => props?.theme?.colors?.buttonTagColor};
     ${(props: IThemeProps) =>
-      props?.theme?.theme === "dark" &&
+      props?.theme?.theme === 'dark' &&
       `
     border-color: ${props?.theme?.colors?.seprator};
     

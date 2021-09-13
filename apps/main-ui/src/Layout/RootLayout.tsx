@@ -1,19 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { RouteConfigComponentProps, renderRoutes } from "react-router-config";
-import { useGlobalContext } from "../hooks/globalContext/globalContext";
-import { Spin } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
-import styled from "styled-components";
+import React, { useEffect, useState } from 'react';
+import { RouteConfigComponentProps, renderRoutes } from 'react-router-config';
+import { useGlobalContext } from '../hooks/globalContext/globalContext';
+import { Spin } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
+import styled from 'styled-components';
 
 const antIcon = <LoadingOutlined style={{ fontSize: 30 }} spin />;
 
 export const RootLayout = (props: RouteConfigComponentProps) => {
-  const { handleRouteHistory, isCheckingLoginUser } = useGlobalContext();
+  const { isCheckingLoginUser } = useGlobalContext();
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    handleRouteHistory(props);
-  });
 
   const getLoading = () => {
     if (loading) {
@@ -54,6 +50,13 @@ const WrapperLoader = styled.div`
     flex-direction: column;
     height: 100px;
     justify-content: space-between;
+    align-items: center;
+
+    .ant-spin {
+      color: #177ddc;
+      text-align: center;
+      vertical-align: middle;
+    }
 
     p {
       font-size: 16px;
