@@ -48,11 +48,12 @@ export default function (item, initialState, change) {
         </WrapperDyFrom>
       );
     case FilterType.DATE_BETWEEN:
+      console.log(initialState, "initial")
       return (
         <WrapperDyFrom>
           <FormLabel className="label">{item.label}</FormLabel>
           <CustomDateRange
-            value={initialState}
+            // value={initialState}
             onChange={(val) => {
               if (val?.length) {
                 let payload = val.map((date) => {

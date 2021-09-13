@@ -1,7 +1,7 @@
-import http, { railsHttp } from "../utils/http";
+import http, { railsHttp } from '../utils/http';
 
 enum USERS {
-  INDEX = "users/index",
+  INDEX = 'users/index',
   DELETE = `user`,
   INVITE = `/user/invite`,
 }
@@ -27,10 +27,13 @@ export const inviteUserAPI = (payload) => http.post(USERS.INVITE, payload);
 
 export const getAllUsers = () => railsHttp.get(`/users/index?purpose=ALL`);
 
-export const getALLBranches = () => railsHttp.get(`/branches`);
+export const getALLBranches = () => http.get(`/users/branch`);
 
-export const verifyUserInvitationAPI = (payload) =>http?.post(`/user/verify-invited-user`, payload);
+export const verifyUserInvitationAPI = (payload) =>
+  http?.post(`/user/verify-invited-user`, payload);
 
-export const userCheckAPI = (payload)=> railsHttp?.post(`/users/check`, payload);
+export const userCheckAPI = (payload) =>
+  railsHttp?.post(`/users/check`, payload);
 
-export const userJoinAPI = (payload)=> http?.put(`user/update-invited-user/${payload?.id}`, payload);
+export const userJoinAPI = (payload) =>
+  http?.put(`user/update-invited-user/${payload?.id}`, payload);

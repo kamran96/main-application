@@ -49,6 +49,13 @@
     "items-service": {
       "tags": []
     },
+    "editable-table": {
+      "tags": []
+    },
+    "editable-table-e2e": {
+      "tags": [],
+      "implicitDependencies": ["editable-table"]
+    },
     "main-api": {
       "tags": []
     },
@@ -59,13 +66,31 @@
       "tags": [],
       "implicitDependencies": ["main-ui"]
     },
-    "send-email": {
-      "tags": []
-    },
     "sorting": {
       "tags": []
     },
     "users-service": {
+      "tags": []
+    },
+    "pixels-to-rem": {
+      "tags": []
+    },
+    "review-invyce-theme": {
+      "tags": []
+    },
+    "shared-global-state-manager": {
+      "tags": []
+    },
+    "shared-invyce-theme": {
+      "tags": []
+    },
+    "shared-types": {
+      "tags": []
+    },
+    "shared-utils": {
+      "tags": []
+    },
+    "sidebar-ui": {
       "tags": []
     }
   }

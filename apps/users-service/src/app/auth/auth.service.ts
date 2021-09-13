@@ -136,10 +136,11 @@ export class AuthService {
 
     res
       .cookie('access_token', token, {
-        httpOnly: true,
-        sameSite: 'strict',
         secure: true,
-        domain: '127.0.0.1',
+        sameSite: 'none',
+        httpOnly: true,
+        domain: 'localhost',
+        // path: '/',
         expires: new Date(Moment().add(process.env.EXPIRES, 'h').toDate()),
       })
       .send({

@@ -74,7 +74,9 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
   }
 
   const checkLayout = (children) => {
-    const routePath: any = routeHistory.location.pathname;
+
+
+    const routePath: any = routeHistory?.history?.location.pathname;
 
     if (userDetails && userDetails.organizationId && userDetails.branchId) {
       return children;

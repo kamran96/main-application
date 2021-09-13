@@ -97,6 +97,7 @@ export default function (
       width: 30,
       className: 'drag-visible textCenter',
       render: () => <DragHandle />,
+      
     },
     {
       title: '#',
