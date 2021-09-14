@@ -28,6 +28,6 @@ export const addRolePermissionAPI = (payload?: any) =>
   http.post(`rbac/role-permission`, payload);
 
 export const getAllRolesWithPermission = () =>
-  http.get(`rbac/role-with-permission`);
+  http.get(`/users/rbac/role-with-permission`);
 
 export const getRoleByIDAPI = (key, id) => http.get(`rbac/role/${id}`);
