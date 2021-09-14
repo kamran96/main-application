@@ -132,15 +132,18 @@ export class AuthService {
     // when added an organization then return new access_token
 
     const token = this.jwtService.sign(payload);
-    // const address = ip.address();
+    const address = ip.address();
 
+    // Logger.log(req)
+
+    console.log(token);
     res
       .cookie('access_token', token, {
         secure: true,
         sameSite: 'none',
         httpOnly: true,
-        domain: 'localhost',
-        // path: '/',
+        // domain: 'localhost',
+        path: '/',
         expires: new Date(Moment().add(process.env.EXPIRES, 'h').toDate()),
       })
       .send({

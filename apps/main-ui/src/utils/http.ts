@@ -27,8 +27,8 @@ if (host && host === 'app.invyce.com') {
 }
 
 const http = axios.create({
-  withCredentials: true,
   baseURL: NodeBaseURL,
+  withCredentials: true,
   cancelToken: new cancelToken(function executor(c) {
     CancelRequest = c;
   }),
