@@ -15,9 +15,10 @@ async function bootstrap() {
   const port = process.env.PORT || 3334;
 
   const options = {
-    origin: true,
     credentials: true,
+    origin: true,
   };
+
   app.enableCors(options);
 
   app.use(bodyParser.json());

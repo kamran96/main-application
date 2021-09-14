@@ -51,6 +51,226 @@
         }
       }
     },
+    "auth-middleware": {
+      "root": "libs/auth-middleware",
+      "sourceRoot": "libs/auth-middleware/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/auth-middleware/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/auth-middleware"],
+          "options": {
+            "jestConfig": "libs/auth-middleware/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "contacts-service": {
+      "root": "apps/contacts-service",
+      "sourceRoot": "apps/contacts-service/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/contacts-service",
+            "main": "apps/contacts-service/src/main.ts",
+            "tsConfig": "apps/contacts-service/tsconfig.app.json",
+            "assets": ["apps/contacts-service/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/contacts-service/src/environments/environment.ts",
+                  "with": "apps/contacts-service/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "contacts-service:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/contacts-service/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/contacts-service"],
+          "options": {
+            "jestConfig": "apps/contacts-service/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "editable-table": {
+      "root": "libs/editable-table",
+      "sourceRoot": "libs/editable-table/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/editable-table/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/editable-table"],
+          "options": {
+            "jestConfig": "libs/editable-table/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "storybook": {
+          "executor": "@nrwl/storybook:storybook",
+          "options": {
+            "uiFramework": "@storybook/react",
+            "port": 4400,
+            "config": {
+              "configFolder": "libs/editable-table/.storybook"
+            }
+          },
+          "configurations": {
+            "ci": {
+              "quiet": true
+            }
+          }
+        },
+        "build-storybook": {
+          "executor": "@nrwl/storybook:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "uiFramework": "@storybook/react",
+            "outputPath": "dist/storybook/editable-table",
+            "config": {
+              "configFolder": "libs/editable-table/.storybook"
+            }
+          },
+          "configurations": {
+            "ci": {
+              "quiet": true
+            }
+          }
+        }
+      }
+    },
+    "editable-table-e2e": {
+      "root": "apps/editable-table-e2e",
+      "sourceRoot": "apps/editable-table-e2e/src",
+      "projectType": "application",
+      "targets": {
+        "e2e": {
+          "executor": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/editable-table-e2e/cypress.json",
+            "tsConfig": "apps/editable-table-e2e/tsconfig.e2e.json",
+            "devServerTarget": "editable-table:storybook"
+          },
+          "configurations": {
+            "ci": {
+              "devServerTarget": "editable-table:storybook:ci"
+            }
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/editable-table-e2e/**/*.{js,ts}"]
+          }
+        }
+      }
+    },
+    "email-service": {
+      "root": "apps/email-service",
+      "sourceRoot": "apps/email-service/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/email-service",
+            "main": "apps/email-service/src/main.ts",
+            "tsConfig": "apps/email-service/tsconfig.app.json",
+            "assets": ["apps/email-service/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/email-service/src/environments/environment.ts",
+                  "with": "apps/email-service/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "email-service:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/email-service/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/email-service"],
+          "options": {
+            "jestConfig": "apps/email-service/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "global-auth-guard": {
+      "root": "libs/global-auth-guard",
+      "sourceRoot": "libs/global-auth-guard/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/global-auth-guard/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/global-auth-guard"],
+          "options": {
+            "jestConfig": "libs/global-auth-guard/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "invoices-service": {
       "root": "apps/invoices-service",
       "sourceRoot": "apps/invoices-service/src",
@@ -146,156 +366,6 @@
           "outputs": ["coverage/apps/items-service"],
           "options": {
             "jestConfig": "apps/items-service/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
-    "contacts-service": {
-      "root": "apps/contacts-service",
-      "sourceRoot": "apps/contacts-service/src",
-      "projectType": "application",
-      "targets": {
-        "build": {
-          "executor": "@nrwl/node:build",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "outputPath": "dist/apps/contacts-service",
-            "main": "apps/contacts-service/src/main.ts",
-            "tsConfig": "apps/contacts-service/tsconfig.app.json",
-            "assets": ["apps/contacts-service/src/assets"]
-          },
-          "configurations": {
-            "production": {
-              "optimization": true,
-              "extractLicenses": true,
-              "inspect": false,
-              "fileReplacements": [
-                {
-                  "replace": "apps/contacts-service/src/environments/environment.ts",
-                  "with": "apps/contacts-service/src/environments/environment.prod.ts"
-                }
-              ]
-            }
-          }
-        },
-        "serve": {
-          "executor": "@nrwl/node:execute",
-          "options": {
-            "buildTarget": "contacts-service:build"
-          }
-        },
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["apps/contacts-service/**/*.ts"]
-          }
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/contacts-service"],
-          "options": {
-            "jestConfig": "apps/contacts-service/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
-    "users-service": {
-      "root": "apps/users-service",
-      "sourceRoot": "apps/users-service/src",
-      "projectType": "application",
-      "targets": {
-        "build": {
-          "executor": "@nrwl/node:build",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "outputPath": "dist/apps/users-service",
-            "main": "apps/users-service/src/main.ts",
-            "tsConfig": "apps/users-service/tsconfig.app.json",
-            "assets": ["apps/users-service/src/assets"]
-          },
-          "configurations": {
-            "production": {
-              "optimization": true,
-              "extractLicenses": true,
-              "inspect": false,
-              "fileReplacements": [
-                {
-                  "replace": "apps/users-service/src/environments/environment.ts",
-                  "with": "apps/users-service/src/environments/environment.prod.ts"
-                }
-              ]
-            }
-          }
-        },
-        "serve": {
-          "executor": "@nrwl/node:execute",
-          "options": {
-            "buildTarget": "users-service:build"
-          }
-        },
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["apps/users-service/**/*.ts"]
-          }
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/users-service"],
-          "options": {
-            "jestConfig": "apps/users-service/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
-    "email-service": {
-      "root": "apps/email-service",
-      "sourceRoot": "apps/email-service/src",
-      "projectType": "application",
-      "targets": {
-        "build": {
-          "executor": "@nrwl/node:build",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "outputPath": "dist/apps/email-service",
-            "main": "apps/email-service/src/main.ts",
-            "tsConfig": "apps/email-service/tsconfig.app.json",
-            "assets": ["apps/email-service/src/assets"]
-          },
-          "configurations": {
-            "production": {
-              "optimization": true,
-              "extractLicenses": true,
-              "inspect": false,
-              "fileReplacements": [
-                {
-                  "replace": "apps/email-service/src/environments/environment.ts",
-                  "with": "apps/email-service/src/environments/environment.prod.ts"
-                }
-              ]
-            }
-          }
-        },
-        "serve": {
-          "executor": "@nrwl/node:execute",
-          "options": {
-            "buildTarget": "email-service:build"
-          }
-        },
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["apps/email-service/**/*.ts"]
-          }
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/email-service"],
-          "options": {
-            "jestConfig": "apps/email-service/jest.config.js",
             "passWithNoTests": true
           }
         }
@@ -427,155 +497,6 @@
         }
       }
     },
-
-    "auth-middleware": {
-      "root": "libs/auth-middleware",
-      "sourceRoot": "libs/auth-middleware/src",
-      "projectType": "library",
-      "targets": {
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["libs/auth-middleware/**/*.ts"]
-          }
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/auth-middleware"],
-          "options": {
-            "jestConfig": "libs/auth-middleware/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
-
-    "global-auth-guard": {
-      "root": "libs/global-auth-guard",
-      "sourceRoot": "libs/global-auth-guard/src",
-      "projectType": "library",
-      "targets": {
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["libs/global-auth-guard/**/*.ts"]
-          }
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/global-auth-guard"],
-          "options": {
-            "jestConfig": "libs/global-auth-guard/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
-
-    "sorting": {
-      "root": "libs/sorting",
-      "sourceRoot": "libs/sorting/src",
-      "projectType": "library",
-      "targets": {
-        "lint": {
-          "options": {
-            "executor": "@nrwl/linter:eslint",
-            "lintFilePatterns": ["libs/sorting/**/*.ts"]
-          }
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/sorting"],
-          "options": {
-            "jestConfig": "libs/sorting/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
-
-    "editable-table": {
-      "root": "libs/editable-table",
-      "sourceRoot": "libs/editable-table/src",
-      "projectType": "library",
-      "targets": {
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["libs/editable-table/**/*.ts"]
-          }
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/editable-table"],
-          "options": {
-            "jestConfig": "libs/editable-table/jest.config.js",
-            "passWithNoTests": true
-          }
-        },
-
-        "storybook": {
-          "executor": "@nrwl/storybook:storybook",
-          "options": {
-            "uiFramework": "@storybook/react",
-            "port": 4400,
-            "config": {
-              "configFolder": "libs/editable-table/.storybook"
-            }
-          },
-          "configurations": {
-            "ci": {
-              "quiet": true
-            }
-          }
-        },
-
-        "build-storybook": {
-          "executor": "@nrwl/storybook:build",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "uiFramework": "@storybook/react",
-            "outputPath": "dist/storybook/editable-table",
-            "config": {
-              "configFolder": "libs/editable-table/.storybook"
-            }
-          },
-          "configurations": {
-            "ci": {
-              "quiet": true
-            }
-          }
-        }
-      }
-    },
-
-    "editable-table-e2e": {
-      "root": "apps/editable-table-e2e",
-      "sourceRoot": "apps/editable-table-e2e/src",
-      "projectType": "application",
-      "targets": {
-        "e2e": {
-          "executor": "@nrwl/cypress:cypress",
-          "options": {
-            "cypressConfig": "apps/editable-table-e2e/cypress.json",
-            "tsConfig": "apps/editable-table-e2e/tsconfig.e2e.json",
-            "devServerTarget": "editable-table:storybook"
-          },
-          "configurations": {
-            "ci": {
-              "devServerTarget": "editable-table:storybook:ci"
-            }
-          }
-        },
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["apps/editable-table-e2e/**/*.{js,ts}"]
-          }
-        }
-      }
-    },
-
     "main-ui-e2e": {
       "root": "apps/main-ui-e2e",
       "sourceRoot": "apps/main-ui-e2e/src",
@@ -602,7 +523,6 @@
         }
       }
     },
-
     "pixels-to-rem": {
       "root": "libs/pixels-to-rem",
       "sourceRoot": "libs/pixels-to-rem/src",
@@ -624,7 +544,56 @@
         }
       }
     },
-
+    "reports-service": {
+      "root": "apps/reports-service",
+      "sourceRoot": "apps/reports-service/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/reports-service",
+            "main": "apps/reports-service/src/main.ts",
+            "tsConfig": "apps/reports-service/tsconfig.app.json",
+            "assets": ["apps/reports-service/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/reports-service/src/environments/environment.ts",
+                  "with": "apps/reports-service/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "reports-service:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/reports-service/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/reports-service"],
+          "options": {
+            "jestConfig": "apps/reports-service/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "review-invyce-theme": {
       "root": "libs/review/invyce-theme",
       "sourceRoot": "libs/review/invyce-theme/src",
@@ -648,7 +617,6 @@
         }
       }
     },
-
     "shared-global-state-manager": {
       "root": "libs/shared/global-state-manager",
       "sourceRoot": "libs/shared/global-state-manager/src",
@@ -757,9 +725,79 @@
           }
         }
       }
+    },
+    "sorting": {
+      "root": "libs/sorting",
+      "sourceRoot": "libs/sorting/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "options": {
+            "executor": "@nrwl/linter:eslint",
+            "lintFilePatterns": ["libs/sorting/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/sorting"],
+          "options": {
+            "jestConfig": "libs/sorting/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "users-service": {
+      "root": "apps/users-service",
+      "sourceRoot": "apps/users-service/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/users-service",
+            "main": "apps/users-service/src/main.ts",
+            "tsConfig": "apps/users-service/tsconfig.app.json",
+            "assets": ["apps/users-service/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/users-service/src/environments/environment.ts",
+                  "with": "apps/users-service/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "users-service:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/users-service/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/users-service"],
+          "options": {
+            "jestConfig": "apps/users-service/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
-
   "cli": {
     "defaultCollection": "@nrwl/nest"
   },

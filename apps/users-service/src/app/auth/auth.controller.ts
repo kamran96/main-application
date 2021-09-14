@@ -25,8 +25,13 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post()
-  async Login(@Body() authDto: UserLoginDto, @Res() res: Response) {
+  async Login(
+    @Body() authDto: UserLoginDto,
+    @Res() res: Response,
+    @Req() req: Request
+  ) {
     try {
+      console.log(req.hostname);
       await this.authService.ValidateUser(authDto, res);
     } catch (error) {
       throw new HttpException(
@@ -125,7 +130,7 @@ export class AuthController {
 
   @Post('logout')
   async logout(@Res() res: Response) {
-    // res.setHeader('Set-Cookie', this.authService.Logout());
+    // res.setHeader('Set-Cookie', await this.authService.Logout());
     return await this.authService.Logout(res);
   }
 
