@@ -84,7 +84,8 @@
             "outputPath": "dist/apps/contacts-service",
             "main": "apps/contacts-service/src/main.ts",
             "tsConfig": "apps/contacts-service/tsconfig.app.json",
-            "assets": ["apps/contacts-service/src/assets"]
+            "assets": ["apps/contacts-service/src/assets"],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {
@@ -96,7 +97,8 @@
                   "replace": "apps/contacts-service/src/environments/environment.ts",
                   "with": "apps/contacts-service/src/environments/environment.prod.ts"
                 }
-              ]
+              ],
+              "generatePackageJson": true
             }
           }
         },
@@ -759,7 +761,8 @@
             "outputPath": "dist/apps/users-service",
             "main": "apps/users-service/src/main.ts",
             "tsConfig": "apps/users-service/tsconfig.app.json",
-            "assets": ["apps/users-service/src/assets"]
+            "assets": ["apps/users-service/src/assets"],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {
@@ -771,7 +774,8 @@
                   "replace": "apps/users-service/src/environments/environment.ts",
                   "with": "apps/users-service/src/environments/environment.prod.ts"
                 }
-              ]
+              ],
+              "generatePackageJson": true
             }
           }
         },
