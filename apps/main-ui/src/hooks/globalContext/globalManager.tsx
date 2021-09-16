@@ -176,7 +176,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const history = useHistory();
 
-  const handleLogin = (action: IAction) => {
+  const handleLogin = async(action: IAction) => {
     switch (action.type) {
       case ILoginActions.LOGIN:
       debugger;  
@@ -187,30 +187,30 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
         break;
       case ILoginActions.LOGOUT:
-        // await mutateLogout("", {
-        //   onSuccess: (data)=>{
-        //     notificationCallback(NOTIFICATIONTYPE.INFO, 'Logout Successfully');
-        //     setTheme('light');
-        //     setIsUserLogin(false);
-        //     queryCache.clear();
-        //   },
-        //   onError: (err: IBaseAPIError)=>{
-        //     if(err?.response?.data.message){
-        //       notificationCallback(NOTIFICATIONTYPE.INFO, `${err.response.data.message}`)
+        await mutateLogout("", {
+          onSuccess: (data)=>{
+            notificationCallback(NOTIFICATIONTYPE.INFO, 'Logout Successfully');
+            setTheme('light');
+            setIsUserLogin(false);
+            queryCache.clear();
+          },
+          onError: (err: IBaseAPIError)=>{
+            if(err?.response?.data.message){
+              notificationCallback(NOTIFICATIONTYPE.INFO, `${err.response.data.message}`)
 
-        //     }else{
-        //       notificationCallback(
-        //         NOTIFICATIONTYPE.ERROR,
-        //         IErrorMessages.NETWORK_ERROR
-        //       );
-        //     }
-        //   }
-        // })
-        // localStorage.removeItem('auth');
-        // setTheme('light');
-        // setAuth(null);
-        // setIsUserLogin(false);
-        // queryCache.clear();
+            }else{
+              notificationCallback(
+                NOTIFICATIONTYPE.ERROR,
+                IErrorMessages.NETWORK_ERROR
+              );
+            }
+          }
+        })
+        localStorage.removeItem('auth');
+        setTheme('light');
+        setAuth(null);
+        setIsUserLogin(false);
+        queryCache.clear();
         break;
       default:
         break;
@@ -284,15 +284,17 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     toggleTheme(theme);
   }, [theme]);
 
-  // const {
-  //   data: allRolesAndPermissionsData,
-  //   isLoading: permissionsFetching,
-  //   isFetched: permissionsFetched,
-  // } = useQuery([`roles-permissions`], getAllRolesWithPermission, {
-  //   enabled: isUserLogin,
-  //   cacheTime: Infinity,
-  //   staleTime: Infinity,
-  // });
+  const {
+    data: allRolesAndPermissionsData,
+    isLoading: permissionsFetching,
+    isFetched: permissionsFetched,
+  } = useQuery([`roles-permissions`], getAllRolesWithPermission, {
+    enabled: isUserLogin,
+    cacheTime: Infinity,
+    staleTime: Infinity,
+  });
+
+  console.log(allRolesAndPermissionsData, "data")
 
   // useEffect(() => {
   //   if (allRolesAndPermissionsData?.data?.result) {
