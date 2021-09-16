@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: main-ingress
+  labels:
+    name: main-http-service
+    author: ejoo
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+    - hosts:
+      - stage.invyce.com
+      secretName: stage-k8s-tls
+  rules:
+  - host: stage.invyce.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/users"
+        backend:
+          service:
+            name: users-http
+            port: 
+              number: 80
+      - pathType: Prefix
+        path: "/contacts"
+        backend:
+          service:
+            name: contacts-http
+            port: 
+              number: 80
