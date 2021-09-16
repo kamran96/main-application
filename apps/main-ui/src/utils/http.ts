@@ -1,7 +1,7 @@
-import axios from "axios";
-import { DecriptionData } from "./encription";
+import axios from 'axios';
+import { DecriptionData } from './encription';
 
-let localIP = `https://192.168.6.120`;
+let localIP = `https://55a5-118-107-143-253.ngrok.io`;
 let RailsBaseURL = "";
 let NodeBaseURL = ``;
 let cancelToken = axios.CancelToken;
@@ -10,12 +10,12 @@ export let CancelRequest: any;
 
 const host = window.location.hostname;
 
-if (host && host === "app.invyce.com") {
+if (host && host === 'app.invyce.com') {
   // set online server endpoints
 
   RailsBaseURL = `https://api.rails.invyce.com/`;
   NodeBaseURL = `https://api.node.invyce.com/`;
-} else if (host && host === "dev.app.invyce.com") {
+} else if (host && host === 'dev.app.invyce.com') {
   // Staging server endpoints
 
   RailsBaseURL = `https://dev.api.rails.invyce.com/`;
@@ -23,12 +23,12 @@ if (host && host === "app.invyce.com") {
 } else {
   // local development
   RailsBaseURL = localIP; // + ":4000"
-  NodeBaseURL = localIP ; //+ ":8081"
+  NodeBaseURL = localIP; //+ ":8081"
 }
 
 const http = axios.create({
   baseURL: NodeBaseURL,
-  // withCredentials: true,
+  withCredentials: true,
   cancelToken: new cancelToken(function executor(c) {
     CancelRequest = c;
   }),
@@ -40,7 +40,7 @@ export const railsHttp = axios.create({
     CancelRequest = c;
   }),
   headers: {
-    "Content-type": "application/json",
+    'Content-type': 'application/json',
   },
 });
 

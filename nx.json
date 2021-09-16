@@ -28,6 +28,27 @@
     ]
   },
   "projects": {
+    "accounting-service": {
+      "tags": []
+    },
+    "auth-middleware": {
+      "tags": []
+    },
+    "contacts-service": {
+      "tags": []
+    },
+    "email-service": {
+      "tags": []
+    },
+    "global-auth-guard": {
+      "tags": []
+    },
+    "invoices-service": {
+      "tags": []
+    },
+    "items-service": {
+      "tags": []
+    },
     "editable-table": {
       "tags": []
     },
@@ -44,6 +65,12 @@
     "main-ui-e2e": {
       "tags": [],
       "implicitDependencies": ["main-ui"]
+    },
+    "sorting": {
+      "tags": []
+    },
+    "users-service": {
+      "tags": []
     },
     "pixels-to-rem": {
       "tags": []
