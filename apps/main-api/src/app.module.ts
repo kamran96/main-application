@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { getMetadataArgsStorage } from 'typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -32,7 +33,7 @@ import { EmailModule } from '../src/Integration/modules/email.model';
         ({
           type: 'postgres',
           host: configService.get('DB_HOST', process.env.DB_HOST),
-          port: configService.get<any>('DB_PORT', process.env.DB_PORT),
+          port: configService.get('DB_PORT',parseInt(process.env.DB_PORT)),
           username: configService.get('DB_USER', process.env.DB_USER),
           password: configService.get('DB_PASSWORD', process.env.DB_PASSWORD),
           database: configService.get('DB_NAME', process.env.DB_NAME),
@@ -40,6 +41,19 @@ import { EmailModule } from '../src/Integration/modules/email.model';
           ssl: { rejectUnauthorized: false },
         } as TypeOrmModuleOptions),
     }),
+    ClientsModule.register([
+      {
+        name: 'EMAIL_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://localhost:5672'],
+          queue: 'email_queue',
+          queueOptions: {
+            durable: false,
+          },
+        },
+      },
+    ]),
     AuthModule,
     UserModule,
     AccountModule,
