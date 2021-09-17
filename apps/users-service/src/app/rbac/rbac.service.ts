@@ -14,21 +14,21 @@ export class RbacService {
     @InjectModel(User.name) private userModel
   ) {}
 
-  async CreateRole(roleDto, organizationId) {
+  async CreateRole(roleDto, user) {
     if (roleDto && roleDto.isNewRecord === false) {
-      const role = await this.GetRole(roleDto.id, organizationId);
+      const role = await this.GetRole(roleDto.id, user.organizationId);
       if (Array.isArray(role) && role.length > 0) {
         await this.roleModel.updateOne(
           { _id: roleDto.id },
           { name: roleDto.name, description: roleDto.description }
         );
 
-        return await this.GetRole(roleDto.id, organizationId);
+        return await this.GetRole(roleDto.id, user.organizationId);
       }
     } else {
       const role = await this.roleModel.find({
         name: roleDto.name,
-        //   organizationId: roleData.organizationId
+        organizationId: user.organizationId,
       });
 
       if (Array.isArray(role) && role.length > 0) {
@@ -36,7 +36,7 @@ export class RbacService {
       }
 
       const findAllRoles = await this.roleModel.find({
-        organizationId: organizationId,
+        organizationId: user.organizationId,
       });
 
       const roleToUpdate = findAllRoles.find((r) => r.level === roleDto.level);
@@ -47,7 +47,7 @@ export class RbacService {
       newRole.description = roleDto.description;
       newRole.level = roleDto.level;
       newRole.parentId = roleDto.parentId;
-      newRole.organizationId = organizationId;
+      newRole.organizationId = user.organizationId;
       newRole.status = 1;
       await newRole.save();
 
@@ -69,10 +69,10 @@ export class RbacService {
     }
   }
 
-  async ShowPermission(type) {
+  async ShowPermission(type, user) {
     const queryRoles = await this.rolePermissionModel
       .find({
-        organizationId: '612793a5afc58999fe3c7d5c',
+        organizationId: user.organizationId,
       })
       .populate('roleId')
       .populate('permissionId', { module: type });
@@ -90,24 +90,24 @@ export class RbacService {
     return roles;
   }
 
-  async GetRole(roleId, organizationId) {
+  async GetRole(roleId, user) {
     const role = this.roleModel.find({
       id: roleId,
-      organizationId: organizationId,
+      organizationId: user.organizationId,
     });
 
     return role;
   }
 
-  async CreatePermission(permissionDto): Promise<any> {
+  async CreatePermission(permissionDto, user): Promise<any> {
     try {
       const permission = new this.permissionModel();
       permission.title = permissionDto.title;
       permission.description = permissionDto.description;
       permission.module = permissionDto.module;
-      //   permission.organizationId = permissionData.organizationId;
-      //   permission.createdById = permissionData.userId;
-      //   permission.updatedById = permissionData.userId;
+      permission.organizationId = user.organizationId;
+      permission.createdById = user.userId;
+      permission.updatedById = user.userId;
       permission.status = 1;
       await permission.save();
 
@@ -135,26 +135,26 @@ export class RbacService {
     return await this.permissionModel.find().distinct('module');
   }
 
-  async GetRoles(): Promise<any> {
+  async GetRoles(user): Promise<any> {
     const role = await this.roleModel
       .find({
-        organizationId: '612793a5afc58999fe3c7d5c',
+        organizationId: user.organizationId,
       })
       .sort({ level: 'ASC' });
 
     return role;
   }
 
-  async GetRoleWithPermissions() {
+  async GetRoleWithPermissions(user) {
     const parentRoles = await this.roleModel
-      .find({ organizationId: '612793a5afc58999fe3c7d5c' })
+      .find({ organizationId: user.organizationId })
       .sort({ level: 'ASC' });
 
     const parentRole = parentRoles.map((r) => r.name);
 
     const queryRoles = await this.rolePermissionModel
       .find({
-        organizationId: '612793a5afc58999fe3c7d5c',
+        organizationId: user.organizationId,
       })
       .populate('roleId')
       .populate('permissionId')

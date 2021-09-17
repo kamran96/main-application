@@ -24,7 +24,9 @@ async function bootstrap() {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser());
-  app.setGlobalPrefix('/users');
+  if (process.env.NODE_ENV === 'production') {
+    app.setGlobalPrefix('/users');
+  }
 
   await app.listen(port, () => {
     Logger.log('Listening at http://localhost:' + port);

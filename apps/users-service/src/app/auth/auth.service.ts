@@ -53,7 +53,11 @@ export class AuthService {
       const userId = req.user.id;
       const findToken = await this.userTokenModel.findOne({
         userId: userId,
-        code: req.cookies.access_token,
+
+        code:
+          process.env.NODE_ENV === 'development'
+            ? req?.headers?.authorization?.split(' ')[1]
+            : req?.cookies?.access_token,
       });
 
       const newTime = Moment(new Date())
@@ -63,9 +67,12 @@ export class AuthService {
 
       if (findToken === null) {
         const token = new this.userTokenModel();
-        token.code = req.cookies.access_token;
+        token.code =
+          process.env.NODE_ENV === 'development'
+            ? req?.headers?.authorization?.split(' ')[1]
+            : req?.cookies?.access_token;
         token.expiresAt = newTime;
-        token.brower = req.headers['user-agent'];
+        token.brower = req?.headers['user-agent'];
         token.ipAddress = ip.address();
         token.userId = userId;
         await token.save();
@@ -132,25 +139,29 @@ export class AuthService {
     // when added an organization then return new access_token
 
     const token = this.jwtService.sign(payload);
-    const address = ip.address();
+    // const address = ip.address();
 
-    // Logger.log(req)
-
-    console.log(token);
-    res
-      .cookie('access_token', token, {
-        secure: true,
-        sameSite: 'none',
-        httpOnly: true,
-        // domain: 'localhost',
-        path: '/',
-        expires: new Date(Moment().add(process.env.EXPIRES, 'h').toDate()),
-      })
-      .send({
-        message: 'Login successfully',
-        status: true,
-        result: newUser,
+    if (process.env.NODE_ENV === 'production') {
+      res
+        .cookie('access_token', token, {
+          secure: true,
+          sameSite: 'none',
+          httpOnly: true,
+          // domain: 'localhost',
+          path: '/',
+          expires: new Date(Moment().add(process.env.EXPIRES, 'h').toDate()),
+        })
+        .send({
+          message: 'Login successfully',
+          status: true,
+          result: newUser,
+        });
+    } else {
+      res.send({
+        user,
+        token: token,
       });
+    }
 
     return {
       user,

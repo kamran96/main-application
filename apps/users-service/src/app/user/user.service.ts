@@ -11,4 +11,14 @@ export class UserService {
     @InjectModel(UserToken.name) private userToken,
     private authService: AuthService
   ) {}
+
+  async FindUserById(userId) {
+    return await this.userModel
+      .findOne({
+        _id: userId,
+      })
+      .populate('role')
+      .populate('organization')
+      .populate('branch');
+  }
 }
