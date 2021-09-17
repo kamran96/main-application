@@ -31,3 +31,10 @@ spec:
             name: contacts-http
             port: 
               number: 80
+      - pathType: Prefix
+        path: "/items"
+        backend:
+          service:
+            name: items-http
+            port: 
+              number: 80

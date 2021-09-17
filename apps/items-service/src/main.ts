@@ -14,6 +14,9 @@ async function bootstrap() {
   const port = process.env.PORT || 3335;
   app.use(cookieParser());
 
+  if (process.env.NODE_ENV === 'production') {
+    app.setGlobalPrefix('/items');
+  }
   await app.listen(port, () => {
     Logger.log('Listening at http://localhost:' + port);
   });

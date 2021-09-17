@@ -13,7 +13,8 @@
             "outputPath": "dist/apps/accounting-service",
             "main": "apps/accounting-service/src/main.ts",
             "tsConfig": "apps/accounting-service/tsconfig.app.json",
-            "assets": ["apps/accounting-service/src/assets"]
+            "assets": ["apps/accounting-service/src/assets"],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {
@@ -25,7 +26,8 @@
                   "replace": "apps/accounting-service/src/environments/environment.ts",
                   "with": "apps/accounting-service/src/environments/environment.prod.ts"
                 }
-              ]
+              ],
+              "generatePackageJson": true
             }
           }
         },
@@ -285,7 +287,8 @@
             "outputPath": "dist/apps/invoices-service",
             "main": "apps/invoices-service/src/main.ts",
             "tsConfig": "apps/invoices-service/tsconfig.app.json",
-            "assets": ["apps/invoices-service/src/assets"]
+            "assets": ["apps/invoices-service/src/assets"],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {
@@ -297,7 +300,8 @@
                   "replace": "apps/invoices-service/src/environments/environment.ts",
                   "with": "apps/invoices-service/src/environments/environment.prod.ts"
                 }
-              ]
+              ],
+              "generatePackageJson": true
             }
           }
         },
@@ -335,7 +339,8 @@
             "outputPath": "dist/apps/items-service",
             "main": "apps/items-service/src/main.ts",
             "tsConfig": "apps/items-service/tsconfig.app.json",
-            "assets": ["apps/items-service/src/assets"]
+            "assets": ["apps/items-service/src/assets"],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {
@@ -347,7 +352,8 @@
                   "replace": "apps/items-service/src/environments/environment.ts",
                   "with": "apps/items-service/src/environments/environment.prod.ts"
                 }
-              ]
+              ],
+              "generatePackageJson": true
             }
           }
         },
@@ -558,7 +564,8 @@
             "outputPath": "dist/apps/reports-service",
             "main": "apps/reports-service/src/main.ts",
             "tsConfig": "apps/reports-service/tsconfig.app.json",
-            "assets": ["apps/reports-service/src/assets"]
+            "assets": ["apps/reports-service/src/assets"],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {
@@ -570,7 +577,8 @@
                   "replace": "apps/reports-service/src/environments/environment.ts",
                   "with": "apps/reports-service/src/environments/environment.prod.ts"
                 }
-              ]
+              ],
+              "generatePackageJson": true
             }
           }
         },

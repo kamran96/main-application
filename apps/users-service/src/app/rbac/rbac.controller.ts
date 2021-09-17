@@ -9,7 +9,10 @@ import {
   HttpException,
   HttpStatus,
   Put,
+  UseGuards,
 } from '@nestjs/common';
+import { Request } from 'express';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   PermissionDto,
   PermissionIdsDto,
@@ -23,7 +26,6 @@ import { RbacService } from './rbac.service';
 export class RbacController {
   constructor(private rbacService: RbacService) {}
 
-  // @UseGuards(JwtAuthGuard)
   @Get('/module')
   async getModules(@Req() req: Request) {
     const modules = await this.rbacService.GetDistinctModule();
@@ -37,10 +39,10 @@ export class RbacController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('/role')
   async getRoles(@Req() req: Request) {
-    const roles = await this.rbacService.GetRoles();
+    const roles = await this.rbacService.GetRoles(req.user);
 
     if (roles) {
       return {
@@ -51,7 +53,7 @@ export class RbacController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post('/test')
   async test(@Req() req: any) {
     await this.rbacService.InsertRoles(req.user.organizationId);
@@ -63,13 +65,10 @@ export class RbacController {
     };
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('/role/:id')
-  async viewRole(@Req() req: any, @Param() params) {
-    const role = await this.rbacService.GetRole(
-      params.id,
-      req.user.organizationId
-    );
+  async viewRole(@Req() req: Request, @Param() params) {
+    const role = await this.rbacService.GetRole(params.id, req.user);
 
     if (role) {
       return {
@@ -80,7 +79,6 @@ export class RbacController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
   @Get('/permission')
   async getPermission(@Req() req: Request, @Query() { page_no, page_size }) {
     const permission = await this.rbacService.GetPermissions(
@@ -97,10 +95,10 @@ export class RbacController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('/permission/show')
   async showPermission(@Query() { type }, @Req() req: Request) {
-    const permission = await this.rbacService.ShowPermission(type);
+    const permission = await this.rbacService.ShowPermission(type, req.user);
     if (permission) {
       return {
         message: 'Successfull',
@@ -113,7 +111,7 @@ export class RbacController {
   // @UseGuards(JwtAuthGuard)
   @Get('/role-with-permission')
   async roleWithPermission(@Req() req: Request) {
-    const permission = await this.rbacService.GetRoleWithPermissions();
+    const permission = await this.rbacService.GetRoleWithPermissions(req.user);
     if (permission) {
       return {
         message: 'Successfull',
@@ -127,10 +125,7 @@ export class RbacController {
   @Post('role')
   async createRole(@Body() roleDto: RoleDto, @Req() req: Request) {
     try {
-      const role = await this.rbacService.CreateRole(
-        roleDto,
-        '612793a5afc58999fe3c7d5c'
-      );
+      const role = await this.rbacService.CreateRole(roleDto, req.user);
 
       if (role) {
         return {
@@ -174,8 +169,8 @@ export class RbacController {
   ) {
     try {
       const permission = await this.rbacService.CreatePermission(
-        permissionDto
-        // req.user,
+        permissionDto,
+        req.user
       );
 
       if (permission) {

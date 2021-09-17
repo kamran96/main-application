@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { DecriptionData } from './encription';
 
-let localIP = `https://55a5-118-107-143-253.ngrok.io`;
-let RailsBaseURL = "";
+let localIP = `http://localhost:3334`;
+let RailsBaseURL = '';
 let NodeBaseURL = ``;
 let cancelToken = axios.CancelToken;
 
@@ -56,10 +56,10 @@ export const railsHttp = axios.create({
 
 // http.interceptors.response.use(res => requestHandler(res));
 
-export const encriptionData = localStorage.getItem("auth");
+export const encriptionData = localStorage.getItem('auth');
 // let access_token = encriptionData
-  // ? DecriptionData(encriptionData).access_token
-  // : false;
+// ? DecriptionData(encriptionData).access_token
+// : false;
 
 export const updateToken = (token: String) => {
   // http.defaults.headers.common.Authorization = `Bearer ${token}`;
@@ -67,7 +67,7 @@ export const updateToken = (token: String) => {
 };
 
 // if (access_token) {
-  // updateToken(access_token);
+// updateToken(access_token);
 // }
 
 export { NodeBaseURL, RailsBaseURL };

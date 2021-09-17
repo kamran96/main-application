@@ -14,10 +14,16 @@ export class Authenticate extends PassportStrategy(Strategy) {
   constructor() {
     super({
       jwtFromRequest: (req) => {
-        if (!req || !req.cookies) return null;
-        token = req.cookies['access_token'];
-        host = req.headers.host;
-        return req.cookies['access_token'];
+        if (process.env.NODE_ENV === 'development') {
+          const header = req.headers?.authorization?.split(' ')[1];
+          token = header;
+          return header;
+        } else {
+          if (!req || !req.cookies) return null;
+          token = req.cookies['access_token'];
+          host = req.headers.host;
+          return req.cookies['access_token'];
+        }
       },
 
       ignoreExpiration: false,
@@ -27,15 +33,22 @@ export class Authenticate extends PassportStrategy(Strategy) {
 
   async validate(payload): Promise<any> {
     try {
+      const type =
+        process.env.NODE_ENV === 'development' ? 'authorization' : 'cookie';
+      const value =
+        process.env.NODE_ENV === 'development'
+          ? `Bearer ${token}`
+          : `access_token=${token}`;
+
       const user = await axios.post(
-        `http://${process.env.GLOBAL_HOST}/users/auth/access-controll`,
+        `http://localhost:3334/users/auth/access-controll`,
         {
           ...payload,
           service: host,
         },
         {
           headers: {
-            cookie: `access_token=${token}`,
+            [type]: value,
           },
         }
       );

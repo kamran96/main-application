@@ -31,7 +31,6 @@ export class AuthController {
     @Req() req: Request
   ) {
     try {
-      console.log(req.hostname);
       await this.authService.ValidateUser(authDto, res);
     } catch (error) {
       throw new HttpException(
