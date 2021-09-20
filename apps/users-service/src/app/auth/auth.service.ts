@@ -158,8 +158,8 @@ export class AuthService {
         });
     } else {
       res.send({
-        user,
-        token: token,
+        users: newUser,
+        access_token: token,
       });
     }
 
