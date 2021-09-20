@@ -117,31 +117,31 @@ export const UsersList: FC<IProps> = () => {
     },
     {
       title: "Username",
-      dataIndex: "name",
-      key: "name",
+      dataIndex: "profile",
+      key: "profile",
+      render: (data)=><>{data?.userName || '-'}</>
     },
     {
       title: "Full Name",
       dataIndex: "profile",
       key: "profile",
-      render: (data: IProfile, row, index) => <>{data && data.fullName}</>,
+      render: (data: IProfile, row, index) => <>{ data?.fullName}</>,
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      render: (data, row, index) => {
-        const { profile } = row;
-        return <>{profile.email}</>;
-      },
+      // render: (data, row, index) => {
+      //   const { profile } = row;
+      //   return <>{profile.email}</>;
+      // },
     },
     {
       title: "Phone Number",
-      dataIndex: "phone_no",
-      key: "phone_no",
+      dataIndex: "profile",
+      key: "profile",
       render: (data, row, index) => {
-        const { profile } = row;
-        return <>{profile.phoneNumber}</>;
+        return <>{data?.phoneNumber}</>;
       },
     },
     {
@@ -150,7 +150,7 @@ export const UsersList: FC<IProps> = () => {
       key: "role",
       render: (data, row, index) => {
         const { role } = row;
-        return <>{role.name}</>;
+        return <>{role?.name}</>;
       },
     },
   ];
@@ -248,19 +248,19 @@ export const UsersList: FC<IProps> = () => {
                   sorter && sorter.order === "descend"
                     ? `-${sorter.field}`
                     : sorter.field
-                }&page=${pagination.current}&page_size=${
-                  pagination.pageSize
+                }&page=${pagination?.current}&page_size=${
+                  pagination?.pageSize
                 }&query=${query}`
               );
             }
           }}
-          totalItems={pagination && pagination.total}
-          pagination={{
-            pageSize: page_size,
-            position: ["bottomRight"],
-            current: page,
-            total: pagination && pagination.total,
-          }}
+          // totalItems={pagination?.total}
+          // pagination={{
+          //   pageSize: page_size,
+          //   position: ["bottomRight"],
+          //   current: page,
+          //   total: pagination?.total,
+          // }}
           hasfooter={true}
           onSelectRow={onSelectedRow}
           enableRowSelection

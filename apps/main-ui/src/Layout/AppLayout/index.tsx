@@ -1,7 +1,7 @@
 import brightnessContrast from '@iconify-icons/carbon/brightness-contrast';
 import Moon from '@iconify-icons/feather/moon';
 import Icon from '@iconify/react';
-import { IRoutesSchema } from '@invyce/shared/types';
+import { IRoutesSchema, ISupportedRoutes } from '@invyce/shared/types';
 import { SidebarUi } from '@invyce/sidebar-ui';
 import { Button } from 'antd';
 import React, { FC } from 'react';
@@ -41,6 +41,7 @@ export const AppLayout: FC<IProps> = ({ children }) => {
 
   const routes = () => {
     let obj = {};
+    
     Object?.keys(RoutingSchema)?.forEach((_routeSchema, routeIndex) => {
       let filter = RoutingSchema[_routeSchema]?.filter(
         (item: IRoutesSchema) => {
@@ -63,8 +64,10 @@ export const AppLayout: FC<IProps> = ({ children }) => {
 
       obj[_routeSchema] = filter;
     });
+
     return obj;
   };
+
 
   return (
       <WrapperApplayout darkModeLoading={darkModeLoading}>
@@ -85,8 +88,9 @@ export const AppLayout: FC<IProps> = ({ children }) => {
                 username: userDetails?.username,
                 userImage: userDetails?.profile?.attachment?.path,
                 theme: theme,
+                link: `${ISupportedRoutes.DASHBOARD_LAYOUT}${ISupportedRoutes.SETTINGS}${ISupportedRoutes.PROFILE_SETTING}`
               }}
-              routes={RoutingSchema}
+              routes={routes() as any}
               onLogOut={() => {
                 handleLogin({ type: ILoginActions.LOGOUT });
               }}

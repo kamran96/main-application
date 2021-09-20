@@ -1,9 +1,16 @@
 import http, { railsHttp } from "../utils/http";
 
 enum ContactAPI {
-  INDEX = "contact",
+  INDEX = "contacts",
   railsINDEX = "contacts/index",
 }
+
+enum ContactServiceAPI{
+  default = 'contacts/contact',
+  index = 'contacts/contact',
+  
+}
+
 
 export const getContacts = (
   key?: string,
@@ -13,7 +20,7 @@ export const getContacts = (
   page_size?: number,
   query?: string
 ) => {
-  let url = `contacts/index?page_size=${page_size}&page_no=${page}&sort=${sortid}&type=${type}`;
+  let url = `contacts/contact?page_size=${page_size}&page_no=${page}&sort=${sortid}&type=${type}`;
   if (query) {
     url = `${url}&query=${query}`;
   }

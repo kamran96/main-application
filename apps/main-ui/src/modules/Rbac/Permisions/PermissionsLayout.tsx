@@ -48,12 +48,14 @@ export const PermissionsLayout: FC = () => {
     }
   }, [history]);
 
+  console.log(selectedPermission, "which permission is selected")
+
   const {
     data: selectedPermissionData,
     isLoading: selectedPermissionFetching,
     isFetched: permissionsFetched,
   } = useQuery(
-    [`permission-show?type=${setPermissions}`, selectedPermission],
+    [`permission-show?type=${selectedPermission}`, selectedPermission],
     permissionsShowAPI,
     {
       enabled: selectedPermission,
@@ -96,6 +98,7 @@ export const PermissionsLayout: FC = () => {
       let newResult = result.map((item, index) => {
         let data = { ...item };
 
+
         let indexOfRolePermission = rolesList.findIndex(
           (i) => item.parentId === i.roleId
         );
@@ -113,6 +116,8 @@ export const PermissionsLayout: FC = () => {
     }
   }, [selectedPermissionData, rolesList]);
 
+  console.log(permissionTable, rolesList, "permission table data")
+
   useEffect(() => {
     if (
       modulesResponse &&
@@ -120,9 +125,10 @@ export const PermissionsLayout: FC = () => {
       modulesResponse.data.result
     ) {
       const { result } = modulesResponse.data;
+      console.log(permissions, "permissions")
       setPermissions(result);
       if (!selectedPermission) {
-        setSelectedPermission(result[0].module);
+        setSelectedPermission(result[0]);
       }
     }
   }, [modulesResponse]);
@@ -135,20 +141,20 @@ export const PermissionsLayout: FC = () => {
         </div>
         <div className="list_area">
           <ul>
-            {permissions.map((p, index) => {
+            {permissions.map((module, index) => {
               return (
                 <li
                   className={`${
-                    p.module === selectedPermission ? "active-module" : ""
+                    module === selectedPermission ? "active-module" : ""
                   }`}
                   onClick={() => {
-                    setSelectedPermission(p.module);
+                    setSelectedPermission(module);
                     history.push(
-                      `/app${ISupportedRoutes.PERMISSIONS}?module=${p.module}`
+                      `/app${ISupportedRoutes.PERMISSIONS}?module=${module}`
                     );
                   }}
                 >
-                  {p.module}
+                  {module}
                 </li>
               );
             })}
