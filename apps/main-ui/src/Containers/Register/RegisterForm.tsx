@@ -24,25 +24,31 @@ export const RegisterForm: FC = () => {
   const [step, setStep] = useState(1);
 
   const [mutateRegister, responseRegister] = useMutation(RegisterAPI);
-  const { data, isLoading } = responseRegister;
-  const { handleLogin, notificationCallback, setUserDetails } =
+  const {  isLoading } = responseRegister;
+  const { handleLogin, notificationCallback } =
     useGlobalContext();
 
-  useEffect(() => {
-    if (data && data.data && data.data.result) {
-      const { result } = data.data;
-      updateToken(result.access_token);
-      setUserDetails(result.users);
-      handleLogin({ type: ILoginActions.LOGIN, payload: result });
-    }
-  }, [data, handleLogin, setUserDetails]);
 
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
     try {
       await mutateRegister(values, {
-        onSuccess: () => {
+        onSuccess: (data) => {
+          if(process.env.NODE_ENV==="production"){
+            handleLogin({
+              type: ILoginActions.LOGIN,
+              payload: { autherization: true }
+            });
+
+          }else{
+            handleLogin({
+              type: ILoginActions.LOGIN,
+              payload: data?.data,
+            });
+            updateToken(data?.data.access_token);
+
+          }
           form.resetFields();
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,

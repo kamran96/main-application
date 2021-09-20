@@ -194,6 +194,11 @@ export const RoutingSchema: IRoutingSchema = {
             },
           ],
         },
+        {
+          tag: "Permissions",
+          route: `${root}${ISupportedRoutes.PERMISSIONS}`,
+          permission: PERMISSIONS.RBAC_ROLE_PERMISSION_INDEX,
+        },
       ],
     },
    

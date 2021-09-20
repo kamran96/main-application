@@ -23,6 +23,7 @@ export interface IActiveUserInfo {
   userId?: number;
   userImage: string;
   theme?: 'dark' | 'light';
+  link?: string;
 }
 
 export interface SidebarUiProps {
@@ -118,7 +119,11 @@ export const SidebarUi: FC<SidebarUiProps> = ({
         </span>
       </div>
       <hr className="mt-10" />
-      <div className="sidebar-userinfo flex alignCenter pointer ph-10">
+      <div onClick={()=> {
+        if(activeUserInfo?.link){
+          history?.push(activeUserInfo.link);
+        }
+      }} className="sidebar-userinfo flex alignCenter pointer ph-10">
         <div className="avatar_area">
           {activeUserInfo?.userImage ? (
             <Avatar

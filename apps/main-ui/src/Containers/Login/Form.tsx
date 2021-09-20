@@ -17,15 +17,32 @@ import { BOLDTEXT } from '../../components/Para/BoldText';
 export const LoginForm: FC = () => {
   const [mutateLogin, responseMutateLogin] = useMutation(LoginAPI);
 
-  const {  notificationCallback, routeHistory, setAutherized }: any =
-    useGlobalContext();
+  const {
+    notificationCallback,
+    routeHistory,
+    setAutherized,
+    handleLogin,
+  }: any = useGlobalContext();
   const { history } = routeHistory;
 
   const onFinish = async (values) => {
     try {
       await mutateLogin(values, {
-        onSuccess: () => {
-          setAutherized(true);
+        onSuccess: (data) => {
+          if(process.env.NODE_ENV==="production"){
+            handleLogin({
+              type: ILoginActions.LOGIN,
+              payload: { autherization: true }
+            });
+
+          }else{
+            handleLogin({
+              type: ILoginActions.LOGIN,
+              payload: data?.data,
+            });
+            updateToken(data?.data.access_token);
+
+          }
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
             `Logged in SuccessFully`

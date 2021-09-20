@@ -2,7 +2,14 @@ import { message } from 'antd';
 import React, { FC, useEffect, useState } from 'react';
 import { queryCache, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
-import { CheckAuthAPI, getAllRolesWithPermission, getUserAPI, LogoutAPI, uploadPdfAPI } from '../../api';
+import {
+  CheckAuthAPI,
+  CheckAuthAPIDev,
+  getAllRolesWithPermission,
+  getUserAPI,
+  LogoutAPI,
+  uploadPdfAPI,
+} from '../../api';
 import {
   IBaseAPIError,
   IErrorMessages,
@@ -22,6 +29,10 @@ const stylesheets = {
   light: `https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.12/antd.min.css`,
   dark: `https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.12/antd.dark.min.css`,
 };
+
+const isProductionEnv = process.env.NODE_ENV === 'production' || false;
+
+const AUTH_CHECK_API = isProductionEnv ? CheckAuthAPI : CheckAuthAPIDev;
 
 const createStylesheetLink = (): HTMLLinkElement => {
   const link = document.createElement('link');
@@ -60,7 +71,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   ] = useMutation(uploadPdfAPI);
 
   const [mutateLogout, resLogout] = useMutation(LogoutAPI);
-
 
   const [isOnline, setIsOnline] = useState(true);
   const [checkAutherized, setAutherized] = useState(true);
@@ -136,7 +146,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const [verifiedModal, setVerifiedModal] = useState(false);
 
-
   const [toggle, setToggle] = useState(true);
 
   window.addEventListener('offline', (event) => {
@@ -176,41 +185,52 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const history = useHistory();
 
-  const handleLogin = async(action: IAction) => {
+  const handleLogin = async (action: IAction) => {
     switch (action.type) {
       case ILoginActions.LOGIN:
-      debugger;  
-      setAutherized(true);
+        const { payload } = action;
 
-        // setAuth(action.payload);
-        // localStorage.setItem('auth', EncriptData(action.payload) as any);
-
+        if (process.env.NODE_ENV === 'production') {
+          setAutherized(true);
+        } else {
+          localStorage.setItem('auth', EncriptData(action.payload) as any);
+          setAuth(action.payload);
+        }
         break;
       case ILoginActions.LOGOUT:
-        await mutateLogout("", {
-          onSuccess: (data)=>{
-            notificationCallback(NOTIFICATIONTYPE.INFO, 'Logout Successfully');
-            setTheme('light');
-            setIsUserLogin(false);
-            queryCache.clear();
-          },
-          onError: (err: IBaseAPIError)=>{
-            if(err?.response?.data.message){
-              notificationCallback(NOTIFICATIONTYPE.INFO, `${err.response.data.message}`)
-
-            }else{
+        if (isProductionEnv) {
+          await mutateLogout('', {
+            onSuccess: (data) => {
               notificationCallback(
-                NOTIFICATIONTYPE.ERROR,
-                IErrorMessages.NETWORK_ERROR
+                NOTIFICATIONTYPE.INFO,
+                'Logout Successfully'
               );
-            }
-          }
-        })
+              setTheme('light');
+              setIsUserLogin(false);
+              queryCache.clear();
+            },
+            onError: (err: IBaseAPIError) => {
+              if (err?.response?.data.message) {
+                notificationCallback(
+                  NOTIFICATIONTYPE.INFO,
+                  `${err.response.data.message}`
+                );
+              } else {
+                notificationCallback(
+                  NOTIFICATIONTYPE.ERROR,
+                  IErrorMessages.NETWORK_ERROR
+                );
+              }
+            },
+          });
+        }
+
         localStorage.removeItem('auth');
         setTheme('light');
         setAuth(null);
         setIsUserLogin(false);
         queryCache.clear();
+
         break;
       default:
         break;
@@ -229,31 +249,40 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   useEffect(() => {
     if (checkIsAuthSaved) {
       let decriptedData = DecriptionData(checkIsAuthSaved);
-      let user: IUser = decriptedData.users;
+      console.log(decriptedData, 'decrypeted data');
+      let user: IUser = decriptedData?.users;
+
       setAuth(decriptedData);
       setUserDetails(user);
     }
   }, [checkIsAuthSaved]);
 
-  let userId = (auth && auth.users && auth.users.id) || null;
+  let userId = auth?.users?.id || null;
 
+  console.log(userId, 'user id is herer');
 
-
-  
-
-/* LoggedInUser is Fetched */
-  const {isLoading, data, error, isFetched} = useQuery([`loggedInUser`], CheckAuthAPI, {
- 
-    cacheTime: Infinity,
-    enabled: checkAutherized,
-    onSuccess: (data)=>{
-      setUserDetails(data?.data.result);
-      setIsUserLogin(true);
-    },
-    onError: ()=>{
-      setAutherized(false);
+  /* LoggedInUser is Fetched */
+  const { isLoading, data, error, isFetched } = useQuery(
+    [`loggedInUser`, userId],
+    AUTH_CHECK_API,
+    {
+      cacheTime: Infinity,
+      enabled: isProductionEnv ? checkAutherized : userId,
+      onSuccess: (data) => {
+        if (isProductionEnv) {
+          setUserDetails(data?.data?.users);
+          setIsUserLogin(true);
+        } else {
+          const { result } = data?.data;
+          setUserDetails(result);
+          setIsUserLogin(true);
+        }
+      },
+      onError: () => {
+        setAutherized(false);
+      },
     }
-  })
+  );
 
   // const { isLoading, data, error, isFetched } = useQuery(
   //   [`loggedInUser`, userId],
@@ -284,6 +313,8 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     toggleTheme(theme);
   }, [theme]);
 
+  console.log(userDetails, 'user details');
+
   const {
     data: allRolesAndPermissionsData,
     isLoading: permissionsFetching,
@@ -294,30 +325,30 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     staleTime: Infinity,
   });
 
-  console.log(allRolesAndPermissionsData, "data")
+  console.log(allRolesAndPermissionsData, 'data');
 
-  // useEffect(() => {
-  //   if (allRolesAndPermissionsData?.data?.result) {
-  //     const { result } = allRolesAndPermissionsData.data;
-  //     const { parentRole } = result;
-  //     const roles: IRolePermissions[] =
-  //       allRolesAndPermissionsData.data.result.roles;
-  //     const newResult = roles.map((item) => {
-  //       let roleIndex = parentRole.findIndex((i) => i === item.role);
-  //       let parents = [];
-  //       for (let index = 0; index <= roleIndex; index++) {
-  //         parents.push(parentRole[index]);
-  //       }
+  useEffect(() => {
+    if (allRolesAndPermissionsData?.data?.result) {
+      const { result } = allRolesAndPermissionsData.data;
+      const { parentRole } = result;
+      const roles: IRolePermissions[] =
+        allRolesAndPermissionsData.data.result.roles;
+      const newResult = roles.map((item) => {
+        let roleIndex = parentRole.findIndex((i) => i === item.role);
+        let parents = [];
+        for (let index = 0; index <= roleIndex; index++) {
+          parents.push(parentRole[index]);
+        }
 
-  //       return {
-  //         ...item,
-  //         action: `${item.module}/${item.title}`,
-  //         parents,
-  //       };
-  //     });
-  //     setRolePermissions(newResult);
-  //   }
-  // }, [allRolesAndPermissionsData]);
+        return {
+          ...item,
+          action: `${item.module}/${item.title}`,
+          parents,
+        };
+      });
+      setRolePermissions(newResult);
+    }
+  }, [allRolesAndPermissionsData]);
 
   // const errResp: any = error;
 
@@ -336,7 +367,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   //     );
   //   }
   // }, [data, checkIsAuthSaved, errResp]);
-
 
   message.config({
     top: 101,
@@ -364,8 +394,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const { theme: appTheme, themeLoading } = useTheme(theme);
 
-  const checkingUser = false;
-
+  const checkingUser = isLoading || permissionsFetching;
 
   return (
     <globalContext.Provider

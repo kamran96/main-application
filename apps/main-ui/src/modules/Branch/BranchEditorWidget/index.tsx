@@ -29,6 +29,7 @@ export const BranchEditorWidget: FC = () => {
   const [form] = Form.useForm();
 
   const { branchId, id } = branchModalConfig;
+
   const { data } = useQuery(
     [`branch-${branchId}`, branchId],
     getBranchByIdAPI,
@@ -37,20 +38,49 @@ export const BranchEditorWidget: FC = () => {
     }
   );
 
+  useEffect(()=>{
+    form.setFieldsValue({prefix: 92});
+  },[])
+
   useEffect(() => {
     if (data && data.data && data.data.result) {
       const { result } = data.data;
+      const {city, postalCode, description,  } = result?.address;
       form.setFieldsValue({
         ...result,
         prefix: parseInt(result?.prefix),
-        city: result?.address_details?.city,
-        postalCode: result?.address_details?.postalCode,
+        city,
+        postalCode,
+        address: description
       });
     }
   }, [data, form]);
 
   const onFinish = async (values) => {
-    let payload = { ...values, organizationId: id, isNewRecord: true };
+
+
+    const {city, address, postalCode, country} = values
+   
+    let _address = {
+      city,
+      postalCode,
+      country,
+      description: address
+    }
+
+    let restValues= {};
+
+    Object.keys(values).forEach((key)=>{
+      
+      if(!Object.keys(_address).includes(key)){
+        restValues = {...restValues, [key]: values[key]}
+      }
+      
+    })
+
+  
+    let payload: any = { ...restValues, address: _address, organizationId: id, isNewRecord: true };
+    
 
     if (branchId !== null) {
       payload = { ...payload, isNewRecord: false, id: branchId };
@@ -184,14 +214,14 @@ export const BranchEditorWidget: FC = () => {
             </Col>
 
             <Col span={12}>
-              <Form.Item label="Fax No" name="fax_no">
+              <Form.Item label="Fax No" name="faxNumber">
                 <Input placeholder="Enter your fax number" size="middle" />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
                 label="Phone Number"
-                name="phone_no"
+                name="phoneNumber"
                 rules={[
                   { required: false, message: "Please add your last name" },
                   { max: 12, min: 4 },
