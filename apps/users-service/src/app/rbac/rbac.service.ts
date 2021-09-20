@@ -70,23 +70,30 @@ export class RbacService {
   }
 
   async ShowPermission(type, user) {
+    const permissions = await this.permissionModel
+      .find({ module: type })
+      .sort({ id: 'asc' });
+
     const queryRoles = await this.rolePermissionModel
       .find({
         organizationId: user.organizationId,
       })
       .populate('roleId')
-      .populate('permissionId', { module: type });
+      .sort({ id: 'asc' });
 
-    const roles = queryRoles.map((r) => ({
-      roleId: r.roleId._id,
-      role: r.roleId.name,
-      permissionId: r.permissionId._id,
-      parentId: r.roleId.parentId || null,
-      hasPermission: r.hasPermission,
-      title: r.permissionId.title,
-      description: r.permissionId.description,
-      module: r.permissionId.module,
-    }));
+    let roles;
+    for (let i of queryRoles) {
+      roles = permissions.map((p) => ({
+        roleId: i.roleId._id,
+        role: i.roleId.name,
+        permissionId: p._id,
+        parentId: i.roleId.parentId || null,
+        title: p.title,
+        description: p.description,
+        module: p.module,
+      }));
+    }
+
     return roles;
   }
 
@@ -97,6 +104,35 @@ export class RbacService {
     });
 
     return role;
+  }
+
+  async GetRoleWithPermissions(user) {
+    const parentRoles = await this.roleModel
+      .find({ organizationId: user.organizationId })
+      .sort({ level: 'ASC' });
+
+    const parentRole = parentRoles.map((r) => r.name);
+
+    const queryRoles = await this.rolePermissionModel
+      .find({
+        organizationId: user.organizationId,
+      })
+      .populate('roleId')
+      .populate('permissionId')
+      .sort({ id: 'asc' });
+
+    const roles = queryRoles.map((r) => ({
+      roleId: r.roleId._id,
+      role: r.roleId.name,
+      permissionId: r.permissionId._id,
+      parentId: r.roleId.parentId || null,
+      hasPermission: r.hasPermission,
+      title: r.permissionId.title,
+      description: r.permissionId.description,
+      organizationId: r.organizationId,
+      module: r.permissionId.module,
+    }));
+    return { parentRole, roles };
   }
 
   async CreatePermission(permissionDto, user): Promise<any> {
@@ -143,34 +179,6 @@ export class RbacService {
       .sort({ level: 'ASC' });
 
     return role;
-  }
-
-  async GetRoleWithPermissions(user) {
-    const parentRoles = await this.roleModel
-      .find({ organizationId: user.organizationId })
-      .sort({ level: 'ASC' });
-
-    const parentRole = parentRoles.map((r) => r.name);
-
-    const queryRoles = await this.rolePermissionModel
-      .find({
-        organizationId: user.organizationId,
-      })
-      .populate('roleId')
-      .populate('permissionId')
-      .sort({ id: 'asc' });
-
-    const roles = queryRoles.map((r) => ({
-      roleId: r.roleId._id,
-      role: r.roleId.name,
-      permissionId: r.permissionId._id,
-      parentId: r.roleId.parentId || null,
-      hasPermission: r.hasPermission,
-      title: r.permissionId.title,
-      description: r.permissionId.description,
-      module: r.permissionId.module,
-    }));
-    return { parentRole, roles };
   }
 
   async GetPermissions(page_no, page_size): Promise<any> {

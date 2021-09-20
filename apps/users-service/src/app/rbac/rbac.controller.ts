@@ -108,7 +108,7 @@ export class RbacController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('/role-with-permission')
   async roleWithPermission(@Req() req: Request) {
     const permission = await this.rbacService.GetRoleWithPermissions(req.user);
