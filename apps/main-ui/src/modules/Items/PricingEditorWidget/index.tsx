@@ -1,21 +1,18 @@
-import { Button, Col, Form, Input, Row, Select } from "antd";
-import React, { FC, useEffect } from "react";
-import { queryCache, useMutation, useQuery } from "react-query";
-import styled from "styled-components";
-import { createPricingAPI, getPriceByIDAPI } from "../../../api";
-import { CommonModal } from "../../../components";
-import { FormLabel } from "../../../components/FormLabel";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { NOTIFICATIONTYPE } from "../../../modal";
+import { Button, Col, Form, Input, Row, Select } from 'antd';
+import React, { FC, useEffect } from 'react';
+import { queryCache, useMutation, useQuery } from 'react-query';
+import styled from 'styled-components';
+import { createPricingAPI, getPriceByIDAPI } from '../../../api';
+import { CommonModal } from '../../../components';
+import { FormLabel } from '../../../components/FormLabel';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { NOTIFICATIONTYPE } from '../../../modal';
 
 const { Option } = Select;
 
 const PricingEditorWidget: FC = () => {
-  const {
-    pricingModalConfig,
-    setPricingModalConfig,
-    notificationCallback,
-  } = useGlobalContext();
+  const { pricingModalConfig, setPricingModalConfig, notificationCallback } =
+    useGlobalContext();
   const [mutateAddItemPrice, respCreatePice] = useMutation(createPricingAPI);
   const [form] = Form.useForm();
   const { obj } = pricingModalConfig;
@@ -27,45 +24,51 @@ const PricingEditorWidget: FC = () => {
     [`price-${pricingId}`, pricingId],
     getPriceByIDAPI,
     {
-      enabled: id && id.length === 1,
+      enabled: pricingId,
     }
   );
 
   useEffect(() => {
     if (data && data.data && data.data.result) {
       const { result } = data.data;
-      let salePrice = (result.salePrice && result.salePrice.toString()) || "";
+      let salePrice = (result.salePrice && result.salePrice.toString()) || '';
       let purchasePrice =
-        (result.purchasePrice && result.purchasePrice.toString()) || "";
+        (result.purchasePrice && result.purchasePrice.toString()) || '';
       form.setFieldsValue({ ...result, salePrice, purchasePrice });
     }
   }, [data, form]);
 
   const onSubmit = async (values) => {
-    const payload = {
-      price: {
-        ...values,
-        salePrice: parseFloat(values.salePrice),
-        purchasePrice: parseFloat(values.purchasePrice),
-      },
+    let payload = {
+      ...values,
+      salePrice: parseFloat(values.salePrice),
+      purchasePrice: parseFloat(values.purchasePrice),
     };
 
     if (obj !== null) {
-      const { id, openingStock, accountId } = obj;
-      if (obj.action === "CREATE") {
-        payload.price = {
-          ...payload.price,
+      const { id, openingStock, accountId, action } = obj;
+      if (action === 'CREATE') {
+        payload = {
+          ...payload,
           item_ids: id,
           openingStock,
           targetAccount: accountId,
           isNewRecord: true,
         };
-      } else if (obj.action === "UPDATE") {
-        payload.price = {
-          ...payload.price,
-          item_ids: id,
-          isNewRecord: false,
-        };
+      } else if (action === 'UPDATE') {
+        if (id.length < 2) {
+          payload = {
+            ...payload,
+            item_ids: id,
+            isNewRecord: true,
+          };
+        } else {
+          payload = {
+            ...payload,
+            item_ids: id,
+            isNewRecord: false,
+          };
+        }
       }
     }
     try {
@@ -74,12 +77,12 @@ const PricingEditorWidget: FC = () => {
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
             `Price is ${
-              obj.action === "UPDATE" ? "Updated" : "Created"
+              obj.action === 'UPDATE' ? 'Updated' : 'Created'
             } sucessfully`
           );
           form.resetFields();
           queryCache.invalidateQueries((q) =>
-            q.queryKey[0].toString().startsWith("items")
+            q.queryKey[0].toString().startsWith('items')
           );
           queryCache.invalidateQueries(`all-items`);
           setPricingModalConfig(false);
@@ -107,12 +110,12 @@ const PricingEditorWidget: FC = () => {
               <FormLabel isRequired>Item Pricing Type</FormLabel>
               <Form.Item
                 name="priceType"
-                rules={[{ required: true, message: "Select Price Type" }]}
+                rules={[{ required: true, message: 'Select Price Type' }]}
               >
                 <Select
                   size="middle"
                   showSearch
-                  style={{ width: "100%" }}
+                  style={{ width: '100%' }}
                   placeholder="Select Item"
                   optionFilterProp="children"
                 >
@@ -128,14 +131,14 @@ const PricingEditorWidget: FC = () => {
                 rules={[
                   {
                     required: true,
-                    message: "Purcahse Price required!",
+                    message: 'Purcahse Price required!',
                     whitespace: false,
                   },
                 ]}
               >
                 <Input
                   disabled={data?.data?.hasPurchases}
-                  placeholder={"eg: milk, match"}
+                  placeholder={'eg: milk, match'}
                   size="middle"
                   type="number"
                 />
@@ -148,13 +151,13 @@ const PricingEditorWidget: FC = () => {
                 rules={[
                   {
                     required: true,
-                    message: "Selling Price required!",
+                    message: 'Selling Price required!',
                     whitespace: false,
                   },
                 ]}
               >
                 <Input
-                  placeholder={"eg: milk, match"}
+                  placeholder={'eg: milk, match'}
                   size="middle"
                   type="number"
                 />
@@ -167,12 +170,12 @@ const PricingEditorWidget: FC = () => {
                 rules={[
                   {
                     required: false,
-                    message: "Tax required!",
+                    message: 'Tax required!',
                     whitespace: false,
                   },
                 ]}
               >
-                <Input placeholder={"eg: 100 or 10%"} size="middle" />
+                <Input placeholder={'eg: 100 or 10%'} size="middle" />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -182,12 +185,12 @@ const PricingEditorWidget: FC = () => {
                 rules={[
                   {
                     required: false,
-                    message: "Discount is invalidate",
+                    message: 'Discount is invalidate',
                     whitespace: false,
                   },
                 ]}
               >
-                <Input placeholder={"eg. 10% or 100"} size="middle" />
+                <Input placeholder={'eg. 10% or 100'} size="middle" />
               </Form.Item>
             </Col>
             <Col span={24}>

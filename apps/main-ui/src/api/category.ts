@@ -1,7 +1,7 @@
 import { railsHttp } from "../utils/http";
 
 enum CATEGORY_API {
-  INDEX = "categories/index",
+  INDEX = "items/category",
 }
 
 export const getCategoriesAPI = (
@@ -29,10 +29,10 @@ export const getChildCategoriesAPI = (key?: string, parentId?: number) => {
 };
 
 export const createCategoryAPI = (payload?: any) =>
-  railsHttp.post(`categories/create`, payload);
+  railsHttp.post(`${CATEGORY_API.INDEX}`, payload);
 
 export const addAttributesAPI = (payload?: any) =>
-  railsHttp.post(`attributes/create`, payload);
+  railsHttp.post(`${CATEGORY_API.INDEX}/attribute`, payload);
 
 export const getAllCategories = () =>
   railsHttp.get(`categories/index?purpose=ALL`);
@@ -41,7 +41,7 @@ export const deleteCategoryAPI = (payload?: any) =>
   railsHttp.put(`categories/delete`, payload);
 
 export const getCategoryByIdAPI = (key?: string, id?: number) =>
-  railsHttp.get(`categories/${id}`);
+  railsHttp.get(`${CATEGORY_API.INDEX}/${id}`);
 
 export const getCategoryAttributesAPI = (key?: string, id?: number) =>
   railsHttp.get(`category-with-attribute/${id}`);
