@@ -149,16 +149,14 @@ const ItemsEditorWidget: FC<IProps> = () => {
 
   const onFinish = async (values) => {
     if (!validateAttributes()) {
-      let payload: any = {
-        item: {
+      let payload: any = { 
           ...values,
           isNewRecord: true,
-        },
+       
       };
       if (id) {
         payload = {
-          ...payload,
-          item: { ...payload.item, isNewRecord: false, id: id },
+          ...payload , isNewRecord: false, id: id 
         };
       }
 
@@ -198,8 +196,8 @@ const ItemsEditorWidget: FC<IProps> = () => {
         },
       });
 
-      if (payload.item.hasPricing && response) {
-        if (response.status === 200 || response.status === 204) {
+      if (payload.hasPricing && response) {
+        if (response.status === 201 || response.status === 204) {
           const { status } = response;
           const { result } = response.data;
           if (id) {
@@ -215,7 +213,7 @@ const ItemsEditorWidget: FC<IProps> = () => {
             setPricingModalConfig(true, {
               ...result,
               id: [result.id],
-              action: status === 200 ? "CREATE" : "UPDATE",
+              action: status === 201 ? "CREATE" : "UPDATE",
             });
           }
         }

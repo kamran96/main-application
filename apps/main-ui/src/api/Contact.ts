@@ -20,22 +20,22 @@ export const getContacts = (
   page_size?: number,
   query?: string
 ) => {
-  let url = `contacts/contact?page_size=${page_size}&page_no=${page}&sort=${sortid}&type=${type}`;
+  let url = `${ContactServiceAPI.default}?page_size=${page_size}&page_no=${page}&sort=${sortid}&type=${type}`;
   if (query) {
     url = `${url}&query=${query}`;
   }
 
-  return railsHttp.get(url);
+  return http.get(url);
 };
 
 export const viewSingleContact = (key?: string, id?: number) =>
-  railsHttp.get(`contacts/${id}`);
+  railsHttp.get(`${ContactServiceAPI.default}/${id}`);
 
 export const deleteContacts = (payload) =>
-  http.put(`${ContactAPI.INDEX}`, payload);
+  http.put(`${ContactServiceAPI.default}`, payload);
 
 export const create_update_contact = (payload) => {
-  let url = `contacts/create`;
+  let url = `${ContactServiceAPI.default}`;
   return railsHttp.post(url, payload);
 };
 
