@@ -164,7 +164,7 @@ export const ChildCategory: FC<IProps> = ({ id }) => {
             //   record.transaction_items;
             return (
               <AttributesTable
-                attributes={record && record.owner ? record.owner : []}
+                attributes={ record?.attributes || []}
               />
             );
           },

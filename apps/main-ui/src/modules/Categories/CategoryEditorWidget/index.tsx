@@ -43,19 +43,17 @@ const CategoryEditorWidget: FC = () => {
 
   const onFormFinish = async (values) => {
     let payload = {
-      category: {
         ...values,
         parentId: null,
         isNewRecord: updateId ? false : true,
-      },
     };
 
     if (updateId) {
-      payload.category = { ...payload.category, id: updateId };
+      payload= { ...payload, id: updateId };
     }
 
     if (parent_id) {
-      payload.category.parentId = parent_id;
+      payload.parentId = parent_id;
     }
 
     try {

@@ -3,7 +3,7 @@ import trash2 from "@iconify-icons/feather/trash-2";
 import { Icon } from "@iconify/react";
 import { Button, Form, Input, Select, Space } from "antd";
 import React, { FC } from "react";
-import { useMutation, useQuery } from "react-query";
+import { queryCache, useMutation, useQuery } from "react-query";
 import styled from "styled-components";
 import { getRbacListAPI } from "../../../api";
 import { CommonModal } from "../../../components";
@@ -55,6 +55,7 @@ export const UserInviteModal: FC = ({}) => {
     mutateInviteUser(values, {
       onSuccess: () => {
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, `Invited Successfully`);
+        queryCache.invalidateQueries((q)=> q.queryKey[0].toString().startsWith('users-list'));
         onCancel();
       },
       onError: (err: IBaseAPIError) => {
