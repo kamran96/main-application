@@ -40,12 +40,10 @@ const ItemsEditorWidget: FC<IProps> = () => {
 
   const [formData, setFormData] = useState<any>({});
   const [attribute_values, setAttriValue] = useState([]);
-  const [useCategorised, setUseCategorised] = useState(false);
   const [hasInventory, setHasInventory] = useState(false);
 
   /* Mutations */
   const [mutateItems, itemsResponse] = useMutation(createUpdateItem);
-  const itemAddResponse = itemsResponse.data;
   /* user context API hook */
   const {
     itemsModalConfig,
@@ -71,6 +69,8 @@ const ItemsEditorWidget: FC<IProps> = () => {
   /* Use form hook antd */
   const [form] = Form.useForm();
 
+  
+
   let catId =
     form.isFieldTouched("categoryId") && form.getFieldValue("categoryId");
 
@@ -78,7 +78,7 @@ const ItemsEditorWidget: FC<IProps> = () => {
     let [filtered] =
       resolvedCategories && resolvedCategories.filter((item) => item.id === id);
     if (filtered) {
-      return filtered.owner;
+      return filtered?.attributes;
     } else {
       return [];
     }
@@ -103,8 +103,24 @@ const ItemsEditorWidget: FC<IProps> = () => {
     fetchSingleItem,
     {
       enabled: id,
-      onSuccess: () => {
-        /* when successfully created OR updated toast will be apear */
+      onSuccess: (data) => {
+       
+        if ( data?.data?.result) {
+          const { result } = data.data;
+          const { attribute_values } = result;
+          if(attribute_values){ 
+            setAttriValue(attribute_values);
+          }
+          
+          form.setFieldsValue({
+            ...result,
+            hasPricing: result.price ? true : false,
+            hasCategory: result?.categoryId ? true : false
+          });
+          setFormData({result});
+        }
+
+         /* when successfully created OR updated toast will be apear */
         /* three type of parameters are passed
         first: notification type
         second: message title
@@ -282,15 +298,17 @@ const ItemsEditorWidget: FC<IProps> = () => {
             </Col>
             <Col span={24}>
               <div className="pb-10">
+              <Form.Item name="hasCategory"  valuePropName="checked" >
+
                 <Checkbox
-                  checked={useCategorised}
-                  onChange={(e) => setUseCategorised(e.target.checked)}
-                >
+                    
+                  >
                   Has Categories
                 </Checkbox>
+                  </Form.Item>
               </div>
             </Col>
-            {useCategorised && (
+            {form.getFieldValue('hasCategory') && (
               <>
                 <Col span={24}>
                   <Row gutter={24}>
@@ -325,9 +343,9 @@ const ItemsEditorWidget: FC<IProps> = () => {
                         </Select>
                       </Form.Item>
                     </Col>
-                    {catId &&
-                      resolvedCategories &&
-                      getVariantsWithId(catId).map(
+                    {
+                      resolvedCategories && form.getFieldValue('categoryId')!==null && 
+                      getVariantsWithId(form.getFieldValue('categoryId')).map(
                         (vari: IVariants, index: number) => {
                           return (
                             <Col key={index} span={12}>

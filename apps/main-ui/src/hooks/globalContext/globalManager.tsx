@@ -268,6 +268,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     {
       cacheTime: Infinity,
       enabled: isProductionEnv ? checkAutherized : userId,
+      
       onSuccess: (data) => {
         if (isProductionEnv) {
           setUserDetails(data?.data?.users);
@@ -278,7 +279,11 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
           setIsUserLogin(true);
         }
       },
-      onError: () => {
+      onError: (err:IBaseAPIError) => {
+        console.log(err?.response?.data?.statusCode)
+        if(err?.response?.data?.statusCode===403){
+         queryCache.cancelQueries('loggedInUser', {exact: true})
+        }
         setAutherized(false);
       },
     }

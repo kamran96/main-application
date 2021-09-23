@@ -36,4 +36,4 @@ export const userCheckAPI = (payload) =>
   railsHttp?.post(`/users/check`, payload);
 
 export const userJoinAPI = (payload) =>
-  http?.put(`user/update-invited-user/${payload?.id}`, payload);
+  http?.put(`${USERS.INDEX}/update-invited-user/${payload?.id}`, payload);
