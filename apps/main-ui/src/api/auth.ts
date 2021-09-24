@@ -18,13 +18,13 @@ export const requestResetPasswordAPI = (payload: any) =>
   http?.post('users/auth/forget-password', payload);
 
 export const resetPasswordAPI = (payload: any) =>
-  http?.post(`auth/change-password`, payload);
+  http?.post(`users/auth/change-password`, payload);
 
 export const verifyAccountAPI = (payload: any) =>
-  http?.post(`auth/verify-otp`, payload);
+  http?.post(`users/auth/verify-otp`, payload);
 
 export const resendVerificationCodeAPI = (payload: any) =>
-  http?.post(`auth/resend-otp`, payload);
+  http?.post(`users/auth/resend-otp`, payload);
 
 export const CheckAuthAPI = (key?: string) => http.get(`users/auth/check`);
 export const CheckAuthAPIDev = (key?: string, id?: number)=> http?.get(`users/user/${id}`);
