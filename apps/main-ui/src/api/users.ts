@@ -37,3 +37,5 @@ export const userCheckAPI = (payload) =>
 
 export const userJoinAPI = (payload) =>
   http?.put(`${USERS.INDEX}/update-invited-user/${payload?.id}`, payload);
+
+export const resendInvitation = (payload)=> http?.post(`${USERS.INDEX}/resend-invitation`, payload);

@@ -61,8 +61,8 @@ export const EmailForm: FC = () => {
               />
               <Form onFinish={onFinish} className="_form" layout="vertical">
                 <Form.Item
-                  label="Email"
-                  name="email"
+                  label="Email / Username"
+                  name="username"
                   rules={[
                     { required: true, message: "Please enter your email" },
                     { type: "email" },

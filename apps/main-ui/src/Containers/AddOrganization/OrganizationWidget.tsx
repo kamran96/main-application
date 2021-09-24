@@ -38,10 +38,20 @@ export const OrganizationWidget: FC = () => {
   const onFinish = async (values) => {
     await mutateOrganization(values, {
       onSuccess: async (data) => {
-        const { result } = data?.data;
-        await updateToken(result?.access_token);
-        await setUserDetails(result.users);
-        await  handleLogin({ type: ILoginActions.LOGIN, payload: result });
+        if(process.env.NODE_ENV==="production"){
+          handleLogin({
+            type: ILoginActions.LOGIN,
+            payload: { autherization: true }
+          });
+
+        }else{
+          handleLogin({
+            type: ILoginActions.LOGIN,
+            payload: data?.data,
+          });
+          updateToken(data?.data.access_token);
+
+        }
         ["loggedInUser", "all-organizations", "roles-permissions"]?.forEach(
           (key) => {
             queryCache?.invalidateQueries((q) =>
