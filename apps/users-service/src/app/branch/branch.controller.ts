@@ -8,7 +8,10 @@ import {
   Param,
   Post,
   Req,
+  UseGuards,
 } from '@nestjs/common';
+import { Request } from 'express';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { BranchDto } from '../dto/branch.dto';
 import { BranchService } from './branch.service';
 
@@ -16,11 +19,11 @@ import { BranchService } from './branch.service';
 export class BranchController {
   constructor(private branchService: BranchService) {}
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get()
   async index(@Req() req: Request) {
     try {
-      const branch = await this.branchService.ListBranch();
+      const branch = await this.branchService.ListBranch(req.user);
 
       if (branch) {
         return {
@@ -36,13 +39,13 @@ export class BranchController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() branchDto: BranchDto, @Req() req: Request) {
     try {
       const branch = await this.branchService.CreateOrUpdateBranch(
-        branchDto
-        // req.user,
+        branchDto,
+        req.user
       );
 
       if (branch) {
@@ -59,16 +62,16 @@ export class BranchController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async view(@Param() params) {
+  async show(@Param() params) {
     try {
-      const branch = await this.branchService.FindBranchById(params);
+      const branch = await this.branchService.FindBranchById(params.id);
 
       if (branch) {
         return {
           message: 'Branch fetched successfully.',
-          result: branch[0],
+          result: branch,
         };
       }
 

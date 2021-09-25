@@ -29,7 +29,9 @@ export class AccountsController {
       if (account) {
         return {
           message: 'Account Fetched successfull',
-          result: account,
+          status: true,
+          pagination: account.pagination,
+          result: !account.pagination ? account : account.accounts,
         };
       }
     } catch (error) {

@@ -1,5 +1,6 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
+import * as mongoosePaginate from 'mongoose-paginate-v2';
 import { Branch } from './branch.schema';
 import { Organization } from './organization.schema';
 import { Role } from './role.schema';
@@ -18,7 +19,7 @@ export class User {
   terms: boolean;
   @Prop()
   marketing: boolean;
-  @Prop()
+  @Prop({ default: false })
   isVerified: boolean;
   @Prop(
     raw({
@@ -33,7 +34,7 @@ export class User {
       bio: String,
       jobTitle: String,
       attachmentId: Number,
-      status: String,
+      status: Number,
     })
   )
   profile: object;
@@ -73,6 +74,7 @@ UserSchema.virtual('role', {
   foreignField: '_id',
   justOne: true,
 });
+UserSchema.plugin(mongoosePaginate);
 
 UserSchema.set('toObject', { virtuals: true });
 UserSchema.set('toJSON', { virtuals: true });

@@ -8,7 +8,7 @@ export class Contact {
   @Prop()
   email: string;
   @Prop()
-  type: number;
+  contactType: number;
   @Prop()
   businessName: string;
   @Prop()
@@ -38,6 +38,10 @@ export class Contact {
   @Prop()
   importedContactId: string;
   @Prop()
+  paymentDaysLimit: string;
+  @Prop()
+  accountNumber: string;
+  @Prop()
   organizationId: string;
   @Prop()
   branchId: string;
@@ -55,3 +59,9 @@ export class Contact {
 
 export const ContactSchema = SchemaFactory.createForClass(Contact);
 ContactSchema.plugin(mongoosePaginate);
+
+ContactSchema.set('toJSON', { virtuals: true });
+
+ContactSchema.virtual('id').get(function () {
+  return this._id.toHexString();
+});

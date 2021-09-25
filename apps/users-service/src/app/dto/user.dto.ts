@@ -20,8 +20,14 @@ export class UserRegisterDto {
 }
 
 export class InvitedUser {
+  users: Array<InvitedUserArr>;
+}
+
+class InvitedUserArr {
   fullname: string;
   @IsNotEmpty()
+  email: string;
+  @IsEmail()
   username: string;
   password: string;
   country: string;

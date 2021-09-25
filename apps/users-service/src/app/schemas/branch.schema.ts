@@ -9,8 +9,6 @@ export class Branch {
   @Prop()
   email: string;
   @Prop()
-  description: string;
-  @Prop()
   phoneNumber: string;
   @Prop()
   faxNumber: string;
@@ -18,9 +16,10 @@ export class Branch {
   prefix: string;
   @Prop(
     raw({
+      description: String,
       city: String,
       country: String,
-      postalAddress: String,
+      postalCode: String,
     })
   )
   address: object;
@@ -41,3 +40,9 @@ export class Branch {
 }
 
 export const BranchSchema = SchemaFactory.createForClass(Branch);
+
+BranchSchema.set('toJSON', { virtuals: true });
+
+BranchSchema.virtual('id').get(function () {
+  return this._id.toHexString();
+});

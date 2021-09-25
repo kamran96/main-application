@@ -29,7 +29,8 @@ export class ContactController {
       return {
         message: 'Successfull',
         status: true,
-        result: contact,
+        result: !contact?.pagination ? contact : contact.contacts,
+        pagination: contact.pagination,
       };
     }
   }

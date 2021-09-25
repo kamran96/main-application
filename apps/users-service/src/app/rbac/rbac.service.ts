@@ -74,27 +74,43 @@ export class RbacService {
       .find({ module: type })
       .sort({ id: 'asc' });
 
-    const queryRoles = await this.rolePermissionModel
+    const roles = await this.rolePermissionModel
       .find({
         organizationId: user.organizationId,
       })
       .populate('roleId')
       .sort({ id: 'asc' });
 
-    let roles;
-    for (let i of queryRoles) {
-      roles = permissions.map((p) => ({
-        roleId: i.roleId._id,
-        role: i.roleId.name,
-        permissionId: p._id,
-        parentId: i.roleId.parentId || null,
-        title: p.title,
-        description: p.description,
-        module: p.module,
-      }));
-    }
+    let obj = {};
+    return permissions.map((p) => {
+      for (let i of roles) {
+        if (p._id.toString() === i.permissionId.toString()) {
+          obj = {
+            roleId: i.roleId._id,
+            role: i.roleId.name,
+            permissionId: p._id,
+            parentId: i.roleId.parentId || null,
+            hasPermission: i.hasPermission,
+            rolePermissionId: i._id,
+            title: p.title,
+            description: p.description,
+            module: p.module,
+          };
+        }
+      }
+      return obj;
+    });
+  }
 
-    return roles;
+  async GetRoles(user): Promise<any> {
+    const role = await this.roleModel
+      .find({
+        organizationId: user.organizationId,
+      })
+      .populate('parent')
+      .sort({ level: 'ASC' });
+
+    return role;
   }
 
   async GetRole(roleId, user) {
@@ -169,16 +185,6 @@ export class RbacService {
 
   async GetDistinctModule(): Promise<any> {
     return await this.permissionModel.find().distinct('module');
-  }
-
-  async GetRoles(user): Promise<any> {
-    const role = await this.roleModel
-      .find({
-        organizationId: user.organizationId,
-      })
-      .sort({ level: 'ASC' });
-
-    return role;
   }
 
   async GetPermissions(page_no, page_size): Promise<any> {
@@ -279,6 +285,26 @@ export class RbacService {
       rolePermission.status = 1;
       await rolePermission.save();
     }
+  }
+
+  async AddRolePermission(data, user) {
+    console.log(data);
+    await this.rolePermissionModel.updateOne(
+      { _id: data.rolePermissionId },
+      {
+        roleId: data.roleId,
+        permissionId: data.permissionId,
+        hasPermission: data.hasPermission,
+        organizationId: user.organizationId,
+        status: 1,
+      }
+    );
+
+    const rolePermission = await this.rolePermissionModel.find({
+      _id: data.rolePermissionId,
+    });
+
+    return rolePermission;
   }
 
   async DeleteRole(roleIds) {

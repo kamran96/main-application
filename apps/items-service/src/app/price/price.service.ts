@@ -11,16 +11,14 @@ export class PriceService {
   ) {}
 
   async FindById(priceId) {
-    return await this.priceModel.find({
-      _id: priceId,
-    });
+    return await this.priceModel.findById(priceId);
   }
 
   async CreatePrice(priceDto) {
     if (priceDto.isNewRecord === false) {
       try {
         for (let i of priceDto.item_ids) {
-          const price = await this.priceModel.findById(i);
+          const price = await this.FindById(i);
           if (price) {
             // update price
             await this.priceModel.updateOne(
@@ -33,7 +31,7 @@ export class PriceService {
                 handlingCost: priceDto.handlingCost || price.handlingCost,
                 priceUnit: priceDto.priceUnit || price.priceUnit,
                 unitsInCorton: priceDto.unitsInCorton || price.unitsInCorton,
-                type: priceDto.type || price.type,
+                priceType: priceDto.priceType || price.priceType,
                 tax: priceDto.tax || price.tax,
                 discount: priceDto.discount || price.discount,
               }
@@ -47,7 +45,7 @@ export class PriceService {
             const price = new this.priceModel(priceDto);
             price.itemId = i;
             price.initialPurchasePrice =
-              item.type === 1 ? priceDto.purchasePrice : null;
+              item.priceType === 1 ? priceDto.purchasePrice : null;
             await price.save();
           }
         }
@@ -56,17 +54,23 @@ export class PriceService {
       }
     } else {
       try {
-        const itemId = priceDto.item_ids;
+        const itemIds = priceDto.item_ids;
         delete priceDto.item_ids;
-        const item = await this.itemModel.findById(itemId);
 
-        const price = new this.priceModel(priceDto);
-        price.itemId = itemId;
-        price.initialPurchasePrice =
-          item.type === 1 ? priceDto.purchasePrice : null;
-        await price.save();
+        let priceArr = [];
+        for (let i of itemIds) {
+          const item = await this.FindById(i);
+          const price = new this.priceModel(priceDto);
 
-        return price;
+          price.itemId = i;
+          price.initialPurchasePrice =
+            item?.priceType === 1 ? priceDto.purchasePrice : null;
+          await price.save();
+
+          priceArr.push(price);
+        }
+
+        return priceArr;
       } catch (error) {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }

@@ -14,7 +14,7 @@ export class Item {
   @Prop()
   barcode: string;
   @Prop()
-  type: number;
+  itemType: number;
   @Prop()
   isActive: boolean;
   @Prop()
@@ -47,3 +47,29 @@ export class Item {
 
 export const ItemSchema = SchemaFactory.createForClass(Item);
 ItemSchema.plugin(mongoosePaginate);
+
+ItemSchema.virtual('id').get(function () {
+  return this._id.toHexString();
+});
+
+ItemSchema.virtual('price', {
+  ref: 'Price',
+  localField: '_id',
+  foreignField: 'itemId',
+  justOne: true,
+});
+ItemSchema.virtual('category', {
+  ref: 'Category',
+  localField: 'categoryId',
+  foreignField: '_id',
+  justOne: true,
+});
+ItemSchema.virtual('attribute_values', {
+  ref: 'AttributeValue',
+  localField: '_id',
+  foreignField: 'itemId',
+  // hasMany: true,
+});
+
+ItemSchema.set('toObject', { virtuals: true });
+ItemSchema.set('toJSON', { virtuals: true });

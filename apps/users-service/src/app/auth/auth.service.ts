@@ -53,17 +53,14 @@ export class AuthService {
       const userId = req.user.id;
       const findToken = await this.userTokenModel.findOne({
         userId: userId,
-
         code:
           process.env.NODE_ENV === 'development'
             ? req?.headers?.authorization?.split(' ')[1]
             : req?.cookies?.access_token,
       });
 
-      const newTime = Moment(new Date())
-        .add(process.env.EXPIRES, 'h')
-        .calendar();
-      const time = Moment(new Date()).calendar();
+      const newTime = Moment(new Date()).add(12, 'h').format();
+      const time = Moment(new Date()).format();
 
       if (findToken === null) {
         const token = new this.userTokenModel();
@@ -96,34 +93,46 @@ export class AuthService {
     }
   }
 
-  async AddUser(authDto) {
+  async AddUser(authDto, organizationId = null, email = '') {
+    let updatedProfile;
+    if (organizationId) {
+      updatedProfile = {
+        fullName: authDto.fullName,
+        country: authDto.country,
+        phoneNumber: authDto.phoneNumber,
+      };
+    }
+
     const user = new this.userModel();
     user.username = authDto.username;
     user.email = authDto.email;
     user.password =
       authDto.password !== '' ? bcrypt.hashSync(authDto.password) : null;
-    user.organizationId = authDto.organizationId || null;
+    user.organizationId = organizationId || null;
     user.branchId = authDto.branchId || null;
     user.roleId = authDto.roleId || null;
     user.prefix = authDto.prefix;
-    user.profile = authDto.profile;
+    user.profile = authDto.profile || updatedProfile;
     user.terms = authDto.terms;
     user.marketing = authDto.marketing;
     user.status = 1;
     await user.save();
 
-    const time = Moment(new Date()).add(1, 'h').calendar();
+    if (!email) {
+      const time = Moment(new Date()).add(1, 'h').calendar();
 
-    let generateOtp: any = generateRandomNDigits(4);
-    parseInt(generateOtp);
+      let generateOtp: any = generateRandomNDigits(4);
+      parseInt(generateOtp);
 
-    const user_token = new this.userTokenModel();
-    user_token.code = generateOtp;
-    user_token.expiresAt = time.toString();
-    user_token.userId = user._id;
-    await user_token.save();
-
-    await this.sendVerificationEmail(user, false, true, generateOtp);
+      const user_token = new this.userTokenModel();
+      user_token.code = generateOtp;
+      user_token.expiresAt = time.toString();
+      user_token.userId = user._id;
+      await user_token.save();
+      await this.sendVerificationEmail(user, generateOtp);
+    } else {
+      await this.sendVerificationEmail(user);
+    }
 
     return user;
   }
@@ -216,12 +225,7 @@ export class AuthService {
     }
   }
 
-  async sendVerificationEmail(
-    usr: any = null,
-    resend: boolean = false,
-    otp = false,
-    generateOtp = null
-  ) {
+  async sendVerificationEmail(usr: any = null, generateOtp = null) {
     const user = await this.userModel.findOne({ email: usr.email });
 
     const data = {
@@ -231,7 +235,7 @@ export class AuthService {
 
     const stringify = JSON.stringify(data);
     const base64 = Buffer.from(stringify).toString('base64');
-    if (otp) {
+    if (generateOtp) {
       this.sendVerificationOtp(user, generateOtp);
     } else {
       this.sendVerificationCode(user, base64, true);
@@ -240,6 +244,35 @@ export class AuthService {
 
   async VerifyOtp(body) {
     try {
+      let response = {
+        status: false,
+      };
+
+      const user_code = await this.userTokenModel.findOne({
+        code: body.otp,
+      });
+
+      const format = Moment(user_code.expiresAt, 'hmm').format('HH:mm');
+      const getOneHour = Moment(new Date()).format('HH:mm');
+
+      if (format && format < getOneHour) {
+        throw new HttpException(
+          'Verification code is expired, Click on resend to generate new verification code.',
+          HttpStatus.BAD_REQUEST
+        );
+      } else {
+        await this.userModel.updateOne(
+          {
+            email: body.email,
+          },
+          { isVerified: true }
+        );
+        response = {
+          status: true,
+        };
+
+        return response;
+      }
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -259,65 +292,63 @@ export class AuthService {
     user_token.userId = user._id;
     await user_token.save();
 
-    await this.sendVerificationEmail(body, false, true, generateOtp);
+    await this.sendVerificationEmail(body, generateOtp);
   }
 
   async sendVerificationOtp(user, otp) {
-    const link = `<h1>OTP for account verification is 
-      <h4>${otp}<h4>
-    </h1>`;
-
     const payload = {
-      email: 'zeeshan@invyce.com',
-      subject: 'For test',
-      message: 'Account verification',
-      from: 'zeeshan@invyce.com',
+      to: user.email,
+      from: 'no-reply@invyce.com',
+      TemplateAlias: 'send-opt',
+      TemplateModel: {
+        product_url: 'https://invyce.com',
+        product_name: 'invyce',
+        name: user.username,
+        action_url: otp,
+        trial_length: 'trial_length_Value',
+        trial_start_date: 'trial_start_date_Value',
+        trial_end_date: 'trial_end_date_Value',
+        support_email: 'support_email_Value',
+        live_chat_url: 'live_chat_url_Value',
+        sender_name: 'sender_name_Value',
+        help_url: 'help_url_Value',
+        company_name: 'company_name_Value',
+        company_address: 'company_address_Value',
+        login_url: 'login_url_Value',
+        username: user.username,
+      },
     };
 
     await this.emailService.emit(SEND_CUSTOMER_EMAIL, payload);
-
-    // await this.email
-    //   .compose(
-    //     user.email,
-    //     `Account verification for ${
-    //       user.organization ? user.organization.name : null
-    //     }`,
-    //     link,
-    //     'no-reply@invyce.com'
-    //   )
-    //   .send();
   }
 
   async sendVerificationCode(user, code, joinCompany): Promise<any> {
-    const baseUrl = process.env.BASE_URL;
+    const baseUrl = 'http://localhost:4200';
     const _code = { code };
     const a = `${baseUrl}/page/join-user?${queryString.stringify(_code)}`;
 
     // info(`Decoded generated for user ${queryString.parse(_code)}`);
-    let link = ``;
 
-    if (joinCompany) {
-      link = `<h1>Invitation to join company.</h1>
-      <p>You have been invited by ${user.organization.name} to join their company.</p>
-      <p><a href='${a}'>Click here</a> to join ${user.organization.name}</p>
-    `;
-    } else {
-      link = `
-    <h2>Congratulations! You account has been created successfully. </h2>
-    <p>For security purposes Invyce wants you to confirm your account before using our app.</p>
-    <p>Please <a href='${a}'>Click Here</a> verify your account</p>
-    <p style='font-size: 12px; color: #888'>Please avoid replying to this email, no one is using this email</p>
-    `;
-    }
+    const payload = {
+      to: user.email,
+      from: 'no-reply@invyce.com',
+      TemplateAlias: 'user-invitation',
+      TemplateModel: {
+        product_url: 'https://invyce.com',
+        product_name: 'invyce',
+        name: 'test',
+        invite_sender_name: 'zeeshan',
+        invite_sender_organization_name: 'test org',
+        action_url: a,
+        support_email: 'support@invyce.com',
+        live_chat_url: 'live_chat_url_Value',
+        help_url: 'help_url_Value',
+        company_name: 'invyce',
+        company_address: 'gilgit',
+      },
+    };
 
-    // await this.email
-    //   .compose(
-    //     user.email,
-    //     `Invite user request from ${user.organization.name}`,
-    //     link,
-    //     'no-reply@invyce.com'
-    //   )
-    //   .send();
+    await this.emailService.emit(SEND_CUSTOMER_EMAIL, payload);
   }
 
   async ForgetPassword(userDto): Promise<boolean> {
@@ -340,12 +371,14 @@ export class AuthService {
   }
 
   async SendForgetPassword(user, code): Promise<any> {
-    const baseUrl = 'http://localhost:3000';
+    const baseUrl = 'http://localhost:4200';
     const _code = queryString.stringify({ code });
     const a = `${baseUrl}/page/forgot-password?${_code}&type=reset-password`;
     const operating_system = os.type();
 
     const payload = {
+      to: user.email,
+      from: 'no-reply@invyce.com',
       TemplateAlias: 'password-reset',
       TemplateModel: {
         product_url: '',
@@ -361,14 +394,6 @@ export class AuthService {
     };
 
     await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
-    // await this.email
-    //   .compose(
-    //     user.email,
-    //     'Password change request',
-    //     link,
-    //     'no-reply@invyce.com'
-    //   )
-    //   .send();
   }
 
   async verifyForgotPassword(code: string): Promise<any> {
@@ -376,7 +401,7 @@ export class AuthService {
     const data = JSON.parse(string);
     if (data) {
       const { user: userId } = data;
-      const user = await this.userModel.findOne({ id: userId });
+      const user = await this.userModel.findById(userId);
       return user;
     }
 
@@ -390,8 +415,8 @@ export class AuthService {
         return false;
       }
 
-      const updatedUser = { ...verify };
-      delete updatedUser.id;
+      delete verify.password;
+      const updatedUser: any = {};
       updatedUser.username = verify.username;
       updatedUser.password = bcrypt.hashSync(userDto.password);
       updatedUser.status = 1;

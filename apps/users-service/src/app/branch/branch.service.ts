@@ -10,11 +10,11 @@ export class BranchService {
     @InjectModel(User.name) private userModel
   ) {}
 
-  async ListBranch(branchData = null) {
+  async ListBranch(branchData) {
     try {
       const branch = await this.branchModel.find({
         status: 1,
-        //   organizationId: branchData.organizationId
+        organizationId: branchData.organizationId,
       });
 
       return branch;
@@ -26,26 +26,37 @@ export class BranchService {
   async CreateOrUpdateBranch(branchDto, branchData = null) {
     if (branchDto && branchDto.isNewRecord === false) {
       try {
-        const result = await this.FindBranchById(branchDto);
+        const branch = await this.FindBranchById(branchDto.id);
         // code goes for update branch
-        if (Array.isArray(result) && result.length > 0) {
-          const [branch] = result;
-          const updatedBranch = { ...branch };
-          delete updatedBranch.id;
+        if (branch) {
+          const updatedBranch: any = {};
+          const address = {
+            description:
+              branchDto?.address?.description || branch?.address?.description,
+            city: branchDto?.address?.city || branch?.address?.city,
+            country: branchDto?.address?.country || branch?.address?.country,
+            postalCode:
+              branchDto?.address?.postalCode || branch?.address?.postalCode,
+          };
 
           updatedBranch.name = branchDto.name || branch.name;
           updatedBranch.prefix = branchDto.prefix || branch.prefix;
           updatedBranch.email = branchDto.email || branch.email;
-          updatedBranch.address = branchDto.address || branch.address;
-          updatedBranch.phone_no = branchDto.phone_no || branch.phone_no;
-          updatedBranch.fax_no = branchDto.fax_no || branch.fax_no;
+          updatedBranch.phoneNumber =
+            branchDto.phoneNumber || branch.phoneNumber;
+          updatedBranch.faxNumber = branchDto.faxNumber || branch.faxNumber;
           updatedBranch.isMain = branchDto.isMain || branch.isMain;
-          updatedBranch.address = branchDto.address || branch.address;
-          // updatedBranch.organizationId = '';
+          updatedBranch.address = address;
+          updatedBranch.organizationId = branch.organizationId;
+          updatedBranch.createdById = branch.createdById;
+          updatedBranch.updatedById = branchData.id;
           updatedBranch.status = 1;
 
-          await this.branchModel.updateOne({ id: branchDto.id }, updatedBranch);
-          return updatedBranch;
+          await this.branchModel.updateOne(
+            { _id: branchDto.id },
+            updatedBranch
+          );
+          return await this.FindBranchById(branchDto.id);
         }
         throw new HttpException('Invalid params', HttpStatus.BAD_REQUEST);
       } catch (error) {
@@ -64,13 +75,13 @@ export class BranchService {
         branch.email = branchDto.email;
         branch.prefix = branchDto.prefix;
         branch.address = branchDto.address;
-        (branch.phone_no = branchDto.phone_no),
-          (branch.fax_no = branchDto.fax_no);
-        branch.organizationId = branchDto.organizationId;
+        branch.phoneNumber = branchDto.phoneNumber;
+        branch.faxNumber = branchDto.faxNumber;
+        branch.organizationId = branchData.organizationId;
         branch.isMain = branchDto.isMain;
         branch.status = 1;
-        // branch.createdById = branchData.userId;
-        // branch.updatedById = branchData.userId;
+        branch.createdById = branchData.id;
+        branch.updatedById = branchData.id;
         await branch.save();
 
         // if (branchData.branchId === null) {
@@ -94,11 +105,8 @@ export class BranchService {
     }
   }
 
-  async FindBranchById(params) {
-    return await this.branchModel.find({
-      _id: params.id,
-      //   organizationId: branchData.organizationId
-    });
+  async FindBranchById(branchId) {
+    return await this.branchModel.findById(branchId);
   }
 
   async deleteBranch(params) {

@@ -19,7 +19,7 @@ export class Price {
   @Prop()
   unitsInCorton: number;
   @Prop()
-  type: number;
+  priceType: number;
   @Prop()
   status: number;
   @Prop()

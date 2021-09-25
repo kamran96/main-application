@@ -9,9 +9,9 @@ import { Sorting } from '@invyce/sorting';
 
 @Injectable()
 export class AccountsService {
-  async ListAccounts(user, query) {
+  async ListAccounts(user, queryData) {
     try {
-      const { purpose, page_size, page_no, sort, filters } = query;
+      const { purpose, page_size, page_no, sort, query } = queryData;
 
       if (purpose === 'ALL') {
         return await getCustomRepository(AccountRepository).find({
@@ -84,8 +84,8 @@ export class AccountsService {
     where a."organizationId" = '${user.organizationId}'
     `;
 
-        if (filters) {
-          const filterData: any = Buffer.from(filters, 'base64').toString();
+        if (query) {
+          const filterData: any = Buffer.from(query, 'base64').toString();
           const data = JSON.parse(filterData);
 
           for (let i in data) {
@@ -245,7 +245,8 @@ export class AccountsService {
           // updatedAccount.branchId = account.branchId;
           updatedAccount.organizationId = account.organizationId;
           updatedAccount.createdById = account.createdById;
-          updatedAccount.updatedById = accountData._id;
+          updatedAccount.updatedById = accountData.id;
+          updatedAccount.status = 1;
 
           await accountRepository.update({ id: accountDto.id }, updatedAccount);
 

@@ -24,7 +24,7 @@ async function bootstrap() {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser());
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env['NODE' + '_ENV'] === 'production') {
     app.setGlobalPrefix('/users');
   }
 

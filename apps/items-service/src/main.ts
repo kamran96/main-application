@@ -5,7 +5,6 @@
 
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { Console } from 'console';
 import * as cookieParser from 'cookie-parser';
 
 import { AppModule } from './app/app.module';
@@ -14,7 +13,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = process.env.PORT || 3335;
   app.use(cookieParser());
-
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
   console.log(process.env['NODE' + '_ENV']);
   if (process.env['NODE' + '_ENV'] === 'production') {
     app.setGlobalPrefix('/items');

@@ -23,9 +23,10 @@ export class PriceController {
         return {
           message: 'Price fetched successfully.',
           status: true,
-          result: price[0] || [],
+          result: price,
         };
       }
+      throw new HttpException('Price not found', HttpStatus.BAD_REQUEST);
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
@@ -46,8 +47,6 @@ export class PriceController {
           result: price,
         };
       }
-
-      throw new HttpException('Failed to create Price', HttpStatus.BAD_REQUEST);
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
