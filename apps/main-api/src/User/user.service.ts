@@ -17,7 +17,7 @@ export class UserService {
   constructor(
     private patination: Pagination,
     private authService: AuthService,
-    private manager: EntityManager,
+    private manager: EntityManager
   ) {}
 
   async ListUser(userData, take, page_no, sort, query) {
@@ -31,7 +31,7 @@ export class UserService {
       take,
       page_no,
       sort,
-      sql,
+      sql
     );
   }
 
@@ -59,7 +59,7 @@ export class UserService {
         await this.manager.update(
           UserProfiles,
           { userId: profileDto.userId },
-          updatedProfile,
+          updatedProfile
         );
         const [updated] = await profileRepository.find({
           where: {
@@ -158,14 +158,14 @@ export class UserService {
         if (user.status === 1 && user.username !== null) {
           throw new HttpException(
             'User aleady registered please contact your admin.',
-            HttpStatus.BAD_REQUEST,
+            HttpStatus.BAD_REQUEST
           );
         } else {
           user_arr.push(user);
 
           await getCustomRepository(UserRepository).update(
             { id: user_id },
-            { status: 1 },
+            { status: 1 }
           );
         }
       }
@@ -185,7 +185,7 @@ export class UserService {
         {
           username,
           password: bcrypt.hashSync(password),
-        },
+        }
       );
 
       await getCustomRepository(ProfileRepository).update(
@@ -194,7 +194,7 @@ export class UserService {
           fullName,
           country,
           phoneNumber,
-        },
+        }
       );
 
       const new_user = await this.authService.CheckUser({

@@ -7,7 +7,7 @@ import layersIcon from "@iconify-icons/feather/layers";
 import shoppingCart from "@iconify-icons/icons8/shopping-cart";
 import coinsIcon from "@iconify-icons/la/coins";
 import fileInvoiceDollar from "@iconify-icons/la/file-invoice-dollar";
-import viewDashboardOutline from "@iconify-icons/mdi/view-dashboard-outline";
+import viewDashboardOutline from "@iconify-icons/mdi/view-dashboard";
 import analyticsIcon from "@iconify-icons/uil/analytics";
 import gitMerge from "@iconify-icons/feather/git-merge";
 import bxsReport from "@iconify-icons/bx/bxs-report";

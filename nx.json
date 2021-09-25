@@ -28,6 +28,34 @@
     ]
   },
   "projects": {
+    "accounting-service": {
+      "tags": []
+    },
+    "auth-middleware": {
+      "tags": []
+    },
+    "contacts-service": {
+      "tags": []
+    },
+    "editable-table": {
+      "tags": []
+    },
+    "editable-table-e2e": {
+      "tags": [],
+      "implicitDependencies": ["editable-table"]
+    },
+    "email-service": {
+      "tags": []
+    },
+    "global-auth-guard": {
+      "tags": []
+    },
+    "invoices-service": {
+      "tags": []
+    },
+    "items-service": {
+      "tags": []
+    },
     "main-api": {
       "tags": []
     },
@@ -37,6 +65,36 @@
     "main-ui-e2e": {
       "tags": [],
       "implicitDependencies": ["main-ui"]
+    },
+    "pixels-to-rem": {
+      "tags": []
+    },
+    "reports-service": {
+      "tags": []
+    },
+    "review-invyce-theme": {
+      "tags": []
+    },
+    "shared-global-state-manager": {
+      "tags": []
+    },
+    "shared-invyce-theme": {
+      "tags": []
+    },
+    "shared-types": {
+      "tags": []
+    },
+    "shared-utils": {
+      "tags": []
+    },
+    "sidebar-ui": {
+      "tags": []
+    },
+    "sorting": {
+      "tags": []
+    },
+    "users-service": {
+      "tags": []
     }
   }
 }

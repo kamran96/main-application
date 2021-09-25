@@ -7,7 +7,8 @@ export const useTheme = (themeName) => {
   const [theme, setTheme] = useState("light");
 
   useEffect(() => {
-    setThemeLoading(true);
+    if(themeName!==theme){
+      setThemeLoading(true);
     let themename = themeName;
     clearTimeout(timeOut);
     timeOut = setTimeout(() => {
@@ -17,6 +18,7 @@ export const useTheme = (themeName) => {
         setThemeLoading(false);
       }, 700);
     }, 500);
+    }
   }, [themeName]);
 
   return { themeLoading, theme };

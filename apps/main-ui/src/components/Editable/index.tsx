@@ -1,41 +1,41 @@
-import React, { FC, useEffect, useState, ReactElement } from "react";
-import { Input, InputNumber } from "antd";
-import { SizeType } from "antd/lib/config-provider/SizeContext";
-import { ClickOutSide } from "./../../utils/clickoutside";
-import { LiteralUnion } from "antd/lib/_util/type";
-import styled from "styled-components";
-import { P } from "../Typography";
-import CommonSelect from "../CommonSelect";
-import { Select } from "antd";
-import CSS from "csstype";
-import { isString } from "../../utils/helperFunctions";
+import React, { FC, useEffect, useState, ReactElement } from 'react';
+import { Input, InputNumber } from 'antd';
+import { SizeType } from 'antd/lib/config-provider/SizeContext';
+import { ClickOutSide } from './../../utils/clickoutside';
+import { LiteralUnion } from 'antd/lib/_util/type';
+import styled from 'styled-components';
+import { P } from '../Typography';
+import CommonSelect from '../CommonSelect';
+import { Select } from 'antd';
+import CSS from 'csstype';
+import { isString } from '../../utils/helperFunctions';
 interface IProps {
   onChange?: (e: any) => void;
   size?: SizeType;
   defaultValue?: string | number;
   type?: LiteralUnion<
-    | "button"
-    | "checkbox"
-    | "color"
-    | "date"
-    | "datetime-local"
-    | "email"
-    | "file"
-    | "hidden"
-    | "image"
-    | "month"
-    | "number"
-    | "password"
-    | "radio"
-    | "range"
-    | "reset"
-    | "search"
-    | "submit"
-    | "tel"
-    | "text"
-    | "time"
-    | "url"
-    | "week",
+    | 'button'
+    | 'checkbox'
+    | 'color'
+    | 'date'
+    | 'datetime-local'
+    | 'email'
+    | 'file'
+    | 'hidden'
+    | 'image'
+    | 'month'
+    | 'number'
+    | 'password'
+    | 'radio'
+    | 'range'
+    | 'reset'
+    | 'search'
+    | 'submit'
+    | 'tel'
+    | 'text'
+    | 'time'
+    | 'url'
+    | 'week',
     string
   >;
   placeholder?: string;
@@ -43,6 +43,7 @@ interface IProps {
   value?: any;
   onClick?: () => void;
   reg?: any;
+  style?: CSS.Properties;
 }
 
 export const Editable: FC<IProps> = ({
@@ -55,20 +56,22 @@ export const Editable: FC<IProps> = ({
   value,
   onClick,
   reg,
+  style,
 }) => {
   const [isEditable, setIsEditable] = useState(false);
   const [inputVal, setInputValue] = useState(value);
 
-  // useEffect(() => {
-  //   if (value !== inputVal) {
-  //     setInputValue(value);
-  //   }
-  // }, [value]);
+  useEffect(() => {
+    if (value !== inputVal) {
+      setInputValue(value);
+    }
+  }, [value]);
 
   let styles = {
-    border: isEditable ? "1px solid transparent" : "1px solid transparent",
-    background: isEditable ? "#fff" : "transparent",
-    cursor: "pointer",
+    border: isEditable ? '1px solid transparent' : '1px solid transparent',
+    background: isEditable ? '#fff' : 'transparent',
+    cursor: 'pointer',
+    ...style,
   };
 
   const inputRef = React.useRef<any>(null);
@@ -83,9 +86,9 @@ export const Editable: FC<IProps> = ({
         }
       }}
     >
-      <WrapperEditable>
+      <WrapperEditable disabled={disabled}>
         <>
-          {type === "number" ? (
+          {type === 'number' ? (
             isEditable ? (
               <InputNumber
                 ref={inputRef}
@@ -100,20 +103,25 @@ export const Editable: FC<IProps> = ({
                 autoFocus
                 disabled={disabled}
                 value={
-                  type === "number"
-                    ? typeof value === "string"
+                  type === 'number'
+                    ? typeof value === 'string'
                       ? parseFloat(inputVal)
                       : inputVal
                     : inputVal
                 }
               />
             ) : (
-              <span
+              <div
                 className="rendered-text"
                 onClick={() => setIsEditable(true)}
               >
                 {inputVal ? inputVal : placeholder ? placeholder : 0}
-              </span>
+                <div className="tooltip">
+                  <span>
+                    {inputVal ? inputVal : placeholder ? placeholder : 0}
+                  </span>
+                </div>
+              </div>
             )
           ) : isEditable ? (
             <Input
@@ -132,9 +140,18 @@ export const Editable: FC<IProps> = ({
               autoFocus
             />
           ) : (
-            <span className="rendered-text" onClick={() => setIsEditable(true)}>
+            <div
+              style={{ ...style, overflow: 'hidden' }}
+              className="rendered-text"
+              onClick={() => (!disabled ? setIsEditable(true) : null)}
+            >
               {inputVal ? inputVal : placeholder}
-            </span>
+              <div className="tooltip">
+                <span>
+                  {inputVal ? inputVal : placeholder ? placeholder : 0}
+                </span>
+              </div>
+            </div>
           )}
         </>
       </WrapperEditable>
@@ -142,7 +159,11 @@ export const Editable: FC<IProps> = ({
   );
 };
 
-export const WrapperEditable = styled.div`
+interface WrapperProps {
+  disabled: boolean;
+}
+
+export const WrapperEditable = styled.div<WrapperProps>`
   overflow: hidden;
   input {
     border: 1px solid transparent;
@@ -185,9 +206,36 @@ export const WrapperEditable = styled.div`
     text-overflow: ellipsis;
     white-space: nowrap;
     min-height: 32px;
+    cursor: ${(props: WrapperProps) =>
+      props.disabled ? 'not-allowed' : 'pointer'};
+    .tooltip {
+      display: none;
+      position: absolute;
+      top: -24px;
+      width: auto;
+      background: #292929;
+      z-index: 11111;
+      padding: 3px 8px;
+      color: #eaeaea;
+      &:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -4px;
+        right: 0;
+        width: 10px;
+        height: 10px;
+        background-color: #292929;
+        margin: auto;
+        transform: rotate(45deg);
+      }
+    }
   }
 
   &:hover {
+    .tooltip {
+      display: block;
+    }
     .rendered-text {
       border: 1px solid #d9d9d9 !important;
     }
@@ -202,7 +250,7 @@ interface IEditableSelectProps {
   showSearch?: boolean;
   style?: CSS.Properties;
   placeholder?: string;
-  optionFilterProp?: string | "children";
+  optionFilterProp?: string | 'children';
   onChange?: (payload: any) => void;
   children?: ReactElement<any>;
   onClick?: () => void;
@@ -240,7 +288,7 @@ export const EditableSelect: FC<IEditableSelectProps> = ({
     } else if (selectValue?.label) {
       return selectValue?.label;
     } else {
-      return placeholder ? placeholder : "Select from dropdown";
+      return placeholder ? placeholder : 'Select from dropdown';
     }
   };
 
@@ -267,7 +315,7 @@ export const EditableSelect: FC<IEditableSelectProps> = ({
             optionFilterProp={optionFilterProp}
             onChange={(val: any, option: any) => {
               setSelectValue(option);
-              console.log({ val, option }, "value");
+              console.log({ val, option }, 'value');
               if (onChange) {
                 onChange(option);
               }
@@ -279,9 +327,16 @@ export const EditableSelect: FC<IEditableSelectProps> = ({
             {children}
           </Select>
         ) : (
-          <span onClick={() => setIsEditable(true)} className="rendered-text">
+          <div
+            style={{ ...style, overflow: 'hidden' }}
+            onClick={() => setIsEditable(true)}
+            className="rendered-text"
+          >
             {renderValue()}
-          </span>
+            <div className="tooltip">
+              <span>{renderValue()}</span>
+            </div>
+          </div>
         )}
       </WrapperEditableSelect>
     </ClickOutSide>
@@ -301,9 +356,35 @@ const WrapperEditableSelect = styled.div`
     text-overflow: ellipsis;
     white-space: nowrap;
     cursor: pointer;
+
+    .tooltip {
+      display: none;
+      position: absolute;
+      top: -24px;
+      width: auto;
+      background: #292929;
+      z-index: 11111;
+      padding: 3px 8px;
+      color: #eaeaea;
+      &:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -4px;
+        right: 0;
+        width: 10px;
+        height: 10px;
+        background-color: #292929;
+        margin: auto;
+        transform: rotate(45deg);
+      }
+    }
   }
 
   &:hover {
+    .tooltip {
+      display: block;
+    }
     .rendered-text {
       border: 1px solid #d9d9d9 !important;
     }

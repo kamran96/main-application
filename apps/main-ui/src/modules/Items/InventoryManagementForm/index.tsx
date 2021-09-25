@@ -5,7 +5,7 @@ import React, { FC, useEffect, useState } from "react";
 import { queryCache, useMutation, useQuery } from "react-query";
 import { getAllItems, StockUpdateAPI } from "../../../api";
 import CommonSelect from "../../../components/CommonSelect";
-import { Editable } from "../../../components/Editable";
+import { Editable, EditableSelect } from "../../../components/Editable";
 import { Heading } from "../../../components/Heading";
 import { CommonTable } from "../../../components/Table";
 import { TableCard } from "../../../components/TableCard";
@@ -17,6 +17,8 @@ import { Color, NOTIFICATIONTYPE } from "../../../modal";
 import deleteIcon from "@iconify/icons-carbon/delete";
 import { P } from "../../../components/Typography";
 import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
+import { getAllAccounts } from "apps/main-ui/src/api/accounts";
+import { IAccountsResult } from "apps/main-ui/src/modal/accounts";
 
 const { Option } = Select;
 
@@ -70,6 +72,12 @@ export const ManageInventoryForm: FC = ({}) => {
       staleTime: Infinity,
     }
   );
+  const { isLoading: accountsLoading, data: accountsData } = useQuery(
+    [`all-accounts`, "ALL"],
+    getAllAccounts
+  );
+
+  let accountsList: IAccountsResult[] = accountsData?.data?.result || [];
 
   let itemsList: IItemsResult[] = itemsData?.data?.result || [];
 
@@ -88,6 +96,7 @@ export const ManageInventoryForm: FC = ({}) => {
       title: "Item",
       dataIndex: "itemId",
       key: "itemId",
+      width: 200,
       render: (data, row, index) => {
         return (
           <CommonSelect
@@ -178,6 +187,74 @@ export const ManageInventoryForm: FC = ({}) => {
       title: "Code",
       dataIndex: "code",
       key: "code",
+    },
+    {
+      title: "Debit",
+      dataIndex: "debit",
+      key: "debit",
+      render: (data, row, index)=>{
+        return(
+          <EditableSelect
+          placeholder="Select Debit Account"
+          className="w-100"
+          value={data}
+          size="middle"
+          onChange={(value)=>{
+            setInventoryList((prev) => {
+              return [
+                ...prev,
+                prev?.splice(index, 1, {
+                  ...prev[index],
+                  debit: value,
+                }),
+              ];
+            });
+          }}
+          >
+            <>
+            {accountsList?.map((acc: IAccountsResult, index)=>{
+              return(
+                <Option key={index} value={acc?.id}>{acc?.name}</Option>
+              )
+            })}
+            </>
+          </EditableSelect>
+        )
+      }
+    },
+    {
+      title: "Credit",
+      dataIndex: "credit",
+      key: "credit",
+      render: (data, row, index)=>{
+        return(
+          <EditableSelect
+          placeholder="Select Credit Account"
+          className="w-100"
+          value={data}
+          size="middle"
+          onChange={(value)=>{
+            setInventoryList((prev) => {
+              return [
+                ...prev,
+                prev?.splice(index, 1, {
+                  ...prev[index],
+                  credit: value,
+                }),
+              ];
+            });
+          }}
+          >
+            <>
+            {accountsList?.map((acc: IAccountsResult, index)=>{
+              return(
+                <Option key={index} value={acc?.id}>{acc?.name}</Option>
+              )
+            })}
+            </>
+          </EditableSelect>
+        )
+      }
     },
     {
       title: "Current Stock",
