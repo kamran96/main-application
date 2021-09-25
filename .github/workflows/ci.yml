@@ -47,5 +47,5 @@ jobs:
       - name: build required projects
         uses: mansagroup/nrwl-nx-action@v2
         with:
-          targets: lint,build
+          all: 'true'
           
