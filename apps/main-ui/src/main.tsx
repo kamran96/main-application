@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Switch } from 'react-router-dom';
 
 import App from './app/app';
 import { sentryInit } from './utils/integrations';
@@ -16,7 +16,9 @@ sentryInit();
 ReactDOM.render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+     <Switch>
+     <App />
+     </Switch>
     </BrowserRouter>
   </StrictMode>,
   document.getElementById('root')

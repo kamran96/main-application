@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: contacts-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: contacts-app
+  template:
+    metadata:
+      labels:
+        app: contacts-app
+    spec:
+      containers:
+      - name: contacts-app
+        image: registry.digitalocean.com/invyce-images/contacts-service:0.0.3
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3333
+
+---
+# k8s service for this micro-service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: contacts-http
+spec:
+  selector:
+    app: contacts-app
+  ports:
+  - port: 80
+    targetPort: 3333

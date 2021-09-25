@@ -9,4 +9,5 @@ export class PriceDto {
   unitsInCarton: number;
   openingStock: number;
   targetAccount: number;
+  item_ids: Array<number>;
 }

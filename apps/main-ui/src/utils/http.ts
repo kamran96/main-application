@@ -1,8 +1,8 @@
-import axios from "axios";
-import { DecriptionData } from "./encription";
+import axios from 'axios';
+import { DecriptionData } from './encription';
 
-let localIP = `http://192.168.1.8`;
-let RailsBaseURL = "";
+let localIP = `http://localhost:3334`;
+let RailsBaseURL = '';
 let NodeBaseURL = ``;
 let cancelToken = axios.CancelToken;
 
@@ -10,24 +10,25 @@ export let CancelRequest: any;
 
 const host = window.location.hostname;
 
-if (host && host === "app.invyce.com") {
+if (host && host === 'app.invyce.com') {
   // set online server endpoints
 
   RailsBaseURL = `https://api.rails.invyce.com/`;
   NodeBaseURL = `https://api.node.invyce.com/`;
-} else if (host && host === "dev.app.invyce.com") {
+} else if (host && host === 'dev.app.invyce.com') {
   // Staging server endpoints
 
   RailsBaseURL = `https://dev.api.rails.invyce.com/`;
   NodeBaseURL = `https://dev.api.node.invyce.com/`;
 } else {
   // local development
-  RailsBaseURL = localIP + ":4000";
-  NodeBaseURL = localIP + ":8081";
+  RailsBaseURL = localIP; // + ":4000"
+  NodeBaseURL = localIP; //+ ":8081"
 }
 
 const http = axios.create({
   baseURL: NodeBaseURL,
+  withCredentials: true,
   cancelToken: new cancelToken(function executor(c) {
     CancelRequest = c;
   }),
@@ -39,7 +40,7 @@ export const railsHttp = axios.create({
     CancelRequest = c;
   }),
   headers: {
-    "Content-type": "application/json",
+    'Content-type': 'application/json',
   },
 });
 
@@ -55,19 +56,19 @@ export const railsHttp = axios.create({
 
 // http.interceptors.response.use(res => requestHandler(res));
 
-export const encriptionData = localStorage.getItem("auth");
-let access_token = encriptionData
-  ? DecriptionData(encriptionData).access_token
-  : false;
+export const encriptionData = localStorage.getItem('auth');
+// let access_token = encriptionData
+// ? DecriptionData(encriptionData).access_token
+// : false;
 
 export const updateToken = (token: String) => {
-  http.defaults.headers.common.Authorization = `Bearer ${token}`;
-  railsHttp.defaults.headers.common.Authorization = `Bearer ${token}`;
+  // http.defaults.headers.common.Authorization = `Bearer ${token}`;
+  // railsHttp.defaults.headers.common.Authorization = `Bearer ${token}`;
 };
 
-if (access_token) {
-  updateToken(access_token);
-}
+// if (access_token) {
+// updateToken(access_token);
+// }
 
 export { NodeBaseURL, RailsBaseURL };
 export default http || railsHttp;

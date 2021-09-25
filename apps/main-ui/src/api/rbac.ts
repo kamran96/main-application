@@ -1,8 +1,8 @@
-import http from "../utils/http";
+import http from '../utils/http';
 
 export const CreateRoleAPI = (payload?: any) => http.post(`rbac/role`, payload);
 
-export const getRbacListAPI = (key?: string) => http.get(`/rbac/role`);
+export const getRbacListAPI = (key?: string) => http.get(`/users/rbac/role`);
 
 export const getPermissionModulesAPI = (key?: string) =>
   http.get(`rbac/module`);
@@ -28,6 +28,6 @@ export const addRolePermissionAPI = (payload?: any) =>
   http.post(`rbac/role-permission`, payload);
 
 export const getAllRolesWithPermission = () =>
-  http.get(`rbac/role-with-permission`);
+  http.get(`/users/rbac/role-with-permission`);
 
 export const getRoleByIDAPI = (key, id) => http.get(`rbac/role/${id}`);

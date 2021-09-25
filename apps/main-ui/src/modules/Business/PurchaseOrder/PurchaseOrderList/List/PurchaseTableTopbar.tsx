@@ -33,7 +33,7 @@ export const PurchaseTopbar: FC<IProps> = ({
   isAbleToDelete = true,
 }) => {
   return (
-    <WrapperPurchaseTopbar className="flex alignCenter justifySpaceBetween">
+    <WrapperPurchaseTopbar className="flex alignCenter justifySpaceBetween pv-30">
       <div className="flex alignCenter _quick_access">
         {/* <Button className={"_customized_button"}>Submit for approvel</Button> */}
         {hasApproveButton && (
