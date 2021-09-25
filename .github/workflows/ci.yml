@@ -48,7 +48,7 @@ jobs:
         uses: mansagroup/nrwl-nx-action@v2
         with:
           all: 'true'
-          targets: lint,build
+          targets: build
       
       # docker build item service images
       - name: Build container image
