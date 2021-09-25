@@ -1,6 +1,6 @@
 {
   "name": "invyce",
-  "version": "0.0.1",
+  "version": "0.0.0-development",
   "author": "zeeshan@invyce.com",
   "license": "MIT",
   "scripts": {
@@ -33,7 +33,8 @@
     "acc_generate": "npm run acc_typeorm:cli -- migration:create -n",
     "acc_migration_run": "npm run acc_typeorm:cli -- migration:run",
     "acc_migration_revert": "npm run acc_typeorm:cli -- migration:revert",
-    "typeorm": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm"
+    "typeorm": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm",
+    "semantic-release": "semantic-release"
   },
   "private": true,
   "dependencies": {
@@ -231,6 +232,14 @@
     "webpack-dev-server": "4.0.0-rc.0",
     "webpack-merge": "^5.8.0",
     "webpack-node-externals": "^3.0.0",
-    "webpack-sources": "^3.0.2"
+    "webpack-sources": "^3.0.2",
+    "semantic-release": "^18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https:git@github.com:invyce/main-application.git"
+  },
+  "publishConfig": {
+    "access": "restricted"
   }
 }
