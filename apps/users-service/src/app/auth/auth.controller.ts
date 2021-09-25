@@ -178,18 +178,18 @@ export class AuthController {
   @Post('verify-otp')
   async verifyOtp(@Body() body) {
     try {
-      // const user = await this.authService.VerifyOtp(body);
-      // if (user.status === true) {
-      //   return {
-      //     message: 'You have been successfully registered',
-      //     status: true,
-      //   };
-      // } else {
-      //   throw new HttpException(
-      //     'Verification code is incorrect, Click on resend to generate new verification code.',
-      //     HttpStatus.BAD_REQUEST,
-      //   );
-      // }
+      const user = await this.authService.VerifyOtp(body);
+      if (user.status === true) {
+        return {
+          message: 'You have been successfully registered',
+          status: true,
+        };
+      } else {
+        throw new HttpException(
+          'Verification code is incorrect, Click on resend to generate new verification code.',
+          HttpStatus.BAD_REQUEST
+        );
+      }
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,

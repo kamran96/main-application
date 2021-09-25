@@ -9,9 +9,10 @@ import {
   Req,
   UseGuards,
   Query,
+  Put,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { ItemDto } from '../dto/item.dto';
+import { DeleteItemDto, ItemDto } from '../dto/item.dto';
 import { ItemService } from './item.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 
@@ -28,7 +29,8 @@ export class ItemController {
       return {
         message: 'Item created successfull',
         status: true,
-        result: item,
+        result: !item.pagination ? item : item.items,
+        pagination: item.pagination,
       };
     }
   }
@@ -49,7 +51,7 @@ export class ItemController {
 
   @Get('/:id')
   @UseGuards(GlobalAuthGuard)
-  async show(@Param() params, @Req() req: Request) {
+  async show(@Param() params) {
     try {
       const item = await this.itemService.FindById(params.id);
 
@@ -57,14 +59,29 @@ export class ItemController {
         return {
           message: 'Item created successfull',
           status: true,
-          result: item[0] || [],
+          result: item,
         };
       }
+
+      throw new HttpException('Item not found', HttpStatus.BAD_REQUEST);
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
+    }
+  }
+
+  @Put()
+  @UseGuards(GlobalAuthGuard)
+  async delete(@Body() itemDeleteIds: DeleteItemDto) {
+    const item = await this.itemService.DeleteItem(itemDeleteIds);
+
+    if (item) {
+      return {
+        message: 'Item deleted succesfully',
+        status: true,
+      };
     }
   }
 }

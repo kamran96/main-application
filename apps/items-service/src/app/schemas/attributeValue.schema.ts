@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
-import { Attribute } from './attribute.schema';
+import { Attribute, AttributeSchema } from './attribute.schema';
 import { Item } from './item.schema';
 
 @Schema()
@@ -17,3 +17,9 @@ export class AttributeValue {
 
 export const AttributeValueSchema =
   SchemaFactory.createForClass(AttributeValue);
+
+AttributeValueSchema.virtual('id').get(function () {
+  return this._id.toHexString();
+});
+
+AttributeValueSchema.set('toJSON', { virtuals: true });

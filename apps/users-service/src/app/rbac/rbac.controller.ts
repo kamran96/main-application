@@ -121,7 +121,7 @@ export class RbacController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post('role')
   async createRole(@Body() roleDto: RoleDto, @Req() req: Request) {
     try {
@@ -142,23 +142,23 @@ export class RbacController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post('/role-permission')
   async addRolePermission(
     @Body() rolePermissionDto: RolePermissionDto,
     @Req() req: Request
   ) {
-    // const role_permission = await this.rbacService.AddRolePermission(
-    //   rolePermissionDto,
-    //   req.user,
-    // );
-    // if (role_permission) {
-    //   return {
-    //     message: 'Successfull.',
-    //     status: 1,
-    //     result: role_permission,
-    //   };
-    // }
+    const role_permission = await this.rbacService.AddRolePermission(
+      rolePermissionDto,
+      req.user
+    );
+    if (role_permission) {
+      return {
+        message: 'Successfull.',
+        status: 1,
+        result: role_permission,
+      };
+    }
   }
 
   // @UseGuards(JwtAuthGuard)

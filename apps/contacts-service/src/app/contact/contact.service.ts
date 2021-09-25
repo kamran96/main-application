@@ -1,13 +1,14 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import * as moment from 'moment';
 import { Contact } from '../Schemas/contact.schema';
 
 @Injectable()
 export class ContactService {
   constructor(@InjectModel(Contact.name) private contactModel) {}
 
-  async FindAll(contactData, query) {
-    const { page_size, page_no, filters, purpose } = query;
+  async FindAll(contactData, queryData) {
+    const { page_size, page_no, query, purpose, type } = queryData;
 
     let contacts;
 
@@ -17,38 +18,93 @@ export class ContactService {
         organizationId: contactData.organizationId,
       });
     } else {
-      if (filters) {
-        const filterData: any = Buffer.from(filters, 'base64').toString();
+      if (query) {
+        const filterData: any = Buffer.from(query, 'base64').toString();
         const data = JSON.parse(filterData);
+
+        const myCustomLabels = {
+          docs: 'contacts',
+          totalDocs: 'total',
+          meta: 'pagination',
+          limit: 'page_size',
+          page: 'page_no',
+          nextPage: 'next',
+          prevPage: 'prev',
+          totalPages: 'total_pages',
+          pagingCounter: 'page_no',
+        };
 
         for (let i in data) {
           if (data[i].type === 'search') {
             const val = data[i].value?.split('%')[1];
-            contacts = await this.contactModel.find({
-              status: 1,
-              organizationId: contactData.organizationId,
-              [i]: { $regex: val },
-            });
+            contacts = await this.contactModel.paginate(
+              {
+                status: 1,
+                organizationId: contactData.organizationId,
+                [i]: { $regex: val },
+              },
+              {
+                offset: page_no * page_size - page_size,
+                limit: page_size,
+                customLabels: myCustomLabels,
+              }
+            );
           } else if (data[i].type === 'date-between') {
-            const start_date = i[1]['value'][0];
-            const end_date = i[1]['value'][1];
-            contacts = await this.contactModel.find({
-              status: 1,
-              organizationId: contactData.organizationId,
-              [i]: { $gt: start_date, $lt: end_date },
-            });
+            const start_date = data[i].value[0];
+            const end_date = data[i].value[1];
+            const add_one_day = moment(end_date).add(1, 'day');
+
+            contacts = await this.contactModel.paginate(
+              {
+                status: 1,
+                organizationId: contactData.organizationId,
+                [i]: { $gt: start_date, $lt: add_one_day },
+              },
+              {
+                offset: page_no * page_size - page_size,
+                limit: page_size,
+                customLabels: myCustomLabels,
+              }
+            );
           } else if (data[i].type === 'compare') {
-            contacts = await this.contactModel.find({
-              status: 1,
-              organization: contactData.organizationId,
-              [i]: { $in: i[1]['value'] },
-            });
+            contacts = await this.contactModel.paginate(
+              {
+                status: 1,
+                organizationId: contactData.organizationId,
+                [i]: { $in: data[i]['value'] },
+              },
+              {
+                offset: page_no * page_size - page_size,
+                limit: page_size,
+                customLabels: myCustomLabels,
+              }
+            );
           } else if (data[i].type === 'in') {
-            contacts = await this.contactModel.find({
-              status: 1,
-              organization: contactData.organizationId,
-              [i]: { $in: i[1]['value'] },
-            });
+            contacts = await this.contactModel.paginate(
+              {
+                status: 1,
+                organizationId: contactData.organizationId,
+                [i]: { $in: data[i]['value'] },
+              },
+              {
+                offset: page_no * page_size - page_size,
+                limit: page_size,
+                customLabels: myCustomLabels,
+              }
+            );
+          } else if (data[i].type === 'equals') {
+            contacts = await this.contactModel.paginate(
+              {
+                status: 1,
+                organizationId: contactData.organizationId,
+                [i]: data[i].value,
+              },
+              {
+                offset: page_no * page_size - page_size,
+                limit: page_size,
+                customLabels: myCustomLabels,
+              }
+            );
           }
         }
       } else {
@@ -64,7 +120,11 @@ export class ContactService {
         };
 
         contacts = await this.contactModel.paginate(
-          { status: 1, organizationId: contactData.organizationId },
+          {
+            status: 1,
+            organizationId: contactData.organizationId,
+            contactType: type,
+          },
           {
             offset: page_no * page_size - page_size,
             limit: page_size,
@@ -73,6 +133,7 @@ export class ContactService {
         );
       }
     }
+
     return contacts;
   }
 
@@ -89,7 +150,8 @@ export class ContactService {
           contactDto.accountNumber || contact.accountNumber;
         updatedContact.email = contactDto.email || contact.email;
         updatedContact.name = contactDto.name || contact.name;
-        updatedContact.type = contactDto.type || contact.type;
+        updatedContact.contactType =
+          contactDto.contactType || contact.contactType;
         updatedContact.cnic = contactDto.cnic || contact.cnic;
         updatedContact.phoneNumber =
           contactDto.phoneNumber || contact.phoneNumber;
@@ -105,6 +167,10 @@ export class ContactService {
           contactDto.salesDiscount || contact.salesDiscount;
         updatedContact.openingBalance =
           contactDto.openingBalance || contact.openingBalance;
+        updatedContact.paymentDaysLimit =
+          contactDto.paymentDaysLimit || contact.paymentDaysLimit;
+        updatedContact.accountNumber =
+          contactDto.accountNumber || contact.accountNumber;
 
         updatedContact.paymentDaysLimit =
           contactDto.paymentDaysLimit || contact.paymentDaysLimit;

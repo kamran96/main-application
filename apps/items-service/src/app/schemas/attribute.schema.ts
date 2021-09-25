@@ -31,3 +31,9 @@ export class Attribute {
 }
 
 export const AttributeSchema = SchemaFactory.createForClass(Attribute);
+
+AttributeSchema.virtual('id').get(function () {
+  return this._id.toHexString();
+});
+
+AttributeSchema.set('toJSON', { virtuals: true });

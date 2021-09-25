@@ -13,7 +13,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = process.env.PORT || 3333;
   app.use(cookieParser());
-
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
   if (process.env.NODE_ENV === 'production') {
     app.setGlobalPrefix('/contacts');
   }

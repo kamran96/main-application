@@ -34,14 +34,14 @@ export class Authenticate extends PassportStrategy(Strategy) {
   async validate(payload): Promise<any> {
     try {
       const type =
-        process.env.NODE_ENV === 'development' ? 'authorization' : 'cookie';
+        process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
       const value =
         process.env.NODE_ENV === 'development'
           ? `Bearer ${token}`
           : `access_token=${token}`;
 
       const user = await axios.post(
-        `http://localhost:3334/users/auth/access-controll`,
+        `http://localhost/users/auth/access-controll`,
         {
           ...payload,
           service: host,

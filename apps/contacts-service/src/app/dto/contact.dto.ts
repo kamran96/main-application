@@ -4,7 +4,7 @@ export class ContactDto {
   @IsNotEmpty()
   name: string;
   email: string;
-  type: number;
+  contactType: number;
   businessName: string;
   cnic: string;
   phoneNumber: string;
@@ -17,6 +17,8 @@ export class ContactDto {
   salesDiscount: number;
   openingBalance: number;
   importedFrom: string;
+  paymentDaysLimit: string;
+  accountNumber: string;
   importedContactId: string;
   organizationId: number;
   branchId: number;

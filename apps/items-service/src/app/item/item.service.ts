@@ -57,12 +57,13 @@ export class ItemService {
       } else {
         const myCustomLabels = {
           docs: 'items',
-          limit: 'pageSize',
-          page: 'currentPage',
+          totalDocs: 'total',
+          limit: 'page_size',
+          page: 'page_no',
           nextPage: 'next',
           prevPage: 'prev',
-          totalPages: 'totalPages',
-          pagingCounter: 'slNo',
+          totalPages: 'total_pages',
+          pagingCounter: 'page_no',
           meta: 'pagination',
         };
 
@@ -71,6 +72,7 @@ export class ItemService {
           {
             offset: page_no * page_size - page_size,
             limit: page_size,
+            populate: 'price',
             customLabels: myCustomLabels,
           }
         );
@@ -97,17 +99,16 @@ export class ItemService {
         );
       } else {
         if (itemDto?.isNewRecord === false) {
-          const result = await this.FindById(itemDto.id);
+          const item = await this.FindById(itemDto.id);
 
-          if (Array.isArray(result) && result.length > 0) {
-            const [item] = result;
+          if (item) {
             let updatedItem = {
               name: itemDto.name || item.name,
               description: itemDto.description || item.description,
               code: itemDto.code || item.code,
               barcode: itemDto.barcode || item.barcode,
               categoryId: itemDto.categoryId || item.categoryId,
-              type: itemDto.type || item.type,
+              itemType: itemDto.itemType || item.itemType,
               isActive: itemDto.isActive || item.isActive,
               stock: itemDto.stock || item.stock,
               organizationId: item.organizationId,
@@ -117,8 +118,8 @@ export class ItemService {
 
             await this.itemModel.updateOne({ _id: itemDto.id }, updatedItem);
 
-            if (itemDto.type === 1) {
-              await this.attributeValueModel.findOneAndDelete({
+            if (itemDto.itemType === 1) {
+              await this.attributeValueModel.deleteMany({
                 itemId: itemDto.id,
               });
 
@@ -139,7 +140,7 @@ export class ItemService {
           item.code = itemDto.code;
           item.barcode = itemDto.barcode;
           item.categoryId = itemDto.categoryId;
-          item.type = itemDto.type;
+          item.itemType = itemDto.itemType;
           item.isActive = itemDto.isActive;
           item.stock = itemDto.stock;
           item.organizationId = itemData.organizationId;
@@ -169,8 +170,18 @@ export class ItemService {
   }
 
   async FindById(itemId) {
-    return await this.itemModel.find({ _id: itemId });
+    return await this.itemModel
+      .findById(itemId)
+      .populate('price')
+      .populate('category')
+      .populate('attribute_values');
   }
 
-  async;
+  async DeleteItem(data) {
+    for (let i of data.ids) {
+      await this.itemModel.updateOne({ _id: i }, { status: 0 });
+    }
+
+    return true;
+  }
 }

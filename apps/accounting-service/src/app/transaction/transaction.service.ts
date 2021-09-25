@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { getCustomRepository } from 'typeorm';
+import { Between, getCustomRepository, ILike, In } from 'typeorm';
 import { Sorting } from '@invyce/sorting';
 
 import {
@@ -14,41 +14,107 @@ enum Entries {
 
 @Injectable()
 export class TransactionService {
-  async ListTransactions(user, query) {
+  async ListTransactions(user, queryData) {
     try {
-      const { page_no, page_size, sort } = query;
+      const { page_no, page_size, sort, query } = queryData;
+      let transactions;
 
       const { sort_column, sort_order } = await Sorting(sort);
-
-      let transactions = await getCustomRepository(TransactionRepository).find({
-        where: {
-          status: 1,
-          organizationId: user.organizationId,
-          // branchId: user.branchId,
-        },
-        skip: page_no * page_no - page_no,
-        take: page_size,
-        relations: ['transactionItems', 'transactionItems.account'],
-      });
-
       const total = await getCustomRepository(TransactionRepository).count({
         status: 1,
         organizationId: user.organizationId,
         // branchId: user.branchId,
       });
 
-      return {
-        pagination: {
-          total,
-          total_pages: Math.ceil(total / page_size),
-          page_size: parseInt(page_size) || 20,
-          // page_total: null,
-          page_no: parseInt(page_no),
-          sort_column: sort_column,
-          sort_order: sort_order,
-        },
-        transactions,
-      };
+      if (query) {
+        const filterData: any = Buffer.from(query, 'base64').toString();
+        const data = JSON.parse(filterData);
+
+        for (let i in data) {
+          if (data[i].type === 'search') {
+            const val = data[i].value?.split('%')[1];
+            // const lower = val.toLowerCase();
+            transactions = await getCustomRepository(
+              TransactionRepository
+            ).find({
+              where: {
+                status: 1,
+                organizationId: user.organizationId,
+                [i]: ILike(val),
+              },
+              skip: page_no * page_size - page_size,
+              take: page_size,
+              relations: ['transactionItems', 'transactionItems.account'],
+            });
+          } else if (data[i].type === 'compare') {
+            transactions = await getCustomRepository(
+              TransactionRepository
+            ).find({
+              where: {
+                status: 1,
+                organizationId: user.organizationId,
+                [i]: In(data[i].value),
+              },
+              skip: page_no * page_size - page_size,
+              take: page_size,
+              relations: ['transactionItems', 'transactionItems.account'],
+            });
+          } else if (data[i].type === 'date-between') {
+            const start_date = data[i].value[0];
+            const end_date = data[i].value[1];
+            transactions = await getCustomRepository(
+              TransactionRepository
+            ).find({
+              where: {
+                status: 1,
+                organizationId: user.organizationId,
+                [i]: Between(start_date, end_date),
+              },
+              skip: page_no * page_size - page_size,
+              take: page_size,
+              relations: ['transactionItems', 'transactionItems.account'],
+            });
+          }
+
+          return {
+            transactions: transactions,
+            pagination: {
+              total,
+              total_pages: Math.ceil(total / page_size),
+              page_size: parseInt(page_size) || 20,
+              // page_total: null,
+              page_no: parseInt(page_no),
+              sort_column: sort_column,
+              sort_order: sort_order,
+            },
+          };
+        }
+      } else {
+        transactions = await getCustomRepository(TransactionRepository).find({
+          where: {
+            status: 1,
+            organizationId: user.organizationId,
+            // branchId: user.branchId,
+          },
+          skip: page_no * page_size - page_size,
+          take: page_size,
+          relations: ['transactionItems', 'transactionItems.account'],
+        });
+
+        return {
+          transactions: transactions,
+          pagination: {
+            total,
+            total_pages: Math.ceil(total / page_size),
+            page_size: parseInt(page_size) || 20,
+            // page_total: null,
+            page_no: parseInt(page_no),
+            sort_column: sort_column,
+            sort_order: sort_order,
+          },
+        };
+      }
+      return transactions;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

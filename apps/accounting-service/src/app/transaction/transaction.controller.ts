@@ -27,11 +27,14 @@ export class TransactionController {
         req.user,
         query
       );
-
       if (transaction) {
         return {
           message: 'Transaction fetched successfully',
-          result: transaction,
+          status: true,
+          pagination: transaction.pagination,
+          result: !transaction.pagination
+            ? transaction
+            : transaction.transactions,
         };
       }
     } catch (error) {

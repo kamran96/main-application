@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
+import * as mongoosePaginate from 'mongoose-paginate-v2';
 
 @Schema()
 export class Category {
@@ -28,6 +29,9 @@ export class Category {
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
+CategorySchema.plugin(mongoosePaginate);
+CategorySchema.set('toJSON', { virtuals: true });
+CategorySchema.set('toObject', { virtuals: true });
 
 CategorySchema.virtual('attributes', {
   ref: 'Attribute',
@@ -35,5 +39,6 @@ CategorySchema.virtual('attributes', {
   foreignField: 'categoryId',
 });
 
-CategorySchema.set('toObject', { virtuals: true });
-CategorySchema.set('toJSON', { virtuals: true });
+CategorySchema.virtual('id').get(function () {
+  return this._id.toHexString();
+});

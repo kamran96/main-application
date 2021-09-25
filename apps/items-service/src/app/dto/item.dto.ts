@@ -5,7 +5,7 @@ export class ItemDto {
   code: string;
   barcode: string;
   categoryId: number;
-  type: number;
+  iteType: number;
   isActive: boolean;
   stock: number;
   isNewRecord: boolean;
@@ -43,6 +43,10 @@ export class Attributes {
 class AttributeValuesDto {
   value: string;
   attributeId: string;
+}
+
+export class DeleteItemDto {
+  ids: Array<string>;
 }
 
 export class DeleteCategoryDto {
