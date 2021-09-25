@@ -1,12 +1,15 @@
 # This is a basic workflow to help you get started with Actions
 
-name: INVYCE-K8-CI
+name: items-service
 
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ main ]
+    paths:
+      - 'apps/items-service'
+      - ".github/workflows/items-service.yml"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -45,10 +48,7 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: build required projects
-        uses: mansagroup/nrwl-nx-action@v2
-        with:
-          all: 'true'
-          targets: build
+        run: NODE_ENV=production yarn build items-service
       
       # docker build item service images
       - name: Build container image
