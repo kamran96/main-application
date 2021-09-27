@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: contacts-app
-        image: registry.digitalocean.com/invyce-images/contacts-service:0.0.3
+        image: <IMAGE>
         resources:
           limits:
             memory: "128Mi"

@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: users-app
-        image: registry.digitalocean.com/invyce-images/users-service:0.0.3
+        image: <IMAGE>
         resources:
           limits:
             memory: "128Mi"

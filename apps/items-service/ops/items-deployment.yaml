@@ -19,7 +19,7 @@ spec:
             memory: "128Mi"
             cpu: "500m"
         ports:
-        - containerPort: 3334
+        - containerPort: 3335
 
 ---
 
@@ -32,4 +32,4 @@ spec:
     app: items-app
   ports:
   - port: 80
-    targetPort: 3334
+    targetPort: 3335
