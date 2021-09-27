@@ -17,7 +17,7 @@ async function bootstrap() {
     origin: true,
     credentials: true,
   });
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env['NODE' + '_ENV'] === 'production') {
     app.setGlobalPrefix('/contacts');
   }
   await app.listen(port, () => {
