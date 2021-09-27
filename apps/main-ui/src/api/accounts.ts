@@ -1,13 +1,14 @@
-import http, { railsHttp } from "../utils/http";
+import http from "../utils/http";
 
 enum ACCOUNT {
-  INDEX = `account`,
-  RAILS_LIST = `accounts/index`,
-  SECONDARY_ACCOUNTS = `accounts/secondary_accounts`,
+  INDEX = `accounts/account`,
+  RAILS_LIST = `accounts/account`,
+  SECONDARY_ACCOUNTS = `accounts/account/secondary-accounts`,
+  CREATE_ACCOUNT = `accounts/account`
 }
 
 export const createUpdateAccountAPI = (payload) =>
-  http.post(`/account`, payload);
+  http.post(`${ACCOUNT.CREATE_ACCOUNT}`, payload);
 
 export const getAllAccountsAPI = (
   key?: string,
@@ -25,23 +26,23 @@ export const getAllAccountsAPI = (
     url = `${url}&query=${query}`;
   }
 
-  return railsHttp.get(url);
+  return http.get(url);
 };
 
 export const getAllAccounts = (key?: string, purpose?: string) =>
-  railsHttp.get(`${ACCOUNT.RAILS_LIST}?purpose=${purpose}`);
+  http.get(`${ACCOUNT.RAILS_LIST}?purpose=${purpose}`);
 
 export const getSecondaryAccounts = () =>
-  railsHttp.get(ACCOUNT.SECONDARY_ACCOUNTS);
+  http.get(ACCOUNT.SECONDARY_ACCOUNTS);
 
 export const getAccountByIDAPI = (key, id) =>
-  railsHttp.get(`${ACCOUNT.INDEX}/${id}`);
+  http.get(`${ACCOUNT.INDEX}/${id}`);
 
 export const deleteAccountsAPI = (ids) => http.put(ACCOUNT.INDEX, ids);
 
-export const getBanks = () => railsHttp.get(`/banks/index`);
+export const getBanks = () => http.get(`accounts/bank`);
 
-export const getBankAccounts = () => railsHttp.get(`/banks/account`);
+export const getBankAccounts = () => http.get(`accounts/bank/account`);
 
 export const getAccountLedger = (
   key,
@@ -56,11 +57,11 @@ export const getAccountLedger = (
     url = `${url}&query=${query}`;
   }
 
-  return railsHttp.get(url);
+  return http.get(url);
 };
 
 export const getRecentAccounts = (key?: string) =>
-  railsHttp.get(`accounts/recent_accounts`);
+  http.get(`accounts/recent_accounts`);
 
 export const getAccountsByTypeAPI = (key?: string, type: string = "invoice") =>
-  railsHttp(`account?type=${type}`);
+  http(`account?type=${type}`);

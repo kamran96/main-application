@@ -5,9 +5,8 @@ import styled from "styled-components";
 import { FormLabel } from "../../../../components/FormLabel";
 import { useMutation, useQuery, queryCache } from "react-query";
 import { getBanks } from "../../../../api/accounts";
-import { BANK_ACCOUNTTYPES } from "../../../../modal/accounts";
+import { ACCOUNT_TYPES } from "../../../../modal/accounts";
 import { createBankAPI } from "../../../../api/banks";
-import { CommonModal } from "../../../../components";
 import { IErrorMessages, IErrorResponse, NOTIFICATIONTYPE } from "../../../../modal";
 
 const { Option } = Select;
@@ -56,7 +55,7 @@ export const AddBankWidget: FC = () => {
   };
 
   return (
-    <CommonModal
+    <Modal
       width={600}
       title="Add Bank"
       visible={banksModalConfig.visibility}
@@ -102,8 +101,10 @@ export const AddBankWidget: FC = () => {
                   placeholder="Select Item"
                   optionFilterProp="children"
                 >
-                  <Option value={BANK_ACCOUNTTYPES?.CURRENT}>Current</Option>
-                  <Option value={BANK_ACCOUNTTYPES?.FIXED}>Fixed</Option>
+                  <Option value={ACCOUNT_TYPES?.CURRENT_ACCOUNT}>Current</Option>
+                  <Option value={ACCOUNT_TYPES?.SAVING_ACCOUNT}>Saving</Option>
+                  <Option value={ACCOUNT_TYPES?.FIXED_DEPOSIT_ACCOUNT}>Fixed Deposit</Option>
+                  <Option value={ACCOUNT_TYPES?.RUNNING_FINANCE_ACCOUNT}>Running Finance</Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -150,7 +151,7 @@ export const AddBankWidget: FC = () => {
           </Row>
         </Form>
       </WrapperAddBanks>
-    </CommonModal>
+    </Modal>
   );
 };
 

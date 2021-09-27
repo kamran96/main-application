@@ -64,7 +64,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
       AllAccounts.data &&
       AllAccounts.data.result &&
       AllAccounts.data.result.filter(
-        (acc) => acc.secondary_account.primary_account.name === 'assets'
+        (acc) => acc?.secondary_account?.primary_account?.name === 'assets'
       )) ||
     [];
   const creditedAccounts: IAccountsResult[] =
@@ -73,8 +73,8 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
       AllAccounts.data.result &&
       AllAccounts.data.result.filter(
         (acc) =>
-          acc.secondary_account.primary_account.name === 'liability' ||
-          acc.secondary_account.primary_account.name === 'equity'
+          acc?.secondary_account?.primary_account?.name === 'liability' ||
+          acc?.secondary_account?.primary_account?.name === 'equity'
       )) ||
     [];
 

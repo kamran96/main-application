@@ -22,6 +22,7 @@ import { DecriptionData, EncriptData } from '../../utils/encription';
 import { useTheme } from '../useTheme';
 import { globalContext } from './globalContext';
 import { useHistory } from 'react-router-dom';
+import { CancelRequest } from '../../utils/http';
 
 type Theme = 'light' | 'dark';
 
@@ -262,7 +263,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   console.log(userId, 'user id is herer');
 
   /* LoggedInUser is Fetched */
-  const { isLoading, data, error, isFetched } = useQuery(
+  const { isLoading, data, error, isFetched, clear } = useQuery(
     [`loggedInUser`, userId],
     AUTH_CHECK_API,
     {
@@ -280,9 +281,9 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         }
       },
       onError: (err:IBaseAPIError) => {
-        console.log(err?.response?.data?.statusCode)
+        // CancelRequest();
         if(err?.response?.data?.statusCode===403){
-         queryCache.cancelQueries('loggedInUser', {exact: true})
+          handleLogin({type: ILoginActions.LOGOUT})
         }
         setAutherized(false);
       },
@@ -399,7 +400,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const { theme: appTheme, themeLoading } = useTheme(theme);
 
-  const checkingUser = isLoading || permissionsFetching;
+  const checkingUser = isLoading && isFetched || permissionsFetching;
 
   return (
     <globalContext.Provider

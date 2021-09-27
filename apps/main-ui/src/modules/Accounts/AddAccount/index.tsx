@@ -46,13 +46,13 @@ export const AddAccount: FC = () => {
   useEffect(() => {
     const { data } = resAccountById;
     if (data && data.data && data.data.result) {
-      const { name, code, description, secondary_account, taxRate } =
+      const { name, code, description, secondaryAccount, taxRate } =
         data.data.result;
       let formData: any = {
         name,
         code,
         description,
-        secondaryAccountId: secondary_account.id,
+        secondaryAccountId: secondaryAccount.id,
         taxRate,
       };
 
@@ -77,7 +77,7 @@ export const AddAccount: FC = () => {
             // id ? "Updated Successfully" : "Created Successfully",
             // `Contact is ${id ? "Updated" : "Created"} successfully`
           );
-          ["`accounts", `account-${id}`]?.forEach((key) => {
+          ["accounts", `account-${id}`]?.forEach((key) => {
             queryCache?.invalidateQueries((q) =>
               q?.queryKey[0]?.toString().startsWith(key)
             );
