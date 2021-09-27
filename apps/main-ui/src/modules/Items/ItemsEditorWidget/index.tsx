@@ -249,7 +249,7 @@ const ItemsEditorWidget: FC<IProps> = () => {
       resAllAccounts.data.data.result &&
       resAllAccounts.data.data.result.filter(
         (item: IAccountsResult) =>
-          item.secondary_account.primary_account.name === "liability"
+          item?.secondary_account?.primary_account?.name === "liability"
       )) ||
     [];
 

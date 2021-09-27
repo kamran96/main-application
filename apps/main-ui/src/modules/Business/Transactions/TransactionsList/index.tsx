@@ -1,11 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { ColumnsType } from "antd/lib/table";
 import dayjs from "dayjs";
-import React, { FC, useEffect, useState } from "react";
-import { usePaginatedQuery, useQuery } from "react-query";
-
+import  { FC, useEffect, useState } from "react";
+import { usePaginatedQuery } from "react-query";
 import { getAllTransactionsAPI } from "../../../../api";
-import { getAllAccounts } from "../../../../api/accounts";
 import { SmartFilter } from "../../../../components/SmartFilter";
 import { CommonTable } from "../../../../components/Table";
 import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
@@ -16,6 +14,7 @@ import moneyFormat from "../../../../utils/moneyFormat";
 import { WrapperTransactionCustomBar, WrapperTransactionsList } from "./styles";
 import { TransactionItemTable } from "./TransactionItemsTable";
 import transactionsFilterSchema from "./transactionsFilterSchema";
+
 
 export const TransactionsList: FC = () => {
   const [filterBar, setFilterbar] = useState<boolean>(false);
@@ -205,7 +204,7 @@ export const TransactionsList: FC = () => {
             return (
               <TransactionItemTable
                 allAccounts={accountsResponse}
-                data={record.transaction_items}
+                data={record.transactionItems}
               />
             );
           },

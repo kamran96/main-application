@@ -103,6 +103,7 @@ export const CommonTable: FC<IProps> = ({
 
   /* **************UTILITY CONSTANTS ************ */
   const _newData: any[] = data ? data : rest?.dataSource as any[];
+  console.log(_newData, "new data")
 
   
 
