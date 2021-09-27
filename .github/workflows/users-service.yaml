@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: items-service
+name: users-service
 
 # Controls when the workflow will run
 on:
@@ -8,8 +8,8 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'apps/items-service'
-      - ".github/workflows/items-service.yaml"
+      - 'apps/users-service'
+      - ".github/workflows/users-service.yaml"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -48,11 +48,11 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: build required projects
-        run: NODE_ENV=production yarn build items-service
+        run: NODE_ENV='production' yarn build users-service
       
       # docker build item service images
       - name: Build container image
-        run: docker build -f $GITHUB_WORKSPACE/apps/items-service/Dockerfile -t registry.digitalocean.com/invyce-images/items-service:$(echo $GITHUB_SHA | head -c7) .
+        run: docker build -f $GITHUB_WORKSPACE/apps/users-service/Dockerfile -t registry.digitalocean.com/invyce-images/users-service:$(echo $GITHUB_SHA | head -c7) .
 
       #login to digitalocean for 1200 seconds
       - name: Log in to DigitalOcean Container Registry with short-lived credentials
@@ -60,14 +60,14 @@ jobs:
      
       # push image to registry
       - name: Push service image to DigitalOcean Container Registry
-        run: docker push registry.digitalocean.com/invyce-images/items-service:$(echo $GITHUB_SHA | head -c7)
+        run: docker push registry.digitalocean.com/invyce-images/users-service:$(echo $GITHUB_SHA | head -c7)
       
       - name: Update deployment file
-        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/invyce-images/items-service:'${TAG}'|' $GITHUB_WORKSPACE/apps/items-service/ops/items-deployment.yaml
+        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/invyce-images/users-service:'${TAG}'|' $GITHUB_WORKSPACE/apps/users-service/ops/users-deployment.yaml
 
       - name: Save DigitalOcean kubeconfig with short-lived credentials
         run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 invyce-cluster
 
       - name: Deploy to DigitalOcean Kubernetes
-        run: kubectl apply -f $GITHUB_WORKSPACE/apps/items-service/ops/items-deployment.yaml
+        run: kubectl apply -f $GITHUB_WORKSPACE/apps/users-service/ops/users-deployment.yaml
 
