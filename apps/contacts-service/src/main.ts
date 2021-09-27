@@ -17,6 +17,8 @@ async function bootstrap() {
     origin: true,
     credentials: true,
   });
+
+  console.log(process.env['NODE' + '_ENV']);
   if (process.env['NODE' + '_ENV'] === 'production') {
     app.setGlobalPrefix('/contacts');
   }
