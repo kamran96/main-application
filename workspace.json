@@ -53,6 +53,56 @@
         }
       }
     },
+    "attachments-service": {
+      "root": "apps/attachments-service",
+      "sourceRoot": "apps/attachments-service/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/attachments-service",
+            "main": "apps/attachments-service/src/main.ts",
+            "tsConfig": "apps/attachments-service/tsconfig.app.json",
+            "assets": ["apps/attachments-service/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/attachments-service/src/environments/environment.ts",
+                  "with": "apps/attachments-service/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "attachments-service:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/attachments-service/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/attachments-service"],
+          "options": {
+            "jestConfig": "apps/attachments-service/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "auth-middleware": {
       "root": "libs/auth-middleware",
       "sourceRoot": "libs/auth-middleware/src",
