@@ -240,7 +240,6 @@ export class RbacService {
 
       return role_arr;
     } catch (error) {
-      console.log(error);
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -288,7 +287,6 @@ export class RbacService {
   }
 
   async AddRolePermission(data, user) {
-    console.log(data);
     await this.rolePermissionModel.updateOne(
       { _id: data.rolePermissionId },
       {
