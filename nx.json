@@ -37,6 +37,13 @@
     "contacts-service": {
       "tags": []
     },
+    "editable-table": {
+      "tags": []
+    },
+    "editable-table-e2e": {
+      "tags": [],
+      "implicitDependencies": ["editable-table"]
+    },
     "email-service": {
       "tags": []
     },
@@ -49,13 +56,6 @@
     "items-service": {
       "tags": []
     },
-    "editable-table": {
-      "tags": []
-    },
-    "editable-table-e2e": {
-      "tags": [],
-      "implicitDependencies": ["editable-table"]
-    },
     "main-api": {
       "tags": []
     },
@@ -66,11 +66,12 @@
       "tags": [],
       "implicitDependencies": ["main-ui"]
     },
-    "sorting": {
+    "mobile-app": {
       "tags": []
     },
-    "users-service": {
-      "tags": []
+    "mobile-app-e2e": {
+      "tags": [],
+      "implicitDependencies": ["mobile-app"]
     },
     "pixels-to-rem": {
       "tags": []
@@ -91,6 +92,12 @@
       "tags": []
     },
     "sidebar-ui": {
+      "tags": []
+    },
+    "sorting": {
+      "tags": []
+    },
+    "users-service": {
       "tags": []
     }
   }
