@@ -5,7 +5,7 @@ ENV PORT=3335
 ENV MONGO_URI=mongodb+srv://contacts:fYnc4.ZPdz378t4@cluster0.hiwqy.mongodb.net/items?retryWrites=true&w=majority
 ENV JWT_SECRET=alalsdflasjlf343424
 ENV EXPIRES=12
-ENV NODE_ENV='production'
+ENV NODE_ENV=production
 EXPOSE ${PORT}
 RUN npm install --production
 RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express
