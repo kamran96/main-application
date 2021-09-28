@@ -15,7 +15,11 @@ import * as queryString from 'query-string';
 import * as os from 'os';
 import * as ip from 'ip';
 import { User } from '../schemas/user.schema';
-import { SEND_CUSTOMER_EMAIL, SEND_FORGOT_PASSWORD } from '@invyce/send-email';
+import {
+  SEND_FORGOT_PASSWORD,
+  SEND_INVITATION,
+  SEND_OTP,
+} from '@invyce/send-email';
 import { UserToken } from '../schemas/userToken.schema';
 import { Response } from 'express';
 
@@ -319,7 +323,7 @@ export class AuthService {
       },
     };
 
-    await this.emailService.emit(SEND_CUSTOMER_EMAIL, payload);
+    await this.emailService.emit(SEND_OTP, payload);
   }
 
   async sendVerificationCode(user, code, joinCompany): Promise<any> {
@@ -348,7 +352,7 @@ export class AuthService {
       },
     };
 
-    await this.emailService.emit(SEND_CUSTOMER_EMAIL, payload);
+    await this.emailService.emit(SEND_INVITATION, payload);
   }
 
   async ForgetPassword(userDto): Promise<boolean> {
