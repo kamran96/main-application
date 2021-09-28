@@ -18,7 +18,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-  console.log(process.env['NODE' + '_ENV']);
   if (process.env['NODE' + '_ENV'] === 'production') {
     app.setGlobalPrefix('/items');
   }
