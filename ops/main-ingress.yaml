@@ -45,3 +45,10 @@ spec:
             name: attachments-http
             port: 
               number: 80
+      - pathType: Prefix
+        path: "/email"
+        backend:
+          service:
+            name: email-http
+            port: 
+              number: 80
