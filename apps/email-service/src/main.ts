@@ -24,7 +24,6 @@ async function bootstrap() {
     }
   );
 
-  console.log(process.env['NODE' + '_ENV']);
   if (process.env['NODE' + '_ENV'] === 'production') {
     app.setGlobalPrefix('/email');
   }

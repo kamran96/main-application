@@ -11,6 +11,7 @@ import { AppModule } from './app/app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  console.log('okkk');
   if (process.env['NODE' + '_ENV'] === 'production') {
     app.setGlobalPrefix('/attachments');
   }
