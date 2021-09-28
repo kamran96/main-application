@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: attachments-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: attachments-app
+  template:
+    metadata:
+      labels:
+        app: attachments-app
+    spec:
+      containers:
+      - name: attachments-app
+        image: <IMAGE>
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3338
+
+---
+# k8s service for this micro-service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: attachments-http
+spec:
+  selector:
+    app: attachments-app
+  ports:
+  - port: 80
+    targetPort: 3338

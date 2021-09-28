@@ -38,3 +38,10 @@ spec:
             name: items-http
             port: 
               number: 80
+      - pathType: Prefix
+        path: "/attachments"
+        backend:
+          service:
+            name: attachments-http
+            port: 
+              number: 80
