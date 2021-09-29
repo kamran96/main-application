@@ -35,9 +35,8 @@ export class AppService {
           mimeType: mimetype,
           fileSize: size,
           path: location,
-          createdBy: req.user.userId,
-          updatedBy: req.user.userId,
-          tenantId: req.user.tenantId,
+          createdById: req.user.id,
+          updatedById: req.user.id,
           status: 1,
         });
 

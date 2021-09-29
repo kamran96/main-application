@@ -131,25 +131,25 @@ export class AccountsController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Put()
-  // async remove(@Body() accountDto: AccountIdsDto) {
-  //   try {
-  //     const account = await this.accountService.DeleteAccount(accountDto);
+  @UseGuards(GlobalAuthGuard)
+  @Put()
+  async remove(@Body() accountDto: AccountIdsDto) {
+    try {
+      const account = await this.accountService.DeleteAccount(accountDto);
 
-  //     if (account) {
-  //       return {
-  //         message: 'Resource modified successfully.',
-  //         status: 1,
-  //       };
-  //     }
+      if (account) {
+        return {
+          message: 'Resource modified successfully.',
+          status: 1,
+        };
+      }
 
-  //     throw new HttpException('Failed to get Accounts', HttpStatus.BAD_REQUEST);
-  //   } catch (error) {
-  //     throw new HttpException(
-  //       `Sorry! Something went wrong, ${error.message}`,
-  //       error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
-  //     );
-  //   }
-  // }
+      throw new HttpException('Failed to get Accounts', HttpStatus.BAD_REQUEST);
+    } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
