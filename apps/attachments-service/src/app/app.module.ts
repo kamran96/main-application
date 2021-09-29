@@ -4,6 +4,7 @@ import { Attachment, AttachmentSchema } from '../schemas/attachment.schema';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { Authenticate } from '@invyce/auth-middleware';
 
 @Module({
   imports: [
@@ -16,6 +17,6 @@ import { AppService } from './app.service';
     ]),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, Authenticate],
 })
 export class AppModule {}

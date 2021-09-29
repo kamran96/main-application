@@ -13,7 +13,7 @@ import {
 import { AppService } from './app.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 
-@Controller()
+@Controller('attachment')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
