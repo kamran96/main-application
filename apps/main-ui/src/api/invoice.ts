@@ -1,17 +1,20 @@
 import { ORDER_TYPE } from "./../modal/invoice";
-import http, { railsHttp } from "../utils/http";
+import http from "../utils/http";
 
 enum INVOICES_API {
-  INDEX = "invoices/index",
-  CREATE = "invoices/create",
-  PO = "/purchases/index",
+  INDEX = "invoices/invoice",
+  CREATE = "invoices/invoice",
+  PO = "invoices/bill",
   CREDIT_NOTE = "credit-note",
+  BILL = 'invoices/bill'
 }
 
 export const InvoiceCreateAPI = (payload) =>
-  railsHttp.post(INVOICES_API.CREATE, payload);
+  http.post(INVOICES_API.CREATE, payload);
+
+
 export const CreditNoteCreateAPI = (payload) =>
-  railsHttp.post(INVOICES_API.CREDIT_NOTE, payload);
+  http.post(INVOICES_API.CREDIT_NOTE, payload);
 export const getInvoiceListAPI = (
   key?: string,
   invoice_type?: number | string,
@@ -27,14 +30,14 @@ export const getInvoiceListAPI = (
   }
 
    
-  return railsHttp.get(url);
+  return http.get(url);
 };
 
 export const getInvoiceByIDAPI = (key?: string, id?: number) =>
-  railsHttp.get(`invoices/${id}`);
+  http.get(`${INVOICES_API.INDEX}/${id}`);
 
 export const purchaseOrderCreateAPI = (payload) =>
-  railsHttp.post(`purchases/create`, payload);
+  http.post(`purchases/create`, payload);
 
 export const getPoListAPI = (
   key?: string,
@@ -49,42 +52,42 @@ export const getPoListAPI = (
   if (query) {
     url = `${url}&query=${query}`;
   }
-  return railsHttp.get(url);
+  return http.get(url);
 };
 
 export const pushDraftToInvoiceAPI = (payload?: any) =>
-  railsHttp.post(`invoices/draft`, { ...payload });
+  http.post(`invoices/draft`, { ...payload });
 
 export const pushDraftToPurchaseAPI = (payload?: any) =>
-  railsHttp.post(`purchases/draft`, { ...payload });
+  http.post(`purchases/draft`, { ...payload });
 
 export const deleteInvoicesAPI = (payload?: any) =>
-  railsHttp.put(`/invoices`, payload);
+  http.put(`${INVOICES_API.INDEX}`, payload);
 
 export const createPurchaseEntryAPI = (payload?: any) =>
-  railsHttp.post(`purchases/create`, payload);
+  http.post(`${INVOICES_API.BILL}`, payload);
 
 export const getPurchasesById = (key?: string, id?: number) =>
-  railsHttp.get(`purchases/${id}`);
+  http.get(`${INVOICES_API.PO}/${id}`);
 
 export const deletePurchaseDrafts = (payload?: any) =>
-  railsHttp.put(`purchases/delete`, payload);
+  http.put(`${INVOICES_API.BILL}`, payload);
 
 export const deleteInvoiceDrafts = (payload?: any) =>
-  railsHttp.put(`invoices/delete`, payload);
+  http.put(INVOICES_API.INDEX, payload);
 
 export const invoiceDashboardDetailsAPI = (key?: string) =>
-  railsHttp.get(`/invoice-details`);
+  http.get(`/invoice-details`);
 
 export const draftInvoicesSuggestAPI = (key?: string) =>
-  railsHttp.get("/invoice-draft");
+  http.get("/invoice-draft");
 
 
 
 export const getInvoiceNumber = (
   key?: string,
   type: ORDER_TYPE = ORDER_TYPE?.SALE_INVOICE
-) => railsHttp?.get(`invoice/number?type=${type}`);
+) => http?.get(`${INVOICES_API.INDEX}/number?type=${type}`);
 
 
 export const getCreditNotes = (
@@ -98,14 +101,14 @@ export const getCreditNotes = (
   if (query) {
     url = `${url}&query=${query}`;
   }
-  return railsHttp.get(url);
+  return http.get(url);
 };
 
-export const creditNoteViewAPI = (key, id)=> railsHttp?.get(`${INVOICES_API?.CREDIT_NOTE}/${id}`);
+export const creditNoteViewAPI = (key, id)=> http?.get(`${INVOICES_API?.CREDIT_NOTE}/${id}`);
  export const topSuggestInvoicesAPI =(key ?: string)=>
- railsHttp.get("invoices-top");
+ http.get("invoices-top");
   
  export const invoiceFlowChartAPI= (key?:string )=>
- railsHttp.get("/invoice-flow-chart");
+ http.get("/invoice-flow-chart");
 
- export const quotationApproveAPI = (id: string|number)=> railsHttp?.put(`quote-update/${id}`);
+ export const quotationApproveAPI = (id: string|number)=> http?.put(`quote-update/${id}`);

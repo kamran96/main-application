@@ -40,7 +40,7 @@ export const create_update_contact = (payload) => {
 };
 
 export const getAllContacts = (key?: string, purpose?: string) =>
-  railsHttp.get(`${ContactAPI.railsINDEX}?purpose=${purpose}`);
+  railsHttp.get(`${ContactServiceAPI.default}?purpose=${purpose}`);
 
 export const getContactLedger = (
   key?: string,

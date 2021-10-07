@@ -71,8 +71,8 @@ export const InvoiceColumns: ColumnsType<any> = [
   },
   {
     title: "Items",
-    dataIndex: "invoice_items",
-    key: "invoice_items",
+    dataIndex: "invoiceItems",
+    key: "invoiceItems",
     render: (data: any[]) => (
       <>{data.length === 1 ? `${data.length} Item` : `${data.length} Items`}</>
     ),

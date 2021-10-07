@@ -125,7 +125,6 @@ export const PermissionsLayout: FC = () => {
       modulesResponse.data.result
     ) {
       const { result } = modulesResponse.data;
-      console.log(permissions, "permissions")
       setPermissions(result);
       if (!selectedPermission) {
         setSelectedPermission(result[0]);
@@ -150,7 +149,7 @@ export const PermissionsLayout: FC = () => {
                   onClick={() => {
                     setSelectedPermission(module);
                     history.push(
-                      `/app${ISupportedRoutes.PERMISSIONS}?module=${module}`
+                      `/app${ISupportedRoutes.SETTINGS}${ISupportedRoutes.PERMISSIONS}?module=${module}`
                     );
                   }}
                 >

@@ -1,25 +1,25 @@
-import React, { FC, ReactElement } from "react";
-import styled from "styled-components";
-import { Tabs } from "antd";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import convertToRem from "../../utils/convertToRem";
-import { Color } from "../../modal";
-import { IThemeProps } from "../../hooks/useTheme/themeColors";
+import React, { FC, ReactElement } from 'react';
+import styled from 'styled-components';
+import { Tabs } from 'antd';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import convertToRem from '../../utils/convertToRem';
+import { Color } from '../../modal';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
 const { TabPane } = Tabs;
 
 interface IProps {
   children?: React.ReactElement<any>;
   onChange?: (key: string | number) => void;
-  size?: "small" | "default" | "large";
+  size?: 'small' | 'default' | 'large';
   defaultkey?: string;
   ref?: any;
   tabBarExtraContent?: ReactElement<any>;
 }
 
 const defaultProps: IProps = {
-  size: "small",
-  defaultkey: "draft",
+  size: 'small',
+  defaultkey: 'draft',
 };
 
 export const TableTabs: FC<IProps> = ({
@@ -37,23 +37,20 @@ export const TableTabs: FC<IProps> = ({
   };
 
   return (
-    <WrapperTabs ref={ref}>
-      {/* <button onClick={()=> setDefaultKey(`awating_aproval`)}>check</button> */}
-      <Tabs
-        tabBarExtraContent={tabBarExtraContent}
-        onChange={(key) => onChangeTab(key)}
-        activeKey={defaultkey}
-        type="card"
-        size={"small"}
-        key={"awating_payment"}
-      >
-        {children}
-      </Tabs>
-    </WrapperTabs>
+    <CustomizedTabs
+      tabBarExtraContent={tabBarExtraContent}
+      onChange={(key) => onChangeTab(key)}
+      activeKey={defaultkey}
+      type="card"
+      size={'small'}
+      key={'awating_payment'}
+    >
+      {children}
+    </CustomizedTabs>
   );
 };
 
-const WrapperTabs: any = styled.div`
+const CustomizedTabs: any = styled(Tabs)`
   .ant-tabs-nav {
     /* border-bottom: 2px dashed #e4e4e4; */
     padding-bottom: 12px;
@@ -73,7 +70,6 @@ const WrapperTabs: any = styled.div`
     font-weight: normal;
     font-size: 0.8125rem;
     text-transform: uppercase;
-    background: #ffffff;
     border: none;
     box-sizing: border-box;
     border-radius: 5px;
@@ -85,20 +81,20 @@ const WrapperTabs: any = styled.div`
       font-style: normal;
       font-weight: normal;
       font-size: ${convertToRem(13)};
-      color: ${Color.$BLACK};
+      color: ${(props: IThemeProps)=> props?.theme?.colors?.$BLACK};
     }
     &:hover {
-      background: #aeaeae !important;
+      background: ${(props: IThemeProps)=> props?.theme?.colors?.bgTh} !important;
       .ant-tabs-tab-btn {
         color: ${Color.$WHITE};
       }
     }
   }
-
+  
   .ant-tabs-tab-active {
-    background: #aeaeae !important;
+    background: ${(props: IThemeProps)=> props?.theme?.colors?.bgTh} !important;
     .ant-tabs-tab-btn {
-      color: ${Color.$WHITE};
+      color: white !important
     }
   }
 `;

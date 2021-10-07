@@ -25,7 +25,9 @@ export const AttributeEditorWidget: FC = () => {
 
   const { data: categoryData, isLoading: categoryAttributeFetching } = useQuery(
     [`categoryAttribute-${categoryId}`, categoryId],
-    getCategoryAttributesAPI
+    getCategoryAttributesAPI, {
+      enabled: categoryId
+    }
   );
 
   useEffect(() => {

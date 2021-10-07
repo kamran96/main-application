@@ -24,7 +24,7 @@ const CategoryEditorWidget: FC = () => {
     [`category-${updateId}`, updateId],
     getCategoryByIdAPI,
     {
-      enabled: updateId,
+      enabled: updateId && updateId!==null,
     }
   );
 
@@ -67,9 +67,9 @@ const CategoryEditorWidget: FC = () => {
           );
           if (!parent_id) {
             [
-              `category-${updateId}`,
               "categories-list",
               "child-categories",
+              `category-${updateId}`,
               "all-categories",
             ].forEach((key) => {
               queryCache.invalidateQueries((q) =>

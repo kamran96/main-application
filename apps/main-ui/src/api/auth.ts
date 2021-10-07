@@ -12,7 +12,7 @@ export const activeBranchAPI = (payload?: any, userId?: number) =>
   railsHttp.put(`users/organization/${payload.UserId}`, payload);
 
 export const updateThemeAPI = (payload?: any) =>
-  railsHttp.put(`users/theme_update`, payload);
+  railsHttp.post(`users/user/update-theme`, payload);
 
 export const requestResetPasswordAPI = (payload: any) =>
   http?.post('users/auth/forget-password', payload);

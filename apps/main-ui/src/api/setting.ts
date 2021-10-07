@@ -13,4 +13,4 @@ export const getUserAPI = (key, id: number) => {
   return railsHttp.get(`user/${id}`);
 };
 
-export const updateProfileAPI = (payload) => http.post(`user/profile`, payload);
+export const updateProfileAPI = (payload) => http.put(`users/user/update-invited-user/${payload?.userId}`, payload);
