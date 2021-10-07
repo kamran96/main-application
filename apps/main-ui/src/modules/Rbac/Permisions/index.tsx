@@ -8,7 +8,7 @@ export const PermissionsContainer: FC = () => {
   return (
     <WrapperPermissionContainer>
       <Row gutter={24}>
-        <Col span={18} offset={3}>
+        <Col span={18} >
           <div className="flex alignCenter justifySpaceBetween pb-20">
             <Heading type="table">Permissions</Heading>
             {/* <Button

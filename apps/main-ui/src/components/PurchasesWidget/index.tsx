@@ -170,44 +170,43 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
       delete paymentData.totalDiscount;
 
       let payload: any = {
-        invoice: {
-          ...value,
-          status: value.status.status,
-          invoiceType: type ? type : IInvoiceType.INVOICE,
-          discount: addition(invoiceDiscount, TotalDiscount),
-          netTotal: NetTotal,
-          grossTotal: GrossTotal,
-          total: '',
-          isNewRecord: true,
-        },
+        ...value,
+        status: value.status.status,
+        invoiceType: type ? type : IInvoiceType.INVOICE,
+        discount: addition(invoiceDiscount, TotalDiscount),
+        netTotal: NetTotal,
+        grossTotal: GrossTotal,
+        total: '',
+        isNewRecord: true,
+
         invoice_items: invoiceItems.map((item, index) => {
           return { ...item, sequence: index };
         }),
       };
-      let payments = {
-        ...paymentData,
-        amount:
-          payment.paymentMode === PaymentMode.CREDIT
-            ? 0
-            : payment.paymentMode === PaymentMode.CASH
-            ? NetTotal
-            : parseFloat(payment.amount),
-      };
+      // let payments = {
+      //   ...paymentData,
+      //   amount:
+      //     payment.paymentMode === PaymentMode.CREDIT
+      //       ? 0
+      //       : payment.paymentMode === PaymentMode.CASH
+      //       ? NetTotal
+      //       : parseFloat(payment.amount),
+      // };
 
-      if (type !== IInvoiceType.QUOTE && payload.invoice.status !== 2) {
-        if (payments.paymentMode === PaymentMode.CASH) {
-          delete payments.dueDate;
-        }
+      // if (type !== IInvoiceType.QUOTE && payload.invoice.status !== 2) {
+      //   if (payments.paymentMode === PaymentMode.CASH) {
+      //     delete payments.dueDate;
+      //   }
 
-        payload.payment = payments;
-      }
+      //   payload.payment = payments;
+      // }
 
-      delete payload.invoice.invoiceDiscount;
-      delete payload.invoice.total;
+      delete payload.invoiceDiscount;
+      delete payload.total;
 
       if (id) {
-        payload.invoice = {
-          ...payload.invoice,
+        payload = {
+          ...payload,
           id,
           isNewRecord: history?.location?.search?.includes('relation')
             ? true
@@ -217,7 +216,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
       }
       if (history?.location?.search?.includes('relation')) {
         let relation = history?.location?.search?.split('relation=')[1];
-        payload.invoice.relation = relation;
+        payload.relation = relation;
       }
 
       try {
@@ -228,14 +227,14 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
               setPrintModal(true);
             }
 
-            if (payload.invoice.status !== 2) {
+            if (payload.status !== 2) {
               if (
                 type !== IInvoiceType.PURCHASE_ENTRY &&
                 type !== IInvoiceType.QUOTE
               ) {
                 let messages = {
-                  invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
-                  quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
+                  invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.reference}`,
+                  quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.reference}`,
                 };
 
                 onSendPDF(
@@ -474,17 +473,16 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                       />
                     </Form.Item>
                   </Col>
-                  {type !== IInvoiceType.BILL && (
-                    <Col span={6}>
-                      <FormLabel>{formLabels.orderNo}</FormLabel>
-                      <Form.Item
-                        name="invoiceNumber"
-                        rules={[{ required: false, message: 'Required !' }]}
-                      >
-                        <Input disabled size="middle" type="number" />
-                      </Form.Item>
-                    </Col>
-                  )}
+
+                  <Col span={6}>
+                    <FormLabel>{formLabels.orderNo}</FormLabel>
+                    <Form.Item
+                      name="invoiceNumber"
+                      rules={[{ required: false, message: 'Required !' }]}
+                    >
+                      <Input disabled size="middle" />
+                    </Form.Item>
+                  </Col>
                 </Row>
               </Col>
               <Col span={6} className="_custom_col_refheader">
@@ -552,15 +550,15 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
               </Col>
             </Row>
           </div>
-            <EditableTable
+          <EditableTable
             loading={isFetching}
-              dragable={(data) => setInvoiceItems(data)}
-              columns={__columns}
-              data={invoiceItems}
-              scrollable={{offsetY: 400, offsetX: 0}}
-            />
+            dragable={(data) => setInvoiceItems(data)}
+            columns={__columns}
+            data={invoiceItems}
+            scrollable={{ offsetY: 400, offsetX: 0 }}
+          />
 
-            {/* <DndProvider manager={manager.current.dragDropManager}>
+          {/* <DndProvider manager={manager.current.dragDropManager}>
               <CommonTable
                 rowClassName={(record, index) =>
                   ` ${
@@ -651,7 +649,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                         reset={paymentReset}
                         onChange={(payload) => setPayment(payload)}
                       />
-                      )}
+                    )}
                 </Rbac>
               </Col>
               <Col

@@ -22,6 +22,7 @@ import {
   getAllContacts,
   getAllItems,
   getInvoiceByIDAPI,
+  getInvoiceNumber,
   getPurchasesById,
 } from '../../api';
 import { getAccountsByTypeAPI } from '../../api/accounts';
@@ -152,8 +153,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
       let key =
         type === IInvoiceType.PURCHASE_ENTRY
-          ? `purchase_items`
-          : 'invoice_items';
+          ? `purchaseItems`
+          : 'invoiceItems';
       const itemsDiscount =
         (result && totalDiscountInInvoice(result[key], 'itemDiscount', type)) ||
         0;
@@ -203,6 +204,17 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
       cacheTime: Infinity,
     }
   );
+
+  const { data: invoiceNumberData } = useQuery(['',IInvoiceType.BILL], getInvoiceNumber);
+
+
+  useEffect(() => {
+    if (invoiceNumberData?.data?.result) {
+      const { result } = invoiceNumberData?.data;
+      AntForm.setFieldsValue({ invoiceNumber: result });
+    }
+  }, [invoiceNumberData, AntForm]);
+
 
   const contactResult: IContactType[] =
     (data &&
@@ -471,7 +483,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                 </Button>
               </Option>
               {/* </Rbac> */}
-              {true &&
+              {
                 items.map((item: IItemsResult, index: number) => {
                   let usedIds = [];
                   invoiceItems.forEach((st) => {

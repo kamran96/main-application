@@ -8,19 +8,19 @@ export const getPermissionModulesAPI = (key?: string) =>
   http.get(`users/rbac/module`);
 
 export const CreatePermissionsAPI = (payload?: any) =>
-  http.post(`rbac/permission`, payload);
+  http.post(`users/rbac/permission`, payload);
 
 export const getPermissionsListAPI = (
   key?: any,
   page: number = 1,
   pageSize: number = 20
-) => http.get(`rbac/permission?pageSize=${pageSize}&page=${page}`);
+) => http.get(`users/rbac/index-permissions?page_size=${pageSize}&page_no=${page}`);
 
 export const deletePermissionAPI = (payload?: any) =>
-  http.put(`/rbac/permission/delete`, payload);
+  http.put(`users/rbac/permission/delete`, payload);
 
 export const deleteRolesAPI = (payload?: any) =>
-  http.put(`/rbac/role/delete`, payload);
+  http.put(`users/rbac/role/delete`, payload);
 export const permissionsShowAPI = (key?: string, type?: string) =>
   http.get(`/users/rbac/permission/show?type=${type}`);
 

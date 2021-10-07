@@ -102,7 +102,7 @@ const ItemsEditorWidget: FC<IProps> = () => {
     [`item-id=${id}`, id],
     fetchSingleItem,
     {
-      enabled: id,
+      enabled: id && id!==null,
       onSuccess: (data) => {
        
         if ( data?.data?.result) {

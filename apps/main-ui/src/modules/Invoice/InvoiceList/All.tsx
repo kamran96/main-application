@@ -23,6 +23,7 @@ import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
 import { IContactTypes, IServerError, NOTIFICATIONTYPE } from "../../../modal";
 import {
   IInvoiceResponse,
+  IInvoiceStatus,
   INVOICETYPE,
   ORDER_TYPE,
 } from "../../../modal/invoice";
@@ -105,7 +106,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
     [
       `invoices-${ORDER_TYPE.SALE_INVOICE}-${INVOICETYPE.Approved}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
       ORDER_TYPE.SALE_INVOICE,
-      "PROCESSED",
+      IInvoiceStatus.approve,
       "ALL",
       page,
       page_size,

@@ -11,7 +11,6 @@ import { Link } from "react-router-dom";
 import Icon from "@iconify/react";
 
 export const SettingLayout: FC = (props: RouteConfigComponentProps) => {
-  console.log(props, "props here");
 
   return (
     <WrapperSettingLayout>

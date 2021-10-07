@@ -2,7 +2,7 @@ import dotsGrid from '@iconify-icons/mdi/dots-grid';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import addLine from '@iconify/icons-ri/add-line';
 import Icon from '@iconify/react';
-import { Button, Card, Col, Form, Row } from 'antd';
+import { Button, Card, Form } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import dayjs from 'dayjs';
 import update from 'immutability-helper';
@@ -14,17 +14,19 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useState,
+  useState
 } from 'react';
 import { useQuery } from 'react-query';
 import { SortableHandle } from 'react-sortable-hoc';
+import styled from 'styled-components';
 import {
   getAllContacts,
   getAllItems,
-  getInvoiceByIDAPI,
-  getPurchasesById,
+  getInvoiceByIDAPI
 } from '../../../../api';
 import { getAccountsByTypeAPI } from '../../../../api/accounts';
+import CommonSelect, { Option } from '../../../../components/CommonSelect';
+import { Editable, EditableSelect } from '../../../../components/Editable';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { useShortcut } from '../../../../hooks/useShortcut';
 import {
@@ -32,7 +34,7 @@ import {
   IContactType,
   IContactTypes,
   NOTIFICATIONTYPE,
-  PaymentMode,
+  PaymentMode
 } from '../../../../modal';
 import { IAccountsResult } from '../../../../modal/accounts';
 import { IInvoiceType } from '../../../../modal/invoice';
@@ -41,17 +43,11 @@ import { IOrganizationType } from '../../../../modal/organization';
 import convertToRem from '../../../../utils/convertToRem';
 import {
   calculateInvoice,
-  totalDiscountInInvoice,
+  totalDiscountInInvoice
 } from '../../../../utils/formulas';
 import moneyFormat from '../../../../utils/moneyFormat';
 import { useWindowSize } from '../../../../utils/useWindowSize';
-import CommonSelect, { Option } from '../../../../components/CommonSelect';
-import { Editable, EditableSelect } from '../../../../components/Editable';
 import defaultItems, { defaultFormData, defaultPayment } from './defaultStates';
-import scrollIntoView from 'scroll-into-view';
-import { TableCard } from '../../../../components/TableCard';
-import { EmailSider } from '../../../../components/EmailSider';
-import styled from 'styled-components';
 
 export const PurchaseContext: any = createContext({});
 export const usePurchaseWidget: any = () => useContext(PurchaseContext);
@@ -152,7 +148,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
       // const { payment } = result;
       const { discount } = result;
 
-      let key = 'invoice_items';
+      let key = 'invoiceItems';
       const itemsDiscount =
         (result && totalDiscountInInvoice(result[key], 'itemDiscount', type)) ||
         0;
@@ -313,239 +309,106 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         []
       : result;
 
-  const columns: ColumnsType<any> = [
-    {
-      title: '',
-      dataIndex: 'sort',
-      width: 30,
-      className: 'drag-visible textCenter',
-      render: () => <DragHandle />,
-    },
-    {
-      title: '#',
-      width: 48,
+      const filteredItems = items?.filter((i, ind)=>{
+          let ids= invoiceItems?.map((inv)=>{
+            return inv.itemId
+          });
 
-      render: (value, record, index) => {
-        return <>{index + 1}</>;
+
+          if(ids?.includes(i.id)){
+            return null
+          }else{
+            return i
+          }
+      })
+
+
+  const columns: ColumnsType<any> = useMemo(()=>{
+    return [
+      {
+        title: '',
+        dataIndex: 'sort',
+        width: 30,
+        className: 'drag-visible textCenter',
+        render: () => <DragHandle />,
       },
-      align: 'center',
-    },
-    {
-      title: 'Item',
-      dataIndex: 'itemId',
-      key: 'itemId',
-      width: width > 1500 ? 220 : 190,
-      align: 'left',
-
-      className: `select-column`,
-
-      render: (value, record, index) => {
-        return (
-          <EditableSelect
-            onClick={() => setSelectedIndex(index)}
-            className={`border-less-select ${
-              index === invoiceItems.length - 1 ? 'scrollIntoView' : ''
-            }`}
-            style={{ width: '100%', minWidth: '180px', maxWidth: '180px' }}
-            loading={itemsLoading}
-            size="middle"
-            value={{
-              value: value !== null ? value : '',
-              label: `${
-                value !== null && items.length
-                  ? items &&
-                    getItemWithItemId(value) &&
-                    `${getItemWithItemId(value).code} / ${
-                      getItemWithItemId(value).name
-                    }`
-                  : 'Select Item'
-              }`,
-            }}
-            labelInValue={true}
-            showSearch
-            placeholder="Select Items"
-            optionFilterProp="children"
-            onChange={(val) => {
-              if (val.value !== 'new_item') {
-                setInvoiceItems((prev) => {
-                  let [selectedItem] = items.filter(
-                    (item) => item.id === val.value
-                  );
-                  let allItems = [...prev];
-                  let unitPrice =
-                    (selectedItem &&
-                      selectedItem.price &&
-                      selectedItem.price.salePrice) ||
-                    0;
-                  let purchasePrice =
-                    (selectedItem &&
-                      selectedItem.price &&
-                      selectedItem.price.purchasePrice) ||
-                    0;
-                  let itemDiscount =
-                    (selectedItem &&
-                      selectedItem.price &&
-                      selectedItem.price.discount) ||
-                    '0';
-                  let tax =
-                    (selectedItem &&
-                      selectedItem.price &&
-                      selectedItem.price.tax) ||
-                    '0';
-                  let costOfGoodAmount =
-                    purchasePrice * allItems[index].quantity;
-
-                  if (
-                    type === IInvoiceType.INVOICE &&
-                    selectedItem.stock < record.quantity
-                  ) {
-                    let allErrors = [...rowsErrors];
-                    allErrors[index] = { hasError: true };
-                    setRowsErrors(allErrors);
-                    notificationCallback(
-                      NOTIFICATIONTYPE.WARNING,
-                      `You are out of stock! Only ${selectedItem.stock} items left in your stock`
-                    );
-                  } else {
-                    let allErrors = [...rowsErrors];
-                    allErrors[index] = { hasError: false };
-                    setRowsErrors(allErrors);
-                  }
-
-                  let description = `${selectedItem?.category?.title || ''}/`;
-
-                  let total = calculateInvoice(unitPrice, tax, itemDiscount);
-
-                  allItems[index] = {
-                    ...allItems[index],
-                    itemId: val.value,
-                    unitPrice: unitPrice.toFixed(2),
-                    tax,
-                    itemDiscount,
-                    total,
-                    costOfGoodAmount,
-                    description,
-                  };
-
-                  return allItems;
-                });
-              }
-            }}
-          >
-            <>
-              {/* <Rbac permission={PERMISSIONS.ITEMS_CREATE}> */}
-              <Option value={'new_item'}>
-                <Button
-                  className="flex alignCenter"
-                  type="link"
-                  onClick={() => {
-                    setItemsModalConfig(true);
-                  }}
-                >
-                  {' '}
-                  <Icon icon={addLine} />{' '}
-                  <span className="ml-10">New Item</span>
-                </Button>
-              </Option>
-              {/* </Rbac> */}
-
-              {true &&
-                items.map((item: IItemsResult, index: number) => {
-                  let usedIds = [];
-                  invoiceItems.forEach((st) => {
-                    if (st.itemId !== null) {
-                      usedIds.push(st.itemId);
-                    } else {
-                      return null;
-                    }
-                  });
-                  if (!usedIds.includes(item.id)) {
-                    return (
-                      <Option key={index} title={item.name} value={item.id}>
-                        {item.code} / {item.name}
-                      </Option>
-                    );
-                  } else {
-                    return null;
-                  }
-                })}
-            </>
-          </EditableSelect>
-        );
+      {
+        title: '#',
+        width: 48,
+  
+        render: (value, record, index) => {
+          return <>{index + 1}</>;
+        },
+        align: 'center',
       },
-    },
-
-    {
-      title: 'Description',
-      dataIndex: 'description',
-      key: 'description',
-      width: width > 1500 ? 400 : 230,
-
-      render: (data, record, index) => {
-        return (
-          <Editable
-            style={{
-              width: '100%',
-              minWidth: '180px',
-              maxWidth: `${width > 1500 ? `520px` : `230px`}`,
-            }}
-            onChange={(e) => {
-              let value = e.target.value;
-              e.preventDefault();
-              clearTimeout(setStateTimeOut);
-              setStateTimeOut = setTimeout(() => {
-                if (value) {
-                  setInvoiceItems((prev) => {
-                    let allItems = [...prev];
-                    allItems[index] = {
-                      ...allItems[index],
-                      description: value,
-                    };
-                    return allItems;
-                  });
-                }
-              }, 500);
-            }}
-            placeholder="Description"
-            size={'middle'}
-            value={data}
-          />
-        );
-      },
-    },
-    {
-      title: 'Qty',
-      dataIndex: 'quantity',
-      key: 'quantity',
-      width: width > 1500 ? 150 : 120,
-
-      render: (value, record, index) => {
-        return (
-          <Editable
-            disabled={!record.itemId}
-            onChange={(value: number) => {
-              clearTimeout(setStateTimeOut);
-              setStateTimeOut = setTimeout(() => {
-                if (value) {
+      {
+        title: 'Item',
+        dataIndex: 'itemId',
+        key: 'itemId',
+        width: width > 1500 ? 220 : 190,
+        align: 'left',
+  
+        className: `select-column`,
+  
+        render: (value, record, index) => {
+          return (
+            <EditableSelect
+              onClick={() => setSelectedIndex(index)}
+              className={`border-less-select ${
+                index === invoiceItems.length - 1 ? 'scrollIntoView' : ''
+              }`}
+              style={{ width: '100%', minWidth: '180px', maxWidth: '180px' }}
+              loading={itemsLoading}
+              size="middle"
+              value={{
+                value: value !== null ? value : '',
+                label: `${
+                  value !== null && items.length
+                    ? items &&
+                      getItemWithItemId(value) &&
+                      `${getItemWithItemId(value).code} / ${
+                        getItemWithItemId(value).name
+                      }`
+                    : 'Select Item'
+                }`,
+              }}
+              labelInValue={true}
+              showSearch
+              placeholder="Select Items"
+              optionFilterProp="children"
+              onChange={(val) => {
+                if (val.value !== 'new_item') {
                   setInvoiceItems((prev) => {
                     let [selectedItem] = items.filter(
-                      (item) => item.id === record.itemId
+                      (item) => item.id === val.value
                     );
-                    let quantity = value;
-                    if (quantity === null || quantity === undefined) {
-                      quantity = 0;
-                    }
                     let allItems = [...prev];
-                    let unitPrice = record.unitPrice;
-                    let purchasePrice = record.purchasePrice;
-                    let itemDiscount = record.itemDiscount;
-
-                    let costOfGoodAmount = purchasePrice * quantity;
-                    let tax = record.tax;
-
+                    let unitPrice =
+                      (selectedItem &&
+                        selectedItem.price &&
+                        selectedItem.price.salePrice) ||
+                      0;
+                    let purchasePrice =
+                      (selectedItem &&
+                        selectedItem.price &&
+                        selectedItem.price.purchasePrice) ||
+                      0;
+                    let itemDiscount =
+                      (selectedItem &&
+                        selectedItem.price &&
+                        selectedItem.price.discount) ||
+                      '0';
+                    let tax =
+                      (selectedItem &&
+                        selectedItem.price &&
+                        selectedItem.price.tax) ||
+                      '0';
+                    let costOfGoodAmount =
+                      purchasePrice * allItems[index].quantity;
+  
                     if (
                       type === IInvoiceType.INVOICE &&
-                      selectedItem.stock < value
+                      selectedItem.stock < record.quantity
                     ) {
                       let allErrors = [...rowsErrors];
                       allErrors[index] = { hasError: true };
@@ -559,222 +422,359 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       allErrors[index] = { hasError: false };
                       setRowsErrors(allErrors);
                     }
-
-                    let total =
-                      calculateInvoice(unitPrice, tax, itemDiscount) * quantity;
+  
+                    let description = `${selectedItem?.category?.title || ''}/`;
+  
+                    let total = calculateInvoice(unitPrice, tax, itemDiscount);
+  
                     allItems[index] = {
                       ...allItems[index],
-                      quantity,
+                      itemId: val.value,
+                      unitPrice: unitPrice.toFixed(2),
+                      tax,
+                      itemDiscount,
                       total,
                       costOfGoodAmount,
+                      description,
                     };
-
+  
                     return allItems;
                   });
                 }
-              }, 500);
-            }}
-            placeholder="qty"
-            type="number"
-            value={value}
-            size={'middle'}
-          />
-        );
-      },
-    },
-    {
-      title: 'Unit Price',
-      dataIndex: 'unitPrice',
-      key: 'unitPrice',
-      width: width > 1500 ? 150 : '',
-
-      render: (value, record, index) => {
-        return (
-          <Editable
-            onChange={(value) => {
-              clearTimeout(setStateTimeOut);
-              setStateTimeOut = setTimeout(() => {
-                setInvoiceItems((prev) => {
-                  let allItems = [...prev];
-                  let unitPrice = value;
-                  let purchasePrice = record.purchasePrice;
-                  let itemDiscount = record.itemDiscount;
-                  let tax = record.tax;
-                  let total =
-                    calculateInvoice(unitPrice, tax, itemDiscount) *
-                    parseInt(record.quantity);
-
-                  allItems[index] = {
-                    ...allItems[index],
-                    unitPrice,
-                    total,
-                  };
-
-                  return allItems;
-                });
-              }, 500);
-            }}
-            type="number"
-            value={value}
-            size={'middle'}
-          />
-        );
-      },
-    },
-    {
-      title: 'Disc %',
-      dataIndex: 'itemDiscount',
-      key: 'itemDiscount',
-      // width: width > 1500 ? 150 : "",
-
-      render: (value, record, index) => {
-        return (
-          <Editable
-            disabled={!record.itemId}
-            type="text"
-            value={value}
-            onChange={(e) => {
-              const { value } = e.target;
-              clearTimeout(setStateTimeOut);
-              setStateTimeOut = setTimeout(() => {
-                setInvoiceItems((prev) => {
-                  let allItems = [...prev];
-                  let itemDiscount = value.replace(/\b0+/g, '');
-
-                  if (itemDiscount === '') {
-                    itemDiscount = '0';
-                  }
-                  let unitPrice = record.unitPrice;
-                  let tax = record.tax;
-                  let total =
-                    calculateInvoice(unitPrice, tax, itemDiscount) *
-                    parseInt(record.quantity);
-
-                  allItems[index] = {
-                    ...allItems[index],
-                    itemDiscount,
-                    total,
-                  };
-
-                  return allItems;
-                });
-              }, 400);
-            }}
-            size={'middle'}
-          />
-        );
-      },
-    },
-    enableAccountColumn
-      ? {
-          title: 'Account',
-          dataIndex: 'accountId',
-          width: width > 1500 ? 220 : 150,
-          render: (value, row, index) => {
-            return (
-              <CommonSelect
-                onClick={() => setAccountRowSelectedIndex(index)}
-                className={`border-less-select`}
-                value={{
-                  value: value !== null ? value : '',
-                  label:
-                    (accountsList?.length && getAccountNameByID(value)) ||
-                    'Select Account',
-                }}
-                labelInValue={true}
-                loading={accountsLoading}
-                size="middle"
-                showSearch
-                style={{ width: '100%' }}
-                placeholder="Select Account"
-                optionFilterProp="children"
-                onChange={(val) => {
-                  setInvoiceItems((prev) => {
-                    let allItems = [...prev];
-                    allItems[index] = {
-                      ...allItems[index],
-                      accountId: val.value,
-                    };
-
-                    return allItems;
-                  });
-                }}
-              >
-                <>
-                  {accountRowSelectedIndex === index &&
-                    accountsList.map((acc: IAccountsResult, index: number) => {
+              }}
+            >
+              <>
+                {/* <Rbac permission={PERMISSIONS.ITEMS_CREATE}> */}
+                <Option value={'new_item'}>
+                  <Button
+                    className="flex alignCenter"
+                    type="link"
+                    onClick={() => {
+                      setItemsModalConfig(true);
+                    }}
+                  >
+                    {' '}
+                    <Icon icon={addLine} />{' '}
+                    <span className="ml-10">New Item</span>
+                  </Button>
+                </Option>
+                {/* </Rbac> */}
+                {
+                  filteredItems.map((item: IItemsResult, index: number) => {
                       return (
-                        <Option key={index} value={acc.id}>
-                          {acc.name}
+                        <Option key={index} title={item.name} value={item.id}>
+                          {item.code} / {item.name}
                         </Option>
                       );
-                    })}
-                </>
-              </CommonSelect>
-            );
-          },
-        }
-      : {
-          width: 0,
+                    
+                  })}
+              </>
+            </EditableSelect>
+          );
         },
-    {
-      title: 'Tax',
-      dataIndex: 'tax',
-      key: 'tax',
-      width: width > 1500 ? 150 : 130,
-      align: 'center',
-
-      render: (value, record, index) => {
-        return <>{value}</>;
       },
-    },
-    {
-      title: 'Amount',
-      dataIndex: 'total',
-      width: 170,
-      key: 'total',
-      align: 'center',
-      render: (value, record, index) => (
-        <>{typeof value === 'number' ? moneyFormat(value) : value}</>
-      ),
-    },
-    {
-      title: '',
-      key: 'action',
-      width: 50,
-      render: (value, record, index) => {
-        return (
-          <i
-            onClick={() => {
-              if (record.id) {
-                setDeleteIds((prev) => {
-                  let allDeleteIds = [...prev];
-                  allDeleteIds.push(record.id);
-                  return allDeleteIds;
-                });
-              }
-              setRowsErrors((prev) => {
-                let allErrors = [...prev];
-                allErrors.splice(index, 1);
-                return allErrors;
-              });
-              handleDelete(index);
-            }}
-          >
-            {' '}
-            <Icon
+  
+      {
+        title: 'Description',
+        dataIndex: 'description',
+        key: 'description',
+        width: width > 1500 ? 670 : 230,
+  
+        render: (data, record, index) => {
+          return (
+            <Editable
               style={{
-                fontSize: convertToRem(20),
-                color: Color.$GRAY,
-                cursor: 'pointer',
+                width: '100%',
+                minWidth: '180px',
+                maxWidth: `${width > 1500 ? `520px` : `230px`}`,
               }}
-              icon={deleteIcon}
+              onChange={(e) => {
+                let value = e.target.value;
+                e.preventDefault();
+                clearTimeout(setStateTimeOut);
+                setStateTimeOut = setTimeout(() => {
+                  if (value) {
+                    setInvoiceItems((prev) => {
+                      let allItems = [...prev];
+                      allItems[index] = {
+                        ...allItems[index],
+                        description: value,
+                      };
+                      return allItems;
+                    });
+                  }
+                }, 500);
+              }}
+              placeholder="Description"
+              size={'middle'}
+              value={data}
             />
-          </i>
-        );
+          );
+        },
       },
-    },
-  ];
+      {
+        title: 'Qty',
+        dataIndex: 'quantity',
+        key: 'quantity',
+        width: width > 1500 ? 150 : 120,
+  
+        render: (value, record, index) => {
+          return (
+            <Editable
+              disabled={!record.itemId}
+              onChange={(value: number) => {
+                clearTimeout(setStateTimeOut);
+                setStateTimeOut = setTimeout(() => {
+                  if (value) {
+                    setInvoiceItems((prev) => {
+                      let [selectedItem] = items.filter(
+                        (item) => item.id === record.itemId
+                      );
+                      let quantity = value;
+                      if (quantity === null || quantity === undefined) {
+                        quantity = 0;
+                      }
+                      let allItems = [...prev];
+                      let unitPrice = record.unitPrice;
+                      let purchasePrice = record.purchasePrice;
+                      let itemDiscount = record.itemDiscount;
+  
+                      let costOfGoodAmount = purchasePrice * quantity;
+                      let tax = record.tax;
+  
+                      if (
+                        type === IInvoiceType.INVOICE &&
+                        selectedItem.stock < value
+                      ) {
+                        let allErrors = [...rowsErrors];
+                        allErrors[index] = { hasError: true };
+                        setRowsErrors(allErrors);
+                        notificationCallback(
+                          NOTIFICATIONTYPE.WARNING,
+                          `You are out of stock! Only ${selectedItem.stock} items left in your stock`
+                        );
+                      } else {
+                        let allErrors = [...rowsErrors];
+                        allErrors[index] = { hasError: false };
+                        setRowsErrors(allErrors);
+                      }
+  
+                      let total =
+                        calculateInvoice(unitPrice, tax, itemDiscount) * quantity;
+                      allItems[index] = {
+                        ...allItems[index],
+                        quantity,
+                        total,
+                        costOfGoodAmount,
+                      };
+  
+                      return allItems;
+                    });
+                  }
+                }, 500);
+              }}
+              placeholder="qty"
+              type="number"
+              value={value}
+              size={'middle'}
+            />
+          );
+        },
+      },
+      {
+        title: 'Unit Price',
+        dataIndex: 'unitPrice',
+        key: 'unitPrice',
+        width: width > 1500 ? 150 : '',
+  
+        render: (value, record, index) => {
+          return (
+            <Editable
+              onChange={(value) => {
+                clearTimeout(setStateTimeOut);
+                setStateTimeOut = setTimeout(() => {
+                  setInvoiceItems((prev) => {
+                    let allItems = [...prev];
+                    let unitPrice = value;
+                    let purchasePrice = record.purchasePrice;
+                    let itemDiscount = record.itemDiscount;
+                    let tax = record.tax;
+                    let total =
+                      calculateInvoice(unitPrice, tax, itemDiscount) *
+                      parseInt(record.quantity);
+  
+                    allItems[index] = {
+                      ...allItems[index],
+                      unitPrice,
+                      total,
+                    };
+  
+                    return allItems;
+                  });
+                }, 500);
+              }}
+              type="number"
+              value={value}
+              size={'middle'}
+            />
+          );
+        },
+      },
+      {
+        title: 'Disc %',
+        dataIndex: 'itemDiscount',
+        key: 'itemDiscount',
+        // width: width > 1500 ? 150 : "",
+  
+        render: (value, record, index) => {
+          return (
+            <Editable
+              disabled={!record.itemId}
+              type="text"
+              value={value}
+              onChange={(e) => {
+                const { value } = e.target;
+                clearTimeout(setStateTimeOut);
+                setStateTimeOut = setTimeout(() => {
+                  setInvoiceItems((prev) => {
+                    let allItems = [...prev];
+                    let itemDiscount = value.replace(/\b0+/g, '');
+  
+                    if (itemDiscount === '') {
+                      itemDiscount = '0';
+                    }
+                    let unitPrice = record.unitPrice;
+                    let tax = record.tax;
+                    let total =
+                      calculateInvoice(unitPrice, tax, itemDiscount) *
+                      parseInt(record.quantity);
+  
+                    allItems[index] = {
+                      ...allItems[index],
+                      itemDiscount,
+                      total,
+                    };
+  
+                    return allItems;
+                  });
+                }, 400);
+              }}
+              size={'middle'}
+            />
+          );
+        },
+      },
+      enableAccountColumn
+        ? {
+            title: 'Account',
+            dataIndex: 'accountId',
+            width: width > 1500 ? 220 : 150,
+            render: (value, row, index) => {
+              return (
+                <CommonSelect
+                  onClick={() => setAccountRowSelectedIndex(index)}
+                  className={`border-less-select`}
+                  value={{
+                    value: value !== null ? value : '',
+                    label:
+                      (accountsList?.length && getAccountNameByID(value)) ||
+                      'Select Account',
+                  }}
+                  labelInValue={true}
+                  loading={accountsLoading}
+                  size="middle"
+                  showSearch
+                  style={{ width: '100%' }}
+                  placeholder="Select Account"
+                  optionFilterProp="children"
+                  onChange={(val) => {
+                    setInvoiceItems((prev) => {
+                      let allItems = [...prev];
+                      allItems[index] = {
+                        ...allItems[index],
+                        accountId: val.value,
+                      };
+  
+                      return allItems;
+                    });
+                  }}
+                >
+                  <>
+                    {accountRowSelectedIndex === index &&
+                      accountsList.map((acc: IAccountsResult, index: number) => {
+                        return (
+                          <Option key={index} value={acc.id}>
+                            {acc.name}
+                          </Option>
+                        );
+                      })}
+                  </>
+                </CommonSelect>
+              );
+            },
+          }
+        : {
+            width: 0,
+          },
+      {
+        title: 'Tax',
+        dataIndex: 'tax',
+        key: 'tax',
+        width: width > 1500 ? 150 : 130,
+        align: 'center',
+  
+        render: (value, record, index) => {
+          return <>{value}</>;
+        },
+      },
+      {
+        title: 'Amount',
+        dataIndex: 'total',
+        width: 170,
+        key: 'total',
+        align: 'center',
+        render: (value, record, index) => (
+          <>{typeof value === 'number' ? moneyFormat(value) : value}</>
+        ),
+      },
+      {
+        title: '',
+        key: 'action',
+        width: 50,
+        render: (value, record, index) => {
+          return (
+            <i
+              onClick={() => {
+                if (record.id) {
+                  setDeleteIds((prev) => {
+                    let allDeleteIds = [...prev];
+                    allDeleteIds.push(record.id);
+                    return allDeleteIds;
+                  });
+                }
+                setRowsErrors((prev) => {
+                  let allErrors = [...prev];
+                  allErrors.splice(index, 1);
+                  return allErrors;
+                });
+                handleDelete(index);
+              }}
+            >
+              {' '}
+              <Icon
+                style={{
+                  fontSize: convertToRem(20),
+                  color: Color.$GRAY,
+                  cursor: 'pointer',
+                }}
+                icon={deleteIcon}
+              />
+            </i>
+          );
+        },
+      },
+    ]
+  }, [filteredItems])
   const handleScroll = () => {
     let ele: HTMLElement = document.querySelector('.ant-table-tbody');
 

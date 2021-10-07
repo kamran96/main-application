@@ -259,17 +259,17 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   }, [checkIsAuthSaved]);
 
   let userId = auth?.users?.id || null;
+  console.log(userId, "user id is set")
 
-  console.log(userId, 'user id is herer');
 
   /* LoggedInUser is Fetched */
-  const { isLoading, data, error, isFetched, clear } = useQuery(
+  const { isLoading, data, error, isFetched } = useQuery(
     [`loggedInUser`, userId],
     AUTH_CHECK_API,
     {
       cacheTime: Infinity,
       enabled: isProductionEnv ? checkAutherized : userId,
-      
+
       onSuccess: (data) => {
         if (isProductionEnv) {
           setUserDetails(data?.data?.users);
@@ -278,12 +278,15 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
           const { result } = data?.data;
           setUserDetails(result);
           setIsUserLogin(true);
+          if (result?.theme) {
+            setTheme(result?.theme);
+          }
         }
       },
-      onError: (err:IBaseAPIError) => {
+      onError: (err: IBaseAPIError) => {
         // CancelRequest();
-        if(err?.response?.data?.statusCode===403){
-          handleLogin({type: ILoginActions.LOGOUT})
+        if (err?.response?.data?.statusCode === 401) {
+          handleLogin({ type: ILoginActions.LOGOUT });
         }
         setAutherized(false);
       },
@@ -331,7 +334,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     staleTime: Infinity,
   });
 
-  console.log(allRolesAndPermissionsData, 'data');
 
   useEffect(() => {
     if (allRolesAndPermissionsData?.data?.result) {
@@ -400,7 +402,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const { theme: appTheme, themeLoading } = useTheme(theme);
 
-  const checkingUser = isLoading && isFetched || permissionsFetching;
+  const checkingUser = (isLoading && !isFetched) || permissionsFetching;
 
   return (
     <globalContext.Provider

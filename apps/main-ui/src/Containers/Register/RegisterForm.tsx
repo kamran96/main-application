@@ -1,22 +1,19 @@
-import React, { FC, useEffect, useState } from "react";
-import styled, { keyframes } from "styled-components";
-import { Form, Row, Col, Input, Checkbox, Button, message } from "antd";
-import { Select } from "antd";
-import { Link } from "react-router-dom";
-import { FormLabel } from "../../components/FormLabel";
+import { Button, Checkbox, Col, Form, Input, Row, Select } from "antd";
+import  { FC, useState } from "react";
 import { useMutation } from "react-query";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
+import en from "../../../../../node_modules/world_countries_lists/data/en/world.json";
 import { RegisterAPI } from "../../api/auth";
-import { updateToken } from "../../utils/http";
+import { Heading } from "../../components/Heading";
+import { BOLDTEXT } from "../../components/Para/BoldText";
+import { Seprator } from "../../components/Seprator";
 import { useGlobalContext } from "../../hooks/globalContext/globalContext";
 import { ILoginActions } from "../../hooks/globalContext/globalManager";
 import { DivProps, IBaseAPIError, NOTIFICATIONTYPE } from "../../modal";
-import { Heading } from "../../components/Heading";
-import { Seprator } from "../../components/Seprator";
-import en from "../../../../../node_modules/world_countries_lists/data/en/world.json";
+import { updateToken } from "../../utils/http";
 import phoneCodes from "../../utils/phoneCodes";
-import { BOLDTEXT } from "../../components/Para/BoldText";
-import Icon from "@iconify/react";
-import arrowLeft from "@iconify-icons/fe/arrow-left";
+
 
 const { Option } = Select;
 
@@ -71,10 +68,7 @@ export const RegisterForm: FC = () => {
     } catch (error) {}
   };
 
-  const onVerification = (values) => {
-    setStep(1);
-    console.log(values);
-  };
+
 
   const getFlag = (short: string) => {
     const data = require(`world_countries_lists/flags/24x24/${short.toLowerCase()}.png`);

@@ -79,7 +79,7 @@ export const Editable: FC<IProps> = ({
   return (
     <ClickOutSide
       initialVal={isEditable}
-      notEffectingClass={`rendered-text`}
+      notEffectingClass={`rendered-text ant-input-number-input SVGAnimatedString `}
       onClickOutSide={() => {
         if (isEditable === true) {
           setIsEditable(false);
@@ -91,6 +91,7 @@ export const Editable: FC<IProps> = ({
           {type === 'number' ? (
             isEditable ? (
               <InputNumber
+              className="dont-close"
                 ref={inputRef}
                 onChange={(val) => {
                   setInputValue(val);
@@ -100,6 +101,7 @@ export const Editable: FC<IProps> = ({
                 type={type}
                 style={styles}
                 size={size}
+                
                 autoFocus
                 disabled={disabled}
                 value={
