@@ -26,7 +26,23 @@ import { RbacService } from './rbac.service';
 export class RbacController {
   constructor(private rbacService: RbacService) {}
 
+  @Get('index-permissions')
+  @UseGuards(JwtAuthGuard)
+  async indexPermission(@Query() query) {
+    const permission = await this.rbacService.IndexPermissions(query);
+
+    if (permission) {
+      return {
+        message: 'Permissions fetched successfull',
+        status: 1,
+        pagination: permission.pagination,
+        result: permission.permissions,
+      };
+    }
+  }
+
   @Get('/module')
+  @UseGuards(JwtAuthGuard)
   async getModules(@Req() req: Request) {
     const modules = await this.rbacService.GetDistinctModule();
 
@@ -39,8 +55,8 @@ export class RbacController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('/role')
+  @UseGuards(JwtAuthGuard)
   async getRoles(@Req() req: Request) {
     const roles = await this.rbacService.GetRoles(req.user);
 
@@ -161,8 +177,8 @@ export class RbacController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
   @Post('/permission')
+  @UseGuards(JwtAuthGuard)
   async createPermission(
     @Body() permissionDto: PermissionDto,
     @Req() req: Request
@@ -201,20 +217,20 @@ export class RbacController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Put('/role/delete')
   async deleteRole(@Body() roleIdsDto: RoleIdsDto) {
     const role = await this.rbacService.DeleteRole(roleIdsDto);
 
-    // if (role) {
-    //   return {
-    //     message: 'Role deleted successfully.',
-    //     status: 1,
-    //   };
-    // }
+    if (role) {
+      return {
+        message: 'Role deleted successfully.',
+        status: 1,
+      };
+    }
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Put('/permission/delete')
   async deletePermission(@Body() permissionIdsDto: PermissionIdsDto) {
     const permission = await this.rbacService.DeletePermission(

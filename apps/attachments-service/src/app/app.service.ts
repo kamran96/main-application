@@ -22,6 +22,11 @@ const s3 = new aws.S3({
 @Injectable()
 export class AppService {
   constructor(@InjectModel(Attachment.name) private attachmentModel) {}
+
+  async FindAttachmentById(attachmentId) {
+    return await this.attachmentModel.findById(attachmentId);
+  }
+
   async fileUpload(req, res): Promise<any> {
     try {
       this.upload(req, res, async (error) => {
@@ -35,9 +40,8 @@ export class AppService {
           mimeType: mimetype,
           fileSize: size,
           path: location,
-          createdBy: req.user.userId,
-          updatedBy: req.user.userId,
-          tenantId: req.user.tenantId,
+          createdById: req.user.id,
+          updatedById: req.user.id,
           status: 1,
         });
 

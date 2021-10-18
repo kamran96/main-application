@@ -16,7 +16,7 @@ export class bill1630669334276 implements MigrationInterface {
           { name: 'grossTotal', type: 'float', isNullable: true },
           { name: 'netTotal', type: 'float', isNullable: true },
           { name: 'date', type: 'varchar', isNullable: true },
-          { name: 'type', type: 'varchar', isNullable: true },
+          { name: 'invoiceType', type: 'varchar', isNullable: true },
           { name: 'directTax', type: 'float', isNullable: true },
           { name: 'indirectTax', type: 'float', isNullable: true },
           { name: 'isTaxIncluded', type: 'int', isNullable: true },
@@ -30,7 +30,7 @@ export class bill1630669334276 implements MigrationInterface {
           { name: 'updatedById', type: 'varchar', isNullable: true },
           { name: 'status', type: 'int', isNullable: true },
           { name: 'createdAt', type: 'timestamp', default: 'NOW()' },
-          { name: 'createdBy', type: 'timestamp', default: 'NOW()' },
+          { name: 'updatedAt', type: 'timestamp', default: 'NOW()' },
         ],
       }),
       true

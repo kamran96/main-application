@@ -14,6 +14,29 @@ export class RbacService {
     @InjectModel(User.name) private userModel
   ) {}
 
+  async IndexPermissions(queryData) {
+    const { page_no, page_size } = queryData;
+    const myCustomLabels = {
+      docs: 'permissions',
+      totalDocs: 'total',
+      limit: 'page_size',
+      page: 'page_no',
+      nextPage: 'next',
+      prevPage: 'prev',
+      totalPages: 'total_pages',
+      meta: 'pagination',
+    };
+
+    return await this.permissionModel.paginate(
+      { status: 1 },
+      {
+        offset: page_no * page_size - page_size,
+        limit: page_size,
+        customLabels: myCustomLabels,
+      }
+    );
+  }
+
   async CreateRole(roleDto, user) {
     if (roleDto && roleDto.isNewRecord === false) {
       const role = await this.GetRole(roleDto.id, user.organizationId);
@@ -163,7 +186,7 @@ export class RbacService {
       permission.status = 1;
       await permission.save();
 
-      const roles = await this.permissionModel.find({
+      const roles = await this.roleModel.find({
         name: 'admin',
       });
 
@@ -171,7 +194,7 @@ export class RbacService {
         const rolePermission = new this.rolePermissionModel();
         rolePermission.roleId = i.id;
         rolePermission.permissionId = permission.id;
-        rolePermission.organizationId = i.organizationId;
+        rolePermission.organizationId = user.organizationId;
         rolePermission.hasPermission = true;
         rolePermission.status = 1;
         await rolePermission.save();
@@ -306,33 +329,29 @@ export class RbacService {
   }
 
   async DeleteRole(roleIds) {
-    // for (let i of roleIds.ids) {
-    //   const [role] = await roleRepo.find({
-    //     where: {
-    //       id: i,
-    //     },
-    //   });
-    //   const rolePermissions = await rolePermissionRepo.find({
-    //     where: {
-    //       roleId: i,
-    //     },
-    //   });
-    //   if (rolePermissions.length > 0) {
-    //     for (let i of rolePermissions) {
-    //       await rolePermissionRepo.update(
-    //         { id: i.id },
-    //         { roleId: role.parentId }
-    //       );
-    //     }
-    //   }
-    //   await roleRepo.delete({ id: i });
-    // }
-    // return true;
+    for (let i of roleIds.ids) {
+      const role = await this.roleModel.findOne({
+        _id: i,
+      });
+      const rolePermissions = await this.rolePermissionModel.findOne({
+        roleId: i,
+      });
+      if (rolePermissions) {
+        for (let i of rolePermissions) {
+          await this.rolePermissionModel.updateOne(
+            { _id: i.id },
+            { roleId: role.parentId }
+          );
+        }
+      }
+      await this.roleModel.findOneAndDelete({ _id: i });
+    }
+    return true;
   }
 
   async DeletePermission(permissionIds) {
     for (let i of permissionIds.ids) {
-      //   await this.permissionModel.delete({ id: i });
+      await this.permissionModel.findOneAndDelete({ id: i });
     }
 
     return true;

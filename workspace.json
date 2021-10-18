@@ -581,6 +581,56 @@
         }
       }
     },
+    "payments-service": {
+      "root": "apps/payments-service",
+      "sourceRoot": "apps/payments-service/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/payments-service",
+            "main": "apps/payments-service/src/main.ts",
+            "tsConfig": "apps/payments-service/tsconfig.app.json",
+            "assets": ["apps/payments-service/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/payments-service/src/environments/environment.ts",
+                  "with": "apps/payments-service/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "payments-service:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/payments-service/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/payments-service"],
+          "options": {
+            "jestConfig": "apps/payments-service/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "pixels-to-rem": {
       "root": "libs/pixels-to-rem",
       "sourceRoot": "libs/pixels-to-rem/src",

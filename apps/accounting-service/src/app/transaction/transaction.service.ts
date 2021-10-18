@@ -98,6 +98,9 @@ export class TransactionService {
           },
           skip: page_no * page_size - page_size,
           take: page_size,
+          order: {
+            date: 'DESC',
+          },
           relations: ['transactionItems', 'transactionItems.account'],
         });
 
@@ -188,4 +191,93 @@ export class TransactionService {
       relations: ['transactionItems'],
     });
   }
+
+  async TransactionApi(data: ITransactionApi, user) {
+    try {
+      if (data || data !== null || data || undefined) {
+        const debits = data['dr'];
+        const credits = data['cr'];
+
+        const debitIds = debits.map((i) => i.account_id);
+        const creditIds = credits.map((i) => i.account_id);
+
+        let initialValue = 0;
+        let amount = debits.reduce(function (previousValue, currentValue) {
+          return previousValue + currentValue.amount;
+        }, initialValue);
+
+        console.log(creditIds, debitIds);
+        const intersection = debitIds.filter((element) =>
+          creditIds.includes(element)
+        );
+        console.log(intersection);
+
+        if (intersection.length > 0) {
+          throw new HttpException(
+            "There's no way to pass an entry on same accounts",
+            HttpStatus.BAD_REQUEST
+          );
+        } else {
+          const transaction = await getCustomRepository(
+            TransactionRepository
+          ).save({
+            amount: data.amount ? data.amount : amount,
+            ref: data.invoice ? data.invoice.reference : data.reference,
+            date: data.createdAt || new Date(),
+            createdAt: data.createdAt || new Date().toDateString(),
+            ndataation: `System transaction against ${data?.invoice?.invoiceNumber}`,
+            // branchId: user.branchId,
+            organizationId: user.organizationId,
+            createdById: user.id,
+            updatedById: user.id,
+            status: data?.invoice?.status === 2 ? 2 : 1 || 1,
+          });
+
+          getCustomRepository(TransactionItemRepository).save(
+            debits.map((dr) => ({
+              transactionId: transaction.id,
+              amount: dr.amount,
+              accountId: dr.accountId,
+              transactionType: Entries.DEBITS,
+              // branchId: user.branchId,
+              organizationId: user.organizationId,
+              createdById: user.id,
+              updatedById: user.id,
+              createdAt: transaction.createdAt,
+              status: transaction.status,
+            }))
+          );
+
+          getCustomRepository(TransactionItemRepository).save(
+            credits.map((cr) => ({
+              transactionId: transaction.id,
+              amount: cr.amount,
+              accountId: cr.accountId,
+              transactionType: Entries.CREDITS,
+              // branchId: user.branchId,
+              organizationId: user.organizationId,
+              createdById: user.id,
+              updatedById: user.id,
+              createdAt: transaction.createdAt,
+              status: transaction.status,
+            }))
+          );
+
+          return transaction;
+        }
+      }
+      throw new HttpException('Parameter is invalid', HttpStatus.BAD_REQUEST);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+}
+
+interface ITransactionApi {
+  amount: number;
+  cr: Array<any>;
+  dr: Array<any>;
+  invoice: any;
+  reference: string;
+  createdAt: string;
 }

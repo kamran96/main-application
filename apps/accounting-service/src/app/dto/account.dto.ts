@@ -16,3 +16,7 @@ export class AccountDto {
 export class AccountIdsDto {
   ids: Array<number>;
 }
+
+export class AccountCodesDto {
+  code: Array<string>;
+}

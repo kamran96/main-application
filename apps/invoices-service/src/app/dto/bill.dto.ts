@@ -10,12 +10,13 @@ export class BillDto {
   currency: number;
   netTotal: number;
   date: string;
-  type: string;
+  invoiceType: string;
   directTax: number;
   indirectTax: number;
   isTaxIncluded: number;
   isReturn: boolean;
   comment: string;
+  status: number;
   invoice_items: Array<BillItemsDto>;
 }
 
@@ -30,4 +31,8 @@ class BillItemsDto {
   total: number;
   sequence: number;
   costOfGoodAmount: number;
+}
+
+export class BillDeleteIdsDto {
+  ids: Array<number>;
 }
