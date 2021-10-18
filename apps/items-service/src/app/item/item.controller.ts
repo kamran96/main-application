@@ -35,6 +35,12 @@ export class ItemController {
     }
   }
 
+  @Post('ids')
+  @UseGuards(GlobalAuthGuard)
+  async listItemByIds(@Body() itemDto: DeleteItemDto) {
+    return await this.itemService.findByItemIds(itemDto);
+  }
+
   @Post()
   @UseGuards(GlobalAuthGuard)
   async create(@Body() itemDto: ItemDto, @Req() req: Request) {

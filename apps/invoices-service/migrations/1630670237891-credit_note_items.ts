@@ -17,7 +17,7 @@ export class creditNoteItems1630670237891 implements MigrationInterface {
           { name: 'description', type: 'varchar', isNullable: true },
           { name: 'quantity', type: 'float', isNullable: true },
           { name: 'itemDiscount', type: 'float', isNullable: true },
-          { name: 'purchasePrice', type: 'float', isNullable: true },
+          { name: 'unitPrice', type: 'float', isNullable: true },
           { name: 'tax', type: 'text', isNullable: true },
           { name: 'total', type: 'float', isNullable: true },
           { name: 'sequence', type: 'int', isNullable: true },

@@ -13,7 +13,7 @@ export class creditNote1630669765794 implements MigrationInterface {
         columns: [
           { name: 'id', type: 'serial', isPrimary: true },
           { name: 'reference', type: 'varchar', isNullable: true },
-          { name: 'contactId', type: 'int', isNullable: true },
+          { name: 'contactId', type: 'varchar', isNullable: true },
           { name: 'invoiceId', type: 'int', isNullable: true },
           { name: 'billId', type: 'int', isNullable: true },
           { name: 'issueDate', type: 'varchar', isNullable: true },

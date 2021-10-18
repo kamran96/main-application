@@ -52,3 +52,10 @@ spec:
             name: email-http
             port: 
               number: 80
+      - pathType: Prefix
+        path: "/accounts"
+        backend:
+          service:
+            name: accounting-http
+            port: 
+              number: 80

@@ -16,7 +16,7 @@ export class invoice1630587629484 implements MigrationInterface {
           { name: 'grossTotal', type: 'float', isNullable: true },
           { name: 'netTotal', type: 'float', isNullable: true },
           { name: 'date', type: 'varchar', isNullable: true },
-          { name: 'type', type: 'varchar', isNullable: true },
+          { name: 'invoiceType', type: 'varchar', isNullable: true },
           { name: 'directTax', type: 'float', isNullable: true },
           { name: 'indirectTax', type: 'float', isNullable: true },
           { name: 'isTaxIncluded', type: 'int', isNullable: true },

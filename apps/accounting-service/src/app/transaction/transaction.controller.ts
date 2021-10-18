@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { TransactionDto } from '../dto/transaction.dto';
+import { TransactionApiDto, TransactionDto } from '../dto/transaction.dto';
 import { TransactionService } from './transaction.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 
@@ -90,5 +90,11 @@ export class TransactionController {
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  @Post('api')
+  @UseGuards(GlobalAuthGuard)
+  async trasanctionApi(@Body() data: TransactionApiDto, @Req() req: Request) {
+    return await this.transactionService.TransactionApi(data, req.user);
   }
 }

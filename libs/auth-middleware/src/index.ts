@@ -1,9 +1,9 @@
-export * from './lib/auth-middleware.module';
-
 import { Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
+
+export * from './lib/auth-middleware.module';
 
 require('dotenv').config();
 
@@ -71,3 +71,19 @@ export class Authenticate extends PassportStrategy(Strategy) {
     }
   }
 }
+
+// export const Http = async () => {
+//   const type =
+//     process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+//   const value =
+//     process.env.NODE_ENV === 'development'
+//       ? `Bearer ${token}`
+//       : `access_token=${token}`;
+
+//   return await axios.create({
+//     baseURL: 'http://localhost',
+//     headers: {
+//       [type]: value,
+//     },
+//   });
+// };

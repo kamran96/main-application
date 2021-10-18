@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -13,15 +14,65 @@ import {
 import { Request } from 'express';
 import { InvoiceService } from './invoice.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
-import { InvoiceDto } from '../dto/invoice.dto';
+import { InvoiceDeleteIdsDto, InvoiceDto } from '../dto/invoice.dto';
 
 @Controller('invoice')
 export class InvoiceController {
   constructor(private invoiceService: InvoiceService) {}
 
+  @Get()
+  @UseGuards(GlobalAuthGuard)
+  async index(@Req() req: Request, @Query() query) {
+    try {
+      const invoice = await this.invoiceService.IndexInvoice(req.user, query);
+
+      if (invoice) {
+        return {
+          message: 'Invoice fetched successfully.',
+          status: true,
+          pagination: invoice.pagination,
+          result: invoice.invoices,
+        };
+      }
+    } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Get('contact/:id')
+  @UseGuards(GlobalAuthGuard)
+  async invoiceAgainstContact(
+    @Param() params,
+    @Req() req: Request,
+    @Query() { type }
+  ) {
+    const invoices = await this.invoiceService.InvoicesAgainstContactId(
+      params.id,
+      req,
+      type
+    );
+
+    if (invoices) {
+      return {
+        message: 'Invoices fetched successfully.',
+        status: true,
+        result: invoices,
+      };
+    }
+  }
+
   @Get('pdf')
   async pdf() {
     return await this.invoiceService.Pdf();
+  }
+
+  @Post('ids')
+  @UseGuards(GlobalAuthGuard)
+  async findByInvoiceIds(@Body() invoiceIds: InvoiceDeleteIdsDto) {
+    return await this.invoiceService.FindByInvoiceIds(invoiceIds);
   }
 
   @UseGuards(GlobalAuthGuard)
@@ -33,17 +84,13 @@ export class InvoiceController {
         req.user
       );
 
-      if (invoice.length > 0) {
+      if (invoice) {
         return {
           message: 'Invoice created successfully.',
           status: true,
-          result: invoice[0],
+          result: invoice,
         };
       }
-      throw new HttpException(
-        'Failed to create invoice',
-        HttpStatus.BAD_REQUEST
-      );
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
@@ -83,15 +130,15 @@ export class InvoiceController {
 
   @UseGuards(GlobalAuthGuard)
   @Get('/:id')
-  async show(@Param() params) {
+  async show(@Param() params, @Req() req: Request) {
     try {
-      const invoice = await this.invoiceService.FindById(params.id);
+      const invoice = await this.invoiceService.FindById(params.id, req);
 
-      if (invoice.length > 0) {
+      if (invoice) {
         return {
           message: 'Invoice fetched successfully.',
           status: true,
-          result: invoice[0],
+          result: invoice,
         };
       }
       throw new HttpException(
@@ -104,6 +151,19 @@ export class InvoiceController {
         `Sorry! Something went wrong, ${error.message}`,
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
+    }
+  }
+
+  @Put()
+  @UseGuards(GlobalAuthGuard)
+  async delete(@Body() inoviceIds: InvoiceDeleteIdsDto) {
+    const invoice = await this.invoiceService.deleteInvoice(inoviceIds);
+
+    if (invoice) {
+      return {
+        message: 'Invoice deleted successfully.',
+        status: true,
+      };
     }
   }
 }

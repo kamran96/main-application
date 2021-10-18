@@ -26,7 +26,7 @@ export class Invoices {
   @Column()
   date: string;
   @Column()
-  type: string;
+  invoiceType: string;
   @Column()
   directTax: number;
   @Column()
@@ -40,7 +40,7 @@ export class Invoices {
   @Column()
   status: number;
   @Column()
-  isReturn: string;
+  comment: string;
   @Column()
   createdAt: string;
   @Column()
