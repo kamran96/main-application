@@ -31,7 +31,6 @@ export class ContactService {
           nextPage: 'next',
           prevPage: 'prev',
           totalPages: 'total_pages',
-          pagingCounter: 'page_no',
         };
 
         for (let i in data) {

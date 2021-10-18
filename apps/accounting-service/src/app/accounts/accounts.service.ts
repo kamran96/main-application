@@ -4,7 +4,7 @@ import {
   PrimaryAccountRepository,
   SecondaryAccountRepository,
 } from '../repositories';
-import { getCustomRepository } from 'typeorm';
+import { getCustomRepository, In } from 'typeorm';
 import { Sorting } from '@invyce/sorting';
 
 @Injectable()
@@ -289,21 +289,25 @@ export class AccountsService {
     return account;
   }
 
-  //   async DeleteAccount(accountDto) {
-  //     try {
-  //       for (let i of accountDto.ids) {
-  //         await this.manager.update(Accounts, { id: i }, { status: 0 });
-  //       }
-  //       const accountRepository = getCustomRepository(AccountRepository);
-  //       const [account] = await accountRepository.find({
-  //         where: {
-  //           id: accountDto.ids[0],
-  //         },
-  //       });
+  async DeleteAccount(accountDto) {
+    try {
+      for (let i of accountDto.ids) {
+        await getCustomRepository(AccountRepository).update(
+          { id: i },
+          { status: 0 }
+        );
+      }
 
-  //       return account;
-  //     } catch (error) {
-  //       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-  //     }
-  //   }
+      return true;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async FindAccountsByCode(code: Array<string>, user) {
+    return await getCustomRepository(AccountRepository).find({
+      code: In(code),
+      // organizationId: user.organizationId,
+    });
+  }
 }

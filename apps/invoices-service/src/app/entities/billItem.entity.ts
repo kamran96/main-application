@@ -14,7 +14,7 @@ export class BillItems {
   @Column()
   itemId: string;
   @Column()
-  invoiceId: number;
+  billId: number;
   @Column()
   description: string;
   @Column()
@@ -22,7 +22,7 @@ export class BillItems {
   @Column()
   itemDiscount: string;
   @Column()
-  unitPrice: number;
+  purchasePrice: number;
   @Column()
   costOfGoodAmount: number;
   @Column()

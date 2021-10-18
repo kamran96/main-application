@@ -12,7 +12,7 @@ export class Attachment {
   path: string;
   @Prop()
   createdById: string;
-  @Prop({ required: true })
+  @Prop()
   updatedById: string;
   @Prop()
   status: number;

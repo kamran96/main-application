@@ -98,14 +98,11 @@ export class AuthService {
   }
 
   async AddUser(authDto, organizationId = null, email = '') {
-    let updatedProfile;
-    if (organizationId) {
-      updatedProfile = {
-        fullName: authDto.fullName,
-        country: authDto.country,
-        phoneNumber: authDto.phoneNumber,
-      };
-    }
+    const updatedProfile = {
+      fullName: authDto.fullName,
+      country: authDto.country,
+      phoneNumber: authDto.phoneNumber,
+    };
 
     const user = new this.userModel();
     user.username = authDto.username;

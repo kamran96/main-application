@@ -33,6 +33,10 @@
     "acc_generate": "npm run acc_typeorm:cli -- migration:create -n",
     "acc_migration_run": "npm run acc_typeorm:cli -- migration:run",
     "acc_migration_revert": "npm run acc_typeorm:cli -- migration:revert",
+    "pay_typeorm:cli": "ts-node ./node_modules/typeorm/cli -f ./apps/payments-service/ormconfig.js",
+    "pay_generate": "npm run pay_typeorm:cli -- migration:create -n",
+    "pay_migration_run": "npm run pay_typeorm:cli -- migration:run",
+    "pay_migration_revert": "npm run pay_typeorm:cli -- migration:revert",
     "typeorm": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm",
     "semantic-release": "semantic-release"
   },

@@ -14,7 +14,7 @@ import {
 import { Request } from 'express';
 import { AccountsService } from './accounts.service';
 // import { JwtAuthGuard } from '../jwt-auth.guard';
-import { AccountDto, AccountIdsDto } from '../dto/account.dto';
+import { AccountCodesDto, AccountDto, AccountIdsDto } from '../dto/account.dto';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 
 @Controller('account')
@@ -131,25 +131,31 @@ export class AccountsController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Put()
-  // async remove(@Body() accountDto: AccountIdsDto) {
-  //   try {
-  //     const account = await this.accountService.DeleteAccount(accountDto);
+  @UseGuards(GlobalAuthGuard)
+  @Put()
+  async remove(@Body() accountDto: AccountIdsDto) {
+    try {
+      const account = await this.accountService.DeleteAccount(accountDto);
 
-  //     if (account) {
-  //       return {
-  //         message: 'Resource modified successfully.',
-  //         status: 1,
-  //       };
-  //     }
+      if (account) {
+        return {
+          message: 'Resource modified successfully.',
+          status: 1,
+        };
+      }
 
-  //     throw new HttpException('Failed to get Accounts', HttpStatus.BAD_REQUEST);
-  //   } catch (error) {
-  //     throw new HttpException(
-  //       `Sorry! Something went wrong, ${error.message}`,
-  //       error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
-  //     );
-  //   }
-  // }
+      throw new HttpException('Failed to get Accounts', HttpStatus.BAD_REQUEST);
+    } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Post('codes')
+  @UseGuards(GlobalAuthGuard)
+  async accountsByCodes(@Body() codes: AccountCodesDto, @Req() req: Request) {
+    return await this.accountService.FindAccountsByCode(codes.code, req.user);
+  }
 }
