@@ -14,7 +14,7 @@ import {
 import { Request } from 'express';
 import { AccountsService } from './accounts.service';
 // import { JwtAuthGuard } from '../jwt-auth.guard';
-import { AccountDto, AccountIdsDto } from '../dto/account.dto';
+import { AccountCodesDto, AccountDto, AccountIdsDto } from '../dto/account.dto';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 
 @Controller('account')
@@ -151,5 +151,11 @@ export class AccountsController {
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  @Post('codes')
+  @UseGuards(GlobalAuthGuard)
+  async accountsByCodes(@Body() codes: AccountCodesDto, @Req() req: Request) {
+    return await this.accountService.FindAccountsByCode(codes.code, req.user);
   }
 }

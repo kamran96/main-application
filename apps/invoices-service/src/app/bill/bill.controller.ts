@@ -6,35 +6,61 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { BillService } from './bill.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
-import { BillDto } from '../dto/bill.dto';
+import { BillDeleteIdsDto, BillDto } from '../dto/bill.dto';
 
 @Controller('bill')
 export class BillController {
   constructor(private billService: BillService) {}
 
+  @Get()
   @UseGuards(GlobalAuthGuard)
+  async index(@Req() req: Request, @Query() query) {
+    try {
+      const bill = await this.billService.IndexBill(req.user, query);
+
+      if (bill) {
+        return {
+          message: 'Bill fetched successfully.',
+          status: true,
+          pagination: bill.pagination,
+          result: bill.bills,
+        };
+      }
+    } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Post('ids')
+  @UseGuards(GlobalAuthGuard)
+  async findByInvoiceIds(@Body() invoiceIds: BillDeleteIdsDto) {
+    return await this.billService.FindByBillIds(invoiceIds);
+  }
+
   @Post()
+  @UseGuards(GlobalAuthGuard)
   async create(@Body() billDto: BillDto, @Req() req: Request) {
     try {
       const bill = await this.billService.CreateBill(billDto, req.user);
 
-      if (bill.length > 0) {
+      if (bill) {
         return {
           message: 'Bill created successfully.',
           status: true,
-          result: bill[0],
+          result: bill,
         };
       }
-      throw new HttpException(
-        'Failed to create invoice',
-        HttpStatus.BAD_REQUEST
-      );
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
@@ -45,15 +71,15 @@ export class BillController {
 
   @UseGuards(GlobalAuthGuard)
   @Get('/:id')
-  async show(@Param() params) {
+  async show(@Param() params, @Req() req: Request) {
     try {
-      const invoice = await this.billService.FindById(params.id);
+      const invoice = await this.billService.FindById(params.id, req);
 
-      if (invoice.length > 0) {
+      if (invoice) {
         return {
           message: 'Invoice fetched successfully.',
           status: true,
-          result: invoice[0],
+          result: invoice,
         };
       }
       throw new HttpException(
@@ -66,6 +92,19 @@ export class BillController {
         `Sorry! Something went wrong, ${error.message}`,
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
+    }
+  }
+
+  @Put()
+  @UseGuards(GlobalAuthGuard)
+  async delete(@Body() billIds: BillDeleteIdsDto) {
+    const bill = await this.billService.deleteBill(billIds);
+
+    if (bill) {
+      return {
+        message: 'Bill deleted successfully.',
+        status: true,
+      };
     }
   }
 }

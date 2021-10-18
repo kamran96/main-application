@@ -4,7 +4,7 @@ import {
   PrimaryAccountRepository,
   SecondaryAccountRepository,
 } from '../repositories';
-import { getCustomRepository } from 'typeorm';
+import { getCustomRepository, In } from 'typeorm';
 import { Sorting } from '@invyce/sorting';
 
 @Injectable()
@@ -302,5 +302,12 @@ export class AccountsService {
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async FindAccountsByCode(code: Array<string>, user) {
+    return await getCustomRepository(AccountRepository).find({
+      code: In(code),
+      // organizationId: user.organizationId,
+    });
   }
 }

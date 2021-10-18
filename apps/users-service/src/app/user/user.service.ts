@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcryptjs';
+import axios from 'axios';
 import { AuthService } from '../auth/auth.service';
 import { User } from '../schemas/user.schema';
 import { UserToken } from '../schemas/userToken.schema';
@@ -74,7 +75,6 @@ export class UserService {
           nextPage: 'next',
           prevPage: 'prev',
           totalPages: 'total_pages',
-          pagingCounter: 'page_no',
           meta: 'pagination',
         };
 
@@ -93,14 +93,58 @@ export class UserService {
     return users;
   }
 
-  async FindUserById(userId) {
-    return await this.userModel
-      .findOne({
-        _id: userId,
-      })
-      .populate('role')
-      .populate('organization')
-      .populate('branch');
+  async FindUserById(userId, req) {
+    try {
+      const user = await this.userModel
+        .findOne({
+          _id: userId,
+        })
+        .populate('role')
+        .populate('organization')
+        .populate('branch');
+
+      let new_obj: any;
+      if (user?.profile?.attachmentId) {
+        let token;
+        if (process.env.NODE_ENV === 'development') {
+          const header = req.headers?.authorization?.split(' ')[1];
+          token = header;
+        } else {
+          if (!req || !req.cookies) return null;
+          token = req.cookies['access_token'];
+        }
+
+        const type =
+          process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+        const value =
+          process.env.NODE_ENV === 'development'
+            ? `Bearer ${token}`
+            : `access_token=${token}`;
+
+        const attachmentId = user?.profile?.attachmentId;
+
+        const request: any = {
+          url: `http://localhost/attachments/attachment/${attachmentId}`,
+          method: 'GET',
+          headers: {
+            [type]: value,
+          },
+        };
+
+        const { data: attachment } = await axios(request);
+
+        if (user?.profile?.attachmentId === attachment.id) {
+          new_obj = {
+            ...user.toObject(),
+            profile: { ...user.profile?.toObject(), attachment },
+          };
+        }
+      }
+
+      return new_obj ? new_obj : user;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   async InviteUserToOrganization(userDto, userData) {
@@ -181,29 +225,107 @@ export class UserService {
 
   async UpdateInvitedUser(userDto, params, res) {
     try {
-      const { username, fullName, country, phoneNumber, password } = userDto;
+      const {
+        username,
+        fullName,
+        country,
+        phoneNumber,
+        password,
+        attachmentId,
+        email,
+        prefix,
+        jobTitle,
+        cnic,
+        website,
+        location,
+        bio,
+      } = userDto;
 
+      const userId = params.id;
+      const user = await this.userModel.findById(userId);
       await this.userModel.updateOne(
-        { _id: params.id },
+        { _id: userId },
         {
-          username,
-          password: bcrypt.hashSync(password),
+          username: username || user.username,
+          password: password ? await bcrypt.hashSync(password) : user.password,
           isVerified: true,
           $set: {
-            'profile.fullName': fullName,
-            'profile.country': country,
-            'profile.phoneNumber': phoneNumber,
+            'profile.fullName': fullName || user?.profile?.fullName,
+            'profile.country': country || user?.profile?.country,
+            'profile.phoneNumber': phoneNumber || user?.profile?.phoneNumber,
+            'profile.attachmentId': attachmentId || user?.profile?.attachmentId,
+            'profile.prefix': prefix || user?.profile?.prefix,
+            'profile.jobTitle': jobTitle || user?.profile?.jobTitle,
+            'profile.cnic': cnic || user?.profile?.cnic,
+            'profile.website': website || user?.profile?.website,
+            'profile.location': location || user?.profile?.location,
+            'profile.bio': bio || user?.profile?.bio,
           },
         }
       );
 
       const new_user = await this.authService.CheckUser({
-        username,
+        username: username ? username : email,
       });
 
-      const user = await this.authService.Login(new_user, res);
+      return await this.authService.Login(new_user, res);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
 
-      return user;
+  async UpdateTheme(body, user) {
+    return await this.userModel.updateOne(
+      { _id: user.id },
+      { theme: body.theme }
+    );
+  }
+
+  async UpdateUserProfile(userDto, params, res) {
+    try {
+      const {
+        username,
+        fullName,
+        country,
+        phoneNumber,
+        password,
+        attachmentId,
+        email,
+        prefix,
+        jobTitle,
+        cnic,
+        website,
+        location,
+        bio,
+      } = userDto;
+
+      const userId = params.id;
+      const user = await this.userModel.findById(userId);
+      await this.userModel.updateOne(
+        { _id: userId },
+        {
+          username: username || user.username,
+          password: password ? await bcrypt.hashSync(password) : user.password,
+          $set: {
+            'profile.fullName': fullName || user?.profile?.fullName,
+            'profile.country': country || user?.profile?.country,
+            'profile.phoneNumber': phoneNumber || user?.profile?.phoneNumber,
+            'profile.attachmentId': attachmentId || user?.profile?.attachmentId,
+            'profile.prefix': prefix || user?.profile?.prefix,
+            'profile.jobTitle': jobTitle || user?.profile?.jobTitle,
+            'profile.cnic': cnic || user?.profile?.cnic,
+            'profile.website': website || user?.profile?.website,
+            'profile.location': location || user?.profile?.location,
+            'profile.bio': bio || user?.profile?.bio,
+          },
+        }
+      );
+
+      const new_user = await this.authService.CheckUser({
+        username: username ? username : email,
+      });
+
+      return await this.authService.Login(new_user, res);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

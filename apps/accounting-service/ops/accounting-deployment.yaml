@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: accounting-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: accounting-app
+  template:
+    metadata:
+      labels:
+        app: accounting-app
+    spec:
+      containers:
+      - name: accounting-app
+        image: <IMAGE>
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3336
+
+---
+# k8s service for this micro-service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: accounting-http
+spec:
+  selector:
+    app: accounting-app
+  ports:
+  - port: 80
+    targetPort: 3336

@@ -15,10 +15,12 @@ export class ItemService {
 
     let items;
     if (purpose === 'ALL') {
-      items = await this.itemModel.find({
-        status: 1,
-        organizationId: itemData.organizationId,
-      });
+      items = await this.itemModel
+        .find({
+          status: 1,
+          organizationId: itemData.organizationId,
+        })
+        .populate('price');
     } else {
       if (filters) {
         const filterData: any = Buffer.from(filters, 'base64').toString();
@@ -63,7 +65,6 @@ export class ItemService {
           nextPage: 'next',
           prevPage: 'prev',
           totalPages: 'total_pages',
-          pagingCounter: 'page_no',
           meta: 'pagination',
         };
 
@@ -175,6 +176,12 @@ export class ItemService {
       .populate('price')
       .populate('category')
       .populate('attribute_values');
+  }
+
+  async findByItemIds(itemIds) {
+    return await this.itemModel.find({
+      _id: { $in: itemIds.ids },
+    });
   }
 
   async DeleteItem(data) {

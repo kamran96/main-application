@@ -4,6 +4,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Param,
   Post,
   Req,
   Res,
@@ -16,6 +17,12 @@ import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 @Controller('attachment')
 export class AppController {
   constructor(private readonly appService: AppService) {}
+
+  @UseGuards(GlobalAuthGuard)
+  @Get('/:id')
+  async show(@Param() params) {
+    return await this.appService.FindAttachmentById(params.id);
+  }
 
   @UseGuards(GlobalAuthGuard)
   @Post()

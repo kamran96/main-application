@@ -14,6 +14,15 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3337;
   app.use(cookieParser());
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
+
+  console.log(process.env['NODE' + '_ENV']);
+  if (process.env['NODE' + '_ENV'] === 'production') {
+    app.setGlobalPrefix('invoices');
+  }
   await app.listen(port, () => {
     Logger.log('Listening at http://localhost:' + port);
   });

@@ -32,7 +32,7 @@ export class CreditNoteService {
     for (let item of dto.invoice_items) {
       await getCustomRepository(CreditNoteItemRepository).save({
         itemId: item.itemId,
-        invoiceId: credit_note.id,
+        creditNoteId: credit_note.id,
         description: item.description,
         quantity: item.quantity,
         itemDiscount: item.itemDiscount,

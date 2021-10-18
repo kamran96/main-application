@@ -10,6 +10,10 @@ export class CreditNotes {
   @Column()
   contactId: string;
   @Column()
+  invoiceId: number;
+  @Column()
+  billId: number;
+  @Column()
   reference: string;
   @Column()
   issueDate: string;
@@ -21,14 +25,13 @@ export class CreditNotes {
   discount: number;
   @Column()
   grossTotal: number;
-  @Column()
-  currency: string;
+  // @Column()
+  // currency: string;
   @Column()
   netTotal: number;
-  @Column()
-  date: string;
-  @Column()
-  type: string;
+  // @Column()
+  // date: string;
+
   @Column()
   branchId: string;
   @Column()

@@ -26,7 +26,7 @@ export class Bills {
   @Column()
   date: string;
   @Column()
-  type: string;
+  invoiceType: string;
   @Column()
   directTax: number;
   @Column()
@@ -55,5 +55,5 @@ export class Bills {
   updatedById: string;
 
   @OneToMany(() => BillItems, (billItem) => billItem.bill)
-  billItems: BillItems[];
+  purchaseItems: BillItems[];
 }

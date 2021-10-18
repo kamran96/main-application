@@ -33,7 +33,7 @@ export class User {
       location: String,
       bio: String,
       jobTitle: String,
-      attachmentId: Number,
+      attachmentId: String,
       status: Number,
     })
   )

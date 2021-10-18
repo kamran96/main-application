@@ -38,15 +38,22 @@ export class UserController {
 
   @Get('/:id')
   @UseGuards(JwtAuthGuard)
-  async show(@Param() params) {
-    const user = await this.userService.FindUserById(params.id);
+  async show(@Param() params, @Req() req: Request) {
+    try {
+      const user = await this.userService.FindUserById(params.id, req);
 
-    if (user) {
-      return {
-        message: 'User fetched successfully.',
-        status: true,
-        result: user,
-      };
+      if (user) {
+        return {
+          message: 'User fetched successfully.',
+          status: true,
+          result: user,
+        };
+      }
+    } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
@@ -91,6 +98,7 @@ export class UserController {
   }
 
   @Post('/verify-invited-user')
+  @UseGuards(JwtAuthGuard)
   async verifyInvitedUser(@Body() body) {
     try {
       const user = await this.userService.VerifyInvitedUser(body);
@@ -110,7 +118,50 @@ export class UserController {
     }
   }
 
+  @Post('update-theme')
+  @UseGuards(JwtAuthGuard)
+  async updateTheme(@Body() body, @Req() req: Request) {
+    const user = await this.userService.UpdateTheme(body, req.user);
+
+    if (user) {
+      return {
+        message: 'Updated theme successfully.',
+        status: true,
+      };
+    }
+  }
+
+  @Put('profile/:id')
+  @UseGuards(JwtAuthGuard)
+  async updateProfile(
+    @Body() userDto: InvitedUser,
+    @Param() params,
+    @Res() res: Response
+  ) {
+    try {
+      const user = await this.userService.UpdateUserProfile(
+        userDto,
+        params,
+        res
+      );
+
+      if (user) {
+        return {
+          message: 'User updated successfully.',
+          result: user,
+          status: 1,
+        };
+      }
+    } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   @Put('/update-invited-user/:id')
+  @UseGuards(JwtAuthGuard)
   async updateVerifiedUser(
     @Body() userDto: InvitedUser,
     @Param() params,

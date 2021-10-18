@@ -11,12 +11,10 @@ export class UserRegisterDto {
   organizationId: number;
   terms: boolean;
   marketing: boolean;
-  profile: {
-    fullname: string;
-    phoneNumber: string;
-    country: string;
-    prefix;
-  };
+  fullname: string;
+  phoneNumber: string;
+  country: string;
+  prefix;
 }
 
 export class InvitedUser {
@@ -32,6 +30,13 @@ class InvitedUserArr {
   password: string;
   country: string;
   phoneNumber: string;
+  attachmentId: string;
+  website: string;
+  location: string;
+  jobTitle: string;
+  prefix: string;
+  cnic: string;
+  bio: string;
 }
 
 export class UserLoginDto {
