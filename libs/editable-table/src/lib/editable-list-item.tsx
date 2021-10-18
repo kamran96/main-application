@@ -47,7 +47,6 @@ const _EditableListItem = ({
 export const EditableListItem = memo(
   _EditableListItem,
   (prevprops, nextProps) => {
-
     return (
       JSON.stringify(prevprops.row) === JSON.stringify(nextProps.row) &&
       JSON.stringify(prevprops.columns) === JSON.stringify(nextProps.columns)

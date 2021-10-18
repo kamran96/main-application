@@ -14,7 +14,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useState
+  useState,
 } from 'react';
 import { useQuery } from 'react-query';
 import { SortableHandle } from 'react-sortable-hoc';
@@ -22,7 +22,7 @@ import styled from 'styled-components';
 import {
   getAllContacts,
   getAllItems,
-  getInvoiceByIDAPI
+  getInvoiceByIDAPI,
 } from '../../../../api';
 import { getAccountsByTypeAPI } from '../../../../api/accounts';
 import CommonSelect, { Option } from '../../../../components/CommonSelect';
@@ -34,7 +34,7 @@ import {
   IContactType,
   IContactTypes,
   NOTIFICATIONTYPE,
-  PaymentMode
+  PaymentMode,
 } from '../../../../modal';
 import { IAccountsResult } from '../../../../modal/accounts';
 import { IInvoiceType } from '../../../../modal/invoice';
@@ -43,7 +43,7 @@ import { IOrganizationType } from '../../../../modal/organization';
 import convertToRem from '../../../../utils/convertToRem';
 import {
   calculateInvoice,
-  totalDiscountInInvoice
+  totalDiscountInInvoice,
 } from '../../../../utils/formulas';
 import moneyFormat from '../../../../utils/moneyFormat';
 import { useWindowSize } from '../../../../utils/useWindowSize';
@@ -309,21 +309,23 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         []
       : result;
 
-      const filteredItems = items?.filter((i, ind)=>{
-          let ids= invoiceItems?.map((inv)=>{
-            return inv.itemId
-          });
+  const filteredItems = ()=>{
+    let filtered = items?.filter((i, ind) => {
+      let ids = invoiceItems?.map((inv) => {
+        return inv.itemId;
+      });
+  
+      if (ids?.includes(i.id)) {
+        return null;
+      } else {
+        return i;
+      }
+    })
 
+    return filtered
+  };
 
-          if(ids?.includes(i.id)){
-            return null
-          }else{
-            return i
-          }
-      })
-
-
-  const columns: ColumnsType<any> = useMemo(()=>{
+  const columns: ColumnsType<any> = useMemo(() => {
     return [
       {
         title: '',
@@ -335,7 +337,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
       {
         title: '#',
         width: 48,
-  
+
         render: (value, record, index) => {
           return <>{index + 1}</>;
         },
@@ -347,10 +349,11 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         key: 'itemId',
         width: width > 1500 ? 220 : 190,
         align: 'left',
-  
+
         className: `select-column`,
-  
+
         render: (value, record, index) => {
+
           return (
             <EditableSelect
               onClick={() => setSelectedIndex(index)}
@@ -405,7 +408,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       '0';
                     let costOfGoodAmount =
                       purchasePrice * allItems[index].quantity;
-  
+
                     if (
                       type === IInvoiceType.INVOICE &&
                       selectedItem.stock < record.quantity
@@ -422,13 +425,13 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       allErrors[index] = { hasError: false };
                       setRowsErrors(allErrors);
                     }
-  
+
                     let description = `${selectedItem?.category?.title || ''}/`;
-  
+
                     let total = calculateInvoice(unitPrice, tax, itemDiscount);
-  
-                    allItems[index] = {
-                      ...allItems[index],
+
+                    allItems.splice(index, 1, {
+                      ...record,
                       itemId: val.value,
                       unitPrice: unitPrice.toFixed(2),
                       tax,
@@ -436,8 +439,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       total,
                       costOfGoodAmount,
                       description,
-                    };
-  
+                    });
+
                     return allItems;
                   });
                 }
@@ -459,27 +462,26 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                   </Button>
                 </Option>
                 {/* </Rbac> */}
-                {
-                  filteredItems.map((item: IItemsResult, index: number) => {
-                      return (
-                        <Option key={index} title={item.name} value={item.id}>
-                          {item.code} / {item.name}
-                        </Option>
-                      );
-                    
-                  })}
+                {filteredItems().map((item: IItemsResult, mapIndex: number) => {
+                  console.log(index, invoiceItems, "items here");
+                  return (
+                    <Option key={mapIndex} title={item.name} value={item.id}>
+                      {item.code} / {item.name}
+                    </Option>
+                  );
+                })}
               </>
             </EditableSelect>
           );
         },
       },
-  
+
       {
         title: 'Description',
         dataIndex: 'description',
         key: 'description',
         width: width > 1500 ? 670 : 230,
-  
+
         render: (data, record, index) => {
           return (
             <Editable
@@ -517,7 +519,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         dataIndex: 'quantity',
         key: 'quantity',
         width: width > 1500 ? 150 : 120,
-  
+
         render: (value, record, index) => {
           return (
             <Editable
@@ -538,10 +540,10 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       let unitPrice = record.unitPrice;
                       let purchasePrice = record.purchasePrice;
                       let itemDiscount = record.itemDiscount;
-  
+
                       let costOfGoodAmount = purchasePrice * quantity;
                       let tax = record.tax;
-  
+
                       if (
                         type === IInvoiceType.INVOICE &&
                         selectedItem.stock < value
@@ -558,16 +560,17 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                         allErrors[index] = { hasError: false };
                         setRowsErrors(allErrors);
                       }
-  
+
                       let total =
-                        calculateInvoice(unitPrice, tax, itemDiscount) * quantity;
+                        calculateInvoice(unitPrice, tax, itemDiscount) *
+                        quantity;
                       allItems[index] = {
                         ...allItems[index],
                         quantity,
                         total,
                         costOfGoodAmount,
                       };
-  
+
                       return allItems;
                     });
                   }
@@ -586,7 +589,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         dataIndex: 'unitPrice',
         key: 'unitPrice',
         width: width > 1500 ? 150 : '',
-  
+
         render: (value, record, index) => {
           return (
             <Editable
@@ -602,13 +605,13 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                     let total =
                       calculateInvoice(unitPrice, tax, itemDiscount) *
                       parseInt(record.quantity);
-  
+
                     allItems[index] = {
                       ...allItems[index],
                       unitPrice,
                       total,
                     };
-  
+
                     return allItems;
                   });
                 }, 500);
@@ -625,7 +628,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         dataIndex: 'itemDiscount',
         key: 'itemDiscount',
         // width: width > 1500 ? 150 : "",
-  
+
         render: (value, record, index) => {
           return (
             <Editable
@@ -639,7 +642,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                   setInvoiceItems((prev) => {
                     let allItems = [...prev];
                     let itemDiscount = value.replace(/\b0+/g, '');
-  
+
                     if (itemDiscount === '') {
                       itemDiscount = '0';
                     }
@@ -648,13 +651,13 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                     let total =
                       calculateInvoice(unitPrice, tax, itemDiscount) *
                       parseInt(record.quantity);
-  
+
                     allItems[index] = {
                       ...allItems[index],
                       itemDiscount,
                       total,
                     };
-  
+
                     return allItems;
                   });
                 }, 400);
@@ -694,20 +697,22 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                         ...allItems[index],
                         accountId: val.value,
                       };
-  
+
                       return allItems;
                     });
                   }}
                 >
                   <>
                     {accountRowSelectedIndex === index &&
-                      accountsList.map((acc: IAccountsResult, index: number) => {
-                        return (
-                          <Option key={index} value={acc.id}>
-                            {acc.name}
-                          </Option>
-                        );
-                      })}
+                      accountsList.map(
+                        (acc: IAccountsResult, index: number) => {
+                          return (
+                            <Option key={index} value={acc.id}>
+                              {acc.name}
+                            </Option>
+                          );
+                        }
+                      )}
                   </>
                 </CommonSelect>
               );
@@ -722,7 +727,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         key: 'tax',
         width: width > 1500 ? 150 : 130,
         align: 'center',
-  
+
         render: (value, record, index) => {
           return <>{value}</>;
         },
@@ -773,8 +778,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
           );
         },
       },
-    ]
-  }, [filteredItems])
+    ];
+  }, [filteredItems]);
   const handleScroll = () => {
     let ele: HTMLElement = document.querySelector('.ant-table-tbody');
 

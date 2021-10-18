@@ -86,6 +86,7 @@ export const LoginForm: FC = () => {
           </Col>
         </Row>
         <Form
+          autoComplete="off"
           className="mt-20"
           initialValues={{ remember: true }}
           onFinish={onFinish}
@@ -116,7 +117,7 @@ export const LoginForm: FC = () => {
                   { required: true, message: 'Please input your password!' },
                 ]}
               >
-                <Input.Password size="large" />
+                <Input.Password size="large" autoComplete="off" />
               </Form.Item>
               <div className="actions-wrapper mv-10">
                 <Form.Item name="remember_me" valuePropName="checked">

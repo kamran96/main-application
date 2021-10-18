@@ -1,4 +1,3 @@
-import "./print.css";
 
 import printIcon from "@iconify-icons/bytesize/print";
 import {
@@ -26,7 +25,6 @@ import { Addressbar, TopbarLogoWithDetails } from "../PrintHeader/Formats";
 import { PDFICON } from "../Icons";
 import { WrapperTable, DefaultWrapper } from "./styles";
 import { useWindowSize } from "../../utils/useWindowSize";
-import { useReactToPrint } from "react-to-print";
 
 interface IProps extends TableProps<any> {
   data?: any[];
