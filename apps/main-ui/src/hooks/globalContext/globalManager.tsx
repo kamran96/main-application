@@ -250,7 +250,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   useEffect(() => {
     if (checkIsAuthSaved) {
       let decriptedData = DecriptionData(checkIsAuthSaved);
-      console.log(decriptedData, 'decrypeted data');
       let user: IUser = decriptedData?.users;
 
       setAuth(decriptedData);
@@ -259,7 +258,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   }, [checkIsAuthSaved]);
 
   let userId = auth?.users?.id || null;
-  console.log(userId, "user id is set")
 
 
   /* LoggedInUser is Fetched */
@@ -322,7 +320,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     toggleTheme(theme);
   }, [theme]);
 
-  console.log(userDetails, 'user details');
 
   const {
     data: allRolesAndPermissionsData,

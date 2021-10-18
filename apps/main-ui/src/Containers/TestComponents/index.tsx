@@ -14,12 +14,7 @@ export const TestComponents: FC = () => {
   console.log(dayjs(state).format('LLL'), "value")
 
   return <>
-  <DatePicker
-  onChange={val=>{
-   setState(val)
-  }}
-  value={state}
+ test 
   
-  />
   </>;
 };

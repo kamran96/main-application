@@ -1,11 +1,16 @@
-import { railsHttp } from "../utils/http";
+import http from '../utils/http';
+
+enum PAYMENTS {
+  CREATE = `/payments/payment`,
+  INDEX  = `payments/payment`
+}
 
 export const getInvoiceAgainstID = (key?: string, payload?: any) =>
-  railsHttp.get(
-    `invoices/credits/${payload.id}?paymentMode=${payload.paymentMode}`
+  http.get(
+    `invoices/invoice/contact/${payload.id}?type=${payload.paymentMode}`
   );
 export const paymentCreateAPI = (payload) => {
-  return railsHttp.post(`payments/create`, payload);
+  return http.post(PAYMENTS.CREATE, payload);
 };
 
 export const paymentIndexAPI = (
@@ -14,15 +19,14 @@ export const paymentIndexAPI = (
   sortid?: string,
   page_size?: number,
   query?: string,
-  paymentType?: number,
-
+  paymentType?: number
 ) => {
-  let url = `payments/index?page_size=${page_size}&page_no=${page}&sort=${sortid}&paymentType=${paymentType}`;
+  let url = `${PAYMENTS.INDEX}?page_size=${page_size}&page_no=${page}&paymentType=${paymentType}`;
   if (query) {
     url = `${url}&query=${query}`;
   }
 
-  return railsHttp.get(url);
+  return http.get(url);
 };
 
 interface IPaymentDeletePayload {
@@ -30,4 +34,4 @@ interface IPaymentDeletePayload {
 }
 
 export const paymentDeleteAPI = (payload?: IPaymentDeletePayload) =>
-  railsHttp.put("payments/delete", payload);
+  http.put('payments/delete', payload);

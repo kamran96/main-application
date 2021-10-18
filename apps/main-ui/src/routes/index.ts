@@ -467,6 +467,11 @@ export const routes = (root = "/app"): RouteConfig[] => [
         component: DefaultLayout,
         routes: [
           {
+            exact: true,
+            path: `page/components`,
+            component: TestComponents,
+          },
+          {
             path: `/page/login`,
             component: Login,
             exact: true,

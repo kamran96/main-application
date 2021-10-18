@@ -159,41 +159,30 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
       delete paymentData.totalAmount;
       delete paymentData.totalDiscount;
       let payload: any = {
-        invoice: {
-          ...value,
-          status: value.status.status,
-          invoiceType: type ? type : IInvoiceType.INVOICE,
-          discount: addition(invoiceDiscount, TotalDiscount),
-          netTotal: NetTotal,
-          grossTotal: GrossTotal,
-          total: '',
-          isNewRecord: true,
-        },
+        ...value,
+        status: value.status.status,
+        invoiceType: type ? type : IInvoiceType.INVOICE,
+        discount: addition(invoiceDiscount, TotalDiscount),
+        netTotal: NetTotal,
+        grossTotal: GrossTotal,
+        total: '',
+        isNewRecord: true,
+
         invoice_items: invoiceItems.map((item, index) => {
           return { ...item, sequence: index };
         }),
       };
-      let payments = {
-        ...paymentData,
-        amount:
-          payment.paymentMode === PaymentMode.CREDIT
-            ? 0
-            : payment.paymentMode === PaymentMode.CASH
-            ? NetTotal
-            : parseFloat(payment.amount),
-      };
 
-      delete payload.invoice.invoiceDiscount;
-      delete payload.invoice.total;
+      delete payload.invoiceDiscount;
+      delete payload.total;
       if (id) {
         payload = {
           ...payload,
-          invoice: {
-            ...payload.invoice,
-            invoiceId: id,
-            isNewRecord: false,
-            deleted_ids: deleteIds,
-          },
+
+          ...payload.invoice,
+          invoiceId: id,
+          isNewRecord: false,
+          deleted_ids: deleteIds,
         };
       }
       try {
@@ -203,7 +192,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
             if (value && value.status.print) {
               setPrintModal(true);
             }
-            if (payload.invoice.status !== 2) {
+            if (payload.status !== 2) {
               let messages = {
                 invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
                 quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,

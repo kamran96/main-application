@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { DecriptionData } from './encription';
 
-let localIP = `http://192.168.6.120/`;
+let localIP = `http://192.168.10.252/`;
 let RailsBaseURL = "";
 let NodeBaseURL = ``;
 const cancelSource = axios.CancelToken.source();

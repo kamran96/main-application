@@ -24,8 +24,7 @@ export const ClickOutSide: FC<IProps> = ({
     // document.addEventListener
     if (body && initialVal && initialVal === true) {
       body.addEventListener("click", (e) => {
-        e.stopPropagation();
-        e.preventDefault();
+        // e.stopPropagation();
         if (!notEffectingClass.includes(e?.target?.className) && e.target.tagName!=='svg'  ) {
 
           setTimeout(() => {

@@ -135,6 +135,7 @@ export const RegisterForm: FC = () => {
                   <Seprator />
                 </div>
                 <Form
+                 autoComplete="off"
                   onFinish={onFinish}
                   onFinishFailed={onFinishFailed}
                   layout="vertical"
@@ -151,7 +152,7 @@ export const RegisterForm: FC = () => {
                           },
                         ]}
                       >
-                        <Input placeholder={"eg John"} size="middle" />
+                        <Input placeholder={"eg John"} size="middle" autoComplete="off" />
                       </Form.Item>
                     </Col>
 
@@ -163,7 +164,7 @@ export const RegisterForm: FC = () => {
                           { required: true, message: "please add username" },
                         ]}
                       >
-                        <Input placeholder="e.g John" size="middle" />
+                        <Input placeholder="e.g John" size="middle" autoComplete="off" />
                       </Form.Item>
                     </Col>
 
@@ -178,6 +179,7 @@ export const RegisterForm: FC = () => {
                         <Input
                           placeholder="e.g someone@example.com"
                           size="middle"
+                          autoComplete="off"
                         />
                       </Form.Item>
                     </Col>
@@ -188,6 +190,7 @@ export const RegisterForm: FC = () => {
                         label="Country"
                       >
                         <Select
+                          
                           size="middle"
                           showSearch
                           style={{ width: "100%" }}
@@ -232,6 +235,7 @@ export const RegisterForm: FC = () => {
                         ]}
                       >
                         <Input
+                        autoComplete="off"
                           addonBefore={prefixSelector}
                           type="text"
                           placeholder="3188889898"
