@@ -23,11 +23,11 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
 }) => {
   let asessorTableData =
     type === "SI"
-      ? "invoice_items"
+      ? "invoiceItems"
       : type === "PO"
-      ? "purchase_items"
+      ? "purchaseItems"
       : type === "BILL"
-      ? "bill_items" : type==="credit-note" ? 'credit_note_items'
+      ? "billItems" : type==="credit-note" ? 'credit_note_items'
       : "invoice_items";
 
   let priceAccessor =
