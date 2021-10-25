@@ -1,6 +1,8 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
-import { performance } from 'perf_hooks';
+import axios from 'axios';
+import { INIT_ACCOUNTS } from '@invyce/send-email';
 import { AuthService } from '../auth/auth.service';
 import { RbacService } from '../rbac/rbac.service';
 import { Branch } from '../schemas/branch.schema';
@@ -16,7 +18,8 @@ export class OrganizationService {
     @InjectModel(Branch.name) private branchModel,
     @InjectModel(User.name) private userModel,
     private rbacService: RbacService,
-    private authService: AuthService
+    private authService: AuthService,
+    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy
   ) {}
 
   async ListOrganizations(organizationData) {
@@ -37,7 +40,7 @@ export class OrganizationService {
 
   async CreateOrUpdateOrganization(
     organizationDto,
-    organizationData = null,
+    req = null,
     res = null
   ): Promise<any> {
     if (organizationDto && organizationDto.isNewRecord === false) {
@@ -111,20 +114,20 @@ export class OrganizationService {
         organization.faxNumber = organizationDto.faxNumber;
         organization.attachmentId = organizationDto.attachmentId;
         organization.address = organizationDto.address;
-        organization.createdById = organizationData.id;
-        organization.updatedById = organizationData.id;
+        organization.createdById = req?.user?.id;
+        organization.updatedById = req?.user?.id;
         organization.status = 1;
         await organization.save();
 
         const organizationUser = new this.organizationUserModel();
         organizationUser.organizationId = organization.id;
-        organizationUser.userId = organizationData.id;
+        organizationUser.userId = req?.user?.id;
         organizationUser.status = 1;
         await organizationUser.save();
 
         let branchArr = [];
         if (
-          organizationData.organizationId === null &&
+          req?.user?.organizationId === null &&
           organization.organizationType === 'SAAS'
         ) {
           const branch = new this.branchModel();
@@ -134,15 +137,26 @@ export class OrganizationService {
           branchArr.push(branch);
         }
 
+        const http = axios.create({
+          baseURL: 'http://localhost',
+        });
+
+        await http.post(`accounts/account/init`, {
+          user: {
+            id: req?.user?.id,
+            organizationId: organization.id,
+          },
+        });
+
         const roles = await this.rbacService.InsertRoles(organization._id);
         await this.rbacService.InsertRolePermission(organization._id);
         const [adminRole] = roles.filter((r) => r.name === 'admin');
 
-        if (organizationData?.organizationId !== null) {
+        if (req?.user?.organizationId !== null) {
           return res.send(organization);
         } else {
           await this.userModel.updateOne(
-            { _id: organizationData.id },
+            { _id: req?.user?.id },
             {
               organizationId: organization._id,
               roleId: adminRole._id,
@@ -151,7 +165,7 @@ export class OrganizationService {
           );
 
           const new_user = await this.authService.CheckUser({
-            username: organizationData.username,
+            username: req?.user?.username,
           });
 
           const user_with_organization = await this.authService.Login(
@@ -162,7 +176,6 @@ export class OrganizationService {
           return user_with_organization;
         }
       } catch (error) {
-        console.log(error);
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
     }

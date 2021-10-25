@@ -29,12 +29,28 @@ export class AppService {
     });
     console.log(email, 'email successfully.');
   }
+
   async SendOtp(data) {
     const email = await client.sendEmailWithTemplate({
       From: data.from,
       To: data.to,
       TemplateAlias: data.TemplateAlias,
       TemplateModel: data.TemplateModel,
+    });
+    console.log(email, 'email successfully.');
+  }
+
+  async SendPdf(data) {
+    let payload: any = {
+      Name: 'build.pdf',
+      ContentType: 'text/pain',
+    };
+    const email = await client.sendEmailWithTemplate({
+      From: data.from,
+      To: data.to,
+      TemplateAlias: data.TemplateAlias,
+      TemplateModel: { ...data.TemplateModel, Attachments: [payload] },
+      // Attachments: [payload],
     });
     console.log(email, 'email successfully.');
   }

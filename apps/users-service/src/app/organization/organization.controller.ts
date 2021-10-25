@@ -54,7 +54,7 @@ export class OrganizationController {
       const organization =
         await this.organizationService.CreateOrUpdateOrganization(
           organizationDto,
-          req.user,
+          req,
           res
         );
 

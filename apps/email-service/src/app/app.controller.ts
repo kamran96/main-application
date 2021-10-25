@@ -6,6 +6,7 @@ import {
   SEND_OTP,
   SEND_FORGOT_PASSWORD,
   SEND_INVITATION,
+  SEND_PDF_MAIL,
 } from '@invyce/send-email';
 
 @Controller()
@@ -32,11 +33,20 @@ export class AppController {
 
     await this.appService.SendForgotPassword(data);
   }
+
   @MessagePattern(SEND_OTP)
   async sendOtp(@Payload() data: any) {
     Logger.log('Data is received.');
     Logger.log(data);
 
     await this.appService.SendOtp(data);
+  }
+
+  @MessagePattern(SEND_PDF_MAIL)
+  async sendPdf(@Payload() data: any) {
+    Logger.log('Data is received.');
+    Logger.log(data);
+
+    await this.appService.SendPdf(data);
   }
 }

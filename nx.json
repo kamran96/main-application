@@ -50,6 +50,9 @@
     "email-service": {
       "tags": []
     },
+    "exports-service": {
+      "tags": []
+    },
     "global-auth-guard": {
       "tags": []
     },

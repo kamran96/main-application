@@ -3,7 +3,10 @@ import {
   AccountRepository,
   PrimaryAccountRepository,
   SecondaryAccountRepository,
+  TransactionItemRepository,
+  TransactionRepository,
 } from '../repositories';
+import * as moment from 'moment';
 import { getCustomRepository, In } from 'typeorm';
 import { Sorting } from '@invyce/sorting';
 
@@ -30,22 +33,22 @@ export class AccountsService {
       
       coalesce((
         select sum(ti.amount) from transaction_items ti
-        where ti."accountId" = a.id and ti."transactionType" = 2 
+        where ti."accountId" = a.id and ti."transactionType" = 20
       ), 0) as total_credit,
       
       coalesce((
         select sum(ti.amount) from transaction_items ti
-        where ti."accountId" = a.id and ti."transactionType" = 1
+        where ti."accountId" = a.id and ti."transactionType" = 10
       ), 0) as total_debit,
       
-      (
+      ABS((
         CASE
         WHEN (pa.name = 'assets') OR ( pa.name='expense') THEN (
           coalesce((
             SELECT sum(ti.amount) from transaction_items AS ti
             left join transactions as t
             on ti."transactionId" = t.id
-            WHERE ti."accountId" = a.id AND ti."transactionType" = 1 
+            WHERE ti."accountId" = a.id AND ti."transactionType" = 10
             and t.status = 1
           ), 0) 
             -
@@ -54,7 +57,7 @@ export class AccountsService {
             SELECT sum(ti.amount) from transaction_items AS ti
             left join transactions as t
             on ti."transactionId" = t.id
-            WHERE ti."accountId" = a.id AND ti."transactionType" = 2 
+            WHERE ti."accountId" = a.id AND ti."transactionType" = 20
             and t.status = 1
           ), 0 )
         )
@@ -63,7 +66,7 @@ export class AccountsService {
             SELECT sum(ti.amount) from transaction_items AS ti
             left join transactions as t
             on ti."transactionId" = t.id
-            WHERE ti."accountId" = a.id AND ti."transactionType" = 2 
+            WHERE ti."accountId" = a.id AND ti."transactionType" = 20
             and t.status = 1
           ), 0) -
     
@@ -71,11 +74,11 @@ export class AccountsService {
             SELECT sum(ti.amount) from transaction_items AS ti
             left join transactions as t
             on ti."transactionId" = t.id
-            WHERE ti."accountId" = a.id AND ti."transactionType" = 1 
+            WHERE ti."accountId" = a.id AND ti."transactionType" = 10
             and t.status = 1
           ), 0 )
         END
-        ) as balance
+        )) as balance
     from accounts a
     left join secondary_accounts sa
     on sa.id = a."secondaryAccountId"
@@ -106,7 +109,7 @@ export class AccountsService {
 
         const page = `
         limit ${page_size || 20}
-        offset ${page_no * page_size - page_size || 1}
+        offset ${page_no * page_size - page_size || 0}
       `;
 
         // const secondaryAccounts = await getCustomRepository(
@@ -165,7 +168,7 @@ export class AccountsService {
     });
   }
 
-  async initAccounts(user): Promise<any> {
+  async initAccounts(data): Promise<any> {
     try {
       const { primary, secondary } = await import('../accounts');
       for (const account of primary) {
@@ -173,9 +176,9 @@ export class AccountsService {
           name: account.name,
           status: 1,
           code: account.code,
-          organizationId: user.organizationId,
-          createdById: user.id, // need to be change later
-          updatedById: user.id, // need to be change later
+          organizationId: data.user.organizationId,
+          createdById: data.user.id, // need to be change later
+          updatedById: data.user.id, // need to be change later
         };
         const primaryAccount = await getCustomRepository(
           PrimaryAccountRepository
@@ -189,9 +192,9 @@ export class AccountsService {
             code: secondaryAccount.code,
             status: 1,
             primaryAccountId: primaryAccount.id,
-            organizationId: user.organizationId,
-            updatedById: user.id,
-            createdById: user.id,
+            organizationId: data.user.organizationId,
+            updatedById: data.user.id,
+            createdById: data.user.id,
           };
           const insertSecondary = await getCustomRepository(
             SecondaryAccountRepository
@@ -206,9 +209,9 @@ export class AccountsService {
                 secondaryAccountId: insertSecondary.id,
                 primaryAccountId: primaryAccount.id,
                 importedFrom: 'init',
-                organizationId: user.organizationId,
-                createdById: user.id,
-                updatedById: user.id,
+                organizationId: data.user.organizationId,
+                createdById: data.user.id,
+                updatedById: data.user.id,
               };
               await getCustomRepository(AccountRepository).save(accountModel);
             }
@@ -218,6 +221,135 @@ export class AccountsService {
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async AccountLedger(user, queryData, accountId) {
+    const { page_size, page_no, sort, query } = queryData;
+    let sql = `
+            SELECT transaction_items.*, (
+              select date from transactions
+              where transactions.id = transaction_items."transactionId"
+              and transactions.status = 1
+            )
+        FROM "transaction_items"
+        WHERE "transaction_items"."status" = 1
+        AND "transaction_items"."organizationId" = '${user.organizationId}'
+        AND "transaction_items"."transactionId" IN
+          (
+              SELECT "transaction_items"."transactionId" FROM "transaction_items"
+              WHERE "transaction_items"."accountId" = ${accountId}
+              )
+        AND "transaction_items"."accountId" != ${accountId}
+    `;
+
+    let opening_balance;
+
+    if (query) {
+      const filterData: any = Buffer.from(query, 'base64').toString();
+      const data = JSON.parse(filterData);
+
+      for (let i in data) {
+        if (data[i].type === 'date-between') {
+          const start_date = data[i].value[0];
+          const end_date = data[i].value[1];
+          const add_one_day = moment(end_date).add(1, 'day').calendar();
+
+          opening_balance = getCustomRepository(TransactionItemRepository)
+            .query(`
+              SELECT (select coalesce(sum(case when transaction_items."transactionType" = 10
+                then transaction_items.amount else - transaction_items.amount end ), 0)
+                from transaction_items where transaction_items."transactionId" in (
+                    select id from transactions where date < '${start_date}'
+                  )
+                and transaction_items."accountId" = accounts.id
+                and transaction_items.status = 1 ) as balance, (
+                  SELECT "transactions"."date" FROM "transactions"
+                  WHERE (date < '${start_date}')
+                  AND "transactions"."status" = 1
+                  AND "transactions"."id" IN (
+                    SELECT "transaction_items"."transactionId" FROM "transaction_items"
+                    WHERE "transaction_items"."accountId" = accounts.id)
+                    ORDER BY "transactions"."date"
+                    DESC LIMIT 1) as date FROM "accounts"
+                    WHERE "accounts"."id" = ${accountId}
+                    AND "accounts"."organizationId" = '${user.organizationId}'
+                    AND "accounts"."status" = 1
+            `);
+
+          sql = sql += `and transaction_items."transactionId" in (
+              select id from transactions
+              WHERE transactions.${i} BETWEEN '${start_date}' AND '${add_one_day}'
+            )`;
+        }
+      }
+    }
+
+    const { sort_column, sort_order } = await Sorting(sort);
+
+    const page = `
+    limit ${page_size || 20}
+    offset ${page_no * page_size - page_size || 0}
+  `;
+
+    const transaction_items = await getCustomRepository(
+      TransactionItemRepository
+    ).query((sql += `order by ${sort_column} ${sort_order}  ${page}`));
+
+    let account_arr = [];
+    let transaction_arr = [];
+    for (let i of transaction_items) {
+      const [account] = await getCustomRepository(AccountRepository).find({
+        where: {
+          id: i.accountId,
+        },
+      });
+      account_arr.push(account);
+
+      const [transaction] = await getCustomRepository(
+        TransactionRepository
+      ).find({
+        where: {
+          id: i.transactionId,
+        },
+      });
+      transaction_arr.push(transaction);
+    }
+
+    let new_arr = [];
+    for (let i of transaction_items) {
+      const account = account_arr.find((a) => a.id === i.accountId);
+      const transaction = transaction_arr.find(
+        (tr) => tr.id === i.transactionId
+      );
+      new_arr.push({
+        ...i,
+        account,
+        transaction,
+      });
+    }
+
+    const total = await getCustomRepository(TransactionItemRepository).count({
+      status: 1,
+      organizationId: user.organizationId,
+    });
+
+    return {
+      pagination: {
+        total,
+        total_pages: Math.ceil(total / page_size),
+        page_size: parseInt(page_size) || 20,
+        // page_total: null,
+        page_no: parseInt(page_no),
+        sort_column: sort_column,
+        sort_order: sort_order,
+      },
+      opening_balance: {
+        comment: 'Opening Balance',
+        date: opening_balance?.length > 0 ? opening_balance[0].date : null,
+        amount: opening_balance?.length > 0 ? opening_balance[0].balance : null,
+      },
+      transaction_items: new_arr,
+    };
   }
 
   async CreateOrUpdateAccount(accountDto, accountData) {
