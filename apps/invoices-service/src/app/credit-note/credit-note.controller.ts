@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -17,6 +18,31 @@ import { CreditNoteDto } from '../dto/credit-note.dto';
 @Controller('credit-note')
 export class CreditNoteController {
   constructor(private creditNoteService: CreditNoteService) {}
+
+  @Get()
+  @UseGuards(GlobalAuthGuard)
+  async index(@Req() req: Request, @Query() query) {
+    try {
+      const invoice = await this.creditNoteService.IndexCreditNote(
+        req.user,
+        query
+      );
+
+      if (invoice) {
+        return {
+          message: 'Invoice fetched successfully.',
+          status: true,
+          pagination: invoice.pagination,
+          result: invoice.invoices,
+        };
+      }
+    } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 
   @UseGuards(GlobalAuthGuard)
   @Post()

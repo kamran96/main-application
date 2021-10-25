@@ -304,6 +304,56 @@
         }
       }
     },
+    "exports-service": {
+      "root": "apps/exports-service",
+      "sourceRoot": "apps/exports-service/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/exports-service",
+            "main": "apps/exports-service/src/main.ts",
+            "tsConfig": "apps/exports-service/tsconfig.app.json",
+            "assets": ["apps/exports-service/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/exports-service/src/environments/environment.ts",
+                  "with": "apps/exports-service/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "exports-service:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/exports-service/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/exports-service"],
+          "options": {
+            "jestConfig": "apps/exports-service/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "global-auth-guard": {
       "root": "libs/global-auth-guard",
       "sourceRoot": "libs/global-auth-guard/src",

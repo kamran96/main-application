@@ -42,26 +42,6 @@ export class AccountsController {
     }
   }
 
-  @Post('/init')
-  @UseGuards(GlobalAuthGuard)
-  async initAccounts(@Req() req: Request) {
-    try {
-      const initialAccounts = await this.accountService.initAccounts(req.user);
-
-      if (initialAccounts) {
-        return {
-          message: 'Specified Account Crreated & Fetched successfull',
-          result: initialAccounts,
-        };
-      }
-    } catch (error) {
-      throw new HttpException(
-        `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
-
   @Get('/secondary-accounts')
   @UseGuards(GlobalAuthGuard)
   async secondaryAccounts(@Req() req: Request) {
@@ -74,6 +54,33 @@ export class AccountsController {
         return {
           message: 'Account fetched successfull',
           result: secondaryAccounts,
+        };
+      }
+    } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Get('ledger/:id')
+  @UseGuards(GlobalAuthGuard)
+  async AccountLedger(@Req() req: Request, @Query() query, @Param() params) {
+    try {
+      const account = await this.accountService.AccountLedger(
+        req.user,
+        query,
+        params.id
+      );
+
+      if (account) {
+        return {
+          message: 'Account ledger fetched successfull',
+          status: true,
+          pagination: account.pagination,
+          opening_balance: account.opening_balance,
+          result: account.transaction_items,
         };
       }
     } catch (error) {
@@ -108,6 +115,11 @@ export class AccountsController {
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  @Post('init')
+  async initAccounts(@Body() data) {
+    return await this.accountService.initAccounts(data);
   }
 
   @Get('/:id')

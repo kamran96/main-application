@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from '../auth/auth.module';
 import { RbacModule } from '../rbac/rbac.module';
@@ -22,6 +23,19 @@ import { OrganizationService } from './organization.service';
       { name: OrganizationUser.name, schema: OrganizationUserSchema },
       { name: Branch.name, schema: BranchSchema },
       { name: User.name, schema: UserSchema },
+    ]),
+    ClientsModule.register([
+      {
+        name: 'EMAIL_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://localhost:5672'],
+          queue: 'email_queue',
+          queueOptions: {
+            durable: false,
+          },
+        },
+      },
     ]),
     RbacModule,
     AuthModule,
