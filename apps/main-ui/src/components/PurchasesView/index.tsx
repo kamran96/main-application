@@ -296,6 +296,8 @@ export const PurchasesView: FC<IProps> = ({
     let pdf = DownloadPDF(printItem);
     let payload = {
       ...values,
+      id,
+      type,
       html: `${pdf}`,
     };
 

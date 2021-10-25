@@ -51,7 +51,7 @@ export const getAccountLedger = (
   page: number = 1,
   query?: string
 ) => {
-  let url = `/accounts/ledger?id=${id}&page_size=${pageSize}&page_no=${page}`;
+  let url = `${ACCOUNT.INDEX}/ledger/${id}?page_size=${pageSize}&page_no=${page}`;
 
   if (query) {
     url = `${url}&query=${query}`;
