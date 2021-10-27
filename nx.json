@@ -104,6 +104,9 @@
     },
     "users-service": {
       "tags": []
+    },
+    "integration": {
+      "tags": []
     }
   }
 }
