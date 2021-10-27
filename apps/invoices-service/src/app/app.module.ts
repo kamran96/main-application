@@ -28,7 +28,7 @@ import { CreditNoteModule } from './credit-note/credit-note.module';
           ),
           database: configService.get('INV_DB_NAME', process.env.INV_DB_NAME),
           entities: getMetadataArgsStorage().tables.map((tbl) => tbl.target),
-          ssl: { rejectUnauthorized: false },
+          // ssl: { rejectUnauthorized: false },
         } as TypeOrmModuleOptions),
     }),
     InvoiceModule,
