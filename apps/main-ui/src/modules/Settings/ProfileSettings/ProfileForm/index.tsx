@@ -1,17 +1,22 @@
-import { Button, Col, Form, Input, Row } from "antd";
-import React, { FC, useEffect, useState } from "react";
-import { queryCache, useMutation, useQuery } from "react-query";
-import styled from "styled-components";
+import { Button, Col, Form, Input, Row, Select } from 'antd';
+import { getFlag } from 'apps/main-ui/src/utils/getFlags';
+import { FC, useEffect, useState } from 'react';
+import { queryCache, useMutation, useQuery } from 'react-query';
+import styled from 'styled-components';
 
-import { getUserAPI, updateProfileAPI } from "../../../../api";
-import { FormLabel } from "../../../../components/FormLabel";
-import { Heading } from "../../../../components/Heading";
-import { Para } from "../../../../components/Para";
-import { Seprator } from "../../../../components/Seprator";
-import { UploadAtachment } from "../../../../components/UploadAtachment";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
-import { IAttachment, NOTIFICATIONTYPE } from "../../../../modal";
-import convertToRem from "../../../../utils/convertToRem";
+import { getUserAPI, updateProfileAPI } from '../../../../api';
+import { FormLabel } from '../../../../components/FormLabel';
+import { Heading } from '../../../../components/Heading';
+import { Para } from '../../../../components/Para';
+import { Seprator } from '../../../../components/Seprator';
+import { UploadAtachment } from '../../../../components/UploadAtachment';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { IAttachment, NOTIFICATIONTYPE } from '../../../../modal';
+import convertToRem from '../../../../utils/convertToRem';
+import phoneCodes from '../../../../utils/phoneCodes';
+import en from "../../../../../../../node_modules/world_countries_lists/data/en/world.json";
+
+const { Option } = Select;
 
 interface IProps {
   id?: number;
@@ -25,9 +30,8 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
   const { notificationCallback } = useGlobalContext();
   const [attachmentData, setAttachmentData] = useState<IAttachment | any>(null);
 
-  const [mutateUpdateProfile, responseUpdateProfile] = useMutation(
-    updateProfileAPI
-  );
+  const [mutateUpdateProfile, responseUpdateProfile] =
+    useMutation(updateProfileAPI);
 
   const onFinish = async (values) => {
     const payload = { ...values, attachmentId, userId: id };
@@ -36,7 +40,7 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
         onSuccess: () => {
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
-            "Updated Successfully"
+            'Updated Successfully'
           );
           queryCache.invalidateQueries(`loggedInUser`);
         },
@@ -47,7 +51,7 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
   };
 
   const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
+    console.log('Failed:', errorInfo);
   };
 
   const { data } = useQuery([`loggedInUser`, id], getUserAPI, {
@@ -57,10 +61,45 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
   useEffect(() => {
     if (data && data.data) {
       const { profile } = data.data.result;
-      form.setFieldsValue(profile);
+      form.setFieldsValue({ ...profile, prefix: parseInt(profile?.prefix) });
       setAttachmentData(profile.attachment);
     }
   }, [data, form]);
+
+  const prefixSelector = (
+    <Form.Item name="prefix" noStyle>
+      <Select
+        style={{ width: 100 }}
+        showSearch
+        defaultValue={92}
+        filterOption={(input, option) => {
+          return (
+            option?.id?.toLowerCase().includes(input?.toLocaleLowerCase()) ||
+            option?.title?.toLowerCase().includes(input?.toLocaleLowerCase())
+          );
+        }}
+      >
+        {phoneCodes?.map((country) => {
+          return (
+            <Option
+              value={country?.phoneCode}
+              title={`${country?.phoneCode}`}
+              id={country?.short}
+            >
+              <img
+                className="mr-10"
+                alt="flag"
+                style={{ width: 18, height: 18, verticalAlign: 'sub' }}
+                src={getFlag(country.short)}
+              />
+              <span>+{country?.phoneCode}</span>
+            </Option>
+          );
+        })}
+      </Select>
+    </Form.Item>
+  );
+
   return (
     <WrapperProfileForm>
       <Form form={form} onFinish={onFinish} onFinishFailed={onFinishFailed}>
@@ -86,18 +125,18 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
                 <FormLabel>Full Name</FormLabel>
                 <Form.Item
                   name="fullName"
-                  rules={[{ required: true, message: "Full Name" }]}
+                  rules={[{ required: true, message: 'Full Name' }]}
                 >
-                  <Input placeholder={"Your full name"} size="large" />
+                  <Input placeholder={'Your full name'} size="large" />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <FormLabel>Job Title</FormLabel>
                 <Form.Item
                   name="jobTitle"
-                  rules={[{ required: true, message: "Your job title" }]}
+                  rules={[{ required: false, message: 'Your job title' }]}
                 >
-                  <Input placeholder={""} size="large" />
+                  <Input placeholder={''} size="large" />
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -107,29 +146,72 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <FormLabel>Location</FormLabel>
+                <FormLabel>Country</FormLabel>
                 <Form.Item
-                  name="location"
-                  rules={[{ required: true, message: "Location" }]}
+                  name="country"
+                  rules={[{ required: true }]}
                 >
-                  <Input placeholder={"Location"} size="large" />
+                  <Select
+                    size="middle"
+                    showSearch
+                    style={{ width: '100%' }}
+                    placeholder="Select a Country"
+                    filterOption={(input, option) => {
+                      return option?.title
+                        ?.toLowerCase()
+                        .includes(input?.toLocaleLowerCase());
+                    }}
+                  >
+                    {en?.map((country) => {
+                      return (
+                        <Option title={country?.name} value={country?.id}>
+                          <img
+                            className="mr-10"
+                            alt="flag"
+                            style={{
+                              width: 18,
+                              height: 18,
+                              verticalAlign: 'sub',
+                            }}
+                            src={getFlag(country.alpha2)}
+                          />
+                          <span>{country?.name}</span>
+                        </Option>
+                      );
+                    })}
+                  </Select>
                 </Form.Item>
               </Col>
               <Col span={24}>
                 <Heading type="form-inner">Contact Details</Heading>
                 <br />
               </Col>
+
               <Col span={12}>
                 <FormLabel>Phone Number</FormLabel>
-                <Form.Item name="phoneNumber">
-                  <Input placeholder={"eg.03XXXXXXXXX"} size="large" />
+                <Form.Item
+                  name="phoneNumber"
+                  rules={[
+                    {
+                      required: false,
+                      message: 'Please add your last name',
+                    },
+                    { max: 12, min: 4 },
+                  ]}
+                >
+                  <Input
+                    addonBefore={prefixSelector}
+                    type="text"
+                    placeholder="3188889898"
+                    size="middle"
+                  />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <FormLabel>Website</FormLabel>
                 <Form.Item name="website">
                   <Input
-                    placeholder={"eg: http://www.example.com"}
+                    placeholder={'eg: http://www.example.com'}
                     size="large"
                   />
                 </Form.Item>

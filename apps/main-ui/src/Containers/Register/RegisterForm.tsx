@@ -1,22 +1,19 @@
-import React, { FC, useEffect, useState } from "react";
-import styled, { keyframes } from "styled-components";
-import { Form, Row, Col, Input, Checkbox, Button, message } from "antd";
-import { Select } from "antd";
-import { Link } from "react-router-dom";
-import { FormLabel } from "../../components/FormLabel";
+import { Button, Checkbox, Col, Form, Input, Row, Select } from "antd";
+import  { FC, useState } from "react";
 import { useMutation } from "react-query";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
+import en from "../../../../../node_modules/world_countries_lists/data/en/world.json";
 import { RegisterAPI } from "../../api/auth";
-import { updateToken } from "../../utils/http";
+import { Heading } from "../../components/Heading";
+import { BOLDTEXT } from "../../components/Para/BoldText";
+import { Seprator } from "../../components/Seprator";
 import { useGlobalContext } from "../../hooks/globalContext/globalContext";
 import { ILoginActions } from "../../hooks/globalContext/globalManager";
 import { DivProps, IBaseAPIError, NOTIFICATIONTYPE } from "../../modal";
-import { Heading } from "../../components/Heading";
-import { Seprator } from "../../components/Seprator";
-import en from "../../../../../node_modules/world_countries_lists/data/en/world.json";
+import { updateToken } from "../../utils/http";
 import phoneCodes from "../../utils/phoneCodes";
-import { BOLDTEXT } from "../../components/Para/BoldText";
-import Icon from "@iconify/react";
-import arrowLeft from "@iconify-icons/fe/arrow-left";
+
 
 const { Option } = Select;
 
@@ -24,25 +21,31 @@ export const RegisterForm: FC = () => {
   const [step, setStep] = useState(1);
 
   const [mutateRegister, responseRegister] = useMutation(RegisterAPI);
-  const { data, isLoading } = responseRegister;
-  const { handleLogin, notificationCallback, setUserDetails } =
+  const {  isLoading } = responseRegister;
+  const { handleLogin, notificationCallback } =
     useGlobalContext();
 
-  useEffect(() => {
-    if (data && data.data && data.data.result) {
-      const { result } = data.data;
-      updateToken(result.access_token);
-      setUserDetails(result.users);
-      handleLogin({ type: ILoginActions.LOGIN, payload: result });
-    }
-  }, [data, handleLogin, setUserDetails]);
 
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
     try {
       await mutateRegister(values, {
-        onSuccess: () => {
+        onSuccess: (data) => {
+          if(process.env.NODE_ENV==="production"){
+            handleLogin({
+              type: ILoginActions.LOGIN,
+              payload: { autherization: true }
+            });
+
+          }else{
+            handleLogin({
+              type: ILoginActions.LOGIN,
+              payload: data?.data,
+            });
+            updateToken(data?.data.access_token);
+
+          }
           form.resetFields();
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
@@ -65,10 +68,7 @@ export const RegisterForm: FC = () => {
     } catch (error) {}
   };
 
-  const onVerification = (values) => {
-    setStep(1);
-    console.log(values);
-  };
+
 
   const getFlag = (short: string) => {
     const data = require(`world_countries_lists/flags/24x24/${short.toLowerCase()}.png`);
@@ -135,6 +135,7 @@ export const RegisterForm: FC = () => {
                   <Seprator />
                 </div>
                 <Form
+                 autoComplete="off"
                   onFinish={onFinish}
                   onFinishFailed={onFinishFailed}
                   layout="vertical"
@@ -151,7 +152,7 @@ export const RegisterForm: FC = () => {
                           },
                         ]}
                       >
-                        <Input placeholder={"eg John"} size="middle" />
+                        <Input placeholder={"eg John"} size="middle" autoComplete="off" />
                       </Form.Item>
                     </Col>
 
@@ -163,7 +164,7 @@ export const RegisterForm: FC = () => {
                           { required: true, message: "please add username" },
                         ]}
                       >
-                        <Input placeholder="e.g John" size="middle" />
+                        <Input placeholder="e.g John" size="middle" autoComplete="off" />
                       </Form.Item>
                     </Col>
 
@@ -178,6 +179,7 @@ export const RegisterForm: FC = () => {
                         <Input
                           placeholder="e.g someone@example.com"
                           size="middle"
+                          autoComplete="off"
                         />
                       </Form.Item>
                     </Col>
@@ -188,6 +190,7 @@ export const RegisterForm: FC = () => {
                         label="Country"
                       >
                         <Select
+                          
                           size="middle"
                           showSearch
                           style={{ width: "100%" }}
@@ -232,6 +235,7 @@ export const RegisterForm: FC = () => {
                         ]}
                       >
                         <Input
+                        autoComplete="off"
                           addonBefore={prefixSelector}
                           type="text"
                           placeholder="3188889898"

@@ -194,6 +194,11 @@ export const RoutingSchema: IRoutingSchema = {
             },
           ],
         },
+        {
+          tag: "Permissions",
+          route: `${root}${ISupportedRoutes.PERMISSIONS}`,
+          permission: PERMISSIONS.RBAC_ROLE_PERMISSION_INDEX,
+        },
       ],
     },
    
@@ -226,7 +231,7 @@ export const RoutingSchema: IRoutingSchema = {
     },
     {
       route: `${root}${ISupportedRoutes.CREATE_PURCHASE_Entry}`,
-      tag: "Create Purchase",
+      tag: "Create Bill",
       icon: shoppingBag,
     },
 
@@ -237,8 +242,8 @@ export const RoutingSchema: IRoutingSchema = {
       permission: PERMISSIONS.QUOTATIONS_CREATE,
     },
     {
-      route: `${root}${ISupportedRoutes.CREATE_BILL}`,
-      tag: "Create Bill",
+      route: `${root}${ISupportedRoutes.ADD_CREDIT_NOTE}`,
+      tag: "Credit Note",
       icon: billIcon,
     },
   ],

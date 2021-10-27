@@ -99,7 +99,7 @@ export const PermissionList: FC = () => {
 
   const handlePermissionsConfig = (pagination, filters, sorter: any, extra) => {
     history.push(
-      `/app${ISupportedRoutes.PERMISSIONS}?&page=${pagination.current}&page_size=${pagination.pageSize}`
+      `/app${ISupportedRoutes.SETTINGS}${ISupportedRoutes.PERMISSION_SETTINGS}?&page=${pagination.current}&page_size=${pagination.pageSize}`
     );
     setPermissionsConfig({
       ...permissionsConfig,

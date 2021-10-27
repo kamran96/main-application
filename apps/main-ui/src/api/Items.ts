@@ -1,39 +1,39 @@
-import http, { railsHttp } from "./../utils/http";
+import http from "./../utils/http";
 
-enum ItemsApi {
-  INDEX = "item",
-  railsINDEX = `items/index`,
-  CREATE_ITEM = `items/create`,
+enum ItemsServiceAPI{
+  default = 'items/item',
+  PRICE= 'items/price'
+  
 }
 
 export const getItemsList = (key, { page, sortid, query, pageSize = 20 }) => {
-  let url = `${ItemsApi.railsINDEX}?page_size=${pageSize}&page_no=${page}&sort=${sortid}`;
+  let url = `${ItemsServiceAPI.default}?page_size=${pageSize}&page_no=${page}&sort=${sortid}`;
   if (query) {
     url = `${url}&query=${query}`;
   }
-  return railsHttp.get(url);
+  return http.get(url);
 };
 
-export const fetchSingleItem = (key, id) => railsHttp.get(`items/${id}`);
-export const deleteItems = (payload) => railsHttp.put(`items/delete`, payload);
+export const fetchSingleItem = (key, id) => http.get(`${ItemsServiceAPI.default}/${id}`);
+export const deleteItems = (payload) => http.put(`${ItemsServiceAPI.default}`, payload);
 
 export const createUpdateItem = (payload) => {
-  let url: string = ItemsApi.CREATE_ITEM;
-  return railsHttp.post(url, payload);
+  let url: string = ItemsServiceAPI.default;
+  return http.post(url, payload);
 };
 
 export const createPricingAPI = (payload) => {
-  return railsHttp.post(`prices/create`, payload);
+  return http.post(`${ItemsServiceAPI.PRICE}`, payload);
 };
 
 export const getAllItems = (key?: string, purpose?: string) =>
-  railsHttp.get(`/items-all`);
+  http.get(`${ItemsServiceAPI.default}?purpose=ALL`);
 
 export const getItemByIDAPI = (key?: string, id?: number) =>
-  railsHttp.get(`item/${id}`);
+  http.get(`item/${id}`);
 
 export const getPriceByIDAPI = (key?: string, id?: number) =>
-  railsHttp.get(`prices/${id}`);
+  http.get(`${ItemsServiceAPI.PRICE}/${id}`);
 
 interface IItemGetPaylod {
   id: number;
@@ -47,11 +47,11 @@ export const getItemDetail = (key?: string, payload?: IItemGetPaylod) => {
   if (start && end) {
     url = `${url}?start=${start}&end=${end}`;
   }
-  return railsHttp.get(url);
+  return http.get(url);
 };
 
 export const getTopRunningItemsAPI = (key?: string) => {
-  return railsHttp.get(`items-top-running`);
+  return http.get(`items-top-running`);
 };
 
 export const getSalesSummaryDataAPI = (
@@ -65,14 +65,14 @@ export const getSalesSummaryDataAPI = (
   if (start && end) {
     url = `${url}?start=${start}&end=${end}`;
   }
-  return railsHttp.get(url);
+  return http.get(url);
 };
 
 export const duplicateItemsAPI = (payload: any) => {
-  let response = railsHttp.post(`items/duplicate`, payload);
+  let response = http.post(`items/duplicate`, payload);
 
   return response;
 };
 
 export const StockUpdateAPI = (payload: any) =>
-  railsHttp?.post(`/items/stock-update`, payload);
+  http?.post(`/items/stock-update`, payload);

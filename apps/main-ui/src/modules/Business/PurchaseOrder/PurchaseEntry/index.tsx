@@ -16,13 +16,13 @@ export const PurchaseEntryEditor: FC = () => {
 
   return (
     <WrapperPurchaseEntry>
-      <Heading>Purchase Entry</Heading>
+      <Heading>Create Bill</Heading>
       <BreadCrumbArea>
         <Breadcrumb>
           <Breadcrumb.Item>
-            <Link to={`/app${ISupportedRoutes.PURCHASES}`}>Purchases</Link>
+            <Link to={`/app${ISupportedRoutes.PURCHASES}`}>Bills</Link>
           </Breadcrumb.Item>
-          <Breadcrumb.Item>Create Purchase Entry</Breadcrumb.Item>
+          <Breadcrumb.Item>Create Bill</Breadcrumb.Item>
         </Breadcrumb>
       </BreadCrumbArea>
       <TableCard>

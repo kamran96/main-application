@@ -159,6 +159,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   const onFinish = async (value) => {
+
     let InvoiceItemsValidation = [];
 
     organization?.organizationType !== IOrganizationType.ENTERPRISE &&
@@ -181,7 +182,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
       delete paymentData.totalDiscount;
 
       let payload: any = {
-        invoice: {
+        
           ...value,
           status: value.status.status,
           invoiceType: type ? type : IInvoiceType.INVOICE,
@@ -190,41 +191,39 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
           grossTotal: GrossTotal,
           total: '',
           isNewRecord: true,
-        },
+        
         invoice_items: invoiceItems.map((item, index) => {
           return { ...item, sequence: index };
         }),
       };
-      let payments = {
-        ...paymentData,
-        amount:
-          payment.paymentMode === PaymentMode.CREDIT
-            ? 0
-            : payment.paymentMode === PaymentMode.CASH
-            ? NetTotal
-            : parseFloat(payment.amount),
-      };
+      // let payments = {
+      //   ...paymentData,
+      //   amount:
+      //     payment.paymentMode === PaymentMode.CREDIT
+      //       ? 0
+      //       : payment.paymentMode === PaymentMode.CASH
+      //       ? NetTotal
+      //       : parseFloat(payment.amount),
+      // };
 
-      if (type !== IInvoiceType.QUOTE && payload.invoice.status !== 2) {
-        if (payments.paymentMode === PaymentMode.CASH) {
-          delete payments.dueDate;
-        }
+      // if (type !== IInvoiceType.QUOTE && payload.invoice.status !== 2) {
+      //   if (payments.paymentMode === PaymentMode.CASH) {
+      //     delete payments.dueDate;
+      //   }
 
-        payload = { ...payload, payment: payments };
-      }
+      //   payload = { ...payload, payment: payments };
+      // }
 
-      delete payload.invoice.invoiceDiscount;
-      delete payload.invoice.total;
+      delete payload.invoiceDiscount;
+      delete payload.total;
 
       if (id) {
         payload = {
           ...payload,
-          invoice: {
-            ...payload.invoice,
             id,
             isNewRecord: false,
             deleted_ids: deleteIds,
-          },
+         
         };
       }
       try {
@@ -235,19 +234,19 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
               setPrintModal(true);
             }
 
-            if (payload.invoice.status !== 2) {
-              let messages = {
-                invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
-                quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
-              };
+            // if (payload.invoice.status !== 2) {
+            //   let messages = {
+            //     invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
+            //     quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
+            //   };
 
-              onSendPDF(
-                value.contactId,
-                type === IInvoiceType.INVOICE
-                  ? messages.invoice
-                  : messages.quotes
-              );
-            }
+            //   onSendPDF(
+            //     value.contactId,
+            //     type === IInvoiceType.INVOICE
+            //       ? messages.invoice
+            //       : messages.quotes
+            //   );
+            // }
 
             ClearAll();
             setInvoiceDiscount(0);
@@ -382,6 +381,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                     <FormLabel>{formLabels.to}</FormLabel>
                     <Form.Item
                       name="contactId"
+                      
                       rules={[{ required: true, message: 'Required !' }]}
                     >
                       <Select
@@ -391,11 +391,11 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                         style={{ width: '100%' }}
                         placeholder="Select Contact"
                         optionFilterProp="children"
-                        onChange={(val) => {
-                          if (val !== 'newContact') {
-                            AntForm.setFieldsValue({ contactId: val });
-                          }
-                        }}
+                        // onChange={(val) => {
+                        //   if (val !== 'newContact') {
+                        //     AntForm.setFieldsValue({ contactId: val });
+                        //   }
+                        // }}
                       >
                         <Option value={'contact-create'}>
                           <Button

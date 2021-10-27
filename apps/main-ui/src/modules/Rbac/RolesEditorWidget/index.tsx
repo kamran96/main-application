@@ -61,14 +61,14 @@ export const RolesEditorWidget: FC = () => {
       level: level > -1 ? level + 2 : 1,
     };
 
-    if (allRoles.length) {
-      payload = {
-        ...payload,
-        roles: roles.map((item, index) => {
-          return { ...item, level: index + 1 };
-        }),
-      };
-    }
+    // if (allRoles.length) {
+    //   payload = {
+    //     ...payload,
+    //     roles: roles.map((item, index) => {
+    //       return { ...item, level: index + 1 };
+    //     }),
+    //   };
+    // }
     if (id) {
       payload = { ...payload, id };
     }

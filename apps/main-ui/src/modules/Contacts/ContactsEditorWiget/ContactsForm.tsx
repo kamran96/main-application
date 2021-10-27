@@ -1,23 +1,23 @@
-import React, { FC, useState, useEffect } from "react";
-import styled from "styled-components";
-import { Form, Row, Col, Input, Button, Select, InputNumber } from "antd";
-import { FormLabel } from "./../../../components/FormLabel/index";
-import { Heading } from "../../../components/Heading";
-import { Para } from "./../../../components/Para/index";
-import { useMutation, useQuery, useQueryCache } from "react-query";
-import { create_update_contact, viewSingleContact } from "../../../api/Contact";
+import React, { FC, useState, useEffect } from 'react';
+import styled from 'styled-components';
+import { Form, Row, Col, Input, Button, Select, InputNumber } from 'antd';
+import { FormLabel } from './../../../components/FormLabel/index';
+import { Heading } from '../../../components/Heading';
+import { Para } from './../../../components/Para/index';
+import { useMutation, useQuery, useQueryCache } from 'react-query';
+import { create_update_contact, viewSingleContact } from '../../../api/Contact';
 import {
   IContactTypes,
   ISupportedRoutes,
   NOTIFICATIONTYPE,
-} from "../../../modal";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { AddressForm } from "./addressForm";
-import { getAllAccounts } from "../../../api/accounts";
-import { IAccountsResult } from "../../../modal/accounts";
-import { EnterpriseWrapper } from "../../../components/EnterpriseWrapper";
-import { IOrganizationType } from "../../../modal/organization";
-import Checkbox from "antd/lib/checkbox/Checkbox";
+} from '../../../modal';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { AddressForm } from './addressForm';
+import { getAllAccounts } from '../../../api/accounts';
+import { IAccountsResult } from '../../../modal/accounts';
+import { EnterpriseWrapper } from '../../../components/EnterpriseWrapper';
+import { IOrganizationType } from '../../../modal/organization';
+import Checkbox from 'antd/lib/checkbox/Checkbox';
 
 const { Option } = Select;
 
@@ -34,20 +34,20 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
   const [showOpeningBlance, setShowOpeningBalance] = useState(false);
   const [address, setAddress] = useState([
     {
-      description: "",
+      description: '',
       addressType: 1,
-      city: "",
-      town: "",
-      country: "",
-      postalCode: "",
+      city: '',
+      town: '',
+      country: '',
+      postalCode: '',
     },
     {
-      description: "",
+      description: '',
       addressType: 2,
-      city: "",
-      town: "",
-      country: "",
-      postalCode: "",
+      city: '',
+      town: '',
+      country: '',
+      postalCode: '',
     },
   ]);
   /* Use form hook antd */
@@ -55,7 +55,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
   const queryCache = useQueryCache();
 
   const { data: AllAccounts } = useQuery(
-    [`all-accounts`, "ALL"],
+    [`all-accounts`, 'ALL'],
     getAllAccounts
   );
 
@@ -64,7 +64,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
       AllAccounts.data &&
       AllAccounts.data.result &&
       AllAccounts.data.result.filter(
-        (acc) => acc.secondary_account.primary_account.name === "assets"
+        (acc) => acc?.secondary_account?.primary_account?.name === 'assets'
       )) ||
     [];
   const creditedAccounts: IAccountsResult[] =
@@ -73,8 +73,8 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
       AllAccounts.data.result &&
       AllAccounts.data.result.filter(
         (acc) =>
-          acc.secondary_account.primary_account.name === "liability" ||
-          acc.secondary_account.primary_account.name === "equity"
+          acc?.secondary_account?.primary_account?.name === 'liability' ||
+          acc?.secondary_account?.primary_account?.name === 'equity'
       )) ||
     [];
 
@@ -98,7 +98,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
         second: message title
         third: message description
         */
-      notificationCallback(NOTIFICATIONTYPE.SUCCESS, "Contact Fetched");
+      notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Contact Fetched');
     },
   });
 
@@ -123,13 +123,15 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
   /* Async function to create and update a contact */
   const onFinish = async (values) => {
     let payload = {
-      contact: { ...values, isNewRecord: true },
+      ...values,
+      isNewRecord: true,
       addresses: address,
     };
     if (id) {
       payload = {
         ...payload,
-        contact: { ...payload.contact, isNewRecord: false, id: parseInt(id) },
+        isNewRecord: false,
+        id: id,
       };
     }
 
@@ -161,15 +163,15 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
         form.resetFields();
         notificationCallback(
           NOTIFICATIONTYPE.SUCCESS,
-          id ? "Updated Successfully" : "Created Successfully",
-          `Contact is ${id ? "Updated" : "Created"} successfully`
+          id ? 'Updated Successfully' : 'Created Successfully',
+          `Contact is ${id ? 'Updated' : 'Created'} successfully`
         );
       },
     });
   };
 
   const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
+    console.log('Failed:', errorInfo);
   };
 
   return (
@@ -179,7 +181,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
         onValuesChange={(changedValue, values) => {
           if (
             changedValue?.openingBalance &&
-            changedValue?.openingBalance !== "0"
+            changedValue?.openingBalance !== '0'
           ) {
             setHasOpeningBalance(true);
           } else if (changedValue?.openingBalance) {
@@ -204,12 +206,12 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
             <FormLabel isRequired={true}>Contact Type</FormLabel>
             <Form.Item
               name="contactType"
-              rules={[{ required: true, message: "Select Contact Type" }]}
+              rules={[{ required: true, message: 'Select Contact Type' }]}
             >
               <Select
                 size="large"
                 showSearch
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 placeholder="Select Item"
                 optionFilterProp="children"
               >
@@ -223,10 +225,10 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
             <Form.Item
               name="businessName"
               rules={[
-                { required: true, message: "Please provide Company Name" },
+                { required: true, message: 'Please provide Company Name' },
               ]}
             >
-              <Input placeholder={""} size="large" />
+              <Input placeholder={''} size="large" />
             </Form.Item>
           </Col>
 
@@ -237,12 +239,12 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               rules={[
                 {
                   required: false,
-                  message: "Please provide Email",
-                  type: "email",
+                  message: 'Please provide Email',
+                  type: 'email',
                 },
               ]}
             >
-              <Input placeholder={"john@example.com"} size="large" />
+              <Input placeholder={'john@example.com'} size="large" />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -252,11 +254,11 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               rules={[
                 {
                   required: true,
-                  message: "Please Primay Person",
+                  message: 'Please Primay Person',
                 },
               ]}
             >
-              <Input placeholder={"john@example.com"} size="large" />
+              <Input placeholder={'john@example.com'} size="large" />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -266,13 +268,13 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               name="phoneNumber"
               rules={[
                 {
-                  message: "Please provide Phone Number",
+                  message: 'Please provide Phone Number',
                 },
               ]}
             >
               <Input
-                style={{ width: "100%" }}
-                placeholder={"(Area code + Alot number). eg : 05811-45XXXX"}
+                style={{ width: '100%' }}
+                placeholder={'(Area code + Alot number). eg : 05811-45XXXX'}
                 size="large"
               />
             </Form.Item>
@@ -285,14 +287,14 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                 {
                   max: 11,
                   min: 11,
-                  message: "Mobile Number must be in 11 Characters",
+                  message: 'Mobile Number must be in 11 Characters',
                 },
-                { required: true, message: "Phone Number is required!" },
+                { required: true, message: 'Phone Number is required!' },
               ]}
             >
               <Input
-                style={{ width: "100%" }}
-                placeholder={"0310XXXXXXX"}
+                style={{ width: '100%' }}
+                placeholder={'0310XXXXXXX'}
                 size="large"
               />
             </Form.Item>
@@ -304,7 +306,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               rules={[
                 {
                   required: false,
-                  message: "Please provide Fax Number",
+                  message: 'Please provide Fax Number',
                 },
                 {
                   max: 10,
@@ -312,8 +314,8 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               ]}
             >
               <Input
-                style={{ width: "100%" }}
-                placeholder={"0215XXXX"}
+                style={{ width: '100%' }}
+                placeholder={'0215XXXX'}
                 size="large"
               />
             </Form.Item>
@@ -322,9 +324,9 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
             <FormLabel isRequired={false}>Skype Name / Number</FormLabel>
             <Form.Item
               name="skypeName"
-              rules={[{ required: false, message: "Please provide Skype ID" }]}
+              rules={[{ required: false, message: 'Please provide Skype ID' }]}
             >
-              <Input placeholder={"live:@example"} size="large" />
+              <Input placeholder={'live:@example'} size="large" />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -334,13 +336,13 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               rules={[
                 {
                   required: false,
-                  message: "Please provide website",
-                  type: "url",
+                  message: 'Please provide website',
+                  type: 'url',
                 },
               ]}
             >
               <Input
-                placeholder={"http://www.phunar.example.com"}
+                placeholder={'http://www.phunar.example.com'}
                 size="large"
               />
             </Form.Item>
@@ -353,14 +355,14 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                 {
                   max: 13,
                   min: 13,
-                  message: "Cnic must be in 13 Characters",
+                  message: 'Cnic must be in 13 Characters',
                 },
               ]}
             >
               <Input
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 size="large"
-                placeholder={"Your CNIC without (-) eg: 7150112547851"}
+                placeholder={'Your CNIC without (-) eg: 7150112547851'}
               />
             </Form.Item>
           </Col>
@@ -460,11 +462,11 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                 <FormLabel isRequired={false}>Opening Balance</FormLabel>
                 <Form.Item
                   name="openingBalance"
-                  rules={[{ required: false, message: "Opening Balance" }]}
+                  rules={[{ required: false, message: 'Opening Balance' }]}
                 >
                   <Input
-                    style={{ width: "100%" }}
-                    placeholder={""}
+                    style={{ width: '100%' }}
+                    placeholder={''}
                     size="large"
                   />
                 </Form.Item>
@@ -476,13 +478,13 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               <FormLabel isRequired={false}>Debit Account</FormLabel>
               <Form.Item
                 name="debitAccount"
-                rules={[{ required: false, message: "Debit Account" }]}
+                rules={[{ required: false, message: 'Debit Account' }]}
               >
                 <Select
                   disabled={!hasOpeningBalance}
                   size="large"
                   showSearch
-                  style={{ width: "100%" }}
+                  style={{ width: '100%' }}
                   placeholder="Select Item"
                   optionFilterProp="children"
                 >
@@ -503,13 +505,13 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               <FormLabel isRequired={false}>Credit Account</FormLabel>
               <Form.Item
                 name="creditAccount"
-                rules={[{ required: false, message: "Credit Account" }]}
+                rules={[{ required: false, message: 'Credit Account' }]}
               >
                 <Select
                   disabled={!hasOpeningBalance}
                   size="large"
                   showSearch
-                  style={{ width: "100%" }}
+                  style={{ width: '100%' }}
                   placeholder="Select Item"
                   optionFilterProp="children"
                 >
@@ -529,12 +531,12 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
             <FormLabel isRequired={true}>Credit Limit Amount</FormLabel>
             <Form.Item
               name="creditLimit"
-              rules={[{ required: true, message: "Please add Credit Limit" }]}
+              rules={[{ required: true, message: 'Please add Credit Limit' }]}
             >
               <InputNumber
                 type="number"
-                style={{ width: "100%" }}
-                placeholder={""}
+                style={{ width: '100%' }}
+                placeholder={''}
                 size="large"
               />
             </Form.Item>
@@ -546,15 +548,15 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               rules={[
                 {
                   required: true,
-                  message: "Please credit block limit",
-                  type: "number",
+                  message: 'Please credit block limit',
+                  type: 'number',
                 },
               ]}
             >
               <InputNumber
                 type="number"
-                style={{ width: "100%" }}
-                placeholder={"add credit limit block"}
+                style={{ width: '100%' }}
+                placeholder={'add credit limit block'}
                 size="large"
               />
             </Form.Item>
@@ -564,13 +566,13 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
             <Form.Item
               name="salesDiscount"
               rules={[
-                { required: true, message: "If no any discount please type 0" },
+                { required: true, message: 'If no any discount please type 0' },
               ]}
             >
               <InputNumber
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 type="number"
-                placeholder={"Sales discount in percentage or amount"}
+                placeholder={'Sales discount in percentage or amount'}
                 size="large"
               />
             </Form.Item>
@@ -582,13 +584,13 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               rules={[
                 {
                   required: true,
-                  message: "Please provide payment days limit",
+                  message: 'Please provide payment days limit',
                 },
               ]}
             >
               <Input
-                style={{ width: "100%" }}
-                placeholder={"Please add payment days limit"}
+                style={{ width: '100%' }}
+                placeholder={'Please add payment days limit'}
                 size="large"
               />
             </Form.Item>
@@ -600,11 +602,11 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               rules={[
                 {
                   required: false,
-                  message: "Please provide Account Number",
+                  message: 'Please provide Account Number',
                 },
               ]}
             >
-              <Input style={{ width: "100%" }} placeholder={""} size="large" />
+              <Input style={{ width: '100%' }} placeholder={''} size="large" />
             </Form.Item>
           </Col>
         </Row>
@@ -626,7 +628,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                   type="primary"
                   htmlType="submit"
                 >
-                  {id ? "Update" : "Create"}
+                  {id ? 'Update' : 'Create'}
                 </Button>
               </div>
             </Form.Item>

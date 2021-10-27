@@ -78,6 +78,13 @@
     "pixels-to-rem": {
       "tags": []
     },
+    "mobile-app": {
+      "tags": []
+    },
+    "mobile-app-e2e": {
+      "tags": [],
+      "implicitDependencies": ["mobile-app"]
+    },
     "reports-service": {
       "tags": []
     },

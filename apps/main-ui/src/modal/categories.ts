@@ -26,7 +26,7 @@ export interface ICategory {
   categories?: ICategory[];
   isActive?: boolean;
   subCategories?: ICategory[];
-  owner?: IVariants[];
+  attributes?: IVariants[];
 }
 
 export interface ICategoriesGetResponse extends IBaseRequest {
