@@ -306,12 +306,12 @@ export const Suppliers: FC = () => {
             columns={columns}
             loading={isFetching || isLoading}
             onChange={handleContactsConfig}
-            totalItems={paginationData.total}
+            totalItems={paginationData?.total}
             pagination={{
               pageSize: page_size,
               position: ["bottomRight"],
-              current: paginationData.page_no,
-              total: paginationData.total,
+              current: paginationData?.page_no,
+              total: paginationData?.total,
             }}
             hasfooter={true}
             onSelectRow={onSelectedRow}

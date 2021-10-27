@@ -79,7 +79,7 @@ export const Editable: FC<IProps> = ({
   return (
     <ClickOutSide
       initialVal={isEditable}
-      notEffectingClass={`rendered-text`}
+      notEffectingClass={`rendered-text ant-input-number-input SVGAnimatedString`}
       onClickOutSide={() => {
         if (isEditable === true) {
           setIsEditable(false);

@@ -108,10 +108,10 @@ export const PurchasesView: FC<IProps> = ({
 
   let accessor =
     type === "SI"
-      ? "invoice_items"
+      ? "invoiceItems"
       : type === "credit-note"
       ? "credit_note_items"
-      : "purchase_items";
+      : "purchaseItems";
 
   /* *************** HOOKS HERE ************** */
 
@@ -151,7 +151,6 @@ export const PurchasesView: FC<IProps> = ({
   /* **************UTILITY HOOKS ENDS HERE**************** */
 
   /* LOCAL STATES */
-  const [invId, setInvId] = useState(null);
   const [emailModal, setEmailModal] = useState(false);
   const [tableData, setTableData] = useState<IInvoiceItem[]>([]);
   const [paymentModal, setPaymentModal] = useState(false);
@@ -183,12 +182,6 @@ export const PurchasesView: FC<IProps> = ({
 
   /*  COMPONENT UTILITY FUNCTIONS */
 
-  const findUserById = (id: number) => {
-    if (allUsers.length) {
-      const [users] = allUsers.filter((item) => item.id === id);
-      return users;
-    }
-  };
   const onPrint = () => {
     let PrintItem: HTMLElement = printRef.current;
 
@@ -303,6 +296,8 @@ export const PurchasesView: FC<IProps> = ({
     let pdf = DownloadPDF(printItem);
     let payload = {
       ...values,
+      id,
+      type,
       html: `${pdf}`,
     };
 
@@ -390,8 +385,8 @@ export const PurchasesView: FC<IProps> = ({
     },
     {
       title: "RATE",
-      dataIndex: "unitPrice",
-      key: "unitPrice",
+      dataIndex: type==="PO" ? `purchasePrice` : `unitPrice`,
+      key: type==="PO" ? `purchasePrice` : `unitPrice`,
     },
     {
       title: "DISCOUNT",
@@ -466,12 +461,12 @@ export const PurchasesView: FC<IProps> = ({
       <div className="pv-10">
         <Row gutter={24}>
           <Col span={12}>
-            <Heading type="container">Invoice 23423</Heading>
+            <Heading type="container"> {type==="SI" ? 'Invoice' : type==="PO" ? 'Bill' : 'Credit Note'} {response?.invoiceNumber ? `(${response?.invoiceNumber})` : null}</Heading>
           </Col>
           <Col span={12}>
             <div className="textRight">
               <Dropdown overlay={menu}>
-                <Button type="primary">Invoice Options</Button>
+                <Button type="primary">{type==="SI" ? 'Invoice' : type==="PO" ? 'Bill' : 'Credit Note'} Options</Button>
               </Dropdown>
             </div>
           </Col>

@@ -50,11 +50,13 @@ export const WrapperTransactionEditor = styled.div`
             ? props?.theme?.colors?.$BLACK
             : "#212121"};
         font-weight: 500;
+        text-align: left;
       }
 
       tbody > tr > td {
         padding: ${convertToRem(5)} ${convertToRem(5)};
         color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
+        border-right:  1px dashed #dadadac7;
       }
       tbody > tr.has-error > td {
         background: #d20d0dcc;

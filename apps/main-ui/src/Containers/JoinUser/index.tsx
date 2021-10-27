@@ -95,14 +95,24 @@ export const JoinUser: FC = () => {
       { ...value, id },
       {
         onSuccess: (data) => {
-          const { result } = data?.data;
-          updateToken(result.access_token);
-          setUserDetails(result.users);
+          if(process.env.NODE_ENV==="production"){
+            handleLogin({
+              type: ILoginActions.LOGIN,
+              payload: { autherization: true }
+            });
+
+          }else{
+            handleLogin({
+              type: ILoginActions.LOGIN,
+              payload: data?.data,
+            });
+            updateToken(data?.data.access_token);
+
+          }
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
-            "Registered Successfully"
+            "User Registered Successfully"
           );
-          handleLogin({ type: ILoginActions.LOGIN, payload: result });
         },
         onError: (err: IBaseAPIError) => {
           if (err?.response?.data?.message) {

@@ -16,6 +16,7 @@ import {
 import { CommonTable } from "../../../../../components/Table";
 import {
   IInvoiceResponse,
+  IInvoiceTypes,
   INVOICETYPE,
   INVOICE_TYPE_STRINGS,
   ORDER_TYPE,
@@ -127,7 +128,7 @@ export const ALLPurchasesList: FC<IProps> = ({ columns, activeTab }) => {
     [
       `invoices-purchases-${INVOICETYPE.Approved}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
       [ORDER_TYPE.PURCAHSE_ORDER],
-      INVOICE_TYPE_STRINGS.Approved,
+      INVOICETYPE.Approved,
       INVOICETYPE.ALL,
       page,
       page_size,

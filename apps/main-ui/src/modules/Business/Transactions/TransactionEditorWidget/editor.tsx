@@ -172,9 +172,11 @@ export const TransactionWidget: FC = () => {
               },
             ]);
             form.resetFields();
-            queryCache.invalidateQueries(
-              `transactions?page=${1}&query=${""}&sort=${"id"}`
-            );
+            ["accounts", `transactions`]?.forEach((key) => {
+              queryCache?.invalidateQueries((q) =>
+                q?.queryKey[0]?.toString().startsWith(key)
+              );
+            });
 
             notificationCallback(
               NOTIFICATIONTYPE.SUCCESS,
@@ -240,7 +242,7 @@ export const TransactionWidget: FC = () => {
                 placeholder="Description"
                 size={"middle"}
                 type="text"
-              />
+                />
             </td>
             <td>
               <Editable

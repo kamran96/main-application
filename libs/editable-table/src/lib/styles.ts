@@ -12,10 +12,10 @@ export const EditableTableWrapper = styled.table<IWrapperProps>`
   width: 100%;
 
   ${(props: IWrapperProps) =>
-    props.scrollable &&
+    props?.scrollable &&
     `
     overflow-y: scroll;
-    max-height: ${convertToRem(props.scrollable.offsetY)};
+    max-height: ${convertToRem(props?.scrollable?.offsetY)};
     display: block;
 
     thead{
@@ -40,19 +40,19 @@ export const EditableTableWrapper = styled.table<IWrapperProps>`
         letter-spacing: 0.04em;
         text-transform: capitalize;
         border-top: ${convertToRem(1)} solid
-          ${(props: IThemeProps) => props.theme.colors.seprator};
+          ${(props: IThemeProps) => props?.theme?.colors?.seprator};
         border-bottom: ${convertToRem(1)} solid
-          ${(props: IThemeProps) => props.theme.colors.seprator};
+          ${(props: IThemeProps) => props?.theme?.colors?.seprator};
       }
     }
   }
   .ant-table-tbody > tr > td {
     border-bottom: 1px solid
-      ${(props: IThemeProps) => props.theme.colors.seprator};
-    color: ${(props: IThemeProps) => props.theme.colors.textTd};
+      ${(props: IThemeProps) => props?.theme?.colors?.seprator};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
     padding: 13px 16px;
     background-color: ${(props: IThemeProps) =>
-      props.theme.colors.td} !important;
+      props?.theme?.colors?.td} !important;
   }
 
 
