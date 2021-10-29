@@ -23,7 +23,7 @@ export class ContactController {
   @Get()
   @UseGuards(GlobalAuthGuard)
   async index(@Req() req: Request, @Query() query) {
-    const contact = await this.contactService.FindAll(req.user, query);
+    const contact = await this.contactService.FindAll(req, query);
 
     if (contact) {
       return {
@@ -84,5 +84,17 @@ export class ContactController {
         status: true,
       };
     }
+  }
+
+  @Post('ids')
+  @UseGuards(GlobalAuthGuard)
+  async contactByIds(@Body() body) {
+    return await this.contactService.ContactByIds(body);
+  }
+
+  @Post('sync')
+  @UseGuards(GlobalAuthGuard)
+  async syncContacts(@Body() body, @Req() req: Request) {
+    return await this.contactService.SyncContacts(body, req);
   }
 }

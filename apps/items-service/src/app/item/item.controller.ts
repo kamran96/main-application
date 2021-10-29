@@ -90,4 +90,10 @@ export class ItemController {
       };
     }
   }
+
+  @Post('sync')
+  @UseGuards(GlobalAuthGuard)
+  async SyncItems(@Body() body, @Req() req: Request) {
+    return await this.itemService.SyncItems(body, req.user);
+  }
 }

@@ -158,9 +158,9 @@ export class OrganizationService {
           await this.userModel.updateOne(
             { _id: req?.user?.id },
             {
-              organizationId: organization._id,
-              roleId: adminRole._id,
-              branchId: branchArr.length > 0 ? branchArr[0]._id : null,
+              organizationId: organization.id,
+              roleId: adminRole.id,
+              branchId: branchArr.length > 0 ? branchArr[0].id : null,
             }
           );
 

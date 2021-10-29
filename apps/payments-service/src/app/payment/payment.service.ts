@@ -3,11 +3,7 @@ import axios from 'axios';
 import { Between, getCustomRepository } from 'typeorm';
 import { PaymentRepository } from '../repositories/payment.repository';
 import { Sorting } from '@invyce/sorting';
-
-enum Modes {
-  INVOICES = 2,
-  BILLS = 1,
-}
+import { Integrations, PaymentModes } from '@invyce/global-constants';
 
 @Injectable()
 export class PaymentService {
@@ -129,7 +125,7 @@ export class PaymentService {
 
       let debitArr = [];
       let creditArr = [];
-      if (data?.paymentMode === Modes.BILLS) {
+      if (data?.paymentMode === PaymentModes.BILLS) {
         // for Bills
         let debits = {
           amount: data.amount,
@@ -320,7 +316,7 @@ export class PaymentService {
             updatedById: req.user.id,
           });
         }
-      } else if (data?.paymentMode === Modes.INVOICES) {
+      } else if (data?.paymentMode === PaymentModes.INVOICES) {
         // for Invoices
         let credits = {
           amount: data.amount,
@@ -508,7 +504,6 @@ export class PaymentService {
         }
       }
     } catch (error) {
-      console.log(error);
       throw new HttpException(error.status, HttpStatus.BAD_REQUEST);
     }
   }
@@ -527,5 +522,40 @@ export class PaymentService {
     }
 
     return inv_arr;
+  }
+
+  async GetPaymentAgainstContactId(contactIds) {
+    let payment_arr = [];
+    for (let i of contactIds.ids) {
+      const type = (i.type = 1 ? `p.amount` : `ABS(p.amount)`);
+      const [payment] = await getCustomRepository(PaymentRepository).query(`
+      SELECT COALESCE(SUM(${type}), 0) as balance
+      FROM payments p
+      WHERE p."contactId" = '${i.id}'
+      and p."entryType" is not null
+      and status = 1
+    `);
+
+      payment_arr.push({ id: i.id, payment });
+    }
+    return payment_arr;
+  }
+
+  async AddPayment(data, user) {
+    for (let i of data.payments) {
+      await getCustomRepository(PaymentRepository).save({
+        amount: i.balance,
+        dueDate: i.createdAt,
+        reference: 'Xero opeing balance',
+        transactionId: i.transactionId,
+        contactId: i.contactId,
+        entryType: 1,
+
+        // importedPaymentId: j.paymentID,
+        importedFrom: Integrations.XERO,
+        organizationId: user.organizationId,
+        status: 1,
+      });
+    }
   }
 }

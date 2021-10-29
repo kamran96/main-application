@@ -10,7 +10,7 @@ import {
   Param,
   Query,
 } from '@nestjs/common';
-import { query, Request } from 'express';
+import { Request } from 'express';
 import { PaymentService } from './payment.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 
@@ -39,6 +39,12 @@ export class PaymentController {
     return await this.paymentService.GetPaymentAgainstInvoiceId(invoiceIds);
   }
 
+  @Post('/contact')
+  @UseGuards(GlobalAuthGuard)
+  async GetPaymentAgainstContactId(@Body() contactIds) {
+    return await this.paymentService.GetPaymentAgainstContactId(contactIds);
+  }
+
   @Post()
   @UseGuards(GlobalAuthGuard)
   async create(@Body() data, @Req() req: Request) {
@@ -58,5 +64,11 @@ export class PaymentController {
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  @Post('add')
+  @UseGuards(GlobalAuthGuard)
+  async addPayment(@Body() body, @Req() req: Request) {
+    return await this.paymentService.AddPayment(body, req.user);
   }
 }

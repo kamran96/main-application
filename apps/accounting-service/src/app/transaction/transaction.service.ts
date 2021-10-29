@@ -1,10 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Between, getCustomRepository, ILike, In } from 'typeorm';
+import axios from 'axios';
 import { Sorting } from '@invyce/sorting';
 
 import {
   TransactionRepository,
   TransactionItemRepository,
+  AccountRepository,
 } from '../repositories';
 
 enum Entries {
@@ -270,6 +272,82 @@ export class TransactionService {
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async AddTransaction(data, req) {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const type =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [type]: value,
+      },
+    });
+
+    let paymentArr = [];
+    for (let i of data.transactions) {
+      async function getAccount(name) {
+        const [account] = await getCustomRepository(AccountRepository).find({
+          where: {
+            name,
+            organizationId: req.user.organizationId,
+          },
+        });
+        return account.id;
+      }
+
+      const transaction = await getCustomRepository(TransactionRepository).save(
+        {
+          amount: i.balance,
+          ref: 'XERO',
+          narration: 'Xero contact balance',
+          date: new Date(),
+          organizationId: req.user.organizationId,
+          branchId: req.user.branchId,
+          createdById: req.user.userId,
+          updatedById: req.user.userId,
+          status: 1,
+        }
+      );
+
+      await getCustomRepository(TransactionItemRepository).save({
+        amount: i.balance,
+        accountId:
+          i.isCustomer === true
+            ? await getAccount('Accounts Receivable')
+            : await getAccount('Accounts Payable'),
+        transactionId: transaction.id,
+        transactionType: 10,
+        branchId: req.user.branchId,
+        organizationId: req.user.organizationId,
+        createdById: req.user.userId,
+        updatedById: req.user.userId,
+        status: 1,
+      });
+
+      paymentArr.push({
+        ...i,
+        transactionId: transaction.id,
+      });
+    }
+
+    await http.post(`payments/payment/add`, {
+      payments: paymentArr,
+    });
   }
 }
 

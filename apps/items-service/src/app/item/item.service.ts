@@ -2,12 +2,15 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { AttributeValue } from '../schemas/attributeValue.schema';
 import { Item } from '../schemas/item.schema';
+import { Integrations } from '@invyce/global-constants';
+import { Price } from '../schemas/price.schema';
 
 @Injectable()
 export class ItemService {
   constructor(
     @InjectModel(Item.name) private itemModel,
-    @InjectModel(AttributeValue.name) private attributeValueModel
+    @InjectModel(AttributeValue.name) private attributeValueModel,
+    @InjectModel(Price.name) private priceModel
   ) {}
 
   async ListItems(itemData, query) {
@@ -190,5 +193,44 @@ export class ItemService {
     }
 
     return true;
+  }
+
+  async SyncItems(data, user) {
+    for (let i of data.items) {
+      console.log(i);
+      const items = await this.itemModel.find({
+        importedItemId: i.itemID,
+        organizationId: user.organizationId,
+      });
+
+      if (items.length === 0) {
+        const item = new this.itemModel({
+          name: i.name,
+          description: i.description,
+          code: i.code,
+          importedItemId: i.itemID,
+          importedFrom: Integrations.XERO,
+          stock: i.quantityOnHand,
+          openingStock: i.quantityOnHand,
+          // accountId:
+          //   i.isTrackedAsInventory === true
+          //     ? await getAccount(i.purchaseDetails.cOGSAccountCode)
+          //     : null,
+          branchId: user.branchId,
+          organizationId: user.organizationId,
+          createdById: user.userId,
+          updatedById: user.userId,
+          status: 1,
+        });
+        await item.save();
+
+        const price = new this.priceModel({
+          purchasePrice: i.purchaseDetails.unitPrice,
+          salePrice: i.salesDetails.unitPrice,
+          itemId: item._id,
+        });
+        await price.save();
+      }
+    }
   }
 }

@@ -168,7 +168,7 @@
     "tslib": "^2.0.0",
     "typeorm": "^0.2.25",
     "world_countries_lists": "^2.2.0",
-    "xero-node": "^4.11.3",
+    "xero-node": "^4.16.1",
     "yarn": "^1.22.5"
   },
   "devDependencies": {
