@@ -170,4 +170,10 @@ export class AccountsController {
   async accountsByCodes(@Body() codes: AccountCodesDto, @Req() req: Request) {
     return await this.accountService.FindAccountsByCode(codes.code, req.user);
   }
+
+  @Post('sync')
+  @UseGuards(GlobalAuthGuard)
+  async syncAccounts(@Body() body, @Req() req: Request) {
+    return await this.accountService.SyncAccounts(body, req.user);
+  }
 }

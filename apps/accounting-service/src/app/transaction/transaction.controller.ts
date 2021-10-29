@@ -97,4 +97,10 @@ export class TransactionController {
   async trasanctionApi(@Body() data: TransactionApiDto, @Req() req: Request) {
     return await this.transactionService.TransactionApi(data, req.user);
   }
+
+  @Post('add')
+  @UseGuards(GlobalAuthGuard)
+  async addTransaction(@Body() data: TransactionApiDto, @Req() req: Request) {
+    return await this.transactionService.AddTransaction(data, req);
+  }
 }

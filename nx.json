@@ -56,6 +56,12 @@
     "global-auth-guard": {
       "tags": []
     },
+    "global-constants": {
+      "tags": []
+    },
+    "integration": {
+      "tags": []
+    },
     "invoices-service": {
       "tags": []
     },
@@ -72,18 +78,18 @@
       "tags": [],
       "implicitDependencies": ["main-ui"]
     },
-    "payments-service": {
-      "tags": []
-    },
-    "pixels-to-rem": {
-      "tags": []
-    },
     "mobile-app": {
       "tags": []
     },
     "mobile-app-e2e": {
       "tags": [],
       "implicitDependencies": ["mobile-app"]
+    },
+    "payments-service": {
+      "tags": []
+    },
+    "pixels-to-rem": {
+      "tags": []
     },
     "reports-service": {
       "tags": []
@@ -110,9 +116,6 @@
       "tags": []
     },
     "users-service": {
-      "tags": []
-    },
-    "integration": {
       "tags": []
     }
   }

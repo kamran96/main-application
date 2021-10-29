@@ -11,6 +11,11 @@ import { AppModule } from './app/app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = process.env.PORT || 3343;
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
+
   if (process.env['NODE' + '_ENV'] === 'production') {
     app.setGlobalPrefix('/integrations');
   }

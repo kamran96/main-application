@@ -166,4 +166,10 @@ export class InvoiceController {
       };
     }
   }
+
+  @Post('sync')
+  @UseGuards(GlobalAuthGuard)
+  async SyncInvoices(@Body() body, @Req() req: Request) {
+    return await this.invoiceService.SyncInvoices(body, req);
+  }
 }

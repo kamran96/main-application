@@ -7,8 +7,9 @@ import {
   TransactionRepository,
 } from '../repositories';
 import * as moment from 'moment';
-import { getCustomRepository, In } from 'typeorm';
+import { getCustomRepository, In, Raw } from 'typeorm';
 import { Sorting } from '@invyce/sorting';
+import { Integrations } from '@invyce/global-constants';
 
 @Injectable()
 export class AccountsService {
@@ -441,5 +442,101 @@ export class AccountsService {
       code: In(code),
       // organizationId: user.organizationId,
     });
+  }
+
+  async SyncAccounts(data, user) {
+    for (let i of data.accounts) {
+      const accountBalance = data.balances.find((j) => j.id === i.accountID);
+
+      const account = await getCustomRepository(AccountRepository).find({
+        where: {
+          importedAccountId: i.accountID,
+          organizationId: user.organizationId,
+        },
+      });
+
+      if (account.length === 0) {
+        const secondaryAccount = await getCustomRepository(
+          SecondaryAccountRepository
+        ).find({
+          where: {
+            name: i.type,
+            organizationId: user.organizationId,
+            status: 1,
+          },
+        });
+
+        let newSecondaryAccount;
+        if (secondaryAccount.length === 0) {
+          const primaryAccount = await getCustomRepository(
+            PrimaryAccountRepository
+          ).find({
+            where: {
+              name: Raw(
+                (alias) => `lower(${alias}) ilike lower('%${i._class}%')`
+              ),
+              organizationId: user.organizationId,
+              status: 1,
+            },
+          });
+
+          newSecondaryAccount = await getCustomRepository(
+            SecondaryAccountRepository
+          ).save({
+            name: i.type,
+            primaryAccountId:
+              primaryAccount.length > 0 ? primaryAccount[0].id : null,
+            organizationId: user.organizationId,
+            createdById: user.userId,
+            updatedById: user.userId,
+            status: 1,
+          });
+        }
+
+        const account = await getCustomRepository(AccountRepository).save({
+          name: i.name,
+          description: i.description,
+          secondaryAccountId:
+            secondaryAccount.length > 0
+              ? secondaryAccount[0].id
+              : newSecondaryAccount.id,
+          code: i.code,
+          taxRate: null,
+          status: 1,
+          importedAccountId: i.accountID,
+          importedFrom: Integrations.XERO,
+          organizationId: user.organizationId,
+        });
+
+        if (accountBalance != undefined && accountBalance.balance != 0) {
+          const transaction = await getCustomRepository(
+            TransactionRepository
+          ).save({
+            amount: accountBalance.balance,
+            ref: 'XERO',
+            narration: 'Xero account balance',
+            date: new Date(),
+            organizationId: user.organizationId,
+            branchId: user.branchId,
+            createdById: user.userId,
+            updatedById: user.userId,
+            status: 1,
+          });
+
+          await getCustomRepository(TransactionItemRepository).save({
+            amount: accountBalance.balance,
+            accountId: account.id,
+            transactionId: transaction.id,
+            transactionType:
+              i._class === 'ASSET' || i._class === 'EXPENSE' ? 10 : 20,
+            branchId: user.branchId,
+            organizationId: user.organizationId,
+            createdById: user.userId,
+            updatedById: user.userId,
+            status: 1,
+          });
+        }
+      }
+    }
   }
 }

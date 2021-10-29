@@ -53,10 +53,7 @@ export class XeroController {
   @Post('/fetch-from-xero')
   async importDataFromXero(@Body() dto, @Req() req: Request) {
     try {
-      const xero = await this.xeroService.ImportDataFromXero(
-        dto.modules,
-        req.user
-      );
+      const xero = await this.xeroService.ImportDataFromXero(dto.modules, req);
 
       if (xero) {
         return {

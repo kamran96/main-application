@@ -7,7 +7,7 @@ import { InvoiceItemRepository } from '../repositories/invoiceItem.repository';
 import { Sorting } from '@invyce/sorting';
 import { BillRepository } from '../repositories/bill.repository';
 import { CreditNoteRepository } from '../repositories/creditNote.repository';
-// import { Http } from '@invyce/auth-middleware';
+import { Integrations } from '@invyce/global-constants';
 
 @Injectable()
 export class InvoiceService {
@@ -497,5 +497,73 @@ export class InvoiceService {
     return await getCustomRepository(InvoiceRepository).find({
       where: { id: In(invoiceIds.ids) },
     });
+  }
+
+  async SyncInvoices(data, req) {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const type =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [type]: value,
+      },
+    });
+
+    let item_arr = [];
+    for (let i of data.invoices) {
+      const mapItemCodes = i.lineItems.map((items) => items.itemCode);
+      item_arr.push(mapItemCodes);
+    }
+
+    const mapContactIds = data.invoices.map((inv) => inv?.contact?.contactID);
+    const { data: contacts } = await http.post(`contacts/contact/ids`, {
+      ids: mapContactIds,
+    });
+
+    for (let inv of data.invoices) {
+      const invoices = await getCustomRepository(InvoiceRepository).find({
+        importedInvoiceId: inv.invoiceID,
+        organizationId: req.user.organizationId,
+      });
+
+      if (invoices.length === 0) {
+        const invoice = await getCustomRepository(InvoiceRepository).save({
+          reference: inv.reference,
+          contactId: await contacts.find(
+            (con) => con.importedContactId === inv.contact.contactID
+          )._id,
+          issueDate: inv.date,
+          invoiceNumber: inv.invoiceNumber,
+          netTotal: inv.subTotal,
+          grossTotal: inv.total,
+          discount: inv.totalDiscount,
+          currency: inv.currencyCode,
+          importedInvoiceId: inv.invoiceID,
+          importedFrom: Integrations.XERO,
+          organizationId: req.user.organizationId,
+          createdById: req.user.id,
+          updatedById: req.user.id,
+          status: 1,
+        });
+
+        for (let j of inv.lineItems) {
+          console.log(j);
+        }
+      }
+    }
   }
 }
