@@ -25,13 +25,14 @@ export class CreditNotes {
   discount: number;
   @Column()
   grossTotal: number;
-  // @Column()
-  // currency: string;
   @Column()
   netTotal: number;
-  // @Column()
-  // date: string;
-
+  @Column()
+  importedCreditNoteId: string;
+  @Column()
+  importedFrom: string;
+  @Column()
+  currency: string;
   @Column()
   branchId: string;
   @Column()

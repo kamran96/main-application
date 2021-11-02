@@ -195,9 +195,14 @@ export class ItemService {
     return true;
   }
 
+  async GetItemsAgainstCodes(data) {
+    return await this.itemModel.find({
+      code: { $in: data.codes },
+    });
+  }
+
   async SyncItems(data, user) {
     for (let i of data.items) {
-      console.log(i);
       const items = await this.itemModel.find({
         importedItemId: i.itemID,
         organizationId: user.organizationId,

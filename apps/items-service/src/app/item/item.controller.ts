@@ -91,6 +91,12 @@ export class ItemController {
     }
   }
 
+  @Post('codes')
+  @UseGuards(GlobalAuthGuard)
+  async getItemsAgainstCodes(@Body() body) {
+    return await this.itemService.GetItemsAgainstCodes(body);
+  }
+
   @Post('sync')
   @UseGuards(GlobalAuthGuard)
   async SyncItems(@Body() body, @Req() req: Request) {

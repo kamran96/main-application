@@ -341,6 +341,7 @@ export class TransactionService {
 
       paymentArr.push({
         ...i,
+        entryType: 1,
         transactionId: transaction.id,
       });
     }

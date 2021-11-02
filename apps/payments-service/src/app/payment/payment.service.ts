@@ -120,7 +120,7 @@ export class PaymentService {
 
       const accountCodesArray = ['15001', '15004', '40003'];
       const { data: accounts } = await http.post(`accounts/account/codes`, {
-        code: accountCodesArray,
+        codes: accountCodesArray,
       });
 
       let debitArr = [];
@@ -544,16 +544,20 @@ export class PaymentService {
   async AddPayment(data, user) {
     for (let i of data.payments) {
       await getCustomRepository(PaymentRepository).save({
-        amount: i.balance,
-        dueDate: i.createdAt,
-        reference: 'Xero opeing balance',
-        transactionId: i.transactionId,
-        contactId: i.contactId,
-        entryType: 1,
+        amount: i?.balance,
+        dueDate: i?.createdAt,
+        date: i?.date,
+        reference: i.reference || 'Xero opeing balance',
+        transactionId: i?.transactionId,
+        contactId: i?.contactId,
+        invoiceId: i?.invoiceId,
+        entryType: i?.entryType,
 
-        // importedPaymentId: j.paymentID,
+        importedPaymentId: i?.paymentId,
         importedFrom: Integrations.XERO,
         organizationId: user.organizationId,
+        createdById: user.id,
+        updatedById: user.id,
         status: 1,
       });
     }
