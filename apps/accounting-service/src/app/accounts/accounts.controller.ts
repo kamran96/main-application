@@ -168,7 +168,7 @@ export class AccountsController {
   @Post('codes')
   @UseGuards(GlobalAuthGuard)
   async accountsByCodes(@Body() codes: AccountCodesDto, @Req() req: Request) {
-    return await this.accountService.FindAccountsByCode(codes.code, req.user);
+    return await this.accountService.FindAccountsByCode(codes.codes, req.user);
   }
 
   @Post('sync')

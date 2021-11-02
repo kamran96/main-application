@@ -18,5 +18,5 @@ export class AccountIdsDto {
 }
 
 export class AccountCodesDto {
-  code: Array<string>;
+  codes: Array<string>;
 }

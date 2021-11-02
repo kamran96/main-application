@@ -66,6 +66,8 @@ export class XeroService {
         'items',
         'invoices',
         'bills',
+        'payments',
+        'creditnotes',
       ];
       return {
         // integration: integration ? integration : getIntegration[0],
@@ -190,19 +192,33 @@ export class XeroService {
         tenant.tenantId
       );
 
-      const getXeroInvoiceIds = xeroInvoices.body.invoices.map(
-        (inv) => inv.invoiceID
-      );
-
       let inv_arr = [];
-      for (let i of getXeroInvoiceIds) {
-        const inv = await xero.accountingApi.getInvoice(tenant.tenantId, i);
+      for (let i of xeroInvoices.body.invoices) {
+        const inv = await xero.accountingApi.getInvoice(
+          tenant.tenantId,
+          i.invoiceID
+        );
         const xeroInvoice = inv.body.invoices[0];
         inv_arr.push(xeroInvoice);
       }
 
+      const xeroCreditNotes = await xero.accountingApi.getCreditNotes(
+        tenant.tenantId
+      );
+
+      let cn_arr = [];
+      for (let i of xeroCreditNotes.body.creditNotes) {
+        const cn = await xero.accountingApi.getCreditNote(
+          tenant.tenantId,
+          i.creditNoteID
+        );
+        const creditNote = cn.body.creditNotes[0];
+        cn_arr.push(creditNote);
+      }
+
       await http.post(`invoices/invoice/sync`, {
         invoices: inv_arr,
+        credit_notes: cn_arr,
       });
     }
 

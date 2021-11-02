@@ -133,56 +133,56 @@ export class ContactService {
           }
         );
       }
-    }
 
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
+      let token;
+      if (process.env.NODE_ENV === 'development') {
+        const header = req.headers?.authorization?.split(' ')[1];
+        token = header;
+      } else {
+        if (!req || !req.cookies) return null;
+        token = req.cookies['access_token'];
+      }
 
-    const type =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
+      const type =
+        process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+      const value =
+        process.env.NODE_ENV === 'development'
+          ? `Bearer ${token}`
+          : `access_token=${token}`;
 
-    const http = axios.create({
-      baseURL: 'http://localhost',
-      headers: {
-        [type]: value,
-      },
-    });
-
-    const mapContactIds = contacts?.contacts.map((con) => ({
-      id: con._id,
-      type: con.contactType,
-    }));
-
-    const { data: payments } = await http.post(`payments/payment/contact`, {
-      ids: mapContactIds,
-    });
-
-    let cont_arr = [];
-    for (let i of contacts.contacts) {
-      let balance = payments.find((pay) => pay.id == i._id);
-
-      cont_arr.push({
-        ...i.toObject(),
-        balance: balance?.payment?.balance,
+      const http = axios.create({
+        baseURL: 'http://localhost',
+        headers: {
+          [type]: value,
+        },
       });
+
+      const mapContactIds = contacts?.contacts.map((con) => ({
+        id: con._id,
+        type: con.contactType,
+      }));
+
+      const { data: payments } = await http.post(`payments/payment/contact`, {
+        ids: mapContactIds,
+      });
+
+      let cont_arr = [];
+      for (let i of contacts.contacts) {
+        let balance = payments.find((pay) => pay.id == i._id);
+
+        cont_arr.push({
+          ...i.toObject(),
+          balance: balance?.payment?.balance,
+        });
+      }
+
+      contacts = {
+        contacts: cont_arr,
+        pagination: contacts.pagination,
+      };
     }
 
-    let new_contact = {
-      contacts: cont_arr,
-      pagination: contacts.pagination,
-    };
-
-    return new_contact;
+    return contacts;
   }
 
   async CreateContact(contactDto, contactData) {

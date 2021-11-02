@@ -24,7 +24,7 @@ export class InvoiceController {
   @UseGuards(GlobalAuthGuard)
   async index(@Req() req: Request, @Query() query) {
     try {
-      const invoice = await this.invoiceService.IndexInvoice(req.user, query);
+      const invoice = await this.invoiceService.IndexInvoice(req, query);
 
       if (invoice) {
         return {

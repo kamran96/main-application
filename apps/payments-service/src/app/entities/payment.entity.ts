@@ -21,6 +21,10 @@ export class Payments {
   @Column()
   paymentType: string;
   @Column()
+  importedPaymentId: string;
+  @Column()
+  importedFrom: string;
+  @Column()
   entryType: number;
   @Column()
   runningPayment: boolean;

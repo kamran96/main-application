@@ -16,6 +16,8 @@ export class CreditNoteItems {
   @Column()
   itemId: string;
   @Column()
+  accountId: string;
+  @Column()
   creditNoteId: number;
   @Column()
   description: string;

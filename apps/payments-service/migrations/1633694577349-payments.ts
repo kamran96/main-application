@@ -19,6 +19,8 @@ export class payments1633694577349 implements MigrationInterface {
           { name: 'date', type: 'timestamp', isNullable: true },
           { name: 'entryType', type: 'smallint', isNullable: true },
           { name: 'runningPayment', type: 'boolean', isNullable: true },
+          { name: 'importedFrom', type: 'varchar', isNullable: true },
+          { name: 'importedPaymentId', type: 'varchar', isNullable: true },
           { name: 'branchId', type: 'varchar', isNullable: true },
           { name: 'organizationId', type: 'varchar', isNullable: true },
           { name: 'createdById', type: 'varchar', isNullable: true },
