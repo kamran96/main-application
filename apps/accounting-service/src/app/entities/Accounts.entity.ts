@@ -45,11 +45,11 @@ export class Accounts {
   @Column()
   updatedById: string;
 
-  @ManyToOne((type) => SecondaryAccounts)
+  @ManyToOne(() => SecondaryAccounts)
   @JoinColumn({ name: 'secondaryAccountId', referencedColumnName: 'id' })
   secondaryAccount: SecondaryAccounts;
 
-  @ManyToOne((type) => PrimaryAccounts)
+  @ManyToOne(() => PrimaryAccounts)
   @JoinColumn({ name: 'secondaryAccountId', referencedColumnName: 'id' })
   primaryAccount: PrimaryAccounts;
 }

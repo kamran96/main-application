@@ -60,8 +60,9 @@ export class Contact {
 export const ContactSchema = SchemaFactory.createForClass(Contact);
 ContactSchema.plugin(mongoosePaginate);
 
-ContactSchema.set('toJSON', { virtuals: true });
-
 ContactSchema.virtual('id').get(function () {
   return this._id.toHexString();
 });
+
+ContactSchema.set('toObject', { virtuals: true });
+ContactSchema.set('toJSON', { virtuals: true });

@@ -216,9 +216,14 @@ export class XeroService {
         cn_arr.push(creditNote);
       }
 
+      const xeroPayments = await xero.accountingApi.getPayments(
+        tenant.tenantId
+      );
+
       await http.post(`invoices/invoice/sync`, {
         invoices: inv_arr,
         credit_notes: cn_arr,
+        payments: xeroPayments.body.payments,
       });
     }
 

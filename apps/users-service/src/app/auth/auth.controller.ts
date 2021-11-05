@@ -4,21 +4,28 @@ import {
   Get,
   HttpException,
   HttpStatus,
-  Logger,
   Post,
   Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import {
   ForgetPasswordDto,
   PasswordDto,
+  SendOtp,
   UserLoginDto,
   UserRegisterDto,
 } from '../dto/user.dto';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import {
+  IUser,
+  IRequest,
+  IUserCheck,
+  IUserWithResponse,
+  IUserWithResponseAndStatus,
+} from '@invyce/interfaces';
 
 @Controller('auth')
 export class AuthController {
@@ -27,9 +34,8 @@ export class AuthController {
   @Post()
   async Login(
     @Body() authDto: UserLoginDto,
-    @Res() res: Response,
-    @Req() req: Request
-  ) {
+    @Res() res: Response
+  ): Promise<void> {
     try {
       await this.authService.ValidateUser(authDto, res);
     } catch (error) {
@@ -41,7 +47,10 @@ export class AuthController {
   }
 
   @Post('/register')
-  async Register(@Body() authDto: UserRegisterDto, @Res() res: Response) {
+  async Register(
+    @Body() authDto: UserRegisterDto,
+    @Res() res: Response
+  ): Promise<IUser | IUserWithResponse> {
     try {
       const users = await this.authService.CheckUser(authDto);
       if (Array.isArray(users) && users.length > 0) {
@@ -68,9 +77,9 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('access-controll')
-  async access(@Body() body, @Req() req: Request) {
+  async access(@Req() req: IRequest): Promise<IUserWithResponseAndStatus> {
     try {
-      const user = await this.authService.AccessControll(body, req);
+      const user = await this.authService.AccessControll(req);
 
       if (user) {
         return {
@@ -86,9 +95,9 @@ export class AuthController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('/check')
-  async check(@Req() req: Request) {
+  @UseGuards(JwtAuthGuard)
+  async check(@Req() req: IRequest): Promise<IUserCheck> {
     try {
       const user = await this.authService.Check(req);
 
@@ -109,14 +118,13 @@ export class AuthController {
   }
 
   @Post('/resend-otp')
-  async resendOtp(@Body() body) {
+  async resendOtp(@Body() body: SendOtp): Promise<IUserWithResponse> {
     try {
-      const user: any = this.authService.ResendOtp(body);
+      const user = this.authService.ResendOtp(body);
 
       if (user) {
         return {
           message: 'Successfull',
-          result: user,
         };
       }
     } catch (error) {
@@ -128,20 +136,21 @@ export class AuthController {
   }
 
   @Post('logout')
-  async logout(@Res() res: Response) {
+  async logout(@Res() res: Response): Promise<Response> {
     // res.setHeader('Set-Cookie', await this.authService.Logout());
     return await this.authService.Logout(res);
   }
 
   @Post('/forget-password')
-  async forgetPassword(@Body() userDto: ForgetPasswordDto): Promise<any> {
+  async forgetPassword(
+    @Body() userDto: ForgetPasswordDto
+  ): Promise<IUserWithResponse> {
     try {
-      const user: any = this.authService.ForgetPassword(userDto);
+      const user = this.authService.ForgetPassword(userDto);
 
       if (user) {
         return {
           message: 'Successfull',
-          result: user,
         };
       }
     } catch (error) {
@@ -153,7 +162,9 @@ export class AuthController {
   }
 
   @Post('/change-password')
-  async changePassword(@Body() userDto: PasswordDto): Promise<any> {
+  async changePassword(
+    @Body() userDto: PasswordDto
+  ): Promise<IUserWithResponse> {
     try {
       const { password, confirmPassword } = userDto;
 
@@ -163,7 +174,6 @@ export class AuthController {
         if (user) {
           return {
             message: 'Successfull',
-            result: user,
           };
         }
       }
@@ -176,7 +186,7 @@ export class AuthController {
   }
 
   @Post('verify-otp')
-  async verifyOtp(@Body() body) {
+  async verifyOtp(@Body() body: SendOtp): Promise<IUserWithResponse> {
     try {
       const user = await this.authService.VerifyOtp(body);
       if (user.status === true) {

@@ -478,6 +478,27 @@
         }
       }
     },
+    "interfaces": {
+      "root": "libs/interfaces",
+      "sourceRoot": "libs/interfaces/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/interfaces/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/interfaces"],
+          "options": {
+            "jestConfig": "libs/interfaces/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "invoices-service": {
       "root": "apps/invoices-service",
       "sourceRoot": "apps/invoices-service/src",
@@ -974,47 +995,22 @@
         }
       }
     },
-    "review-invyce-theme": {
-      "root": "libs/review/invyce-theme",
-      "sourceRoot": "libs/review/invyce-theme/src",
+    "send-email": {
+      "root": "libs/send-email",
+      "sourceRoot": "libs/send-email/src",
       "projectType": "library",
       "targets": {
         "lint": {
-          "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/review/invyce-theme/**/*.{ts,tsx,js,jsx}"
-            ]
+            "executor": "@nrwl/linter:eslint",
+            "lintFilePatterns": ["libs/send-email/**/*.ts"]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/review/invyce-theme"],
+          "outputs": ["coverage/libs/send-email"],
           "options": {
-            "jestConfig": "libs/review/invyce-theme/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
-    "shared-global-state-manager": {
-      "root": "libs/shared/global-state-manager",
-      "sourceRoot": "libs/shared/global-state-manager/src",
-      "projectType": "library",
-      "targets": {
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": [
-              "libs/shared/global-state-manager/**/*.{ts,tsx,js,jsx}"
-            ]
-          }
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/shared/global-state-manager"],
-          "options": {
-            "jestConfig": "libs/shared/global-state-manager/jest.config.js",
+            "jestConfig": "libs/send-email/jest.config.js",
             "passWithNoTests": true
           }
         }

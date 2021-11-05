@@ -26,6 +26,7 @@ class BillItemsDto {
   description: string;
   quantity: string;
   itemDiscount: string;
+  purchasePrice: number;
   unitPrice: string;
   tax: string;
   total: number;
@@ -33,6 +34,10 @@ class BillItemsDto {
   costOfGoodAmount: number;
 }
 
-export class BillDeleteIdsDto {
+export class BillIdsDto {
   ids: Array<number>;
+}
+
+export class BillParamsDto {
+  id: number;
 }

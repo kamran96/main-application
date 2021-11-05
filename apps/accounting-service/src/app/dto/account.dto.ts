@@ -4,7 +4,7 @@ export class AccountDto {
   @IsNotEmpty()
   name: string;
   description: string;
-  code: number | string;
+  code: string;
   secondaryAccountId: number;
   primaryAccountId: number;
   importedFrom: string;
@@ -19,4 +19,8 @@ export class AccountIdsDto {
 
 export class AccountCodesDto {
   codes: Array<string>;
+}
+
+export class ParamsDto {
+  id: number;
 }

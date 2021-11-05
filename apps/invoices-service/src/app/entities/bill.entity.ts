@@ -26,6 +26,8 @@ export class Bills {
   @Column()
   date: string;
   @Column()
+  comment: string;
+  @Column()
   invoiceType: string;
   @Column()
   directTax: number;
@@ -39,8 +41,6 @@ export class Bills {
   organizationId: string;
   @Column()
   status: number;
-  @Column()
-  isReturn: string;
   @Column()
   createdAt: string;
   @Column()

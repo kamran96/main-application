@@ -9,9 +9,7 @@ export class BranchDto {
   isMain: boolean;
   prefix: string;
   email: string;
-  address: {
-    city: string;
-    country: string;
-    postalCode: string;
-  };
+  city: string;
+  country: string;
+  postalCode: string;
 }

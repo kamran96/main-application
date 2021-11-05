@@ -4,49 +4,64 @@ import axios from 'axios';
 import { BillRepository } from '../repositories/bill.repository';
 import { BillItemRepository } from '../repositories/billItem.repository';
 import { Sorting } from '@invyce/sorting';
+import {
+  IBaseUser,
+  IPage,
+  IBillWithResponse,
+  IRequest,
+  IBill,
+} from '@invyce/interfaces';
+import { BillDto, BillIdsDto } from '../dto/bill.dto';
 
 @Injectable()
 export class BillService {
-  async IndexBill(user, queryData) {
-    const { page_no, page_size, invoice_type, status, sort, query } = queryData;
-    let bills;
+  async IndexBill(
+    user: IBaseUser,
+    queryData: IPage
+  ): Promise<IBillWithResponse> {
+    const { page_no, page_size, status, sort, query } = queryData;
 
+    let bills;
+    const ps: number = parseInt(page_size);
+    const pn: number = parseInt(page_no);
     const { sort_column, sort_order } = await Sorting(sort);
 
     const total = await getCustomRepository(BillRepository).count({
       status,
       organizationId: user.organizationId,
       // invoiceType: invoice_type,
-      // branchId: user.branchId,
+      branchId: user.branchId,
     });
 
     if (query) {
-      const filterData: any = Buffer.from(query, 'base64').toString();
+      const filterData = Buffer.from(query, 'base64').toString();
       const data = JSON.parse(filterData);
 
-      for (let i in data) {
+      for (const i in data) {
         if (data[i].type === 'search') {
           const val = data[i].value?.split('%')[1];
           // const lower = val.toLowerCase();
           bills = await getCustomRepository(BillRepository).find({
             where: {
               status: 1,
+              branchId: user.branchId,
               organizationId: user.organizationId,
               [i]: ILike(val),
             },
-            skip: page_no * page_size - page_size,
-            take: page_size,
+            skip: pn * ps - ps,
+            take: ps,
             relations: ['purchaseItems', 'purchaseItems.account'],
           });
         } else if (data[i].type === 'compare') {
           bills = await getCustomRepository(BillRepository).find({
             where: {
               status: 1,
+              branchId: user.branchId,
               organizationId: user.organizationId,
               [i]: In(data[i].value),
             },
-            skip: page_no * page_size - page_size,
-            take: page_size,
+            skip: pn * ps - ps,
+            take: ps,
             relations: ['purchaseItems', 'purchaseItems.account'],
           });
         } else if (data[i].type === 'date-between') {
@@ -56,22 +71,22 @@ export class BillService {
             where: {
               status: 1,
               organizationId: user.organizationId,
+              branchId: user.branchId,
               [i]: Between(start_date, end_date),
             },
-            skip: page_no * page_size - page_size,
-            take: page_size,
+            skip: pn * ps - ps,
+            take: ps,
             relations: ['purchaseItems', 'purchaseItems.account'],
           });
         }
 
         return {
-          bills: bills,
+          result: bills,
           pagination: {
             total,
-            total_pages: Math.ceil(total / page_size),
-            page_size: parseInt(page_size) || 20,
-            // page_total: null,
-            page_no: parseInt(page_no),
+            total_pages: Math.ceil(total / ps),
+            page_size: ps || 20,
+            page_no: pn,
             sort_column: sort_column,
             sort_order: sort_order,
           },
@@ -83,10 +98,10 @@ export class BillService {
           status: status,
           // invoiceType: invoice_type,
           organizationId: user.organizationId,
-          // branchId: user.branchId
+          branchId: user.branchId,
         },
-        skip: page_no * page_size - page_size,
-        take: page_size,
+        skip: pn * ps - ps,
+        take: ps,
         order: {
           [sort_column]: sort_order,
         },
@@ -95,20 +110,19 @@ export class BillService {
     }
 
     return {
-      bills,
+      result: bills,
       pagination: {
         total,
-        total_pages: Math.ceil(total / page_size),
-        page_size: parseInt(page_size) || 20,
-        // page_total: null,
-        page_no: parseInt(page_no),
+        total_pages: Math.ceil(total / ps),
+        page_size: ps || 20,
+        page_no: pn,
         sort_column: sort_column,
         sort_order: sort_order,
       },
     };
   }
 
-  async CreateBill(dto, data) {
+  async CreateBill(dto: BillDto, data: IBaseUser): Promise<IBill> {
     const bill = await getCustomRepository(BillRepository).save({
       contactId: dto.contactId,
       reference: dto.reference,
@@ -132,7 +146,7 @@ export class BillService {
       status: dto.status,
     });
 
-    for (let item of dto.invoice_items) {
+    for (const item of dto.invoice_items) {
       await getCustomRepository(BillItemRepository).save({
         itemId: item.itemId,
         billId: bill.id,
@@ -151,13 +165,13 @@ export class BillService {
     return bill;
   }
 
-  async FindById(billId, req) {
+  async FindById(billId: number, req: IRequest): Promise<IBill> {
     const [bill] = await getCustomRepository(BillRepository).find({
       where: { id: billId },
       relations: ['purchaseItems'],
     });
 
-    let new_bill: any;
+    let new_bill;
     if (bill?.contactId) {
       let token;
       if (process.env.NODE_ENV === 'development') {
@@ -178,7 +192,7 @@ export class BillService {
       const contactId = bill?.contactId;
       const itemIdsArray = bill?.purchaseItems.map((ids) => ids.itemId);
 
-      const contactRequest: any = {
+      const contactRequest = {
         url: `http://localhost/contacts/contact/${contactId}`,
         method: 'GET',
         headers: {
@@ -193,13 +207,13 @@ export class BillService {
         },
       });
 
-      const { data: contact } = await axios(contactRequest);
+      const { data: contact } = await axios(contactRequest as unknown);
       const { data: items } = await http.post(`items/item/ids`, {
         ids: itemIdsArray,
       });
 
-      let billItemArr = [];
-      for (let i of bill.purchaseItems) {
+      const billItemArr = [];
+      for (const i of bill.purchaseItems) {
         const item = items.find((j) => i.itemId === j.id);
         billItemArr.push({ ...i, item });
       }
@@ -215,8 +229,8 @@ export class BillService {
     return new_bill ? new_bill : bill;
   }
 
-  async deleteBill(billIds) {
-    for (let i of billIds.ids) {
+  async deleteBill(billIds: BillIdsDto): Promise<boolean> {
+    for (const i of billIds.ids) {
       await getCustomRepository(BillRepository).update(
         { id: i },
         { status: 0 }
@@ -226,7 +240,7 @@ export class BillService {
     return true;
   }
 
-  async FindByBillIds(billds) {
+  async FindByBillIds(billds: BillIdsDto): Promise<IBill[]> {
     return await getCustomRepository(BillRepository).find({
       where: { id: In(billds.ids) },
     });

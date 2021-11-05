@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
 export class PrimaryAccounts {
@@ -13,15 +7,15 @@ export class PrimaryAccounts {
   @Column()
   name: string;
   @Column()
-  organizationId: number;
+  organizationId: string;
   @Column()
   status: number;
   @Column()
   createdAt: string;
   @Column()
-  createdById: number;
+  createdById: string;
   @Column()
   updatedAt: string;
   @Column()
-  updatedById: number;
+  updatedById: string;
 }

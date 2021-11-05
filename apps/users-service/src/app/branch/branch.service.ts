@@ -1,5 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { IBaseUser, IBranch } from '@invyce/interfaces';
+import { BranchDto } from '../dto/branch.dto';
 import { Branch } from '../schemas/branch.schema';
 import { User } from '../schemas/user.schema';
 
@@ -10,7 +12,7 @@ export class BranchService {
     @InjectModel(User.name) private userModel
   ) {}
 
-  async ListBranch(branchData) {
+  async ListBranch(branchData: IBaseUser): Promise<IBranch[]> {
     try {
       const branch = await this.branchModel.find({
         status: 1,
@@ -23,34 +25,34 @@ export class BranchService {
     }
   }
 
-  async CreateOrUpdateBranch(branchDto, branchData = null) {
+  async CreateOrUpdateBranch(
+    branchDto: BranchDto,
+    branchData: IBaseUser
+  ): Promise<IBranch> {
     if (branchDto && branchDto.isNewRecord === false) {
       try {
         const branch = await this.FindBranchById(branchDto.id);
         // code goes for update branch
         if (branch) {
-          const updatedBranch: any = {};
           const address = {
-            description:
-              branchDto?.address?.description || branch?.address?.description,
-            city: branchDto?.address?.city || branch?.address?.city,
-            country: branchDto?.address?.country || branch?.address?.country,
-            postalCode:
-              branchDto?.address?.postalCode || branch?.address?.postalCode,
+            description: branchDto?.description || branch?.address?.description,
+            city: branchDto?.city || branch?.address?.city,
+            country: branchDto?.country || branch?.address?.country,
+            postalAddress: branchDto?.postalCode || branch?.address?.postalCode,
           };
-
-          updatedBranch.name = branchDto.name || branch.name;
-          updatedBranch.prefix = branchDto.prefix || branch.prefix;
-          updatedBranch.email = branchDto.email || branch.email;
-          updatedBranch.phoneNumber =
-            branchDto.phoneNumber || branch.phoneNumber;
-          updatedBranch.faxNumber = branchDto.faxNumber || branch.faxNumber;
-          updatedBranch.isMain = branchDto.isMain || branch.isMain;
-          updatedBranch.address = address;
-          updatedBranch.organizationId = branch.organizationId;
-          updatedBranch.createdById = branch.createdById;
-          updatedBranch.updatedById = branchData.id;
-          updatedBranch.status = 1;
+          const updatedBranch = {
+            name: branchDto.name || branch.name,
+            prefix: branchDto.prefix || branch.prefix,
+            email: branchDto.email || branch.email,
+            phoneNumber: branchDto.phoneNumber || branch.phoneNumber,
+            faxNumber: branchDto.faxNumber || branch.faxNumber,
+            isMain: branchDto.isMain || branch.isMain,
+            address: address,
+            organizationId: branch.organizationId,
+            createdById: branch.createdById,
+            updatedById: branchData.id,
+            status: 1,
+          };
 
           await this.branchModel.updateOne(
             { _id: branchDto.id },
@@ -64,17 +66,18 @@ export class BranchService {
       }
     } else {
       try {
-        // code goese for create
-        // const user = await this.userModel.findOne({
-        // id: branchData.userId,
-        //   relations: ['role'],
-        // });
+        const address = {
+          description: branchDto?.description,
+          city: branchDto.city,
+          country: branchDto.country,
+          postalCode: branchDto.postalCode,
+        };
 
         const branch = new this.branchModel();
         branch.name = branchDto.name;
         branch.email = branchDto.email;
         branch.prefix = branchDto.prefix;
-        branch.address = branchDto.address;
+        branch.address = address;
         branch.phoneNumber = branchDto.phoneNumber;
         branch.faxNumber = branchDto.faxNumber;
         branch.organizationId = branchData.organizationId;
@@ -105,13 +108,14 @@ export class BranchService {
     }
   }
 
-  async FindBranchById(branchId) {
+  async FindBranchById(branchId: number): Promise<IBranch> {
     return await this.branchModel.findById(branchId);
   }
 
-  async deleteBranch(params) {
-    // await this.manager.update(Branches, { id: params.id }, { status: 0 });
-    // const [branch] = await this.FindBranchById(params);
-    // return branch;
-  }
+  // async deleteBranch(params: number) {
+  // console.log(params);
+  // await this.manager.update(Branches, { id: params.id }, { status: 0 });
+  // const [branch] = await this.FindBranchById(params);
+  // return branch;
+  // }
 }

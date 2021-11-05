@@ -11,3 +11,17 @@ export class PaymentDto {
   remainingAmount: number;
   invoice_ids: Array<number>;
 }
+
+export class PaymentContactDto {
+  ids: Array<ContactType>;
+}
+
+export class PaymentInvoiceDto {
+  type: string;
+  ids: Array<string>;
+}
+
+class ContactType {
+  type: number;
+  id: string;
+}

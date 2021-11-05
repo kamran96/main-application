@@ -8,6 +8,15 @@ import {
   TransactionItemRepository,
   AccountRepository,
 } from '../repositories';
+import {
+  IBaseUser,
+  IPage,
+  ITransactionItem,
+  ITransaction,
+  ITransactionWithResponse,
+  IRequest,
+} from '@invyce/interfaces';
+import { TransactionDto } from '../dto/transaction.dto';
 
 enum Entries {
   DEBITS = 10,
@@ -16,26 +25,30 @@ enum Entries {
 
 @Injectable()
 export class TransactionService {
-  async ListTransactions(user, queryData) {
+  async ListTransactions(
+    user: IBaseUser,
+    queryData: IPage
+  ): Promise<ITransactionWithResponse> {
     try {
       const { page_no, page_size, sort, query } = queryData;
-      let transactions;
+      const ps: number = parseInt(page_size);
+      const pn: number = parseInt(page_no);
 
+      let transactions;
       const { sort_column, sort_order } = await Sorting(sort);
       const total = await getCustomRepository(TransactionRepository).count({
         status: 1,
         organizationId: user.organizationId,
-        // branchId: user.branchId,
+        branchId: user.branchId,
       });
 
       if (query) {
-        const filterData: any = Buffer.from(query, 'base64').toString();
+        const filterData = Buffer.from(query, 'base64').toString();
         const data = JSON.parse(filterData);
 
-        for (let i in data) {
+        for (const i in data) {
           if (data[i].type === 'search') {
             const val = data[i].value?.split('%')[1];
-            // const lower = val.toLowerCase();
             transactions = await getCustomRepository(
               TransactionRepository
             ).find({
@@ -44,8 +57,8 @@ export class TransactionService {
                 organizationId: user.organizationId,
                 [i]: ILike(val),
               },
-              skip: page_no * page_size - page_size,
-              take: page_size,
+              skip: pn * ps - ps,
+              take: ps,
               relations: ['transactionItems', 'transactionItems.account'],
             });
           } else if (data[i].type === 'compare') {
@@ -57,8 +70,8 @@ export class TransactionService {
                 organizationId: user.organizationId,
                 [i]: In(data[i].value),
               },
-              skip: page_no * page_size - page_size,
-              take: page_size,
+              skip: pn * ps - ps,
+              take: ps,
               relations: ['transactionItems', 'transactionItems.account'],
             });
           } else if (data[i].type === 'date-between') {
@@ -72,20 +85,19 @@ export class TransactionService {
                 organizationId: user.organizationId,
                 [i]: Between(start_date, end_date),
               },
-              skip: page_no * page_size - page_size,
-              take: page_size,
+              skip: pn * ps - ps,
+              take: ps,
               relations: ['transactionItems', 'transactionItems.account'],
             });
           }
 
           return {
-            transactions: transactions,
+            result: transactions,
             pagination: {
               total,
-              total_pages: Math.ceil(total / page_size),
-              page_size: parseInt(page_size) || 20,
-              // page_total: null,
-              page_no: parseInt(page_no),
+              total_pages: Math.ceil(total / ps),
+              page_size: ps || 20,
+              page_no: pn,
               sort_column: sort_column,
               sort_order: sort_order,
             },
@@ -98,8 +110,8 @@ export class TransactionService {
             organizationId: user.organizationId,
             // branchId: user.branchId,
           },
-          skip: page_no * page_size - page_size,
-          take: page_size,
+          skip: pn * ps - ps,
+          take: ps,
           order: {
             date: 'DESC',
           },
@@ -107,13 +119,13 @@ export class TransactionService {
         });
 
         return {
-          transactions: transactions,
+          result: transactions,
           pagination: {
             total,
-            total_pages: Math.ceil(total / page_size),
-            page_size: parseInt(page_size) || 20,
+            total_pages: Math.ceil(total / ps),
+            page_size: pn || 20,
             // page_total: null,
-            page_no: parseInt(page_no),
+            page_no: pn,
             sort_column: sort_column,
             sort_order: sort_order,
           },
@@ -125,14 +137,17 @@ export class TransactionService {
     }
   }
 
-  async CreateTransaction(transactionDto, userInfo): Promise<any> {
+  async CreateTransaction(
+    transactionDto: TransactionDto,
+    userInfo
+  ): Promise<ITransaction> {
     const transaction = await getCustomRepository(TransactionRepository).save({
       date: transactionDto.date,
       ref: transactionDto.ref,
       narration: transactionDto.narration,
       notes: transactionDto.notes,
       amount: transactionDto.amount,
-      // branchId: userInfo.branchId,
+      branchId: userInfo.branchId,
       organizationId: userInfo.organizationId,
       createdById: userInfo.userId,
       updatedById: userInfo.userId,
@@ -141,9 +156,9 @@ export class TransactionService {
 
     const { debits, credits } = transactionDto.entries;
 
-    let arr = [];
+    const arr: ITransactionItem[] = [];
 
-    for (let i of debits) {
+    for (const i of debits) {
       const transactionItems = await getCustomRepository(
         TransactionItemRepository
       ).save({
@@ -151,7 +166,7 @@ export class TransactionService {
         amount: i.amount,
         accountId: i.accountId,
         description: i.description,
-        // branchId: userInfo.branchId,
+        branchId: userInfo.branchId,
         organizationId: userInfo.organizationId,
         createdById: userInfo.userId,
         updatedById: userInfo.userId,
@@ -162,7 +177,7 @@ export class TransactionService {
       arr.push(transactionItems);
     }
 
-    for (let i of credits) {
+    for (const i of credits) {
       const transactionItems = await getCustomRepository(
         TransactionItemRepository
       ).save({
@@ -170,7 +185,7 @@ export class TransactionService {
         amount: i.amount,
         description: i.description,
         accountId: i.accountId,
-        // branchId: userInfo.branchId,
+        branchId: userInfo.branchId,
         organizationId: userInfo.organizationId,
         createdById: userInfo.userId,
         updatedById: userInfo.userId,
@@ -187,94 +202,97 @@ export class TransactionService {
     };
   }
 
-  async FindTransactionById(transactionId) {
-    return await getCustomRepository(TransactionRepository).find({
-      where: { id: transactionId, status: 1 },
-      relations: ['transactionItems'],
-    });
+  async FindTransactionById(transactionId: number): Promise<ITransaction> {
+    const [transaction] = await getCustomRepository(TransactionRepository).find(
+      {
+        where: { id: transactionId, status: 1 },
+        relations: ['transactionItems'],
+      }
+    );
+    return transaction;
   }
 
-  async TransactionApi(data: ITransactionApi, user) {
+  async TransactionApi(transactions, user: IBaseUser): Promise<void> {
     try {
-      if (data || data !== null || data || undefined) {
-        const debits = data['dr'];
-        const credits = data['cr'];
+      console.log('making transaction...');
+      for (const data of transactions) {
+        if (data || data !== null || data || undefined) {
+          const debits = data['dr'];
+          const credits = data['cr'];
 
-        const debitIds = debits.map((i) => i.account_id);
-        const creditIds = credits.map((i) => i.account_id);
+          const debitIds = debits.map((i) => i.account_id);
+          const creditIds = credits.map((i) => i.account_id);
 
-        let initialValue = 0;
-        let amount = debits.reduce(function (previousValue, currentValue) {
-          return previousValue + currentValue.amount;
-        }, initialValue);
+          const initialValue = 0;
+          const amount = debits.reduce(function (previousValue, currentValue) {
+            return previousValue + currentValue.amount;
+          }, initialValue);
 
-        console.log(creditIds, debitIds);
-        const intersection = debitIds.filter((element) =>
-          creditIds.includes(element)
-        );
-        console.log(intersection);
-
-        if (intersection.length > 0) {
-          throw new HttpException(
-            "There's no way to pass an entry on same accounts",
-            HttpStatus.BAD_REQUEST
+          const intersection = debitIds.filter((element) =>
+            creditIds.includes(element)
           );
-        } else {
-          const transaction = await getCustomRepository(
-            TransactionRepository
-          ).save({
-            amount: data.amount ? data.amount : amount,
-            ref: data.invoice ? data.invoice.reference : data.reference,
-            date: data.createdAt || new Date(),
-            createdAt: data.createdAt || new Date().toDateString(),
-            ndataation: `System transaction against ${data?.invoice?.invoiceNumber}`,
-            // branchId: user.branchId,
-            organizationId: user.organizationId,
-            createdById: user.id,
-            updatedById: user.id,
-            status: data?.invoice?.status === 2 ? 2 : 1 || 1,
-          });
 
-          getCustomRepository(TransactionItemRepository).save(
-            debits.map((dr) => ({
-              transactionId: transaction.id,
-              amount: dr.amount,
-              accountId: dr.accountId,
-              transactionType: Entries.DEBITS,
+          if (intersection.length > 0) {
+            throw new HttpException(
+              "There's no way to pass an entry on same accounts",
+              HttpStatus.BAD_REQUEST
+            );
+          } else {
+            const transaction = await getCustomRepository(
+              TransactionRepository
+            ).save({
+              amount: data.amount ? data.amount : amount,
+              ref: data.invoice ? data.invoice.reference : data.reference,
+              date: data.createdAt || new Date(),
+              createdAt: data.createdAt || new Date().toDateString(),
+              ndataation: `System transaction against ${data?.invoice?.invoiceNumber}`,
               // branchId: user.branchId,
               organizationId: user.organizationId,
               createdById: user.id,
               updatedById: user.id,
-              createdAt: transaction.createdAt,
-              status: transaction.status,
-            }))
-          );
+              status: data?.invoice?.status === 2 ? 2 : 1 || 1,
+            });
 
-          getCustomRepository(TransactionItemRepository).save(
-            credits.map((cr) => ({
-              transactionId: transaction.id,
-              amount: cr.amount,
-              accountId: cr.accountId,
-              transactionType: Entries.CREDITS,
-              // branchId: user.branchId,
-              organizationId: user.organizationId,
-              createdById: user.id,
-              updatedById: user.id,
-              createdAt: transaction.createdAt,
-              status: transaction.status,
-            }))
-          );
+            getCustomRepository(TransactionItemRepository).save(
+              debits.map((dr) => ({
+                transactionId: transaction.id,
+                amount: dr.amount,
+                accountId: dr.accountId,
+                transactionType: Entries.DEBITS,
+                // branchId: user.branchId,
+                organizationId: user.organizationId,
+                createdById: user.id,
+                updatedById: user.id,
+                createdAt: transaction.createdAt,
+                status: transaction.status,
+              }))
+            );
 
-          return transaction;
+            getCustomRepository(TransactionItemRepository).save(
+              credits.map((cr) => ({
+                transactionId: transaction.id,
+                amount: cr.amount,
+                accountId: cr.accountId,
+                transactionType: Entries.CREDITS,
+                // branchId: user.branchId,
+                organizationId: user.organizationId,
+                createdById: user.id,
+                updatedById: user.id,
+                createdAt: transaction.createdAt,
+                status: transaction.status,
+              }))
+            );
+          }
         }
       }
       throw new HttpException('Parameter is invalid', HttpStatus.BAD_REQUEST);
     } catch (error) {
+      console.log(error);
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
-  async AddTransaction(data, req) {
+  async AddTransaction(data, req: IRequest): Promise<void> {
     let token;
     if (process.env.NODE_ENV === 'development') {
       const header = req.headers?.authorization?.split(' ')[1];
@@ -298,9 +316,9 @@ export class TransactionService {
       },
     });
 
-    let paymentArr = [];
-    for (let i of data.transactions) {
-      async function getAccount(name) {
+    const paymentArr = [];
+    for (const i of data.transactions) {
+      const getAccount = async (name: string) => {
         const [account] = await getCustomRepository(AccountRepository).find({
           where: {
             name,
@@ -308,7 +326,7 @@ export class TransactionService {
           },
         });
         return account.id;
-      }
+      };
 
       const transaction = await getCustomRepository(TransactionRepository).save(
         {
@@ -318,8 +336,8 @@ export class TransactionService {
           date: new Date(),
           organizationId: req.user.organizationId,
           branchId: req.user.branchId,
-          createdById: req.user.userId,
-          updatedById: req.user.userId,
+          createdById: req.user.id,
+          updatedById: req.user.id,
           status: 1,
         }
       );
@@ -334,8 +352,8 @@ export class TransactionService {
         transactionType: 10,
         branchId: req.user.branchId,
         organizationId: req.user.organizationId,
-        createdById: req.user.userId,
-        updatedById: req.user.userId,
+        createdById: req.user.id,
+        updatedById: req.user.id,
         status: 1,
       });
 
@@ -350,13 +368,4 @@ export class TransactionService {
       payments: paymentArr,
     });
   }
-}
-
-interface ITransactionApi {
-  amount: number;
-  cr: Array<any>;
-  dr: Array<any>;
-  invoice: any;
-  reference: string;
-  createdAt: string;
 }

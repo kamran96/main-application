@@ -12,9 +12,16 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { Request } from 'express';
+import { Response } from 'express';
+import { IPage, IRequest, IUserWithResponse } from '@invyce/interfaces';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { InvitedUser } from '../dto/user.dto';
+import { ParamsDto } from '../dto/rbac.dto';
+import {
+  InvitedUserDetailDto,
+  InvitedUserDto,
+  SendOtp,
+  UserThemeDto,
+} from '../dto/user.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -23,7 +30,10 @@ export class UserController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async index(@Req() req: Request, @Query() query) {
+  async index(
+    @Req() req: IRequest,
+    @Query() query: IPage
+  ): Promise<IUserWithResponse> {
     const user = await this.userService.ListUsers(req.user, query);
 
     if (user) {
@@ -38,7 +48,10 @@ export class UserController {
 
   @Get('/:id')
   @UseGuards(JwtAuthGuard)
-  async show(@Param() params, @Req() req: Request) {
+  async show(
+    @Param() params: ParamsDto,
+    @Req() req: IRequest
+  ): Promise<IUserWithResponse> {
     try {
       const user = await this.userService.FindUserById(params.id, req);
 
@@ -59,7 +72,10 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Post('invite')
-  async inviteUsers(@Body() userDto, @Req() req: Request) {
+  async inviteUsers(
+    @Body() userDto: InvitedUserDto,
+    @Req() req: IRequest
+  ): Promise<IUserWithResponse> {
     try {
       const user = this.userService.InviteUserToOrganization(userDto, req.user);
 
@@ -79,14 +95,17 @@ export class UserController {
 
   @Post('/resend-invitation')
   @UseGuards(JwtAuthGuard)
-  async resendInvitation(@Body() userDto: InvitedUser, @Req() req: Request) {
+  async resendInvitation(
+    @Body() userDto: InvitedUserDetailDto,
+    @Req() req: IRequest
+  ): Promise<IUserWithResponse> {
     try {
       const user = await this.userService.ResendInvitation(userDto, req.user);
 
-      if (user) {
+      if (user !== undefined) {
         return {
           message: 'Invitation send successfully.',
-          status: 1,
+          status: true,
         };
       }
     } catch (error) {
@@ -99,7 +118,7 @@ export class UserController {
 
   @Post('/verify-invited-user')
   @UseGuards(JwtAuthGuard)
-  async verifyInvitedUser(@Body() body) {
+  async verifyInvitedUser(@Body() body: SendOtp): Promise<IUserWithResponse> {
     try {
       const user = await this.userService.VerifyInvitedUser(body);
 
@@ -107,7 +126,7 @@ export class UserController {
         return {
           message: 'User verified successfully.',
           result: user,
-          status: 1,
+          status: true,
         };
       }
     } catch (error) {
@@ -120,10 +139,13 @@ export class UserController {
 
   @Post('update-theme')
   @UseGuards(JwtAuthGuard)
-  async updateTheme(@Body() body, @Req() req: Request) {
+  async updateTheme(
+    @Body() body: UserThemeDto,
+    @Req() req: IRequest
+  ): Promise<IUserWithResponse> {
     const user = await this.userService.UpdateTheme(body, req.user);
 
-    if (user) {
+    if (user !== undefined) {
       return {
         message: 'Updated theme successfully.',
         status: true,
@@ -134,10 +156,10 @@ export class UserController {
   @Put('profile/:id')
   @UseGuards(JwtAuthGuard)
   async updateProfile(
-    @Body() userDto: InvitedUser,
-    @Param() params,
+    @Body() userDto: InvitedUserDetailDto,
+    @Param() params: ParamsDto,
     @Res() res: Response
-  ) {
+  ): Promise<IUserWithResponse> {
     try {
       const user = await this.userService.UpdateUserProfile(
         userDto,
@@ -149,7 +171,7 @@ export class UserController {
         return {
           message: 'User updated successfully.',
           result: user,
-          status: 1,
+          status: true,
         };
       }
     } catch (error) {
@@ -163,10 +185,10 @@ export class UserController {
   @Put('/update-invited-user/:id')
   @UseGuards(JwtAuthGuard)
   async updateVerifiedUser(
-    @Body() userDto: InvitedUser,
-    @Param() params,
+    @Body() userDto: InvitedUserDetailDto,
+    @Param() params: ParamsDto,
     @Res() res: Response
-  ) {
+  ): Promise<IUserWithResponse> {
     try {
       const user = await this.userService.UpdateInvitedUser(
         userDto,

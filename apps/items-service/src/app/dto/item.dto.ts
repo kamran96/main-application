@@ -1,11 +1,11 @@
 export class ItemDto {
-  id: number;
+  id: string;
   name: string;
   description: string;
   code: string;
   barcode: string;
   categoryId: number;
-  iteType: number;
+  itemType: number;
   isActive: boolean;
   stock: number;
   isNewRecord: boolean;
@@ -15,7 +15,7 @@ export class ItemDto {
 }
 
 export class CategoryDto {
-  id: number;
+  id: string;
   title: string;
   description: string;
   parentId: number;
@@ -45,11 +45,19 @@ class AttributeValuesDto {
   attributeId: string;
 }
 
-export class DeleteItemDto {
+export class ItemIdsDto {
   ids: Array<string>;
 }
 
 export class DeleteCategoryDto {
   ids: Array<string>;
   isLeaf: boolean;
+}
+
+export class ItemCodesDto {
+  codes: Array<string>;
+}
+
+export class ParamsDto {
+  id: string;
 }

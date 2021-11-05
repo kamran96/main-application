@@ -62,6 +62,9 @@
     "integration": {
       "tags": []
     },
+    "interfaces": {
+      "tags": []
+    },
     "invoices-service": {
       "tags": []
     },
@@ -94,12 +97,7 @@
     "reports-service": {
       "tags": []
     },
-    "review-invyce-theme": {
-      "tags": []
-    },
-    "shared-global-state-manager": {
-      "tags": []
-    },
+    "send-email": {},
     "shared-invyce-theme": {
       "tags": []
     },

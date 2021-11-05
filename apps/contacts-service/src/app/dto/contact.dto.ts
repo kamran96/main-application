@@ -10,7 +10,7 @@ export class ContactDto {
   phoneNumber: string;
   cellNumber: string;
   faxNumber: string;
-  stypeName: string;
+  skypeName: string;
   webLink: string;
   creditLimit: number;
   creditLimitBlock: number;
@@ -24,11 +24,24 @@ export class ContactDto {
   branchId: number;
   createdById: number;
   updatedById: number;
-  addresses: Array<any>;
-  id: number;
+  addresses: Array<AddressDto>;
+  id: string;
   isNewRecord: boolean;
+}
+
+export class AddressDto {
+  description: string;
+  addressType: number;
+  city: string;
+  town: string;
+  country: string;
+  postalCode: string;
 }
 
 export class ContactIds {
   ids: Array<number>;
+}
+
+export class ParamsDto {
+  id: string;
 }

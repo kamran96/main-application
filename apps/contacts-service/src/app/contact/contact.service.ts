@@ -4,13 +4,26 @@ import * as moment from 'moment';
 import axios from 'axios';
 import { Contact } from '../Schemas/contact.schema';
 import { Integrations } from '@invyce/global-constants';
+import {
+  IPage,
+  IRequest,
+  IContact,
+  IBaseUser,
+  IContactWithResponse,
+} from '@invyce/interfaces';
+import { ContactDto, ContactIds } from '../dto/contact.dto';
 
 @Injectable()
 export class ContactService {
   constructor(@InjectModel(Contact.name) private contactModel) {}
 
-  async FindAll(req, queryData) {
+  async FindAll(
+    req: IRequest,
+    queryData: IPage
+  ): Promise<IContactWithResponse> {
     const { page_size, page_no, query, purpose, type: contactType } = queryData;
+    const ps: number = parseInt(page_size);
+    const pn: number = parseInt(page_no);
 
     let contacts;
 
@@ -21,11 +34,11 @@ export class ContactService {
       });
     } else {
       if (query) {
-        const filterData: any = Buffer.from(query, 'base64').toString();
+        const filterData = Buffer.from(query, 'base64').toString();
         const data = JSON.parse(filterData);
 
         const myCustomLabels = {
-          docs: 'contacts',
+          docs: 'result',
           totalDocs: 'total',
           meta: 'pagination',
           limit: 'page_size',
@@ -35,7 +48,7 @@ export class ContactService {
           totalPages: 'total_pages',
         };
 
-        for (let i in data) {
+        for (const i in data) {
           if (data[i].type === 'search') {
             const val = data[i].value?.split('%')[1];
             contacts = await this.contactModel.paginate(
@@ -45,8 +58,8 @@ export class ContactService {
                 [i]: { $regex: val },
               },
               {
-                offset: page_no * page_size - page_size,
-                limit: page_size,
+                offset: pn * ps - ps,
+                limit: ps,
                 customLabels: myCustomLabels,
               }
             );
@@ -62,8 +75,8 @@ export class ContactService {
                 [i]: { $gt: start_date, $lt: add_one_day },
               },
               {
-                offset: page_no * page_size - page_size,
-                limit: page_size,
+                offset: pn * ps - ps,
+                limit: ps,
                 customLabels: myCustomLabels,
               }
             );
@@ -75,8 +88,8 @@ export class ContactService {
                 [i]: { $in: data[i]['value'] },
               },
               {
-                offset: page_no * page_size - page_size,
-                limit: page_size,
+                offset: pn * ps - ps,
+                limit: ps,
                 customLabels: myCustomLabels,
               }
             );
@@ -88,8 +101,8 @@ export class ContactService {
                 [i]: { $in: data[i]['value'] },
               },
               {
-                offset: page_no * page_size - page_size,
-                limit: page_size,
+                offset: pn * ps - ps,
+                limit: ps,
                 customLabels: myCustomLabels,
               }
             );
@@ -101,8 +114,8 @@ export class ContactService {
                 [i]: data[i].value,
               },
               {
-                offset: page_no * page_size - page_size,
-                limit: page_size,
+                offset: pn * ps - ps,
+                limit: ps,
                 customLabels: myCustomLabels,
               }
             );
@@ -110,7 +123,7 @@ export class ContactService {
         }
       } else {
         const myCustomLabels = {
-          docs: 'contacts',
+          docs: 'result',
           limit: 'pageSize',
           page: 'currentPage',
           nextPage: 'next',
@@ -127,8 +140,8 @@ export class ContactService {
             contactType,
           },
           {
-            offset: page_no * page_size - page_size,
-            limit: page_size,
+            offset: pn * ps - ps,
+            limit: ps,
             customLabels: myCustomLabels,
           }
         );
@@ -157,7 +170,7 @@ export class ContactService {
         },
       });
 
-      const mapContactIds = contacts?.contacts.map((con) => ({
+      const mapContactIds = contacts?.result.map((con) => ({
         id: con._id,
         type: con.contactType,
       }));
@@ -166,9 +179,9 @@ export class ContactService {
         ids: mapContactIds,
       });
 
-      let cont_arr = [];
-      for (let i of contacts.contacts) {
-        let balance = payments.find((pay) => pay.id == i._id);
+      const cont_arr = [];
+      for (const i of contacts.result) {
+        const balance = payments.find((pay) => pay.id == i._id);
 
         cont_arr.push({
           ...i.toObject(),
@@ -177,7 +190,7 @@ export class ContactService {
       }
 
       contacts = {
-        contacts: cont_arr,
+        result: cont_arr,
         pagination: contacts.pagination,
       };
     }
@@ -185,49 +198,41 @@ export class ContactService {
     return contacts;
   }
 
-  async CreateContact(contactDto, contactData) {
+  async CreateContact(
+    contactDto: ContactDto,
+    contactData: IBaseUser
+  ): Promise<IContact> {
     if (contactDto && contactDto.isNewRecord === false) {
       const contact = await this.FindById(contactDto.id);
 
       if (contact) {
-        const updatedContact: any = {};
+        const updatedContact = {
+          businessName: contactDto.businessName || contact.businessName,
+          accountNumber: contactDto.accountNumber || contact.accountNumber,
+          email: contactDto.email || contact.email,
+          name: contactDto.name || contact.name,
+          contactType: contactDto.contactType || contact.contactType,
+          cnic: contactDto.cnic || contact.cnic,
+          phoneNumber: contactDto.phoneNumber || contact.phoneNumber,
+          cellNumber: contactDto.cellNumber || contact.cellNumber,
+          faxNumber: contactDto.faxNumber || contact.faxNumber,
+          skypeName: contactDto.skypeName || contact.skypeName,
+          webLink: contactDto.webLink || contact.webLink,
+          creditLimit: contactDto.creditLimit || contact.creditLimit,
+          creditLimitBlock:
+            contactDto.creditLimitBlock || contact.creditLimitBlock,
+          salesDiscount: contactDto.salesDiscount || contact.salesDiscount,
+          openingBalance: contactDto.openingBalance || contact.openingBalance,
+          paymentDaysLimit:
+            contactDto.paymentDaysLimit || contact.paymentDaysLimit,
 
-        updatedContact.businessName =
-          contactDto.businessName || contact.businessName;
-        updatedContact.accountNumber =
-          contactDto.accountNumber || contact.accountNumber;
-        updatedContact.email = contactDto.email || contact.email;
-        updatedContact.name = contactDto.name || contact.name;
-        updatedContact.contactType =
-          contactDto.contactType || contact.contactType;
-        updatedContact.cnic = contactDto.cnic || contact.cnic;
-        updatedContact.phoneNumber =
-          contactDto.phoneNumber || contact.phoneNumber;
-        updatedContact.cellNumber = contactDto.cellNumber || contact.cellNumber;
-        updatedContact.faxNumber = contactDto.faxNumber || contact.faxNumber;
-        updatedContact.skypeName = contactDto.skypeName || contact.skypeName;
-        updatedContact.webLink = contactDto.webLink || contact.webLink;
-        updatedContact.creditLimit =
-          contactDto.creditLimit || contact.creditLimit;
-        updatedContact.creditLimitBlock =
-          contactDto.creditLimitBlock || contact.creditLimitBlock;
-        updatedContact.salesDiscount =
-          contactDto.salesDiscount || contact.salesDiscount;
-        updatedContact.openingBalance =
-          contactDto.openingBalance || contact.openingBalance;
-        updatedContact.paymentDaysLimit =
-          contactDto.paymentDaysLimit || contact.paymentDaysLimit;
-        updatedContact.accountNumber =
-          contactDto.accountNumber || contact.accountNumber;
-
-        updatedContact.paymentDaysLimit =
-          contactDto.paymentDaysLimit || contact.paymentDaysLimit;
-        updatedContact.branchId = contact.branchId;
-        updatedContact.addresses = contactDto.addresses || contact.addresses;
-        updatedContact.status = 1 || contact.status;
-        updatedContact.createdById = contact.createdById;
-        updatedContact.organizationId = contact.organizationId;
-        updatedContact.updatedById = contactData._id;
+          branchId: contact.branchId,
+          addresses: contactDto.addresses || contact.addresses,
+          status: 1 || contact.status,
+          createdById: contact.createdById,
+          organizationId: contact.organizationId,
+          updatedById: contactData._id,
+        };
 
         await this.contactModel.updateOne(
           { _id: contactDto.id },
@@ -250,12 +255,12 @@ export class ContactService {
     }
   }
 
-  async FindById(id) {
+  async FindById(id: string): Promise<IContact> {
     return await this.contactModel.findById(id);
   }
 
-  async Remove(deletedIds) {
-    for (let i of deletedIds.ids) {
+  async Remove(deletedIds: ContactIds): Promise<void> {
+    for (const i of deletedIds.ids) {
       await this.contactModel.updateOne(
         { _id: i },
         {
@@ -263,17 +268,15 @@ export class ContactService {
         }
       );
     }
-
-    return true;
   }
 
-  async ContactByIds(data) {
+  async ContactByIds(data: ContactIds): Promise<IContact[]> {
     return await this.contactModel.find({
       importedContactId: { $in: data.ids },
     });
   }
 
-  async SyncContacts(data, req) {
+  async SyncContacts(data, req: IRequest): Promise<void> {
     let token;
     if (process.env.NODE_ENV === 'development') {
       const header = req.headers?.authorization?.split(' ')[1];
@@ -297,8 +300,8 @@ export class ContactService {
       },
     });
 
-    let transactionArr = [];
-    for (let i of data.contacts) {
+    const transactionArr = [];
+    for (const i of data.contacts) {
       const contacts = await this.contactModel.find({
         importedContactId: i.contactID,
         organizationId: req.user.organizationId,

@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  OneToMany,
-  JoinColumn,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { TransactionItems } from './TransactionItem.entity';
 
 @Entity()
@@ -22,9 +16,9 @@ export class Transactions {
   @Column()
   date: Date;
   @Column()
-  organizationId: number;
+  organizationId: string;
   @Column()
-  branchId: number;
+  branchId: string;
   @Column()
   status: number;
   @Column()
@@ -32,11 +26,11 @@ export class Transactions {
   @Column()
   createdAt: string;
   @Column()
-  createdById: number;
+  createdById: string;
   @Column()
   updatedAt: string;
   @Column()
-  updatedById: number;
+  updatedById: string;
   @OneToMany(
     () => TransactionItems,
     (transactionItems) => transactionItems.transaction
