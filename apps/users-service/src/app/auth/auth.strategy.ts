@@ -1,10 +1,15 @@
-import { Strategy, ExtractJwt } from 'passport-jwt';
+import { Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import {
+  IBaseUser,
+  IRequest,
+  IUser,
+  IUserAccessControlResponse,
+} from '@invyce/interfaces';
 
 let data = {};
-let token;
 @Injectable()
 export class AuthStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
@@ -19,7 +24,7 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
           return header;
         } else {
           if (!req || !req.cookies) return null;
-          token = req.cookies['access_token'];
+          req.cookies['access_token'];
           data = {
             cookies: req.cookies,
             headers: null,
@@ -32,9 +37,10 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any): Promise<any> {
+  async validate(payload: IBaseUser): Promise<IUser> {
     const newData = { ...data, user: payload };
-    const user = await this.authService.AccessControll('', newData);
+    const user: IUserAccessControlResponse =
+      await this.authService.AccessControll(newData as IRequest);
 
     if (user?.statusCode === HttpStatus.OK) {
       return user?.user;

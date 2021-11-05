@@ -11,10 +11,10 @@ import {
   Query,
   Put,
 } from '@nestjs/common';
-import { Request } from 'express';
-import { DeleteItemDto, ItemDto } from '../dto/item.dto';
+import { ItemCodesDto, ItemDto, ItemIdsDto, ParamsDto } from '../dto/item.dto';
 import { ItemService } from './item.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
+import { IRequest, IPage, IItemWithResponse, IItem } from '@invyce/interfaces';
 
 @Controller('item')
 export class ItemController {
@@ -22,14 +22,17 @@ export class ItemController {
 
   @Get()
   @UseGuards(GlobalAuthGuard)
-  async index(@Req() req: Request, @Query() query) {
+  async index(
+    @Req() req: IRequest,
+    @Query() query: IPage
+  ): Promise<IItemWithResponse> {
     const item = await this.itemService.ListItems(req.user, query);
 
     if (item) {
       return {
         message: 'Item created successfull',
         status: true,
-        result: !item.pagination ? item : item.items,
+        result: !item.pagination ? item : item.result,
         pagination: item.pagination,
       };
     }
@@ -37,13 +40,16 @@ export class ItemController {
 
   @Post('ids')
   @UseGuards(GlobalAuthGuard)
-  async listItemByIds(@Body() itemDto: DeleteItemDto) {
+  async listItemByIds(@Body() itemDto: ItemIdsDto): Promise<IItem[]> {
     return await this.itemService.findByItemIds(itemDto);
   }
 
   @Post()
   @UseGuards(GlobalAuthGuard)
-  async create(@Body() itemDto: ItemDto, @Req() req: Request) {
+  async create(
+    @Body() itemDto: ItemDto,
+    @Req() req: IRequest
+  ): Promise<IItemWithResponse> {
     const item = await this.itemService.CreateItem(itemDto, req.user);
 
     if (item) {
@@ -57,7 +63,7 @@ export class ItemController {
 
   @Get('/:id')
   @UseGuards(GlobalAuthGuard)
-  async show(@Param() params) {
+  async show(@Param() params: ParamsDto): Promise<IItemWithResponse> {
     try {
       const item = await this.itemService.FindById(params.id);
 
@@ -80,10 +86,10 @@ export class ItemController {
 
   @Put()
   @UseGuards(GlobalAuthGuard)
-  async delete(@Body() itemDeleteIds: DeleteItemDto) {
+  async delete(@Body() itemDeleteIds: ItemIdsDto): Promise<IItemWithResponse> {
     const item = await this.itemService.DeleteItem(itemDeleteIds);
 
-    if (item) {
+    if (item !== undefined) {
       return {
         message: 'Item deleted succesfully',
         status: true,
@@ -93,13 +99,13 @@ export class ItemController {
 
   @Post('codes')
   @UseGuards(GlobalAuthGuard)
-  async getItemsAgainstCodes(@Body() body) {
+  async getItemsAgainstCodes(@Body() body: ItemCodesDto): Promise<IItem[]> {
     return await this.itemService.GetItemsAgainstCodes(body);
   }
 
   @Post('sync')
   @UseGuards(GlobalAuthGuard)
-  async SyncItems(@Body() body, @Req() req: Request) {
+  async SyncItems(@Body() body, @Req() req: IRequest): Promise<void> {
     return await this.itemService.SyncItems(body, req.user);
   }
 }

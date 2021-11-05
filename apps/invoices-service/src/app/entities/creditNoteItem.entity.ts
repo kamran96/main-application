@@ -5,9 +5,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Bills } from './bill.entity';
 import { CreditNotes } from './creditNote.entity';
-import { Invoices } from './invoice.entity';
 
 @Entity()
 export class CreditNoteItems {
@@ -16,15 +14,15 @@ export class CreditNoteItems {
   @Column()
   itemId: string;
   @Column()
-  accountId: string;
+  accountId: number;
   @Column()
   creditNoteId: number;
   @Column()
   description: string;
   @Column()
-  quantity: string;
+  quantity: number;
   @Column()
-  itemDiscount: string;
+  itemDiscount: number;
   @Column()
   unitPrice: number;
   @Column()

@@ -10,15 +10,37 @@ import * as moment from 'moment';
 import { getCustomRepository, In, Raw } from 'typeorm';
 import { Sorting } from '@invyce/sorting';
 import { Integrations } from '@invyce/global-constants';
+import {
+  IAccount,
+  IAccountWithResponse,
+  IBaseUser,
+  IPage,
+  IRequest,
+  ISecondaryAccount,
+} from '@invyce/interfaces';
+import { AccountDto, AccountIdsDto } from '../dto/account.dto';
 
 @Injectable()
 export class AccountsService {
-  async ListAccounts(user, queryData) {
+  async ListAccounts(
+    user: IBaseUser,
+    queryData: IPage
+  ): Promise<IAccountWithResponse> {
     try {
       const { purpose, page_size, page_no, sort, query } = queryData;
+      const ps: number = parseInt(page_size);
+      const pn: number = parseInt(page_no);
 
+      const total = await getCustomRepository(AccountRepository).count({
+        status: 1,
+        organizationId: user.organizationId,
+      });
+
+      const { sort_column, sort_order } = await Sorting(sort);
+
+      let accounts;
       if (purpose === 'ALL') {
-        return await getCustomRepository(AccountRepository).find({
+        accounts = await getCustomRepository(AccountRepository).find({
           where: { status: 1, organizationId: user.organizationId },
         });
       } else {
@@ -89,10 +111,10 @@ export class AccountsService {
     `;
 
         if (query) {
-          const filterData: any = Buffer.from(query, 'base64').toString();
+          const filterData = Buffer.from(query, 'base64').toString();
           const data = JSON.parse(filterData);
 
-          for (let i in data) {
+          for (const i in data) {
             if (data[i].type === 'search') {
               const val = data[i].value.toLowerCase();
               return await getCustomRepository(AccountRepository).query(
@@ -106,11 +128,9 @@ export class AccountsService {
           }
         }
 
-        const { sort_column, sort_order } = await Sorting(sort);
-
         const page = `
-        limit ${page_size || 20}
-        offset ${page_no * page_size - page_size || 0}
+        limit ${ps || 20}
+        offset ${pn * ps - ps || 0}
       `;
 
         // const secondaryAccounts = await getCustomRepository(
@@ -118,7 +138,7 @@ export class AccountsService {
         // ).find({
         //   where: { status: 1, organizationId: user.organizationId },
         // });
-        const accounts = await getCustomRepository(AccountRepository).query(
+        accounts = await getCustomRepository(AccountRepository).query(
           (sql += `order by ${sort_column} ${sort_order}  ${page}`)
         );
 
@@ -135,31 +155,25 @@ export class AccountsService {
         //     }
         //   }
         // }
-
-        const total = await getCustomRepository(AccountRepository).count({
-          status: 1,
-          organizationId: user.organizationId,
-        });
-
-        return {
-          pagination: {
-            total,
-            total_pages: Math.ceil(total / page_size),
-            page_size: parseInt(page_size) || 20,
-            // page_total: null,
-            page_no: parseInt(page_no),
-            sort_column: sort_column,
-            sort_order: sort_order,
-          },
-          accounts,
-        };
       }
+
+      return {
+        pagination: {
+          total,
+          total_pages: Math.ceil(total / ps),
+          page_size: parseInt(page_size) || 20,
+          page_no: parseInt(page_no),
+          sort_column: sort_column,
+          sort_order: sort_order,
+        },
+        result: accounts,
+      };
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
-  async SecondaryAccountName(user) {
+  async SecondaryAccountName(user: IBaseUser): Promise<ISecondaryAccount[]> {
     return await getCustomRepository(SecondaryAccountRepository).find({
       where: {
         status: 1,
@@ -169,7 +183,7 @@ export class AccountsService {
     });
   }
 
-  async initAccounts(data): Promise<any> {
+  async initAccounts(data: IRequest): Promise<void> {
     try {
       const { primary, secondary } = await import('../accounts');
       for (const account of primary) {
@@ -224,8 +238,15 @@ export class AccountsService {
     }
   }
 
-  async AccountLedger(user, queryData, accountId) {
+  async AccountLedger(
+    user: IBaseUser,
+    queryData: IPage,
+    accountId: number
+  ): Promise<IAccountWithResponse> {
     const { page_size, page_no, sort, query } = queryData;
+    const ps: number = parseInt(page_size);
+    const pn: number = parseInt(page_no);
+
     let sql = `
             SELECT transaction_items.*, (
               select date from transactions
@@ -246,10 +267,10 @@ export class AccountsService {
     let opening_balance;
 
     if (query) {
-      const filterData: any = Buffer.from(query, 'base64').toString();
+      const filterData = Buffer.from(query, 'base64').toString();
       const data = JSON.parse(filterData);
 
-      for (let i in data) {
+      for (const i in data) {
         if (data[i].type === 'date-between') {
           const start_date = data[i].value[0];
           const end_date = data[i].value[1];
@@ -288,17 +309,17 @@ export class AccountsService {
     const { sort_column, sort_order } = await Sorting(sort);
 
     const page = `
-    limit ${page_size || 20}
-    offset ${page_no * page_size - page_size || 0}
+    limit ${ps || 20}
+    offset ${pn * ps - ps || 0}
   `;
 
     const transaction_items = await getCustomRepository(
       TransactionItemRepository
     ).query((sql += `order by ${sort_column} ${sort_order}  ${page}`));
 
-    let account_arr = [];
-    let transaction_arr = [];
-    for (let i of transaction_items) {
+    const account_arr = [];
+    const transaction_arr = [];
+    for (const i of transaction_items) {
       const [account] = await getCustomRepository(AccountRepository).find({
         where: {
           id: i.accountId,
@@ -316,8 +337,8 @@ export class AccountsService {
       transaction_arr.push(transaction);
     }
 
-    let new_arr = [];
-    for (let i of transaction_items) {
+    const new_arr = [];
+    for (const i of transaction_items) {
       const account = account_arr.find((a) => a.id === i.accountId);
       const transaction = transaction_arr.find(
         (tr) => tr.id === i.transactionId
@@ -337,10 +358,10 @@ export class AccountsService {
     return {
       pagination: {
         total,
-        total_pages: Math.ceil(total / page_size),
-        page_size: parseInt(page_size) || 20,
+        total_pages: Math.ceil(total / ps),
+        page_size: ps || 20,
         // page_total: null,
-        page_no: parseInt(page_no),
+        page_no: pn,
         sort_column: sort_column,
         sort_order: sort_order,
       },
@@ -353,7 +374,10 @@ export class AccountsService {
     };
   }
 
-  async CreateOrUpdateAccount(accountDto, accountData) {
+  async CreateOrUpdateAccount(
+    accountDto: AccountDto,
+    accountData: IBaseUser
+  ): Promise<IAccount> {
     const accountRepository = getCustomRepository(AccountRepository);
     if (accountDto && accountDto.isNewRecord === false) {
       // we need to update account
@@ -373,7 +397,7 @@ export class AccountsService {
           updatedAccount.secondaryAccountId =
             accountDto.secondaryAccountId || account.secondaryAccountId;
           updatedAccount.primaryAccountId =
-            accountDto.parimaryAccountId || account.primaryAccountId;
+            accountDto.primaryAccountId || account.primaryAccountId;
           updatedAccount.status = account.status;
           // updatedAccount.branchId = account.branchId;
           updatedAccount.organizationId = account.organizationId;
@@ -413,8 +437,8 @@ export class AccountsService {
     }
   }
 
-  async FindAccountById(accountId) {
-    const account = await getCustomRepository(AccountRepository).find({
+  async FindAccountById(accountId: number): Promise<IAccount> {
+    const [account] = await getCustomRepository(AccountRepository).find({
       where: { id: accountId, status: 1 },
       relations: ['secondaryAccount', 'secondaryAccount.primaryAccount'],
     });
@@ -422,9 +446,9 @@ export class AccountsService {
     return account;
   }
 
-  async DeleteAccount(accountDto) {
+  async DeleteAccount(accountDto: AccountIdsDto): Promise<boolean> {
     try {
-      for (let i of accountDto.ids) {
+      for (const i of accountDto.ids) {
         await getCustomRepository(AccountRepository).update(
           { id: i },
           { status: 0 }
@@ -437,15 +461,16 @@ export class AccountsService {
     }
   }
 
-  async FindAccountsByCode(code: Array<string>, user) {
+  async FindAccountsByCode(codes): Promise<IAccount[]> {
     return await getCustomRepository(AccountRepository).find({
-      code: In(code),
-      // organizationId: user.organizationId,
+      where: {
+        code: In(codes),
+      },
     });
   }
 
-  async SyncAccounts(data, user) {
-    for (let i of data.accounts) {
+  async SyncAccounts(data, user: IBaseUser): Promise<void> {
+    for (const i of data.accounts) {
       const accountBalance = data.balances.find((j) => j.id === i.accountID);
 
       const account = await getCustomRepository(AccountRepository).find({
@@ -487,8 +512,8 @@ export class AccountsService {
             primaryAccountId:
               primaryAccount.length > 0 ? primaryAccount[0].id : null,
             organizationId: user.organizationId,
-            createdById: user.userId,
-            updatedById: user.userId,
+            createdById: user.id,
+            updatedById: user.id,
             status: 1,
           });
         }
@@ -511,17 +536,7 @@ export class AccountsService {
         if (accountBalance != undefined && accountBalance.balance != 0) {
           const transaction = await getCustomRepository(
             TransactionRepository
-          ).save({
-            amount: accountBalance.balance,
-            ref: 'XERO',
-            narration: 'Xero account balance',
-            date: new Date(),
-            organizationId: user.organizationId,
-            branchId: user.branchId,
-            createdById: user.userId,
-            updatedById: user.userId,
-            status: 1,
-          });
+          ).save({});
 
           await getCustomRepository(TransactionItemRepository).save({
             amount: accountBalance.balance,
@@ -531,8 +546,8 @@ export class AccountsService {
               i._class === 'ASSET' || i._class === 'EXPENSE' ? 10 : 20,
             branchId: user.branchId,
             organizationId: user.organizationId,
-            createdById: user.userId,
-            updatedById: user.userId,
+            createdById: user.id,
+            updatedById: user.id,
             status: 1,
           });
         }

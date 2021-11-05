@@ -14,6 +14,8 @@ import { Request } from 'express';
 import { TransactionApiDto, TransactionDto } from '../dto/transaction.dto';
 import { TransactionService } from './transaction.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
+import { IRequest, IPage, ITransactionWithResponse } from '@invyce/interfaces';
+import { ParamsDto } from '../dto/account.dto';
 
 @Controller('transaction')
 export class TransactionController {
@@ -21,7 +23,10 @@ export class TransactionController {
 
   @Get()
   @UseGuards(GlobalAuthGuard)
-  async index(@Req() req: Request, @Query() query) {
+  async index(
+    @Req() req: IRequest,
+    @Query() query: IPage
+  ): Promise<ITransactionWithResponse> {
     try {
       const transaction = await this.transactionService.ListTransactions(
         req.user,
@@ -32,9 +37,7 @@ export class TransactionController {
           message: 'Transaction fetched successfully',
           status: true,
           pagination: transaction.pagination,
-          result: !transaction.pagination
-            ? transaction
-            : transaction.transactions,
+          result: !transaction.pagination ? transaction : transaction.result,
         };
       }
     } catch (error) {
@@ -47,7 +50,10 @@ export class TransactionController {
 
   @Post()
   @UseGuards(GlobalAuthGuard)
-  async create(@Body() transactionDto: TransactionDto, @Req() req: Request) {
+  async create(
+    @Body() transactionDto: TransactionDto,
+    @Req() req: Request
+  ): Promise<ITransactionWithResponse> {
     try {
       const transaction = await this.transactionService.CreateTransaction(
         transactionDto,
@@ -70,17 +76,17 @@ export class TransactionController {
 
   @Get('/:id')
   @UseGuards(GlobalAuthGuard)
-  async show(@Param() params) {
+  async show(@Param() params: ParamsDto): Promise<ITransactionWithResponse> {
     try {
       const transaction = await this.transactionService.FindTransactionById(
         params.id
       );
 
-      if (transaction.length) {
+      if (transaction) {
         return {
           message: 'Transaction fetched successfully.',
           status: true,
-          result: transaction[0],
+          result: transaction,
         };
       }
       throw new HttpException('Transaction not found', HttpStatus.BAD_REQUEST);
@@ -94,13 +100,22 @@ export class TransactionController {
 
   @Post('api')
   @UseGuards(GlobalAuthGuard)
-  async trasanctionApi(@Body() data: TransactionApiDto, @Req() req: Request) {
-    return await this.transactionService.TransactionApi(data, req.user);
+  async trasanctionApi(
+    @Body() data: TransactionApiDto,
+    @Req() req: IRequest
+  ): Promise<void> {
+    return await this.transactionService.TransactionApi(
+      data.transactions,
+      req.user
+    );
   }
 
   @Post('add')
   @UseGuards(GlobalAuthGuard)
-  async addTransaction(@Body() data: TransactionApiDto, @Req() req: Request) {
+  async addTransaction(
+    @Body() data: TransactionApiDto,
+    @Req() req: IRequest
+  ): Promise<void> {
     return await this.transactionService.AddTransaction(data, req);
   }
 }

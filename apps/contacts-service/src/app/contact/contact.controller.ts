@@ -11,10 +11,15 @@ import {
   Req,
   Query,
 } from '@nestjs/common';
-import { Request } from 'express';
-import { ContactDto, ContactIds } from '../dto/contact.dto';
+import { ContactDto, ContactIds, ParamsDto } from '../dto/contact.dto';
 import { ContactService } from './contact.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
+import {
+  IRequest,
+  IPage,
+  IContactWithResponse,
+  IContact,
+} from '@invyce/interfaces';
 
 @Controller('contact')
 export class ContactController {
@@ -22,14 +27,17 @@ export class ContactController {
 
   @Get()
   @UseGuards(GlobalAuthGuard)
-  async index(@Req() req: Request, @Query() query) {
+  async index(
+    @Req() req: IRequest,
+    @Query() query: IPage
+  ): Promise<IContactWithResponse> {
     const contact = await this.contactService.FindAll(req, query);
 
     if (contact) {
       return {
         message: 'Successfull',
         status: true,
-        result: !contact?.pagination ? contact : contact.contacts,
+        result: !contact?.pagination ? contact : contact.result,
         pagination: contact.pagination,
       };
     }
@@ -37,7 +45,10 @@ export class ContactController {
 
   @Post()
   @UseGuards(GlobalAuthGuard)
-  async create(@Body() contactDto: ContactDto, @Req() req: Request) {
+  async create(
+    @Body() contactDto: ContactDto,
+    @Req() req: IRequest
+  ): Promise<IContactWithResponse> {
     try {
       const contact = await this.contactService.CreateContact(
         contactDto,
@@ -61,7 +72,7 @@ export class ContactController {
 
   @Get('/:id')
   @UseGuards(GlobalAuthGuard)
-  async show(@Param() params) {
+  async show(@Param() params: ParamsDto): Promise<IContactWithResponse> {
     const contact = await this.contactService.FindById(params.id);
 
     if (contact) {
@@ -75,10 +86,10 @@ export class ContactController {
 
   @Put()
   @UseGuards(GlobalAuthGuard)
-  async delete(@Body() deletedIds: ContactIds) {
+  async delete(@Body() deletedIds: ContactIds): Promise<IContactWithResponse> {
     const contact = await this.contactService.Remove(deletedIds);
 
-    if (contact) {
+    if (contact !== undefined) {
       return {
         message: 'Contact deleted succesfully',
         status: true,
@@ -88,13 +99,13 @@ export class ContactController {
 
   @Post('ids')
   @UseGuards(GlobalAuthGuard)
-  async contactByIds(@Body() body) {
+  async contactByIds(@Body() body: ContactIds): Promise<IContact[]> {
     return await this.contactService.ContactByIds(body);
   }
 
   @Post('sync')
   @UseGuards(GlobalAuthGuard)
-  async syncContacts(@Body() body, @Req() req: Request) {
+  async syncContacts(@Body() body, @Req() req: IRequest): Promise<void> {
     return await this.contactService.SyncContacts(body, req);
   }
 }

@@ -2,8 +2,9 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import axios from 'axios';
-import { INIT_ACCOUNTS } from '@invyce/send-email';
+import { IRequest, IAddress, IOrganization } from '@invyce/interfaces';
 import { AuthService } from '../auth/auth.service';
+import { OrganizationDto } from '../dto/organization.dto';
 import { RbacService } from '../rbac/rbac.service';
 import { Branch } from '../schemas/branch.schema';
 import { Organization } from '../schemas/organization.schema';
@@ -39,56 +40,56 @@ export class OrganizationService {
   }
 
   async CreateOrUpdateOrganization(
-    organizationDto,
-    req = null,
-    res = null
-  ): Promise<any> {
+    organizationDto: OrganizationDto,
+    req: IRequest
+  ): Promise<IOrganization> {
+    const address: IAddress = {
+      description: organizationDto.description,
+      city: organizationDto.city,
+      country: organizationDto.country,
+      postalCode: organizationDto.postalCode,
+    };
+
     if (organizationDto && organizationDto.isNewRecord === false) {
       // we need to update organization
       try {
-        const result = await this.organizationModel.find({
-          id: organizationDto.id,
+        const organization = await this.organizationModel.findOne({
+          _id: organizationDto.id,
         });
 
-        if (Array.isArray(result) && result.length > 0) {
-          const [organization] = result;
-          const updatedOrganization = { ...organization };
-          delete updatedOrganization.id;
-
-          updatedOrganization.name = organizationDto.name || organization.name;
-          updatedOrganization.website =
-            organizationDto.website || organization.website;
-          updatedOrganization.attachmentId =
-            organizationDto.attachmentId || organization.attachmentId;
-          updatedOrganization.phoneNumber =
-            organizationDto.phoneNumber || organization.phoneNumber;
-          updatedOrganization.faxNumber =
-            organizationDto.faxNumber || organization.faxNumber;
-          updatedOrganization.prefix =
-            organizationDto.prefix || organization.prefix;
-          updatedOrganization.email =
-            organizationDto.email || organization.email;
-          updatedOrganization.organizationType =
-            organizationDto.organizationType || organization.organizationType;
-          updatedOrganization.niche =
-            organizationDto.niche || organization.niche;
-          updatedOrganization.permanentAddress =
-            organizationDto.permanentAddress || organization.permanentAddress;
-          updatedOrganization.address =
-            organizationDto.address || organization.address;
-          updatedOrganization.residentialAddress =
-            organizationDto.residentialAddress ||
-            organization.residentialAddress;
-          updatedOrganization.financialEnding =
-            organizationDto.financialEnding || organization.financialEnding;
-          updatedOrganization.status = 1 || organization.status;
+        if (organization) {
+          const updatedOrganization = {
+            name: organizationDto.name || organization.name,
+            website: organizationDto.website || organization.website,
+            attachmentId:
+              organizationDto.attachmentId || organization.attachmentId,
+            phoneNumber:
+              organizationDto.phoneNumber || organization.phoneNumber,
+            faxNumber: organizationDto.faxNumber || organization.faxNumber,
+            prefix: organizationDto.prefix || organization.prefix,
+            email: organizationDto.email || organization.email,
+            organizationType:
+              organizationDto.organizationType || organization.organizationType,
+            niche: organizationDto.niche || organization.niche,
+            permanentAddress:
+              organizationDto.permanentAddress || organization.permanentAddress,
+            address: address,
+            residentialAddress:
+              organizationDto.residentialAddress ||
+              organization.residentialAddress,
+            financialEnding:
+              organizationDto.financialEnding || organization.financialEnding,
+            status: 1 || organization.status,
+          };
 
           await this.organizationModel.updateOne(
-            { id: organizationDto.id },
+            { _id: organizationDto.id },
             updatedOrganization
           );
 
-          return updatedOrganization;
+          return await this.organizationModel.findOne({
+            _id: organizationDto.id,
+          });
         }
         throw new HttpException('Invalid Params', HttpStatus.BAD_REQUEST);
       } catch (error) {
@@ -113,7 +114,7 @@ export class OrganizationService {
         organization.phoneNumber = organizationDto.phoneNumber;
         organization.faxNumber = organizationDto.faxNumber;
         organization.attachmentId = organizationDto.attachmentId;
-        organization.address = organizationDto.address;
+        organization.address = address;
         organization.createdById = req?.user?.id;
         organization.updatedById = req?.user?.id;
         organization.status = 1;
@@ -125,7 +126,7 @@ export class OrganizationService {
         organizationUser.status = 1;
         await organizationUser.save();
 
-        let branchArr = [];
+        const branchArr = [];
         if (
           req?.user?.organizationId === null &&
           organization.organizationType === 'SAAS'
@@ -153,7 +154,7 @@ export class OrganizationService {
         const [adminRole] = roles.filter((r) => r.name === 'admin');
 
         if (req?.user?.organizationId !== null) {
-          return res.send(organization);
+          return organization;
         } else {
           await this.userModel.updateOne(
             { _id: req?.user?.id },
@@ -164,16 +165,7 @@ export class OrganizationService {
             }
           );
 
-          const new_user = await this.authService.CheckUser({
-            username: req?.user?.username,
-          });
-
-          const user_with_organization = await this.authService.Login(
-            new_user,
-            res
-          );
-
-          return user_with_organization;
+          return organization;
         }
       } catch (error) {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -181,10 +173,10 @@ export class OrganizationService {
     }
   }
 
-  async ViewOrganization(params) {
+  async ViewOrganization(organizationId: string): Promise<IOrganization> {
     const organization = await this.organizationModel
       .findOne({
-        _id: params.id,
+        _id: organizationId,
       })
       .populate('branches');
 

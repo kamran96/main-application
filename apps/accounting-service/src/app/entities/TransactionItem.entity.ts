@@ -20,23 +20,23 @@ export class TransactionItems {
   @Column()
   accountId: number;
   @Column()
-  branchId: number;
+  branchId: string;
   @Column()
   description: string;
   @Column()
   transactionId: number;
   @Column()
-  organizationId: number;
+  organizationId: string;
   @Column()
   status: number;
   @Column()
   createdAt: string;
   @Column()
-  createdById: number;
+  createdById: string;
   @Column()
   updatedAt: string;
   @Column()
-  updatedById: number;
+  updatedById: string;
   @ManyToOne(() => Transactions, (transaction) => transaction.id)
   transaction: Transactions;
 

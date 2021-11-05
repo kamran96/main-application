@@ -6,6 +6,16 @@ import axios from 'axios';
 import { AuthService } from '../auth/auth.service';
 import { User } from '../schemas/user.schema';
 import { UserToken } from '../schemas/userToken.schema';
+import { IBaseUser, IPage, IRequest, IUser } from '@invyce/interfaces';
+import { ParamsDto } from '../dto/rbac.dto';
+import {
+  InvitedUserDto,
+  InvitedUserDetailDto,
+  SendOtp,
+  UserLoginDto,
+  UserThemeDto,
+} from '../dto/user.dto';
+import { Response } from 'express';
 
 @Injectable()
 export class UserService {
@@ -17,8 +27,11 @@ export class UserService {
     private authService: AuthService
   ) {}
 
-  async ListUsers(user, query) {
+  async ListUsers(user: IBaseUser, query: IPage) {
     const { page_size, page_no, filters, purpose } = query;
+    const ps: number = parseInt(page_size);
+    const pn: number = parseInt(page_no);
+
     let users;
 
     if (purpose === 'ALL') {
@@ -26,17 +39,17 @@ export class UserService {
         .find({
           status: 1,
           organizationId: user.organizationId,
-          // branchId: user.branchId,
+          branchId: user.branchId,
         })
         .populate('role')
         .populate('organization')
         .populate('branch');
     } else {
       if (filters) {
-        const filterData: any = Buffer.from(filters, 'base64').toString();
+        const filterData = Buffer.from(filters, 'base64').toString();
         const data = JSON.parse(filterData);
 
-        for (let i in data) {
+        for (const i in data) {
           if (data[i].type === 'search') {
             const val = data[i].value?.split('%')[1];
             users = await this.userModel.find({
@@ -81,8 +94,8 @@ export class UserService {
         users = await this.userModel.paginate(
           { status: 1, organizationId: user.organizationId },
           {
-            offset: page_no * page_size - page_size,
-            limit: page_size,
+            offset: pn * ps - ps,
+            limit: ps,
             populate: ['role', 'organization', 'branch'],
             customLabels: myCustomLabels,
           }
@@ -93,7 +106,7 @@ export class UserService {
     return users;
   }
 
-  async FindUserById(userId, req) {
+  async FindUserById(userId: string, req: IRequest): Promise<IUser> {
     try {
       const user = await this.userModel
         .findOne({
@@ -103,7 +116,7 @@ export class UserService {
         .populate('organization')
         .populate('branch');
 
-      let new_obj: any;
+      let new_obj;
       if (user?.profile?.attachmentId) {
         let token;
         if (process.env.NODE_ENV === 'development') {
@@ -123,7 +136,7 @@ export class UserService {
 
         const attachmentId = user?.profile?.attachmentId;
 
-        const request: any = {
+        const request = {
           url: `http://localhost/attachments/attachment/${attachmentId}`,
           method: 'GET',
           headers: {
@@ -131,7 +144,7 @@ export class UserService {
           },
         };
 
-        const { data: attachment } = await axios(request);
+        const { data: attachment } = await axios(request as unknown);
 
         if (user?.profile?.attachmentId === attachment.id) {
           new_obj = {
@@ -147,11 +160,14 @@ export class UserService {
     }
   }
 
-  async InviteUserToOrganization(userDto, userData) {
+  async InviteUserToOrganization(
+    userDto: InvitedUserDto,
+    userData: IBaseUser
+  ): Promise<void> {
     const { users } = userDto;
 
     let insertedUser;
-    for (let user of users) {
+    for (const user of users) {
       const dbUser = await this.userModel.find({
         email: user.email,
         organizationId: userData.organizationId,
@@ -176,26 +192,23 @@ export class UserService {
         );
       }
     }
-
-    return true;
   }
 
-  async ResendInvitation(data, user) {
+  async ResendInvitation(data: UserLoginDto, user: IBaseUser): Promise<void> {
     const dbUser = await this.userModel.findOne({
       email: data.email,
       organizationId: user.organizationId,
     });
 
     await this.authService.sendVerificationEmail(dbUser);
-    return true;
   }
 
-  async VerifyInvitedUser(body) {
+  async VerifyInvitedUser(body: SendOtp): Promise<IUser> {
     try {
-      const string = Buffer.from(body.code, 'base64').toString('ascii');
+      const string = Buffer.from(body.otp, 'base64').toString('ascii');
       const data = JSON.parse(string);
 
-      let user_arr = [];
+      const user_arr = [];
       if (data) {
         const { user: user_id } = data;
 
@@ -223,11 +236,15 @@ export class UserService {
     }
   }
 
-  async UpdateInvitedUser(userDto, params, res) {
+  async UpdateInvitedUser(
+    userDto: InvitedUserDetailDto,
+    params: ParamsDto,
+    res: Response
+  ): Promise<IUser[]> {
     try {
       const {
         username,
-        fullName,
+        fullname,
         country,
         phoneNumber,
         password,
@@ -250,7 +267,7 @@ export class UserService {
           password: password ? await bcrypt.hashSync(password) : user.password,
           isVerified: true,
           $set: {
-            'profile.fullName': fullName || user?.profile?.fullName,
+            'profile.fullName': fullname || user?.profile?.fullName,
             'profile.country': country || user?.profile?.country,
             'profile.phoneNumber': phoneNumber || user?.profile?.phoneNumber,
             'profile.attachmentId': attachmentId || user?.profile?.attachmentId,
@@ -274,18 +291,19 @@ export class UserService {
     }
   }
 
-  async UpdateTheme(body, user) {
-    return await this.userModel.updateOne(
-      { _id: user.id },
-      { theme: body.theme }
-    );
+  async UpdateTheme(body: UserThemeDto, user: IBaseUser): Promise<void> {
+    await this.userModel.updateOne({ _id: user.id }, { theme: body.theme });
   }
 
-  async UpdateUserProfile(userDto, params, res) {
+  async UpdateUserProfile(
+    userDto: InvitedUserDetailDto,
+    params: ParamsDto,
+    res: Response
+  ): Promise<IUser[]> {
     try {
       const {
         username,
-        fullName,
+        fullname,
         country,
         phoneNumber,
         password,
@@ -307,7 +325,7 @@ export class UserService {
           username: username || user.username,
           password: password ? await bcrypt.hashSync(password) : user.password,
           $set: {
-            'profile.fullName': fullName || user?.profile?.fullName,
+            'profile.fullName': fullname || user?.profile?.fullName,
             'profile.country': country || user?.profile?.country,
             'profile.phoneNumber': phoneNumber || user?.profile?.phoneNumber,
             'profile.attachmentId': attachmentId || user?.profile?.attachmentId,

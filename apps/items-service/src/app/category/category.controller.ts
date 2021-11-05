@@ -12,9 +12,19 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
-import { AttributeDto, CategoryDto, DeleteCategoryDto } from '../dto/item.dto';
+import {
+  AttributeDto,
+  CategoryDto,
+  DeleteCategoryDto,
+  ParamsDto,
+} from '../dto/item.dto';
 import { CategoryService } from './category.service';
-import { Request } from 'express';
+import {
+  IRequest,
+  IPage,
+  ICategoryWithResponse,
+  IAttributeWithResponse,
+} from '@invyce/interfaces';
 
 @Controller('category')
 export class CategoryController {
@@ -22,14 +32,17 @@ export class CategoryController {
 
   @Get()
   @UseGuards(GlobalAuthGuard)
-  async index(@Req() req: Request, @Query() query) {
+  async index(
+    @Req() req: IRequest,
+    @Query() query: IPage
+  ): Promise<ICategoryWithResponse> {
     const category = await this.categoryService.ListCategory(req.user, query);
 
     if (category) {
       return {
         message: 'Category created successfull',
         status: true,
-        result: !category.pagination ? category : category.categories,
+        result: !category.pagination ? category : category.result,
         pagination: category.pagination,
       };
     }
@@ -37,7 +50,10 @@ export class CategoryController {
 
   @Post()
   @UseGuards(GlobalAuthGuard)
-  async create(@Body() categoryDto: CategoryDto, @Req() req: Request) {
+  async create(
+    @Body() categoryDto: CategoryDto,
+    @Req() req: IRequest
+  ): Promise<ICategoryWithResponse> {
     const category = await this.categoryService.CreateCategory(
       categoryDto,
       req.user
@@ -53,7 +69,9 @@ export class CategoryController {
   }
 
   @Post('attribute')
-  async createAttribs(@Body() attribsDto: AttributeDto) {
+  async createAttribs(
+    @Body() attribsDto: AttributeDto
+  ): Promise<IAttributeWithResponse> {
     const attribute = await this.categoryService.CreateAttribute(attribsDto);
 
     if (attribute) {
@@ -65,7 +83,7 @@ export class CategoryController {
   }
 
   @Get('/:id')
-  async show(@Param() params) {
+  async show(@Param() params: ParamsDto): Promise<ICategoryWithResponse> {
     try {
       const category = await this.categoryService.FindById(params.id);
 
@@ -86,12 +104,14 @@ export class CategoryController {
   }
 
   @Put()
-  async delete(@Body() deleteCategoryDto: DeleteCategoryDto) {
+  async delete(
+    @Body() deleteCategoryDto: DeleteCategoryDto
+  ): Promise<ICategoryWithResponse> {
     const category = await this.categoryService.DeleteCategory(
       deleteCategoryDto
     );
 
-    if (category) {
+    if (category !== undefined) {
       return {
         message: 'Category delete successfully.',
         status: true,

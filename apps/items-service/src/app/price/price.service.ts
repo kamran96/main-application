@@ -1,7 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { IPrice } from '@invyce/interfaces';
 import { Item } from '../schemas/item.schema';
 import { Price } from '../schemas/price.schema';
+import { PriceDto } from '../dto/price.dto';
 
 @Injectable()
 export class PriceService {
@@ -10,14 +12,14 @@ export class PriceService {
     @InjectModel(Item.name) private itemModel
   ) {}
 
-  async FindById(priceId) {
+  async FindById(priceId: string): Promise<IPrice> {
     return await this.priceModel.findById(priceId);
   }
 
-  async CreatePrice(priceDto) {
+  async CreatePrice(priceDto: PriceDto): Promise<IPrice | IPrice[]> {
     if (priceDto.isNewRecord === false) {
       try {
-        for (let i of priceDto.item_ids) {
+        for (const i of priceDto.item_ids) {
           const price = await this.FindById(i);
           if (price) {
             // update price
@@ -57,8 +59,8 @@ export class PriceService {
         const itemIds = priceDto.item_ids;
         delete priceDto.item_ids;
 
-        let priceArr = [];
-        for (let i of itemIds) {
+        const priceArr = [];
+        for (const i of itemIds) {
           const item = await this.FindById(i);
           const price = new this.priceModel(priceDto);
 

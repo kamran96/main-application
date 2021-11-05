@@ -3,7 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { AttributeValue } from '../schemas/attributeValue.schema';
 import { Item } from '../schemas/item.schema';
 import { Integrations } from '@invyce/global-constants';
+import { IBaseUser, IItem, IItemWithResponse, IPage } from '@invyce/interfaces';
 import { Price } from '../schemas/price.schema';
+import { ItemCodesDto, ItemDto, ItemIdsDto } from '../dto/item.dto';
 
 @Injectable()
 export class ItemService {
@@ -13,8 +15,13 @@ export class ItemService {
     @InjectModel(Price.name) private priceModel
   ) {}
 
-  async ListItems(itemData, query) {
+  async ListItems(
+    itemData: IBaseUser,
+    query: IPage
+  ): Promise<IItemWithResponse> {
     const { page_size, page_no, filters, purpose } = query;
+    const ps: number = parseInt(page_size);
+    const pn: number = parseInt(page_no);
 
     let items;
     if (purpose === 'ALL') {
@@ -26,10 +33,10 @@ export class ItemService {
         .populate('price');
     } else {
       if (filters) {
-        const filterData: any = Buffer.from(filters, 'base64').toString();
+        const filterData = Buffer.from(filters, 'base64').toString();
         const data = JSON.parse(filterData);
 
-        for (let i in data) {
+        for (const i in data) {
           if (data[i].type === 'search') {
             const val = data[i].value?.split('%')[1];
             items = await this.itemModel.find({
@@ -61,7 +68,7 @@ export class ItemService {
         }
       } else {
         const myCustomLabels = {
-          docs: 'items',
+          docs: 'result',
           totalDocs: 'total',
           limit: 'page_size',
           page: 'page_no',
@@ -74,7 +81,7 @@ export class ItemService {
         items = await this.itemModel.paginate(
           { status: 1, organizationId: itemData.organizationId },
           {
-            offset: page_no * page_size - page_size,
+            offset: pn * ps - ps,
             limit: page_size,
             populate: 'price',
             customLabels: myCustomLabels,
@@ -85,14 +92,15 @@ export class ItemService {
     return items;
   }
 
-  async CreateItem(itemDto, itemData) {
+  async CreateItem(itemDto: ItemDto, itemData: IBaseUser): Promise<IItem> {
     try {
       let find_item = [];
       if (itemDto.isNewRecord === true) {
         find_item = await this.itemModel.find({
           code: itemDto.code,
           status: 1,
-          organizationId: itemDto.organizationId,
+          organizationId: itemData.organizationId,
+          branchId: itemData.branchId,
         });
       }
 
@@ -106,7 +114,7 @@ export class ItemService {
           const item = await this.FindById(itemDto.id);
 
           if (item) {
-            let updatedItem = {
+            const updatedItem = {
               name: itemDto.name || item.name,
               description: itemDto.description || item.description,
               code: itemDto.code || item.code,
@@ -127,7 +135,7 @@ export class ItemService {
                 itemId: itemDto.id,
               });
 
-              for (let i of itemDto.attribute_values) {
+              for (const i of itemDto.attribute_values) {
                 const attrib = new this.attributeValueModel(i);
                 attrib.itemId = item.id;
                 attrib.status = 1;
@@ -154,7 +162,7 @@ export class ItemService {
           await item.save();
 
           if (itemDto.attribute_values.length > 0) {
-            for (let values of itemDto.attribute_values) {
+            for (const values of itemDto.attribute_values) {
               const attribute_value = new this.attributeValueModel(values);
               attribute_value.itemId = item.id;
               attribute_value.status = 1;
@@ -173,7 +181,7 @@ export class ItemService {
     }
   }
 
-  async FindById(itemId) {
+  async FindById(itemId: string): Promise<IItem> {
     return await this.itemModel
       .findById(itemId)
       .populate('price')
@@ -181,28 +189,26 @@ export class ItemService {
       .populate('attribute_values');
   }
 
-  async findByItemIds(itemIds) {
+  async findByItemIds(itemIds: ItemIdsDto): Promise<IItem[]> {
     return await this.itemModel.find({
       _id: { $in: itemIds.ids },
     });
   }
 
-  async DeleteItem(data) {
-    for (let i of data.ids) {
+  async DeleteItem(data: ItemIdsDto): Promise<void> {
+    for (const i of data.ids) {
       await this.itemModel.updateOne({ _id: i }, { status: 0 });
     }
-
-    return true;
   }
 
-  async GetItemsAgainstCodes(data) {
+  async GetItemsAgainstCodes(data: ItemCodesDto): Promise<IItem[]> {
     return await this.itemModel.find({
       code: { $in: data.codes },
     });
   }
 
-  async SyncItems(data, user) {
-    for (let i of data.items) {
+  async SyncItems(data, user: IBaseUser): Promise<void> {
+    for (const i of data.items) {
       const items = await this.itemModel.find({
         importedItemId: i.itemID,
         organizationId: user.organizationId,
@@ -223,8 +229,8 @@ export class ItemService {
           //     : null,
           branchId: user.branchId,
           organizationId: user.organizationId,
-          createdById: user.userId,
-          updatedById: user.userId,
+          createdById: user.id,
+          updatedById: user.id,
           status: 1,
         });
         await item.save();

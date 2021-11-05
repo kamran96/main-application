@@ -7,12 +7,21 @@ import {
   HttpException,
   HttpStatus,
   Get,
-  Param,
   Query,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { PaymentService } from './payment.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
+import {
+  IRequest,
+  IPage,
+  IPaymentWithResponse,
+  IPayment,
+} from '@invyce/interfaces';
+import {
+  PaymentContactDto,
+  PaymentDto,
+  PaymentInvoiceDto,
+} from '../dto/payment.dto';
 
 @Controller('payment')
 export class PaymentController {
@@ -20,7 +29,10 @@ export class PaymentController {
 
   @Get()
   @UseGuards(GlobalAuthGuard)
-  async index(@Query() query, @Req() req: Request) {
+  async index(
+    @Query() query: IPage,
+    @Req() req: IRequest
+  ): Promise<IPaymentWithResponse> {
     const payments = await this.paymentService.Index(query, req.user);
 
     if (payments) {
@@ -28,26 +40,33 @@ export class PaymentController {
         message: 'Payments fetched successfully.',
         status: true,
         pagination: payments.pagination,
-        result: payments.payments,
+        result: payments.result,
       };
     }
   }
 
   @Post('/invoice')
   @UseGuards(GlobalAuthGuard)
-  async getPaymentAgainstInvoice(@Body() invoiceIds) {
+  async getPaymentAgainstInvoice(
+    @Body() invoiceIds: PaymentInvoiceDto
+  ): Promise<IPayment[]> {
     return await this.paymentService.GetPaymentAgainstInvoiceId(invoiceIds);
   }
 
   @Post('/contact')
   @UseGuards(GlobalAuthGuard)
-  async GetPaymentAgainstContactId(@Body() contactIds) {
+  async GetPaymentAgainstContactId(
+    @Body() contactIds: PaymentContactDto
+  ): Promise<IPayment[]> {
     return await this.paymentService.GetPaymentAgainstContactId(contactIds);
   }
 
   @Post()
   @UseGuards(GlobalAuthGuard)
-  async create(@Body() data, @Req() req: Request) {
+  async create(
+    @Body() data: PaymentDto,
+    @Req() req: IRequest
+  ): Promise<IPaymentWithResponse> {
     try {
       const payment = await this.paymentService.CreatePayment(data, req);
 
@@ -68,7 +87,7 @@ export class PaymentController {
 
   @Post('add')
   @UseGuards(GlobalAuthGuard)
-  async addPayment(@Body() body, @Req() req: Request) {
+  async addPayment(@Body() body, @Req() req: IRequest): Promise<void> {
     return await this.paymentService.AddPayment(body, req.user);
   }
 }

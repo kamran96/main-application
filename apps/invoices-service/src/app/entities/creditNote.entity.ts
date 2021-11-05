@@ -1,7 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { BillItems } from './billItem.entity';
 import { CreditNoteItems } from './creditNoteItem.entity';
-import { InvoiceItems } from './invoiceItem.entity';
 
 @Entity()
 export class CreditNotes {

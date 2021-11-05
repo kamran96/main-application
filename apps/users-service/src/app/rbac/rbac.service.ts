@@ -1,5 +1,22 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import {
+  IBaseUser,
+  IPage,
+  IPermission,
+  IPermissionResponse,
+  IRole,
+  IRolePermission,
+  IRoleWithParent,
+} from '@invyce/interfaces';
+import {
+  PermissionDto,
+  PermissionIdsDto,
+  RoleDto,
+  RoleIdsDto,
+  RolePermissionDto,
+} from '../dto/rbac.dto';
+
 import { Permission } from '../schemas/permission.schema';
 import { Role } from '../schemas/role.schema';
 import { RolePermission } from '../schemas/rolePermission.schema';
@@ -14,10 +31,13 @@ export class RbacService {
     @InjectModel(User.name) private userModel
   ) {}
 
-  async IndexPermissions(queryData) {
+  async IndexPermissions(queryData: IPage): Promise<IPermissionResponse> {
     const { page_no, page_size } = queryData;
+    const pn: number = parseInt(page_no);
+    const ps: number = parseInt(page_size);
+
     const myCustomLabels = {
-      docs: 'permissions',
+      docs: 'result',
       totalDocs: 'total',
       limit: 'page_size',
       page: 'page_no',
@@ -30,23 +50,23 @@ export class RbacService {
     return await this.permissionModel.paginate(
       { status: 1 },
       {
-        offset: page_no * page_size - page_size,
+        offset: pn * ps - ps,
         limit: page_size,
         customLabels: myCustomLabels,
       }
     );
   }
 
-  async CreateRole(roleDto, user) {
+  async CreateRole(roleDto: RoleDto, user: IBaseUser): Promise<IRole> {
     if (roleDto && roleDto.isNewRecord === false) {
-      const role = await this.GetRole(roleDto.id, user.organizationId);
-      if (Array.isArray(role) && role.length > 0) {
+      const role = await this.GetRole(roleDto.id);
+      if (role) {
         await this.roleModel.updateOne(
           { _id: roleDto.id },
           { name: roleDto.name, description: roleDto.description }
         );
 
-        return await this.GetRole(roleDto.id, user.organizationId);
+        return await this.GetRole(roleDto.id);
       }
     } else {
       const role = await this.roleModel.find({
@@ -80,7 +100,7 @@ export class RbacService {
       );
 
       if (parentRole.length > 0) {
-        for (let i of parentRole) {
+        for (const i of parentRole) {
           await this.roleModel.updateOne(
             { _id: i._id },
             { level: i.level + 1 }
@@ -92,7 +112,7 @@ export class RbacService {
     }
   }
 
-  async ShowPermission(type, user) {
+  async ShowPermission(type: string, user: IBaseUser): Promise<IPermission> {
     const permissions = await this.permissionModel
       .find({ module: type })
       .sort({ id: 'asc' });
@@ -106,7 +126,7 @@ export class RbacService {
 
     let obj = {};
     return permissions.map((p) => {
-      for (let i of roles) {
+      for (const i of roles) {
         if (p._id.toString() === i.permissionId.toString()) {
           obj = {
             roleId: i.roleId._id,
@@ -125,7 +145,7 @@ export class RbacService {
     });
   }
 
-  async GetRoles(user): Promise<any> {
+  async GetRoles(user: IBaseUser): Promise<IRole[]> {
     const role = await this.roleModel
       .find({
         organizationId: user.organizationId,
@@ -136,16 +156,11 @@ export class RbacService {
     return role;
   }
 
-  async GetRole(roleId, user) {
-    const role = this.roleModel.find({
-      id: roleId,
-      organizationId: user.organizationId,
-    });
-
-    return role;
+  async GetRole(roleId: string): Promise<IRole> {
+    return await this.roleModel.findById(roleId);
   }
 
-  async GetRoleWithPermissions(user) {
+  async GetRoleWithPermissions(user: IBaseUser): Promise<IRoleWithParent> {
     const parentRoles = await this.roleModel
       .find({ organizationId: user.organizationId })
       .sort({ level: 'ASC' });
@@ -174,15 +189,18 @@ export class RbacService {
     return { parentRole, roles };
   }
 
-  async CreatePermission(permissionDto, user): Promise<any> {
+  async CreatePermission(
+    permissionDto: PermissionDto,
+    user: IBaseUser
+  ): Promise<IPermission> {
     try {
       const permission = new this.permissionModel();
       permission.title = permissionDto.title;
       permission.description = permissionDto.description;
       permission.module = permissionDto.module;
       permission.organizationId = user.organizationId;
-      permission.createdById = user.userId;
-      permission.updatedById = user.userId;
+      permission.createdById = user.id;
+      permission.updatedById = user.id;
       permission.status = 1;
       await permission.save();
 
@@ -190,7 +208,7 @@ export class RbacService {
         name: 'admin',
       });
 
-      for (let i of roles) {
+      for (const i of roles) {
         const rolePermission = new this.rolePermissionModel();
         rolePermission.roleId = i.id;
         rolePermission.permissionId = permission.id;
@@ -206,37 +224,37 @@ export class RbacService {
     }
   }
 
-  async GetDistinctModule(): Promise<any> {
+  async GetDistinctModule(): Promise<IPermission[]> {
     return await this.permissionModel.find().distinct('module');
   }
 
-  async GetPermissions(page_no, page_size): Promise<any> {
-    // const permissionRepo = getCustomRepository(PermissionRepository);
-    // const permission = await permissionRepo.find({
-    //   where: {
-    //     // organizationId: user.organizationId,
-    //   },
-    //   take: page_size || 20,
-    //   skip: page_no || 0,
-    // });
-    // const pagination = await this.pagination.paginate(
-    //   permission,
-    //   page_size,
-    //   page_no
-    // );
-    // return {
-    //   pagination,
-    //   permission,
-    // };
-  }
+  // async GetPermissions(page_no, page_size): Promise<any> {
+  // const permissionRepo = getCustomRepository(PermissionRepository);
+  // const permission = await permissionRepo.find({
+  //   where: {
+  //     // organizationId: user.organizationId,
+  //   },
+  //   take: page_size || 20,
+  //   skip: page_no || 0,
+  // });
+  // const pagination = await this.pagination.paginate(
+  //   permission,
+  //   page_size,
+  //   page_no
+  // );
+  // return {
+  //   pagination,
+  //   permission,
+  // };
+  // }
 
-  async InsertRoles(organizationId): Promise<any> {
+  async InsertRoles(organizationId: string): Promise<IRole[]> {
     try {
       const { roles } = await import('../rbac');
 
-      let role_arr = [];
+      const role_arr = [];
       let level = 1;
-      for (let i of roles) {
+      for (const i of roles) {
         const role = new this.roleModel();
         role.name = i.name;
         role.organizationId = organizationId;
@@ -247,7 +265,7 @@ export class RbacService {
         role_arr.push(role);
       }
 
-      for (let i of roles) {
+      for (const i of roles) {
         const parentRole = role_arr.find((r) => r.name === i.parent);
         const role = role_arr.find((r) => r.name === i.name);
 
@@ -267,11 +285,11 @@ export class RbacService {
     }
   }
 
-  async InsertGlobalPermissions() {
+  async InsertGlobalPermissions(): Promise<IPermission[]> {
     const { permissions } = await import('../rbac');
 
-    let permissionArr = [];
-    for (let i of permissions) {
+    const permissionArr = [];
+    for (const i of permissions) {
       const permission = new this.permissionModel();
       permission.title = i.title;
       permission.description = i.description;
@@ -284,7 +302,7 @@ export class RbacService {
     return permissionArr;
   }
 
-  async InsertRolePermission(organizationId) {
+  async InsertRolePermission(organizationId: string): Promise<void> {
     const { permissions } = await import('../rbac');
 
     const roles = await this.roleModel.find({ organizationId });
@@ -293,7 +311,7 @@ export class RbacService {
       .find()
       .sort({ id: 'ASC' });
 
-    for (let permission of permissions) {
+    for (const permission of permissions) {
       const pId = globalPermissions.find(
         (gp) => gp.description === permission.description
       );
@@ -309,7 +327,10 @@ export class RbacService {
     }
   }
 
-  async AddRolePermission(data, user) {
+  async AddRolePermission(
+    data: RolePermissionDto,
+    user: IBaseUser
+  ): Promise<IRolePermission> {
     await this.rolePermissionModel.updateOne(
       { _id: data.rolePermissionId },
       {
@@ -328,8 +349,8 @@ export class RbacService {
     return rolePermission;
   }
 
-  async DeleteRole(roleIds) {
-    for (let i of roleIds.ids) {
+  async DeleteRole(roleIds: RoleIdsDto): Promise<boolean> {
+    for (const i of roleIds.ids) {
       const role = await this.roleModel.findOne({
         _id: i,
       });
@@ -337,7 +358,7 @@ export class RbacService {
         roleId: i,
       });
       if (rolePermissions) {
-        for (let i of rolePermissions) {
+        for (const i of rolePermissions) {
           await this.rolePermissionModel.updateOne(
             { _id: i.id },
             { roleId: role.parentId }
@@ -349,8 +370,8 @@ export class RbacService {
     return true;
   }
 
-  async DeletePermission(permissionIds) {
-    for (let i of permissionIds.ids) {
+  async DeletePermission(permissionIds: PermissionIdsDto): Promise<boolean> {
+    for (const i of permissionIds.ids) {
       await this.permissionModel.findOneAndDelete({ id: i });
     }
 

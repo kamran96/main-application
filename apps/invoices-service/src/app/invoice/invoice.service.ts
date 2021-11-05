@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Between, getCustomRepository, ILike, In, LessThan } from 'typeorm';
 import axios from 'axios';
-require('dotenv').config();
+import * as dotenv from 'dotenv';
 import { InvoiceRepository } from '../repositories/invoice.repository';
 import { InvoiceItemRepository } from '../repositories/invoiceItem.repository';
 import { Sorting } from '@invyce/sorting';
@@ -9,17 +9,33 @@ import { BillRepository } from '../repositories/bill.repository';
 import { CreditNoteRepository } from '../repositories/creditNote.repository';
 import { CreditNoteItemRepository } from '../repositories/creditNoteItem.repository';
 import {
+  IBaseUser,
+  IPage,
+  IRequest,
+  IInvoice,
+  IInvoiceWithResponse,
+} from '@invyce/interfaces';
+import {
   Integrations,
   XeroStatuses,
   XeroTypes,
 } from '@invyce/global-constants';
-import { CreditNoteItems } from '../entities/creditNoteItem.entity';
+import { BillItemRepository } from '../repositories/billItem.repository';
+import { InvoiceDto, InvoiceIdsDto } from '../dto/invoice.dto';
+
+dotenv.config();
 
 @Injectable()
 export class InvoiceService {
-  async IndexInvoice(req, queryData) {
+  async IndexInvoice(
+    req: IRequest,
+    queryData: IPage
+  ): Promise<IInvoiceWithResponse> {
     const { page_no, page_size, invoice_type, type, status, sort, query } =
       queryData;
+
+    const ps: number = parseInt(page_size);
+    const pn: number = parseInt(page_no);
     let invoices;
 
     const { sort_column, sort_order } = await Sorting(sort);
@@ -31,12 +47,12 @@ export class InvoiceService {
       // branchId: user.branchId,
     });
 
-    let invoice_arr = [];
+    const invoice_arr = [];
     if (query) {
-      const filterData: any = Buffer.from(query, 'base64').toString();
+      const filterData = Buffer.from(query, 'base64').toString();
       const data = JSON.parse(filterData);
 
-      for (let i in data) {
+      for (const i in data) {
         if (data[i].type === 'search') {
           const val = data[i].value?.split('%')[1];
           // const lower = val.toLowerCase();
@@ -46,8 +62,8 @@ export class InvoiceService {
               organizationId: req.user.organizationId,
               [i]: ILike(val),
             },
-            skip: page_no * page_size - page_size,
-            take: page_size,
+            skip: pn * ps - ps,
+            take: ps,
             relations: ['transactionItems', 'transactionItems.account'],
           });
         } else if (data[i].type === 'compare') {
@@ -57,8 +73,8 @@ export class InvoiceService {
               organizationId: req.user.organizationId,
               [i]: In(data[i].value),
             },
-            skip: page_no * page_size - page_size,
-            take: page_size,
+            skip: pn * ps - ps,
+            take: ps,
             relations: ['transactionItems', 'transactionItems.account'],
           });
         } else if (data[i].type === 'date-between') {
@@ -70,20 +86,20 @@ export class InvoiceService {
               organizationId: req.user.organizationId,
               [i]: Between(start_date, end_date),
             },
-            skip: page_no * page_size - page_size,
-            take: page_size,
+            skip: pn * ps - ps,
+            take: ps,
             relations: ['transactionItems', 'transactionItems.account'],
           });
         }
 
         return {
-          invoices: invoices,
+          result: invoices,
           pagination: {
             total,
-            total_pages: Math.ceil(total / page_size),
-            page_size: parseInt(page_size) || 20,
+            total_pages: Math.ceil(total / ps),
+            page_size: ps || 20,
             // page_total: null,
-            page_no: parseInt(page_no),
+            page_no: pn,
             sort_column: sort_column,
             sort_order: sort_order,
           },
@@ -121,8 +137,8 @@ export class InvoiceService {
             organizationId: req.user.organizationId,
             // branchId: user.branchId
           },
-          skip: page_no * page_size - page_size,
-          take: page_size,
+          skip: pn * ps - ps,
+          take: ps,
           order: {
             [sort_column]: sort_order,
           },
@@ -136,8 +152,8 @@ export class InvoiceService {
           type: 'INVOICE',
         });
 
-        for (let i of invoices) {
-          let balance = balances.find((bal) => bal.id === i.id);
+        for (const i of invoices) {
+          const balance = balances.find((bal) => bal.id === i.id);
           invoice_arr.push({
             ...i,
             paid_amount: balance.invoice.balance,
@@ -152,8 +168,8 @@ export class InvoiceService {
             organizationId: req.user.organizationId,
             // branchId: user.branchId
           },
-          skip: page_no * page_size - page_size,
-          take: page_size,
+          skip: pn * ps - ps,
+          take: ps,
           order: {
             [sort_column]: sort_order,
           },
@@ -167,8 +183,8 @@ export class InvoiceService {
           type: 'INVOICE',
         });
 
-        for (let i of invoices) {
-          let balance = balances.find((bal) => bal.id === i.id);
+        for (const i of invoices) {
+          const balance = balances.find((bal) => bal.id === i.id);
           if (balance.invoice.balance === 0) {
             invoice_arr.push({
               ...i,
@@ -185,8 +201,8 @@ export class InvoiceService {
             organizationId: req.user.organizationId,
             // branchId: user.branchId
           },
-          skip: page_no * page_size - page_size,
-          take: page_size,
+          skip: pn * ps - ps,
+          take: ps,
           order: {
             [sort_column]: sort_order,
           },
@@ -200,8 +216,8 @@ export class InvoiceService {
           type: 'INVOICE',
         });
 
-        for (let i of invoices) {
-          let balance = balances.find((bal) => bal.id === i.id);
+        for (const i of invoices) {
+          const balance = balances.find((bal) => bal.id === i.id);
           if (balance.invoice.balance > 0) {
             invoice_arr.push({
               ...i,
@@ -219,8 +235,8 @@ export class InvoiceService {
             dueDate: LessThan(new Date()),
             // branchId: user.branchId
           },
-          skip: page_no * page_size - page_size,
-          take: page_size,
+          skip: pn * ps - ps,
+          take: ps,
           order: {
             [sort_column]: sort_order,
           },
@@ -230,23 +246,25 @@ export class InvoiceService {
     }
 
     return {
-      invoices: invoice_arr.length > 0 ? invoice_arr : invoices,
+      result: invoice_arr.length > 0 ? invoice_arr : invoices,
       pagination: {
         total,
-        total_pages: Math.ceil(total / page_size),
-        page_size: parseInt(page_size) || 20,
+        total_pages: Math.ceil(total / ps),
+        page_size: ps || 20,
         // page_total: null,
-        page_no: parseInt(page_no),
+        page_no: pn,
         sort_column: sort_column,
         sort_order: sort_order,
       },
     };
   }
 
-  async CreateInvoice(dto, data) {
+  async CreateInvoice(dto: InvoiceDto, data: IBaseUser): Promise<IInvoice> {
     if (dto && dto.isNewRecord === false) {
       // we need to update invoice
-      const invoice: any = await getCustomRepository(InvoiceRepository).find({
+      const invoice: IInvoice = await getCustomRepository(
+        InvoiceRepository
+      ).findOne({
         where: {
           id: dto.id,
           organizationId: data.organizationId,
@@ -282,14 +300,14 @@ export class InvoiceService {
         invoiceId: dto.id,
       });
 
-      for (let item of dto.invoice_items) {
+      for (const item of dto.invoice_items) {
         await getCustomRepository(InvoiceItemRepository).save({
           itemId: item.itemId,
-          invoiceId: invoice.id,
+          invoiceId: dto.id,
           description: item.description,
           quantity: item.quantity,
           itemDiscount: item.itemDiscount,
-          unitPrice: item.unitPrice,
+          unitPrice: parseInt(item.unitPrice),
           costOfGoodAmount: item.costOfGoodAmount,
           sequence: item.sequence,
           tax: item.tax,
@@ -323,14 +341,14 @@ export class InvoiceService {
         status: dto.status,
       });
 
-      for (let item of dto.invoice_items) {
+      for (const item of dto.invoice_items) {
         await getCustomRepository(InvoiceItemRepository).save({
           itemId: item.itemId,
           invoiceId: invoice.id,
           description: item.description,
           quantity: item.quantity,
           itemDiscount: item.itemDiscount,
-          unitPrice: item.unitPrice,
+          unitPrice: parseInt(item.unitPrice),
           costOfGoodAmount: item.costOfGoodAmount,
           sequence: item.sequence,
           tax: item.tax,
@@ -343,13 +361,13 @@ export class InvoiceService {
     }
   }
 
-  async FindById(invoiceId, req) {
+  async FindById(invoiceId: number, req: IRequest): Promise<IInvoice> {
     const [invoice] = await getCustomRepository(InvoiceRepository).find({
       where: { id: invoiceId },
       relations: ['invoiceItems'],
     });
 
-    let new_invoice: any;
+    let new_invoice;
     if (invoice?.contactId) {
       let token;
       if (process.env.NODE_ENV === 'development') {
@@ -370,7 +388,7 @@ export class InvoiceService {
       const contactId = invoice?.contactId;
       const itemIdsArray = invoice?.invoiceItems.map((ids) => ids.itemId);
 
-      const contactRequest: any = {
+      const contactRequest = {
         url: `http://localhost/contacts/contact/${contactId}`,
         method: 'GET',
         headers: {
@@ -385,13 +403,13 @@ export class InvoiceService {
         },
       });
 
-      const { data: contact } = await axios(contactRequest);
+      const { data: contact } = await axios(contactRequest as unknown);
       const { data: items } = await http.post(`items/item/ids`, {
         ids: itemIdsArray,
       });
 
-      let invoiceItemArr = [];
-      for (let i of invoice.invoiceItems) {
+      const invoiceItemArr = [];
+      for (const i of invoice.invoiceItems) {
         const item = items.find((j) => i.itemId === j.id);
         invoiceItemArr.push({ ...i, item });
       }
@@ -407,7 +425,7 @@ export class InvoiceService {
     return new_invoice ? new_invoice : invoice;
   }
 
-  async GetInvoiceNumber(type, user) {
+  async GetInvoiceNumber(type: string, user: IBaseUser): Promise<string> {
     let invoiceNo = '';
     if (type === 'SI') {
       const [invoice] = await getCustomRepository(InvoiceRepository).find({
@@ -426,7 +444,7 @@ export class InvoiceService {
         const year = new Date().getFullYear();
         const n = invoice.invoiceNumber.split('-');
         let m = parseInt(n[2]);
-        let o = (m += 1);
+        const o = (m += 1);
         invoiceNo = `INV-${year}-${o}`;
       } else {
         invoiceNo = `INV-${new Date().getFullYear()}-1`;
@@ -448,7 +466,7 @@ export class InvoiceService {
         const year = new Date().getFullYear();
         const n = bill.invoiceNumber.split('-');
         let m = parseInt(n[2]);
-        let o = (m += 1);
+        const o = (m += 1);
         invoiceNo = `BILL-${year}-${o}`;
       } else {
         invoiceNo = `BILL-${new Date().getFullYear()}-1`;
@@ -472,7 +490,7 @@ export class InvoiceService {
         const year = new Date().getFullYear();
         const n = credit_note.invoiceNumber.split('-');
         let m = parseInt(n[2]);
-        let o = (m += 1);
+        const o = (m += 1);
         invoiceNo = `CN-${year}-${o}`;
       } else {
         invoiceNo = `CN-${new Date().getFullYear()}-1`;
@@ -486,7 +504,7 @@ export class InvoiceService {
     console.log('Sending pdf please wait...');
     console.log(process.env.PDF_GENERATOR_KEY);
 
-    const requestObj: any = {
+    const requestObj = {
       url: 'https://api.pdfmonkey.io/api/v1/documents',
       method: 'GET',
       headers: {
@@ -502,12 +520,12 @@ export class InvoiceService {
       },
     };
 
-    const data = await axios(requestObj);
+    const data = await axios(requestObj as unknown);
     console.log(data.data);
   }
 
-  async deleteInvoice(invoiceIds) {
-    for (let i of invoiceIds.ids) {
+  async deleteInvoice(invoiceIds: InvoiceIdsDto): Promise<boolean> {
+    for (const i of invoiceIds.ids) {
       await getCustomRepository(InvoiceRepository).update(
         { id: i },
         { status: 0 }
@@ -517,7 +535,11 @@ export class InvoiceService {
     return true;
   }
 
-  async InvoicesAgainstContactId(contactId, req, type) {
+  async InvoicesAgainstContactId(
+    contactId: string,
+    req: IRequest,
+    type: number
+  ): Promise<IInvoice[]> {
     if (type == 2) {
       const invoices = await getCustomRepository(InvoiceRepository).find({
         where: {
@@ -526,7 +548,7 @@ export class InvoiceService {
         },
       });
 
-      let inv_arr = [];
+      const inv_arr = [];
       if (invoices.length > 0) {
         let token;
         if (process.env.NODE_ENV === 'development') {
@@ -558,8 +580,8 @@ export class InvoiceService {
           type: 'INVOICE',
         });
 
-        for (let inv of invoices) {
-          let balance = payments.find((pay) => pay.id === inv.id);
+        for (const inv of invoices) {
+          const balance = payments.find((pay) => pay.id === inv.id);
 
           inv_arr.push({
             ...inv,
@@ -578,7 +600,7 @@ export class InvoiceService {
         },
       });
 
-      let inv_arr = [];
+      const inv_arr = [];
       if (bills.length > 0) {
         let token;
         if (process.env.NODE_ENV === 'development') {
@@ -610,8 +632,8 @@ export class InvoiceService {
           type: 'BILL',
         });
 
-        for (let inv of bills) {
-          let balance = payments.find((pay) => pay.id === inv.id);
+        for (const inv of bills) {
+          const balance = payments.find((pay) => pay.id === inv.id);
 
           inv_arr.push({
             ...inv,
@@ -624,13 +646,13 @@ export class InvoiceService {
     }
   }
 
-  async FindByInvoiceIds(invoiceIds) {
+  async FindByInvoiceIds(invoiceIds: InvoiceIdsDto): Promise<IInvoice[]> {
     return await getCustomRepository(InvoiceRepository).find({
       where: { id: In(invoiceIds.ids) },
     });
   }
 
-  async SyncInvoices(data, req) {
+  async SyncInvoices(data, req: IRequest): Promise<void> {
     let token;
     if (process.env.NODE_ENV === 'development') {
       const header = req.headers?.authorization?.split(' ')[1];
@@ -654,9 +676,9 @@ export class InvoiceService {
       },
     });
 
-    let item_arr: any = [];
-    let account_arr: any = [];
-    for (let i of data.invoices) {
+    const item_arr = [];
+    const account_arr = [];
+    for (const i of data.invoices) {
       const mapItemCodes = i.lineItems.map((items) => items.itemCode);
       const mapAccountCodes = i.lineItems.map(
         (accounts) => accounts.accountCode
@@ -669,14 +691,25 @@ export class InvoiceService {
       account_arr.push(mapAccountCodes);
     }
 
-    const newest_arr = item_arr.flat();
+    const mapAccountCodesFromPayments = data.payments.map(
+      (i) => i.account.code
+    );
+
+    const itemCodesArray = item_arr.flat();
     const { data: items } = await http.post(`items/item/codes`, {
-      codes: newest_arr,
+      codes: itemCodesArray,
     });
 
+    const inventoryAndCostOfGoodSoldAccountCodes = ['310', '630', '610'];
+
     const new_account_codes = account_arr.flat();
+    const concatAccountCodes = new_account_codes.concat(
+      mapAccountCodesFromPayments,
+      inventoryAndCostOfGoodSoldAccountCodes
+    );
+
     const { data: accounts } = await http.post(`accounts/account/codes`, {
-      codes: new_account_codes,
+      codes: concatAccountCodes,
     });
 
     const mapContactIds = data.invoices.map((inv) => inv?.contact?.contactID);
@@ -684,53 +717,65 @@ export class InvoiceService {
       ids: mapContactIds,
     });
 
-    for (let i of data.credit_notes) {
-      if (i.type === 'ACCRECCREDIT') {
-        const credit_note = await getCustomRepository(
-          CreditNoteRepository
-        ).save({
-          issueDate: i.date,
-          contactId: await contacts.find(
-            (con) => con.importedContactId === i.contact.contactID
-          )._id,
-          reference: i.reference,
-          invoiceNumber: i.creditNoteNumber,
-          currency: i.currencyCode,
-          netTotal: i.subTotal,
-          grossTotal: i.total,
-          status: XeroStatuses[`${i.status}`],
-          importedCreditNoteId: i.creditNoteID,
-          importedFrom: Integrations.XERO,
-          organizationId: req.user.organizationId,
-          createdById: req.user.id,
-          updatedById: req.user.id,
-        });
+    const payment_arr = [];
+    for (const pay of data.payments) {
+      payment_arr.push({
+        balance: pay.amount,
+        date: pay.date,
+        reference: pay.reference,
+        contactId: contacts.find(
+          (ids) => ids.importedContactId === pay?.invoice?.contact?.contactID
+        )._id,
+        invoiceId: pay?.invoice?.invoiceID,
+        paymentId: pay.paymentID,
+        status: XeroStatuses[`${pay.status}`],
+      });
+    }
 
-        for (let j of i.lineItems) {
-          await getCustomRepository(CreditNoteItemRepository).save({
-            creditNoteId: credit_note.id,
-            description: j.description,
-            quantity: j.quantity,
-            amount: j.amount,
-            itemId: j?.itemCode
-              ? await items.find((ids) => ids.code === j.itemCode)._id
-              : null,
-            accountId: await accounts.find((ids) => ids.code === j.accountCode)
-              .id,
-            tax: i.taxAmount,
-          });
-        }
+    for (const i of data.credit_notes) {
+      const credit_note = await getCustomRepository(CreditNoteRepository).save({
+        issueDate: i.date,
+        contactId: await contacts.find(
+          (con) => con.importedContactId === i.contact.contactID
+        )._id,
+        reference: i.reference,
+        invoiceNumber: i.creditNoteNumber,
+        currency: i.currencyCode,
+        netTotal: i.subTotal,
+        grossTotal: i.total,
+        status: XeroStatuses[`${i.status}`],
+        importedCreditNoteId: i.creditNoteID,
+        importedFrom: Integrations.XERO,
+        organizationId: req.user.organizationId,
+        createdById: req.user.id,
+        updatedById: req.user.id,
+      });
+
+      for (const j of i.lineItems) {
+        await getCustomRepository(CreditNoteItemRepository).save({
+          creditNoteId: credit_note.id,
+          description: j.description,
+          quantity: j.quantity,
+          amount: j.amount,
+          itemId: j?.itemCode
+            ? await items.find((ids) => ids.code === j.itemCode)._id
+            : null,
+          accountId: await accounts.find((ids) => ids.code === j.accountCode)
+            .id,
+          tax: i.taxAmount,
+        });
       }
     }
 
-    let payment_arr = [];
-    for (let inv of data.invoices) {
+    const invoiceIds = [];
+    const transactions = [];
+    for (const inv of data.invoices) {
       const invoices = await getCustomRepository(InvoiceRepository).find({
         importedInvoiceId: inv.invoiceID,
         organizationId: req.user.organizationId,
       });
 
-      if (invoices.length === 0 && XeroTypes.INVOICE) {
+      if (invoices.length === 0 && inv.type === XeroTypes.INVOICE) {
         const invoice = await getCustomRepository(InvoiceRepository).save({
           reference: inv.reference,
           contactId: await contacts.find(
@@ -753,7 +798,7 @@ export class InvoiceService {
           status: XeroStatuses[`${inv.status}`],
         });
 
-        for (let j of inv.lineItems) {
+        for (const j of inv.lineItems) {
           await getCustomRepository(InvoiceItemRepository).save({
             invoiceId: invoice.id,
             itemId: j?.itemCode
@@ -768,13 +813,43 @@ export class InvoiceService {
             accountId: await accounts.find((ids) => ids.code === j.accountCode)
               .id,
             organizationId: req.user.organizationId,
-            createdById: req.user.userId,
+            createdById: req.user.id,
             status: invoice.status,
           });
+
+          if (invoice.status === 1) {
+            const debits = [
+              {
+                amount: inv.amount,
+                account_id: accounts.find((ids) => ids.code === '610').id,
+              },
+              {
+                amout: inv.amount,
+                account_id: accounts.find((ids) => ids.code === '310'),
+              },
+            ];
+            const credits = [
+              {
+                amount: inv.amount,
+                account_id: accounts.find((ids) => ids.code === '630').id,
+              },
+              {
+                amout: inv.amount,
+                account_id: accounts.find((ids) => ids.code === j.accountCode),
+              },
+            ];
+
+            transactions.push({
+              dr: debits,
+              cr: credits,
+              invoice: invoice,
+              createdAt: invoice.createdAt,
+            });
+          }
         }
 
         if (inv?.creditNotes?.length > 0) {
-          for (let cn of inv.creditNotes) {
+          for (const cn of inv.creditNotes) {
             await getCustomRepository(CreditNoteRepository).update(
               { importedCreditNoteId: cn.creditNoteID },
               {
@@ -784,28 +859,83 @@ export class InvoiceService {
           }
         }
 
-        if (inv?.payments?.length > 0) {
-          for (let pay of inv.payments) {
-            payment_arr.push({
-              balance: pay.amount,
-              date: pay.date,
-              reference: pay.reference,
-              contactId: invoice.contactId,
-              invoiceId: invoice.id,
+        invoiceIds.push({
+          id: invoice.id,
+          importedInvoiceId: invoice.importedInvoiceId,
+        });
+      } else if (inv.type === XeroTypes.BILL) {
+        const bill = await getCustomRepository(BillRepository).save({
+          reference: inv.reference,
+          contactId: await contacts.find(
+            (con) => con.importedContactId === inv.contact.contactID
+          )._id,
+          issueDate: inv.date,
+          date: inv.date,
+          dueDate: inv.dueDate,
+          invoiceType: 'SI',
+          invoiceNumber: inv.invoiceNumber,
+          netTotal: inv.subTotal,
+          grossTotal: inv.total,
+          discount: inv.totalDiscount,
+          currency: inv.currencyCode,
+          importedBillId: inv.invoiceID,
+          importedFrom: Integrations.XERO,
+          organizationId: req.user.organizationId,
+          createdById: req.user.id,
+          updatedById: req.user.id,
+          status: XeroStatuses[`${inv.status}`],
+        });
 
-              paymentId: pay.paymentID,
-              organizationId: req.user.organizationId,
-              status: invoice.status,
-            });
+        for (const j of inv.lineItems) {
+          await getCustomRepository(BillItemRepository).save({
+            billId: bill.id,
+            itemId: j?.itemCode
+              ? await items.find((ids) => ids.code === j.itemCode)._id
+              : null,
+            description: j?.description,
+            total: j?.lineAmount,
+            tax: j?.taxAmount?.toString() || null,
+            unitPrice: j.unitAmount,
+            quantity: j?.quantity?.toString() || null,
+            itemDiscount: j?.discountAmount?.toString() || null,
+            accountId: await accounts.find((ids) => ids.code === j.accountCode)
+              .id,
+            organizationId: req.user.organizationId,
+            createdById: req.user.id,
+            status: bill.status,
+          });
+        }
+
+        if (inv?.creditNotes?.length > 0) {
+          for (const cn of inv.creditNotes) {
+            await getCustomRepository(CreditNoteRepository).update(
+              { importedCreditNoteId: cn.creditNoteID },
+              {
+                billId: bill.id,
+              }
+            );
           }
         }
-      } else if (XeroTypes.BILL) {
-        const bill = await getCustomRepository(BillRepository).save({});
       }
     }
 
+    const newPaymentPayload = [];
+    for (const i of payment_arr) {
+      newPaymentPayload.push({
+        ...i,
+        invoiceId: invoiceIds.find(
+          (ids) => ids.invoiceId === i.importedInvoiceId
+        ).id,
+      });
+    }
+
     await http.post(`payments/payment/add`, {
-      payments: payment_arr,
+      payments: newPaymentPayload,
+    });
+
+    console.log('sending transaction...');
+    await http.post('accounts/transaction/api', {
+      transactions,
     });
   }
 }
