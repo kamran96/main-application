@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as moment from 'moment';
 import axios from 'axios';
 import { Contact } from '../Schemas/contact.schema';
-import { Integrations } from '@invyce/global-constants';
+import { Entries, Integrations } from '@invyce/global-constants';
 import {
   IPage,
   IRequest,
@@ -301,55 +301,139 @@ export class ContactService {
     });
 
     const transactionArr = [];
-    for (const i of data.contacts) {
-      const contacts = await this.contactModel.find({
-        importedContactId: i.contactID,
-        organizationId: req.user.organizationId,
-      });
-
-      if (contacts.length === 0) {
-        const getNumbers = (numbers, type) =>
-          numbers.find((p) => p.phoneType === type);
-
-        // ruturns 1 if customer 2 if supplier else null
-        const ContactType = (customer, supplier) =>
-          customer === true ? 1 : supplier === true ? 2 : null;
-
-        const contact = new this.contactModel({
-          accountNumber: i.accountNumber,
-          email: i.emailAddress,
-
-          name: i.name,
-          skypeName: i.skypeUserName,
-          contactType: ContactType(i.isCustomer, i.isSupplier),
-          webLink: i.website,
-          salesDiscount: i.discount,
-          cellNumber: getNumbers(i.phones, 'MOBILE').phoneNumber || null,
-          faxNumber: getNumbers(i.phones, 'FAX').phoneNumber || null,
-          phoneNumber: getNumbers(i.phones, 'DEFAULT').phoneNumber || null,
+    if (data.type === Integrations.XERO) {
+      for (const i of data.contacts) {
+        const contacts = await this.contactModel.find({
           importedContactId: i.contactID,
-          importedFrom: Integrations.XERO,
-          addresses: JSON.stringify(i.addresses),
           organizationId: req.user.organizationId,
-
-          createdById: req.user.id,
-          updatedById: req.user.id,
-          status: 1,
         });
-        await contact.save();
-        if (
-          i.balances &&
-          (i?.balaces?.accountsReceivable?.outstanding !== 0 ||
-            i?.balances?.accountsPayable?.outstanding !== 0)
-        ) {
-          transactionArr.push({
-            contactId: contact.id,
-            contactType: i.isCustomer || i.isSupplier,
-            balance:
-              i?.balances?.accountsReceivable?.outstanding ||
-              i?.balances?.accountsPayable?.outstanding,
-            createdAt: contact.createdAt,
+
+        if (contacts.length === 0) {
+          const getNumbers = (numbers, type) =>
+            numbers.find((p) => p.phoneType === type);
+
+          // ruturns 1 if customer 2 if supplier else null
+          const ContactType = (customer, supplier) =>
+            customer === true ? 1 : supplier === true ? 2 : null;
+
+          const contact = new this.contactModel({
+            accountNumber: i.accountNumber,
+            email: i.emailAddress,
+
+            name: i.name,
+            skypeName: i.skypeUserName,
+            contactType: ContactType(i.isCustomer, i.isSupplier),
+            webLink: i.website,
+            salesDiscount: i.discount,
+            cellNumber: getNumbers(i.phones, 'MOBILE').phoneNumber || null,
+            faxNumber: getNumbers(i.phones, 'FAX').phoneNumber || null,
+            phoneNumber: getNumbers(i.phones, 'DEFAULT').phoneNumber || null,
+            importedContactId: i.contactID,
+            importedFrom: Integrations.XERO,
+            addresses: JSON.stringify(i.addresses),
+            organizationId: req.user.organizationId,
+
+            createdById: req.user.id,
+            updatedById: req.user.id,
+            status: 1,
           });
+          await contact.save();
+          if (
+            i.balances &&
+            (i?.balaces?.accountsReceivable?.outstanding !== 0 ||
+              i?.balances?.accountsPayable?.outstanding !== 0)
+          ) {
+            transactionArr.push({
+              contactId: contact.id,
+              contactType: i.isCustomer
+                ? 'customer'
+                : i.isSupplier
+                ? 'supplier'
+                : null,
+              balance:
+                i?.balances?.accountsReceivable?.outstanding ||
+                i?.balances?.accountsPayable?.outstanding,
+              ref: 'Xe',
+              narration: 'XE contact balance',
+              createdAt: contact.createdAt,
+            });
+          }
+        }
+      }
+    } else if (data.type === Integrations.QUICK_BOOK) {
+      for (const i of data.contacts.customers) {
+        const contacts = await this.contactModel.find({
+          importedContactId: i.Id,
+          organizationId: req.user.organizationId,
+        });
+
+        if (contacts.length === 0 && i?.GivenName) {
+          const contact = new this.contactModel({
+            businessName: i.CompanyName,
+            name: i.GivenName,
+            phoneNumber: i.PrimaryPhone ? i.PrimaryPhone.FreeFormNumber : '',
+            email: i.PrimaryEmailAddr ? i.PrimaryEmailAddr.Address : '',
+            webLink: i.WebAddr ? i.WebAddr.URI : '',
+            contactType: 1,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            createdById: req.user.id,
+            updatedById: req.user.id,
+            importedContactId: i.Id,
+            importedFrom: Integrations.QUICK_BOOK,
+            status: 1,
+          });
+          await contact.save();
+          if (i?.balances > 0) {
+            transactionArr.push({
+              balance: i.Balance,
+              contactId: contact.id,
+              ref: 'QB',
+              narration: 'QB contact balance',
+              name: 'Cash Receiveable',
+              contactType: 'customer',
+              transactionType: Entries.DEBITS,
+              createdAt: contact.createdAt,
+            });
+          }
+        }
+      }
+
+      for (const i of data.contacts.vendors) {
+        const contacts = await this.contactModel.find({
+          importedContactId: i.Id,
+          organizationId: req.user.organizationId,
+        });
+
+        if (contacts.length === 0 && i?.GivenName) {
+          const contact = new this.contactModel({
+            businessName: i.CompanyName,
+            name: i.GivenName,
+            phoneNumber: i.PrimaryPhone ? i.PrimaryPhone.FreeFormNumber : '',
+            email: i.PrimaryEmailAddr ? i.PrimaryEmailAddr.Address : '',
+            webLink: i.WebAddr ? i.WebAddr.URI : '',
+            contactType: 2,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            createdById: req.user.id,
+            updatedById: req.user.id,
+            importedContactId: i.Id,
+            importedFrom: Integrations.QUICK_BOOK,
+            status: 1,
+          });
+          await contact.save();
+          if (i?.balances > 0) {
+            transactionArr.push({
+              balance: i.Balance,
+              contactId: contact.id,
+              ref: 'QB',
+              narration: 'QB contact balance',
+              contactType: 'supplier',
+              name: 'Cash Receiveable',
+              transactionType: Entries.DEBITS,
+              createdAt: contact.createdAt,
+            });
+          }
         }
       }
     }

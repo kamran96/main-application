@@ -55,7 +55,8 @@ export class DeleteCategoryDto {
 }
 
 export class ItemCodesDto {
-  codes: Array<string>;
+  type: string;
+  payload: Array<string>;
 }
 
 export class ParamsDto {
