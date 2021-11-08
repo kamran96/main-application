@@ -7,9 +7,9 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { XeroService } from './xero.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
+import { IRequest } from '@invyce/interfaces';
 
 @Controller('xero')
 export class XeroController {
@@ -30,9 +30,9 @@ export class XeroController {
 
   @UseGuards(GlobalAuthGuard)
   @Post('/callback')
-  async xerocallback(@Body() data, @Req() req: Request) {
+  async xerocallback(@Body() data) {
     try {
-      const xero = await this.xeroService.XeroCallback(data.token, req.user);
+      const xero = await this.xeroService.XeroCallback(data.token);
 
       if (xero) {
         return {
@@ -51,7 +51,7 @@ export class XeroController {
 
   @UseGuards(GlobalAuthGuard)
   @Post('/fetch-from-xero')
-  async importDataFromXero(@Body() dto, @Req() req: Request) {
+  async importDataFromXero(@Body() dto, @Req() req: IRequest) {
     try {
       const xero = await this.xeroService.ImportDataFromXero(dto.modules, req);
 

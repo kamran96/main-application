@@ -676,266 +676,327 @@ export class InvoiceService {
       },
     });
 
-    const item_arr = [];
-    const account_arr = [];
-    for (const i of data.invoices) {
-      const mapItemCodes = i.lineItems.map((items) => items.itemCode);
-      const mapAccountCodes = i.lineItems.map(
-        (accounts) => accounts.accountCode
-      );
+    const mapContactIds =
+      data.type === Integrations.XERO
+        ? data.invoices.map((inv) => inv?.contact?.contactID)
+        : data.invoices.map((inv) => inv?.CustomerRef?.value);
 
-      if (!mapItemCodes.includes(undefined)) {
-        item_arr.push(mapItemCodes);
-      }
-
-      account_arr.push(mapAccountCodes);
-    }
-
-    const mapAccountCodesFromPayments = data.payments.map(
-      (i) => i.account.code
-    );
-
-    const itemCodesArray = item_arr.flat();
-    const { data: items } = await http.post(`items/item/codes`, {
-      codes: itemCodesArray,
-    });
-
-    const inventoryAndCostOfGoodSoldAccountCodes = ['310', '630', '610'];
-
-    const new_account_codes = account_arr.flat();
-    const concatAccountCodes = new_account_codes.concat(
-      mapAccountCodesFromPayments,
-      inventoryAndCostOfGoodSoldAccountCodes
-    );
-
-    const { data: accounts } = await http.post(`accounts/account/codes`, {
-      codes: concatAccountCodes,
-    });
-
-    const mapContactIds = data.invoices.map((inv) => inv?.contact?.contactID);
     const { data: contacts } = await http.post(`contacts/contact/ids`, {
       ids: mapContactIds,
     });
 
-    const payment_arr = [];
-    for (const pay of data.payments) {
-      payment_arr.push({
-        balance: pay.amount,
-        date: pay.date,
-        reference: pay.reference,
-        contactId: contacts.find(
-          (ids) => ids.importedContactId === pay?.invoice?.contact?.contactID
-        )._id,
-        invoiceId: pay?.invoice?.invoiceID,
-        paymentId: pay.paymentID,
-        status: XeroStatuses[`${pay.status}`],
-      });
-    }
+    const newPaymentPayload = [];
+    const transactions = [];
 
-    for (const i of data.credit_notes) {
-      const credit_note = await getCustomRepository(CreditNoteRepository).save({
-        issueDate: i.date,
-        contactId: await contacts.find(
-          (con) => con.importedContactId === i.contact.contactID
-        )._id,
-        reference: i.reference,
-        invoiceNumber: i.creditNoteNumber,
-        currency: i.currencyCode,
-        netTotal: i.subTotal,
-        grossTotal: i.total,
-        status: XeroStatuses[`${i.status}`],
-        importedCreditNoteId: i.creditNoteID,
-        importedFrom: Integrations.XERO,
-        organizationId: req.user.organizationId,
-        createdById: req.user.id,
-        updatedById: req.user.id,
+    if (data.type === Integrations.XERO) {
+      const item_arr = [];
+      const account_arr = [];
+      for (const i of data.invoices) {
+        const mapItemCodes = i.lineItems.map((items) => items.itemCode);
+        const mapAccountCodes = i.lineItems.map(
+          (accounts) => accounts.accountCode
+        );
+
+        if (!mapItemCodes.includes(undefined)) {
+          item_arr.push(mapItemCodes);
+        }
+
+        account_arr.push(mapAccountCodes);
+      }
+
+      const mapAccountCodesFromPayments = data.payments.map(
+        (i) => i.account.code
+      );
+
+      const itemCodesArray = item_arr.flat();
+      const { data: items } = await http.post(`items/item/ids-or-codes`, {
+        payload: itemCodesArray,
+        type: Integrations.XERO,
       });
 
-      for (const j of i.lineItems) {
-        await getCustomRepository(CreditNoteItemRepository).save({
-          creditNoteId: credit_note.id,
-          description: j.description,
-          quantity: j.quantity,
-          amount: j.amount,
-          itemId: j?.itemCode
-            ? await items.find((ids) => ids.code === j.itemCode)._id
-            : null,
-          accountId: await accounts.find((ids) => ids.code === j.accountCode)
-            .id,
-          tax: i.taxAmount,
+      const new_account_codes = account_arr.flat();
+      const concatAccountCodes = new_account_codes.concat(
+        mapAccountCodesFromPayments
+      );
+
+      const { data: accounts } = await http.post(`accounts/account/codes`, {
+        codes: concatAccountCodes,
+      });
+
+      const payment_arr = [];
+      for (const pay of data.payments) {
+        payment_arr.push({
+          balance: pay.amount,
+          date: pay.date,
+          reference: pay.reference,
+          contactId: contacts.find(
+            (ids) => ids.importedContactId === pay?.invoice?.contact?.contactID
+          )._id,
+          invoiceId: pay?.invoice?.invoiceID,
+          paymentId: pay.paymentID,
+          status: XeroStatuses[`${pay.status}`],
         });
       }
-    }
 
-    const invoiceIds = [];
-    const transactions = [];
-    for (const inv of data.invoices) {
-      const invoices = await getCustomRepository(InvoiceRepository).find({
-        importedInvoiceId: inv.invoiceID,
-        organizationId: req.user.organizationId,
-      });
-
-      if (invoices.length === 0 && inv.type === XeroTypes.INVOICE) {
-        const invoice = await getCustomRepository(InvoiceRepository).save({
-          reference: inv.reference,
+      for (const i of data.credit_notes) {
+        const credit_note = await getCustomRepository(
+          CreditNoteRepository
+        ).save({
+          issueDate: i.date,
           contactId: await contacts.find(
-            (con) => con.importedContactId === inv.contact.contactID
+            (con) => con.importedContactId === i.contact.contactID
           )._id,
-          issueDate: inv.date,
-          date: inv.date,
-          dueDate: inv.dueDate,
-          invoiceType: 'SI',
-          invoiceNumber: inv.invoiceNumber,
-          netTotal: inv.subTotal,
-          grossTotal: inv.total,
-          discount: inv.totalDiscount,
-          currency: inv.currencyCode,
-          importedInvoiceId: inv.invoiceID,
+          reference: i.reference,
+          invoiceNumber: i.creditNoteNumber,
+          currency: i.currencyCode,
+          netTotal: i.subTotal,
+          grossTotal: i.total,
+          status: XeroStatuses[`${i.status}`],
+          importedCreditNoteId: i.creditNoteID,
           importedFrom: Integrations.XERO,
           organizationId: req.user.organizationId,
           createdById: req.user.id,
           updatedById: req.user.id,
-          status: XeroStatuses[`${inv.status}`],
         });
 
-        for (const j of inv.lineItems) {
-          await getCustomRepository(InvoiceItemRepository).save({
-            invoiceId: invoice.id,
+        for (const j of i.lineItems) {
+          await getCustomRepository(CreditNoteItemRepository).save({
+            creditNoteId: credit_note.id,
+            description: j.description,
+            quantity: j.quantity,
+            amount: j.amount,
             itemId: j?.itemCode
               ? await items.find((ids) => ids.code === j.itemCode)._id
               : null,
-            description: j?.description,
-            total: j?.lineAmount,
-            tax: j?.taxAmount?.toString() || null,
-            unitPrice: j.unitAmount,
-            quantity: j?.quantity?.toString() || null,
-            itemDiscount: j?.discountAmount?.toString() || null,
             accountId: await accounts.find((ids) => ids.code === j.accountCode)
               .id,
+            tax: i.taxAmount,
+          });
+        }
+      }
+
+      const invoiceIds = [];
+      for (const inv of data.invoices) {
+        const invoices = await getCustomRepository(InvoiceRepository).find({
+          importedInvoiceId: inv.invoiceID,
+          organizationId: req.user.organizationId,
+        });
+
+        if (invoices.length === 0 && inv.type === XeroTypes.INVOICE) {
+          const invoice = await getCustomRepository(InvoiceRepository).save({
+            reference: inv.reference,
+            contactId: await contacts.find(
+              (con) => con.importedContactId === inv.contact.contactID
+            )._id,
+            issueDate: inv.date,
+            date: inv.date,
+            dueDate: inv.dueDate,
+            invoiceType: 'SI',
+            invoiceNumber: inv.invoiceNumber,
+            netTotal: inv.subTotal,
+            grossTotal: inv.total,
+            discount: inv.totalDiscount,
+            currency: inv.currencyCode,
+            importedInvoiceId: inv.invoiceID,
+            importedFrom: Integrations.XERO,
             organizationId: req.user.organizationId,
             createdById: req.user.id,
-            status: invoice.status,
+            updatedById: req.user.id,
+            status: XeroStatuses[`${inv.status}`],
           });
 
-          if (invoice.status === 1) {
-            const debits = [
-              {
-                amount: inv.amount,
-                account_id: accounts.find((ids) => ids.code === '610').id,
-              },
-              {
-                amout: inv.amount,
-                account_id: accounts.find((ids) => ids.code === '310'),
-              },
-            ];
-            const credits = [
-              {
-                amount: inv.amount,
-                account_id: accounts.find((ids) => ids.code === '630').id,
-              },
-              {
-                amout: inv.amount,
-                account_id: accounts.find((ids) => ids.code === j.accountCode),
-              },
-            ];
-
-            transactions.push({
-              dr: debits,
-              cr: credits,
-              invoice: invoice,
-              createdAt: invoice.createdAt,
+          for (const j of inv.lineItems) {
+            await getCustomRepository(InvoiceItemRepository).save({
+              invoiceId: invoice.id,
+              itemId: j?.itemCode
+                ? await items.find((ids) => ids.code === j.itemCode)._id
+                : null,
+              description: j?.description,
+              total: j?.lineAmount,
+              tax: j?.taxAmount?.toString() || null,
+              unitPrice: j.unitAmount,
+              quantity: j?.quantity?.toString() || null,
+              itemDiscount: j?.discountAmount?.toString() || null,
+              accountId: await accounts.find(
+                (ids) => ids.code === j.accountCode
+              ).id,
+              organizationId: req.user.organizationId,
+              createdById: req.user.id,
+              status: invoice.status,
             });
           }
-        }
 
-        if (inv?.creditNotes?.length > 0) {
-          for (const cn of inv.creditNotes) {
-            await getCustomRepository(CreditNoteRepository).update(
-              { importedCreditNoteId: cn.creditNoteID },
-              {
-                invoiceId: invoice.id,
-              }
-            );
+          if (inv?.creditNotes?.length > 0) {
+            for (const cn of inv.creditNotes) {
+              await getCustomRepository(CreditNoteRepository).update(
+                { importedCreditNoteId: cn.creditNoteID },
+                {
+                  invoiceId: invoice.id,
+                }
+              );
+            }
           }
-        }
 
-        invoiceIds.push({
-          id: invoice.id,
-          importedInvoiceId: invoice.importedInvoiceId,
-        });
-      } else if (inv.type === XeroTypes.BILL) {
-        const bill = await getCustomRepository(BillRepository).save({
-          reference: inv.reference,
-          contactId: await contacts.find(
-            (con) => con.importedContactId === inv.contact.contactID
-          )._id,
-          issueDate: inv.date,
-          date: inv.date,
-          dueDate: inv.dueDate,
-          invoiceType: 'SI',
-          invoiceNumber: inv.invoiceNumber,
-          netTotal: inv.subTotal,
-          grossTotal: inv.total,
-          discount: inv.totalDiscount,
-          currency: inv.currencyCode,
-          importedBillId: inv.invoiceID,
-          importedFrom: Integrations.XERO,
-          organizationId: req.user.organizationId,
-          createdById: req.user.id,
-          updatedById: req.user.id,
-          status: XeroStatuses[`${inv.status}`],
-        });
-
-        for (const j of inv.lineItems) {
-          await getCustomRepository(BillItemRepository).save({
-            billId: bill.id,
-            itemId: j?.itemCode
-              ? await items.find((ids) => ids.code === j.itemCode)._id
-              : null,
-            description: j?.description,
-            total: j?.lineAmount,
-            tax: j?.taxAmount?.toString() || null,
-            unitPrice: j.unitAmount,
-            quantity: j?.quantity?.toString() || null,
-            itemDiscount: j?.discountAmount?.toString() || null,
-            accountId: await accounts.find((ids) => ids.code === j.accountCode)
-              .id,
+          invoiceIds.push({
+            id: invoice.id,
+            importedInvoiceId: invoice.importedInvoiceId,
+          });
+        } else if (inv.type === XeroTypes.BILL) {
+          const bill = await getCustomRepository(BillRepository).save({
+            reference: inv.reference,
+            contactId: await contacts.find(
+              (con) => con.importedContactId === inv.contact.contactID
+            )._id,
+            issueDate: inv.date,
+            date: inv.date,
+            dueDate: inv.dueDate,
+            invoiceType: 'SI',
+            invoiceNumber: inv.invoiceNumber,
+            netTotal: inv.subTotal,
+            grossTotal: inv.total,
+            discount: inv.totalDiscount,
+            currency: inv.currencyCode,
+            importedBillId: inv.invoiceID,
+            importedFrom: Integrations.XERO,
             organizationId: req.user.organizationId,
             createdById: req.user.id,
-            status: bill.status,
+            updatedById: req.user.id,
+            status: XeroStatuses[`${inv.status}`],
           });
-        }
 
-        if (inv?.creditNotes?.length > 0) {
-          for (const cn of inv.creditNotes) {
-            await getCustomRepository(CreditNoteRepository).update(
-              { importedCreditNoteId: cn.creditNoteID },
+          for (const j of inv.lineItems) {
+            await getCustomRepository(BillItemRepository).save({
+              billId: bill.id,
+              itemId: j?.itemCode
+                ? await items.find((ids) => ids.code === j.itemCode)._id
+                : null,
+              description: j?.description,
+              total: j?.lineAmount,
+              tax: j?.taxAmount?.toString() || null,
+              unitPrice: j.unitAmount,
+              quantity: j?.quantity?.toString() || null,
+              itemDiscount: j?.discountAmount?.toString() || null,
+              accountId: await accounts.find(
+                (ids) => ids.code === j.accountCode
+              ).id,
+              organizationId: req.user.organizationId,
+              createdById: req.user.id,
+              status: bill.status,
+            });
+          }
+
+          if (inv?.creditNotes?.length > 0) {
+            for (const cn of inv.creditNotes) {
+              await getCustomRepository(CreditNoteRepository).update(
+                { importedCreditNoteId: cn.creditNoteID },
+                {
+                  billId: bill.id,
+                }
+              );
+            }
+          }
+        }
+      }
+
+      for (const i of payment_arr) {
+        newPaymentPayload.push({
+          ...i,
+          invoiceId: invoiceIds.find(
+            (ids) => ids.invoiceId === i.importedInvoiceId
+          ).id,
+        });
+      }
+    } else if (data.type === Integrations.QUICK_BOOK) {
+      const item_ids_array = [];
+      // fetch items
+      for (const i of data.invoices) {
+        if (i.Id) {
+          const filterLineItems = i.Line.filter(
+            (item) => item.Id !== undefined
+          );
+          const mapItemIds = filterLineItems.map((ids) => ids.Id);
+          item_ids_array.push(mapItemIds);
+        }
+      }
+
+      const new_item_ids_array = item_ids_array.flat();
+      const { data: items } = await http.post('items/item/ids-or-codes', {
+        payload: new_item_ids_array,
+        type: Integrations.QUICK_BOOK,
+      });
+
+      for (const inv of data.invoices) {
+        const invoice = await getCustomRepository(InvoiceRepository).find({
+          where: {
+            importedInvoiceId: inv.Id,
+            organizationId: req.user.organizationId,
+          },
+        });
+        if (invoice.length === 0) {
+          if (inv?.Id) {
+            const QBInvoice = await getCustomRepository(InvoiceRepository).save(
               {
-                billId: bill.id,
+                reference: inv.domain,
+                contactId: await contacts.find(
+                  (con) => con.importedContactId === inv?.CustomerRef?.value
+                ).id,
+                issueDate: inv.TxnDate,
+                dueDate: inv.DueDate,
+                grossTotal: inv.TotalAmt,
+                invoiceType: 'SI',
+                invoiceNumber: 'INV-' + inv.DocNumber,
+                netTotal:
+                  inv.TxnTaxDetail.TotalTax > 0
+                    ? inv.TotalAmt - inv.TxnTaxDetail.TotalTax
+                    : inv.TotalAmt,
+                date: new Date().toString(),
+                currency: inv.CurrencyRef.value,
+                importedInvoiceId: inv.Id,
+                importedFrom: Integrations.QUICK_BOOK,
+                organizationId: req.user.organizationId,
+                createdById: req.user.id,
+                updatedById: req.user.id,
+                status: 1,
               }
             );
+
+            const lineItems = inv.Line.filter((item) => item.Id !== undefined);
+
+            for (const item of lineItems) {
+              await getCustomRepository(InvoiceItemRepository).save({
+                invoiceId: QBInvoice.id,
+                itemId: await items.find(
+                  (ids) => ids.importedItemId === item.Id
+                ).id,
+                description: item.Description,
+                total:
+                  item.SalesItemLineDetail.UnitPrice *
+                  item.SalesItemLineDetail.Qty,
+                unitPrice: item.SalesItemLineDetail.UnitPrice,
+                quantity: item.SalesItemLineDetail.Qty,
+                organizationId: req.user.organizationId,
+                branchId: req.user.branchId,
+                createdById: req.user.id,
+                updatedById: req.user.id,
+                status: 1,
+              });
+            }
           }
         }
       }
     }
 
-    const newPaymentPayload = [];
-    for (const i of payment_arr) {
-      newPaymentPayload.push({
-        ...i,
-        invoiceId: invoiceIds.find(
-          (ids) => ids.invoiceId === i.importedInvoiceId
-        ).id,
+    if (newPaymentPayload.length > 0) {
+      await http.post(`payments/payment/add`, {
+        payments: newPaymentPayload,
       });
     }
 
-    await http.post(`payments/payment/add`, {
-      payments: newPaymentPayload,
-    });
-
     console.log('sending transaction...');
-    await http.post('accounts/transaction/api', {
-      transactions,
-    });
+    if (transactions.length > 0) {
+      await http.post('accounts/transaction/api', {
+        transactions,
+      });
+    }
   }
 }

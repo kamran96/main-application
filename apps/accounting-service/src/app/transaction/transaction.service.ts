@@ -17,11 +17,7 @@ import {
   IRequest,
 } from '@invyce/interfaces';
 import { TransactionDto } from '../dto/transaction.dto';
-
-enum Entries {
-  DEBITS = 10,
-  CREDITS = 20,
-}
+import { Entries } from '@invyce/global-constants';
 
 @Injectable()
 export class TransactionService {
@@ -319,20 +315,22 @@ export class TransactionService {
     const paymentArr = [];
     for (const i of data.transactions) {
       const getAccount = async (name: string) => {
-        const [account] = await getCustomRepository(AccountRepository).find({
-          where: {
-            name,
-            organizationId: req.user.organizationId,
-          },
-        });
-        return account.id;
+        if (i.name) {
+          const [account] = await getCustomRepository(AccountRepository).find({
+            where: {
+              name,
+              organizationId: req.user.organizationId,
+            },
+          });
+          return account.id;
+        }
       };
 
       const transaction = await getCustomRepository(TransactionRepository).save(
         {
           amount: i.balance,
-          ref: 'XERO',
-          narration: 'Xero contact balance',
+          ref: i.ref,
+          narration: i.narration,
           date: new Date(),
           organizationId: req.user.organizationId,
           branchId: req.user.branchId,
@@ -344,10 +342,11 @@ export class TransactionService {
 
       await getCustomRepository(TransactionItemRepository).save({
         amount: i.balance,
-        accountId:
-          i.isCustomer === true
-            ? await getAccount('Accounts Receivable')
-            : await getAccount('Accounts Payable'),
+        accountId: i.accountId
+          ? i.accountId
+          : i.contactType === 'customer'
+          ? await getAccount('Accounts Receivable')
+          : await getAccount('Accounts Payable'),
         transactionId: transaction.id,
         transactionType: 10,
         branchId: req.user.branchId,

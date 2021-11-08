@@ -1,12 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { XeroClient } from 'xero-node';
-import * as jwtDecode from 'jwt-decode';
+// import * as jwtDecode from 'jwt-decode';
 import axios from 'axios';
+import { Integrations } from '@invyce/global-constants';
 
 const scopes = `openid profile email accounting.transactions accounting.reports.read accounting.settings accounting.contacts offline_access`;
 
-const client_id = process.env.XERO_CLIENT_ID;
-const client_secret = process.env.XERO_CLIENT_SECRET;
+// const client_id = process.env.XERO_CLIENT_ID;
+// const client_secret = process.env.XERO_CLIENT_SECRET;
 
 const xero = new XeroClient({
   clientId: '8DB0A3AE9F13409B818BE0DAF4EE05F2',
@@ -28,11 +29,11 @@ export class XeroService {
     return consetUrl;
   }
 
-  async XeroCallback(data, userData) {
+  async XeroCallback(data: unknown) {
     try {
-      const payload = `/integration/xero${data}`;
-      const tokenSet = await xero.apiCallback(payload);
-      const [tenant] = await xero.updateTenants(false);
+      // const payload = `/integration/xero${data}`;
+      // const tokenSet = await xero.apiCallback(payload);
+      // const [tenant] = await xero.updateTenants(false);
 
       // const getIntegration = await getCustomRepository(
       //   IntegrationRepository,
@@ -114,7 +115,7 @@ export class XeroService {
         tenant.tenantId
       );
 
-      let balances = [];
+      const balances = [];
       if (
         Array.isArray(xeroAccounts.body.accounts) &&
         xeroAccounts.body.accounts.length > 0
@@ -123,7 +124,7 @@ export class XeroService {
           (item: any) => item.rowType === 'Section'
         );
 
-        let arr = [];
+        const arr = [];
         sections.forEach((i) => {
           return i.rows.forEach((j) => {
             const row = j.cells.filter((item) => {
@@ -133,9 +134,9 @@ export class XeroService {
           });
         });
 
-        arr?.map((item, index) => {
+        arr?.map((item) => {
           let obj = { name: '', balance: null, id: null };
-          item?.forEach((feach, findex) => {
+          item?.forEach((feach) => {
             if (isNaN(feach?.value)) {
               obj = {
                 ...obj,
@@ -159,6 +160,7 @@ export class XeroService {
         await http.post(`accounts/account/sync`, {
           accounts: xeroAccounts.body.accounts,
           balances,
+          type: Integrations.XERO,
         });
       }
     }
@@ -171,6 +173,7 @@ export class XeroService {
       if (xeroContacts.body.contacts.length > 0) {
         await http.post(`contacts/contact/sync`, {
           contacts: xeroContacts.body.contacts,
+          type: Integrations.XERO,
         });
       }
     }
@@ -181,6 +184,7 @@ export class XeroService {
       if (xeroItems.body.items.length > 0) {
         await http.post(`items/item/sync`, {
           items: xeroItems.body.items,
+          type: Integrations.XERO,
         });
       }
     }
@@ -192,8 +196,8 @@ export class XeroService {
         tenant.tenantId
       );
 
-      let inv_arr = [];
-      for (let i of xeroInvoices.body.invoices) {
+      const inv_arr = [];
+      for (const i of xeroInvoices.body.invoices) {
         const inv = await xero.accountingApi.getInvoice(
           tenant.tenantId,
           i.invoiceID
@@ -206,8 +210,8 @@ export class XeroService {
         tenant.tenantId
       );
 
-      let cn_arr = [];
-      for (let i of xeroCreditNotes.body.creditNotes) {
+      const cn_arr = [];
+      for (const i of xeroCreditNotes.body.creditNotes) {
         const cn = await xero.accountingApi.getCreditNote(
           tenant.tenantId,
           i.creditNoteID
@@ -221,6 +225,7 @@ export class XeroService {
       );
 
       await http.post(`invoices/invoice/sync`, {
+        type: Integrations.XERO,
         invoices: inv_arr,
         credit_notes: cn_arr,
         payments: xeroPayments.body.payments,

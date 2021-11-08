@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Between, getCustomRepository } from 'typeorm';
 import { PaymentRepository } from '../repositories/payment.repository';
 import { Sorting } from '@invyce/sorting';
-import { Integrations, PaymentModes } from '@invyce/global-constants';
+import { PaymentModes } from '@invyce/global-constants';
 import {
   IPage,
   IBaseUser,
@@ -579,7 +579,7 @@ export class PaymentService {
         entryType: i?.entryType,
 
         importedPaymentId: i?.paymentId,
-        importedFrom: Integrations.XERO,
+        importedFrom: i.importedFrom,
         organizationId: user.organizationId,
         createdById: user.id,
         updatedById: user.id,

@@ -201,46 +201,91 @@ export class ItemService {
     }
   }
 
-  async GetItemsAgainstCodes(data: ItemCodesDto): Promise<IItem[]> {
-    return await this.itemModel.find({
-      code: { $in: data.codes },
-    });
+  async FetchMultipleItems(data: ItemCodesDto): Promise<IItem[]> {
+    if (data.type === Integrations.XERO) {
+      return await this.itemModel.find({
+        code: { $in: data.payload },
+      });
+    } else if (data.type === Integrations.QUICK_BOOK) {
+      return await this.itemModel.find({
+        importedItemId: { $in: data.payload },
+      });
+    }
   }
 
   async SyncItems(data, user: IBaseUser): Promise<void> {
-    for (const i of data.items) {
-      const items = await this.itemModel.find({
-        importedItemId: i.itemID,
-        organizationId: user.organizationId,
-      });
-
-      if (items.length === 0) {
-        const item = new this.itemModel({
-          name: i.name,
-          description: i.description,
-          code: i.code,
+    if (data.type === Integrations.XERO) {
+      for (const i of data.items) {
+        const items = await this.itemModel.find({
           importedItemId: i.itemID,
-          importedFrom: Integrations.XERO,
-          stock: i.quantityOnHand,
-          openingStock: i.quantityOnHand,
-          // accountId:
-          //   i.isTrackedAsInventory === true
-          //     ? await getAccount(i.purchaseDetails.cOGSAccountCode)
-          //     : null,
-          branchId: user.branchId,
           organizationId: user.organizationId,
-          createdById: user.id,
-          updatedById: user.id,
-          status: 1,
         });
-        await item.save();
 
-        const price = new this.priceModel({
-          purchasePrice: i.purchaseDetails.unitPrice,
-          salePrice: i.salesDetails.unitPrice,
-          itemId: item._id,
+        if (items.length === 0) {
+          const item = new this.itemModel({
+            name: i.name,
+            description: i.description,
+            code: i.code,
+            importedItemId: i.itemID,
+            importedFrom: Integrations.XERO,
+            stock: i.quantityOnHand,
+            openingStock: i.quantityOnHand,
+            // accountId:
+            //   i.isTrackedAsInventory === true
+            //     ? await getAccount(i.purchaseDetails.cOGSAccountCode)
+            //     : null,
+            branchId: user.branchId,
+            organizationId: user.organizationId,
+            createdById: user.id,
+            updatedById: user.id,
+            status: 1,
+          });
+          await item.save();
+
+          const price = new this.priceModel({
+            purchasePrice: i.purchaseDetails.unitPrice,
+            salePrice: i.salesDetails.unitPrice,
+            itemId: item._id,
+          });
+          await price.save();
+        }
+      }
+    } else if (data.type === Integrations.QUICK_BOOK) {
+      for (const i of data.items) {
+        const items = await this.itemModel.find({
+          importedItemId: i.Id,
+          organizationId: user.organizationId,
         });
-        await price.save();
+
+        if (items.length === 0) {
+          const item = new this.itemModel({
+            name: i.Name,
+            description: i.Description,
+            hasInventory: i.TrackQtyOnHand,
+            stock: i.TrackQtyOnHand === true ? i.QtyOnHand : null,
+            openingStock: i.TrackQtyOnHand === true ? i.QtyOnHand : null,
+            importedItemId: i.Id,
+            importedFrom: Integrations.QUICK_BOOK,
+            organizationId: user.organizationId,
+            branchId: user.branchId,
+            createdById: user.id,
+            updatedById: user.id,
+            status: 1,
+          });
+          await item.save();
+
+          const price = new this.priceModel({
+            purchasePrice: i.PurchaseCost,
+            salePrice: i.UnitPrice,
+            itemId: item._id,
+          });
+          await price.save();
+
+          // need to work on this...
+          // if (i?.TrackQtyOnHand === true) {
+
+          // }
+        }
       }
     }
   }

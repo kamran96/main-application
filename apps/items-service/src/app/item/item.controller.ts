@@ -97,10 +97,10 @@ export class ItemController {
     }
   }
 
-  @Post('codes')
+  @Post('ids-or-codes')
   @UseGuards(GlobalAuthGuard)
-  async getItemsAgainstCodes(@Body() body: ItemCodesDto): Promise<IItem[]> {
-    return await this.itemService.GetItemsAgainstCodes(body);
+  async fetchMultipleItems(@Body() body: ItemCodesDto): Promise<IItem[]> {
+    return await this.itemService.FetchMultipleItems(body);
   }
 
   @Post('sync')

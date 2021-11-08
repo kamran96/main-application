@@ -9,7 +9,7 @@ import {
 import * as moment from 'moment';
 import { getCustomRepository, In, Raw } from 'typeorm';
 import { Sorting } from '@invyce/sorting';
-import { Integrations } from '@invyce/global-constants';
+import { Integrations, Entries } from '@invyce/global-constants';
 import {
   IAccount,
   IAccountWithResponse,
@@ -470,86 +470,194 @@ export class AccountsService {
   }
 
   async SyncAccounts(data, user: IBaseUser): Promise<void> {
-    for (const i of data.accounts) {
-      const accountBalance = data.balances.find((j) => j.id === i.accountID);
+    if (data.type === Integrations.XERO) {
+      for (const i of data.accounts) {
+        const accountBalance = data.balances.find((j) => j.id === i.accountID);
 
-      const account = await getCustomRepository(AccountRepository).find({
-        where: {
-          importedAccountId: i.accountID,
-          organizationId: user.organizationId,
-        },
-      });
-
-      if (account.length === 0) {
-        const secondaryAccount = await getCustomRepository(
-          SecondaryAccountRepository
-        ).find({
+        const account = await getCustomRepository(AccountRepository).find({
           where: {
-            name: i.type,
+            importedAccountId: i.accountID,
             organizationId: user.organizationId,
-            status: 1,
           },
         });
 
-        let newSecondaryAccount;
-        if (secondaryAccount.length === 0) {
-          const primaryAccount = await getCustomRepository(
-            PrimaryAccountRepository
+        if (account.length === 0) {
+          const secondaryAccount = await getCustomRepository(
+            SecondaryAccountRepository
           ).find({
             where: {
-              name: Raw(
-                (alias) => `lower(${alias}) ilike lower('%${i._class}%')`
-              ),
+              name: i.type,
               organizationId: user.organizationId,
               status: 1,
             },
           });
 
-          newSecondaryAccount = await getCustomRepository(
-            SecondaryAccountRepository
-          ).save({
-            name: i.type,
-            primaryAccountId:
-              primaryAccount.length > 0 ? primaryAccount[0].id : null,
-            organizationId: user.organizationId,
-            createdById: user.id,
-            updatedById: user.id,
-            status: 1,
-          });
-        }
+          let newSecondaryAccount;
+          if (secondaryAccount.length === 0) {
+            const primaryAccount = await getCustomRepository(
+              PrimaryAccountRepository
+            ).find({
+              where: {
+                name: Raw(
+                  (alias) => `lower(${alias}) ilike lower('%${i._class}%')`
+                ),
+                organizationId: user.organizationId,
+                status: 1,
+              },
+            });
 
-        const account = await getCustomRepository(AccountRepository).save({
-          name: i.name,
-          description: i.description,
-          secondaryAccountId:
-            secondaryAccount.length > 0
-              ? secondaryAccount[0].id
-              : newSecondaryAccount.id,
-          code: i.code,
-          taxRate: null,
-          status: 1,
-          importedAccountId: i.accountID,
-          importedFrom: Integrations.XERO,
-          organizationId: user.organizationId,
+            newSecondaryAccount = await getCustomRepository(
+              SecondaryAccountRepository
+            ).save({
+              name: i.type,
+              primaryAccountId:
+                primaryAccount.length > 0 ? primaryAccount[0].id : null,
+              organizationId: user.organizationId,
+              createdById: user.id,
+              updatedById: user.id,
+              status: 1,
+            });
+          }
+
+          const account = await getCustomRepository(AccountRepository).save({
+            name: i.name,
+            description: i.description,
+            secondaryAccountId:
+              secondaryAccount.length > 0
+                ? secondaryAccount[0].id
+                : newSecondaryAccount.id,
+            primaryAccountId:
+              secondaryAccount.length > 0
+                ? secondaryAccount[0].primaryAccountId
+                : newSecondaryAccount.primaryAccountId,
+            code: i.code,
+            taxRate: null,
+            status: 1,
+            importedAccountId: i.accountID,
+            importedFrom: Integrations.XERO,
+            organizationId: user.organizationId,
+          });
+
+          if (accountBalance?.balance > 0) {
+            const transaction = await getCustomRepository(
+              TransactionRepository
+            ).save({
+              amount: accountBalance.balance,
+              ref: 'Xero account balance',
+              narration: 'Xero account balance',
+              date: new Date(),
+              organizationId: user.organizationId,
+              branchId: user.branchId,
+              createdById: user.id,
+              updatedById: user.id,
+              status: 1,
+            });
+
+            await getCustomRepository(TransactionItemRepository).save({
+              amount: accountBalance.balance,
+              accountId: account.id,
+              transactionId: transaction.id,
+              transactionType: Entries.DEBITS,
+              branchId: user.branchId,
+              organizationId: user.organizationId,
+              createdById: user.id,
+              updatedById: user.id,
+              status: 1,
+            });
+          }
+        }
+      }
+    } else if (data.type === Integrations.QUICK_BOOK) {
+      for (const i of data.accounts) {
+        const account = await getCustomRepository(AccountRepository).find({
+          where: {
+            importedAccountId: i.Id,
+            organizationId: user.organizationId,
+          },
         });
 
-        if (accountBalance != undefined && accountBalance.balance != 0) {
-          const transaction = await getCustomRepository(
-            TransactionRepository
-          ).save({});
+        if (account.length === 0) {
+          const secondaryAccount = await getCustomRepository(
+            SecondaryAccountRepository
+          ).find({
+            where: {
+              name: i.type,
+              organizationId: user.organizationId,
+              status: 1,
+            },
+          });
 
-          await getCustomRepository(TransactionItemRepository).save({
-            amount: accountBalance.balance,
-            accountId: account.id,
-            transactionId: transaction.id,
-            transactionType:
-              i._class === 'ASSET' || i._class === 'EXPENSE' ? 10 : 20,
-            branchId: user.branchId,
+          let newSecondaryAccount;
+          if (secondaryAccount.length === 0) {
+            const primaryAccount = await getCustomRepository(
+              PrimaryAccountRepository
+            ).find({
+              where: {
+                name: Raw(
+                  (alias) =>
+                    `lower(${alias}) ilike lower('%${i.Classification}%')`
+                ),
+                organizationId: user.organizationId,
+                status: 1,
+              },
+            });
+
+            newSecondaryAccount = await getCustomRepository(
+              SecondaryAccountRepository
+            ).save({
+              name: i.AccountType,
+              primaryAccountId:
+                primaryAccount.length > 0 ? primaryAccount[0].id : null,
+              organizationId: user.organizationId,
+              createdById: user.id,
+              updatedById: user.id,
+              status: 1,
+            });
+          }
+
+          const account = await getCustomRepository(AccountRepository).save({
+            name: i.Name,
+            description: i.FullyQualifiedName,
+            secondaryAccountId:
+              secondaryAccount.length > 0
+                ? secondaryAccount[0].id
+                : newSecondaryAccount.id,
+            // code: getCode.toString(),
+            importedAccountId: i.Id,
+            importedFrom: Integrations.QUICK_BOOK,
             organizationId: user.organizationId,
             createdById: user.id,
             updatedById: user.id,
             status: 1,
           });
+
+          if (i?.CurrentBalance > 0) {
+            const transaction = await getCustomRepository(
+              TransactionRepository
+            ).save({
+              amount: i.CurrentBalance,
+              ref: 'Quickbooks account balance',
+              narration: 'Quickbooks account balance',
+              date: new Date(),
+              organizationId: user.organizationId,
+              branchId: user.branchId,
+              createdById: user.id,
+              updatedById: user.id,
+              status: 1,
+            });
+
+            await getCustomRepository(TransactionItemRepository).save({
+              amount: i.CurrentBalance,
+              accountId: account.id,
+              transactionId: transaction.id,
+              transactionType: Entries.DEBITS,
+              branchId: user.branchId,
+              organizationId: user.organizationId,
+              createdById: user.id,
+              updatedById: user.id,
+              status: 1,
+            });
+          }
         }
       }
     }

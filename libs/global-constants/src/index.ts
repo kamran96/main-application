@@ -23,3 +23,8 @@ export enum XeroStatuses {
   PAID = 1,
   VOIDED = 'VOIDED',
 }
+
+export enum Entries {
+  DEBITS = 10,
+  CREDITS = 20,
+}
