@@ -19,7 +19,7 @@ import { ParamsDto } from '../dto/rbac.dto';
 import {
   InvitedUserDetailDto,
   InvitedUserDto,
-  SendOtp,
+  SendCodeDto,
   UserThemeDto,
 } from '../dto/user.dto';
 import { UserService } from './user.service';
@@ -117,8 +117,9 @@ export class UserController {
   }
 
   @Post('/verify-invited-user')
-  @UseGuards(JwtAuthGuard)
-  async verifyInvitedUser(@Body() body: SendOtp): Promise<IUserWithResponse> {
+  async verifyInvitedUser(
+    @Body() body: SendCodeDto
+  ): Promise<IUserWithResponse> {
     try {
       const user = await this.userService.VerifyInvitedUser(body);
 

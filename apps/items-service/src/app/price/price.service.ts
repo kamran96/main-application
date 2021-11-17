@@ -13,7 +13,7 @@ export class PriceService {
   ) {}
 
   async FindById(priceId: string): Promise<IPrice> {
-    return await this.priceModel.findById(priceId);
+    return await this.priceModel.findOne({ itemId: priceId });
   }
 
   async CreatePrice(priceDto: PriceDto): Promise<IPrice | IPrice[]> {
@@ -24,7 +24,7 @@ export class PriceService {
           if (price) {
             // update price
             await this.priceModel.updateOne(
-              { _id: i },
+              { itemId: i },
               {
                 purchasePrice: priceDto.purchasePrice || price.purchasePrice,
                 salePrice: priceDto.salePrice || price.salePrice,
