@@ -9,7 +9,7 @@ export interface EditableListItemProps extends DivProps {
   moveCard?: (dragIndex: number, hoverIndex: number) => void;
   index: number;
   id: string;
-  selectedIndex: number |null
+  selectedIndex: number | null;
 }
 
 const _EditableListItem = ({
@@ -21,13 +21,13 @@ const _EditableListItem = ({
   ...rest
 }: EditableListItemProps) => {
   const renderData = (column: EditableColumnsType, row: any, index: number) => {
-    let styles: any = { ...column.style };
+    const styles: any = { ...column.style };
     if (column.width) {
       // styles = { ...styles, width: column.width };
     }
 
     return (
-      <td  className="ant-table-cell">
+      <td className="ant-table-cell">
         {column.render
           ? column.render(row[column.dataIndex], row, index)
           : row[column.dataIndex]}

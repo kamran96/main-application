@@ -8,6 +8,7 @@ body{
     .ant-card, .ant-popover-inner{
   background: ${(props: IThemeProps) =>
     props?.theme?.colors?.sidebarBg} !important;
+  
 }
 }
 
@@ -256,6 +257,19 @@ color: ${(props: IThemeProps) => props?.theme?.colors?.sidebarListActiveText}
 .ant-select-dropdown{
   background-color: ${(props: IThemeProps) =>
     props?.theme?.colors?.cardBg} !important;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px ${(props: IThemeProps) =>
+      props?.theme?.colors?.cardBg} inset !important;
+}
+/*Change text in autofill textbox*/
+input:-webkit-autofill{
+    -webkit-text-fill-color: ${(props: IThemeProps) =>
+      props?.theme?.colors?.inputColor} !important;
 }
 
 

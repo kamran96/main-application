@@ -4,7 +4,7 @@ import editSolid from '@iconify-icons/clarity/edit-solid';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import { ColumnsType } from 'antd/es/table';
 import { Button } from 'antd';
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { queryCache, useMutation, usePaginatedQuery } from 'react-query';
 import styled from 'styled-components';
 
@@ -23,9 +23,7 @@ import { ISupportedRoutes } from '../../../modal/routing';
 import { CommonTable } from './../../../components/Table';
 import UserFilterSchema from './UsersFilterSchema';
 
-interface IProps {}
-
-export const UsersList: FC<IProps> = () => {
+export const UsersList: FC = () => {
   const { notificationCallback } = useGlobalContext();
   const [{ result, pagination }, setUsersResponse] = useState<any>({
     result: [],
@@ -48,8 +46,6 @@ export const UsersList: FC<IProps> = () => {
   const [resendIndex, setResendIndex] = useState(null);
 
   const { page, query, sortid, page_size } = usersConfig;
-
-
 
   const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
     [
@@ -74,9 +70,9 @@ export const UsersList: FC<IProps> = () => {
       routeHistory.history.location.search
     ) {
       let obj = {};
-      let queryArr = history.location.search.split('?')[1].split('&');
+      const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
-        let split = item.split('=');
+        const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
 
@@ -116,11 +112,7 @@ export const UsersList: FC<IProps> = () => {
         queryCache.invalidateQueries((q) =>
           q.queryKey[0].toString().startsWith('users-list?page')
         );
-        notificationCallback(
-          NOTIFICATIONTYPE.SUCCESS,
-          'User Deleted',
-          'Your selected users are deleted successfuly '
-        );
+        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'User Deleted');
       },
     });
   };
@@ -128,7 +120,7 @@ export const UsersList: FC<IProps> = () => {
   useEffect(() => {
     if (resolvedData && resolvedData.data && resolvedData.data.result) {
       const { result } = resolvedData.data;
-      let newResult = [];
+      const newResult = [];
       result.forEach((item, index) => {
         newResult.push({ ...item, key: item.id });
       });
@@ -193,11 +185,11 @@ export const UsersList: FC<IProps> = () => {
       width: 80,
       render: (data, row, index) => (
         <>
-          {data? (
+          {data ? (
             'User Active'
           ) : (
             <Button
-            className="fs-12"
+              className="fs-12"
               loading={resendIndex === index ? resendLoading : false}
               onClick={() => handleResendInvitation(row?.email, index)}
               type="primary"
@@ -259,7 +251,7 @@ export const UsersList: FC<IProps> = () => {
           />
           <SmartFilter
             onFilter={(encode) => {
-              let route = `/app${ISupportedRoutes.USERS}?sortid=${sortid}&page=1&page_size=${page_size}&query=${encode}`;
+              const route = `/app${ISupportedRoutes.USERS}?sortid=${sortid}&page=1&page_size=${page_size}&query=${encode}`;
               history.push(route);
               setUsersConfig({ ...usersConfig, query: encode });
             }}
@@ -313,8 +305,8 @@ export const UsersList: FC<IProps> = () => {
           totalItems={pagination?.total}
           pagination={{
             pageSize: page_size,
-            position: ["bottomRight"],
-            current: typeof page==="string" ? parseInt(page) : page,
+            position: ['bottomRight'],
+            current: typeof page === 'string' ? parseInt(page) : page,
             total: pagination?.total,
           }}
           hasfooter={true}

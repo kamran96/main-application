@@ -81,6 +81,9 @@
       "tags": [],
       "implicitDependencies": ["main-ui"]
     },
+    "invyce-persist": {
+      "tags": []
+    },
     "mobile-app": {
       "tags": []
     },

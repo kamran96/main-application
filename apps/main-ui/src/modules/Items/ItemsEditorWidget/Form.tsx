@@ -11,16 +11,16 @@ import {
   Select,
 } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
-import { FC, useEffect, useState, useCallback } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { queryCache, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
+
 import {
   createUpdateItem,
   fetchSingleItem,
   getAllCategories,
 } from '../../../api';
 import { getAllAccounts } from '../../../api/accounts';
-import { CommonModal } from '../../../components';
 import { FormLabel } from '../../../components/FormLabel';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { NOTIFICATIONTYPE } from '../../../modal';
@@ -33,12 +33,10 @@ import { DynamicForm } from './DynamicForm';
 
 const { Option } = Select;
 
-interface IProps {}
-
-export const ItemsForm: FC<IProps> = () => {
+export const ItemsForm: FC = () => {
   /* HOOKS */
 
-  const [formData, setFormData] = useState<any>({});
+  const [formData, setFormData] = useState({});
   const [attribute_values, setAttriValue] = useState([]);
   const [hasInventory, setHasInventory] = useState(false);
 
@@ -69,11 +67,11 @@ export const ItemsForm: FC<IProps> = () => {
   /* Use form hook antd */
   const [form] = Form.useForm();
 
-  let catId =
+  const catId =
     form.isFieldTouched('categoryId') && form.getFieldValue('categoryId');
 
   const getVariantsWithId = (id) => {
-    let [filtered] =
+    const [filtered] =
       resolvedCategories && resolvedCategories.filter((item) => item.id === id);
     if (filtered) {
       return filtered?.attributes;
@@ -84,8 +82,8 @@ export const ItemsForm: FC<IProps> = () => {
 
   useEffect(() => {
     if (catId && resolvedCategories && !id) {
-      let allVariants: any[] = getVariantsWithId(catId);
-      let totalVariants =
+      const allVariants: IVariants[] = getVariantsWithId(catId);
+      const totalVariants =
         allVariants.length &&
         allVariants.map((vari, index) => {
           return { value: '', attributeId: vari.id };
@@ -96,42 +94,34 @@ export const ItemsForm: FC<IProps> = () => {
   }, [catId]);
 
   /*Query hook for  Fetching single contact against ID */
-  const { isLoading, isError, data, error } = useQuery(
-    [`item-id=${id}`, id],
-    fetchSingleItem,
-    {
-      enabled: id && id !== null,
-      onSuccess: (data) => {
-        if (data?.data?.result) {
-          const { result } = data.data;
-          const { attribute_values } = result;
-          if (attribute_values) {
-            setAttriValue(attribute_values);
-          }
-
-          form.setFieldsValue({
-            ...result,
-            hasPricing: result.price ? true : false,
-            hasCategory: result?.categoryId ? true : false,
-          });
-          setFormData({ result });
+  const { data } = useQuery([`item-id=${id}`, id], fetchSingleItem, {
+    enabled: id && id !== null,
+    onSuccess: (data) => {
+      if (data?.data?.result) {
+        const { result } = data.data;
+        const { attribute_values } = result;
+        if (attribute_values) {
+          setAttriValue(attribute_values);
         }
 
-        /* when successfully created OR updated toast will be apear */
-        /* three type of parameters are passed
+        form.setFieldsValue({
+          ...result,
+          hasPricing: result.price ? true : false,
+          hasCategory: result?.categoryId ? true : false,
+        });
+        setFormData({ result });
+      }
+
+      /* when successfully created OR updated toast will be apear */
+      /* three type of parameters are passed
           first: notification type
           second: message title
           third: message description
           */
 
-        notificationCallback(
-          NOTIFICATIONTYPE.SUCCESS,
-          'Item Fetched',
-          'You can now update Item Properties'
-        );
-      },
-    }
-  );
+      notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Item Fetched');
+    },
+  });
 
   useEffect(() => {
     if (data && data.data && data.data.result) {
@@ -148,7 +138,7 @@ export const ItemsForm: FC<IProps> = () => {
 
   const validateAttributes = () => {
     let hasErrors = false;
-    let validation = attribute_values.map((entity) => {
+    const validation = attribute_values.map((entity) => {
       if (entity.value === '') {
         hasErrors = true;
         return { ...entity, hasError: true };
@@ -161,6 +151,7 @@ export const ItemsForm: FC<IProps> = () => {
   };
 
   const onFinish = async (values) => {
+    console.log(values, 'values');
     if (!validateAttributes()) {
       let payload: any = {
         ...values,
@@ -181,10 +172,7 @@ export const ItemsForm: FC<IProps> = () => {
         onSuccess: () => {
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
-            id ? 'Updated' : 'Created',
-            `Item is ${id ? `Updated` : `Created`} Successfully`
-            // id ? "Updated Successfully" : "Created Successfully",
-            // `Contact is ${id ? "Updated" : "Created"} successfully`
+            id ? 'Updated' : 'Created'
           );
           ['item-id', 'items?page', 'all-items'].forEach((key) => {
             queryCache.invalidateQueries((q) =>
@@ -197,7 +185,7 @@ export const ItemsForm: FC<IProps> = () => {
           setAttriValue([]);
         },
         onError: (error) => {
-          let err: IServerError = error;
+          const err: IServerError = error;
 
           if (err && err.response) {
             const { message } = err.response.data;
@@ -215,7 +203,7 @@ export const ItemsForm: FC<IProps> = () => {
           const { status } = response;
           const { result } = response.data;
           if (id) {
-            let updateRes: any = { ...result };
+            const updateRes: any = { ...result };
             delete updateRes.openingStock;
             delete updateRes.accountId;
             setPricingModalConfig(true, {
@@ -241,7 +229,7 @@ export const ItemsForm: FC<IProps> = () => {
   const resAllAccounts = useQuery([`all-accounts`, `ALL`], getAllAccounts, {
     enabled: itemsModalConfig.visibility,
   });
-  let allLiabilitiesAcc: IAccountsResult[] =
+  const allLiabilitiesAcc: IAccountsResult[] =
     (resAllAccounts.data &&
       resAllAccounts.data.data &&
       resAllAccounts.data.data.result &&
@@ -252,9 +240,9 @@ export const ItemsForm: FC<IProps> = () => {
     [];
 
   useEffect(() => {
-    return ()=>{
-        form.resetFields();
-    }
+    return () => {
+      form.resetFields();
+    };
   }, []);
 
   return (
@@ -294,79 +282,77 @@ export const ItemsForm: FC<IProps> = () => {
             </div>
           </Col>
           {form.getFieldValue('hasCategory') && (
-            <>
-              <Col span={24}>
-                <Row gutter={24}>
-                  <Col span={12}>
-                    <FormLabel>Category</FormLabel>
-                    <Form.Item
-                      name="categoryId"
-                      rules={[
-                        { required: false, message: 'Please add your role' },
-                      ]}
-                    >
-                      <Select
-                        disabled={
-                          form.getFieldValue('itemType') !== ITEM_TYPE.PRODUCT
-                        }
-                        size="middle"
-                        showSearch
-                        style={{ width: '100%' }}
-                        placeholder="Select Item"
-                        optionFilterProp="children"
-                      >
-                        {resolvedCategories.length &&
-                          resolvedCategories.map(
-                            (category: ICategory, index: number) => {
-                              return (
-                                <Option key={index} value={category.id}>
-                                  {category.title}
-                                </Option>
-                              );
-                            }
-                          )}
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                  {resolvedCategories &&
-                    form.getFieldValue('categoryId') !== null &&
-                    getVariantsWithId(form.getFieldValue('categoryId')).map(
-                      (vari: IVariants, index: number) => {
-                        return (
-                          <Col key={index} span={12}>
-                            <FormLabel>{vari.title}</FormLabel>
-                            <DynamicForm
-                              value={
-                                attribute_values[index] &&
-                                attribute_values[index].value
-                              }
-                              onChange={(value) => {
-                                let changedValue = {
-                                  attributeId: vari.id,
-                                  value: value,
-                                };
-
-                                const allValues = [...attribute_values];
-                                allValues[index] = changedValue;
-
-                                setAttriValue(allValues);
-                              }}
-                              item={vari}
-                            />
-                            {attribute_values[index] &&
-                              attribute_values[index].hasError && (
-                                <p className="attri_error">
-                                  {' '}
-                                  {vari.title} is required !
-                                </p>
-                              )}
-                          </Col>
-                        );
+            <Col span={24}>
+              <Row gutter={24}>
+                <Col span={12}>
+                  <FormLabel>Category</FormLabel>
+                  <Form.Item
+                    name="categoryId"
+                    rules={[
+                      { required: false, message: 'Please add your role' },
+                    ]}
+                  >
+                    <Select
+                      disabled={
+                        form.getFieldValue('itemType') !== ITEM_TYPE.PRODUCT
                       }
-                    )}
-                </Row>
-              </Col>
-            </>
+                      size="middle"
+                      showSearch
+                      style={{ width: '100%' }}
+                      placeholder="Select Item"
+                      optionFilterProp="children"
+                    >
+                      {resolvedCategories.length &&
+                        resolvedCategories.map(
+                          (category: ICategory, index: number) => {
+                            return (
+                              <Option key={index} value={category.id}>
+                                {category.title}
+                              </Option>
+                            );
+                          }
+                        )}
+                    </Select>
+                  </Form.Item>
+                </Col>
+                {resolvedCategories &&
+                  form.getFieldValue('categoryId') !== null &&
+                  getVariantsWithId(form.getFieldValue('categoryId')).map(
+                    (vari: IVariants, index: number) => {
+                      return (
+                        <Col key={index} span={12}>
+                          <FormLabel>{vari.title}</FormLabel>
+                          <DynamicForm
+                            value={
+                              attribute_values[index] &&
+                              attribute_values[index].value
+                            }
+                            onChange={(value) => {
+                              const changedValue = {
+                                attributeId: vari.id,
+                                value: value,
+                              };
+
+                              const allValues = [...attribute_values];
+                              allValues[index] = changedValue;
+
+                              setAttriValue(allValues);
+                            }}
+                            item={vari}
+                          />
+                          {attribute_values[index] &&
+                            attribute_values[index].hasError && (
+                              <p className="attri_error">
+                                {' '}
+                                {vari.title} is required !
+                              </p>
+                            )}
+                        </Col>
+                      );
+                    }
+                  )}
+              </Row>
+            </Col>
           )}
 
           <Col span={12}>

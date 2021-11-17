@@ -4,7 +4,8 @@ import Icon from '@iconify/react';
 import { IRoutesSchema, ISupportedRoutes } from '@invyce/shared/types';
 import { SidebarUi } from '@invyce/sidebar-ui';
 import { Button } from 'antd';
-import React, { FC } from 'react';
+import { ReactNode } from 'react';
+import { FC } from 'react';
 import { useMutation } from 'react-query';
 import { updateThemeAPI } from '../../api';
 import { InyvceDarkTextIcon } from '../../assets/icons';
@@ -16,12 +17,12 @@ import { InvyceCmdPalette } from './CommandPalette';
 import { ContentArea, NewUserContentArea, WrapperApplayout } from './styles';
 
 interface IProps {
-  children: React.ReactElement<any>;
+  children: ReactNode;
 }
 
 export const AppLayout: FC<IProps> = ({ children }) => {
   const { rbac } = useRbac(null);
-  const [muateTheme, resMutateTheme] = useMutation(updateThemeAPI);
+  const [muateTheme] = useMutation(updateThemeAPI);
   const {
     userDetails,
     theme,
@@ -39,18 +40,17 @@ export const AppLayout: FC<IProps> = ({ children }) => {
     await muateTheme(payload);
   };
 
-
   const _filteredRoutes = () => {
-    let obj = {};
+    const obj = {};
 
     Object?.keys(RoutingSchema)?.forEach((_routeSchema, routeIndex) => {
-      let parents = [];
+      const parents = [];
 
       RoutingSchema[_routeSchema].forEach((parent: IRoutesSchema) => {
         if (parent?.children?.length) {
           const _children = parent?.children?.filter((child: IRoutesSchema) => {
             if (!child?.permission || rbac?.can(child?.permission)) {
-              let a = rbac.can(child?.permission);
+              const a = rbac.can(child?.permission);
               return child;
             } else {
               return null;
@@ -71,7 +71,6 @@ export const AppLayout: FC<IProps> = ({ children }) => {
     return obj;
   };
 
-
   return (
     <WrapperApplayout darkModeLoading={darkModeLoading}>
       <div className="dark-mode-loading">
@@ -90,7 +89,7 @@ export const AppLayout: FC<IProps> = ({ children }) => {
               userEmail: userDetails?.profile?.email,
               username: userDetails?.username,
               userImage: userDetails?.profile?.attachment?.path,
-              theme: theme,
+              theme: theme === 'light' ? 'light' : 'dark',
               link: `${ISupportedRoutes.DASHBOARD_LAYOUT}${ISupportedRoutes.SETTINGS}${ISupportedRoutes.PROFILE_SETTING}`,
             }}
             routes={_filteredRoutes() as any}
@@ -120,7 +119,9 @@ export const AppLayout: FC<IProps> = ({ children }) => {
           </ContentArea>
         </section>
       ) : (
-        <NewUserContentArea layoutChanged={userDetails?.organizationId}>
+        <NewUserContentArea
+          layoutChanged={userDetails?.organizationId ? true : false}
+        >
           <div className="content">{children}</div>
         </NewUserContentArea>
       )}

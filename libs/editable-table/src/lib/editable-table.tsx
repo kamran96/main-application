@@ -64,7 +64,7 @@ export function EditableTable({
 
   useEffect(() => {
     if (cacheKey) {
-      let data = localStorage.getItem(cacheKey);
+      const data = localStorage.getItem(cacheKey);
       if (data) {
         dragable(JSON.parse(data));
       }
@@ -74,7 +74,7 @@ export function EditableTable({
   useEffect(() => {
     if (loading) {
       setLoadingConfig(() => {
-        let cols = columns?.map((col) => {
+        const cols = columns?.map((col) => {
           return {
             ...col,
             render: () => (
@@ -121,9 +121,9 @@ export function EditableTable({
       dragEnd
     ) {
       console.log(dragIndex, dropIndex);
-      let _dragItem = data[dragIndex];
+      const _dragItem = data[dragIndex];
 
-      let allRows = [...data];
+      const allRows = [...data];
       allRows.splice(dragIndex, 1);
       allRows.splice(dropIndex, 0, _dragItem);
 
@@ -131,6 +131,7 @@ export function EditableTable({
 
       resetDrag();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dragIndex, dropIndex, dragEnd]);
 
   const resetDrag = () => {
@@ -142,7 +143,7 @@ export function EditableTable({
     <EditableTableWrapper scrollable={scrollable ? scrollable : null}>
       <colgroup>
         {columns.map((col, index) => {
-          let style = { width: col?.width ? `${col.width}px` : '' };
+          const style = { width: col?.width ? `${col.width}px` : '' };
           return <col key={index} style={style} />;
         })}
       </colgroup>

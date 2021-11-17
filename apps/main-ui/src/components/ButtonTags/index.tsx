@@ -1,12 +1,12 @@
-import Icon from "@iconify/react";
-import { Button } from "antd";
-import { ButtonType } from "antd/lib/button";
-import { SizeType } from "antd/lib/config-provider/SizeContext";
-import React, { FC, ReactElement, Ref } from "react";
-import styled from "styled-components";
-import { IThemeProps } from "../../hooks/useTheme/themeColors";
+import Icon from '@iconify/react';
+import { Button } from 'antd';
+import { ButtonType } from 'antd/lib/button';
+import { SizeType } from 'antd/lib/config-provider/SizeContext';
+import { FC, ReactNode, Ref } from 'react';
+import styled from 'styled-components';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
-import { Color } from "../../modal";
+import { Color } from '../../modal';
 
 interface IProps {
   size: SizeType;
@@ -19,7 +19,7 @@ interface IProps {
   type?: ButtonType;
   ghost?: boolean;
   loading?: boolean;
-  customizeIcon?: ReactElement<any>;
+  customizeIcon?: ReactNode;
 }
 
 export const ButtonTag: FC<IProps> = ({
@@ -45,7 +45,7 @@ export const ButtonTag: FC<IProps> = ({
         ref={ref}
         disabled={disabled}
         className={`flex alignCenter ${className} ${
-          !disabled ? "_customized_button" : ""
+          !disabled ? '_customized_button' : ''
         }`}
         size={size}
       >
@@ -75,18 +75,16 @@ const WrapperButtonTag = styled.div`
   ._customized_button {
     background: ${(props: IThemeProps) => props?.theme?.colors?.buttonTagBg};
     color: ${(props: IThemeProps) => props?.theme?.colors?.buttonTagColor};
-    span{
+    span {
       color: ${(props: IThemeProps) => props?.theme?.colors?.buttonTagColor};
-
     }
 
     &:hover {
       background: ${Color.$Secondary} !important;
       color: ${Color.$WHITE};
-      span{
+      span {
         color: ${Color.$WHITE};
-
-    }
+      }
     }
   }
 `;

@@ -1,28 +1,29 @@
-import { PlusOutlined } from "@ant-design/icons";
-import trash2 from "@iconify-icons/feather/trash-2";
-import { Icon } from "@iconify/react";
-import { Button, Form, Input, Select, Space } from "antd";
-import React, { FC } from "react";
-import { queryCache, useMutation, useQuery } from "react-query";
-import styled from "styled-components";
-import { getRbacListAPI } from "../../../api";
-import { CommonModal } from "../../../components";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
+import { PlusOutlined } from '@ant-design/icons';
+import trash2 from '@iconify-icons/feather/trash-2';
+import { Icon } from '@iconify/react';
+import React, { FC } from 'react';
+import { queryCache, useMutation, useQuery } from 'react-query';
+import styled from 'styled-components';
+import { getRbacListAPI } from '../../../api';
+import { CommonModal } from '../../../components';
+import { Button, Form, Input, Select, Space } from 'antd';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import {
   IBaseAPIError,
   IErrorMessages,
   NOTIFICATIONTYPE,
-} from "../../../modal";
-import { getALLBranches, inviteUserAPI } from "./../../../api/users";
+} from '../../../modal';
+import { getALLBranches, inviteUserAPI } from './../../../api/users';
+import { IThemeProps } from '@invyce/shared/invyce-theme';
 
 const { Option } = Select;
 
-export const UserInviteModal: FC = ({}) => {
+export const UserInviteModal: FC = () => {
   const { userInviteModal, setUserInviteModal, notificationCallback } =
     useGlobalContext();
   const formInitialValues = [
     {
-      email: "",
+      email: '',
       branchId: null,
       roleId: null,
     },
@@ -55,7 +56,9 @@ export const UserInviteModal: FC = ({}) => {
     mutateInviteUser(values, {
       onSuccess: () => {
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, `Invited Successfully`);
-        queryCache.invalidateQueries((q)=> q.queryKey[0].toString().startsWith('users-list'));
+        queryCache.invalidateQueries((q) =>
+          q.queryKey[0].toString().startsWith('users-list')
+        );
         onCancel();
       },
       onError: (err: IBaseAPIError) => {
@@ -86,7 +89,7 @@ export const UserInviteModal: FC = ({}) => {
           name="dynamic_form_nest_item"
           onFinish={onFinish}
           autoComplete="off"
-          layout={"vertical"}
+          layout={'vertical'}
         >
           {/* <Form.Item
             name="area"
@@ -100,29 +103,30 @@ export const UserInviteModal: FC = ({}) => {
               {(fields, { add, remove }) => {
                 return (
                   <>
-                    {fields.map((field) => (
-                      <Space
-                        className="flex alignCenter justifySpaceBetween form-list-item"
-                        key={field.key}
-                        align="baseline"
-                      >
-                        <Form.Item
-                          className="email_field"
-                          {...field}
-                          label="Email"
-                          name={[field.name, "email"]}
-                          fieldKey={[field.fieldKey, "email"]}
-                          rules={[
-                            { required: true, message: "Email is required!" },
-                            { type: "email", message: "Email is invalid" },
-                          ]}
+                    <div className="list-wrapper">
+                      {fields.map((field) => (
+                        <Space
+                          className="flex alignCenter justifySpaceBetween form-list-item"
+                          key={field.key}
+                          align="baseline"
                         >
-                          <Input
-                            placeholder="Please type Email"
-                            size="middle"
-                          />
-                        </Form.Item>
-                        <Form.Item
+                          <Form.Item
+                            className="email_field"
+                            {...field}
+                            label="Email"
+                            name={[field.name, 'email']}
+                            fieldKey={[field.fieldKey, 'email']}
+                            rules={[
+                              { required: true, message: 'Email is required!' },
+                              { type: 'email', message: 'Email is invalid' },
+                            ]}
+                          >
+                            <Input
+                              placeholder="Please type Email"
+                              size="middle"
+                            />
+                          </Form.Item>
+                          {/* <Form.Item
                           {...field}
                           label="Branch"
                           name={[field.name, "branchId"]}
@@ -147,39 +151,42 @@ export const UserInviteModal: FC = ({}) => {
                               );
                             })}
                           </Select>
-                        </Form.Item>
-                        <Form.Item
-                          {...field}
-                          label="Role"
-                          name={[field.name, "roleId"]}
-                          fieldKey={[field.fieldKey, "roleId"]}
-                          rules={[
-                            { required: true, message: "Role is required!" },
-                          ]}
-                        >
-                          <Select
-                            size="middle"
-                            showSearch
-                            style={{ width: "100%" }}
-                            placeholder="Select a Role"
-                            optionFilterProp="children"
+                        </Form.Item> */}
+                          <Form.Item
+                            {...field}
+                            label="Role"
+                            name={[field.name, 'roleId']}
+                            fieldKey={[field.fieldKey, 'roleId']}
+                            rules={[
+                              { required: true, message: 'Role is required!' },
+                            ]}
                           >
-                            {rolesResult.map((item, index) => {
-                              return (
-                                <Option value={item.roleId}>{item.name}</Option>
-                              );
-                            })}
-                          </Select>
-                        </Form.Item>
+                            <Select
+                              size="middle"
+                              showSearch
+                              style={{ width: '100%' }}
+                              placeholder="Select a Role"
+                              optionFilterProp="children"
+                            >
+                              {rolesResult.map((item, index) => {
+                                return (
+                                  <Option value={item.roleId}>
+                                    {item.name}
+                                  </Option>
+                                );
+                              })}
+                            </Select>
+                          </Form.Item>
 
-                        <div
-                          className="delete-icon flex alignCenter"
-                          onClick={() => remove(field.name)}
-                        >
-                          <Icon icon={trash2} />
-                        </div>
-                      </Space>
-                    ))}
+                          <div
+                            className="delete-icon flex alignCenter"
+                            onClick={() => remove(field.name)}
+                          >
+                            <Icon icon={trash2} />
+                          </div>
+                        </Space>
+                      ))}
+                    </div>
 
                     <Form.Item className="add-user ">
                       <Button
@@ -213,7 +220,13 @@ export const UserInviteModal: FC = ({}) => {
 export default UserInviteModal;
 
 const WrapperUserInviteModal = styled.div`
-  min-height: 400px;
+  .list-wrapper {
+    min-height: 400px;
+    max-height: 600px;
+    padding-bottom: 30px;
+    overflow-y: auto;
+  }
+
   .ant-space-item {
     width: 100%;
   }
@@ -235,9 +248,9 @@ const WrapperUserInviteModal = styled.div`
   }
 
   .form-list-item {
-    background: #fff;
+    background: ${(props: IThemeProps) => props?.theme?.colors?.layoutBg};
     padding: 3px 15px;
-    border: 1px solid #f4f4f4;
+    border: 1px solid ${(props: IThemeProps) => props?.theme?.colors?.layoutBg};
     margin: 6px 0;
   }
   .form-list-item:nth-child(even) {

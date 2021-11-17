@@ -163,8 +163,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
         form.resetFields();
         notificationCallback(
           NOTIFICATIONTYPE.SUCCESS,
-          id ? 'Updated Successfully' : 'Created Successfully',
-          `Contact is ${id ? 'Updated' : 'Created'} successfully`
+          id ? 'Updated Successfully' : 'Created Successfully'
         );
       },
     });
@@ -370,14 +369,14 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
             <div className="textRight">
               <Button
                 onClick={() => {
-                  let addresses = [...address];
-                  let indexed = addresses.findIndex(
+                  const addresses = [...address];
+                  const indexed = addresses.findIndex(
                     (adress) => adress.addressType === 1
                   );
                   if (indexed > -1) {
                     const { description, city, country, postalCode } =
                       address[indexed];
-                    let secondaryIndex = addresses.findIndex(
+                    const secondaryIndex = addresses.findIndex(
                       (adress) => adress.addressType === 2
                     );
                     if (secondaryIndex > -1) {
@@ -415,9 +414,9 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                   index={index}
                   item={adr}
                   onChange={(values) => {
-                    let payload = { ...values, addressType: adr.addressType };
-                    let addressArr = [...address];
-                    let indexed = addressArr.findIndex(
+                    const payload = { ...values, addressType: adr.addressType };
+                    const addressArr = [...address];
+                    const indexed = addressArr.findIndex(
                       (ind) => ind && ind.addressType === adr.addressType
                     );
                     if (indexed > -1) {
@@ -457,21 +456,19 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
             </div>
           </Col>
           {!id && showOpeningBlance && (
-            <>
-              <Col span={12}>
-                <FormLabel isRequired={false}>Opening Balance</FormLabel>
-                <Form.Item
-                  name="openingBalance"
-                  rules={[{ required: false, message: 'Opening Balance' }]}
-                >
-                  <Input
-                    style={{ width: '100%' }}
-                    placeholder={''}
-                    size="large"
-                  />
-                </Form.Item>
-              </Col>
-            </>
+            <Col span={12}>
+              <FormLabel isRequired={false}>Opening Balance</FormLabel>
+              <Form.Item
+                name="openingBalance"
+                rules={[{ required: false, message: 'Opening Balance' }]}
+              >
+                <Input
+                  style={{ width: '100%' }}
+                  placeholder={''}
+                  size="large"
+                />
+              </Form.Item>
+            </Col>
           )}
           <EnterpriseWrapper enable={[IOrganizationType.ENTERPRISE]}>
             <Col span={12}>
