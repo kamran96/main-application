@@ -28,7 +28,6 @@ export class PriceController {
           result: price,
         };
       }
-      throw new HttpException('Price not found', HttpStatus.BAD_REQUEST);
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,

@@ -11,9 +11,9 @@ import { ParamsDto } from '../dto/rbac.dto';
 import {
   InvitedUserDto,
   InvitedUserDetailDto,
-  SendOtp,
   UserLoginDto,
   UserThemeDto,
+  SendCodeDto,
 } from '../dto/user.dto';
 import { Response } from 'express';
 
@@ -203,9 +203,9 @@ export class UserService {
     await this.authService.sendVerificationEmail(dbUser);
   }
 
-  async VerifyInvitedUser(body: SendOtp): Promise<IUser> {
+  async VerifyInvitedUser(body: SendCodeDto): Promise<IUser> {
     try {
-      const string = Buffer.from(body.otp, 'base64').toString('ascii');
+      const string = Buffer.from(body.code, 'base64').toString('ascii');
       const data = JSON.parse(string);
 
       const user_arr = [];

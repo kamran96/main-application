@@ -49,6 +49,10 @@ export class UserLoginDto {
   password?: string;
 }
 
+export class SendCodeDto {
+  code: string;
+}
+
 export class ForgetPasswordDto {
   username: string;
 }

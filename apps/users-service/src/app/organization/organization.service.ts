@@ -149,8 +149,8 @@ export class OrganizationService {
           },
         });
 
-        const roles = await this.rbacService.InsertRoles(organization._id);
-        await this.rbacService.InsertRolePermission(organization._id);
+        const roles = await this.rbacService.InsertRoles(organization.id);
+        await this.rbacService.InsertRolePermission(organization.id);
         const [adminRole] = roles.filter((r) => r.name === 'admin');
 
         if (req?.user?.organizationId !== null) {
@@ -168,6 +168,7 @@ export class OrganizationService {
           return organization;
         }
       } catch (error) {
+        console.log(error);
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
     }
