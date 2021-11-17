@@ -19,6 +19,7 @@
       "@invyce/auth-middleware": ["libs/auth-middleware/src/index.ts"],
       "@invyce/editable-table": ["libs/editable-table/src/index.ts"],
       "@invyce/global-auth-guard": ["libs/global-auth-guard/src/index.ts"],
+      "@invyce/invyce-persist": ["libs/invyce-persist/src/index.ts"],
       "@invyce/global-constants": ["libs/global-constants/src/index.ts"],
       "@invyce/interfaces": ["libs/interfaces/src/index.ts"],
       "@invyce/pixels-to-rem": ["libs/pixels-to-rem/src/index.ts"],
