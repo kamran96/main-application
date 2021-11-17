@@ -191,10 +191,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         title: "Type",
         dataIndex: "type",
         key: "type",
-        render: (data, row, index) => {
-          const { secondary_account } = row;
-          return <>{secondary_account.name}</>;
-        },
+       
       },
       {
         width: 100,
@@ -341,7 +338,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
           customTopbar={renderCustomTopbar()}
           data={result}
           columns={columns}
-          loading={isFetching}
+          loading={isLoading}
           onChange={handleAccountsConfig}
           totalItems={pagination && pagination.total}
           pagination={{

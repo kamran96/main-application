@@ -1,19 +1,19 @@
-import { Button, Checkbox, Modal } from "antd";
-import React, { FC, useEffect, useState } from "react";
-import { useMutation } from "react-query";
-import styled from "styled-components";
-import XeroLogo from "../../../../assets/xero.png";
-import { H3, H4, P } from "../../../../components/Typography";
+import { Button, Checkbox, Modal } from 'antd';
+import React, { FC, useEffect, useState } from 'react';
+import { useMutation } from 'react-query';
+import styled from 'styled-components';
+import XeroLogo from '../../../../assets/xero.png';
+import { H3, H4, P } from '../../../../components/Typography';
 import {
   XeroCopyModulesAPI,
   XeroIntegrationAPI,
   XeroVerification,
-} from "../../../../api";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
-import { Seprator } from "../../../../components/Seprator";
-import { CommonModal } from "../../../../components";
-import { ISupportedRoutes } from "../../../../modal";
-import { IThemeProps } from "../../../../hooks/useTheme/themeColors";
+} from '../../../../api';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { Seprator } from '../../../../components/Seprator';
+import { CommonModal } from '../../../../components';
+import { ISupportedRoutes } from '../../../../modal';
+import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
 
 export const Xero: FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -32,23 +32,20 @@ export const Xero: FC = () => {
   const { location } = routeHistory?.history;
 
   useEffect(() => {
-    if (location?.search) {
-      const items =  JSON?.parse(atob(location?.search?.split("?xero=verified&fetchItems=")[1]));
-      setImportList(()=>{
+    if (location?.search && location?.search.includes('xero=verified')) {
+      const items = JSON?.parse(
+        atob(location?.search?.split('?xero=verified&fetchItems=')[1])
+      );
+      setImportList(() => {
         setModalVisible(true);
 
-          return items?.map((item, index)=>{
-            return { name: item, fetch: false };
-
-
-          })
-
-
+        return items?.map((item, index) => {
+          return { name: item, fetch: false };
+        });
       });
-   
     }
   }, [location]);
-  
+
   // useEffect(() => {
   //   if (verify?.data?.result) {
   //     const result = verify?.data?.result.modules.map((item, index) => {
@@ -59,7 +56,7 @@ export const Xero: FC = () => {
   //   }
   // }, [verify]);
 
-  let modalDefault = localStorage.getItem("xero-modal");
+  const modalDefault = localStorage.getItem('xero-modal');
 
   useEffect(() => {
     if (modalDefault && modalDefault !== undefined && modalDefault !== null) {
@@ -85,7 +82,7 @@ export const Xero: FC = () => {
   };
 
   const _xeroCopyModules = async () => {
-    let payload = {
+    const payload = {
       modules: [],
     };
     importList?.forEach((item, index) => {
@@ -100,7 +97,7 @@ export const Xero: FC = () => {
   return (
     <WrapperCard>
       <div className="integration_card">
-        <img className="service_logo" src={XeroLogo} alt={"xero logo"} />
+        <img className="service_logo" src={XeroLogo} alt={'xero logo'} />
         <H4>Xero</H4>
         <div className="description">
           <p className="paragraph">
@@ -114,7 +111,7 @@ export const Xero: FC = () => {
           type="default"
           size="middle"
         >
-          {verifyLoading ? "verifying.." : "Connect"}
+          {verifyLoading ? 'verifying..' : 'Connect'}
         </Button>
       </div>
       <IntegrationModal
@@ -144,14 +141,15 @@ export const Xero: FC = () => {
                             });
                           });
                         }}
-                      /> All
+                      />{' '}
+                      All
                     </li>
                     {importList?.map((item, index) => {
                       return (
                         <li>
                           <Checkbox
                             onChange={(e) => {
-                              let allItems = [...importList];
+                              const allItems = [...importList];
                               allItems[index] = {
                                 ...allItems[index],
                                 fetch: e.target.checked,
@@ -159,7 +157,7 @@ export const Xero: FC = () => {
                               setImportList(allItems);
                             }}
                             checked={item?.fetch}
-                          />{" "}
+                          />{' '}
                           {item?.name}
                         </li>
                       );
@@ -197,7 +195,7 @@ export const Xero: FC = () => {
 const WrapperCard: any = styled.div`
   .integration_card {
     background: ${(props: IThemeProps) =>
-      props?.theme?.colors?.sidebarBg || "#ffff"};
+      props?.theme?.colors?.sidebarBg || '#ffff'};
     border-radius: 6px;
     display: flex;
 
@@ -224,19 +222,19 @@ const WrapperCard: any = styled.div`
       text-align: center;
 
       color: ${(props: IThemeProps) =>
-        props?.theme?.colors?.textTd || "#303030"};
+        props?.theme?.colors?.textTd || '#303030'};
       margin: 0;
     }
   }
 `;
 
-type DivProps = JSX.IntrinsicElements['div']
+type DivProps = JSX.IntrinsicElements['div'];
 
 interface WrapperXeroWrapperProps extends DivProps {
-  step?: Number;
+  step?: number;
 }
 
-const WrapperXeroModal= styled.div<WrapperXeroWrapperProps>`
+const WrapperXeroModal = styled.div<WrapperXeroWrapperProps>`
   overflow: hidden;
   .main-wrapper {
     min-height: 387px;
@@ -246,7 +244,7 @@ const WrapperXeroModal= styled.div<WrapperXeroWrapperProps>`
     padding: 0px;
     transition: 0.6s all ease-in-out;
     margin-left: ${(props: any) =>
-      props?.step === 2 ? "-660px" : props?.step === 3 ? "-1320px" : "0"};
+      props?.step === 2 ? '-660px' : props?.step === 3 ? '-1320px' : '0'};
 
     .step-1 {
       /* margin-right: 70px; */
@@ -277,6 +275,9 @@ const WrapperXeroModal= styled.div<WrapperXeroWrapperProps>`
                 background-color: #1a497e;
                 border-color: #1a497e;
               }
+            }
+            .ant-checkbox-wrapper:after {
+              display: none;
             }
           }
           li:nth-child(even) {
@@ -315,6 +316,10 @@ const WrapperXeroModal= styled.div<WrapperXeroWrapperProps>`
         background: linear-gradient(180deg, #164273 0%, #2f71bb 100%);
       }
     }
+  }
+
+  .ant-checkbox-wrapper:after {
+    display: none !important;
   }
 `;
 

@@ -78,7 +78,7 @@ export const UploadAtachment: SFC<IProps> = ({
           headers={{
             Authorization: `Bearer ${auth?.access_token}`,
           }}
-          action={`${NodeBaseURL}/attachment`}
+          action={`${NodeBaseURL}/attachments/attachment`}
         >
           {fileList.length < 1 && "+ Upload"}
         </Upload>

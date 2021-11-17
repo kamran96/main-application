@@ -24,7 +24,7 @@ export class AttachmentService {
 
   async fileUpload(req, res): Promise<any> {
     try {
-      this.upload(req, res, async function(error) {
+      this.upload(req, res, async function (error) {
         if (error) {
           return res.status(404).json(`Failed to upload image file: ${error}`);
         }
@@ -55,7 +55,7 @@ export class AttachmentService {
       s3,
       bucket: 'invyce',
       acl: 'public-read',
-      key: function(request, file, cb) {
+      key: function (request, file, cb) {
         cb(null, `${Date.now().toString()} - ${file.originalname}`);
       },
     }),
@@ -106,7 +106,7 @@ export class AttachmentService {
             },
           ],
           body.cc,
-          body.bcc,
+          body.bcc
         )
         .send();
 

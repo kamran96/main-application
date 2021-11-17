@@ -50,7 +50,19 @@
     "email-service": {
       "tags": []
     },
+    "exports-service": {
+      "tags": []
+    },
     "global-auth-guard": {
+      "tags": []
+    },
+    "global-constants": {
+      "tags": []
+    },
+    "integration": {
+      "tags": []
+    },
+    "interfaces": {
       "tags": []
     },
     "invoices-service": {
@@ -69,6 +81,16 @@
       "tags": [],
       "implicitDependencies": ["main-ui"]
     },
+    "invyce-persist": {
+      "tags": []
+    },
+    "mobile-app": {
+      "tags": []
+    },
+    "mobile-app-e2e": {
+      "tags": [],
+      "implicitDependencies": ["mobile-app"]
+    },
     "payments-service": {
       "tags": []
     },
@@ -78,12 +100,7 @@
     "reports-service": {
       "tags": []
     },
-    "review-invyce-theme": {
-      "tags": []
-    },
-    "shared-global-state-manager": {
-      "tags": []
-    },
+    "send-email": {},
     "shared-invyce-theme": {
       "tags": []
     },

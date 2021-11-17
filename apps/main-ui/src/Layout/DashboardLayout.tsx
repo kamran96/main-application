@@ -1,96 +1,86 @@
-import React, { lazy, FC, Suspense } from "react";
-import { DashboardWrapper } from "./DashboardStyles";
-import { RouteConfigComponentProps } from "react-router-config";
-import { AppLayout } from "./AppLayout";
-import { useGlobalContext } from "../hooks/globalContext/globalContext";
-import { Redirect } from "react-router-dom";
-import { GeneralPreferencesWidget } from "../modules/Settings/GeneralPreferances/GeneralPreferancesWidget";
-import renderRoutes from "./renderRoutes";
-import { ITheme, Themes } from "../hooks/useTheme/themeColors";
-import { ThemeProvider } from "styled-components";
-import GlobalStyle from "./globalStyles";
-// import { UserInviteModal2 } from "./../modules/Users/UserInviteModal/newIndex";
+import React, { lazy, FC, Suspense } from 'react';
+import { DashboardWrapper } from './DashboardStyles';
+import { RouteConfigComponentProps } from 'react-router-config';
+import { AppLayout } from './AppLayout';
+import { useGlobalContext } from '../hooks/globalContext/globalContext';
+import { Redirect } from 'react-router-dom';
+import { GeneralPreferencesWidget } from '../modules/Settings/GeneralPreferances/GeneralPreferancesWidget';
+import renderRoutes from './renderRoutes';
+import { ITheme, Themes } from '../hooks/useTheme/themeColors';
+import { ThemeProvider } from 'styled-components';
+import GlobalStyle from './globalStyles';
 
 export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
   /* Dynamic Imports */
   const UserInviteModal = lazy(
-    () => import("../modules/Users/UserInviteModal")
+    () => import('../modules/Users/UserInviteModal')
   );
   const ItemsEditorWidget = lazy(
-    () => import("../modules/Items/ItemsEditorWidget")
+    () => import('../modules/Items/ItemsEditorWidget')
   );
   const PricingEditorWidget = lazy(
-    () => import("../modules/Items/PricingEditorWidget")
+    () => import('../modules/Items/PricingEditorWidget')
   );
   const CategoryEditorWidget = lazy(
-    () => import("../modules/Categories/CategoryEditorWidget")
+    () => import('../modules/Categories/CategoryEditorWidget')
   );
   const PaymentsEditorWidget = lazy(
-    () => import("../modules/Payment/PaymentsEditorWidget")
+    () => import('../modules/Payment/PaymentsEditorWidget')
   );
   const BranchEditorWidget = lazy(
-    () => import("../modules/Branch/BranchEditorWidget")
+    () => import('../modules/Branch/BranchEditorWidget')
   );
   const AttributeEditorWidget = lazy(
-    () => import("../modules/Categories/AttributeEditorWidget")
+    () => import('../modules/Categories/AttributeEditorWidget')
   );
   const AddBankWidget = lazy(
-    () => import("../modules/Business/BankAccounts/AddBank")
+    () => import('../modules/Business/BankAccounts/AddBank')
   );
   const AddOrganizationForm = lazy(
-    () => import("../Containers/AddOrganization/AddOrganizationForm")
+    () => import('../Containers/AddOrganization/AddOrganizationForm')
   );
   const RolesEditorWidget = lazy(
-    () => import("../modules/Rbac/RolesEditorWidget/index")
+    () => import('../modules/Rbac/RolesEditorWidget/index')
   );
   const PermissionsEditorWidget = lazy(
-    () => import("../modules/Rbac/PermissionsEditorWidget/index")
+    () => import('../modules/Rbac/PermissionsEditorWidget/index')
   );
-  const AddAccount = lazy(() => import("../modules/Accounts/AddAccount"));
+  const AddAccount = lazy(() => import('../modules/Accounts/AddAccount'));
   const EnableDispatchModal = lazy(
-    () => import("../modules/Dispatching/DispatchingWall/EnableDispatch")
+    () => import('../modules/Dispatching/DispatchingWall/EnableDispatch')
   );
   const ReviewModal = lazy(
-    () => import("../modules/Dispatching/DispatchingWall/ReviewModal")
+    () => import('../modules/Dispatching/DispatchingWall/ReviewModal')
   );
 
   const VerifyAccountModal = lazy(
-    () => import("../components/VerificationModal")
+    () => import('../components/VerificationModal')
   );
 
-  const Paywall = lazy(() => import("../modules/Paywall"));
+  const Paywall = lazy(() => import('../modules/Paywall'));
 
-  const {
-    isUserLogin,
-    userDetails,
-    routeHistory,
-    toggle,
-    theme,
-    darkModeLoading,
-  } = useGlobalContext();
+  const { isUserLogin, userDetails, routeHistory, theme, itemsModalConfig } =
+    useGlobalContext();
 
   if (!isUserLogin) {
     return <Redirect to="/page/login" />;
   }
 
   const checkLayout = (children) => {
-
-
     const routePath: any = routeHistory?.history?.location.pathname;
 
     if (userDetails && userDetails.organizationId && userDetails.branchId) {
       return children;
-    } else if (routePath.includes("/app/organizations")) {
+    } else if (routePath.includes('/app/organizations')) {
       return children;
     } else {
       return <Redirect to="/app/organizations" />;
     }
   };
 
-  let layoutTheme: ITheme = {
+  const layoutTheme: ITheme = {
     colors: Themes[theme],
-    toggle,
-    theme: theme,
+    theme: theme === 'dark' ? 'dark' : 'light',
   };
 
   return (
@@ -103,7 +93,7 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
           <UserInviteModal />
         </Suspense>
         <Suspense fallback={<></>}>
-          <ItemsEditorWidget />
+          <ItemsEditorWidget visibility={itemsModalConfig?.visibility} />
         </Suspense>
         <GeneralPreferencesWidget />
         <Suspense fallback={<></>}>

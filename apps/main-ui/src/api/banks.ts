@@ -1,9 +1,10 @@
-import { railsHttp } from "../utils/http";
+import http from "../utils/http";
 
 enum BANKS {
-  INDEX = "/banks/account",
+  INDEX = "accounts/bank",
 }
 
-export const getBanksList = () => railsHttp.get(BANKS.INDEX);
+export const getBanksList = () => http.get(BANKS.INDEX);
+export const getBankAccountsList = ()=> http?.get(`${BANKS.INDEX}/account`);
 
-export const createBankAPI = (payload)=> railsHttp?.post(`banks/account/create`, payload);
+export const createBankAPI = (payload)=> http?.post(`accounts/bank/account`, payload);

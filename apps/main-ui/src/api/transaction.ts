@@ -1,12 +1,12 @@
-import { railsHttp } from "../utils/http";
+import http from "../utils/http";
 
 enum TRANSACTION {
-  CREATE = "transactions/create",
-  RAILS_INDEX = "/transactions/index",
+  CREATE = "accounts/transaction",
+  INDEX = "accounts/transaction",
 }
 
 export const createTransactionAPI = (payload) =>
-  railsHttp.post(TRANSACTION.CREATE, payload);
+  http.post(TRANSACTION.CREATE, payload);
 
 export const getAllTransactionsAPI = (
   key?: string,
@@ -14,7 +14,7 @@ export const getAllTransactionsAPI = (
   pageSize?: number,
   query?: string
 ) => {
-  let url = `${TRANSACTION.RAILS_INDEX}?page_size=${pageSize}&page_no=${page}`;
+  let url = `${TRANSACTION.INDEX}?page_size=${pageSize}&page_no=${page}`;
   if(query){
     url= `${url}&query=${query}`
   }
@@ -22,5 +22,5 @@ export const getAllTransactionsAPI = (
   //   url = `${url}&sort=${sortid}`;
   // }
 
-  return railsHttp.get(url);
+  return http.get(url);
 };

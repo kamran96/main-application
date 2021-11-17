@@ -7,13 +7,12 @@ import {
   Param,
   Post,
   Req,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Request, Response } from 'express';
+import { IRequest, IOrganizationResponse } from '@invyce/interfaces';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { OrganizationDto } from '../dto/organization.dto';
+import { OrganizationDto, OrganizationParams } from '../dto/organization.dto';
 import { OrganizationService } from './organization.service';
 
 @Controller('organization')
@@ -22,7 +21,7 @@ export class OrganizationController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async index(@Req() req: Request) {
+  async index(@Req() req: IRequest): Promise<IOrganizationResponse> {
     try {
       const organization = await this.organizationService.ListOrganizations(
         req.user
@@ -45,17 +44,12 @@ export class OrganizationController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  async create(
-    @Body() organizationDto: OrganizationDto,
-    @Req() req: Request,
-    @Res() res: Response
-  ) {
+  async create(@Body() organizationDto: OrganizationDto, @Req() req: IRequest) {
     try {
       const organization =
         await this.organizationService.CreateOrUpdateOrganization(
           organizationDto,
-          req.user,
-          res
+          req
         );
 
       if (organization) {
@@ -75,10 +69,12 @@ export class OrganizationController {
 
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
-  async view(@Param() params, @Req() req: Request) {
+  async view(
+    @Param() params: OrganizationParams
+  ): Promise<IOrganizationResponse> {
     try {
       const organization = await this.organizationService.ViewOrganization(
-        params
+        params.id
       );
 
       if (organization) {

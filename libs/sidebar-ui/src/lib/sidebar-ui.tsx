@@ -5,7 +5,7 @@ import {
 } from './styles';
 import { Avatar, Button, Popover } from 'antd';
 import { IRoutesSchema, IRoutingSchema } from '@invyce/shared/types';
-import { FC } from 'hoist-non-react-statics/node_modules/@types/react';
+import { FC, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import Icon from '@iconify/react';
 import { ReactElement, useState } from 'react';
@@ -23,6 +23,7 @@ export interface IActiveUserInfo {
   userId?: number;
   userImage: string;
   theme?: 'dark' | 'light';
+  link?: string;
 }
 
 export interface SidebarUiProps {
@@ -102,6 +103,15 @@ export const SidebarUi: FC<SidebarUiProps> = ({
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
+  let toggleCached: null | string = localStorage?.getItem('isToggle') || null;
+
+  useEffect(()=>{
+    if(toggleCached){
+        setSidebarOpen(JSON.parse(toggleCached))
+    }
+  },[toggleCached])
+
+
   return (
     <SidebarWrapper toggle={sidebarOpen}>
       <div className="logo_area flex alignCenter">
@@ -111,6 +121,7 @@ export const SidebarUi: FC<SidebarUiProps> = ({
         <span
           onClick={() => {
             setSidebarOpen(!sidebarOpen);
+            localStorage.setItem('isToggle', JSON.stringify(!sidebarOpen))
           }}
           className="collapse pointer"
         >
@@ -118,7 +129,11 @@ export const SidebarUi: FC<SidebarUiProps> = ({
         </span>
       </div>
       <hr className="mt-10" />
-      <div className="sidebar-userinfo flex alignCenter pointer ph-10">
+      <div onClick={()=> {
+        if(activeUserInfo?.link){
+          history?.push(activeUserInfo.link);
+        }
+      }} className="sidebar-userinfo flex alignCenter pointer ph-10">
         <div className="avatar_area">
           {activeUserInfo?.userImage ? (
             <Avatar

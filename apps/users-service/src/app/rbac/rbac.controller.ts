@@ -11,7 +11,6 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   PermissionDto,
@@ -19,7 +18,16 @@ import {
   RoleDto,
   RoleIdsDto,
   RolePermissionDto,
+  ParamsDto,
 } from '../dto/rbac.dto';
+import {
+  IRequest,
+  IPermissionResponse,
+  IRolePermissionWithResponse,
+  IRoleWithParentWithResponse,
+  IRoleWithResponse,
+  IPage,
+} from '@invyce/interfaces';
 import { RbacService } from './rbac.service';
 
 @Controller('rbac')
@@ -28,7 +36,7 @@ export class RbacController {
 
   @Get('index-permissions')
   @UseGuards(JwtAuthGuard)
-  async indexPermission(@Query() query) {
+  async indexPermission(@Query() query: IPage): Promise<IPermissionResponse> {
     const permission = await this.rbacService.IndexPermissions(query);
 
     if (permission) {
@@ -36,14 +44,14 @@ export class RbacController {
         message: 'Permissions fetched successfull',
         status: 1,
         pagination: permission.pagination,
-        result: permission.permissions,
+        result: permission.result,
       };
     }
   }
 
   @Get('/module')
   @UseGuards(JwtAuthGuard)
-  async getModules(@Req() req: Request) {
+  async getModules(): Promise<IPermissionResponse> {
     const modules = await this.rbacService.GetDistinctModule();
 
     if (modules) {
@@ -57,7 +65,7 @@ export class RbacController {
 
   @Get('/role')
   @UseGuards(JwtAuthGuard)
-  async getRoles(@Req() req: Request) {
+  async getRoles(@Req() req: IRequest): Promise<IRoleWithResponse> {
     const roles = await this.rbacService.GetRoles(req.user);
 
     if (roles) {
@@ -71,7 +79,7 @@ export class RbacController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/test')
-  async test(@Req() req: any) {
+  async test(@Req() req: IRequest): Promise<IRoleWithResponse> {
     await this.rbacService.InsertRoles(req.user.organizationId);
     await this.rbacService.InsertRolePermission(req.user.organizationId);
 
@@ -83,38 +91,41 @@ export class RbacController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/role/:id')
-  async viewRole(@Req() req: Request, @Param() params) {
-    const role = await this.rbacService.GetRole(params.id, req.user);
+  async viewRole(@Param() params: ParamsDto): Promise<IRoleWithResponse> {
+    const role = await this.rbacService.GetRole(params.id);
 
     if (role) {
       return {
         message: 'Successfull.',
         status: 1,
-        result: role[0] || [],
+        result: role,
       };
     }
   }
 
-  @Get('/permission')
-  async getPermission(@Req() req: Request, @Query() { page_no, page_size }) {
-    const permission = await this.rbacService.GetPermissions(
-      page_no,
-      page_size
-    );
+  // @Get('/permission')
+  // async getPermission(@Query() query: PageDto) {
+  //   const permission = await this.rbacService.GetPermissions(
+  //     query
+  //   );
 
-    if (permission) {
-      return {
-        message: 'Successfull',
-        pagination: permission.pagination,
-        result: permission.permission,
-      };
-    }
-  }
+  //   if (permission) {
+  //     return {
+  //       message: 'Successfull',
+  //       pagination: permission.pagination,
+  //       result: permission.permission,
+  //     };
+  //   }
+  // }
 
   @UseGuards(JwtAuthGuard)
   @Get('/permission/show')
-  async showPermission(@Query() { type }, @Req() req: Request) {
+  async showPermission(
+    @Query() { type },
+    @Req() req: IRequest
+  ): Promise<IPermissionResponse> {
     const permission = await this.rbacService.ShowPermission(type, req.user);
+
     if (permission) {
       return {
         message: 'Successfull',
@@ -126,8 +137,11 @@ export class RbacController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/role-with-permission')
-  async roleWithPermission(@Req() req: Request) {
+  async roleWithPermission(
+    @Req() req: IRequest
+  ): Promise<IRoleWithParentWithResponse> {
     const permission = await this.rbacService.GetRoleWithPermissions(req.user);
+
     if (permission) {
       return {
         message: 'Successfull',
@@ -139,7 +153,10 @@ export class RbacController {
 
   @UseGuards(JwtAuthGuard)
   @Post('role')
-  async createRole(@Body() roleDto: RoleDto, @Req() req: Request) {
+  async createRole(
+    @Body() roleDto: RoleDto,
+    @Req() req: IRequest
+  ): Promise<IRoleWithResponse> {
     try {
       const role = await this.rbacService.CreateRole(roleDto, req.user);
 
@@ -162,8 +179,8 @@ export class RbacController {
   @Post('/role-permission')
   async addRolePermission(
     @Body() rolePermissionDto: RolePermissionDto,
-    @Req() req: Request
-  ) {
+    @Req() req: IRequest
+  ): Promise<IRolePermissionWithResponse> {
     const role_permission = await this.rbacService.AddRolePermission(
       rolePermissionDto,
       req.user
@@ -181,8 +198,8 @@ export class RbacController {
   @UseGuards(JwtAuthGuard)
   async createPermission(
     @Body() permissionDto: PermissionDto,
-    @Req() req: Request
-  ) {
+    @Req() req: IRequest
+  ): Promise<IPermissionResponse> {
     try {
       const permission = await this.rbacService.CreatePermission(
         permissionDto,
@@ -205,7 +222,7 @@ export class RbacController {
   }
 
   @Post('/insert-permission')
-  async insertGlobalPermissions(@Req() req: any) {
+  async insertGlobalPermissions(): Promise<IPermissionResponse> {
     const permission = await this.rbacService.InsertGlobalPermissions();
 
     if (permission) {
@@ -219,7 +236,7 @@ export class RbacController {
 
   @UseGuards(JwtAuthGuard)
   @Put('/role/delete')
-  async deleteRole(@Body() roleIdsDto: RoleIdsDto) {
+  async deleteRole(@Body() roleIdsDto: RoleIdsDto): Promise<IRoleWithResponse> {
     const role = await this.rbacService.DeleteRole(roleIdsDto);
 
     if (role) {
@@ -232,7 +249,9 @@ export class RbacController {
 
   @UseGuards(JwtAuthGuard)
   @Put('/permission/delete')
-  async deletePermission(@Body() permissionIdsDto: PermissionIdsDto) {
+  async deletePermission(
+    @Body() permissionIdsDto: PermissionIdsDto
+  ): Promise<IPermissionResponse> {
     const permission = await this.rbacService.DeletePermission(
       permissionIdsDto
     );

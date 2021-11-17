@@ -11,10 +11,10 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { BillService } from './bill.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
-import { BillDeleteIdsDto, BillDto } from '../dto/bill.dto';
+import { BillIdsDto, BillDto, BillParamsDto } from '../dto/bill.dto';
+import { IRequest, IPage, IBillWithResponse, IBill } from '@invyce/interfaces';
 
 @Controller('bill')
 export class BillController {
@@ -22,7 +22,10 @@ export class BillController {
 
   @Get()
   @UseGuards(GlobalAuthGuard)
-  async index(@Req() req: Request, @Query() query) {
+  async index(
+    @Req() req: IRequest,
+    @Query() query: IPage
+  ): Promise<IBillWithResponse> {
     try {
       const bill = await this.billService.IndexBill(req.user, query);
 
@@ -31,7 +34,7 @@ export class BillController {
           message: 'Bill fetched successfully.',
           status: true,
           pagination: bill.pagination,
-          result: bill.bills,
+          result: bill.result,
         };
       }
     } catch (error) {
@@ -44,13 +47,16 @@ export class BillController {
 
   @Post('ids')
   @UseGuards(GlobalAuthGuard)
-  async findByInvoiceIds(@Body() invoiceIds: BillDeleteIdsDto) {
+  async findByInvoiceIds(@Body() invoiceIds: BillIdsDto): Promise<IBill[]> {
     return await this.billService.FindByBillIds(invoiceIds);
   }
 
   @Post()
   @UseGuards(GlobalAuthGuard)
-  async create(@Body() billDto: BillDto, @Req() req: Request) {
+  async create(
+    @Body() billDto: BillDto,
+    @Req() req: IRequest
+  ): Promise<IBillWithResponse> {
     try {
       const bill = await this.billService.CreateBill(billDto, req.user);
 
@@ -71,7 +77,10 @@ export class BillController {
 
   @UseGuards(GlobalAuthGuard)
   @Get('/:id')
-  async show(@Param() params, @Req() req: Request) {
+  async show(
+    @Param() params: BillParamsDto,
+    @Req() req: IRequest
+  ): Promise<IBillWithResponse> {
     try {
       const invoice = await this.billService.FindById(params.id, req);
 
@@ -87,7 +96,6 @@ export class BillController {
         HttpStatus.BAD_REQUEST
       );
     } catch (error) {
-      console.log(error);
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
@@ -97,7 +105,7 @@ export class BillController {
 
   @Put()
   @UseGuards(GlobalAuthGuard)
-  async delete(@Body() billIds: BillDeleteIdsDto) {
+  async delete(@Body() billIds: BillIdsDto): Promise<IBillWithResponse> {
     const bill = await this.billService.deleteBill(billIds);
 
     if (bill) {

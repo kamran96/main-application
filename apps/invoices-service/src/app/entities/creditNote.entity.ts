@@ -1,7 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { BillItems } from './billItem.entity';
 import { CreditNoteItems } from './creditNoteItem.entity';
-import { InvoiceItems } from './invoiceItem.entity';
 
 @Entity()
 export class CreditNotes {
@@ -25,13 +23,14 @@ export class CreditNotes {
   discount: number;
   @Column()
   grossTotal: number;
-  // @Column()
-  // currency: string;
   @Column()
   netTotal: number;
-  // @Column()
-  // date: string;
-
+  @Column()
+  importedCreditNoteId: string;
+  @Column()
+  importedFrom: string;
+  @Column()
+  currency: string;
   @Column()
   branchId: string;
   @Column()

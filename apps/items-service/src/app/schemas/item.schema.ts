@@ -24,6 +24,10 @@ export class Item {
   @Prop()
   minimumStock: number;
   @Prop()
+  importedItemId: string;
+  @Prop()
+  importedFrom: string;
+  @Prop()
   hasCategory: boolean;
   @Prop()
   hasInventory: boolean;

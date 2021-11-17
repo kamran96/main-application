@@ -71,9 +71,9 @@ export const useCols = () => {
     },
     {
       title: "Amount",
-      dataIndex: "balance",
-      key: "balance",
-      render: (data) => <>{data ? moneyFormat(data) : "-"}</>,
+      dataIndex: "amount",
+      key: "amount",
+      render: (data) => <>{data ? moneyFormat(Math.abs(data)) : "-"}</>,
     },
   ];
 

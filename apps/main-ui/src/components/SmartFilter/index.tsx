@@ -100,13 +100,13 @@ export const SmartFilter: FC<IProps> = ({
   };
 
   const menu = (
-    <WrapperMenu>
-      <Menu className="menu_wrapper">
+    <WrapperMenu className="ph-9">
+      <Menu  className="menu_wrapper">
         {Object.keys(filter).map((key, index) => {
           return (
             <Menu.Item
               key={index}
-              className="flex alignCenter jusifySpaceBetween"
+              className="flex alignCenter jusifySpaceBetween ph-9"
             >
               <p className="filter_name">{filter[key].label}</p>
               <i className="flex alignCenter">
@@ -380,6 +380,7 @@ export const WrapperMenu = styled.div`
     box-shadow: ${convertToRem(0)} ${convertToRem(1)} ${convertToRem(
       4
     )} rgb(0 0 0 / 24%); */
+    padding: 0 ${convertToRem(9)};
 
     .filter_name {
       margin: 0 !important;

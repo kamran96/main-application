@@ -12,15 +12,20 @@ export class OrganizationDto {
   email: string;
   website: string;
   attachmentId: number;
+  organizationType: string;
+  permanentAddress: string;
+  residentialAddress: string;
   phoneNumber: string;
   faxNumber: string;
   prefix: string;
   userId: number;
   roleId: number;
-  address: {
-    description: string;
-    city: string;
-    country: string;
-    postalCode: string;
-  };
+  description: string;
+  city: string;
+  country: string;
+  postalCode: string;
+}
+
+export class OrganizationParams {
+  id: string;
 }

@@ -1,5 +1,6 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
+import { IAddress } from '@invyce/interfaces';
 import { Organization } from './organization.schema';
 
 @Schema()
@@ -19,10 +20,11 @@ export class Branch {
       description: String,
       city: String,
       country: String,
+      postalAddress: String,
       postalCode: String,
     })
   )
-  address: object;
+  address: IAddress;
   @Prop()
   isMain: boolean;
   @Prop()

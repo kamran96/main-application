@@ -21,7 +21,7 @@ export class InvoiceDto {
   invoice_items: Array<InvoiceItemsDto>;
 }
 
-class InvoiceItemsDto {
+export class InvoiceItemsDto {
   id: number;
   itemId: string;
   description: string;
@@ -34,6 +34,10 @@ class InvoiceItemsDto {
   costOfGoodAmount: number;
 }
 
-export class InvoiceDeleteIdsDto {
+export class InvoiceIdsDto {
   ids: Array<number>;
+}
+
+export class ParamsDto {
+  id: string;
 }

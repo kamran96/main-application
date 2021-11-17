@@ -24,7 +24,7 @@ const CategoryEditorWidget: FC = () => {
     [`category-${updateId}`, updateId],
     getCategoryByIdAPI,
     {
-      enabled: updateId,
+      enabled: updateId && updateId!==null,
     }
   );
 
@@ -43,19 +43,17 @@ const CategoryEditorWidget: FC = () => {
 
   const onFormFinish = async (values) => {
     let payload = {
-      category: {
         ...values,
         parentId: null,
         isNewRecord: updateId ? false : true,
-      },
     };
 
     if (updateId) {
-      payload.category = { ...payload.category, id: updateId };
+      payload= { ...payload, id: updateId };
     }
 
     if (parent_id) {
-      payload.category.parentId = parent_id;
+      payload.parentId = parent_id;
     }
 
     try {
@@ -69,9 +67,9 @@ const CategoryEditorWidget: FC = () => {
           );
           if (!parent_id) {
             [
-              `category-${updateId}`,
               "categories-list",
               "child-categories",
+              `category-${updateId}`,
               "all-categories",
             ].forEach((key) => {
               queryCache.invalidateQueries((q) =>

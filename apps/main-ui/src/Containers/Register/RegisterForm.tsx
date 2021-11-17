@@ -1,22 +1,19 @@
-import React, { FC, useEffect, useState } from "react";
-import styled, { keyframes } from "styled-components";
-import { Form, Row, Col, Input, Checkbox, Button, message } from "antd";
-import { Select } from "antd";
-import { Link } from "react-router-dom";
-import { FormLabel } from "../../components/FormLabel";
-import { useMutation } from "react-query";
-import { RegisterAPI } from "../../api/auth";
-import { updateToken } from "../../utils/http";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { ILoginActions } from "../../hooks/globalContext/globalManager";
-import { DivProps, IBaseAPIError, NOTIFICATIONTYPE } from "../../modal";
-import { Heading } from "../../components/Heading";
-import { Seprator } from "../../components/Seprator";
-import en from "../../../../../node_modules/world_countries_lists/data/en/world.json";
-import phoneCodes from "../../utils/phoneCodes";
-import { BOLDTEXT } from "../../components/Para/BoldText";
-import Icon from "@iconify/react";
-import arrowLeft from "@iconify-icons/fe/arrow-left";
+/* eslint-disable @typescript-eslint/no-var-requires */
+import { Button, Checkbox, Col, Form, Input, Row, Select } from 'antd';
+import { FC, useState } from 'react';
+import { useMutation } from 'react-query';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
+import en from '../../../../../node_modules/world_countries_lists/data/en/world.json';
+import { RegisterAPI } from '../../api/auth';
+import { Heading } from '../../components/Heading';
+import { BOLDTEXT } from '../../components/Para/BoldText';
+import { Seprator } from '../../components/Seprator';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { ILoginActions } from '../../hooks/globalContext/globalManager';
+import { DivProps, IBaseAPIError, NOTIFICATIONTYPE } from '../../modal';
+import { updateToken } from '../../utils/http';
+import phoneCodes from '../../utils/phoneCodes';
 
 const { Option } = Select;
 
@@ -24,31 +21,29 @@ export const RegisterForm: FC = () => {
   const [step, setStep] = useState(1);
 
   const [mutateRegister, responseRegister] = useMutation(RegisterAPI);
-  const { data, isLoading } = responseRegister;
-  const { handleLogin, notificationCallback, setUserDetails } =
-    useGlobalContext();
-
-  useEffect(() => {
-    if (data && data.data && data.data.result) {
-      const { result } = data.data;
-      updateToken(result.access_token);
-      setUserDetails(result.users);
-      handleLogin({ type: ILoginActions.LOGIN, payload: result });
-    }
-  }, [data, handleLogin, setUserDetails]);
+  const { isLoading } = responseRegister;
+  const { handleLogin, notificationCallback } = useGlobalContext();
 
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
     try {
       await mutateRegister(values, {
-        onSuccess: () => {
+        onSuccess: (data) => {
+          if (process.env.NODE_ENV === 'production') {
+            handleLogin({
+              type: ILoginActions.LOGIN,
+              payload: { autherization: true },
+            });
+          } else {
+            handleLogin({
+              type: ILoginActions.LOGIN,
+              payload: data?.data,
+            });
+            updateToken(data?.data.access_token);
+          }
           form.resetFields();
-          notificationCallback(
-            NOTIFICATIONTYPE.SUCCESS,
-            "User Created",
-            `User Registration Completed`
-          );
+          notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'User Created');
         },
         onError: (error: IBaseAPIError) => {
           if (
@@ -62,18 +57,15 @@ export const RegisterForm: FC = () => {
           }
         },
       });
-    } catch (error) {}
-  };
-
-  const onVerification = (values) => {
-    setStep(1);
-    console.log(values);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const getFlag = (short: string) => {
     const data = require(`world_countries_lists/flags/24x24/${short.toLowerCase()}.png`);
     // for dumi
-    if (typeof data === "string") {
+    if (typeof data === 'string') {
       return data;
     }
     // for CRA
@@ -81,7 +73,7 @@ export const RegisterForm: FC = () => {
   };
 
   const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
+    console.log('Failed:', errorInfo);
   };
   const prefixSelector = (
     <Form.Item name="prefix" noStyle>
@@ -106,7 +98,7 @@ export const RegisterForm: FC = () => {
               <img
                 className="mr-10"
                 alt="flag"
-                style={{ width: 18, height: 18, verticalAlign: "sub" }}
+                style={{ width: 18, height: 18, verticalAlign: 'sub' }}
                 src={getFlag(country.short)}
               />
               <span>+{country?.phoneCode}</span>
@@ -122,7 +114,13 @@ export const RegisterForm: FC = () => {
       <div className="form_body">
         <div className="form_wrapper">
           <Row gutter={24}>
-            <Col xxl={{ span: 19, offset: 5,pull: 4 }} xl={{span:24}} md={{span:24}} sm={{span:24}} xs={{span:24}}>
+            <Col
+              xxl={{ span: 19, offset: 5, pull: 4 }}
+              xl={{ span: 24 }}
+              md={{ span: 24 }}
+              sm={{ span: 24 }}
+              xs={{ span: 24 }}
+            >
               <div className="personal_info">
                 <div className="form_title">
                   <Heading className="mb-20" type="table">
@@ -130,11 +128,12 @@ export const RegisterForm: FC = () => {
                   </Heading>
                   <p className="form_description">
                     Let’s get all set up so you can verify your personal account
-                    and begin <br /> setting up your profile.{" "}
+                    and begin <br /> setting up your profile.{' '}
                   </p>
                   <Seprator />
                 </div>
                 <Form
+                  autoComplete="off"
                   onFinish={onFinish}
                   onFinishFailed={onFinishFailed}
                   layout="vertical"
@@ -147,11 +146,15 @@ export const RegisterForm: FC = () => {
                         rules={[
                           {
                             required: true,
-                            message: "Please add your first name",
+                            message: 'Please add your first name',
                           },
                         ]}
                       >
-                        <Input placeholder={"eg John"} size="middle" />
+                        <Input
+                          placeholder={'eg John'}
+                          size="middle"
+                          autoComplete="off"
+                        />
                       </Form.Item>
                     </Col>
 
@@ -160,10 +163,14 @@ export const RegisterForm: FC = () => {
                         name="username"
                         label="Username"
                         rules={[
-                          { required: true, message: "please add username" },
+                          { required: true, message: 'please add username' },
                         ]}
                       >
-                        <Input placeholder="e.g John" size="middle" />
+                        <Input
+                          placeholder="e.g John"
+                          size="middle"
+                          autoComplete="off"
+                        />
                       </Form.Item>
                     </Col>
 
@@ -172,12 +179,13 @@ export const RegisterForm: FC = () => {
                         name="email"
                         label="Email"
                         rules={[
-                          { required: true, message: "Please add your email" },
+                          { required: true, message: 'Please add your email' },
                         ]}
                       >
                         <Input
                           placeholder="e.g someone@example.com"
                           size="middle"
+                          autoComplete="off"
                         />
                       </Form.Item>
                     </Col>
@@ -190,7 +198,7 @@ export const RegisterForm: FC = () => {
                         <Select
                           size="middle"
                           showSearch
-                          style={{ width: "100%" }}
+                          style={{ width: '100%' }}
                           placeholder="Select a Country"
                           filterOption={(input, option) => {
                             return option?.title
@@ -207,7 +215,7 @@ export const RegisterForm: FC = () => {
                                   style={{
                                     width: 18,
                                     height: 18,
-                                    verticalAlign: "sub",
+                                    verticalAlign: 'sub',
                                   }}
                                   src={getFlag(country.alpha2)}
                                 />
@@ -226,12 +234,13 @@ export const RegisterForm: FC = () => {
                         rules={[
                           {
                             required: false,
-                            message: "Please add your last name",
+                            message: 'Please add your last name',
                           },
                           { max: 12, min: 4 },
                         ]}
                       >
                         <Input
+                          autoComplete="off"
                           addonBefore={prefixSelector}
                           type="text"
                           placeholder="3188889898"
@@ -245,11 +254,11 @@ export const RegisterForm: FC = () => {
                         name="password"
                         label="Password"
                         rules={[
-                          { required: true, message: "Please add a password" },
+                          { required: true, message: 'Please add a password' },
                           {
                             min: 6,
                             message:
-                              "Your Password shold have minimum 6 characters",
+                              'Your Password shold have minimum 6 characters',
                           },
                         ]}
                         hasFeedback
@@ -266,16 +275,30 @@ export const RegisterForm: FC = () => {
                       >
                         <Checkbox>
                           <span>
-                            I have read and agree to the <Link target="_blank" to="https://invyce.com/terms-conditions/">terms, </Link>
-                            <Link target="_blank" to="https://invyce.com/privacy-policy/">Privacy, </Link> and{" "}
-                            <Link target="_blank" to="https://invyce.com/cookie-policy/">Cookie Policy </Link>
+                            I have read and agree to the{' '}
+                            <Link
+                              target="_blank"
+                              to="https://invyce.com/terms-conditions/"
+                            >
+                              terms,{' '}
+                            </Link>
+                            <Link
+                              target="_blank"
+                              to="https://invyce.com/privacy-policy/"
+                            >
+                              Privacy,{' '}
+                            </Link>{' '}
+                            and{' '}
+                            <Link
+                              target="_blank"
+                              to="https://invyce.com/cookie-policy/"
+                            >
+                              Cookie Policy{' '}
+                            </Link>
                           </span>
                         </Checkbox>
                       </Form.Item>
-                      <Form.Item
-                        name="update-details"
-                        valuePropName="checked"
-                      >
+                      <Form.Item name="update-details" valuePropName="checked">
                         <Checkbox>
                           Send me all the Marketing and Update details
                         </Checkbox>
@@ -285,7 +308,7 @@ export const RegisterForm: FC = () => {
                       <Form.Item>
                         <div className="actions-wrapper">
                           <Button
-                            style={{ width: "100%" }}
+                            style={{ width: '100%' }}
                             loading={isLoading}
                             type="primary"
                             htmlType="submit"
@@ -347,7 +370,7 @@ export const RegisterForm: FC = () => {
          */}
         </div>
         <div className="already_account pb-10 textCenter">
-          Already have an account?{" "}
+          Already have an account?{' '}
           <Link to={`/page/login`}>
             <BOLDTEXT>Login</BOLDTEXT>
           </Link>
@@ -357,8 +380,8 @@ export const RegisterForm: FC = () => {
   );
 };
 
-interface IRegisterFormWrapperProps extends DivProps{
-  step: Number
+interface IRegisterFormWrapperProps extends DivProps {
+  step: number;
 }
 
 const RegisterFormWrapper = styled.div<IRegisterFormWrapperProps>`
@@ -403,18 +426,23 @@ const RegisterFormWrapper = styled.div<IRegisterFormWrapperProps>`
       position: absolute;
       width: 100%;
       top: 0;
-      transition: ${(props: any) => (props?.step === 1 ? "0.5s" : "0.9s")} all
-        ease-in-out;
-      opacity: ${(props: any) => (props?.step === 1 ? "1" : "0")};
+      transition: ${(props: IRegisterFormWrapperProps) =>
+          props?.step === 1 ? '0.5s' : '0.9s'}
+        all ease-in-out;
+      opacity: ${(props: IRegisterFormWrapperProps) =>
+        props?.step === 1 ? '1' : '0'};
     }
     .verification {
       position: absolute;
       width: 100%;
       top: 0;
-      transition: ${(props: any) => (props?.step === 2 ? "0.9s" : "0.5s")} all
-        ease-in-out;
-      opacity: ${(props: any) => (props?.step === 2 ? "1" : "0")};
-      z-index: ${(props: any) => (props?.step === 2 ? "1" : "-1")};
+      transition: ${(props: IRegisterFormWrapperProps) =>
+          props?.step === 2 ? '0.9s' : '0.5s'}
+        all ease-in-out;
+      opacity: ${(props: IRegisterFormWrapperProps) =>
+        props?.step === 2 ? '1' : '0'};
+      z-index: ${(props: IRegisterFormWrapperProps) =>
+        props?.step === 2 ? '1' : '-1'};
     }
 
     .form_title {

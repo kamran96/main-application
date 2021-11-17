@@ -7,9 +7,9 @@ export class Payments {
   @Column()
   contactId: string;
   @Column()
-  invoiceId: string;
+  invoiceId: number;
   @Column()
-  billId: string;
+  billId: number;
   @Column()
   reference: string;
   @Column()
@@ -19,7 +19,11 @@ export class Payments {
   @Column()
   paymentMode: number;
   @Column()
-  paymentType: string;
+  paymentType: number;
+  @Column()
+  importedPaymentId: string;
+  @Column()
+  importedFrom: string;
   @Column()
   entryType: number;
   @Column()

@@ -1,26 +1,29 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import printIcon from "@iconify-icons/bytesize/print";
-import editSolid from "@iconify-icons/clarity/edit-solid";
-import deleteIcon from "@iconify/icons-carbon/delete";
-import { ColumnsType } from "antd/es/table";
-import React, { FC, useEffect, useState } from "react";
-import { queryCache, useMutation, usePaginatedQuery } from "react-query";
-import styled from "styled-components";
+import printIcon from '@iconify-icons/bytesize/print';
+import editSolid from '@iconify-icons/clarity/edit-solid';
+import deleteIcon from '@iconify/icons-carbon/delete';
+import { ColumnsType } from 'antd/es/table';
+import { Button } from 'antd';
+import { FC, useEffect, useState } from 'react';
+import { queryCache, useMutation, usePaginatedQuery } from 'react-query';
+import styled from 'styled-components';
 
-import { deleteUserAPI, getUsersListAPI } from "../../../api/users";
-import { ButtonTag } from "../../../components/ButtonTags";
-import { ConfirmModal } from "../../../components/ConfirmModal";
-import { PDFICON } from "../../../components/Icons";
-import { SmartFilter } from "../../../components/SmartFilter";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { IProfile, NOTIFICATIONTYPE } from "../../../modal";
-import { ISupportedRoutes } from "../../../modal/routing";
-import { CommonTable } from "./../../../components/Table";
-import UserFilterSchema from "./UsersFilterSchema";
+import {
+  deleteUserAPI,
+  getUsersListAPI,
+  resendInvitation,
+} from '../../../api/users';
+import { ButtonTag } from '../../../components/ButtonTags';
+import { ConfirmModal } from '../../../components/ConfirmModal';
+import { PDFICON } from '../../../components/Icons';
+import { SmartFilter } from '../../../components/SmartFilter';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { IProfile, NOTIFICATIONTYPE } from '../../../modal';
+import { ISupportedRoutes } from '../../../modal/routing';
+import { CommonTable } from './../../../components/Table';
+import UserFilterSchema from './UsersFilterSchema';
 
-interface IProps {}
-
-export const UsersList: FC<IProps> = () => {
+export const UsersList: FC = () => {
   const { notificationCallback } = useGlobalContext();
   const [{ result, pagination }, setUsersResponse] = useState<any>({
     result: [],
@@ -29,15 +32,18 @@ export const UsersList: FC<IProps> = () => {
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [mutateDeleteUser, resDeleteUser] = useMutation(deleteUserAPI);
+  const [mutateResendInvitation, { isLoading: resendLoading }] =
+    useMutation(resendInvitation);
 
   const [selectedRow, setSelectedRow] = useState([]);
 
   const [usersConfig, setUsersConfig] = useState({
     page: 1,
-    query: "",
-    sortid: "id",
+    query: '',
+    sortid: 'id',
     page_size: 20,
   });
+  const [resendIndex, setResendIndex] = useState(null);
 
   const { page, query, sortid, page_size } = usersConfig;
 
@@ -64,9 +70,9 @@ export const UsersList: FC<IProps> = () => {
       routeHistory.history.location.search
     ) {
       let obj = {};
-      let queryArr = history.location.search.split("?")[1].split("&");
+      const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
-        let split = item.split("=");
+        const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
 
@@ -78,6 +84,23 @@ export const UsersList: FC<IProps> = () => {
     setSelectedRow(item.selectedRowKeys);
   };
 
+  const handleResendInvitation = async (email, index) => {
+    setResendIndex(index);
+    const payload = {
+      email,
+    };
+
+    await mutateResendInvitation(payload, {
+      onSuccess: (data) => {
+        notificationCallback(
+          NOTIFICATIONTYPE.SUCCESS,
+          `Email sent to ${email}`
+        );
+        setResendIndex(null);
+      },
+    });
+  };
+
   const handledelete = async () => {
     const payload = {
       ids: [...selectedRow],
@@ -87,13 +110,9 @@ export const UsersList: FC<IProps> = () => {
       onSuccess: () => {
         setDeleteConfirm(false);
         queryCache.invalidateQueries((q) =>
-          q.queryKey[0].toString().startsWith("users-list?page")
+          q.queryKey[0].toString().startsWith('users-list?page')
         );
-        notificationCallback(
-          NOTIFICATIONTYPE.SUCCESS,
-          "User Deleted",
-          "Your selected users are deleted successfuly "
-        );
+        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'User Deleted');
       },
     });
   };
@@ -101,7 +120,7 @@ export const UsersList: FC<IProps> = () => {
   useEffect(() => {
     if (resolvedData && resolvedData.data && resolvedData.data.result) {
       const { result } = resolvedData.data;
-      let newResult = [];
+      const newResult = [];
       result.forEach((item, index) => {
         newResult.push({ ...item, key: item.id });
       });
@@ -111,47 +130,76 @@ export const UsersList: FC<IProps> = () => {
 
   const columns: ColumnsType<any> = [
     {
-      title: "#",
-      dataIndex: "key",
-      key: "key",
+      title: '#',
+      dataIndex: 'key',
+      key: 'key',
+      render: (data, row, index) => <>{index + 1}</>,
     },
     {
-      title: "Username",
-      dataIndex: "name",
-      key: "name",
+      title: 'Username',
+      dataIndex: 'profile',
+      key: 'profile',
+      render: (data) => <>{data?.userName || '-'}</>,
     },
     {
-      title: "Full Name",
-      dataIndex: "profile",
-      key: "profile",
-      render: (data: IProfile, row, index) => <>{data && data.fullName}</>,
+      title: 'Full Name',
+      dataIndex: 'profile',
+      key: 'profile',
+      render: (data: IProfile, row, index) => <>{data?.fullName}</>,
     },
     {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+    },
+    {
+      title: 'Phone Number',
+      dataIndex: 'profile',
+      key: 'profile',
       render: (data, row, index) => {
-        const { profile } = row;
-        return <>{profile.email}</>;
+        return <>{data?.phoneNumber}</>;
       },
     },
     {
-      title: "Phone Number",
-      dataIndex: "phone_no",
-      key: "phone_no",
-      render: (data, row, index) => {
-        const { profile } = row;
-        return <>{profile.phoneNumber}</>;
-      },
-    },
-    {
-      title: "User Role",
-      dataIndex: "role",
-      key: "role",
+      title: 'User Role',
+      dataIndex: 'role',
+      key: 'role',
       render: (data, row, index) => {
         const { role } = row;
-        return <>{role.name}</>;
+        return <>{role?.name}</>;
       },
+    },
+    {
+      title: 'User Role',
+      dataIndex: 'role',
+      key: 'role',
+      render: (data, row, index) => {
+        const { role } = row;
+        return <>{role?.name}</>;
+      },
+    },
+    {
+      title: 'Actions',
+      dataIndex: 'username',
+      key: 'status',
+      width: 80,
+      render: (data, row, index) => (
+        <>
+          {data ? (
+            'User Active'
+          ) : (
+            <Button
+              className="fs-12"
+              loading={resendIndex === index ? resendLoading : false}
+              onClick={() => handleResendInvitation(row?.email, index)}
+              type="primary"
+              size="small"
+            >
+              Resend Email
+            </Button>
+          )}
+        </>
+      ),
     },
   ];
 
@@ -171,7 +219,7 @@ export const UsersList: FC<IProps> = () => {
                   }}
                   title="Edit"
                   icon={editSolid}
-                  size={"middle"}
+                  size={'middle'}
                 />
                 <ButtonTag
                   className="mr-10"
@@ -179,7 +227,7 @@ export const UsersList: FC<IProps> = () => {
                   onClick={() => setDeleteConfirm(true)}
                   title="Delete"
                   icon={deleteIcon}
-                  size={"middle"}
+                  size={'middle'}
                 />
                 {/* <MoreActions /> */}
               </>
@@ -203,7 +251,7 @@ export const UsersList: FC<IProps> = () => {
           />
           <SmartFilter
             onFilter={(encode) => {
-              let route = `/app${ISupportedRoutes.USERS}?sortid=${sortid}&page=1&page_size=${page_size}&query=${encode}`;
+              const route = `/app${ISupportedRoutes.USERS}?sortid=${sortid}&page=1&page_size=${page_size}&query=${encode}`;
               history.push(route);
               setUsersConfig({ ...usersConfig, query: encode });
             }}
@@ -239,27 +287,27 @@ export const UsersList: FC<IProps> = () => {
                 page: pagination.current,
                 page_size: pagination.pageSize,
                 sortid:
-                  sorter && sorter.order === "descend"
+                  sorter && sorter.order === 'descend'
                     ? `-${sorter.field}`
                     : sorter.field,
               });
               history.push(
                 `/app${ISupportedRoutes.USERS}?sortid=${
-                  sorter && sorter.order === "descend"
+                  sorter && sorter.order === 'descend'
                     ? `-${sorter.field}`
                     : sorter.field
-                }&page=${pagination.current}&page_size=${
-                  pagination.pageSize
+                }&page=${pagination?.current}&page_size=${
+                  pagination?.pageSize
                 }&query=${query}`
               );
             }
           }}
-          totalItems={pagination && pagination.total}
+          totalItems={pagination?.total}
           pagination={{
             pageSize: page_size,
-            position: ["bottomRight"],
-            current: page,
-            total: pagination && pagination.total,
+            position: ['bottomRight'],
+            current: typeof page === 'string' ? parseInt(page) : page,
+            total: pagination?.total,
           }}
           hasfooter={true}
           onSelectRow={onSelectedRow}
@@ -267,7 +315,7 @@ export const UsersList: FC<IProps> = () => {
         />
       </div>
       <ConfirmModal
-        text={"Are you sure want to delete?"}
+        text={'Are you sure want to delete?'}
         loading={resDeleteUser.isLoading}
         visible={deleteConfirm}
         onCancel={() => setDeleteConfirm(false)}

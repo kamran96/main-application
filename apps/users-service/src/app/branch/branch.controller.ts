@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -10,7 +9,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { Request } from 'express';
+import { IRequest, IBranchDetail, IBranchParams } from '@invyce/interfaces';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { BranchDto } from '../dto/branch.dto';
 import { BranchService } from './branch.service';
@@ -21,7 +20,7 @@ export class BranchController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async index(@Req() req: Request) {
+  async index(@Req() req: IRequest): Promise<IBranchDetail> {
     try {
       const branch = await this.branchService.ListBranch(req.user);
 
@@ -41,7 +40,10 @@ export class BranchController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() branchDto: BranchDto, @Req() req: Request) {
+  async create(
+    @Body() branchDto: BranchDto,
+    @Req() req: IRequest
+  ): Promise<IBranchDetail> {
     try {
       const branch = await this.branchService.CreateOrUpdateBranch(
         branchDto,
@@ -64,7 +66,7 @@ export class BranchController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async show(@Param() params) {
+  async show(@Param() params: IBranchParams): Promise<IBranchDetail> {
     try {
       const branch = await this.branchService.FindBranchById(params.id);
 
@@ -84,17 +86,17 @@ export class BranchController {
     }
   }
 
-  @Delete(':id')
-  async remove(@Param() params) {
-    const branch = await this.branchService.deleteBranch(params);
+  // @Delete(':id')
+  // async remove(@Param() params) {
+  // const branch = await this.branchService.deleteBranch(params);
 
-    // if (branch) {
-    //   return {
-    //     message: 'Resource modified successfully.',
-    //     status: 1,
-    //   };
-    // }
+  // if (branch) {
+  //   return {
+  //     message: 'Resource modified successfully.',
+  //     status: 1,
+  //   };
+  // }
 
-    throw new HttpException('Failed to get Item', HttpStatus.BAD_REQUEST);
-  }
+  // throw new HttpException('Failed to get Item', HttpStatus.BAD_REQUEST);
+  // }
 }

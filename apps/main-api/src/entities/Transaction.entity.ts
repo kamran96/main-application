@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  OneToMany,
-  JoinColumn,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { TransactionItems } from './TransactionItem.entity';
 
 @Entity()
@@ -39,7 +33,7 @@ export class Transactions {
   updatedById: number;
   @OneToMany(
     () => TransactionItems,
-    transactionItems => transactionItems.transactionId,
+    (transactionItems) => transactionItems.transactionId
   )
   transactionItems: TransactionItems;
 }

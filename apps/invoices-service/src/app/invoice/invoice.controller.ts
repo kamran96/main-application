@@ -11,10 +11,15 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { InvoiceService } from './invoice.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
-import { InvoiceDeleteIdsDto, InvoiceDto } from '../dto/invoice.dto';
+import { InvoiceIdsDto, InvoiceDto, ParamsDto } from '../dto/invoice.dto';
+import {
+  IInvoice,
+  IInvoiceWithResponse,
+  IPage,
+  IRequest,
+} from '@invyce/interfaces';
 
 @Controller('invoice')
 export class InvoiceController {
@@ -22,16 +27,19 @@ export class InvoiceController {
 
   @Get()
   @UseGuards(GlobalAuthGuard)
-  async index(@Req() req: Request, @Query() query) {
+  async index(
+    @Req() req: IRequest,
+    @Query() query: IPage
+  ): Promise<IInvoiceWithResponse> {
     try {
-      const invoice = await this.invoiceService.IndexInvoice(req.user, query);
+      const invoice = await this.invoiceService.IndexInvoice(req, query);
 
       if (invoice) {
         return {
           message: 'Invoice fetched successfully.',
           status: true,
           pagination: invoice.pagination,
-          result: invoice.invoices,
+          result: invoice.result,
         };
       }
     } catch (error) {
@@ -45,10 +53,10 @@ export class InvoiceController {
   @Get('contact/:id')
   @UseGuards(GlobalAuthGuard)
   async invoiceAgainstContact(
-    @Param() params,
-    @Req() req: Request,
+    @Param() params: ParamsDto,
+    @Req() req: IRequest,
     @Query() { type }
-  ) {
+  ): Promise<IInvoiceWithResponse> {
     const invoices = await this.invoiceService.InvoicesAgainstContactId(
       params.id,
       req,
@@ -71,13 +79,18 @@ export class InvoiceController {
 
   @Post('ids')
   @UseGuards(GlobalAuthGuard)
-  async findByInvoiceIds(@Body() invoiceIds: InvoiceDeleteIdsDto) {
+  async findByInvoiceIds(
+    @Body() invoiceIds: InvoiceIdsDto
+  ): Promise<IInvoice[]> {
     return await this.invoiceService.FindByInvoiceIds(invoiceIds);
   }
 
   @UseGuards(GlobalAuthGuard)
   @Post()
-  async create(@Body() invoiceDto: InvoiceDto, @Req() req: Request) {
+  async create(
+    @Body() invoiceDto: InvoiceDto,
+    @Req() req: IRequest
+  ): Promise<IInvoiceWithResponse> {
     try {
       const invoice = await this.invoiceService.CreateInvoice(
         invoiceDto,
@@ -101,7 +114,10 @@ export class InvoiceController {
 
   @UseGuards(GlobalAuthGuard)
   @Get('number')
-  async getInvoiceNumber(@Query() { type }, @Req() req: Request) {
+  async getInvoiceNumber(
+    @Query() { type },
+    @Req() req: IRequest
+  ): Promise<IInvoiceWithResponse> {
     try {
       const invoice = await this.invoiceService.GetInvoiceNumber(
         type,
@@ -130,7 +146,10 @@ export class InvoiceController {
 
   @UseGuards(GlobalAuthGuard)
   @Get('/:id')
-  async show(@Param() params, @Req() req: Request) {
+  async show(
+    @Param() params,
+    @Req() req: IRequest
+  ): Promise<IInvoiceWithResponse> {
     try {
       const invoice = await this.invoiceService.FindById(params.id, req);
 
@@ -156,7 +175,9 @@ export class InvoiceController {
 
   @Put()
   @UseGuards(GlobalAuthGuard)
-  async delete(@Body() inoviceIds: InvoiceDeleteIdsDto) {
+  async delete(
+    @Body() inoviceIds: InvoiceIdsDto
+  ): Promise<IInvoiceWithResponse> {
     const invoice = await this.invoiceService.deleteInvoice(inoviceIds);
 
     if (invoice) {
@@ -165,5 +186,11 @@ export class InvoiceController {
         status: true,
       };
     }
+  }
+
+  @Post('sync')
+  @UseGuards(GlobalAuthGuard)
+  async SyncInvoices(@Body() body, @Req() req: IRequest): Promise<void> {
+    return await this.invoiceService.SyncInvoices(body, req);
   }
 }

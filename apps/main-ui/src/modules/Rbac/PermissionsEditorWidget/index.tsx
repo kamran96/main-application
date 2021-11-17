@@ -25,14 +25,12 @@ export const PermissionsEditorWidget: FC = () => {
 
   useEffect(() => {
     if (
-      modulesResponse &&
-      modulesResponse.data &&
-      modulesResponse.data &&
-      modulesResponse.data.result
+      
+      modulesResponse?.data?.result
     ) {
       const { result } = modulesResponse.data;
       const options = result.map((item) => {
-        return { value: item.module };
+        return { value: item };
       });
 
       setModules(options);

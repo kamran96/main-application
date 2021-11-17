@@ -1,13 +1,16 @@
 import bxPlus from '@iconify-icons/bx/bx-plus';
 import printIcon from '@iconify-icons/bytesize/print';
 import Icon from '@iconify/react';
+import { EditableTable } from '@invyce/editable-table';
+import { invycePersist } from '@invyce/invyce-persist';
 import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import dayjs from 'dayjs';
 import { FC, useRef, useState } from 'react';
-import { createDndContext, DndProvider } from 'react-dnd';
+import { createDndContext } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { queryCache, useMutation } from 'react-query';
+
 import { createPurchaseEntryAPI, InvoiceCreateAPI } from '../../api';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import {
@@ -15,7 +18,6 @@ import {
   IServerError,
   ISupportedRoutes,
   NOTIFICATIONTYPE,
-  PaymentMode,
 } from '../../modal';
 import { IInvoiceStatus, IInvoiceType, ITaxTypes } from '../../modal/invoice';
 import { IOrganizationType } from '../../modal/organization';
@@ -30,13 +32,12 @@ import { PrintFormat } from '../PrintFormat';
 import { Rbac } from '../Rbac';
 import { PERMISSIONS } from '../Rbac/permissions';
 import { Seprator } from '../Seprator';
-import { CommonTable } from '../Table';
 import defaultItems from './defaultStates';
 import { DragableBodyRow } from './draggable';
+import c from './keys';
 import { PrintViewPurchaseWidget } from './PrintViewPurchaseWidget';
 import { WrapperInvoiceForm } from './styles';
 import { PurchaseManager, usePurchaseWidget } from './WidgetManager';
-import { EditableTable } from '@invyce/editable-table';
 
 const RNDContext = createDndContext(HTML5Backend);
 
@@ -52,22 +53,21 @@ enum ISUBMITTYPE {
 interface IProps {
   type?: 'BILL' | 'SI' | 'POE' | 'PO' | 'QO';
   id?: number;
-  onSubmit?: (payload: any) => void;
 }
 
 interface IPaymentPayload {
   paymentMode: number;
   totalAmount: number;
   totalDiscount: number;
-  dueDate: any;
+  dueDate: string;
   paymentType?: number;
   bankId?: number;
-  amount?: number | any;
+  amount?: number;
 }
 
-let debounce: any;
+let debounce;
 
-const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
+const Editor: FC<IProps> = ({ type, id }) => {
   /* ************ HOOKS *************** */
   /* Component State Hooks */
   const { routeHistory, userDetails } = useGlobalContext();
@@ -128,7 +128,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     const printItem = printRef.current;
     let email = ``;
 
-    let [filteredContact] = contactResult.filter(
+    const [filteredContact] = contactResult.filter(
       (cont) => cont.id === contactId
     );
 
@@ -136,8 +136,8 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
       email = filteredContact.email;
     }
 
-    let pdf = DownloadPDF(printItem);
-    let payload = {
+    const pdf = DownloadPDF(printItem);
+    const payload = {
       email,
       html: `${pdf}`,
       message,
@@ -148,7 +148,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   const onFinish = async (value) => {
-    let InvoiceItemsValidation = [];
+    const InvoiceItemsValidation = [];
 
     organization?.organizationType !== IOrganizationType.ENTERPRISE &&
       invoiceItems.forEach(async (i, index) => {
@@ -165,49 +165,53 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
         })}] Please Select any item otherwise delete empty row.`
       );
     } else {
-      let paymentData = { ...payment };
+      const paymentData = { ...payment };
       delete paymentData.totalAmount;
       delete paymentData.totalDiscount;
 
-      let payload: any = {
-        invoice: {
-          ...value,
-          status: value.status.status,
-          invoiceType: type ? type : IInvoiceType.INVOICE,
-          discount: addition(invoiceDiscount, TotalDiscount),
-          netTotal: NetTotal,
-          grossTotal: GrossTotal,
-          total: '',
-          isNewRecord: true,
-        },
+      let payload = {
+        ...value,
+        status: value.status.status,
+        invoiceType: type ? type : IInvoiceType.INVOICE,
+        discount: addition(
+          typeof invoiceDiscount === 'string'
+            ? parseInt(invoiceDiscount)
+            : invoiceDiscount,
+          TotalDiscount
+        ),
+        netTotal: NetTotal,
+        grossTotal: GrossTotal,
+        total: '',
+        isNewRecord: true,
+
         invoice_items: invoiceItems.map((item, index) => {
           return { ...item, sequence: index };
         }),
       };
-      let payments = {
-        ...paymentData,
-        amount:
-          payment.paymentMode === PaymentMode.CREDIT
-            ? 0
-            : payment.paymentMode === PaymentMode.CASH
-            ? NetTotal
-            : parseFloat(payment.amount),
-      };
+      // let payments = {
+      //   ...paymentData,
+      //   amount:
+      //     payment.paymentMode === PaymentMode.CREDIT
+      //       ? 0
+      //       : payment.paymentMode === PaymentMode.CASH
+      //       ? NetTotal
+      //       : parseFloat(payment.amount),
+      // };
 
-      if (type !== IInvoiceType.QUOTE && payload.invoice.status !== 2) {
-        if (payments.paymentMode === PaymentMode.CASH) {
-          delete payments.dueDate;
-        }
+      // if (type !== IInvoiceType.QUOTE && payload.invoice.status !== 2) {
+      //   if (payments.paymentMode === PaymentMode.CASH) {
+      //     delete payments.dueDate;
+      //   }
 
-        payload.payment = payments;
-      }
+      //   payload.payment = payments;
+      // }
 
-      delete payload.invoice.invoiceDiscount;
-      delete payload.invoice.total;
+      delete payload?.invoiceDiscount;
+      delete payload?.total;
 
       if (id) {
-        payload.invoice = {
-          ...payload.invoice,
+        payload = {
+          ...payload,
           id,
           isNewRecord: history?.location?.search?.includes('relation')
             ? true
@@ -216,8 +220,8 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
         };
       }
       if (history?.location?.search?.includes('relation')) {
-        let relation = history?.location?.search?.split('relation=')[1];
-        payload.invoice.relation = relation;
+        const relation = history?.location?.search?.split('relation=')[1];
+        payload.relation = relation;
       }
 
       try {
@@ -228,14 +232,14 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
               setPrintModal(true);
             }
 
-            if (payload.invoice.status !== 2) {
+            if (payload.status !== 2) {
               if (
                 type !== IInvoiceType.PURCHASE_ENTRY &&
                 type !== IInvoiceType.QUOTE
               ) {
-                let messages = {
-                  invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
-                  quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
+                const messages = {
+                  invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.reference}`,
+                  quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.reference}`,
                 };
 
                 onSendPDF(
@@ -248,10 +252,6 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
             }
 
             ClearAll();
-            setInvoiceDiscount(0);
-
-            /* this will clear invoice items, formdata and payment */
-            setInvoiceItems([{ ...defaultItems }]);
 
             [
               'invoices',
@@ -283,7 +283,9 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
             }
           },
         });
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
   const onCancelPrint = () => {
@@ -293,7 +295,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
       queryCache.removeQueries(`${type}-${id}-view`);
       let route = history.location.pathname.split('/');
       if (route.length > 3) {
-        let removeIndex = route.length - 1;
+        const removeIndex = route.length - 1;
         route.splice(removeIndex, 1);
         route = route.join('/');
       } else {
@@ -389,11 +391,19 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
       </div>
       <div className=" _disable_print">
         <Form
-          onSubmitCapture={(e) => {}}
           form={AntForm}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           onValuesChange={(changedField, allvalues) => {
+            const _formData =
+              invycePersist(c.ANTFORMCACHE + type, '', 'localStorage').get() ||
+              null;
+            invycePersist(
+              c.ANTFORMCACHE + type,
+              { ..._formData, ...allvalues },
+              'localStorage'
+            ).set();
+
             if (changedField?.isTaxIncluded) {
               setTaxType(changedField?.isTaxIncluded);
             }
@@ -474,17 +484,16 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                       />
                     </Form.Item>
                   </Col>
-                  {type !== IInvoiceType.BILL && (
-                    <Col span={6}>
-                      <FormLabel>{formLabels.orderNo}</FormLabel>
-                      <Form.Item
-                        name="invoiceNumber"
-                        rules={[{ required: false, message: 'Required !' }]}
-                      >
-                        <Input disabled size="middle" type="number" />
-                      </Form.Item>
-                    </Col>
-                  )}
+
+                  <Col span={6}>
+                    <FormLabel>{formLabels.orderNo}</FormLabel>
+                    <Form.Item
+                      name="invoiceNumber"
+                      rules={[{ required: false, message: 'Required !' }]}
+                    >
+                      <Input disabled size="middle" />
+                    </Form.Item>
+                  </Col>
                 </Row>
               </Col>
               <Col span={6} className="_custom_col_refheader">
@@ -552,15 +561,15 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
               </Col>
             </Row>
           </div>
-            <EditableTable
+          <EditableTable
             loading={isFetching}
-              dragable={(data) => setInvoiceItems(data)}
-              columns={__columns}
-              data={invoiceItems}
-              scrollable={{offsetY: 400, offsetX: 0}}
-            />
+            dragable={(data) => setInvoiceItems(data)}
+            columns={__columns}
+            data={invoiceItems}
+            scrollable={{ offsetY: 400, offsetX: 0 }}
+          />
 
-            {/* <DndProvider manager={manager.current.dragDropManager}>
+          {/* <DndProvider manager={manager.current.dragDropManager}>
               <CommonTable
                 rowClassName={(record, index) =>
                   ` ${
@@ -629,30 +638,6 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                     </Form.Item>
                   </div>
                 )}
-                <Rbac
-                  permission={
-                    type === IInvoiceType.INVOICE
-                      ? PERMISSIONS.INVOICES_DRAFT_APPROVE
-                      : type === IInvoiceType.PURCHASE_ENTRY
-                      ? PERMISSIONS.PURCHASES_DRAFT_APPROVE
-                      : PERMISSIONS.INVOICES_DRAFT_APPROVE
-                  }
-                >
-                  {type !== IInvoiceType.QUOTE &&
-                    organization.organizationType !==
-                      IOrganizationType.ENTERPRISE && (
-                      <Payment
-                        issueDate={issueDate}
-                        initialValues={{
-                          ...payment,
-                          totalAmount: NetTotal,
-                          totalDiscount: TotalDiscount,
-                        }}
-                        reset={paymentReset}
-                        onChange={(payload) => setPayment(payload)}
-                      />
-                      )}
-                </Rbac>
               </Col>
               <Col
                 xs={{ span: 8, offset: 4 }}
@@ -689,11 +674,11 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                       <Form.Item name="invoiceDiscount">
                         <InputNumber
                           onChange={(val) => {
-                            let value = val;
+                            const value = val;
                             clearTimeout(debounce);
 
                             debounce = setTimeout(() => {
-                              setInvoiceDiscount(value);
+                              setInvoiceDiscount(value as number);
                             }, 400);
                           }}
                           size="middle"
@@ -718,13 +703,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
             <Col span={24}>
               <div className="actions">
                 <Form.Item name="status" className="actions_control">
-                  <Button
-                    onClick={() => {
-                      AntForm.resetFields();
-                    }}
-                    size={'middle'}
-                    type="default"
-                  >
+                  <Button onClick={ClearAll} size={'middle'} type="default">
                     Cancel
                   </Button>
                   <Button

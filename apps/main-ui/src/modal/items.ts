@@ -1,5 +1,5 @@
-import { ICategory } from "./categories";
-import { IBase, IBaseRequest, IBaseResponse } from "./base";
+import { ICategory } from './categories';
+import { IBase, IBaseRequest, IBaseResponse } from './base';
 
 export enum ITEM_TYPE {
   PRODUCT = 1,
