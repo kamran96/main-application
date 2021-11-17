@@ -20,31 +20,6 @@ export const PrintHeader: FC<IProps> = ({
 
   return (
     <div className="common_print_header">
-      {/* <div className="organization_details">
-        <table style={{ border: "none !imprtant" }} className="border_none">
-          <tr>
-            <Heading type="form">{title}</Heading>
-            <p>
-              Date: <b>{date}</b>
-            </p>
-          </tr>
-        </table>
-      </div>
-      <div className="flex alignCenter ">
-        {userDetails?.profile?.attachmentId && (
-          <div className="logo mr-20">
-            <img src={_logo} alt={"Company Logo"} />
-          </div>
-        )}
-        <div className="org_details">
-          <Heading type="form">
-            {userDetails &&
-              userDetails.organizationId &&
-              userDetails.organization.name}
-          </Heading>
-        </div>
-      </div> */}
-
       <table style={{ width: "100%" }}>
         <tbody>
           <tr>

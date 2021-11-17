@@ -1,8 +1,16 @@
 import { message } from 'antd';
-import React, { FC, useEffect, useState } from 'react';
+import { ReactNode } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { queryCache, useMutation, useQuery } from 'react-query';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import { CheckAuthAPI, getAllRolesWithPermission, getUserAPI, LogoutAPI, uploadPdfAPI } from '../../api';
+import {
+  CheckAuthAPI,
+  CheckAuthAPIDev,
+  getAllRolesWithPermission,
+  LogoutAPI,
+  uploadPdfAPI,
+} from '../../api';
 import {
   IBaseAPIError,
   IErrorMessages,
@@ -14,7 +22,6 @@ import { IRolePermissions } from '../../modal/rbac';
 import { DecriptionData, EncriptData } from '../../utils/encription';
 import { useTheme } from '../useTheme';
 import { globalContext } from './globalContext';
-import { useHistory } from 'react-router-dom';
 
 type Theme = 'light' | 'dark';
 
@@ -22,6 +29,10 @@ const stylesheets = {
   light: `https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.12/antd.min.css`,
   dark: `https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.12/antd.dark.min.css`,
 };
+
+const isProductionEnv = process.env.NODE_ENV === 'production' || false;
+
+const AUTH_CHECK_API = isProductionEnv ? CheckAuthAPI : CheckAuthAPIDev;
 
 const createStylesheetLink = (): HTMLLinkElement => {
   const link = document.createElement('link');
@@ -39,7 +50,13 @@ const toggleTheme = (t: Theme) => {
 };
 
 interface IProps {
-  children: React.ReactElement<any>;
+  children: ReactNode;
+}
+
+interface IModalsConfig {
+  visibility?: boolean;
+  id?: string | number;
+  [key: string]: unknown;
 }
 
 export enum ILoginActions {
@@ -49,7 +66,7 @@ export enum ILoginActions {
 
 interface IAction {
   type?: ILoginActions;
-  payload?: any;
+  payload?: unknown;
 }
 
 export const GlobalManager: FC<IProps> = ({ children }) => {
@@ -61,74 +78,83 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const [mutateLogout, resLogout] = useMutation(LogoutAPI);
 
-
   const [isOnline, setIsOnline] = useState(true);
   const [checkAutherized, setAutherized] = useState(true);
   const [theme, setTheme] = useState<Theme>('light');
 
   const [isUserLogin, setIsUserLogin] = useState(false);
   const [auth, setAuth] = useState<IAuth>(null);
-  const [userDetails, setUserDetails] = useState<IUser | any>(null);
+  const [userDetails, setUserDetails] = useState<IUser>(null);
   const [userInviteModal, setUserInviteModal] = useState<boolean>(false);
-  const [itemsModalConfig, setItemsModalConfig] = useState<any>({
+  const [itemsModalConfig, setItemsModalConfig] = useState<IModalsConfig>({
     visibility: false,
     id: null,
   });
   const [transactionModal, setTransactionModal] = useState<boolean>(false);
   const [preferancesModal, setPreferancesModal] = useState<boolean>(false);
-  const [accountsModalConfig, setAccountsModalConfig] = useState<any>({
-    visibility: false,
-    id: null,
-  });
-  const [organizationModalConfig, setOrganizationConfig] = useState({
-    visibility: false,
-    id: null,
-  });
+  const [accountsModalConfig, setAccountsModalConfig] = useState<IModalsConfig>(
+    {
+      visibility: false,
+      id: null,
+    }
+  );
+  const [organizationModalConfig, setOrganizationConfig] =
+    useState<IModalsConfig>({
+      visibility: false,
+      id: null,
+    });
 
-  const [pricingModalConfig, setPricingModalConfig] = useState({
+  const [pricingModalConfig, setPricingModalConfig] = useState<IModalsConfig>({
     visibility: false,
     obj: null,
     updateId: null,
   });
-  const [banksModalConfig, setBanksModalConfig] = useState({
+  const [banksModalConfig, setBanksModalConfig] = useState<IModalsConfig>({
     id: null,
     visibility: false,
   });
-  const [paymentsModalConfig, setPaymentsModalConfig] = useState({
-    id: null,
-    visibility: false,
-  });
-  const [branchModalConfig, setBranchModalConfig] = useState({
+  const [paymentsModalConfig, setPaymentsModalConfig] = useState<IModalsConfig>(
+    {
+      id: null,
+      visibility: false,
+    }
+  );
+  const [branchModalConfig, setBranchModalConfig] = useState<IModalsConfig>({
     id: null,
     visibility: false,
     branchId: null,
   });
-  const [categoryModalConfig, setCategoryModalConfig] = useState({
-    parent_id: null,
-    visibility: false,
-    updateId: null,
-    isChild: false,
-  });
-  const [attributeConfig, setAttributeConfig] = useState({
+  const [categoryModalConfig, setCategoryModalConfig] = useState<IModalsConfig>(
+    {
+      parent_id: null,
+      visibility: false,
+      updateId: null,
+      isChild: false,
+    }
+  );
+  const [attributeConfig, setAttributeConfig] = useState<IModalsConfig>({
     categoryObj: null,
     visibility: false,
   });
 
-  const [dispatchConfigModal, setDispatchConfigModal] = useState({
-    visibility: false,
-  });
-  const [reviewConfigModal, setreviewConfigModal] = useState({
+  const [dispatchConfigModal, setDispatchConfigModal] = useState<IModalsConfig>(
+    {
+      visibility: false,
+    }
+  );
+  const [reviewConfigModal, setreviewConfigModal] = useState<IModalsConfig>({
     visibility: false,
   });
 
-  const [rbacConfigModal, setRbacConfigModal] = useState({
+  const [rbacConfigModal, setRbacConfigModal] = useState<IModalsConfig>({
     visibility: false,
     id: null,
   });
-  const [permissionsConfigModal, setPermissionConfigModal] = useState({
-    visibility: false,
-    id: null,
-  });
+  const [permissionsConfigModal, setPermissionConfigModal] =
+    useState<IModalsConfig>({
+      visibility: false,
+      id: null,
+    });
 
   const [rolePermissions, setRolePermissions] = useState<IRolePermissions[]>(
     []
@@ -136,17 +162,19 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const [verifiedModal, setVerifiedModal] = useState(false);
 
-
-  const [toggle, setToggle] = useState(true);
-
   window.addEventListener('offline', (event) => {
-    setIsOnline(false);
+    if (isOnline !== false) {
+      setIsOnline(false);
+    }
   });
   window.addEventListener('online', (event) => {
-    setIsOnline(true);
+    console.log('is online fired');
+    if (isOnline !== true) {
+      setIsOnline(true);
+    }
   });
 
-  const handleUploadPDF = async (payload: any) => {
+  const handleUploadPDF = async (payload: unknown) => {
     await mutateSendPDF(payload, {
       onSuccess: () => {
         notificationCallback(
@@ -156,12 +184,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
       },
 
       onError: (error: IServerError) => {
-        if (
-          error &&
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
+        if (error?.response?.data?.message) {
           const { message } = error.response.data;
           notificationCallback(NOTIFICATIONTYPE.SUCCESS, message);
         } else {
@@ -176,41 +199,50 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const history = useHistory();
 
-  const handleLogin = async(action: IAction) => {
+  const handleLogin = async (action: IAction) => {
     switch (action.type) {
       case ILoginActions.LOGIN:
-      debugger;  
-      setAutherized(true);
-
-        // setAuth(action.payload);
-        // localStorage.setItem('auth', EncriptData(action.payload) as any);
-
+        if (process.env.NODE_ENV === 'production') {
+          setAutherized(true);
+        } else {
+          localStorage.setItem('auth', EncriptData(action.payload) as string);
+          setAuth(action.payload);
+        }
         break;
       case ILoginActions.LOGOUT:
-        await mutateLogout("", {
-          onSuccess: (data)=>{
-            notificationCallback(NOTIFICATIONTYPE.INFO, 'Logout Successfully');
-            setTheme('light');
-            setIsUserLogin(false);
-            queryCache.clear();
-          },
-          onError: (err: IBaseAPIError)=>{
-            if(err?.response?.data.message){
-              notificationCallback(NOTIFICATIONTYPE.INFO, `${err.response.data.message}`)
-
-            }else{
+        if (isProductionEnv) {
+          await mutateLogout('', {
+            onSuccess: (data) => {
               notificationCallback(
-                NOTIFICATIONTYPE.ERROR,
-                IErrorMessages.NETWORK_ERROR
+                NOTIFICATIONTYPE.INFO,
+                'Logout Successfully'
               );
-            }
-          }
-        })
+              setTheme('light');
+              setIsUserLogin(false);
+              queryCache.clear();
+            },
+            onError: (err: IBaseAPIError) => {
+              if (err?.response?.data.message) {
+                notificationCallback(
+                  NOTIFICATIONTYPE.INFO,
+                  `${err.response.data.message}`
+                );
+              } else {
+                notificationCallback(
+                  NOTIFICATIONTYPE.ERROR,
+                  IErrorMessages.NETWORK_ERROR
+                );
+              }
+            },
+          });
+        }
+
         localStorage.removeItem('auth');
         setTheme('light');
         setAuth(null);
         setIsUserLogin(false);
         queryCache.clear();
+
         break;
       default:
         break;
@@ -218,42 +250,49 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   };
 
   const checkIsAuthSaved = localStorage.getItem('auth');
-  const isSidebarOpen: boolean = JSON.parse(localStorage.getItem('isToggle'));
-
-  useEffect(() => {
-    if (isSidebarOpen !== null) {
-      setToggle(isSidebarOpen);
-    }
-  }, [isSidebarOpen]);
 
   useEffect(() => {
     if (checkIsAuthSaved) {
-      let decriptedData = DecriptionData(checkIsAuthSaved);
-      let user: IUser = decriptedData.users;
+      const decriptedData = DecriptionData(checkIsAuthSaved);
+      const user: IUser = decriptedData?.users;
+
       setAuth(decriptedData);
       setUserDetails(user);
     }
   }, [checkIsAuthSaved]);
 
-  let userId = (auth && auth.users && auth.users.id) || null;
+  const userId = auth?.users?.id || null;
 
+  /* LoggedInUser is Fetched */
+  const { isLoading, isFetched } = useQuery(
+    [`loggedInUser`, userId],
+    AUTH_CHECK_API,
+    {
+      cacheTime: Infinity,
+      enabled: isProductionEnv ? checkAutherized : userId,
 
-
-  
-
-/* LoggedInUser is Fetched */
-  const {isLoading, data, error, isFetched} = useQuery([`loggedInUser`], CheckAuthAPI, {
- 
-    cacheTime: Infinity,
-    enabled: checkAutherized,
-    onSuccess: (data)=>{
-      setUserDetails(data?.data.result);
-      setIsUserLogin(true);
-    },
-    onError: ()=>{
-      setAutherized(false);
+      onSuccess: (data) => {
+        if (isProductionEnv) {
+          setUserDetails(data?.data?.users);
+          setIsUserLogin(true);
+        } else {
+          const { result } = data?.data;
+          setUserDetails(result);
+          setIsUserLogin(true);
+          if (result?.theme) {
+            setTheme(result?.theme);
+          }
+        }
+      },
+      onError: (err: IBaseAPIError) => {
+        // CancelRequest();
+        if (err?.response?.data?.statusCode === 401) {
+          handleLogin({ type: ILoginActions.LOGOUT });
+        }
+        setAutherized(false);
+      },
     }
-  })
+  );
 
   // const { isLoading, data, error, isFetched } = useQuery(
   //   [`loggedInUser`, userId],
@@ -294,30 +333,28 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     staleTime: Infinity,
   });
 
-  console.log(allRolesAndPermissionsData, "data")
+  useEffect(() => {
+    if (allRolesAndPermissionsData?.data?.result) {
+      const { result } = allRolesAndPermissionsData.data;
+      const { parentRole } = result;
+      const roles: IRolePermissions[] =
+        allRolesAndPermissionsData.data.result.roles;
+      const newResult = roles.map((item) => {
+        const roleIndex = parentRole.findIndex((i) => i === item.role);
+        const parents = [];
+        for (let index = 0; index <= roleIndex; index++) {
+          parents.push(parentRole[index]);
+        }
 
-  // useEffect(() => {
-  //   if (allRolesAndPermissionsData?.data?.result) {
-  //     const { result } = allRolesAndPermissionsData.data;
-  //     const { parentRole } = result;
-  //     const roles: IRolePermissions[] =
-  //       allRolesAndPermissionsData.data.result.roles;
-  //     const newResult = roles.map((item) => {
-  //       let roleIndex = parentRole.findIndex((i) => i === item.role);
-  //       let parents = [];
-  //       for (let index = 0; index <= roleIndex; index++) {
-  //         parents.push(parentRole[index]);
-  //       }
-
-  //       return {
-  //         ...item,
-  //         action: `${item.module}/${item.title}`,
-  //         parents,
-  //       };
-  //     });
-  //     setRolePermissions(newResult);
-  //   }
-  // }, [allRolesAndPermissionsData]);
+        return {
+          ...item,
+          action: `${item.module}/${item.title}`,
+          parents,
+        };
+      });
+      setRolePermissions(newResult);
+    }
+  }, [allRolesAndPermissionsData]);
 
   // const errResp: any = error;
 
@@ -336,7 +373,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   //     );
   //   }
   // }, [data, checkIsAuthSaved, errResp]);
-
 
   message.config({
     top: 101,
@@ -364,8 +400,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const { theme: appTheme, themeLoading } = useTheme(theme);
 
-  const checkingUser = false;
-
+  const checkingUser = (isLoading && !isFetched) || permissionsFetching;
 
   return (
     <globalContext.Provider
@@ -400,7 +435,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         pricingModalConfig,
         setPricingModalConfig: (
           visibility: boolean,
-          obj: any = null,
+          obj: unknown = null,
           updateId: number = null
         ) => {
           setPricingModalConfig({ visibility, obj, updateId });
@@ -427,12 +462,15 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
           visibility: boolean,
           parent_id: number = null,
           updateId: number = null,
-          isChild: boolean = false
+          isChild = false
         ) => {
           setCategoryModalConfig({ parent_id, visibility, updateId, isChild });
         },
         attributeConfig,
-        setAttributeConfig: (visibility: boolean, categoryObj: any = null) => {
+        setAttributeConfig: (
+          visibility: boolean,
+          categoryObj: unknown = null
+        ) => {
           setAttributeConfig({ visibility, categoryObj });
         },
         dispatchConfigModal,
@@ -460,7 +498,13 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         theme: appTheme,
         darkModeLoading: themeLoading,
         setTheme: (payload) => {
-          setTheme(payload);
+          setTheme((prev) => {
+            if (prev !== payload) {
+              return payload;
+            } else {
+              return prev;
+            }
+          });
         },
         verifiedModal,
         setVerifiedModal,

@@ -24,6 +24,8 @@ export class InvoiceItems {
   @Column()
   unitPrice: number;
   @Column()
+  accountId: number;
+  @Column()
   costOfGoodAmount: number;
   @Column()
   sequence: number;

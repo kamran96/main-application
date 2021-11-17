@@ -67,9 +67,9 @@ export const Editable: FC<IProps> = ({
     }
   }, [value]);
 
-  let styles = {
+  const styles = {
     border: isEditable ? '1px solid transparent' : '1px solid transparent',
-    background: isEditable ? '#fff' : 'transparent',
+    background: !isEditable && 'transparent',
     cursor: 'pointer',
     ...style,
   };
@@ -79,7 +79,7 @@ export const Editable: FC<IProps> = ({
   return (
     <ClickOutSide
       initialVal={isEditable}
-      notEffectingClass={`rendered-text`}
+      notEffectingClass={`rendered-text ant-input-number-input SVGAnimatedString`}
       onClickOutSide={() => {
         if (isEditable === true) {
           setIsEditable(false);
@@ -87,73 +87,66 @@ export const Editable: FC<IProps> = ({
       }}
     >
       <WrapperEditable disabled={disabled}>
-        <>
-          {type === 'number' ? (
-            isEditable ? (
-              <InputNumber
-                ref={inputRef}
-                onChange={(val) => {
-                  setInputValue(val);
-                  onChange(val);
-                }}
-                placeholder={placeholder}
-                type={type}
-                style={styles}
-                size={size}
-                autoFocus
-                disabled={disabled}
-                value={
-                  type === 'number'
-                    ? typeof value === 'string'
-                      ? parseFloat(inputVal)
-                      : inputVal
-                    : inputVal
-                }
-              />
-            ) : (
-              <div
-                className="rendered-text"
-                onClick={() => setIsEditable(true)}
-              >
-                {inputVal ? inputVal : placeholder ? placeholder : 0}
-                <div className="tooltip">
-                  <span>
-                    {inputVal ? inputVal : placeholder ? placeholder : 0}
-                  </span>
-                </div>
-              </div>
-            )
-          ) : isEditable ? (
-            <Input
+        {type === 'number' ? (
+          isEditable ? (
+            <InputNumber
               ref={inputRef}
-              disabled={disabled}
-              onChange={(e) => {
-                let val = e.target.value;
+              onChange={(val) => {
                 setInputValue(val);
-                onChange(e);
+                onChange(val);
               }}
               placeholder={placeholder}
               type={type}
               style={styles}
               size={size}
-              value={inputVal}
               autoFocus
+              disabled={disabled}
+              value={
+                type === 'number'
+                  ? typeof value === 'string'
+                    ? parseFloat(inputVal)
+                    : inputVal
+                  : inputVal
+              }
             />
           ) : (
-            <div
-              style={{ ...style, overflow: 'hidden' }}
-              className="rendered-text"
-              onClick={() => (!disabled ? setIsEditable(true) : null)}
-            >
-              {inputVal ? inputVal : placeholder}
+            <div className="rendered-text" onClick={() => setIsEditable(true)}>
+              {inputVal ? inputVal : placeholder ? placeholder : 0}
               <div className="tooltip">
                 <span>
                   {inputVal ? inputVal : placeholder ? placeholder : 0}
                 </span>
               </div>
             </div>
-          )}
-        </>
+          )
+        ) : isEditable ? (
+          <Input
+            ref={inputRef}
+            disabled={disabled}
+            onChange={(e) => {
+              const val = e.target.value;
+              setInputValue(val);
+              onChange(e);
+            }}
+            placeholder={placeholder}
+            type={type}
+            style={styles}
+            size={size}
+            value={inputVal}
+            autoFocus
+          />
+        ) : (
+          <div
+            style={{ ...style, overflow: 'hidden' }}
+            className="rendered-text"
+            onClick={() => (!disabled ? setIsEditable(true) : null)}
+          >
+            {inputVal ? inputVal : placeholder}
+            <div className="tooltip">
+              <span>{inputVal ? inputVal : placeholder ? placeholder : 0}</span>
+            </div>
+          </div>
+        )}
       </WrapperEditable>
     </ClickOutSide>
   );
@@ -175,6 +168,9 @@ export const WrapperEditable = styled.div<WrapperProps>`
   }
   input:hover {
     border: 1px solid #d9d9d9 !important;
+  }
+  input:focus {
+    border-color: #ffffff14 !important;
   }
 
   .input-para {

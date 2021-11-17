@@ -26,8 +26,7 @@
                   "replace": "apps/accounting-service/src/environments/environment.ts",
                   "with": "apps/accounting-service/src/environments/environment.prod.ts"
                 }
-              ],
-              "generatePackageJson": true
+              ]
             }
           }
         },
@@ -136,8 +135,7 @@
             "outputPath": "dist/apps/contacts-service",
             "main": "apps/contacts-service/src/main.ts",
             "tsConfig": "apps/contacts-service/tsconfig.app.json",
-            "assets": ["apps/contacts-service/src/assets"],
-            "generatePackageJson": true
+            "assets": ["apps/contacts-service/src/assets"]
           },
           "configurations": {
             "production": {
@@ -149,8 +147,7 @@
                   "replace": "apps/contacts-service/src/environments/environment.ts",
                   "with": "apps/contacts-service/src/environments/environment.prod.ts"
                 }
-              ],
-              "generatePackageJson": true
+              ]
             }
           }
         },
@@ -233,8 +230,8 @@
       "sourceRoot": "apps/editable-table-e2e/src",
       "projectType": "application",
       "targets": {
-        "e2e": {
-          "executor": "@nrwl/cypress:cypress",
+        "test": {
+          "executor": "@nrwl/jest:jest",
           "options": {
             "cypressConfig": "apps/editable-table-e2e/cypress.json",
             "tsConfig": "apps/editable-table-e2e/tsconfig.e2e.json",
@@ -250,6 +247,37 @@
           "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["apps/editable-table-e2e/**/*.{js,ts}"]
+          }
+        },
+        "storybook": {
+          "executor": "@nrwl/storybook:storybook",
+          "options": {
+            "uiFramework": "@storybook/react",
+            "port": 4400,
+            "config": {
+              "configFolder": "libs/editable-table/.storybook"
+            }
+          },
+          "configurations": {
+            "ci": {
+              "quiet": true
+            }
+          }
+        },
+        "build-storybook": {
+          "executor": "@nrwl/storybook:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "uiFramework": "@storybook/react",
+            "outputPath": "dist/storybook/editable-table",
+            "config": {
+              "configFolder": "libs/editable-table/.storybook"
+            }
+          },
+          "configurations": {
+            "ci": {
+              "quiet": true
+            }
           }
         }
       }
@@ -304,6 +332,79 @@
         }
       }
     },
+    "invyce-persist": {
+      "root": "libs/invyce-persist",
+      "sourceRoot": "libs/invyce-persist/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/invyce-persist/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/invyce-persist"],
+          "options": {
+            "jestConfig": "libs/invyce-persist/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "exports-service": {
+      "root": "apps/exports-service",
+      "sourceRoot": "apps/exports-service/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/exports-service",
+            "main": "apps/exports-service/src/main.ts",
+            "tsConfig": "apps/exports-service/tsconfig.app.json",
+            "assets": ["apps/exports-service/src/assets"],
+            "generatePackageJson": true
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/exports-service/src/environments/environment.ts",
+                  "with": "apps/exports-service/src/environments/environment.prod.ts"
+                }
+              ],
+              "generatePackageJson": true
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "exports-service:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/exports-service/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/exports-service"],
+          "options": {
+            "jestConfig": "apps/exports-service/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "global-auth-guard": {
       "root": "libs/global-auth-guard",
       "sourceRoot": "libs/global-auth-guard/src",
@@ -325,6 +426,100 @@
         }
       }
     },
+    "global-constants": {
+      "root": "libs/global-constants",
+      "sourceRoot": "libs/global-constants/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/global-constants/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/global-constants"],
+          "options": {
+            "jestConfig": "libs/global-constants/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "integration": {
+      "root": "apps/integration",
+      "sourceRoot": "apps/integration/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/integration",
+            "main": "apps/integration/src/main.ts",
+            "tsConfig": "apps/integration/tsconfig.app.json",
+            "assets": ["apps/integration/src/assets"],
+            "generatePackageJson": true
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/integration/src/environments/environment.ts",
+                  "with": "apps/integration/src/environments/environment.prod.ts"
+                }
+              ],
+              "generatePackageJson": true
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "integration:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/integration/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/integration"],
+          "options": {
+            "jestConfig": "apps/integration/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "interfaces": {
+      "root": "libs/interfaces",
+      "sourceRoot": "libs/interfaces/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/interfaces/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/interfaces"],
+          "options": {
+            "jestConfig": "libs/interfaces/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "invoices-service": {
       "root": "apps/invoices-service",
       "sourceRoot": "apps/invoices-service/src",
@@ -337,8 +532,7 @@
             "outputPath": "dist/apps/invoices-service",
             "main": "apps/invoices-service/src/main.ts",
             "tsConfig": "apps/invoices-service/tsconfig.app.json",
-            "assets": ["apps/invoices-service/src/assets"],
-            "generatePackageJson": true
+            "assets": ["apps/invoices-service/src/assets"]
           },
           "configurations": {
             "production": {
@@ -350,8 +544,7 @@
                   "replace": "apps/invoices-service/src/environments/environment.ts",
                   "with": "apps/invoices-service/src/environments/environment.prod.ts"
                 }
-              ],
-              "generatePackageJson": true
+              ]
             }
           }
         },
@@ -581,6 +774,139 @@
         }
       }
     },
+    "mobile-app": {
+      "root": "apps/mobile-app",
+      "sourceRoot": "apps/mobile-app/src",
+      "projectType": "application",
+      "targets": {
+        "start": {
+          "executor": "@nrwl/react-native:start",
+          "options": {
+            "port": 8081
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "command": "nx start mobile-app"
+          }
+        },
+        "run-ios": {
+          "executor": "@nrwl/react-native:run-ios",
+          "options": {}
+        },
+        "bundle-ios": {
+          "executor": "@nrwl/react-native:bundle",
+          "outputs": ["apps/mobile-app/build"],
+          "options": {
+            "entryFile": "apps/mobile-app/src/main.tsx",
+            "platform": "ios",
+            "bundleOutput": "dist/apps/mobile-app/ios/main.jsbundle"
+          }
+        },
+        "run-android": {
+          "executor": "@nrwl/react-native:run-android",
+          "options": {}
+        },
+        "build-android": {
+          "executor": "@nrwl/react-native:build-android",
+          "outputs": [
+            "apps/mobile-app/android/app/build/outputs/bundle",
+            "apps/mobile-app/android/app/build/outputs/apk"
+          ],
+          "options": {}
+        },
+        "bundle-android": {
+          "executor": "@nrwl/react-native:bundle",
+          "options": {
+            "entryFile": "apps/mobile-app/src/main.tsx",
+            "platform": "android",
+            "bundleOutput": "dist/apps/mobile-app/android/main.jsbundle"
+          }
+        },
+        "sync-deps": {
+          "executor": "@nrwl/react-native:sync-deps",
+          "options": {}
+        },
+        "ensure-symlink": {
+          "executor": "@nrwl/react-native:ensure-symlink",
+          "options": {}
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["apps/mobile-app/**/*.{ts,tsx,js,jsx}"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/mobile-app"],
+          "options": {
+            "jestConfig": "apps/mobile-app/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "mobile-app-e2e": {
+      "root": "apps/mobile-app-e2e",
+      "sourceRoot": "apps/mobile-app-e2e/src",
+      "projectType": "application",
+      "targets": {
+        "build-ios": {
+          "executor": "@nrwl/detox:build",
+          "options": {
+            "detoxConfiguration": "ios.sim.debug"
+          },
+          "configurations": {
+            "production": {
+              "detoxConfiguration": "ios.sim.release"
+            }
+          }
+        },
+        "test-ios": {
+          "executor": "@nrwl/detox:test",
+          "options": {
+            "detoxConfiguration": "ios.sim.debug"
+          },
+          "configurations": {
+            "production": {
+              "detoxConfiguration": "ios.sim.release"
+            }
+          }
+        },
+        "build-android": {
+          "executor": "@nrwl/detox:build",
+          "options": {
+            "detoxConfiguration": "android.emu.debug"
+          },
+          "configurations": {
+            "production": {
+              "detoxConfiguration": "android.emu.release"
+            }
+          }
+        },
+        "test-android": {
+          "executor": "@nrwl/detox:test",
+          "options": {
+            "detoxConfiguration": "android.emu.debug"
+          },
+          "configurations": {
+            "production": {
+              "detoxConfiguration": "android.emu.release"
+            }
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["apps/mobile-app-e2e/**/*.{ts,tsx,js,jsx}"]
+          }
+        }
+      }
+    },
     "payments-service": {
       "root": "apps/payments-service",
       "sourceRoot": "apps/payments-service/src",
@@ -687,64 +1013,25 @@
           "options": {
             "buildTarget": "reports-service:build"
           }
-        },
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["apps/reports-service/**/*.ts"]
-          }
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/reports-service"],
-          "options": {
-            "jestConfig": "apps/reports-service/jest.config.js",
-            "passWithNoTests": true
-          }
         }
       }
     },
-    "review-invyce-theme": {
-      "root": "libs/review/invyce-theme",
-      "sourceRoot": "libs/review/invyce-theme/src",
+    "send-email": {
+      "root": "libs/send-email",
+      "sourceRoot": "libs/send-email/src",
       "projectType": "library",
       "targets": {
         "lint": {
-          "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/review/invyce-theme/**/*.{ts,tsx,js,jsx}"
-            ]
+            "executor": "@nrwl/linter:eslint",
+            "lintFilePatterns": ["libs/send-email/**/*.ts"]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/review/invyce-theme"],
+          "outputs": ["coverage/libs/send-email"],
           "options": {
-            "jestConfig": "libs/review/invyce-theme/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
-    "shared-global-state-manager": {
-      "root": "libs/shared/global-state-manager",
-      "sourceRoot": "libs/shared/global-state-manager/src",
-      "projectType": "library",
-      "targets": {
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": [
-              "libs/shared/global-state-manager/**/*.{ts,tsx,js,jsx}"
-            ]
-          }
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/shared/global-state-manager"],
-          "options": {
-            "jestConfig": "libs/shared/global-state-manager/jest.config.js",
+            "jestConfig": "libs/send-email/jest.config.js",
             "passWithNoTests": true
           }
         }

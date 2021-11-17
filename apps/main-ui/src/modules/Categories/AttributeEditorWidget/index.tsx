@@ -1,16 +1,16 @@
-import deleteIcon from "@iconify/icons-carbon/delete";
-import Icon from "@iconify/react";
-import { Button, Col, Row, Tooltip } from "antd";
-import React, { FC, useEffect, useState } from "react";
-import { queryCache, useMutation, useQuery } from "react-query";
-import { addAttributesAPI, getCategoryAttributesAPI } from "../../../api";
-import { CommonModal } from "../../../components";
-import { CommonLoader } from "../../../components/FallBackLoader";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { Color, IVariants, NOTIFICATIONTYPE } from "../../../modal";
-import convertToRem from "../../../utils/convertToRem";
-import { AttriForm } from "./form";
-import { WrapperAttributeWidget } from "./styles";
+import deleteIcon from '@iconify/icons-carbon/delete';
+import Icon from '@iconify/react';
+import { Button, Col, Row, Tooltip } from 'antd';
+import React, { FC, useEffect, useState } from 'react';
+import { queryCache, useMutation, useQuery } from 'react-query';
+import { addAttributesAPI, getCategoryAttributesAPI } from '../../../api';
+import { CommonModal } from '../../../components';
+import { CommonLoader } from '../../../components/FallBackLoader';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { Color, IVariants, NOTIFICATIONTYPE } from '../../../modal';
+import convertToRem from '../../../utils/convertToRem';
+import { AttriForm } from './form';
+import { WrapperAttributeWidget } from './styles';
 
 export const AttributeEditorWidget: FC = () => {
   const [attriData, setAttriData] = useState<IVariants[]>([{}]);
@@ -18,31 +18,30 @@ export const AttributeEditorWidget: FC = () => {
   const [checkValidation, setCheckValidation] = useState(false);
   const [errors, setErrors] = useState([]);
 
-  const {
-    attributeConfig,
-    setAttributeConfig,
-    notificationCallback,
-  } = useGlobalContext();
+  const { attributeConfig, setAttributeConfig, notificationCallback } =
+    useGlobalContext();
   const { visibility, categoryObj } = attributeConfig;
   const categoryId = (categoryObj && categoryObj.id) || null;
 
   const { data: categoryData, isLoading: categoryAttributeFetching } = useQuery(
     [`categoryAttribute-${categoryId}`, categoryId],
-    getCategoryAttributesAPI
+    getCategoryAttributesAPI, {
+      enabled: categoryId
+    }
   );
 
   useEffect(() => {
     if (categoryData?.data?.result) {
       const { result } = categoryData.data;
-      const { owner } = result;
-      let initialData = owner.map((item, index) => {
+      const { attributes } = result;
+      let initialData = attributes.map((item, index) => {
         const { title, valueType, values, id } = item;
-        if (valueType === "DROPDOWN") {
+        if (valueType === 'DROPDOWN') {
           return {
             title,
-            valueType: "custom",
+            valueType: 'custom',
             type: valueType,
-            value: values ? values.join(",") : "",
+            value: values ? values.join(',') : '',
             id,
           };
         } else {
@@ -57,42 +56,45 @@ export const AttributeEditorWidget: FC = () => {
     }
   }, [categoryData]);
 
+
+  console.log(attriData, "attributes data")
+
+
   const [mutateAttributes, resMutateAttributes] = useMutation(addAttributesAPI);
 
   const handleSubmit = async () => {
     let payload = {
-      attribute: {
-        deleted_ids: [...deletedIds],
-        categoryId,
-        attributes: attriData.map((item: any, index: number) => {
-          if (item.type === "DROPDOWN") {
-            let value = item.value.split(",");
-            delete item.valueType;
-            return { ...item, value };
-          } else {
-            const { title, type, id } = item;
-            let reutrnedValue: any = { title, type };
-            if (id) {
-              reutrnedValue = { ...reutrnedValue, id };
-            }
-
-            return reutrnedValue;
+      deleted_ids: [...deletedIds],
+      categoryId,
+      attributes: attriData.map((item: any, index: number) => {
+        if (item.type === 'DROPDOWN') {
+          let values = item.value.split(',');
+          const {id} = item;
+          delete item.valueType;
+          return id ? { ...item, values, id } : { ...item, values };
+        } else {
+          const { title, type, id } = item;
+          let reutrnedValue: any = { title, type };
+          if (id) {
+            reutrnedValue = { ...reutrnedValue, id };
           }
-        }),
-      },
+
+          return reutrnedValue;
+        }
+      }),
     };
 
     mutateAttributes(payload, {
       onSuccess: () => {
         notificationCallback(
           NOTIFICATIONTYPE.SUCCESS,
-          "Attributes Added Successfully"
+          'Attributes Added Successfully'
         );
         [
           `categoryAttribute-${categoryId}`,
-          "child-categories",
-          "categories-list",
-          "all-categories",
+          'child-categories',
+          'categories-list',
+          'all-categories',
         ].forEach((key) => {
           queryCache.invalidateQueries((q) =>
             q.queryKey[0].toString().startsWith(key)
@@ -112,7 +114,7 @@ export const AttributeEditorWidget: FC = () => {
         setAttributeConfig(false);
         setAttriData([{}]);
       }}
-      title={"Add Attributes"}
+      title={'Add Attributes'}
       footer={false}
     >
       <WrapperAttributeWidget>
@@ -138,7 +140,7 @@ export const AttributeEditorWidget: FC = () => {
                       </Col>
                       <Col span={2}>
                         <div className="flex alignCenter justifyCenter delete-icon">
-                          <Tooltip placement="top" title={"Remove"}>
+                          <Tooltip placement="top" title={'Remove'}>
                             <i
                               className="flex alignCenter justifyCenter"
                               onClick={() => {
@@ -156,7 +158,7 @@ export const AttributeEditorWidget: FC = () => {
                                 style={{
                                   fontSize: convertToRem(16),
                                   color: Color.$GRAY_LIGHT,
-                                  cursor: "pointer",
+                                  cursor: 'pointer',
                                 }}
                                 icon={deleteIcon}
                               />
@@ -207,7 +209,7 @@ export const AttributeEditorWidget: FC = () => {
             </div>
           </>
         ) : (
-          <div className={"loader-area flex alignCenter justifyCenter"}>
+          <div className={'loader-area flex alignCenter justifyCenter'}>
             <CommonLoader />
           </div>
         )}

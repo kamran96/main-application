@@ -1,34 +1,35 @@
-import { Button, Col, Form, Input, Row, Select } from "antd";
-import React, { FC } from "react";
-import { queryCache, useMutation } from "react-query";
-import styled from "styled-components";
-import en from "world_countries_lists/data/en/world.json";
-import { addOrganizationAPI } from "../../api/organizations";
-import InvyceLog from "../../assets/invyceLogo.png";
-import OrgIllustration from "../../assets/organization.png";
-import { DatePicker } from "../../components/DatePicker";
-import { HeadingTemplate1 } from "../../components/HeadingTemplates";
-import { BOLDTEXT } from "../../components/Para/BoldText";
-import { Seprator } from "../../components/Seprator";
-import { UploadAtachment } from "../../components/UploadAtachment";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { ILoginActions } from "../../hooks/globalContext/globalManager";
-import { IThemeProps } from "../../hooks/useTheme/themeColors";
-import { ISupportedRoutes } from "../../modal";
-import { updateToken } from "../../utils/http";
-import phoneCodes from "../../utils/phoneCodes";
+import { Button, Col, Form, Input, Row, Select } from 'antd';
+import { FC } from 'react';
+import { queryCache, useMutation } from 'react-query';
+import styled from 'styled-components';
+import en from 'world_countries_lists/data/en/world.json';
+import { addOrganizationAPI } from '../../api/organizations';
+import InvyceLog from '../../assets/invyceLogo.png';
+import OrgIllustration from '../../assets/organization.png';
+import { DatePicker } from '../../components/DatePicker';
+import { HeadingTemplate1 } from '../../components/HeadingTemplates';
+import { BOLDTEXT } from '../../components/Para/BoldText';
+import { Seprator } from '../../components/Seprator';
+import { UploadAtachment } from '../../components/UploadAtachment';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { ILoginActions } from '../../hooks/globalContext/globalManager';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
+import { ISupportedRoutes } from '../../modal';
+import { updateToken } from '../../utils/http';
+import phoneCodes from '../../utils/phoneCodes';
 
 const { Option } = Select;
 
 export const OrganizationWidget: FC = () => {
-  const { setUserDetails, handleLogin, routeHistory } = useGlobalContext();
-  const {history} = routeHistory;
+  const { handleLogin, routeHistory } = useGlobalContext();
+  const { history } = routeHistory;
   const [mutateOrganization, { isLoading }] = useMutation(addOrganizationAPI);
   const [form] = Form.useForm();
   const getFlag = (short: string) => {
-    const data = require(`world_countries_lists/flags/24x24/${short.toLowerCase()}.png`);
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const data: any = require(`world_countries_lists/flags/24x24/${short.toLowerCase()}.png`);
     // for dumi
-    if (typeof data === "string") {
+    if (typeof data === 'string') {
       return data;
     }
     // for CRA
@@ -38,11 +39,19 @@ export const OrganizationWidget: FC = () => {
   const onFinish = async (values) => {
     await mutateOrganization(values, {
       onSuccess: async (data) => {
-        const { result } = data?.data;
-        await updateToken(result?.access_token);
-        await setUserDetails(result.users);
-        await  handleLogin({ type: ILoginActions.LOGIN, payload: result });
-        ["loggedInUser", "all-organizations", "roles-permissions"]?.forEach(
+        if (process.env.NODE_ENV === 'production') {
+          handleLogin({
+            type: ILoginActions.LOGIN,
+            payload: { autherization: true },
+          });
+        } else {
+          handleLogin({
+            type: ILoginActions.LOGIN,
+            payload: data?.data,
+          });
+          updateToken(data?.data.access_token);
+        }
+        ['loggedInUser', 'all-organizations', 'roles-permissions']?.forEach(
           (key) => {
             queryCache?.invalidateQueries((q) =>
               q?.queryKey[0].toString().startsWith(key)
@@ -80,7 +89,7 @@ export const OrganizationWidget: FC = () => {
               <img
                 className="mr-10"
                 alt="flag"
-                style={{ width: 18, height: 18, verticalAlign: "sub" }}
+                style={{ width: 18, height: 18, verticalAlign: 'sub' }}
                 src={getFlag(country.short)}
               />
               <span>+{country?.phoneCode}</span>
@@ -95,7 +104,7 @@ export const OrganizationWidget: FC = () => {
     <OrganizationWidgetWrapper>
       <div className="illustration">
         <div className="invyce_logo">
-          <img src={InvyceLog} alt={"invyce logo"} />
+          <img src={InvyceLog} alt={'invyce logo'} />
         </div>
         <h2 className="slogan">
           Need more few
@@ -120,7 +129,7 @@ export const OrganizationWidget: FC = () => {
                 name="name"
                 label="Name of Organization?"
                 rules={[
-                  { required: true, message: "Organization Name is required!" },
+                  { required: true, message: 'Organization Name is required!' },
                 ]}
               >
                 <Input size="middle" placeholder="e.g Abc pvt ltd" />
@@ -130,7 +139,7 @@ export const OrganizationWidget: FC = () => {
               <Form.Item
                 name="email"
                 label="Email?"
-                rules={[{ required: true, message: "Email is required!" }]}
+                rules={[{ required: true, message: 'Email is required!' }]}
               >
                 <Input size="middle" placeholder="abce@domain.com" />
               </Form.Item>
@@ -139,7 +148,7 @@ export const OrganizationWidget: FC = () => {
               <Form.Item
                 name="faxNumber"
                 label="Fax No"
-                rules={[{ required: false, message: "Fax is required!" }]}
+                rules={[{ required: false, message: 'Fax is required!' }]}
               >
                 <Input size="middle" placeholder="Enter your fax number" />
               </Form.Item>
@@ -149,7 +158,7 @@ export const OrganizationWidget: FC = () => {
                 label="Phone Number"
                 name="phoneNumber"
                 rules={[
-                  { required: false, message: "Please add your last name" },
+                  { required: false, message: 'Please add your last name' },
                   { max: 12, min: 4 },
                 ]}
               >
@@ -183,7 +192,7 @@ export const OrganizationWidget: FC = () => {
                 <Select
                   size="middle"
                   showSearch
-                  style={{ width: "100%" }}
+                  style={{ width: '100%' }}
                   placeholder="Select a Country"
                   filterOption={(input, option) => {
                     return option?.title
@@ -200,7 +209,7 @@ export const OrganizationWidget: FC = () => {
                           style={{
                             width: 18,
                             height: 18,
-                            verticalAlign: "sub",
+                            verticalAlign: 'sub',
                           }}
                           src={getFlag(country.alpha2)}
                         />
@@ -211,13 +220,13 @@ export const OrganizationWidget: FC = () => {
                 </Select>
               </Form.Item>
             </Col>
-            
+
             <Col span={12}>
               <Form.Item name="city" label="City">
                 <Input size="middle" placeholder="New York" />
               </Form.Item>
             </Col>
-            
+
             <Col span={12}>
               <Form.Item name="postalCode" label="Area Code">
                 <Input size="middle" placeholder="8898" />
@@ -234,9 +243,9 @@ export const OrganizationWidget: FC = () => {
             <Col span={12}>
               <Form.Item name="financialEnding" label="Financial Year Ends">
                 <DatePicker
-                  style={{ width: "100%" }}
+                  style={{ width: '100%' }}
                   size="middle"
-                  picker={"month"}
+                  picker={'month'}
                 />
               </Form.Item>
             </Col>
@@ -249,7 +258,7 @@ export const OrganizationWidget: FC = () => {
               <Seprator />
             </Col>
             <Col span={12}>
-              <Form.Item name="attachmentId" >
+              <Form.Item name="attachmentId">
                 <UploadAtachment
                   onUploadSuccess={(id) => {
                     form.setFieldsValue({ attachmentId: id });
@@ -268,7 +277,7 @@ export const OrganizationWidget: FC = () => {
                   size="middle"
                   htmlType="submit"
                 >
-                  {" "}
+                  {' '}
                   &nbsp;&nbsp;Create Organization&nbsp;&nbsp;
                 </Button>
               </Form.Item>

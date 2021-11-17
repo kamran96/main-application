@@ -1,43 +1,42 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import lineChart from "@iconify-icons/fe/line-chart";
-import copyIcon from "@iconify-icons/feather/copy";
-import deleteIcon from "@iconify/icons-carbon/delete";
-import editSolid from "@iconify/icons-clarity/edit-solid";
-import { Button } from "antd";
-import { ColumnsType } from "antd/lib/table";
-import { plainToClass } from "class-transformer";
-import React, { FC, useEffect, useMemo, useState } from "react";
+import lineChart from '@iconify-icons/fe/line-chart';
+import deleteIcon from '@iconify/icons-carbon/delete';
+import editSolid from '@iconify/icons-clarity/edit-solid';
+import { Button } from 'antd';
+import { ColumnsType } from 'antd/lib/table';
+import { plainToClass } from 'class-transformer';
+import { FC, useEffect, useMemo, useState } from 'react';
 import {
   queryCache,
   useMutation,
   usePaginatedQuery,
   useQuery,
-} from "react-query";
-import { Link } from "react-router-dom";
-import { deleteItems, getAllCategories, getItemsList } from "../../../api";
-import { ButtonTag } from "../../../components/ButtonTags";
-import { ConfirmModal } from "../../../components/ConfirmModal";
-import { Heading } from "../../../components/Heading";
-import { Rbac } from "../../../components/Rbac";
-import { PERMISSIONS } from "../../../components/Rbac/permissions";
-import { SmartFilter } from "../../../components/SmartFilter";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { ICategory, NOTIFICATIONTYPE } from "../../../modal";
+} from 'react-query';
+import { Link } from 'react-router-dom';
+import { deleteItems, getAllCategories, getItemsList } from '../../../api';
+import { ButtonTag } from '../../../components/ButtonTags';
+import { ConfirmModal } from '../../../components/ConfirmModal';
+import { Heading } from '../../../components/Heading';
+import { Rbac } from '../../../components/Rbac';
+import { PERMISSIONS } from '../../../components/Rbac/permissions';
+import { SmartFilter } from '../../../components/SmartFilter';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { ICategory, NOTIFICATIONTYPE } from '../../../modal';
 import {
   IItemsResponse,
   IItemsResult,
   ITemsResult,
   ITEM_TYPE,
-} from "../../../modal/items";
-import { ISupportedRoutes } from "../../../modal/routing";
-import moneyFormat from "../../../utils/moneyFormat";
-import { useWindowSize } from "../../../utils/useWindowSize";
-import { CommonTable } from "./../../../components/Table";
-import { DuplicateModal } from "./DuplicateModal";
-import filterSchema from "./filterSchema";
-import { PrintColumns } from "./PrintColumns";
-import { ItemsListWrapper } from "./styles";
-import packageIcon from "@iconify-icons/feather/package";
+} from '../../../modal/items';
+import { ISupportedRoutes } from '../../../modal/routing';
+import moneyFormat from '../../../utils/moneyFormat';
+import { useWindowSize } from '../../../utils/useWindowSize';
+import { CommonTable } from './../../../components/Table';
+import { DuplicateModal } from './DuplicateModal';
+import filterSchema from './filterSchema';
+import { PrintColumns } from './PrintColumns';
+import { ItemsListWrapper } from './styles';
+import packageIcon from '@iconify-icons/feather/package';
 
 export const ItemsList: FC = () => {
   /* HOOKS */
@@ -46,9 +45,9 @@ export const ItemsList: FC = () => {
   const [itemsFilterningSchema, setItemsFilteringSchema] =
     useState(filterSchema);
   const [itemsConfig, setItemsConfig] = useState({
-    query: "",
+    query: '',
     page: 1,
-    sortid: "id",
+    sortid: 'id',
     page_size: 20,
   });
   const { page, sortid, query, page_size } = itemsConfig;
@@ -88,9 +87,9 @@ export const ItemsList: FC = () => {
   useEffect(() => {
     if (history?.location?.search) {
       let obj = {};
-      let queryArr = history.location.search.split("?")[1].split("&");
+      const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
-        let split = item.split("=");
+        const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
       setItemsConfig({ ...itemsConfig, ...obj });
@@ -110,7 +109,7 @@ export const ItemsList: FC = () => {
 
   useEffect(() => {
     if (resolvedCategories && resolvedCategories.length) {
-      let filteringSchema = {
+      const filteringSchema = {
         ...filterSchema,
         categoryId: {
           ...filterSchema.categoryId,
@@ -124,8 +123,8 @@ export const ItemsList: FC = () => {
     }
   }, [resolvedCategories]);
 
-  let pageSize =
-    typeof page_size === "string" ? parseInt(page_size) : page_size;
+  const pageSize =
+    typeof page_size === 'string' ? parseInt(page_size) : page_size;
 
   const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
     [
@@ -141,19 +140,20 @@ export const ItemsList: FC = () => {
   useEffect(() => {
     if (resolvedData && resolvedData.data && resolvedData.data.result) {
       const response: IItemsResponse = resolvedData.data;
-      let result: IItemsResult[] | any = [];
+      const result: IItemsResult[] | any = [];
       // response.result.forEach((item) => {
       //   result.push({ ...item, key: item.id });
       // });
 
       response.result.forEach((item: IItemsResult) => {
-        let categoryName = item?.category?.title || "";
+        const categoryName = item?.category?.title || '';
         let prices = item?.price;
         prices = { ...prices, priceId: prices?.id };
         delete prices?.id;
-        let items = plainToClass(ITemsResult, item);
+        const items = plainToClass(ITemsResult, item);
 
-        let obj = Object.assign(items, prices);
+        const obj = Object.assign(items, prices);
+
         result.push({
           ...obj,
           categoryName,
@@ -167,7 +167,7 @@ export const ItemsList: FC = () => {
   }, [resolvedData]);
 
   const handleDelete = async () => {
-    let payload = {
+    const payload = {
       ids: [...selectedRow],
     };
     try {
@@ -175,9 +175,9 @@ export const ItemsList: FC = () => {
         onSuccess: () => {
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
-            "Item Deleted Successfully"
+            'Item Deleted Successfully'
           );
-          ["all-items", "items?page"].forEach((key) => {
+          ['all-items', 'items?page'].forEach((key) => {
             queryCache.invalidateQueries((q) =>
               q.queryKey[0].toString().startsWith(key)
             );
@@ -186,93 +186,89 @@ export const ItemsList: FC = () => {
         },
       });
     } catch (error) {
-      notificationCallback(
-        NOTIFICATIONTYPE.ERROR,
-        "Error",
-        "Something went wrong please make sure your internet connection is stable. Try again later"
-      );
+      notificationCallback(NOTIFICATIONTYPE.ERROR, 'Error');
     }
   };
 
-  const columns: ColumnsType<any> = [
+  const columns: ColumnsType<IItemsResult> = [
     {
-      title: "#",
-      dataIndex: "",
+      title: '#',
+      dataIndex: '',
       width: 60,
       render: (item, row, index) => {
-        return <>{index + 1}</>;
+        return index + 1;
       },
     },
     {
-      title: "Item Name",
-      dataIndex: "name",
+      title: 'Item Name',
+      dataIndex: 'name',
       width: 300,
-      key: "name",
+      key: 'name',
       render: (data, row, index) => (
         <Link to={`/app${ISupportedRoutes.ITEMS}/${row.id}`}>{data}</Link>
       ),
     },
     {
-      title: "Category",
-      dataIndex: "categoryName",
-      key: "categoryName",
-      render: (data, row, index) => <>{data}</>,
+      title: 'Category',
+      dataIndex: 'categoryName',
+      key: 'categoryName',
+      render: (data, row, index) => data,
     },
     {
-      title: "Code",
-      dataIndex: "code",
-      key: "code",
+      title: 'Code',
+      dataIndex: 'code',
+      key: 'code',
     },
     {
-      title: "Purchase Price ",
-      dataIndex: "purchasePrice",
-      key: "purchasePrice",
+      title: 'Purchase Price ',
+      dataIndex: 'purchasePrice',
+      key: 'purchasePrice',
       render: (price, row, index) => {
-        return <>{price && moneyFormat(price)}</>;
+        return price && moneyFormat(price);
       },
     },
     {
-      title: "Sale Price ",
-      dataIndex: "salePrice",
-      key: "salePrice",
+      title: 'Sale Price ',
+      dataIndex: 'salePrice',
+      key: 'salePrice',
       sorter: false,
       showSorterTooltip: false,
       render: (price, row, index) => {
-        return <>{price && moneyFormat(price)}</>;
+        return price && moneyFormat(price);
       },
     },
     {
-      title: "Item Type ",
-      dataIndex: "itemType",
-      key: "itemType",
+      title: 'Item Type ',
+      dataIndex: 'itemType',
+      key: 'itemType',
       sorter: false,
       showSorterTooltip: false,
       render: (data, row, index) => {
         return (
-          <>
+          <div>
             {data === ITEM_TYPE.PRODUCT
-              ? "Product"
+              ? 'Product'
               : data === ITEM_TYPE.SERVICE
-              ? "Service"
-              : "-"}
-          </>
+              ? 'Service'
+              : '-'}
+          </div>
         );
       },
     },
     {
-      title: "Stock",
-      dataIndex: "showStock",
+      title: 'Stock',
+      dataIndex: 'showStock',
       render: (data, row, index) => {
-        return <>{data}</>;
+        return data;
       },
     },
 
     {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
       render: (status) => {
-        return <>{status === 1 ? "Active" : "Deactive"}</>;
+        return status === 1 ? 'Active' : 'Deactive';
       },
     },
   ];
@@ -296,7 +292,7 @@ export const ItemsList: FC = () => {
         />
         <SmartFilter
           onFilter={(encode) => {
-            let route = `/app/items?sortid=${sortid}&page=1&page_size=20&query=${encode}`;
+            const route = `/app/items?sortid=${sortid}&page=1&page_size=20&query=${encode}`;
             history.push(route);
             setItemsConfig({ ...itemsConfig, query: encode });
           }}
@@ -309,7 +305,7 @@ export const ItemsList: FC = () => {
   };
 
   const copyItemsList = () => {
-    let copyItems = [];
+    const copyItems = [];
 
     selectedRow.map((id) => {
       const [filter] = result.filter((item) => item.id === id);
@@ -346,7 +342,7 @@ export const ItemsList: FC = () => {
                 onClick={() =>
                   setPricingModalConfig(true, {
                     id: selectedRow,
-                    action: "UPDATE",
+                    action: 'UPDATE',
                   })
                 }
                 title="Update Pricing"
@@ -382,7 +378,7 @@ export const ItemsList: FC = () => {
         return { ...prev, x: true };
       });
     } else {
-      setScrollConfig({ y: "100vh" });
+      setScrollConfig({ y: '100vh' });
     }
   }, [width]);
 
@@ -400,7 +396,7 @@ export const ItemsList: FC = () => {
               <Button
                 onClick={() => setItemsModalConfig(true)}
                 type="primary"
-                size={"middle"}
+                size={'middle'}
               >
                 Add Item
               </Button>
@@ -411,11 +407,11 @@ export const ItemsList: FC = () => {
           // scroll={scrollConfig}
           className="customized-table"
           rowKey={(record) => record.id}
-          key={"table1"}
+          key={'table1'}
           pdfExportable
           exportable
           printColumns={printCols}
-          printTitle={"Items List"}
+          printTitle={'Items List'}
           customTopbar={renderCustomTopbar()}
           topbarRightPannel={renderTopbarRightPannel()}
           hasPrint
@@ -429,14 +425,14 @@ export const ItemsList: FC = () => {
               );
               setItemsConfig({
                 ...itemsConfig,
-                sortid: "id",
+                sortid: 'id',
                 page: pagination.current,
                 page_size: pagination.pageSize,
               });
             } else {
               history.push(
                 `/app${ISupportedRoutes.ITEMS}?sortid=${
-                  sorter && sorter.order === "descend"
+                  sorter && sorter.order === 'descend'
                     ? `-${sorter.field}`
                     : sorter.field
                 }&page=${pagination.current}&page_size=${
@@ -446,7 +442,7 @@ export const ItemsList: FC = () => {
               setItemsConfig({
                 ...itemsConfig,
                 sortid:
-                  sorter.order === "descend"
+                  sorter.order === 'descend'
                     ? `-${sorter.field}`
                     : sorter.field,
               });
@@ -454,9 +450,9 @@ export const ItemsList: FC = () => {
           }}
           pagination={{
             showSizeChanger: true,
-            pageSizeOptions: ["10", "20", "50", "100", "150"],
+            pageSizeOptions: ['10', '20', '50', '100', '150'],
             pageSize: pagination && pagination.page_size,
-            position: ["bottomRight"],
+            position: ['bottomRight'],
             current: pagination.page_no,
             total: pagination && pagination.total,
           }}

@@ -1,49 +1,41 @@
 import bxPlus from '@iconify-icons/bx/bx-plus';
 import printIcon from '@iconify-icons/bytesize/print';
 import Icon from '@iconify/react';
+import { EditableTable } from '@invyce/editable-table';
+import { invycePersist } from '@invyce/invyce-persist';
 import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import dayjs from 'dayjs';
-import React, { FC, useRef, useState, useEffect } from 'react';
-import { createDndContext, DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import { FC, useEffect, useRef, useState } from 'react';
 import { queryCache, useMutation, useQuery } from 'react-query';
 
-import {
-  createPurchaseEntryAPI,
-  getInvoiceNumber,
-  InvoiceCreateAPI,
-} from '../../../../api';
+import { getInvoiceNumber, InvoiceCreateAPI } from '../../../../api';
+import { ConfirmModal } from '../../../../components/ConfirmModal';
+import { DatePicker } from '../../../../components/DatePicker';
+import { FormLabel } from '../../../../components/FormLabel';
+import { Payment } from '../../../../components/Payment';
+import { PrintFormat } from '../../../../components/PrintFormat';
+import { PrintViewPurchaseWidget } from '../../../../components/PurchasesWidget/PrintViewPurchaseWidget';
+import { Rbac } from '../../../../components/Rbac';
+import { PERMISSIONS } from '../../../../components/Rbac/permissions';
+import { Seprator } from '../../../../components/Seprator';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import {
   IErrorMessages,
   IServerError,
   ISupportedRoutes,
   NOTIFICATIONTYPE,
-  PaymentMode,
 } from '../../../../modal';
 import { IInvoiceType, ITaxTypes } from '../../../../modal/invoice';
 import { IOrganizationType } from '../../../../modal/organization';
 import { addition } from '../../../../utils/helperFunctions';
 import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv, { DownloadPDF } from '../../../../utils/Print';
-import { ConfirmModal } from '../../../../components/ConfirmModal';
-import { DatePicker } from '../../../../components/DatePicker';
-import { FormLabel } from '../../../../components/FormLabel';
-import { Payment } from '../../../../components/Payment';
-import { PrintFormat } from '../../../../components/PrintFormat';
-import { Rbac } from '../../../../components/Rbac';
-import { PERMISSIONS } from '../../../../components/Rbac/permissions';
-import { Seprator } from '../../../../components/Seprator';
-import { CommonTable } from '../../../../components/Table';
-import defaultItems from './defaultStates';
-import { DragableBodyRow } from './draggable';
-import { WrapperInvoiceForm } from './styles';
 import { PurchaseManager, usePurchaseWidget } from './EditorManager';
-import { PrintViewPurchaseWidget } from '../../../../components/PurchasesWidget/PrintViewPurchaseWidget';
-import { EditableTable } from '@invyce/editable-table';
-
-const RNDContext = createDndContext(HTML5Backend);
+import c from './keys';
+import { WrapperInvoiceForm } from './styles';
+import { create_update_contact } from '../../../../api/Contact';
+import { IContactTypes } from '@invyce/shared/types';
 
 const { Option } = Select;
 
@@ -81,6 +73,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   const [issueDate, setIssueDate] = useState(dayjs());
   const [printModal, setPrintModal] = useState(false);
   const [taxType, setTaxType] = useState<ITaxTypes>(ITaxTypes.TAX_INCLUSIVE);
+  const [createContactName, setCreateContactName] = useState('');
 
   const {
     rowsErrors,
@@ -97,7 +90,6 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     payment,
     setPayment,
     AntForm,
-    moveRow,
     isFetching,
     paymentReset,
     handleAddRow,
@@ -118,6 +110,10 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   const APISTAKE = InvoiceCreateAPI;
   /* React Query useMutation hook and ASYNC method to create invoice */
   const [muatateCreateInvoice, resMutateInvoice] = useMutation(APISTAKE);
+  //  CONTACT CREATE API
+  const [mutateCreateContact, resMutateCreateContact] = useMutation(
+    create_update_contact
+  );
   const [submitType, setSubmitType] = useState('');
   /* ********** HOOKS ENDS HERE ************** */
 
@@ -139,7 +135,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     const printItem = printRef.current;
     let email = ``;
 
-    let [filteredContact] = contactResult.filter(
+    const [filteredContact] = contactResult.filter(
       (cont) => cont.id === contactId
     );
 
@@ -147,8 +143,8 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
       email = filteredContact.email;
     }
 
-    let pdf = DownloadPDF(printItem);
-    let payload = {
+    const pdf = DownloadPDF(printItem);
+    const payload = {
       email,
       html: `${pdf}`,
       message,
@@ -156,10 +152,22 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     handleUploadPDF(payload);
   };
 
+  const onCreateContact = async () => {
+    await mutateCreateContact(
+      { name: createContactName, contactType: IContactTypes.CUSTOMER },
+      {
+        onSuccess: (data) => {
+          queryCache?.invalidateQueries('all-contacts');
+          notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Contact Created');
+        },
+      }
+    );
+  };
+
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   const onFinish = async (value) => {
-    let InvoiceItemsValidation = [];
+    const InvoiceItemsValidation = [];
 
     organization?.organizationType !== IOrganizationType.ENTERPRISE &&
       invoiceItems.forEach(async (i, index) => {
@@ -176,67 +184,64 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
         })}] Please Select any item otherwise delete empty row.`
       );
     } else {
-      let paymentData = { ...payment };
+      const paymentData = { ...payment };
       delete paymentData.totalAmount;
       delete paymentData.totalDiscount;
 
       let payload: any = {
-        invoice: {
-          ...value,
-          status: value.status.status,
-          invoiceType: type ? type : IInvoiceType.INVOICE,
-          discount: addition(invoiceDiscount, TotalDiscount),
-          netTotal: NetTotal,
-          grossTotal: GrossTotal,
-          total: '',
-          isNewRecord: true,
-        },
+        ...value,
+        status: value.status.status,
+        invoiceType: type ? type : IInvoiceType.INVOICE,
+        discount: addition(invoiceDiscount, TotalDiscount),
+        netTotal: NetTotal,
+        grossTotal: GrossTotal,
+        total: '',
+        isNewRecord: true,
+
         invoice_items: invoiceItems.map((item, index) => {
           return { ...item, sequence: index };
         }),
       };
-      let payments = {
-        ...paymentData,
-        amount:
-          payment.paymentMode === PaymentMode.CREDIT
-            ? 0
-            : payment.paymentMode === PaymentMode.CASH
-            ? NetTotal
-            : parseFloat(payment.amount),
-      };
+      // let payments = {
+      //   ...paymentData,
+      //   amount:
+      //     payment.paymentMode === PaymentMode.CREDIT
+      //       ? 0
+      //       : payment.paymentMode === PaymentMode.CASH
+      //       ? NetTotal
+      //       : parseFloat(payment.amount),
+      // };
 
-      if (type !== IInvoiceType.QUOTE && payload.invoice.status !== 2) {
-        if (payments.paymentMode === PaymentMode.CASH) {
-          delete payments.dueDate;
-        }
+      // if (type !== IInvoiceType.QUOTE && payload.invoice.status !== 2) {
+      //   if (payments.paymentMode === PaymentMode.CASH) {
+      //     delete payments.dueDate;
+      //   }
 
-        payload = { ...payload, payment: payments };
-      }
+      //   payload = { ...payload, payment: payments };
+      // }
 
-      delete payload.invoice.invoiceDiscount;
-      delete payload.invoice.total;
+      delete payload.invoiceDiscount;
+      delete payload.total;
 
       if (id) {
         payload = {
           ...payload,
-          invoice: {
-            ...payload.invoice,
-            id,
-            isNewRecord: false,
-            deleted_ids: deleteIds,
-          },
+          id,
+          isNewRecord: false,
+          deleted_ids: deleteIds,
         };
       }
       try {
         await muatateCreateInvoice(payload, {
           onSuccess: () => {
             notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Invoice Created');
+
             if (value && value.status.print) {
               setPrintModal(true);
             }
 
             if (payload.invoice.status !== 2) {
-              let messages = {
+              const messages = {
                 invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
                 quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
               };
@@ -250,10 +255,8 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
             }
 
             ClearAll();
-            setInvoiceDiscount(0);
 
             /* this will clear invoice items, formdata and payment */
-            setInvoiceItems([{ ...defaultItems }]);
 
             [
               'invoices',
@@ -285,7 +288,9 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
             }
           },
         });
-      } catch (error) {}
+      } catch (error) {
+        return null;
+      }
     }
   };
   const onCancelPrint = () => {
@@ -295,7 +300,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
       queryCache.removeQueries(`${type}-${id}-view`);
       let route = history.location.pathname.split('/');
       if (route.length > 3) {
-        let removeIndex = route.length - 1;
+        const removeIndex = route.length - 1;
         route.splice(removeIndex, 1);
         route = route.join('/');
       } else {
@@ -329,14 +334,6 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     orderNo: type === IInvoiceType.INVOICE ? 'Invoice #' : 'Order No',
   };
 
-  const components = {
-    body: {
-      row: DragableBodyRow,
-    },
-  };
-
-  const manager = useRef(RNDContext);
-
   /* JSX  */
   return (
     <WrapperInvoiceForm>
@@ -364,11 +361,19 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
       </div>
       <div className=" _disable_print">
         <Form
-          onSubmitCapture={(e) => {}}
           form={AntForm}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           onValuesChange={(changedField, allvalues) => {
+            const _formData =
+              invycePersist(c.ANTFORMCACHE + type, '', 'localStorage').get() ||
+              null;
+            invycePersist(
+              c.ANTFORMCACHE + type,
+              { ..._formData, ...allvalues },
+              'localStorage'
+            ).set();
+
             if (changedField?.isTaxIncluded) {
               setTaxType(changedField?.isTaxIncluded);
             }
@@ -390,21 +395,41 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                         showSearch
                         style={{ width: '100%' }}
                         placeholder="Select Contact"
-                        optionFilterProp="children"
-                        onChange={(val) => {
-                          if (val !== 'newContact') {
-                            AntForm.setFieldsValue({ contactId: val });
+                        // optionFilterProp="children"
+                        filterOption={(input, option) => {
+                          setCreateContactName(input);
+                          if (typeof option?.children === 'string') {
+                            return (
+                              option?.value
+                                ?.toLowerCase()
+                                .includes(input?.toLocaleLowerCase()) ||
+                              option?.children
+                                ?.toLowerCase()
+                                .includes(input?.toLocaleLowerCase())
+                            );
+                          } else {
+                            return true;
                           }
                         }}
+                        // onChange={(val) => {
+                        //   if (val !== 'newContact') {
+                        //     AntForm.setFieldsValue({ contactId: val });
+                        //   }
+                        // }}
                       >
-                        <Option value={'contact-create'}>
+                        <Option
+                          style={{
+                            textAlign: 'left',
+                            border: '1px solid white',
+                          }}
+                          value={'contact-create'}
+                        >
                           <Button
-                            onClick={() => {
-                              history.push(
-                                `/app${ISupportedRoutes.CREATE_CONTACT}`
-                              );
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onCreateContact();
                             }}
-                            type="link"
+                            type="default"
                             size="middle"
                           >
                             Create Contact
@@ -622,28 +647,6 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                     </Form.Item>
                   </div>
                 )}
-                <Rbac
-                  permission={
-                    type === IInvoiceType.INVOICE
-                      ? PERMISSIONS.INVOICES_DRAFT_APPROVE
-                      : PERMISSIONS.INVOICES_DRAFT_APPROVE
-                  }
-                >
-                  {type !== IInvoiceType.QUOTE &&
-                    organization.organizationType !==
-                      IOrganizationType.ENTERPRISE && (
-                      <Payment
-                        issueDate={issueDate}
-                        initialValues={{
-                          ...payment,
-                          totalAmount: NetTotal,
-                          totalDiscount: TotalDiscount,
-                        }}
-                        reset={paymentReset}
-                        onChange={(payload) => setPayment(payload)}
-                      />
-                    )}
-                </Rbac>
               </Col>
               <Col
                 xs={{ span: 8, offset: 4 }}
@@ -680,7 +683,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                       <Form.Item name="invoiceDiscount">
                         <InputNumber
                           onChange={(val) => {
-                            let value = val;
+                            const value = val;
                             clearTimeout(debounce);
 
                             debounce = setTimeout(() => {
@@ -711,7 +714,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                 <Form.Item name="status" className="actions_control">
                   <Button
                     onClick={() => {
-                      AntForm.resetFields();
+                      ClearAll();
                     }}
                     size={'middle'}
                     type="default"

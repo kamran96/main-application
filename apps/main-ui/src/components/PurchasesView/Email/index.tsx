@@ -6,7 +6,6 @@ import React, { FC, useEffect } from "react";
 import styled from "styled-components";
 import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
 import convertToRem from "../../../utils/convertToRem";
-import { CancelRequest } from "../../../utils/http";
 import { FormLabel } from "../../FormLabel";
 import CommonModal from "../../Modal";
 

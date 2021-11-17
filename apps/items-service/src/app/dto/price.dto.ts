@@ -11,5 +11,6 @@ export class PriceDto {
   isNewRecord: boolean;
   handlingCost: number;
   unitsInCorton: number;
+  priceUnit: number;
   item_ids: Array<string>;
 }

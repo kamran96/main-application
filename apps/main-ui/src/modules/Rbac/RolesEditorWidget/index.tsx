@@ -1,19 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Form, Input, Select } from "antd";
-import TextArea from "antd/lib/input/TextArea";
-import React, { FC, useEffect } from "react";
-import { queryCache, useMutation, useQuery } from "react-query";
-import styled from "styled-components";
+import { Button, Form, Input, Select } from 'antd';
+import TextArea from 'antd/lib/input/TextArea';
+import React, { FC, useEffect } from 'react';
+import { queryCache, useMutation, useQuery } from 'react-query';
+import styled from 'styled-components';
 import {
   CreateRoleAPI,
   getRbacListAPI,
   getRoleByIDAPI,
-} from "../../../api/rbac";
-import { CommonModal } from "../../../components";
-import { FormLabel } from "../../../components/FormLabel";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { IRoleRequest } from "../../../modal";
-import convertToRem from "../../../utils/convertToRem";
+} from '../../../api/rbac';
+import { CommonModal } from '../../../components';
+import { FormLabel } from '../../../components/FormLabel';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { IRoleRequest } from '../../../modal';
+import convertToRem from '../../../utils/convertToRem';
 
 const { Option } = Select;
 
@@ -48,10 +48,10 @@ export const RolesEditorWidget: FC = () => {
   }, [roleIdData]);
 
   const onFinish = async (values) => {
-    let level =
+    const level =
       allRoles.length &&
       allRoles.findIndex((i) => i.roleId === values.parentId);
-    let roles = [...allRoles];
+    const roles = [...allRoles];
     roles.splice(level + 1, 0, {
       ...values,
     });
@@ -61,14 +61,14 @@ export const RolesEditorWidget: FC = () => {
       level: level > -1 ? level + 2 : 1,
     };
 
-    if (allRoles.length) {
-      payload = {
-        ...payload,
-        roles: roles.map((item, index) => {
-          return { ...item, level: index + 1 };
-        }),
-      };
-    }
+    // if (allRoles.length) {
+    //   payload = {
+    //     ...payload,
+    //     roles: roles.map((item, index) => {
+    //       return { ...item, level: index + 1 };
+    //     }),
+    //   };
+    // }
     if (id) {
       payload = { ...payload, id };
     }
@@ -101,7 +101,7 @@ export const RolesEditorWidget: FC = () => {
             rules={[
               {
                 required: true,
-                message: "Role Name is required !",
+                message: 'Role Name is required !',
               },
             ]}
           >
@@ -130,7 +130,7 @@ export const RolesEditorWidget: FC = () => {
               </Button>
               <Button
                 loading={resMutateRoles.isLoading}
-                htmlType={"submit"}
+                htmlType={'submit'}
                 type="primary"
               >
                 Create

@@ -1,30 +1,30 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable no-throw-literal */
-import React, { FC, useCallback, useEffect, useState } from "react";
-import { TableCard } from "../../../../components/TableCard";
-import { Heading } from "../../../../components/Heading";
-import { Button, Col, Form, Input, Row, Select, Spin } from "antd";
-import { FormLabel } from "../../../../components/FormLabel";
-import { ListItem } from "./ListItem";
-import update from "immutability-helper";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { queryCache, useMutation, useQuery } from "react-query";
-import { getAllAccounts, getRecentAccounts } from "../../../../api/accounts";
-import { createTransactionAPI } from "../../../../api";
-import { IAccountsResult } from "../../../../modal/accounts";
-import { Editable } from "../../../../components/Editable";
-import moneyFormat from "../../../../utils/moneyFormat";
-import { NOTIFICATIONTYPE } from "../../../../modal";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
-import { Icon } from "@iconify/react";
-import deleteIcon from "@iconify/icons-carbon/delete";
-import { WrapperTransactionEditor } from "./styles";
-import TextArea from "antd/lib/input/TextArea";
-import addLine from "@iconify/icons-ri/add-line";
-import { DatePicker } from "../../../../components/DatePicker";
-import dayjs from "dayjs";
-import { LoadingOutlined } from "@ant-design/icons";
+import React, { FC, useCallback, useEffect, useState } from 'react';
+import { TableCard } from '../../../../components/TableCard';
+import { Heading } from '../../../../components/Heading';
+import { Button, Col, Form, Input, Row, Select, Spin } from 'antd';
+import { FormLabel } from '../../../../components/FormLabel';
+import { ListItem } from './ListItem';
+import update from 'immutability-helper';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { queryCache, useMutation, useQuery } from 'react-query';
+import { getAllAccounts, getRecentAccounts } from '../../../../api/accounts';
+import { createTransactionAPI } from '../../../../api';
+import { IAccountsResult } from '../../../../modal/accounts';
+import { Editable, EditableSelect } from '../../../../components/Editable';
+import moneyFormat from '../../../../utils/moneyFormat';
+import { NOTIFICATIONTYPE } from '../../../../modal';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { Icon } from '@iconify/react';
+import deleteIcon from '@iconify/icons-carbon/delete';
+import { WrapperTransactionEditor } from './styles';
+import TextArea from 'antd/lib/input/TextArea';
+import addLine from '@iconify/icons-ri/add-line';
+import { DatePicker } from '../../../../components/DatePicker';
+import dayjs from 'dayjs';
+import { LoadingOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 
@@ -47,7 +47,7 @@ export const TransactionWidget: FC = () => {
       account: null,
       debit: 0,
       credit: 0,
-      description: "",
+      description: '',
       key: 1,
       error: false,
     },
@@ -63,9 +63,9 @@ export const TransactionWidget: FC = () => {
 
   /*Query hook for  Fetching all accounts against ID */
   const { isLoading: recentAccountsLoading, data: recentAccountsData } =
-    useQuery([`recent-accounts`, "ALL"], getRecentAccounts);
+    useQuery([`recent-accounts`, 'ALL'], getRecentAccounts);
   const { isLoading: accountsLoading, data: accountsData } = useQuery(
-    [`all-accounts`, "ALL"],
+    [`all-accounts`, 'ALL'],
     getAllAccounts
   );
 
@@ -118,8 +118,8 @@ export const TransactionWidget: FC = () => {
       });
     });
 
-    let credits = [];
-    let debits = [];
+    const credits = [];
+    const debits = [];
 
     transactionItems.forEach((tranc, index) => {
       if (tranc && tranc.debit > 0) {
@@ -150,7 +150,7 @@ export const TransactionWidget: FC = () => {
       return { amount: a.amount + b.amount };
     });
 
-    let payload = {
+    const payload = {
       ...values,
       entries: {
         credits,
@@ -165,38 +165,40 @@ export const TransactionWidget: FC = () => {
           onSuccess: () => {
             setTransactionItems([
               {
-                account: "",
+                account: '',
                 debit: 0,
                 credit: 0,
-                description: "",
+                description: '',
               },
             ]);
             form.resetFields();
-            queryCache.invalidateQueries(
-              `transactions?page=${1}&query=${""}&sort=${"id"}`
-            );
+            ['accounts', `transactions`]?.forEach((key) => {
+              queryCache?.invalidateQueries((q) =>
+                q?.queryKey[0]?.toString().startsWith(key)
+              );
+            });
 
             notificationCallback(
               NOTIFICATIONTYPE.SUCCESS,
-              "Transaction Created"
+              'Transaction Created'
             );
           },
         });
-      } else throw { status: 501, message: "Transaction Not Matched" };
+      } else throw { status: 501, message: 'Transaction Not Matched' };
     } catch (error) {
       if (error.status && error.status === 501) {
         notificationCallback(NOTIFICATIONTYPE.ERROR, error.message);
       }
 
-      console.log(error, "error");
+      console.log(error, 'error');
     }
   };
   const onFinishFailed = (error) => {
-    console.log(error, "check error");
+    console.log(error, 'check error');
   };
 
   const onTableInputChange = (value, index, accessor) => {
-    let allItems = [...transactionItems];
+    const allItems = [...transactionItems];
     allItems[index] = { ...allItems[index], [accessor]: value, error: false };
     setTransactionItems(allItems);
   };
@@ -212,33 +214,35 @@ export const TransactionWidget: FC = () => {
         children={
           <>
             <td>{index + 1}</td>
-            <td style={{ maxWidth: "170px", minWidth: "140px" }}>
-              <Select
+            <td style={{ maxWidth: '170px', minWidth: '140px' }}>
+              <EditableSelect
                 loading={accountsLoading}
-                size={"middle"}
+                size={'middle'}
                 value={list.account}
                 showSearch
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 placeholder="Select Account"
                 optionFilterProp="children"
                 onChange={(val) => {
-                  onTableInputChange(val, index, "account");
+                  onTableInputChange(val, index, 'account');
                 }}
               >
-                {accounts.map((item: IAccountsResult, index: number) => {
-                  return <Option value={item.id}>{item.name}</Option>;
-                })}
-              </Select>
+                <>
+                  {accounts.map((item: IAccountsResult, index: number) => {
+                    return <Option value={item.id}>{item.name}</Option>;
+                  })}
+                </>
+              </EditableSelect>
             </td>
             <td>
               <Editable
                 value={list.description}
                 onChange={(e) => {
-                  let val = e.target.value;
-                  onTableInputChange(val, index, "description");
+                  const val = e.target.value;
+                  onTableInputChange(val, index, 'description');
                 }}
                 placeholder="Description"
-                size={"middle"}
+                size={'middle'}
                 type="text"
               />
             </td>
@@ -247,10 +251,10 @@ export const TransactionWidget: FC = () => {
                 disabled={list.credit > 0}
                 value={list.debit}
                 onChange={(value) => {
-                  onTableInputChange(value, index, "debit");
+                  onTableInputChange(value, index, 'debit');
                 }}
                 placeholder="debit"
-                size={"middle"}
+                size={'middle'}
                 type="number"
               />
             </td>
@@ -259,17 +263,17 @@ export const TransactionWidget: FC = () => {
                 disabled={list.debit > 0}
                 value={list.credit}
                 onChange={(value) => {
-                  onTableInputChange(value, index, "credit");
+                  onTableInputChange(value, index, 'credit');
                 }}
                 placeholder="credit"
-                size={"middle"}
+                size={'middle'}
                 type="number"
               />
             </td>
             <td className="action-icon">
               <i
                 onClick={() => {
-                  let cloneItems = [...transactionItems];
+                  const cloneItems = [...transactionItems];
                   cloneItems.splice(index, 1);
                   setTransactionItems(cloneItems);
                 }}
@@ -286,7 +290,7 @@ export const TransactionWidget: FC = () => {
 
   const handleQuickBar = (acc) => {
     const allitems = [...transactionItems];
-    let lastIndex = allitems.length === 0 ? 0 : allitems.length - 1;
+    const lastIndex = allitems.length === 0 ? 0 : allitems.length - 1;
     if (allitems.length === 0) {
       handleAddRow(acc.id);
     } else if (allitems[lastIndex].account) {
@@ -298,12 +302,12 @@ export const TransactionWidget: FC = () => {
   };
 
   const handleAddRow = (acc?: number) => {
-    let allItems = [...transactionItems];
+    const allItems = [...transactionItems];
     allItems.push({
       account: acc ? acc : null,
       debit: 0,
       credit: 0,
-      description: "",
+      description: '',
       key: allItems.length + 1,
     });
     setTransactionItems(allItems);
@@ -344,7 +348,7 @@ export const TransactionWidget: FC = () => {
                           <FormLabel>Reference #</FormLabel>
                           <Form.Item
                             name="ref"
-                            rules={[{ required: true, message: "Required !" }]}
+                            rules={[{ required: true, message: 'Required !' }]}
                           >
                             <Input size="middle" />
                           </Form.Item>
@@ -353,13 +357,13 @@ export const TransactionWidget: FC = () => {
                           <FormLabel>Date</FormLabel>
                           <Form.Item
                             name="date"
-                            rules={[{ required: true, message: "Required !" }]}
+                            rules={[{ required: true, message: 'Required !' }]}
                           >
                             <DatePicker
-                              style={{ width: "100%" }}
+                              style={{ width: '100%' }}
                               size="middle"
                               disabledDate={(current) => {
-                                return current > dayjs().endOf("day");
+                                return current > dayjs().endOf('day');
                               }}
                             />
                           </Form.Item>
@@ -394,18 +398,18 @@ export const TransactionWidget: FC = () => {
                               <thead>
                                 <tr>
                                   {[
-                                    "",
-                                    "#",
-                                    "Particular",
-                                    "Description",
-                                    "Debit",
-                                    "Credit",
-                                    "",
+                                    '',
+                                    '#',
+                                    'Particular',
+                                    'Description',
+                                    'Debit',
+                                    'Credit',
+                                    '',
                                   ].map((head, index) => {
                                     if (index === 0 || index === 1) {
                                       return (
                                         <th
-                                          style={{ width: "10px" }}
+                                          style={{ width: '10px' }}
                                           key={index}
                                         >
                                           {head}
@@ -455,13 +459,13 @@ export const TransactionWidget: FC = () => {
                               rules={[
                                 {
                                   required: true,
-                                  message: "Field is required !",
+                                  message: 'Field is required !',
                                 },
                               ]}
                             >
                               <TextArea
                                 placeholder={
-                                  "narration will be added in the transaction"
+                                  'narration will be added in the transaction'
                                 }
                                 rows={2}
                               />
@@ -476,7 +480,7 @@ export const TransactionWidget: FC = () => {
                               rules={[
                                 {
                                   required: true,
-                                  message: "Field is required !",
+                                  message: 'Field is required !',
                                 },
                               ]}
                             >
@@ -526,8 +530,8 @@ export const TransactionWidget: FC = () => {
                     <div
                       className={`quick-detail-wrapper ${
                         recentAccountsLoading
-                          ? "flex alignCenter justifyCenter"
-                          : ""
+                          ? 'flex alignCenter justifyCenter'
+                          : ''
                       }`}
                     >
                       {recentAccountsLoading ? (
@@ -540,27 +544,27 @@ export const TransactionWidget: FC = () => {
                             {accounts.length > 0 &&
                               accounts.map((acc, index) => {
                                 if (index <= 5) {
-                                  let isIncluded = transactionItems.findIndex(
+                                  const isIncluded = transactionItems.findIndex(
                                     (a) => a.account === acc.id
                                   );
-                                  let classname =
-                                    isIncluded !== -1 ? "itemAdded" : "";
+                                  const classname =
+                                    isIncluded !== -1 ? 'itemAdded' : '';
                                   return (
                                     <li
                                       className={`${classname}`}
                                       onClick={() => {
-                                        if (classname !== "itemAdded") {
+                                        if (classname !== 'itemAdded') {
                                           handleQuickBar(acc);
-                                        }else{
-                                          return null
+                                        } else {
+                                          return null;
                                         }
                                       }}
                                     >
                                       {acc.name}
                                     </li>
                                   );
-                                }else{
-                                  return null
+                                } else {
+                                  return null;
                                 }
                               })}
                           </ul>
@@ -573,8 +577,8 @@ export const TransactionWidget: FC = () => {
                     <div
                       className={`quick-detail-wrapper ${
                         recentAccountsLoading
-                          ? "flex alignCenter justifyCenter"
-                          : ""
+                          ? 'flex alignCenter justifyCenter'
+                          : ''
                       }`}
                     >
                       {recentAccountsLoading ? (
@@ -587,28 +591,28 @@ export const TransactionWidget: FC = () => {
                             {recentAccounts.length > 0 &&
                               recentAccounts?.map((acc, index) => {
                                 if (index <= 5) {
-                                  let isIncluded = transactionItems.findIndex(
+                                  const isIncluded = transactionItems.findIndex(
                                     (a) => a.account === acc.id
                                   );
 
-                                  let classname =
-                                    isIncluded !== -1 ? "itemAdded" : "";
+                                  const classname =
+                                    isIncluded !== -1 ? 'itemAdded' : '';
                                   return (
                                     <li
                                       className={`${classname}`}
                                       onClick={() => {
-                                        if (classname !== "itemAdded") {
+                                        if (classname !== 'itemAdded') {
                                           handleQuickBar(acc);
-                                        }else{
-                                          return null
+                                        } else {
+                                          return null;
                                         }
                                       }}
                                     >
                                       {acc.name}
                                     </li>
                                   );
-                                }else{
-                                  return null
+                                } else {
+                                  return null;
                                 }
                               })}
                           </ul>

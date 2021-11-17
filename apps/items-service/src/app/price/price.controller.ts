@@ -7,6 +7,8 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
+import { IPriceWithResponse } from '@invyce/interfaces';
+import { ParamsDto } from '../dto/item.dto';
 import { PriceDto } from '../dto/price.dto';
 import { PriceService } from './price.service';
 
@@ -15,7 +17,7 @@ export class PriceController {
   constructor(private priceService: PriceService) {}
 
   @Get('/:id')
-  async show(@Param() params) {
+  async show(@Param() params: ParamsDto): Promise<IPriceWithResponse> {
     try {
       const price = await this.priceService.FindById(params.id);
 
@@ -26,7 +28,6 @@ export class PriceController {
           result: price,
         };
       }
-      throw new HttpException('Price not found', HttpStatus.BAD_REQUEST);
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
@@ -36,7 +37,7 @@ export class PriceController {
   }
 
   @Post()
-  async create(@Body() priceDto: PriceDto) {
+  async create(@Body() priceDto: PriceDto): Promise<IPriceWithResponse> {
     try {
       const price = await this.priceService.CreatePrice(priceDto);
 

@@ -1,7 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import {
+  IBaseUser,
+  ICategory,
+  ICategoryWithResponse,
+  IPage,
+} from '@invyce/interfaces';
 import { Attribute } from '../schemas/attribute.schema';
 import { Category } from '../schemas/category.schema';
+import { CategoryDto, DeleteCategoryDto } from '../dto/item.dto';
 
 @Injectable()
 export class CategoryService {
@@ -10,10 +17,15 @@ export class CategoryService {
     @InjectModel(Attribute.name) private attributeModel
   ) {}
 
-  async ListCategory(user, query) {
+  async ListCategory(
+    user: IBaseUser,
+    query: IPage
+  ): Promise<ICategoryWithResponse> {
     const { page_no, page_size, purpose, parentId } = query;
-    let categories;
+    const ps: number = parseInt(page_size);
+    const pn: number = parseInt(page_no);
 
+    let categories;
     if (purpose) {
       categories = await this.categoryModel
         .find({
@@ -27,7 +39,7 @@ export class CategoryService {
         });
     } else {
       const myCustomLabels = {
-        docs: 'categories',
+        docs: 'result',
         totalDocs: 'total',
         limit: 'pageSize',
         page: 'currentPage',
@@ -45,8 +57,8 @@ export class CategoryService {
           parentId: parentId || null,
         },
         {
-          offset: page_no * page_size - page_size,
-          limit: page_size,
+          offset: pn * ps - ps,
+          limit: ps,
           populate: {
             path: 'attributes',
             match: { status: { $gte: 1 } },
@@ -58,12 +70,15 @@ export class CategoryService {
     return categories;
   }
 
-  async CreateCategory(categoryDto, user) {
+  async CreateCategory(
+    categoryDto: CategoryDto,
+    user: IBaseUser
+  ): Promise<ICategory> {
     if (categoryDto && categoryDto.isNewRecord === false) {
       const category = await this.FindById(categoryDto.id);
 
       if (category) {
-        let updatedCategory = {
+        const updatedCategory = {
           title: categoryDto.title || category.title,
           description: categoryDto.description || category.description,
         };
@@ -84,7 +99,7 @@ export class CategoryService {
     }
   }
 
-  async FindById(categoryId) {
+  async FindById(categoryId: string): Promise<ICategory> {
     return await this.categoryModel
       .findById(categoryId)
       .populate('attributes', null, { status: 1 });
@@ -92,13 +107,13 @@ export class CategoryService {
 
   async CreateAttribute(attribsDto) {
     if (attribsDto.deleted_ids?.length > 0) {
-      for (let id of attribsDto.deleted_ids) {
+      for (const id of attribsDto.deleted_ids) {
         await this.attributeModel.updateOne({ _id: id }, { status: 0 });
       }
     }
 
     delete attribsDto.deleted_ids;
-    for (let attribute of attribsDto.attributes) {
+    for (const attribute of attribsDto.attributes) {
       if (attribute?.id) {
         // update attribute
         const att = await this.attributeModel.findById(attribute?.id);
@@ -126,17 +141,15 @@ export class CategoryService {
     return true;
   }
 
-  async DeleteCategory(deleteCategoryDto) {
+  async DeleteCategory(deleteCategoryDto: DeleteCategoryDto): Promise<void> {
     if (deleteCategoryDto.isLeaf === false) {
-      for (let id of deleteCategoryDto.ids) {
+      for (const id of deleteCategoryDto.ids) {
         await this.categoryModel.updateOne({ parentId: id }, { status: 0 });
       }
     }
 
-    for (let id of deleteCategoryDto.ids) {
+    for (const id of deleteCategoryDto.ids) {
       await this.categoryModel.updateOne({ _id: id }, { status: 0 });
     }
-
-    return true;
   }
 }

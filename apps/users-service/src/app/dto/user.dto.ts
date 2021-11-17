@@ -7,6 +7,7 @@ export class UserRegisterDto {
   email: string;
   password: string;
   roleId: number;
+  fullName: string;
   branchId: number;
   organizationId: number;
   terms: boolean;
@@ -17,11 +18,11 @@ export class UserRegisterDto {
   prefix;
 }
 
-export class InvitedUser {
-  users: Array<InvitedUserArr>;
+export class InvitedUserDto {
+  users: Array<InvitedUserDetailDto>;
 }
 
-class InvitedUserArr {
+export class InvitedUserDetailDto {
   fullname: string;
   @IsNotEmpty()
   email: string;
@@ -37,12 +38,19 @@ class InvitedUserArr {
   prefix: string;
   cnic: string;
   bio: string;
+  roleId: string;
+  branchId: string;
 }
 
 export class UserLoginDto {
   @IsNotEmpty()
   username: string;
-  password: string;
+  email?: string;
+  password?: string;
+}
+
+export class SendCodeDto {
+  code: string;
 }
 
 export class ForgetPasswordDto {
@@ -68,4 +76,13 @@ export class ProfileDto {
 
 export class UserIdsDto {
   ids: Array<number>;
+}
+
+export class SendOtp {
+  email: string;
+  otp: string;
+}
+
+export class UserThemeDto {
+  theme: string;
 }

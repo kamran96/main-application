@@ -1,5 +1,5 @@
 export class RoleDto {
-  id: number;
+  id: string;
   name: string;
   description: string;
   level: number;
@@ -14,7 +14,11 @@ export class PermissionDto {
 }
 
 export class RoleIdsDto {
-  ids: Array<number>;
+  ids: Array<string>;
+}
+
+export class ParamsDto {
+  id: string;
 }
 
 export class PermissionIdsDto {

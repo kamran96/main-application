@@ -1,16 +1,16 @@
-import dayjs from "dayjs";
-import React, { FC } from "react";
-import { IInvoiceResult, IAddress } from "../../modal/invoice";
-import { totalDiscountInInvoice } from "../../utils/formulas";
-import moneyFormat from "../../utils/moneyFormat";
-import { BoldText } from "../Para/BoldText";
-import { PrintHeaderFormat, TableDivisions } from "../PrintHeader";
-import { Addressbar, TopbarLogoWithDetails } from "../PrintHeader/Formats";
-import { Capitalize } from "../Typography";
+import dayjs from 'dayjs';
+import React, { FC } from 'react';
+import { IInvoiceResult, IAddress } from '../../modal/invoice';
+import { totalDiscountInInvoice } from '../../utils/formulas';
+import moneyFormat from '../../utils/moneyFormat';
+import { BoldText } from '../Para/BoldText';
+import { PrintHeaderFormat, TableDivisions } from '../PrintHeader';
+import { Addressbar, TopbarLogoWithDetails } from '../PrintHeader/Formats';
+import { Capitalize } from '../Typography';
 
 interface IProps {
   data?: IInvoiceResult;
-  type?: "SI" | "PO" | "QO" | "BILL" |"credit-note";
+  type?: 'SI' | 'PO' | 'QO' | 'BILL' | 'credit-note';
   heading?: string;
   hideCalculation?: boolean;
 }
@@ -21,17 +21,20 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
   heading,
   hideCalculation = false,
 }) => {
-  let asessorTableData =
-    type === "SI"
-      ? "invoice_items"
-      : type === "PO"
-      ? "purchase_items"
-      : type === "BILL"
-      ? "bill_items" : type==="credit-note" ? 'credit_note_items'
-      : "invoice_items";
+  const asessorTableData =
+    type === 'SI'
+      ? 'invoiceItems'
+      : type === 'PO'
+      ? 'purchaseItems'
+      : type === 'BILL'
+      ? 'billItems'
+      : type === 'credit-note'
+      ? 'credit_note_items'
+      : 'invoice_items';
 
-  let priceAccessor =
-    type === "SI" || "QO" || "BILL" ? "unitPrice" : "purchasePrice";
+  const priceAccessor =
+    // eslint-disable-next-line no-constant-condition
+    type === 'SI' || 'QO' || 'BILL' ? 'unitPrice' : 'purchasePrice';
 
   const calculatedDisc: number = data && data.discount;
   /* ********* THIS IS RESPONSIBLE TO GET ITEMS DISCOUNT TOTAL ************ */
@@ -39,8 +42,8 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
     (data &&
       totalDiscountInInvoice(
         asessorTableData,
-        "itemDiscount",
-        type === "PO" ? "POE" : "SI"
+        'itemDiscount',
+        type === 'PO' ? 'POE' : 'SI'
       )) ||
     0;
 
@@ -54,21 +57,21 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
     (data &&
       totalDiscountInInvoice(
         asessorTableData,
-        "tax",
-        type === "PO" ? "POE" : "SI"
+        'tax',
+        type === 'PO' ? 'POE' : 'SI'
       )) ||
     0;
 
-  let _heading =
-    data.invoiceType === "SI"
-      ? "Sale Invoice"
-      : data.invoiceType === "PO" || data.invoiceType === "POE"
-      ? "Purchase Order"
-      : data.invoiceType === "QO"
-      ? data.invoiceType === "BILL"
-        ? "Bill"
-        : "Quotation"
-      : "";
+  const _heading =
+    data.invoiceType === 'SI'
+      ? 'Sale Invoice'
+      : data.invoiceType === 'PO' || data.invoiceType === 'POE'
+      ? 'Purchase Order'
+      : data.invoiceType === 'QO'
+      ? data.invoiceType === 'BILL'
+        ? 'Bill'
+        : 'Quotation'
+      : '';
 
   return (
     <div id="purchase_order_print_view">
@@ -88,7 +91,7 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
         <div className="main_wrapper">
           <div className="invoice_dispatch_details">
             <div className="billed">
-              <table className="_main_table" style={{ width: "100%" }}>
+              <table className="_main_table" style={{ width: '100%' }}>
                 <tr>
                   <td>
                     <div>
@@ -99,7 +102,10 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
                         <tr>
                           <td>
                             <BoldText style={{ margin: 0 }}>
-                             <Capitalize> {data?.contact?.name || ""}</Capitalize>
+                              <Capitalize>
+                                {' '}
+                                {data?.contact?.name || ''}
+                              </Capitalize>
                             </BoldText>
                           </td>
                         </tr>
@@ -116,12 +122,12 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
                     </div>
                   </td>
                   <td className="invoices_details">
-                    <div style={{ display: "flex", justifyContent: "center" }}>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
                       <table>
                         <tr>
                           <td className="head">
                             Invoice number
-                            <BoldText style={{ color: "#222234" }}>
+                            <BoldText style={{ color: '#222234' }}>
                               {data?.invoiceNumber}
                             </BoldText>
                           </td>
@@ -129,7 +135,7 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
                         <tr>
                           <td className="head">
                             Reference
-                            <BoldText style={{ color: "#222234" }}>
+                            <BoldText style={{ color: '#222234' }}>
                               {data?.reference}
                             </BoldText>
                           </td>
@@ -139,15 +145,15 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
                   </td>
                   <td>
                     <div
-                      style={{ display: "flex", justifyContent: "flex-end" }}
+                      style={{ display: 'flex', justifyContent: 'flex-end' }}
                     >
                       <table>
                         <tr>
                           <td className="head">
                             <div>
                               Invoice Date
-                              <BoldText style={{ color: "#222234" }}>
-                                {dayjs(data?.issueDate)?.format("D MMM, YYYY")}
+                              <BoldText style={{ color: '#222234' }}>
+                                {dayjs(data?.issueDate)?.format('D MMM, YYYY')}
                               </BoldText>
                             </div>
                           </td>
@@ -157,8 +163,8 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
                             {data?.dueDate && (
                               <div>
                                 Due Date
-                                <BoldText style={{ color: "#222234" }}>
-                                  {dayjs(data?.dueDate)?.format("D MMM, YYYY")}
+                                <BoldText style={{ color: '#222234' }}>
+                                  {dayjs(data?.dueDate)?.format('D MMM, YYYY')}
                                 </BoldText>
                               </div>
                             )}
@@ -176,16 +182,16 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
             <thead>
               <tr>
                 {/* <th style={{ textAlign: "center" }}> #</th> */}
-                <th style={{ textAlign: "left" }}>Item Name</th>
+                <th style={{ textAlign: 'left' }}>Item Name</th>
 
-                <th style={{ textAlign: "center" }}> Qty</th>
-                <th style={{ textAlign: "center" }}>
-                  {" "}
-                  {type === "SI" ? "Unit Price" : "Purchase"}{" "}
+                <th style={{ textAlign: 'center' }}> Qty</th>
+                <th style={{ textAlign: 'center' }}>
+                  {' '}
+                  {type === 'SI' ? 'Unit Price' : 'Purchase'}{' '}
                 </th>
-                <th style={{ textAlign: "center" }}> Disc</th>
-                <th style={{ textAlign: "center" }}> Tax</th>
-                <th style={{ textAlign: "center" }}> Amount</th>
+                <th style={{ textAlign: 'center' }}> Disc</th>
+                <th style={{ textAlign: 'center' }}> Tax</th>
+                <th style={{ textAlign: 'center' }}> Amount</th>
               </tr>
             </thead>
             <tbody>
@@ -207,25 +213,25 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
                           </p>
                           <p className="item_desc">{listItem.description}</p>
                         </td>
-                        <td style={{ textAlign: "center" }}>
+                        <td style={{ textAlign: 'center' }}>
                           {listItem.quantity}
                         </td>
-                        <td style={{ textAlign: "center" }}>
+                        <td style={{ textAlign: 'center' }}>
                           {listItem[priceAccessor]
                             ? moneyFormat(listItem[priceAccessor])
-                            : "-"}
+                            : '-'}
                         </td>
-                        <td style={{ textAlign: "center" }}>
+                        <td style={{ textAlign: 'center' }}>
                           {listItem.itemDiscount &&
-                          listItem.itemDiscount.includes("%")
+                          listItem.itemDiscount.includes('%')
                             ? `${listItem.itemDiscount}%`
                             : listItem.itemDiscount
                             ? moneyFormat(listItem.itemDiscount)
-                            : "-"}
+                            : '-'}
                         </td>
-                        <td style={{ textAlign: "center" }}>{listItem.tax}</td>
-                        <td style={{ textAlign: "center" }}>
-                          {listItem.total ? moneyFormat(listItem.total) : "-"}
+                        <td style={{ textAlign: 'center' }}>{listItem.tax}</td>
+                        <td style={{ textAlign: 'center' }}>
+                          {listItem.total ? moneyFormat(listItem.total) : '-'}
                         </td>
                       </tr>
                     );
@@ -234,48 +240,43 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
           </table>
           <div
             style={{
-              padding: "20px 0",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
+              padding: '20px 0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
             }}
             className="flex aliginCenter justifySpaceBetween"
           >
-            {true ? (
-              // {data && data.comment ? (
-              <div className="comment area ">
-                <BoldText style={{ color: "#656584" }} className="pv-10">
-                  Note:
-                </BoldText>
-                <div
+            <div className="comment area ">
+              <BoldText style={{ color: '#656584' }} className="pv-10">
+                Note:
+              </BoldText>
+              <div
+                style={{
+                  padding: '4px 0',
+                  marginRight: '40px',
+                }}
+              >
+                <p
                   style={{
-                    padding: "4px 0",
-                    marginRight: "40px",
+                    fontSize: 14,
+                    paddingRight: 0,
+                    color: '#222234',
+                    lineHeight: '17px',
                   }}
                 >
-                  <p
-                    style={{
-                      fontSize: 14,
-                      paddingRight: 0,
-                      color: "#222234",
-                      lineHeight: "17px",
-                    }}
-                  >
-                    {/* {data.comment} */}
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                    Quis nobis, consequatur facilis facere architecto suscipit
-                    recusandae, quisquam accusantium ipsa tempore, modi enim
-                    aspernatur? Sit neque ullam ratione corrupti, sed aperiam.
-                  </p>
-                </div>
+                  {/* {data.comment} */}
+                  Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quis
+                  nobis, consequatur facilis facere architecto suscipit
+                  recusandae, quisquam accusantium ipsa tempore, modi enim
+                  aspernatur? Sit neque ullam ratione corrupti, sed aperiam.
+                </p>
               </div>
-            ) : (
-              <div></div>
-            )}
+            </div>
             {!hideCalculation ? (
               <div className="total">
                 <table
-                  style={{ borderSpacing: "0 !important" }}
+                  style={{ borderSpacing: '0 !important' }}
                   className="total_table"
                 >
                   <tr>
@@ -309,23 +310,23 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
               <div></div>
             )}
           </div>
-          <div style={{ padding: "20px 0" }}>
+          <div style={{ padding: '20px 0' }}>
             <div className="terms">
-              <BoldText style={{ color: "#656584" }} className="pv-10">
+              <BoldText style={{ color: '#656584' }} className="pv-10">
                 Terms & Conditions
               </BoldText>
               <div
                 style={{
-                  padding: "4px 0",
-                  marginRight: "40px",
+                  padding: '4px 0',
+                  marginRight: '40px',
                 }}
               >
                 <p
                   style={{
                     fontSize: 14,
                     paddingRight: 0,
-                    color: "#222234",
-                    lineHeight: "17px",
+                    color: '#222234',
+                    lineHeight: '17px',
                   }}
                 >
                   {/* {data.comment} */}

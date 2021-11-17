@@ -1,8 +1,8 @@
-import http, { railsHttp } from "../utils/http";
+import http from '../utils/http';
 
-enum ContactAPI {
-  INDEX = "contact",
-  railsINDEX = "contacts/index",
+enum ContactServiceAPI {
+  default = 'contacts/contact',
+  index = 'contacts/contact',
 }
 
 export const getContacts = (
@@ -13,27 +13,27 @@ export const getContacts = (
   page_size?: number,
   query?: string
 ) => {
-  let url = `contacts/index?page_size=${page_size}&page_no=${page}&sort=${sortid}&type=${type}`;
+  let url = `${ContactServiceAPI.default}?page_size=${page_size}&page_no=${page}&sort=${sortid}&type=${type}`;
   if (query) {
     url = `${url}&query=${query}`;
   }
 
-  return railsHttp.get(url);
+  return http.get(url);
 };
 
 export const viewSingleContact = (key?: string, id?: number) =>
-  railsHttp.get(`contacts/${id}`);
+  http.get(`${ContactServiceAPI.default}/${id}`);
 
 export const deleteContacts = (payload) =>
-  http.put(`${ContactAPI.INDEX}`, payload);
+  http.put(`${ContactServiceAPI.default}`, payload);
 
 export const create_update_contact = (payload) => {
-  let url = `contacts/create`;
-  return railsHttp.post(url, payload);
+  const url = `${ContactServiceAPI.default}`;
+  return http.post(url, payload);
 };
 
 export const getAllContacts = (key?: string, purpose?: string) =>
-  railsHttp.get(`${ContactAPI.railsINDEX}?purpose=${purpose}`);
+  http.get(`${ContactServiceAPI.default}?purpose=${purpose}`);
 
 export const getContactLedger = (
   key?: string,
@@ -47,5 +47,5 @@ export const getContactLedger = (
   if (query) {
     url = `${url}&query=${query}`;
   }
-  return railsHttp.get(url);
+  return http.get(url);
 };

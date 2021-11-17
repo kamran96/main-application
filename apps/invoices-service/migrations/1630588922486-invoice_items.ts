@@ -18,6 +18,7 @@ export class invoiceItems1630588922486 implements MigrationInterface {
           { name: 'quantity', type: 'float', isNullable: true },
           { name: 'itemDiscount', type: 'float', isNullable: true },
           { name: 'unitPrice', type: 'float', isNullable: true },
+          { name: 'accountId', type: 'int', isNullable: true },
           { name: 'tax', type: 'text', isNullable: true },
           { name: 'total', type: 'float', isNullable: true },
           { name: 'sequence', type: 'int', isNullable: true },

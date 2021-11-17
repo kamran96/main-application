@@ -1,12 +1,10 @@
 import axios from 'axios';
 import { DecriptionData } from './encription';
 
-let localIP = `http://localhost`;
+const localIP = `http://192.168.1.22/`;
 let RailsBaseURL = '';
 let NodeBaseURL = ``;
-let cancelToken = axios.CancelToken;
-
-export let CancelRequest: any;
+const cancelSource = axios.CancelToken.source();
 
 const host = window.location.hostname;
 
@@ -22,23 +20,19 @@ if (host && host === 'app.invyce.com') {
   NodeBaseURL = `https://dev.api.node.invyce.com/`;
 } else {
   // local development
-  RailsBaseURL = localIP; // + ":4000"
+  RailsBaseURL = localIP; // + ":3000"
   NodeBaseURL = localIP; //+ ":8081"
 }
 
 const http = axios.create({
   baseURL: NodeBaseURL,
   withCredentials: true,
-  cancelToken: new cancelToken(function executor(c) {
-    CancelRequest = c;
-  }),
+  cancelToken: cancelSource.token,
 });
 
 export const railsHttp = axios.create({
   baseURL: RailsBaseURL,
-  cancelToken: new cancelToken(function executor(c) {
-    CancelRequest = c;
-  }),
+  cancelToken: cancelSource.token,
   headers: {
     'Content-type': 'application/json',
   },
@@ -57,18 +51,22 @@ export const railsHttp = axios.create({
 // http.interceptors.response.use(res => requestHandler(res));
 
 export const encriptionData = localStorage.getItem('auth');
-// let access_token = encriptionData
-// ? DecriptionData(encriptionData).access_token
-// : false;
+const access_token = encriptionData
+  ? DecriptionData(encriptionData).access_token
+  : false;
 
-export const updateToken = (token: String) => {
-  // http.defaults.headers.common.Authorization = `Bearer ${token}`;
-  // railsHttp.defaults.headers.common.Authorization = `Bearer ${token}`;
+export const updateToken = (token: string) => {
+  http.defaults.headers.common.Authorization = `Bearer ${token}`;
+  railsHttp.defaults.headers.common.Authorization = `Bearer ${token}`;
 };
 
-// if (access_token) {
-// updateToken(access_token);
-// }
+export const CancelRequest = () => {
+  cancelSource.cancel();
+};
+
+if (access_token) {
+  updateToken(access_token);
+}
 
 export { NodeBaseURL, RailsBaseURL };
 export default http || railsHttp;

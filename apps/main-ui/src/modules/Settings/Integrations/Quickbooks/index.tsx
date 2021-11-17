@@ -1,15 +1,17 @@
-import { Button, Checkbox, Modal } from "antd";
-import React, { FC, useEffect, useState } from "react";
-import { useMutation } from "react-query";
-import styled from "styled-components";
-import Quickbook from "../../../../assets/quickbook.png";
-import { H3, H4, P } from "../../../../components/Typography";
-import { QuickbooksIntegrationAPI, XeroVerification } from "../../../../api";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
-import { Seprator } from "../../../../components/Seprator";
-import { CommonModal } from "../../../../components";
-import { ISupportedRoutes } from "../../../../modal";
-import { IThemeProps } from "../../../../hooks/useTheme/themeColors";
+import { Button, Checkbox } from 'antd';
+import { FC, useEffect, useState } from 'react';
+import { useMutation } from 'react-query';
+import styled from 'styled-components';
+
+import { QuickbooksIntegrationAPI } from '../../../../api';
+import Quickbook from '../../../../assets/quickbook.png';
+import { CommonModal } from '../../../../components';
+import { Seprator } from '../../../../components/Seprator';
+import { H3, H4 } from '../../../../components/Typography';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
+import { ISupportedRoutes } from '../../../../modal';
+import { QuickbooksFetchAPI } from '../../../../api';
 
 export const QuickBooks: FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -18,6 +20,8 @@ export const QuickBooks: FC = () => {
   const [mutateIntegration, { isLoading, data }] = useMutation(
     QuickbooksIntegrationAPI
   );
+  const [mutateFetchModules, { data: modulesData }] =
+    useMutation(QuickbooksFetchAPI);
 
   // const [muateteCopyModules, resCopyModules] = useMutation(QuickbooksIntegrationAPI);
 
@@ -46,12 +50,13 @@ export const QuickBooks: FC = () => {
   // }, [verify]);
 
   useEffect(() => {
-    if (location?.search && location?.search.includes("quickbooks=verified")) {
+    if (location?.search && location?.search.includes('quickbooks=verified')) {
       const fetchItems = JSON.parse(
-        atob(location?.search?.split("fetchItems=")[1])
+        atob(location?.search?.split('fetchItems=')[1])
       )?.map((item, index) => {
         return { name: item, fetch: false };
       });
+
       setImportList(fetchItems);
       setModalVisible(true);
     }
@@ -75,7 +80,7 @@ export const QuickBooks: FC = () => {
   };
 
   const _quickbookCopyModules = async () => {
-    let payload = {
+    const payload = {
       modules: [],
     };
     importList?.forEach((item, index) => {
@@ -84,13 +89,13 @@ export const QuickBooks: FC = () => {
       }
     });
 
-    // await muateteCopyModules(payload);
+    await mutateFetchModules(payload);
   };
 
   return (
     <WrapperCard>
       <div className="integration_card">
-        <img className="service_logo" src={Quickbook} alt={"quickbooks logo"} />
+        <img className="service_logo" src={Quickbook} alt={'quickbooks logo'} />
         <H4>Intuit’s Quick Books</H4>
         <div className="description">
           <p>
@@ -104,7 +109,7 @@ export const QuickBooks: FC = () => {
           type="default"
           size="middle"
         >
-          {false ? "verifying.." : "Connect"}
+          {false ? 'verifying..' : 'Connect'}
         </Button>
       </div>
       <IntegrationModal
@@ -143,7 +148,7 @@ export const QuickBooks: FC = () => {
                         <li>
                           <Checkbox
                             onChange={(e) => {
-                              let allItems = [...importList];
+                              const allItems = [...importList];
                               allItems[index] = {
                                 ...allItems[index],
                                 fetch: e.target.checked,
@@ -190,7 +195,7 @@ export const QuickBooks: FC = () => {
 const WrapperCard = styled.div`
   .integration_card {
     background: ${(props: IThemeProps) =>
-      props?.theme?.colors?.sidebarBg || "#ffff"};
+      props?.theme?.colors?.sidebarBg || '#ffff'};
     border-radius: 6px;
     display: flex;
 
@@ -217,16 +222,16 @@ const WrapperCard = styled.div`
       text-align: center;
 
       color: ${(props: IThemeProps) =>
-        props?.theme?.colors?.textTd || "#303030"};
+        props?.theme?.colors?.textTd || '#303030'};
       margin: 0;
     }
   }
 `;
 
-type DivProps = JSX.IntrinsicElements['div']
+type DivProps = JSX.IntrinsicElements['div'];
 
 interface WrapperXeroWrapperProps extends DivProps {
-  step?: Number;
+  step?: number;
 }
 
 const WrapperXeroModal = styled.div<WrapperXeroWrapperProps>`
@@ -239,7 +244,7 @@ const WrapperXeroModal = styled.div<WrapperXeroWrapperProps>`
     padding: 0px;
     transition: 0.6s all ease-in-out;
     margin-left: ${(props: any) =>
-      props?.step === 2 ? "-660px" : props?.step === 3 ? "-1320px" : "0"};
+      props?.step === 2 ? '-660px' : props?.step === 3 ? '-1320px' : '0'};
 
     .step-1 {
       /* margin-right: 70px; */
@@ -267,6 +272,9 @@ const WrapperXeroModal = styled.div<WrapperXeroWrapperProps>`
               .ant-checkbox-checked .ant-checkbox-inner {
                 background-color: #1a497e;
                 border-color: #1a497e;
+              }
+              &::after {
+                display: none;
               }
             }
           }

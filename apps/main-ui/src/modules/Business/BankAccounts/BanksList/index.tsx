@@ -3,7 +3,7 @@ import { ColumnsType } from "antd/lib/table";
 import dayjs from "dayjs";
 import { useQuery } from "react-query";
 import styled from "styled-components";
-import { getBanksList } from "../../../../api/banks";
+import { getBankAccountsList } from "../../../../api/banks";
 import { CommonTable } from "../../../../components/Table";
 import { ACCOUNT_TYPES, ACCOUNT_TYPES_NAMES } from "../../../../modal/accounts";
 import { IBaseAPIError } from "../../../../modal/base";
@@ -14,7 +14,7 @@ import { TableCard } from "../../../../components/TableCard";
 export const BanksList: FC = () => {
   const [responseBanks, setResponseBanks] = useState([]);
   const { notificationCallback } = useGlobalContext();
-  const { isLoading, data } = useQuery([`banks-list`], getBanksList, {
+  const { isLoading, data } = useQuery([`banks-list`], getBankAccountsList, {
     onError: (error: IBaseAPIError) => {
       if (
         error &&

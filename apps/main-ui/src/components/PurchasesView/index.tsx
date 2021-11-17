@@ -1,73 +1,66 @@
-import { Card, Col, Row, Button, Dropdown, Menu } from "antd";
-import React, { useEffect, useState } from "react";
-import { FC } from "react";
-import styled from "styled-components";
-import { Heading } from "../Heading";
-import { PrintHeaderFormat } from "../PrintHeader";
-import { TableDivisions } from "../PrintHeader";
-import { TopbarLogoWithDetails, Addressbar } from "../PrintHeader/Formats";
-import { Seprator } from "../Seprator";
-import { BoldText, BOLDTEXT } from "../Para/BoldText";
-import { Capitalize, H3, P } from "../Typography";
-import moneyFormat from "../../utils/moneyFormat";
-import { CommonTable } from "../Table";
-import { ColumnsType } from "antd/lib/table";
-import { useRbac } from "../Rbac/useRbac";
+import { Card, Col, Row, Button, Dropdown, Menu } from 'antd';
+import { useEffect, useState } from 'react';
+import { FC } from 'react';
+import styled from 'styled-components';
+import { Heading } from '../Heading';
+import { PrintHeaderFormat } from '../PrintHeader';
+import { TableDivisions } from '../PrintHeader';
+import { TopbarLogoWithDetails, Addressbar } from '../PrintHeader/Formats';
+import { Seprator } from '../Seprator';
+import { BoldText, BOLDTEXT } from '../Para/BoldText';
+import { Capitalize, H3, P } from '../Typography';
+import moneyFormat from '../../utils/moneyFormat';
+import { CommonTable } from '../Table';
+import { ColumnsType } from 'antd/lib/table';
+import { useRbac } from '../Rbac/useRbac';
 import {
   creditNoteViewAPI,
   getInvoiceByIDAPI,
   getPurchasesById,
   pushDraftToInvoiceAPI,
   pushDraftToPurchaseAPI,
-} from "../../api";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import {
-  IAddress,
-  IInvoiceItem,
-  IInvoiceResult,
-  IInvoiceType,
-} from "../../modal/invoice";
-import { queryCache, useMutation, useQuery } from "react-query";
+} from '../../api';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { IAddress, IInvoiceItem, IInvoiceResult } from '../../modal/invoice';
+import { queryCache, useMutation, useQuery } from 'react-query';
 import {
   IErrorMessages,
   IServerError,
   ISupportedRoutes,
   NOTIFICATIONTYPE,
   PaymentMode,
-} from "../../modal";
-import dayjs from "dayjs";
-import { LoadingOutlined } from "@ant-design/icons";
-import { getAllUsers } from "../../api/users";
-import { useRef } from "react";
-import { PERMISSIONS } from "../Rbac/permissions";
+} from '../../modal';
+import dayjs from 'dayjs';
+import { getAllUsers } from '../../api/users';
+import { useRef } from 'react';
+import { PERMISSIONS } from '../Rbac/permissions';
 import printDiv, {
   ConvertDivToPDFAndDownload,
   DownloadPDF,
-} from "../../utils/Print";
-import { Link } from "react-router-dom";
-import { IOrganizations } from "../../modal/organization";
-import CommonModal from "../Modal";
-import { EmailModal } from "./Email";
-import { Payment } from "../Payment";
-import { IThemeProps } from "../../hooks/useTheme/themeColors";
-import { PrintFormat } from "../PrintFormat";
-import { PrintViewPurchaseWidget } from "../PurchasesWidget/PrintViewPurchaseWidget";
-import { totalDiscountInInvoice } from "../../utils/formulas";
-import { getBanks } from "../../api/accounts";
+} from '../../utils/Print';
+import { Link } from 'react-router-dom';
+import CommonModal from '../Modal';
+import { EmailModal } from './Email';
+import { Payment } from '../Payment';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
+import { PrintFormat } from '../PrintFormat';
+import { PrintViewPurchaseWidget } from '../PurchasesWidget/PrintViewPurchaseWidget';
+import { totalDiscountInInvoice } from '../../utils/formulas';
+import { getBanks } from '../../api/accounts';
 interface IProps {
-  type?: "SI" | "PO" | "credit-note";
+  type?: 'SI' | 'PO' | 'credit-note';
   id?: number;
   onApprove?: (payload?: any) => void;
 }
 
 enum IInvoiceActions {
-  APPROVE = "approve",
-  CREDIT_NOTE = "credit_note",
-  DOWNLOAD_PDF = "pdf_download",
-  EMAIL = "email",
-  CHANGE_DUE_DATE = "change_due_date",
-  PROCEED = "proceed_po",
-  PRINT = "print",
+  APPROVE = 'approve',
+  CREDIT_NOTE = 'credit_note',
+  DOWNLOAD_PDF = 'pdf_download',
+  EMAIL = 'email',
+  CHANGE_DUE_DATE = 'change_due_date',
+  PROCEED = 'proceed_po',
+  PRINT = 'print',
 }
 interface IPaymentPayload {
   paymentMode: number;
@@ -89,29 +82,24 @@ const defaultStates = {
   paymentType: null,
 };
 
-
-export const PurchasesView: FC<IProps> = ({
-  id,
-  type = "SI",
-  onApprove,
-}) => {
+export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
   /* ******API STAKE******* */
   const APISTAKE =
-    type === "SI"
+    type === 'SI'
       ? getInvoiceByIDAPI
-      : type === "credit-note"
+      : type === 'credit-note'
       ? creditNoteViewAPI
       : getPurchasesById;
   const APISTAKE_APPROVED =
-    type === "PO" ? pushDraftToPurchaseAPI : pushDraftToInvoiceAPI;
+    type === 'PO' ? pushDraftToPurchaseAPI : pushDraftToInvoiceAPI;
   /* ******API STAKE ENDS HERE******* */
 
-  let accessor =
-    type === "SI"
-      ? "invoice_items"
-      : type === "credit-note"
-      ? "credit_note_items"
-      : "purchase_items";
+  const accessor =
+    type === 'SI'
+      ? 'invoiceItems'
+      : type === 'credit-note'
+      ? 'credit_note_items'
+      : 'purchaseItems';
 
   /* *************** HOOKS HERE ************** */
 
@@ -138,7 +126,7 @@ export const PurchasesView: FC<IProps> = ({
   /*Query hook for  Fetching all accounts against ID */
   // const allContactsRes = useQuery([`all-contacts`, "ALL"], getAllContacts);
 
-  const allUsersRes = useQuery([`all-users`, "ALL"], getAllUsers);
+  const allUsersRes = useQuery([`all-users`, 'ALL'], getAllUsers);
 
   const allUsers =
     (allUsersRes.data &&
@@ -151,7 +139,6 @@ export const PurchasesView: FC<IProps> = ({
   /* **************UTILITY HOOKS ENDS HERE**************** */
 
   /* LOCAL STATES */
-  const [invId, setInvId] = useState(null);
   const [emailModal, setEmailModal] = useState(false);
   const [tableData, setTableData] = useState<IInvoiceItem[]>([]);
   const [paymentModal, setPaymentModal] = useState(false);
@@ -167,7 +154,7 @@ export const PurchasesView: FC<IProps> = ({
       });
 
       if (response && response[accessor]) {
-        let sortedItems = response[accessor].sort((a, b) => {
+        const sortedItems = response[accessor].sort((a, b) => {
           return a.sequence - b.sequence;
         });
         setTableData(sortedItems);
@@ -183,19 +170,13 @@ export const PurchasesView: FC<IProps> = ({
 
   /*  COMPONENT UTILITY FUNCTIONS */
 
-  const findUserById = (id: number) => {
-    if (allUsers.length) {
-      const [users] = allUsers.filter((item) => item.id === id);
-      return users;
-    }
-  };
   const onPrint = () => {
-    let PrintItem: HTMLElement = printRef.current;
+    const PrintItem: HTMLElement = printRef.current;
 
     printDiv(PrintItem);
   };
   const onPDF = () => {
-    let PrintItem: HTMLElement = printRef.current;
+    const PrintItem: HTMLElement = printRef.current;
 
     ConvertDivToPDFAndDownload(PrintItem);
   };
@@ -229,7 +210,7 @@ export const PurchasesView: FC<IProps> = ({
   }
 
   const handleApprove = () => {
-    let allItem = [...response[accessor]];
+    const allItem = [...response[accessor]];
     const payload = {
       invoice: {
         ...response,
@@ -255,7 +236,7 @@ export const PurchasesView: FC<IProps> = ({
     delete payload.invoice.updatedById;
     delete payload.invoice.isReturn;
 
-    if (type === "PO") {
+    if (type === 'PO') {
       delete payload.invoice.purchase_items;
     } else {
       delete payload.invoice.invoice_items;
@@ -263,15 +244,15 @@ export const PurchasesView: FC<IProps> = ({
 
     mutateApprove(payload, {
       onSuccess: () => {
-        notificationCallback(NOTIFICATIONTYPE.SUCCESS, "Approved Successfully");
+        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Approved Successfully');
         setPayment({ ...defaultStates });
         setPaymentModal(false);
         [
-          "invoices",
-          "transactions",
-          "items?page",
-          "invoice-view",
-          "ledger-contact",
+          'invoices',
+          'transactions',
+          'items?page',
+          'invoice-view',
+          'ledger-contact',
         ].forEach((key) => {
           queryCache.invalidateQueries((q) =>
             q.queryKey[0].toString().startsWith(`${key}`)
@@ -298,11 +279,13 @@ export const PurchasesView: FC<IProps> = ({
   };
 
   const onEmail = (values) => {
-    let printItem = printRef.current;
+    const printItem = printRef.current;
 
-    let pdf = DownloadPDF(printItem);
-    let payload = {
+    const pdf = DownloadPDF(printItem);
+    const payload = {
       ...values,
+      id,
+      type,
       html: `${pdf}`,
     };
 
@@ -313,14 +296,14 @@ export const PurchasesView: FC<IProps> = ({
     let itemStatus: any = <BoldText>Credit</BoldText>;
     if (response && response.paid_amount && response.payments.length) {
       const { paid_amount, netTotal } = response;
-      let paidAmount = Math.abs(paid_amount);
+      const paidAmount = Math.abs(paid_amount);
 
       if (netTotal - paidAmount === netTotal) {
         itemStatus = `Credit`;
       } else if (netTotal === paidAmount) {
         itemStatus = `Full Payment`;
       } else if (netTotal > paidAmount) {
-        itemStatus = "Partial Payment";
+        itemStatus = 'Partial Payment';
       }
     }
     return itemStatus;
@@ -331,28 +314,28 @@ export const PurchasesView: FC<IProps> = ({
   const calculatedDisc: number = response && response.discount;
   /* ********* THIS IS RESPONSIBLE TO GET ITEMS DISCOUNT TOTAL ************ */
   const itemsDiscount =
-      (response &&
-        totalDiscountInInvoice(
-          response[accessor],
-          "itemDiscount",
-          type === "PO" ? "POE" : "SI"
-          )) ||
-      0;
-      
-      const invoiceDiscount = calculatedDisc - itemsDiscount;
-    const { data: bankData } = useQuery([`all-banks`], getBanks);
-    const banksList = (bankData && bankData.data && bankData.data.result) || [];
-    
-    /* ************* THIS WILL CALCULATE TOTAL TAX ************* */
-    const TotalTax =
-      (response &&
-        totalDiscountInInvoice(
-         response[accessor],
-         "tax",
-         type === "PO" ? "POE" : "SI"
-         )) ||
-      0;
-      
+    (response &&
+      totalDiscountInInvoice(
+        response[accessor],
+        'itemDiscount',
+        type === 'PO' ? 'POE' : 'SI'
+      )) ||
+    0;
+
+  const invoiceDiscount = calculatedDisc - itemsDiscount;
+  const { data: bankData } = useQuery([`all-banks`], getBanks);
+  const banksList = (bankData && bankData.data && bankData.data.result) || [];
+
+  /* ************* THIS WILL CALCULATE TOTAL TAX ************* */
+  const TotalTax =
+    (response &&
+      totalDiscountInInvoice(
+        response[accessor],
+        'tax',
+        type === 'PO' ? 'POE' : 'SI'
+      )) ||
+    0;
+
   const getPaidAmount = () => {
     let paid_amount = 0;
     if (response && response.paid_amount) {
@@ -360,94 +343,94 @@ export const PurchasesView: FC<IProps> = ({
     }
     return paid_amount;
   };
-  
+
   const getRemainigAmount = () => {
     const { netTotal, paid_amount } = response;
-    return typeof netTotal === "string"
-    ? parseFloat(netTotal) - Math.abs(paid_amount)
-    : netTotal - Math.abs(paid_amount);
+    return typeof netTotal === 'string'
+      ? parseFloat(netTotal) - Math.abs(paid_amount)
+      : netTotal - Math.abs(paid_amount);
   };
-  
+
   /* *********************CALCULATIONS ENDS HERE**************** */
   const columns: ColumnsType = [
     {
-      title: "DESCRIPTION",
-      dataIndex: "item",
-      key: "item",
+      title: 'DESCRIPTION',
+      dataIndex: 'item',
+      key: 'item',
       render: (data: any, row: IInvoiceItem, index: number) => {
         return (
           <>
-            <BOLDTEXT> {data ? data?.name : "-"}</BOLDTEXT> <br />
-            <div className="mt-10">{row ? row?.description : "-"}</div>
+            <BOLDTEXT> {data ? data?.name : '-'}</BOLDTEXT> <br />
+            <div className="mt-10">{row ? row?.description : '-'}</div>
           </>
         );
       },
     },
     {
-      title: "QTY",
-      dataIndex: "quantity",
-      key: "quantity",
+      title: 'QTY',
+      dataIndex: 'quantity',
+      key: 'quantity',
     },
     {
-      title: "RATE",
-      dataIndex: "unitPrice",
-      key: "unitPrice",
+      title: 'RATE',
+      dataIndex: type === 'PO' ? `purchasePrice` : `unitPrice`,
+      key: type === 'PO' ? `purchasePrice` : `unitPrice`,
     },
     {
-      title: "DISCOUNT",
-      dataIndex: "itemDiscount",
-      key: "itemDiscount",
+      title: 'DISCOUNT',
+      dataIndex: 'itemDiscount',
+      key: 'itemDiscount',
     },
     {
-      title: "TAX",
-      dataIndex: "tax",
-      key: "tax",
+      title: 'TAX',
+      dataIndex: 'tax',
+      key: 'tax',
     },
     {
-      title: "TOTAL",
-      dataIndex: "total",
-      key: "total",
+      title: 'TOTAL',
+      dataIndex: 'total',
+      key: 'total',
     },
   ];
 
   const _options: IInvoiceOptions[] = [
-    response.invoiceType === "PO" && {
-      title: "Approve",
+    response.invoiceType === 'PO' && {
+      title: 'Approve',
       permission: PERMISSIONS?.PURCHASE_ORDERS_APPROVE,
       key: IInvoiceActions.APPROVE,
     },
 
     response.status === 2 &&
-      response.invoiceType !== "QO" && {
-        title: "Proceed",
+      response.invoiceType !== 'QO' && {
+        title: 'Proceed',
         permission:
-          type === "SI" || type === "credit-note"
+          type === 'SI' || type === 'credit-note'
             ? PERMISSIONS?.INVOICES_DRAFT_APPROVE
             : PERMISSIONS?.PURCHASES_DRAFT_APPROVE,
         key: IInvoiceActions.PROCEED,
       },
     {
-      title: "Print",
+      title: 'Print',
       permission: null,
       key: IInvoiceActions.PRINT,
     },
     {
-      title: "Add Credit note",
+      title: 'Add Credit note',
       permission: PERMISSIONS?.INVOICES_CREATE,
       key: IInvoiceActions.CREDIT_NOTE,
     },
     {
-      title: "Download as PDF",
+      title: 'Download as PDF',
       permission: null,
       key: IInvoiceActions.DOWNLOAD_PDF,
     },
     {
-      title: "Email",
+      title: 'Email',
       permission: null,
       key: IInvoiceActions.EMAIL,
     },
     {
-      title: "Change Due Date",
+      title: 'Change Due Date',
       permission: PERMISSIONS?.INVOICES_CREATE,
       key: IInvoiceActions.CHANGE_DUE_DATE,
     },
@@ -466,12 +449,27 @@ export const PurchasesView: FC<IProps> = ({
       <div className="pv-10">
         <Row gutter={24}>
           <Col span={12}>
-            <Heading type="container">Invoice 23423</Heading>
+            <Heading type="container">
+              {' '}
+              {type === 'SI'
+                ? 'Invoice'
+                : type === 'PO'
+                ? 'Bill'
+                : 'Credit Note'}{' '}
+              {response?.invoiceNumber ? `(${response?.invoiceNumber})` : null}
+            </Heading>
           </Col>
           <Col span={12}>
             <div className="textRight">
               <Dropdown overlay={menu}>
-                <Button type="primary">Invoice Options</Button>
+                <Button type="primary">
+                  {type === 'SI'
+                    ? 'Invoice'
+                    : type === 'PO'
+                    ? 'Bill'
+                    : 'Credit Note'}{' '}
+                  Options
+                </Button>
               </Dropdown>
             </div>
           </Col>
@@ -505,7 +503,7 @@ export const PurchasesView: FC<IProps> = ({
                     </tr>
                     <tr>
                       <td>
-                        {type === "SI" || type === "credit-note" ? (
+                        {type === 'SI' || type === 'credit-note' ? (
                           <Link
                             className="mt-8"
                             to={`/app${ISupportedRoutes.CONTACTS}/${
@@ -521,7 +519,7 @@ export const PurchasesView: FC<IProps> = ({
                     </tr>
                     <tr>
                       <td>
-                        {type === "SI" || type === "credit-note"
+                        {type === 'SI' || type === 'credit-note'
                           ? response?.contact?.addresses?.length &&
                             response?.contact?.addresses[0]?.description
                           : userDetails &&
@@ -531,20 +529,20 @@ export const PurchasesView: FC<IProps> = ({
                     </tr>
                     <tr>
                       <td>
-                        {type === "SI" ||
-                          (type === "credit-note" &&
+                        {type === 'SI' ||
+                          (type === 'credit-note' &&
                             response?.contact?.addressId &&
                             response?.contact?.addresses[0]?.city) ||
-                          ""}
+                          ''}
                       </td>
                     </tr>
                     <tr>
                       <td>
-                        {type === "SI" ||
-                          (type === "credit-note" &&
+                        {type === 'SI' ||
+                          (type === 'credit-note' &&
                             response?.contact?.addressId &&
                             response?.contact?.addresses[0]?.city) ||
-                          ""}
+                          ''}
                       </td>
                     </tr>
                   </table>
@@ -578,7 +576,7 @@ export const PurchasesView: FC<IProps> = ({
                       <td>
                         <BoldText>
                           <Capitalize>
-                            {dayjs(response?.issueDate).format("MM/DD/YYYY")}
+                            {dayjs(response?.issueDate).format('MM/DD/YYYY')}
                           </Capitalize>
                         </BoldText>
                       </td>
@@ -608,7 +606,7 @@ export const PurchasesView: FC<IProps> = ({
                       <td>
                         <BoldText>
                           <Capitalize>
-                            {dayjs(response?.dueDate).format("MM/DD/YYYY")}
+                            {dayjs(response?.dueDate).format('MM/DD/YYYY')}
                           </Capitalize>
                         </BoldText>
                       </td>
@@ -681,19 +679,20 @@ export const PurchasesView: FC<IProps> = ({
               </table>
             </div>
           </Col>
-         {response?.comment && (
+          {response?.comment && (
             <Col span={10}>
-            <div className="notes">
-              <h5 className="label">
-                <BOLDTEXT>Notes</BOLDTEXT>
-              </h5>
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris
-                aliquam pulvinar dolor urna enim vitae vel. Ultrices eget ut.
-              </p>
-            </div>
-          </Col>
-         )}
+              <div className="notes">
+                <h5 className="label">
+                  <BOLDTEXT>Notes</BOLDTEXT>
+                </h5>
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  Mauris aliquam pulvinar dolor urna enim vitae vel. Ultrices
+                  eget ut.
+                </p>
+              </div>
+            </Col>
+          )}
           <Col span={14}>
             <div className="notes">
               <h5 className="label">
@@ -753,10 +752,10 @@ export const PurchasesView: FC<IProps> = ({
         setVisibility={(a) => setEmailModal(a)}
       />
 
-<div className="_visibleOnPrint" ref={printRef}>
+      <div className="_visibleOnPrint" ref={printRef}>
         <PrintFormat>
           <PrintViewPurchaseWidget
-            hideCalculation={response.invoiceType === "PO" ? true : false}
+            hideCalculation={response.invoiceType === 'PO' ? true : false}
             type={type}
             data={response}
           />
@@ -970,7 +969,7 @@ const WrapperNewPurchaseView = styled.div`
     }
   }
 
-  div.ant-table-body{
+  div.ant-table-body {
     overflow-x: hidden;
   }
 `;

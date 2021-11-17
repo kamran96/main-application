@@ -1,6 +1,7 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import * as mongoosePaginate from 'mongoose-paginate-v2';
+import { IProfile } from '@invyce/interfaces';
 import { Branch } from './branch.schema';
 import { Organization } from './organization.schema';
 import { Role } from './role.schema';
@@ -19,7 +20,7 @@ export class User {
   terms: boolean;
   @Prop()
   marketing: boolean;
-  @Prop({ default: false })
+  @Prop()
   isVerified: boolean;
   @Prop(
     raw({
@@ -37,7 +38,7 @@ export class User {
       status: Number,
     })
   )
-  profile: object;
+  profile: IProfile;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Organization' })
   organizationId: Organization;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Role' })

@@ -1,29 +1,26 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Col, Form, Input, Row, Select } from "antd";
-import FormItem from "antd/lib/form/FormItem";
-import React, { FC, useEffect } from "react";
-import { queryCache, useMutation, useQuery } from "react-query";
-import styled from "styled-components";
+import { Button, Col, Form, Input, Row, Select } from 'antd';
+import dayjs from 'dayjs';
+import { FC, useEffect } from 'react';
+import { queryCache, useMutation, useQuery } from 'react-query';
+import styled from 'styled-components';
+import en from 'world_countries_lists/data/en/world.json';
+
 import {
   addOrganizationAPI,
   getOrganizationByIdAPI,
-} from "../../api/organizations";
-import { CommonModal } from "../../components";
-import { DatePicker } from "../../components/DatePicker";
-import { FormLabel } from "../../components/FormLabel";
-import { Status } from "../../components/Status";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { ILoginActions } from "../../hooks/globalContext/globalManager";
-import { NOTIFICATIONTYPE } from "../../modal";
-import { IBaseAPIError, IServerError } from "../../modal/base";
-import { IOrganizationType } from "../../modal/organization";
-import { updateToken } from "../../utils/http";
-import phoneCodes from "../../utils/phoneCodes";
-import en from "world_countries_lists/data/en/world.json";
-import { BOLDTEXT } from "../../components/Para/BoldText";
-import { Seprator } from "../../components/Seprator";
-import { UploadAtachment } from "../../components/UploadAtachment";
-import dayjs from "dayjs";
+} from '../../api/organizations';
+import { CommonModal } from '../../components';
+import { DatePicker } from '../../components/DatePicker';
+import { BOLDTEXT } from '../../components/Para/BoldText';
+import { Seprator } from '../../components/Seprator';
+import { UploadAtachment } from '../../components/UploadAtachment';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { ILoginActions } from '../../hooks/globalContext/globalManager';
+import { NOTIFICATIONTYPE } from '../../modal';
+import { IBaseAPIError, IServerError } from '../../modal/base';
+import { updateToken } from '../../utils/http';
+import phoneCodes from '../../utils/phoneCodes';
 
 const { Option } = Select;
 
@@ -58,13 +55,12 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
   useEffect(() => {
     if (data && data.data && data.data.result) {
       const { result } = data.data;
-      const { country, city, postalCode } = result?.address;
       form.setFieldsValue({
         ...result,
         financialEnding: dayjs(result?.financialEnding),
-        country,
-        city,
-        postalCode,
+        country: result?.address?.country,
+        city: result?.address?.city,
+        postalCode: result?.address?.postalCode,
       });
     } else if (
       errorResponse &&
@@ -86,7 +82,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
       onSuccess: () => {
         form.resetFields();
         setOrganizationConfig(false);
-        ["loggedInUser", "all-organizations"]?.forEach((key) => {
+        ['loggedInUser', 'all-organizations']?.forEach((key) => {
           queryCache?.invalidateQueries((q) =>
             q?.queryKey[0]?.toString().startsWith(key)
           );
@@ -96,11 +92,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
         if (id) {
           queryCache.invalidateQueries(`organization-${id}`);
         }
-        notificationCallback(
-          NOTIFICATIONTYPE.SUCCESS,
-          "Created",
-          `Organization is Created Successfully`
-        );
+        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Created');
         handleClose();
       },
       onError: (error: IServerError) => {
@@ -115,7 +107,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
         } else {
           notificationCallback(
             NOTIFICATIONTYPE.ERROR,
-            "Please check your internet connection"
+            'Please check your internet connection'
           );
         }
       },
@@ -132,7 +124,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
   }, [updateResponseData, handleLogin, setUserDetails]);
 
   const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
+    console.log('Failed:', errorInfo);
   };
 
   const handleClose = () => {
@@ -140,9 +132,10 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
     setOrganizationConfig(false);
   };
   const getFlag = (short: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const data = require(`world_countries_lists/flags/24x24/${short.toLowerCase()}.png`);
     // for dumi
-    if (typeof data === "string") {
+    if (typeof data === 'string') {
       return data;
     }
     // for CRA
@@ -171,7 +164,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
               <img
                 className="mr-10"
                 alt="flag"
-                style={{ width: 18, height: 18, verticalAlign: "sub" }}
+                style={{ width: 18, height: 18, verticalAlign: 'sub' }}
                 src={getFlag(country.short)}
               />
               <span>+{country?.phoneCode}</span>
@@ -188,8 +181,8 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
       title="Add Your Organization"
       visible={visibility}
       onCancel={handleClose}
-      cancelText={"Cancel"}
-      okText={"Add Item"}
+      cancelText={'Cancel'}
+      okText={'Add Item'}
       okButtonProps={{ loading: false }}
       footer={false}
     >
@@ -201,7 +194,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
                 name="name"
                 label="Name of Organization?"
                 rules={[
-                  { required: true, message: "Organization Name is required!" },
+                  { required: true, message: 'Organization Name is required!' },
                 ]}
               >
                 <Input size="middle" placeholder="e.g Abc pvt ltd" />
@@ -211,7 +204,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
               <Form.Item
                 name="niche"
                 label="Organization Niche"
-                rules={[{ required: true, message: "Niche is required!" }]}
+                rules={[{ required: true, message: 'Niche is required!' }]}
               >
                 <Input size="middle" placeholder="e.g Abc pvt ltd" />
               </Form.Item>
@@ -220,7 +213,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
               <Form.Item
                 name="email"
                 label="Email?"
-                rules={[{ required: true, message: "Email is required!" }]}
+                rules={[{ required: true, message: 'Email is required!' }]}
               >
                 <Input size="middle" placeholder="abce@domain.com" />
               </Form.Item>
@@ -229,7 +222,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
               <Form.Item
                 name="faxNumber"
                 label="Fax No"
-                rules={[{ required: false, message: "Fax is required!" }]}
+                rules={[{ required: false, message: 'Fax is required!' }]}
               >
                 <Input size="middle" placeholder="Enter your fax number" />
               </Form.Item>
@@ -239,7 +232,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
                 label="Phone Number"
                 name="phoneNumber"
                 rules={[
-                  { required: false, message: "Please add your last name" },
+                  { required: false, message: 'Please add your last name' },
                   { max: 12, min: 4 },
                 ]}
               >
@@ -273,7 +266,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
                 <Select
                   size="middle"
                   showSearch
-                  style={{ width: "100%" }}
+                  style={{ width: '100%' }}
                   placeholder="Select a Country"
                   filterOption={(input, option) => {
                     return option?.title
@@ -290,7 +283,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
                           style={{
                             width: 18,
                             height: 18,
-                            verticalAlign: "sub",
+                            verticalAlign: 'sub',
                           }}
                           src={getFlag(country.alpha2)}
                         />
@@ -324,9 +317,9 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
             <Col span={12}>
               <Form.Item name="financialEnding" label="Financial Year Ends">
                 <DatePicker
-                  style={{ width: "100%" }}
+                  style={{ width: '100%' }}
                   size="middle"
-                  picker={"month"}
+                  picker={'month'}
                 />
               </Form.Item>
             </Col>
@@ -353,7 +346,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
             <Col span={24}>
               <Form.Item className="mt-20 textRight ">
                 <Button
-                className="mr-10"
+                  className="mr-10"
                   onClick={handleClose}
                   type="default"
                   size="middle"
@@ -367,7 +360,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
                   size="middle"
                   htmlType="submit"
                 >
-                  {" "}
+                  {' '}
                   &nbsp;&nbsp;Create Organization&nbsp;&nbsp;
                 </Button>
               </Form.Item>

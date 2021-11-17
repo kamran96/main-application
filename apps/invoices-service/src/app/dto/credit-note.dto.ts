@@ -19,11 +19,15 @@ class CreditNoteItemDto {
   id: number;
   itemId: string;
   description: string;
-  quantity: string;
-  itemDiscount: string;
-  unitPrice: string;
+  quantity: number;
+  itemDiscount: number;
+  unitPrice: number;
   tax: string;
   total: number;
   sequence: number;
   costOfGoodAmount: number;
+}
+
+export class CnParamsDto {
+  id: number;
 }

@@ -1,29 +1,44 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as moment from 'moment';
+import axios from 'axios';
 import { Contact } from '../Schemas/contact.schema';
+import { Entries, Integrations } from '@invyce/global-constants';
+import {
+  IPage,
+  IRequest,
+  IContact,
+  IBaseUser,
+  IContactWithResponse,
+} from '@invyce/interfaces';
+import { ContactDto, ContactIds } from '../dto/contact.dto';
 
 @Injectable()
 export class ContactService {
   constructor(@InjectModel(Contact.name) private contactModel) {}
 
-  async FindAll(contactData, queryData) {
-    const { page_size, page_no, query, purpose, type } = queryData;
+  async FindAll(
+    req: IRequest,
+    queryData: IPage
+  ): Promise<IContactWithResponse> {
+    const { page_size, page_no, query, purpose, type: contactType } = queryData;
+    const ps: number = parseInt(page_size);
+    const pn: number = parseInt(page_no);
 
     let contacts;
 
     if (purpose === 'ALL') {
       contacts = await this.contactModel.find({
         status: 1,
-        organizationId: contactData.organizationId,
+        organizationId: req.user.organizationId,
       });
     } else {
       if (query) {
-        const filterData: any = Buffer.from(query, 'base64').toString();
+        const filterData = Buffer.from(query, 'base64').toString();
         const data = JSON.parse(filterData);
 
         const myCustomLabels = {
-          docs: 'contacts',
+          docs: 'result',
           totalDocs: 'total',
           meta: 'pagination',
           limit: 'page_size',
@@ -33,18 +48,18 @@ export class ContactService {
           totalPages: 'total_pages',
         };
 
-        for (let i in data) {
+        for (const i in data) {
           if (data[i].type === 'search') {
             const val = data[i].value?.split('%')[1];
             contacts = await this.contactModel.paginate(
               {
                 status: 1,
-                organizationId: contactData.organizationId,
+                organizationId: req.user.organizationId,
                 [i]: { $regex: val },
               },
               {
-                offset: page_no * page_size - page_size,
-                limit: page_size,
+                offset: pn * ps - ps,
+                limit: ps,
                 customLabels: myCustomLabels,
               }
             );
@@ -56,12 +71,12 @@ export class ContactService {
             contacts = await this.contactModel.paginate(
               {
                 status: 1,
-                organizationId: contactData.organizationId,
+                organizationId: req.user.organizationId,
                 [i]: { $gt: start_date, $lt: add_one_day },
               },
               {
-                offset: page_no * page_size - page_size,
-                limit: page_size,
+                offset: pn * ps - ps,
+                limit: ps,
                 customLabels: myCustomLabels,
               }
             );
@@ -69,12 +84,12 @@ export class ContactService {
             contacts = await this.contactModel.paginate(
               {
                 status: 1,
-                organizationId: contactData.organizationId,
+                organizationId: req.user.organizationId,
                 [i]: { $in: data[i]['value'] },
               },
               {
-                offset: page_no * page_size - page_size,
-                limit: page_size,
+                offset: pn * ps - ps,
+                limit: ps,
                 customLabels: myCustomLabels,
               }
             );
@@ -82,12 +97,12 @@ export class ContactService {
             contacts = await this.contactModel.paginate(
               {
                 status: 1,
-                organizationId: contactData.organizationId,
+                organizationId: req.user.organizationId,
                 [i]: { $in: data[i]['value'] },
               },
               {
-                offset: page_no * page_size - page_size,
-                limit: page_size,
+                offset: pn * ps - ps,
+                limit: ps,
                 customLabels: myCustomLabels,
               }
             );
@@ -95,12 +110,12 @@ export class ContactService {
             contacts = await this.contactModel.paginate(
               {
                 status: 1,
-                organizationId: contactData.organizationId,
+                organizationId: req.user.organizationId,
                 [i]: data[i].value,
               },
               {
-                offset: page_no * page_size - page_size,
-                limit: page_size,
+                offset: pn * ps - ps,
+                limit: ps,
                 customLabels: myCustomLabels,
               }
             );
@@ -108,7 +123,7 @@ export class ContactService {
         }
       } else {
         const myCustomLabels = {
-          docs: 'contacts',
+          docs: 'result',
           limit: 'pageSize',
           page: 'currentPage',
           nextPage: 'next',
@@ -121,64 +136,103 @@ export class ContactService {
         contacts = await this.contactModel.paginate(
           {
             status: 1,
-            organizationId: contactData.organizationId,
-            contactType: type,
+            organizationId: req.user.organizationId,
+            contactType,
           },
           {
-            offset: page_no * page_size - page_size,
-            limit: page_size,
+            offset: pn * ps - ps,
+            limit: ps,
             customLabels: myCustomLabels,
           }
         );
       }
+
+      let token;
+      if (process.env.NODE_ENV === 'development') {
+        const header = req.headers?.authorization?.split(' ')[1];
+        token = header;
+      } else {
+        if (!req || !req.cookies) return null;
+        token = req.cookies['access_token'];
+      }
+
+      const type =
+        process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+      const value =
+        process.env.NODE_ENV === 'development'
+          ? `Bearer ${token}`
+          : `access_token=${token}`;
+
+      const http = axios.create({
+        baseURL: 'http://localhost',
+        headers: {
+          [type]: value,
+        },
+      });
+
+      const mapContactIds = contacts?.result.map((con) => ({
+        id: con._id,
+        type: con.contactType,
+      }));
+
+      const { data: payments } = await http.post(`payments/payment/contact`, {
+        ids: mapContactIds,
+      });
+
+      const cont_arr = [];
+      for (const i of contacts.result) {
+        const balance = payments.find((pay) => pay.id == i._id);
+
+        cont_arr.push({
+          ...i.toObject(),
+          balance: balance?.payment?.balance,
+        });
+      }
+
+      contacts = {
+        result: cont_arr,
+        pagination: contacts.pagination,
+      };
     }
 
     return contacts;
   }
 
-  async CreateContact(contactDto, contactData) {
+  async CreateContact(
+    contactDto: ContactDto,
+    contactData: IBaseUser
+  ): Promise<IContact> {
     if (contactDto && contactDto.isNewRecord === false) {
       const contact = await this.FindById(contactDto.id);
 
       if (contact) {
-        const updatedContact: any = {};
+        const updatedContact = {
+          businessName: contactDto.businessName || contact.businessName,
+          accountNumber: contactDto.accountNumber || contact.accountNumber,
+          email: contactDto.email || contact.email,
+          name: contactDto.name || contact.name,
+          contactType: contactDto.contactType || contact.contactType,
+          cnic: contactDto.cnic || contact.cnic,
+          phoneNumber: contactDto.phoneNumber || contact.phoneNumber,
+          cellNumber: contactDto.cellNumber || contact.cellNumber,
+          faxNumber: contactDto.faxNumber || contact.faxNumber,
+          skypeName: contactDto.skypeName || contact.skypeName,
+          webLink: contactDto.webLink || contact.webLink,
+          creditLimit: contactDto.creditLimit || contact.creditLimit,
+          creditLimitBlock:
+            contactDto.creditLimitBlock || contact.creditLimitBlock,
+          salesDiscount: contactDto.salesDiscount || contact.salesDiscount,
+          openingBalance: contactDto.openingBalance || contact.openingBalance,
+          paymentDaysLimit:
+            contactDto.paymentDaysLimit || contact.paymentDaysLimit,
 
-        updatedContact.businessName =
-          contactDto.businessName || contact.businessName;
-        updatedContact.accountNumber =
-          contactDto.accountNumber || contact.accountNumber;
-        updatedContact.email = contactDto.email || contact.email;
-        updatedContact.name = contactDto.name || contact.name;
-        updatedContact.contactType =
-          contactDto.contactType || contact.contactType;
-        updatedContact.cnic = contactDto.cnic || contact.cnic;
-        updatedContact.phoneNumber =
-          contactDto.phoneNumber || contact.phoneNumber;
-        updatedContact.cellNumber = contactDto.cellNumber || contact.cellNumber;
-        updatedContact.faxNumber = contactDto.faxNumber || contact.faxNumber;
-        updatedContact.skypeName = contactDto.skypeName || contact.skypeName;
-        updatedContact.webLink = contactDto.webLink || contact.webLink;
-        updatedContact.creditLimit =
-          contactDto.creditLimit || contact.creditLimit;
-        updatedContact.creditLimitBlock =
-          contactDto.creditLimitBlock || contact.creditLimitBlock;
-        updatedContact.salesDiscount =
-          contactDto.salesDiscount || contact.salesDiscount;
-        updatedContact.openingBalance =
-          contactDto.openingBalance || contact.openingBalance;
-        updatedContact.paymentDaysLimit =
-          contactDto.paymentDaysLimit || contact.paymentDaysLimit;
-        updatedContact.accountNumber =
-          contactDto.accountNumber || contact.accountNumber;
-
-        updatedContact.paymentDaysLimit =
-          contactDto.paymentDaysLimit || contact.paymentDaysLimit;
-        updatedContact.branchId = contact.branchId;
-        updatedContact.addresses = contactDto.addresses || contact.addresses;
-        updatedContact.status = 1 || contact.status;
-        updatedContact.createdById = contact.createdById;
-        updatedContact.organizationId = contact.organizationId;
-        updatedContact.updatedById = contactData._id;
+          branchId: contact.branchId,
+          addresses: contactDto.addresses || contact.addresses,
+          status: 1 || contact.status,
+          createdById: contact.createdById,
+          organizationId: contact.organizationId,
+          updatedById: contactData._id,
+        };
 
         await this.contactModel.updateOne(
           { _id: contactDto.id },
@@ -201,12 +255,12 @@ export class ContactService {
     }
   }
 
-  async FindById(id) {
+  async FindById(id: string): Promise<IContact> {
     return await this.contactModel.findById(id);
   }
 
-  async Remove(deletedIds) {
-    for (let i of deletedIds.ids) {
+  async Remove(deletedIds: ContactIds): Promise<void> {
+    for (const i of deletedIds.ids) {
       await this.contactModel.updateOne(
         { _id: i },
         {
@@ -214,7 +268,178 @@ export class ContactService {
         }
       );
     }
+  }
 
-    return true;
+  async ContactByIds(data: ContactIds): Promise<IContact[]> {
+    return await this.contactModel.find({
+      importedContactId: { $in: data.ids },
+    });
+  }
+
+  async SyncContacts(data, req: IRequest): Promise<void> {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const type =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [type]: value,
+      },
+    });
+
+    const transactionArr = [];
+    if (data.type === Integrations.XERO) {
+      for (const i of data.contacts) {
+        const contacts = await this.contactModel.find({
+          importedContactId: i.contactID,
+          organizationId: req.user.organizationId,
+        });
+
+        if (contacts.length === 0) {
+          const getNumbers = (numbers, type) =>
+            numbers.find((p) => p.phoneType === type);
+
+          // ruturns 1 if customer 2 if supplier else null
+          const ContactType = (customer, supplier) =>
+            customer === true ? 1 : supplier === true ? 2 : null;
+
+          const contact = new this.contactModel({
+            accountNumber: i.accountNumber,
+            email: i.emailAddress,
+
+            name: i.name,
+            skypeName: i.skypeUserName,
+            contactType: ContactType(i.isCustomer, i.isSupplier),
+            webLink: i.website,
+            salesDiscount: i.discount,
+            cellNumber: getNumbers(i.phones, 'MOBILE').phoneNumber || null,
+            faxNumber: getNumbers(i.phones, 'FAX').phoneNumber || null,
+            phoneNumber: getNumbers(i.phones, 'DEFAULT').phoneNumber || null,
+            importedContactId: i.contactID,
+            importedFrom: Integrations.XERO,
+            addresses: JSON.stringify(i.addresses),
+            organizationId: req.user.organizationId,
+
+            createdById: req.user.id,
+            updatedById: req.user.id,
+            status: 1,
+          });
+          await contact.save();
+          if (
+            i.balances &&
+            (i?.balaces?.accountsReceivable?.outstanding !== 0 ||
+              i?.balances?.accountsPayable?.outstanding !== 0)
+          ) {
+            transactionArr.push({
+              contactId: contact.id,
+              contactType: i.isCustomer
+                ? 'customer'
+                : i.isSupplier
+                ? 'supplier'
+                : null,
+              balance:
+                i?.balances?.accountsReceivable?.outstanding ||
+                i?.balances?.accountsPayable?.outstanding,
+              ref: 'Xe',
+              narration: 'XE contact balance',
+              createdAt: contact.createdAt,
+            });
+          }
+        }
+      }
+    } else if (data.type === Integrations.QUICK_BOOK) {
+      for (const i of data.contacts.customers) {
+        const contacts = await this.contactModel.find({
+          importedContactId: i.Id,
+          organizationId: req.user.organizationId,
+        });
+
+        if (contacts.length === 0 && i?.GivenName) {
+          const contact = new this.contactModel({
+            businessName: i.CompanyName,
+            name: i.GivenName,
+            phoneNumber: i.PrimaryPhone ? i.PrimaryPhone.FreeFormNumber : '',
+            email: i.PrimaryEmailAddr ? i.PrimaryEmailAddr.Address : '',
+            webLink: i.WebAddr ? i.WebAddr.URI : '',
+            contactType: 1,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            createdById: req.user.id,
+            updatedById: req.user.id,
+            importedContactId: i.Id,
+            importedFrom: Integrations.QUICK_BOOK,
+            status: 1,
+          });
+          await contact.save();
+          if (i?.balances > 0) {
+            transactionArr.push({
+              balance: i.Balance,
+              contactId: contact.id,
+              ref: 'QB',
+              narration: 'QB contact balance',
+              name: 'Cash Receiveable',
+              contactType: 'customer',
+              transactionType: Entries.DEBITS,
+              createdAt: contact.createdAt,
+            });
+          }
+        }
+      }
+
+      for (const i of data.contacts.vendors) {
+        const contacts = await this.contactModel.find({
+          importedContactId: i.Id,
+          organizationId: req.user.organizationId,
+        });
+
+        if (contacts.length === 0 && i?.GivenName) {
+          const contact = new this.contactModel({
+            businessName: i.CompanyName,
+            name: i.GivenName,
+            phoneNumber: i.PrimaryPhone ? i.PrimaryPhone.FreeFormNumber : '',
+            email: i.PrimaryEmailAddr ? i.PrimaryEmailAddr.Address : '',
+            webLink: i.WebAddr ? i.WebAddr.URI : '',
+            contactType: 2,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            createdById: req.user.id,
+            updatedById: req.user.id,
+            importedContactId: i.Id,
+            importedFrom: Integrations.QUICK_BOOK,
+            status: 1,
+          });
+          await contact.save();
+          if (i?.balances > 0) {
+            transactionArr.push({
+              balance: i.Balance,
+              contactId: contact.id,
+              ref: 'QB',
+              narration: 'QB contact balance',
+              contactType: 'supplier',
+              name: 'Cash Receiveable',
+              transactionType: Entries.DEBITS,
+              createdAt: contact.createdAt,
+            });
+          }
+        }
+      }
+    }
+
+    await http.post(`accounts/transaction/add`, {
+      transactions: transactionArr,
+    });
   }
 }

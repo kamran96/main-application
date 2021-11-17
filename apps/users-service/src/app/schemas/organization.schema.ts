@@ -1,4 +1,5 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { IAddress } from '@invyce/interfaces';
 
 @Schema()
 export class Organization {
@@ -20,17 +21,16 @@ export class Organization {
   faxNumber: string;
   @Prop()
   prefix: string;
-  @Prop()
-  postalCode: string;
   @Prop(
     raw({
       description: String,
       city: String,
       country: String,
       postalAddress: String,
+      postalCode: String,
     })
   )
-  address: object;
+  address: IAddress;
   @Prop()
   status: number;
   @Prop()

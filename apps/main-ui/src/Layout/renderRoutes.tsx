@@ -5,6 +5,8 @@ import { useRbac } from "../components/Rbac/useRbac";
 import { CommonLoader } from "../components/FallBackLoader";
 
 const renderRoutes = (routes, extraProps = {}, switchProps = {}) => {
+ 
+
   return (
     <>
       {routes.map((route, i) => (
@@ -16,6 +18,7 @@ const renderRoutes = (routes, extraProps = {}, switchProps = {}) => {
 
 const PrivateRoute = ({ route, i, extraProps = {}, switchProps = {} }) => {
   const { rbac } = useRbac(null);
+ 
 
   const [wait, setWait] = useState(true);
 
@@ -43,6 +46,7 @@ const PrivateRoute = ({ route, i, extraProps = {}, switchProps = {} }) => {
           );
         }
         if (!route.restricted) {
+         
           return <route.component {...props} {...extraProps} route={route} />;
         } else if (route.restricted && rbac.can(route.permission)) {
           return <route.component {...props} {...extraProps} route={route} />;

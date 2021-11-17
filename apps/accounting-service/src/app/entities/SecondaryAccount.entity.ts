@@ -4,7 +4,6 @@ import {
   Column,
   JoinColumn,
   ManyToOne,
-  OneToMany,
 } from 'typeorm';
 import { PrimaryAccounts } from '.';
 
@@ -19,19 +18,19 @@ export class SecondaryAccounts {
   @Column()
   primaryAccountId: number;
   @Column()
-  organizationId: number;
+  organizationId: string;
   @Column()
   status: number;
   @Column()
   createdAt: string;
   @Column()
-  createdById: number;
+  createdById: string;
   @Column()
   updatedAt: string;
   @Column()
-  updatedById: number;
+  updatedById: string;
 
-  @ManyToOne((type) => PrimaryAccounts)
+  @ManyToOne(() => PrimaryAccounts)
   @JoinColumn({ name: 'primaryAccountId', referencedColumnName: 'id' })
   primaryAccount: PrimaryAccounts;
 }

@@ -30,7 +30,7 @@ export class invoice1630587629484 implements MigrationInterface {
           { name: 'updatedById', type: 'varchar', isNullable: true },
           { name: 'status', type: 'int', isNullable: true },
           { name: 'createdAt', type: 'timestamp', default: 'NOW()' },
-          { name: 'createdBy', type: 'timestamp', default: 'NOW()' },
+          { name: 'updatedAt', type: 'timestamp', default: 'NOW()' },
         ],
       }),
       true
