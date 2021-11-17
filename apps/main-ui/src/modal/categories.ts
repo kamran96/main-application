@@ -1,10 +1,14 @@
-import { IBase, IBaseRequest } from "./base";
+import { IBase, IBaseRequest } from './base';
 
 export interface IChildCategory {
   parentId: number;
   isActive: boolean;
-  categories: any[];
+  categories: ICategory[];
   isLoading?: boolean;
+}
+
+interface IUndefined {
+  [key: string]: unknown;
 }
 
 export interface IVariants extends IBase {
@@ -13,7 +17,7 @@ export interface IVariants extends IBase {
   categoryId?: number;
   valueType?: string;
   lookupId?: number;
-  values?: any[] | any;
+  values?: IUndefined[] | any;
   id?: number;
 }
 export interface ICategory {

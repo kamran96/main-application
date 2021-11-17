@@ -1,21 +1,23 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { useMemo, memo } from 'react';
 import { FC } from 'react';
 import { CommonModal } from '../../../components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { ItemsForm } from './Form';
 
-interface IProps {}
-
-const ItemsEditorWidget: FC<IProps> = () => {
+interface IProps {
+  visibility: boolean;
+}
+const _itemsEditorWidget: FC<IProps> = ({ visibility }) => {
   /* user context API hook */
-  const { itemsModalConfig, setItemsModalConfig } = useGlobalContext();
+  const { setItemsModalConfig } = useGlobalContext();
 
   return (
     <CommonModal
       width={600}
       title="Add Item"
-      visible={itemsModalConfig.visibility}
+      visible={visibility}
       onCancel={() => {
         setItemsModalConfig(false);
       }}
@@ -28,4 +30,9 @@ const ItemsEditorWidget: FC<IProps> = () => {
     </CommonModal>
   );
 };
+
+const ItemsEditorWidget = memo(_itemsEditorWidget, (prevProps, nextProps) => {
+  return true;
+});
+
 export default ItemsEditorWidget;

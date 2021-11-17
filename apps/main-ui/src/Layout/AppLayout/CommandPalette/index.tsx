@@ -1,37 +1,29 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import { PERMISSIONS } from "../../../components/Rbac/permissions";
-import { useRbac } from "../../../components/Rbac/useRbac";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { DivProps, ISupportedRoutes } from "../../../modal";
-import CommandPalette from "react-command-palette";
-import Icon from "@iconify/react";
-import arrowUp from "@iconify-icons/feather/arrow-up";
-import arrowDown from "@iconify-icons/feather/arrow-down";
-import bxUser from "@iconify-icons/bx/bx-user";
-import organizationLine from "@iconify-icons/clarity/organization-line";
-import bookOpen from "@iconify-icons/feather/book-open";
-import dollarSign from "@iconify-icons/feather/dollar-sign";
-import filePlus from "@iconify-icons/feather/file-plus";
-import fileText from "@iconify-icons/feather/file-text";
-import layersIcon from "@iconify-icons/feather/layers";
-import usersIcon from "@iconify-icons/feather/users";
-import shoppingCart from "@iconify-icons/icons8/shopping-cart";
-import coinsIcon from "@iconify-icons/la/coins";
-import fileInvoiceDollar from "@iconify-icons/la/file-invoice-dollar";
-import viewDashboardOutline from "@iconify-icons/mdi/view-dashboard-outline";
-import analyticsIcon from "@iconify-icons/uil/analytics";
-import gitMerge from "@iconify-icons/feather/git-merge";
-import bxsReport from "@iconify-icons/bx/bxs-report";
-import shoppingBag from "@iconify-icons/fe/shopping-bag";
-import lockIcon from "@iconify-icons/feather/lock";
-import shieldIcon from "@iconify-icons/feather/shield";
-import slidersIcon from "@iconify-icons/feather/sliders";
-import userRole from "@iconify-icons/carbon/user-role";
-import settingsIcon from "@iconify-icons/feather/settings";
-import powerIcon from "@iconify-icons/feather/power";
-import CommandPlatteGlobalStyles from "./commandPaletteGlobalStyles";
-import { IThemeProps } from "../../../hooks/useTheme/themeColors";
+import bxUser from '@iconify-icons/bx/bx-user';
+import userRole from '@iconify-icons/carbon/user-role';
+import shoppingBag from '@iconify-icons/fe/shopping-bag';
+import arrowDown from '@iconify-icons/feather/arrow-down';
+import arrowUp from '@iconify-icons/feather/arrow-up';
+import bookOpen from '@iconify-icons/feather/book-open';
+import dollarSign from '@iconify-icons/feather/dollar-sign';
+import filePlus from '@iconify-icons/feather/file-plus';
+import fileText from '@iconify-icons/feather/file-text';
+import lockIcon from '@iconify-icons/feather/lock';
+import powerIcon from '@iconify-icons/feather/power';
+import settingsIcon from '@iconify-icons/feather/settings';
+import usersIcon from '@iconify-icons/feather/users';
+import shoppingCart from '@iconify-icons/icons8/shopping-cart';
+import fileInvoiceDollar from '@iconify-icons/la/file-invoice-dollar';
+import analyticsIcon from '@iconify-icons/uil/analytics';
+import Icon from '@iconify/react';
+import { ILoginActions } from '../../../hooks/globalContext/globalManager';
+import CommandPalette from 'react-command-palette';
+import styled from 'styled-components';
+import { PERMISSIONS } from '../../../components/Rbac/permissions';
+import { useRbac } from '../../../components/Rbac/useRbac';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { IThemeProps } from '../../../hooks/useTheme/themeColors';
+import { DivProps, ISupportedRoutes } from '../../../modal';
+import CommandPlatteGlobalStyles from './commandPaletteGlobalStyles';
 
 export const InvyceCmdPalette = () => {
   const { rbac } = useRbac(null);
@@ -48,301 +40,301 @@ export const InvyceCmdPalette = () => {
 
   const commands = [
     {
-      name: "Create Invoice",
+      name: 'Create Invoice',
       command: () => {
         history.push(`/app${ISupportedRoutes.CREATE_INVOICE}`);
       },
-      shortcut: "",
+      shortcut: '',
       permission: PERMISSIONS.INVOICES_CREATE,
       icon: fileText,
-      type: "bussiness",
+      type: 'bussiness',
     },
     {
-      name: "Invoice > Approved",
+      name: 'Invoice > Approved',
       command: () => {
         history.push(`/app${ISupportedRoutes.INVOICES}?tabIndex=all`);
       },
-      shortcut: "",
+      shortcut: '',
       permission: PERMISSIONS.INVOICES_INDEX,
       icon: fileText,
-      type: "bussiness",
+      type: 'bussiness',
     },
     {
-      name: "Invoice > Draft",
+      name: 'Invoice > Draft',
       command: () => {
         history.push(`/app${ISupportedRoutes.INVOICES}?tabIndex=draft`);
       },
-      shortcut: "",
+      shortcut: '',
       permission: PERMISSIONS.INVOICES_INDEX,
       icon: fileText,
-      type: "bussiness",
+      type: 'bussiness',
     },
     {
-      name: "Invoice > Awaiting Payments",
+      name: 'Invoice > Awaiting Payments',
       command: () => {
         history.push(
           `/app${ISupportedRoutes.INVOICES}?tabIndex=awating_payment`
         );
       },
-      shortcut: "",
+      shortcut: '',
       permission: PERMISSIONS.INVOICES_INDEX,
       icon: fileText,
-      type: "bussiness",
+      type: 'bussiness',
     },
     {
-      name: "Invoice > Paid",
+      name: 'Invoice > Paid',
       command: () => {
         history.push(`/app${ISupportedRoutes.INVOICES}?tabIndex=paid`);
       },
-      shortcut: "",
+      shortcut: '',
       permission: PERMISSIONS.INVOICES_INDEX,
       icon: fileText,
-      type: "bussiness",
+      type: 'bussiness',
     },
     {
-      name: "Create Purchase Order",
+      name: 'Create Purchase Order',
       command: () => {
         history.push(`/app${ISupportedRoutes.CREATE_PURCHASE_ORDER}`);
       },
       permission: PERMISSIONS.PURCHASE_ORDERS_CREATE,
       icon: bookOpen,
-      type: "bussiness",
+      type: 'bussiness',
     },
     {
-      name: "Purchase Order List > Approved",
+      name: 'Purchase Order List > Approved',
       command: () => {
         history.push(`/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=all`);
       },
       permission: PERMISSIONS.PURCHASE_ORDERS_INDEX,
       icon: bookOpen,
-      type: "bussiness",
+      type: 'bussiness',
     },
     {
-      name: "Purchase Order List > Draft",
+      name: 'Purchase Order List > Draft',
       command: () => {
         history.push(`/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=draft`);
       },
       permission: PERMISSIONS.PURCHASE_ORDERS_INDEX,
       icon: bookOpen,
-      type: "bussiness",
+      type: 'bussiness',
     },
     {
-      name: "Create Purchase Entry",
+      name: 'Create Purchase Entry',
       command: () => {
         history.push(`/app${ISupportedRoutes.CREATE_PURCHASE_Entry}`);
       },
       permission: PERMISSIONS.PURCHASES_CREATE,
       icon: shoppingBag,
-      type: "bussiness",
+      type: 'bussiness',
     },
     {
-      name: "Purchases List > Approved",
+      name: 'Purchases List > Approved',
       command: () => {
         history.push(`/app${ISupportedRoutes.PURCHASES}?tabIndex=all`);
       },
       permission: PERMISSIONS.PURCHASES_INDEX,
       icon: shoppingBag,
-      type: "bussiness",
+      type: 'bussiness',
     },
     {
-      name: "Purchases List > Draft",
+      name: 'Purchases List > Draft',
       command: () => {
         history.push(`/app${ISupportedRoutes.PURCHASES}?tabIndex=draft`);
       },
       permission: PERMISSIONS.PURCHASES_INDEX,
       icon: shoppingBag,
-      type: "bussiness",
+      type: 'bussiness',
     },
 
     {
-      name: "Create Quotation",
+      name: 'Create Quotation',
       command: () => {
         history.push(`/app${ISupportedRoutes.CREATE_QUOTE}`);
       },
       permission: PERMISSIONS.QUOTATIONS_CREATE,
       icon: fileInvoiceDollar,
-      type: "bussiness",
+      type: 'bussiness',
     },
     {
-      name: "Create Payment",
+      name: 'Create Payment',
       command: () => {
         setPaymentsModalConfig(true);
       },
       permission: PERMISSIONS.PAYMENTS_CREATE,
       icon: dollarSign,
-      type: "bussiness",
+      type: 'bussiness',
     },
     {
-      name: "Create Role",
+      name: 'Create Role',
       command: () => {
         setRbacConfigModal(true);
       },
       permission: PERMISSIONS.PAYMENTS_CREATE,
       icon: userRole,
-      type: "organization",
+      type: 'organization',
     },
     {
-      name: "Roles",
+      name: 'Roles',
       command: () => {
         history.push(`/app${ISupportedRoutes.RBAC}`);
       },
       permission: PERMISSIONS.RBAC_ROLE_INDEX,
       icon: userRole,
-      type: "organization",
+      type: 'organization',
     },
     {
-      name: "Permissions",
+      name: 'Permissions',
       command: () => {
         history.push(`/app${ISupportedRoutes.PERMISSIONS}`);
       },
       permission: PERMISSIONS.RBAC_ROLE_PERMISSION_UPDATE,
       icon: lockIcon,
-      type: "organization",
+      type: 'organization',
     },
     {
-      name: "Chart of Accounts > List",
+      name: 'Chart of Accounts > List',
       command: () => {
         history.push(`/app${ISupportedRoutes.ACCOUNTS}`);
       },
       permission: PERMISSIONS.ACCOUNTS_INDEX,
       icon: analyticsIcon,
-      type: "accounting",
+      type: 'accounting',
     },
     {
-      name: "Create Account",
+      name: 'Create Account',
       command: () => {
         setAccountsModalConfig({ visibility: true, id: null });
       },
       permission: PERMISSIONS.ACCOUNTS_CREATE,
       icon: analyticsIcon,
-      type: "accounting",
+      type: 'accounting',
     },
     {
-      name: "Transaction > List",
+      name: 'Transaction > List',
       command: () => {
         history.push(`/app${ISupportedRoutes.TRANSACTIONS}`);
       },
       permission: PERMISSIONS.TRANSACTIONS_INDEX,
       icon: filePlus,
-      type: "accounting",
+      type: 'accounting',
     },
     {
-      name: "Create Transaction",
+      name: 'Create Transaction',
       command: () => {
         history.push(`/app${ISupportedRoutes.CREATE_TRANSACTION}`);
       },
       permission: PERMISSIONS.TRANSACTIONS_CREATE,
       icon: filePlus,
-      type: "accounting",
+      type: 'accounting',
     },
 
     {
-      name: "Contacts List  > Customers",
+      name: 'Contacts List  > Customers',
       command: () => {
         history.push(`/app${ISupportedRoutes.CONTACTS}?tabIndex=customers`);
       },
       permission: PERMISSIONS.CONTACTS_INDEX,
       icon: bxUser,
-      type: "contacts",
+      type: 'contacts',
     },
     {
-      name: "Contacts List  > Suppliers",
+      name: 'Contacts List  > Suppliers',
       command: () => {
         history.push(`/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers`);
       },
       permission: PERMISSIONS.CONTACTS_INDEX,
       icon: bxUser,
-      type: "contacts",
+      type: 'contacts',
     },
     {
-      name: "Create Contacts",
+      name: 'Create Contacts',
       command: () => {
         history.push(`/app${ISupportedRoutes.CREATE_CONTACT}`);
       },
       permission: PERMISSIONS.CONTACTS_CREATE,
       icon: bxUser,
-      type: "contacts",
+      type: 'contacts',
     },
     {
-      name: "Users > List",
+      name: 'Users > List',
       command: () => {
         history.push(`/app${ISupportedRoutes.USERS}`);
       },
       permission: PERMISSIONS.USERS_LIST,
       icon: usersIcon,
-      type: "users",
+      type: 'users',
     },
     {
-      name: "Create User",
+      name: 'Create User',
       command: () => {
         setUserInviteModal(true);
       },
       permission: PERMISSIONS.USERS_CREATE,
       icon: usersIcon,
-      type: "users",
+      type: 'users',
     },
     {
-      name: "Create Item",
+      name: 'Create Item',
       command: () => {
         setItemsModalConfig(true);
       },
       permission: PERMISSIONS.ITEMS_CREATE,
       icon: shoppingCart,
-      type: "bussiness",
+      type: 'bussiness',
     },
     {
-      name: "Items > List",
+      name: 'Items > List',
       command: () => {
         history.push(`/app${ISupportedRoutes.ITEMS}`);
       },
       permission: PERMISSIONS.ITEMS_INDEX,
       icon: shoppingCart,
-      type: "bussiness",
+      type: 'bussiness',
     },
     {
-      name: "User > Profile Settings",
+      name: 'User > Profile Settings',
       command: () => {
         history.push(`/app${ISupportedRoutes.PROFILE_SETTING}`);
       },
       icon: settingsIcon,
-      type: "zsettings",
+      type: 'zsettings',
     },
     {
-      name: "User > Account Setting",
+      name: 'User > Account Setting',
       command: () => {
         history.push(`/app${ISupportedRoutes.ACCOUNT_SETTING}`);
       },
       icon: settingsIcon,
-      type: "zsettings",
+      type: 'zsettings',
     },
     {
-      name: "Logout",
+      name: 'Logout',
       command: () => {
-        handleLogin({ type: "SET_LOGOUT" });
+        handleLogin({ type: ILoginActions.LOGOUT });
       },
       icon: powerIcon,
-      type: "zz",
+      type: 'zz',
     },
   ];
 
   const theme = {
-    container: "invyce-container", // invyce-container
-    containerOpen: "invyce-containerOpen", // invyce-containerOpen
-    content: "invyce-content", // invyce-content
-    header: "invyce-header", // invyce-header
-    input: "invyce-input", // invyce-input
-    inputFocused: "invyce-inputFocused", // invyce-inputFocused
-    inputOpen: "invyce-inputOpen", // invyce-inputOpen
-    modal: "invyce-modal", // invyce-modal
-    overlay: "invyce-overlay", // invyce-overlay
-    spinner: "invyce-spinner", // invyce-spinner
-    suggestion: "invyce-suggestion", // invyce-suggestion
-    suggestionFirst: "invyce-suggestionFirst", // invyce-suggestionFirst
-    suggestionHighlighted: "invyce-suggestionHighlighted", // invyce-suggestionHighlighted
-    suggestionsContainer: "invyce-suggestionsContainer", // invyce-suggestionsContainer
-    suggestionsContainerOpen: "invyce-suggestionsContainerOpen", // invyce-suggestionsContainerOpen
-    suggestionsList: "invyce-suggestionsList", // invyce-suggestionsList
-    trigger: "invyce-trigger", // invyce-trigger
+    container: 'invyce-container', // invyce-container
+    containerOpen: 'invyce-containerOpen', // invyce-containerOpen
+    content: 'invyce-content', // invyce-content
+    header: 'invyce-header', // invyce-header
+    input: 'invyce-input', // invyce-input
+    inputFocused: 'invyce-inputFocused', // invyce-inputFocused
+    inputOpen: 'invyce-inputOpen', // invyce-inputOpen
+    modal: 'invyce-modal', // invyce-modal
+    overlay: 'invyce-overlay', // invyce-overlay
+    spinner: 'invyce-spinner', // invyce-spinner
+    suggestion: 'invyce-suggestion', // invyce-suggestion
+    suggestionFirst: 'invyce-suggestionFirst', // invyce-suggestionFirst
+    suggestionHighlighted: 'invyce-suggestionHighlighted', // invyce-suggestionHighlighted
+    suggestionsContainer: 'invyce-suggestionsContainer', // invyce-suggestionsContainer
+    suggestionsContainerOpen: 'invyce-suggestionsContainerOpen', // invyce-suggestionsContainerOpen
+    suggestionsList: 'invyce-suggestionsList', // invyce-suggestionsList
+    trigger: 'invyce-trigger', // invyce-trigger
   };
 
   const renderHeader = () => {
@@ -394,7 +386,7 @@ export const InvyceCmdPalette = () => {
   };
 
   const commandsList = () => {
-    let sortedCommands = commands
+    const sortedCommands = commands
       .filter((c) => !c.permission || rbac.can(c.permission))
       .sort((a, b) => {
         if (a.type < b.type) return -1;
@@ -405,7 +397,7 @@ export const InvyceCmdPalette = () => {
 
     const _commands = [];
 
-    let types = [];
+    const types = [];
     sortedCommands.forEach((ty, ti) => {
       if (!types.includes(ty.type)) {
         types.push(ty.type);
@@ -413,9 +405,9 @@ export const InvyceCmdPalette = () => {
     });
 
     types.forEach((type, typeIndex) => {
-      let filtered = sortedCommands.filter((scItem) => scItem.type === type);
+      const filtered = sortedCommands.filter((scItem) => scItem.type === type);
 
-      let cmdGroup = filtered.map((item, index) => {
+      const cmdGroup = filtered.map((item, index) => {
         if (filtered.length - 1 === index) {
           return { ...item, lastIndex: true };
         } else {
@@ -440,7 +432,7 @@ export const InvyceCmdPalette = () => {
         }
         defaultInputValue=""
         commands={commandsList()}
-        hotKeys={["ctrl+shift+p", "command+shift+p"]}
+        hotKeys={['ctrl+shift+p', 'command+shift+p']}
         showSpinnerOnSelect={false}
         closeOnSelect
         resetInputOnClose
@@ -477,8 +469,8 @@ const Wrapperheader = styled.div`
   }
 `;
 
-interface IWrapperCommandsProps extends DivProps{
-  isLastindex: boolean
+interface IWrapperCommandsProps extends DivProps {
+  isLastindex: boolean;
 }
 
 const WrapperCommands = styled.div<IWrapperCommandsProps>`

@@ -332,6 +332,27 @@
         }
       }
     },
+    "invyce-persist": {
+      "root": "libs/invyce-persist",
+      "sourceRoot": "libs/invyce-persist/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/invyce-persist/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/invyce-persist"],
+          "options": {
+            "jestConfig": "libs/invyce-persist/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "exports-service": {
       "root": "apps/exports-service",
       "sourceRoot": "apps/exports-service/src",

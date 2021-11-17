@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { Form, Input, Select, Tabs } from 'antd';
 import { FormLabel } from '../FormLabel';
 import { DatePicker } from '../DatePicker';
-import { useState } from 'hoist-non-react-statics/node_modules/@types/react';
+import { useState } from 'react';
 import { PaymentMode } from '../../modal/payment';
 import dayjs from 'dayjs';
 import { defaultSettings } from './constants';
@@ -20,8 +20,7 @@ export const Payments = ({ initialValues, onChange, reset, issueDate }) => {
 
   const { isLoading, data } = useQuery([`all-bank-accounts`], getBankAccounts);
 
-
-  let paymentTypeStatus = form.getFieldValue('paymentType');
+  const paymentTypeStatus = form.getFieldValue('paymentType');
   const disableDates = (current) => {
     if (issueDate) {
       return current <= dayjs(issueDate).subtract(1, 'day');
@@ -177,7 +176,7 @@ export const Payments = ({ initialValues, onChange, reset, issueDate }) => {
                     },
                     {
                       validator: (rule, value, callback) => {
-                        let amount = form.getFieldValue('totalAmount');
+                        const amount = form.getFieldValue('totalAmount');
                         if (parseInt(value) > amount) {
                           try {
                             throw new Error(

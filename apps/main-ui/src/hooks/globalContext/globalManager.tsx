@@ -1,12 +1,13 @@
 import { message } from 'antd';
-import React, { FC, useEffect, useState } from 'react';
+import { ReactNode } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { queryCache, useMutation, useQuery } from 'react-query';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import {
   CheckAuthAPI,
   CheckAuthAPIDev,
   getAllRolesWithPermission,
-  getUserAPI,
   LogoutAPI,
   uploadPdfAPI,
 } from '../../api';
@@ -21,8 +22,6 @@ import { IRolePermissions } from '../../modal/rbac';
 import { DecriptionData, EncriptData } from '../../utils/encription';
 import { useTheme } from '../useTheme';
 import { globalContext } from './globalContext';
-import { useHistory } from 'react-router-dom';
-import { CancelRequest } from '../../utils/http';
 
 type Theme = 'light' | 'dark';
 
@@ -51,7 +50,13 @@ const toggleTheme = (t: Theme) => {
 };
 
 interface IProps {
-  children: React.ReactElement<any>;
+  children: ReactNode;
+}
+
+interface IModalsConfig {
+  visibility?: boolean;
+  id?: string | number;
+  [key: string]: unknown;
 }
 
 export enum ILoginActions {
@@ -61,7 +66,7 @@ export enum ILoginActions {
 
 interface IAction {
   type?: ILoginActions;
-  payload?: any;
+  payload?: unknown;
 }
 
 export const GlobalManager: FC<IProps> = ({ children }) => {
@@ -79,67 +84,77 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const [isUserLogin, setIsUserLogin] = useState(false);
   const [auth, setAuth] = useState<IAuth>(null);
-  const [userDetails, setUserDetails] = useState<IUser | any>(null);
+  const [userDetails, setUserDetails] = useState<IUser>(null);
   const [userInviteModal, setUserInviteModal] = useState<boolean>(false);
-  const [itemsModalConfig, setItemsModalConfig] = useState<any>({
+  const [itemsModalConfig, setItemsModalConfig] = useState<IModalsConfig>({
     visibility: false,
     id: null,
   });
   const [transactionModal, setTransactionModal] = useState<boolean>(false);
   const [preferancesModal, setPreferancesModal] = useState<boolean>(false);
-  const [accountsModalConfig, setAccountsModalConfig] = useState<any>({
-    visibility: false,
-    id: null,
-  });
-  const [organizationModalConfig, setOrganizationConfig] = useState({
-    visibility: false,
-    id: null,
-  });
+  const [accountsModalConfig, setAccountsModalConfig] = useState<IModalsConfig>(
+    {
+      visibility: false,
+      id: null,
+    }
+  );
+  const [organizationModalConfig, setOrganizationConfig] =
+    useState<IModalsConfig>({
+      visibility: false,
+      id: null,
+    });
 
-  const [pricingModalConfig, setPricingModalConfig] = useState({
+  const [pricingModalConfig, setPricingModalConfig] = useState<IModalsConfig>({
     visibility: false,
     obj: null,
     updateId: null,
   });
-  const [banksModalConfig, setBanksModalConfig] = useState({
+  const [banksModalConfig, setBanksModalConfig] = useState<IModalsConfig>({
     id: null,
     visibility: false,
   });
-  const [paymentsModalConfig, setPaymentsModalConfig] = useState({
-    id: null,
-    visibility: false,
-  });
-  const [branchModalConfig, setBranchModalConfig] = useState({
+  const [paymentsModalConfig, setPaymentsModalConfig] = useState<IModalsConfig>(
+    {
+      id: null,
+      visibility: false,
+    }
+  );
+  const [branchModalConfig, setBranchModalConfig] = useState<IModalsConfig>({
     id: null,
     visibility: false,
     branchId: null,
   });
-  const [categoryModalConfig, setCategoryModalConfig] = useState({
-    parent_id: null,
-    visibility: false,
-    updateId: null,
-    isChild: false,
-  });
-  const [attributeConfig, setAttributeConfig] = useState({
+  const [categoryModalConfig, setCategoryModalConfig] = useState<IModalsConfig>(
+    {
+      parent_id: null,
+      visibility: false,
+      updateId: null,
+      isChild: false,
+    }
+  );
+  const [attributeConfig, setAttributeConfig] = useState<IModalsConfig>({
     categoryObj: null,
     visibility: false,
   });
 
-  const [dispatchConfigModal, setDispatchConfigModal] = useState({
-    visibility: false,
-  });
-  const [reviewConfigModal, setreviewConfigModal] = useState({
+  const [dispatchConfigModal, setDispatchConfigModal] = useState<IModalsConfig>(
+    {
+      visibility: false,
+    }
+  );
+  const [reviewConfigModal, setreviewConfigModal] = useState<IModalsConfig>({
     visibility: false,
   });
 
-  const [rbacConfigModal, setRbacConfigModal] = useState({
+  const [rbacConfigModal, setRbacConfigModal] = useState<IModalsConfig>({
     visibility: false,
     id: null,
   });
-  const [permissionsConfigModal, setPermissionConfigModal] = useState({
-    visibility: false,
-    id: null,
-  });
+  const [permissionsConfigModal, setPermissionConfigModal] =
+    useState<IModalsConfig>({
+      visibility: false,
+      id: null,
+    });
 
   const [rolePermissions, setRolePermissions] = useState<IRolePermissions[]>(
     []
@@ -147,16 +162,19 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const [verifiedModal, setVerifiedModal] = useState(false);
 
-  const [toggle, setToggle] = useState(true);
-
   window.addEventListener('offline', (event) => {
-    setIsOnline(false);
+    if (isOnline !== false) {
+      setIsOnline(false);
+    }
   });
   window.addEventListener('online', (event) => {
-    setIsOnline(true);
+    console.log('is online fired');
+    if (isOnline !== true) {
+      setIsOnline(true);
+    }
   });
 
-  const handleUploadPDF = async (payload: any) => {
+  const handleUploadPDF = async (payload: unknown) => {
     await mutateSendPDF(payload, {
       onSuccess: () => {
         notificationCallback(
@@ -166,12 +184,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
       },
 
       onError: (error: IServerError) => {
-        if (
-          error &&
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
+        if (error?.response?.data?.message) {
           const { message } = error.response.data;
           notificationCallback(NOTIFICATIONTYPE.SUCCESS, message);
         } else {
@@ -189,12 +202,10 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   const handleLogin = async (action: IAction) => {
     switch (action.type) {
       case ILoginActions.LOGIN:
-        const { payload } = action;
-
         if (process.env.NODE_ENV === 'production') {
           setAutherized(true);
         } else {
-          localStorage.setItem('auth', EncriptData(action.payload) as any);
+          localStorage.setItem('auth', EncriptData(action.payload) as string);
           setAuth(action.payload);
         }
         break;
@@ -239,29 +250,21 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   };
 
   const checkIsAuthSaved = localStorage.getItem('auth');
-  const isSidebarOpen: boolean = JSON.parse(localStorage.getItem('isToggle'));
-
-  useEffect(() => {
-    if (isSidebarOpen !== null) {
-      setToggle(isSidebarOpen);
-    }
-  }, [isSidebarOpen]);
 
   useEffect(() => {
     if (checkIsAuthSaved) {
-      let decriptedData = DecriptionData(checkIsAuthSaved);
-      let user: IUser = decriptedData?.users;
+      const decriptedData = DecriptionData(checkIsAuthSaved);
+      const user: IUser = decriptedData?.users;
 
       setAuth(decriptedData);
       setUserDetails(user);
     }
   }, [checkIsAuthSaved]);
 
-  let userId = auth?.users?.id || null;
-
+  const userId = auth?.users?.id || null;
 
   /* LoggedInUser is Fetched */
-  const { isLoading, data, error, isFetched } = useQuery(
+  const { isLoading, isFetched } = useQuery(
     [`loggedInUser`, userId],
     AUTH_CHECK_API,
     {
@@ -320,7 +323,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     toggleTheme(theme);
   }, [theme]);
 
-
   const {
     data: allRolesAndPermissionsData,
     isLoading: permissionsFetching,
@@ -331,7 +333,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     staleTime: Infinity,
   });
 
-
   useEffect(() => {
     if (allRolesAndPermissionsData?.data?.result) {
       const { result } = allRolesAndPermissionsData.data;
@@ -339,8 +340,8 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
       const roles: IRolePermissions[] =
         allRolesAndPermissionsData.data.result.roles;
       const newResult = roles.map((item) => {
-        let roleIndex = parentRole.findIndex((i) => i === item.role);
-        let parents = [];
+        const roleIndex = parentRole.findIndex((i) => i === item.role);
+        const parents = [];
         for (let index = 0; index <= roleIndex; index++) {
           parents.push(parentRole[index]);
         }
@@ -434,7 +435,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         pricingModalConfig,
         setPricingModalConfig: (
           visibility: boolean,
-          obj: any = null,
+          obj: unknown = null,
           updateId: number = null
         ) => {
           setPricingModalConfig({ visibility, obj, updateId });
@@ -461,12 +462,15 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
           visibility: boolean,
           parent_id: number = null,
           updateId: number = null,
-          isChild: boolean = false
+          isChild = false
         ) => {
           setCategoryModalConfig({ parent_id, visibility, updateId, isChild });
         },
         attributeConfig,
-        setAttributeConfig: (visibility: boolean, categoryObj: any = null) => {
+        setAttributeConfig: (
+          visibility: boolean,
+          categoryObj: unknown = null
+        ) => {
           setAttributeConfig({ visibility, categoryObj });
         },
         dispatchConfigModal,
@@ -494,7 +498,13 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         theme: appTheme,
         darkModeLoading: themeLoading,
         setTheme: (payload) => {
-          setTheme(payload);
+          setTheme((prev) => {
+            if (prev !== payload) {
+              return payload;
+            } else {
+              return prev;
+            }
+          });
         },
         verifiedModal,
         setVerifiedModal,

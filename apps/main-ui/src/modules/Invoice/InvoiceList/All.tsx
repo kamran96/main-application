@@ -1,35 +1,35 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button } from "antd";
-import React, { FC, useEffect, useState } from "react";
+import { Button } from 'antd';
+import React, { FC, useEffect, useState } from 'react';
 import {
   queryCache,
   useMutation,
   usePaginatedQuery,
   useQuery,
-} from "react-query";
+} from 'react-query';
 import {
   deleteInvoiceDrafts,
   getAllContacts,
   getInvoiceListAPI,
-} from "../../../api";
-import { ConfirmModal } from "../../../components/ConfirmModal";
-import { PDFICON } from "../../../components/Icons";
-import { PurchaseListTopbar } from "../../../components/PurchasesListTopbar";
-import { PERMISSIONS } from "../../../components/Rbac/permissions";
-import { useRbac } from "../../../components/Rbac/useRbac";
-import { SmartFilter } from "../../../components/SmartFilter";
-import { CommonTable } from "../../../components/Table";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { IContactTypes, IServerError, NOTIFICATIONTYPE } from "../../../modal";
+} from '../../../api';
+import { ConfirmModal } from '../../../components/ConfirmModal';
+import { PDFICON } from '../../../components/Icons';
+import { PurchaseListTopbar } from '../../../components/PurchasesListTopbar';
+import { PERMISSIONS } from '../../../components/Rbac/permissions';
+import { useRbac } from '../../../components/Rbac/useRbac';
+import { SmartFilter } from '../../../components/SmartFilter';
+import { CommonTable } from '../../../components/Table';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { IContactTypes, IServerError, NOTIFICATIONTYPE } from '../../../modal';
 import {
   IInvoiceResponse,
   IInvoiceStatus,
   INVOICETYPE,
   ORDER_TYPE,
-} from "../../../modal/invoice";
-import { ISupportedRoutes } from "../../../modal/routing";
-import { _exportableCols } from "./commonCol";
-import InvoicesFilterSchema from "./InvoicesFilterSchema";
+} from '../../../modal/invoice';
+import { ISupportedRoutes } from '../../../modal/routing';
+import { _exportableCols } from './commonCol';
+import InvoicesFilterSchema from './InvoicesFilterSchema';
 
 interface IProps {
   columns?: any[];
@@ -37,8 +37,8 @@ interface IProps {
 export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
-    query: "",
-    sortid: "",
+    query: '',
+    sortid: '',
     page_size: 10,
   });
 
@@ -57,9 +57,9 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
       routeHistory.history.location.search
     ) {
       let obj = {};
-      let queryArr = history.location.search.split("?")[1].split("&");
+      const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
-        let split = item.split("=");
+        const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
 
@@ -67,22 +67,19 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
     }
   }, [routeHistory]);
 
-  const [invoiceFiltersSchema, setInvoiceFilterSchema] = useState(
-    InvoicesFilterSchema
-  );
+  const [invoiceFiltersSchema, setInvoiceFilterSchema] =
+    useState(InvoicesFilterSchema);
   const [selectedRow, setSelectedRow] = useState([]);
 
   const [filterBar, setFilterBar] = useState<boolean>(false);
 
-  const [
-    { result, pagination },
-    setAllInvoicesRes,
-  ] = useState<IInvoiceResponse>({
-    result: [],
-    pagination: null,
-  });
+  const [{ result, pagination }, setAllInvoicesRes] =
+    useState<IInvoiceResponse>({
+      result: [],
+      pagination: null,
+    });
 
-  const allContacts = useQuery([`all-contacts`, "ALL"], getAllContacts);
+  const allContacts = useQuery([`all-contacts`, 'ALL'], getAllContacts);
 
   useEffect(() => {
     if (
@@ -91,7 +88,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
       allContacts.data.data.result
     ) {
       const { result } = allContacts.data.data;
-      let schema = invoiceFiltersSchema;
+      const schema = invoiceFiltersSchema;
       schema.contactId.value = result.filter(
         (item) => item.contactType === IContactTypes.CUSTOMER
       );
@@ -101,22 +98,20 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
 
   const { page, query, sortid, page_size } = allInvoicesConfig;
 
-
   const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
     [
       `invoices-${ORDER_TYPE.SALE_INVOICE}-${INVOICETYPE.Approved}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
       ORDER_TYPE.SALE_INVOICE,
       IInvoiceStatus.approve,
-      "ALL",
+      'ALL',
       page,
       page_size,
       query,
     ],
     getInvoiceListAPI
   );
-  const [mutateDeleteOrders, resDeleteOrders] = useMutation(
-    deleteInvoiceDrafts
-  );
+  const [mutateDeleteOrders, resDeleteOrders] =
+    useMutation(deleteInvoiceDrafts);
 
   const onSelectedRow = (item) => {
     setSelectedRow(item.selectedRowKeys);
@@ -143,18 +138,18 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
     await mutateDeleteOrders(payload, {
       onSuccess: () => {
         [
-          "invoices",
-          "transactions",
-          "items?page",
-          "invoice-view",
-          "ledger-contact",
-          "all-items",
+          'invoices',
+          'transactions',
+          'items?page',
+          'invoice-view',
+          'ledger-contact',
+          'all-items',
         ].forEach((key) => {
           queryCache.invalidateQueries((q) =>
             q.queryKey[0].toString().startsWith(`${key}`)
           );
         });
-        notificationCallback(NOTIFICATIONTYPE.SUCCESS, "Deleted Successfully");
+        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Deleted Successfully');
 
         setSelectedRow([]);
         setConfirmModal(false);
@@ -176,9 +171,9 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   const cols = [...columns];
 
   cols.splice(2, 0, {
-    title: "Return",
-    dataIndex: "isReturn",
-    render: (data) => <>{data && data === true ? "Returned" : ""}</>,
+    title: 'Return',
+    dataIndex: 'isReturn',
+    render: (data) => <>{data && data === true ? 'Returned' : ''}</>,
   });
 
   /* Functions Here */
@@ -196,7 +191,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
         <SmartFilter
           onFilter={(encode) => {
             setAllInvoicesConfig({ ...allInvoicesConfig, query: encode });
-            let route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
+            const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
             history.push(route);
           }}
           onClose={() => setFilterBar(false)}
@@ -216,10 +211,10 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
         hasPrint
         exportableProps={{
           fields: _exportableCols,
-          fileName: "approved-invoices",
+          fileName: 'approved-invoices',
         }}
         exportable
-        printTitle={"Approved Invoices"}
+        printTitle={'Approved Invoices'}
         customTopbar={
           <PurchaseListTopbar
             disabled={!selectedRow.length}
@@ -229,7 +224,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
               <SmartFilter
                 onFilter={(encode) => {
                   setAllInvoicesConfig({ ...allInvoicesConfig, query: encode });
-                  let route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
+                  const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
                   history.push(route);
                 }}
                 onClose={() => setFilterBar(false)}
@@ -243,7 +238,6 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
         columns={cols}
         loading={isFetching || isLoading}
         onChange={(pagination, filters, sorter: any, extra) => {
-          
           if (sorter.order === undefined) {
             setAllInvoicesConfig({
               ...allInvoicesConfig,
@@ -251,7 +245,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
               page: pagination.current,
               page_size: pagination.pageSize,
             });
-            let route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+            const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
             history.push(route);
           } else {
             setAllInvoicesConfig({
@@ -259,16 +253,16 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
               page: pagination.current,
               page_size: pagination.pageSize,
               sortid:
-                sorter && sorter.order === "descend"
+                sorter && sorter.order === 'descend'
                   ? `-${sorter.field}`
                   : sorter.field,
             });
-            let route = `/app${
+            const route = `/app${
               ISupportedRoutes.INVOICES
             }?tabIndex=all&sortid=null&page=${pagination.current}&page_size=${
               pagination.pageSize
             }&query=${query}&sortid=${
-              sorter && sorter.order === "descend"
+              sorter && sorter.order === 'descend'
                 ? `-${sorter.field}`
                 : sorter.field
             }`;
@@ -277,9 +271,8 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
         }}
         totalItems={pagination && pagination.total}
         pagination={{
-          
           pageSize: page_size,
-          position: ["bottomRight"],
+          position: ['bottomRight'],
           current: pagination && pagination.page_no,
           total: pagination && pagination.total,
         }}

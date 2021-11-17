@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { DecriptionData } from './encription';
 
-let localIP = `http://localhost/`;
+const localIP = `http://192.168.6.235/`;
 let RailsBaseURL = '';
 let NodeBaseURL = ``;
 const cancelSource = axios.CancelToken.source();
@@ -20,7 +20,7 @@ if (host && host === 'app.invyce.com') {
   NodeBaseURL = `https://dev.api.node.invyce.com/`;
 } else {
   // local development
-  RailsBaseURL = localIP; // + ":4000"
+  RailsBaseURL = localIP; // + ":3000"
   NodeBaseURL = localIP; //+ ":8081"
 }
 
@@ -51,11 +51,11 @@ export const railsHttp = axios.create({
 // http.interceptors.response.use(res => requestHandler(res));
 
 export const encriptionData = localStorage.getItem('auth');
-let access_token = encriptionData
+const access_token = encriptionData
   ? DecriptionData(encriptionData).access_token
   : false;
 
-export const updateToken = (token: String) => {
+export const updateToken = (token: string) => {
   http.defaults.headers.common.Authorization = `Bearer ${token}`;
   railsHttp.defaults.headers.common.Authorization = `Bearer ${token}`;
 };

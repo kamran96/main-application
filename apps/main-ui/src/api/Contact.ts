@@ -1,16 +1,9 @@
-import http, { railsHttp } from "../utils/http";
+import http from '../utils/http';
 
-enum ContactAPI {
-  INDEX = "contacts",
-  railsINDEX = "contacts/index",
-}
-
-enum ContactServiceAPI{
+enum ContactServiceAPI {
   default = 'contacts/contact',
   index = 'contacts/contact',
-  
 }
-
 
 export const getContacts = (
   key?: string,
@@ -29,18 +22,18 @@ export const getContacts = (
 };
 
 export const viewSingleContact = (key?: string, id?: number) =>
-  railsHttp.get(`${ContactServiceAPI.default}/${id}`);
+  http.get(`${ContactServiceAPI.default}/${id}`);
 
 export const deleteContacts = (payload) =>
   http.put(`${ContactServiceAPI.default}`, payload);
 
 export const create_update_contact = (payload) => {
-  let url = `${ContactServiceAPI.default}`;
-  return railsHttp.post(url, payload);
+  const url = `${ContactServiceAPI.default}`;
+  return http.post(url, payload);
 };
 
 export const getAllContacts = (key?: string, purpose?: string) =>
-  railsHttp.get(`${ContactServiceAPI.default}?purpose=${purpose}`);
+  http.get(`${ContactServiceAPI.default}?purpose=${purpose}`);
 
 export const getContactLedger = (
   key?: string,
@@ -54,5 +47,5 @@ export const getContactLedger = (
   if (query) {
     url = `${url}&query=${query}`;
   }
-  return railsHttp.get(url);
+  return http.get(url);
 };

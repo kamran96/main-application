@@ -1,20 +1,20 @@
-import { Button, Col, Form, Input, Row, Select } from "antd";
-import TextArea from "antd/lib/input/TextArea";
-import React, { FC, useEffect, useState } from "react";
-import { queryCache, useMutation, useQuery } from "react-query";
-import styled from "styled-components";
+import { Button, Col, Form, Input, Row, Select } from 'antd';
+import TextArea from 'antd/lib/input/TextArea';
+import { FC, useEffect, useState } from 'react';
+import { queryCache, useMutation, useQuery } from 'react-query';
+import styled from 'styled-components';
 import {
   createUpdateAccountAPI,
   getAccountByIDAPI,
   getSecondaryAccounts,
-} from "../../../api/accounts";
-import { CommonModal } from "../../../components";
-import { FormLabel } from "../../../components/FormLabel";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { NOTIFICATIONTYPE } from "../../../modal";
-import convertToRem from "../../../utils/convertToRem";
-import getRangeOfNumbers from "../../../utils/getRangeOfNumbers";
-import { ISecondaryAccount } from "./../../../modal/accounts";
+} from '../../../api/accounts';
+import { CommonModal } from '../../../components';
+import { FormLabel } from '../../../components/FormLabel';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { NOTIFICATIONTYPE } from '../../../modal';
+import convertToRem from '../../../utils/convertToRem';
+import getRangeOfNumbers from '../../../utils/getRangeOfNumbers';
+import { ISecondaryAccount } from './../../../modal/accounts';
 
 const { Option } = Select;
 export const AccountsForm: FC = () => {
@@ -24,7 +24,6 @@ export const AccountsForm: FC = () => {
   const [secondaryAccounts, setSecondaryAccounts] = useState<
     ISecondaryAccount[]
   >([]);
-
 
   const { accountsModalConfig, setAccountsModalConfig, notificationCallback } =
     useGlobalContext();
@@ -40,7 +39,7 @@ export const AccountsForm: FC = () => {
         second: message title
         third: message description
         */
-      notificationCallback(NOTIFICATIONTYPE.SUCCESS, "Account Fetched");
+      notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Account Fetched');
     },
   });
 
@@ -49,7 +48,7 @@ export const AccountsForm: FC = () => {
     if (data && data.data && data.data.result) {
       const { name, code, description, secondaryAccount, taxRate } =
         data.data.result;
-      let formData: any = {
+      const formData = {
         name,
         code,
         description,
@@ -73,12 +72,9 @@ export const AccountsForm: FC = () => {
         onSuccess: () => {
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
-            id ? "Updated" : "Created",
-            `Account is ${id ? `Updated` : `Created`} Successfully`
-            // id ? "Updated Successfully" : "Created Successfully",
-            // `Contact is ${id ? "Updated" : "Created"} successfully`
+            id ? 'Updated' : 'Created'
           );
-          ["accounts", `account-${id}`]?.forEach((key) => {
+          ['accounts', `account-${id}`]?.forEach((key) => {
             queryCache?.invalidateQueries((q) =>
               q?.queryKey[0]?.toString().startsWith(key)
             );
@@ -87,10 +83,12 @@ export const AccountsForm: FC = () => {
           form.resetFields();
         },
       });
-    } catch (error) {}
+    } catch (error) {
+      console.log({ error });
+    }
   };
   const onFinisFailed = (error) => {
-    console.log(error, "check error");
+    console.log(error, 'check error');
   };
 
   /*Query hook for  Fetching single contact against ID */
@@ -101,7 +99,6 @@ export const AccountsForm: FC = () => {
       enabled: accountsModalConfig.visibility === true,
     }
   );
-
 
   useEffect(() => {
     if (data && data.data) {
@@ -129,13 +126,13 @@ export const AccountsForm: FC = () => {
               <FormLabel>Account Type</FormLabel>
               <Form.Item
                 name="secondaryAccountId"
-                rules={[{ required: true, message: "Please account" }]}
+                rules={[{ required: true, message: 'Please account' }]}
               >
                 <Select
                   loading={isLoading}
                   size="large"
                   showSearch
-                  style={{ width: "100%" }}
+                  style={{ width: '100%' }}
                   placeholder="Select account"
                   optionFilterProp="children"
                 >
@@ -177,7 +174,7 @@ export const AccountsForm: FC = () => {
                 <Select
                   size="large"
                   showSearch
-                  style={{ width: "100%" }}
+                  style={{ width: '100%' }}
                   placeholder="Select tax.."
                   optionFilterProp="children"
                 >
@@ -211,7 +208,7 @@ export const AccountsForm: FC = () => {
                     type="primary"
                     htmlType="submit"
                   >
-                    {accountsModalConfig.id ? "Update" : "Create"}
+                    {accountsModalConfig.id ? 'Update' : 'Create'}
                   </Button>
                   <Button
                     onClick={() => {
@@ -230,7 +227,6 @@ export const AccountsForm: FC = () => {
     </CommonModal>
   );
 };
-
 
 const WrapperAddAccount = styled.div`
   .input-info {

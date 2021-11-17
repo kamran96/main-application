@@ -15,11 +15,11 @@ const PricingEditorWidget: FC = () => {
     useGlobalContext();
   const [mutateAddItemPrice, respCreatePice] = useMutation(createPricingAPI);
   const [form] = Form.useForm();
-const { obj } = pricingModalConfig;
+  const { obj } = pricingModalConfig;
 
   const id = obj && obj.id ? obj.id : null;
   const pricingId = (Array.isArray(id) && id.length > 0 && id[0]) || null;
-  console.log(id, pricingId, "pricing")
+  console.log(id, pricingId, 'pricing');
 
   const { data } = useQuery(
     [`price-${pricingId}`, pricingId],
@@ -61,7 +61,7 @@ const { obj } = pricingModalConfig;
           payload = {
             ...payload,
             item_ids: id,
-            isNewRecord: true,
+            isNewRecord: false,
           };
         } else {
           payload = {
