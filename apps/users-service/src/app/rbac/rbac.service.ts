@@ -307,12 +307,15 @@ export class RbacService {
 
     const roles = await this.roleModel.find({ organizationId });
 
-    const globalPermissions = await this.permissionModel
+    let globalPermissions = await this.permissionModel
       .find()
       .sort({ _id: 'ASC' });
 
+    if (globalPermissions.length === 0) {
+      globalPermissions = await this.InsertGlobalPermissions();
+    }
+
     for (const permission of permissions) {
-      console.log(permission, 'permission');
       const pId = globalPermissions.find(
         (gp) => gp.description === permission.description
       );

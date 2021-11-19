@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import axios from 'axios';
+import { Response } from 'express';
 import { IRequest, IAddress, IOrganization } from '@invyce/interfaces';
 import { AuthService } from '../auth/auth.service';
 import { OrganizationDto } from '../dto/organization.dto';
@@ -41,8 +42,9 @@ export class OrganizationService {
 
   async CreateOrUpdateOrganization(
     organizationDto: OrganizationDto,
-    req: IRequest
-  ): Promise<IOrganization> {
+    req: IRequest,
+    res: Response
+  ): Promise<unknown> {
     const address: IAddress = {
       description: organizationDto.description,
       city: organizationDto.city,
@@ -165,10 +167,12 @@ export class OrganizationService {
             }
           );
 
-          return organization;
+          const users = await this.authService.CheckUser({
+            username: req.user.username,
+          });
+          return await this.authService.Login(users, res);
         }
       } catch (error) {
-        console.log(error);
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
     }

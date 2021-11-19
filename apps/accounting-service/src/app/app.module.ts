@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { getMetadataArgsStorage } from 'typeorm';
-require('dotenv').config();
-
+import * as dotenv from 'dotenv';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AccountsModule } from './accounts/accounts.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { BankModule } from './bank/bank.module';
+dotenv.config();
 
 @Module({
   imports: [
@@ -20,7 +20,10 @@ import { BankModule } from './bank/bank.module';
         ({
           type: 'postgres',
           host: configService.get('ACC_DB_HOST', process.env.ACC_DB_HOST),
-          port: configService.get<any>('ACC_DB_PORT', process.env.ACC_DB_PORT),
+          port: configService.get<unknown>(
+            'ACC_DB_PORT',
+            process.env.ACC_DB_PORT
+          ),
           username: configService.get('ACC_DB_USER', process.env.ACC_DB_USER),
           password: configService.get(
             'ACC_DB_PASSWORD',

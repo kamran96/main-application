@@ -7,8 +7,10 @@ import {
   Param,
   Post,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { IRequest, IOrganizationResponse } from '@invyce/interfaces';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -44,12 +46,17 @@ export class OrganizationController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  async create(@Body() organizationDto: OrganizationDto, @Req() req: IRequest) {
+  async create(
+    @Body() organizationDto: OrganizationDto,
+    @Req() req: IRequest,
+    @Res() res: Response
+  ) {
     try {
       const organization =
         await this.organizationService.CreateOrUpdateOrganization(
           organizationDto,
-          req
+          req,
+          res
         );
 
       if (organization) {
