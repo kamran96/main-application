@@ -6,6 +6,7 @@
   "scripts": {
     "nx": "nx",
     "start": "nx serve",
+    "start-backend": "nx run-many --parallel --target=serve --projects=users-service,contacts-service,items-service,accounting-service,attachments-service,email-service,invoices-service,payments-service,exports-service,integration",
     "build": "nx build",
     "test": "nx test",
     "lint": "nx workspace-lint && nx lint",
