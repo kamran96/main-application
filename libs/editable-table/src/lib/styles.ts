@@ -1,7 +1,6 @@
-import { IThemeProps } from './../../../shared/invyce-theme/src/types/index';
+import { IThemeProps } from '@invyce/shared/invyce-theme';
 import { convertToRem } from '@invyce/pixels-to-rem';
 import styled from 'styled-components';
-import { Scrollable } from './editable-table';
 
 type DivProps = JSX.IntrinsicElements['div'];
 interface IWrapperProps extends DivProps {
@@ -27,7 +26,7 @@ export const EditableTableWrapper = styled.table<IWrapperProps>`
 
 `}
 
-.ant-table-thead > tr > th {
+  .ant-table-thead > tr > th {
     padding: 9px 16px;
   }
   .ant-table-thead {
@@ -55,9 +54,10 @@ export const EditableTableWrapper = styled.table<IWrapperProps>`
       props?.theme?.colors?.td} !important;
   }
 
-
-
-  .ant-table-thead > tr > th, .ant-table-tbody > tr > td, .ant-table tfoot > tr > th, .ant-table tfoot > tr > td {
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td,
+  .ant-table tfoot > tr > th,
+  .ant-table tfoot > tr > td {
     padding: 9px 16px;
   }
 `;

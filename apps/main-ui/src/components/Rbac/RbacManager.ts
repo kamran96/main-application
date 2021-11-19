@@ -1,4 +1,4 @@
-import { IRolePermissions } from "../../modal/rbac";
+import { IRolePermissions } from '../../modal/rbac';
 
 export class RbacManager {
   permission: string;
@@ -16,7 +16,7 @@ export class RbacManager {
     let hasPermission = true;
     const permissionLocal: string =
       permission?.trim() || this.permission?.trim();
-    let permissionIndex = this.rolePermissions.findIndex(
+    const permissionIndex = this.rolePermissions.findIndex(
       (i) => i.action === permissionLocal
     );
 
@@ -24,13 +24,13 @@ export class RbacManager {
       if (
         this.rolePermissions[permissionIndex].role === this.role ||
         this.rolePermissions[permissionIndex].parents.includes(this.role) ||
-        this.role === "super-admin"
+        this.role === 'super-admin'
       ) {
         hasPermission = true;
       } else {
         hasPermission = false;
       }
-    } else if (this.role === "super-admin" || this.role === "onboarding-user") {
+    } else if (this.role === 'super-admin' || this.role === 'onboarding-user') {
       hasPermission = true;
     } else {
       hasPermission = false;
