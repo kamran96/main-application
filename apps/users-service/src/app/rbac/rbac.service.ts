@@ -311,9 +311,11 @@ export class RbacService {
       .find()
       .sort({ _id: 'ASC' });
 
+    console.log(globalPermissions, 'okkkayu');
     if (globalPermissions.length === 0) {
       globalPermissions = await this.InsertGlobalPermissions();
     }
+    console.log(globalPermissions, 'asdfsd');
 
     for (const permission of permissions) {
       const pId = globalPermissions.find(
