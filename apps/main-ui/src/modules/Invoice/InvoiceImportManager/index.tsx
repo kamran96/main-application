@@ -1,4 +1,4 @@
-export const InvoiceImportManager = () => {
+export const InvoiceImportManager = ({ onLoad }) => {
   const obj_csv = {
     size: 0,
     dataFile: [],
@@ -25,6 +25,7 @@ export const InvoiceImportManager = () => {
     lbreak.forEach((res) => {
       csvData.push(res.split(','));
     });
+    onLoad(csvData);
     console.table(csvData);
   }
   return <input type="file" onChange={readImage} />;

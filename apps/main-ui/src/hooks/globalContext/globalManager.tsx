@@ -32,6 +32,8 @@ const stylesheets = {
 
 const isProductionEnv = process.env.NODE_ENV === 'production' || false;
 
+console.log(isProductionEnv, 'what is dot env');
+
 const AUTH_CHECK_API = isProductionEnv ? CheckAuthAPI : CheckAuthAPIDev;
 
 const createStylesheetLink = (): HTMLLinkElement => {
