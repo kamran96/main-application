@@ -40,6 +40,9 @@
     "contacts-service": {
       "tags": []
     },
+    "csv-service": {
+      "tags": []
+    },
     "editable-table": {
       "tags": []
     },
@@ -68,6 +71,9 @@
     "invoices-service": {
       "tags": []
     },
+    "invyce-persist": {
+      "tags": []
+    },
     "items-service": {
       "tags": []
     },
@@ -80,9 +86,6 @@
     "main-ui-e2e": {
       "tags": [],
       "implicitDependencies": ["main-ui"]
-    },
-    "invyce-persist": {
-      "tags": []
     },
     "mobile-app": {
       "tags": []
