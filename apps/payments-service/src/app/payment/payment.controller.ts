@@ -48,17 +48,25 @@ export class PaymentController {
   @Post('/invoice')
   @UseGuards(GlobalAuthGuard)
   async getPaymentAgainstInvoice(
-    @Body() invoiceIds: PaymentInvoiceDto
+    @Body() invoiceIds: PaymentInvoiceDto,
+    @Req() req: IRequest
   ): Promise<IPayment[]> {
-    return await this.paymentService.GetPaymentAgainstInvoiceId(invoiceIds);
+    return await this.paymentService.GetPaymentAgainstInvoiceId(
+      invoiceIds,
+      req.user
+    );
   }
 
   @Post('/contact')
   @UseGuards(GlobalAuthGuard)
   async GetPaymentAgainstContactId(
-    @Body() contactIds: PaymentContactDto
+    @Body() contactIds: PaymentContactDto,
+    @Req() req: IRequest
   ): Promise<IPayment[]> {
-    return await this.paymentService.GetPaymentAgainstContactId(contactIds);
+    return await this.paymentService.GetPaymentAgainstContactId(
+      contactIds,
+      req.user
+    );
   }
 
   @Post()

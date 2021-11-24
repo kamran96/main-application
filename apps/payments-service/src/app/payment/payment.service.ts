@@ -41,7 +41,7 @@ export class PaymentService {
       status: 1,
       organizationId: user.organizationId,
       paymentMode: paymentType,
-      // branchId: user.branchId,
+      branchId: user.branchId,
     });
 
     if (query) {
@@ -55,6 +55,7 @@ export class PaymentService {
           payments = await getCustomRepository(PaymentRepository).find({
             where: {
               status: 1,
+              branchId: user.branchId,
               organizationId: user.organizationId,
               [i]: Between(start_date, end_date),
             },
@@ -66,8 +67,8 @@ export class PaymentService {
     } else {
       payments = await getCustomRepository(PaymentRepository).find({
         where: {
-          // organizationId: user.organizationId,
-          // branchId: user.branchId,
+          organizationId: user.organizationId,
+          branchId: user.branchId,
           status: 1,
           paymentMode: paymentType,
         },
@@ -140,17 +141,15 @@ export class PaymentService {
         codes: accountCodesArray,
       });
 
-      let debits = [];
-      let credits = [];
       if (data?.paymentMode === PaymentModes.BILLS) {
         // for Bills
-        debits = [
+        const debits = [
           {
             amount: data.amount,
             account_id: accounts.find((i) => i.code === '40003').id,
           },
         ];
-        credits = [
+        const credits = [
           {
             amount: data.amount,
             account_id:
@@ -169,83 +168,76 @@ export class PaymentService {
 
         const { data: transaction } = await http.post(
           'accounts/transaction/api',
-          payload
+          {
+            transactions: payload,
+          }
         );
 
         if (data?.invoice_ids?.length > 0) {
-          const bills = await getCustomRepository(PaymentRepository)
-            .query(`select p."billId", sum(p.amount) as balance, count(id) as total_payments 
-        from payments p
-        where p."billId" in (${data.invoice_ids})
-        and p.status = 1
-        and p."organizationId" = '${req.user.organizationId}'
-        group by p."billId"
-        `);
-
           const remainig = data.amount;
-          if (bills.length > 0) {
-            for (const i of bills) {
-              const purchase_total = Math.abs(parseFloat(i.balance));
-              if (purchase_total > remainig && remainig > 0) {
-                await getCustomRepository(PaymentRepository).save({
-                  date: data.date,
-                  contactId: data.contactId,
-                  paymentType: data.paymentType,
-                  paymentMode: data.paymentMode,
-                  amount: parseInt(`-${remainig}`),
-                  runningPayment: data.runningPayment,
-                  billId: i.id,
-                  reference: data.reference,
-                  comment: data.comment,
-                  status: 1,
-                  organizationId: req.user.organizationId,
-                  createdById: req.user.id,
-                  updatedById: req.user.id,
-                });
-              } else if (purchase_total < remainig && remainig > 0) {
-                await getCustomRepository(PaymentRepository).save({
-                  date: data.date,
-                  contactId: data.contactId,
-                  paymentType: data.paymentType,
-                  paymentMode: data.paymentMode,
-                  amount: parseInt(`-${purchase_total}`),
-                  runningPayment: data.runningPayment,
-                  reference: data.reference,
-                  billId: i.id,
-                  comment: data.comment,
-                  status: 1,
-                  organizationId: req.user.organizationId,
-                  createdById: req.user.id,
-                  updatedById: req.user.id,
-                });
-              } else if (purchase_total === remainig && remainig > 0) {
-                await getCustomRepository(PaymentRepository).save({
-                  date: data.date,
-                  contactId: data.contactId,
-                  paymentType: data.paymentType,
-                  paymentMode: data.paymentMode,
-                  amount: parseInt(`-${remainig}`),
-                  runningPayment: data.runningPayment,
-                  reference: data.reference,
-                  comment: data.comment,
-                  billId: i.id,
-                  status: 1,
-                  organizationId: req.user.organizationId,
-                  createdById: req.user.id,
-                  updatedById: req.user.id,
-                });
-              }
-            }
-          } else {
-            if (data.invoice_ids.length === 1) {
+
+          const http = axios.create({
+            baseURL: 'http://localhost',
+            headers: {
+              [type]: value,
+            },
+          });
+
+          const { data: inv } = await http.post(`invoices/bill/ids`, {
+            ids: data.invoice_ids,
+          });
+
+          for (const i of inv) {
+            const purchase_total = Math.abs(parseFloat(i.netTotal));
+            if (purchase_total > remainig && remainig > 0) {
               await getCustomRepository(PaymentRepository).save({
                 date: data.date,
                 contactId: data.contactId,
                 paymentType: data.paymentType,
                 paymentMode: data.paymentMode,
-                billId: data.invoice_ids[0],
-                amount: parseInt(`-${data.amount}`),
+                amount: parseInt(`-${remainig}`),
+                transactionId: transaction.id,
                 runningPayment: data.runningPayment,
+                entryType: 1,
+                billId: i.id,
+                reference: data.reference,
+                comment: data.comment,
+                status: 1,
+                branchId: req.user.branchId,
+                organizationId: req.user.organizationId,
+                createdById: req.user.id,
+                updatedById: req.user.id,
+              });
+            } else if (purchase_total < remainig && remainig > 0) {
+              await getCustomRepository(PaymentRepository).save({
+                date: data.date,
+                contactId: data.contactId,
+                paymentType: data.paymentType,
+                paymentMode: data.paymentMode,
+                amount: parseInt(`-${purchase_total}`),
+                runningPayment: data.runningPayment,
+                billId: i.id,
+                transactionId: transaction.id,
+                reference: data.reference,
+                entryType: 1,
+                comment: data.comment,
+                status: 1,
+                branchId: req.user.branchId,
+                organizationId: req.user.organizationId,
+                createdById: req.user.id,
+                updatedById: req.user.id,
+              });
+            } else if (purchase_total === remainig && remainig > 0) {
+              await getCustomRepository(PaymentRepository).save({
+                date: data.date,
+                contactId: data.contactId,
+                paymentType: data.paymentType,
+                paymentMode: data.paymentMode,
+                transactionId: transaction.id,
+                amount: parseInt(`-${remainig}`),
+                runningPayment: data.runningPayment,
+                billId: i.id,
+                entryType: 1,
                 reference: data.reference,
                 comment: data.comment,
                 status: 1,
@@ -253,70 +245,6 @@ export class PaymentService {
                 createdById: req.user.id,
                 updatedById: req.user.id,
               });
-            } else {
-              const http = axios.create({
-                baseURL: 'http://localhost',
-                headers: {
-                  [type]: value,
-                },
-              });
-
-              const { data: inv } = await http.post(`invoices/bill/ids`, {
-                ids: data.invoice_ids,
-              });
-
-              for (const i of inv) {
-                const purchase_total = Math.abs(parseFloat(i.netTotal));
-                if (purchase_total > remainig && remainig > 0) {
-                  await getCustomRepository(PaymentRepository).save({
-                    date: data.date,
-                    contactId: data.contactId,
-                    paymentType: data.paymentType,
-                    paymentMode: data.paymentMode,
-                    amount: parseInt(`-${remainig}`),
-                    runningPayment: data.runningPayment,
-                    billId: i.id,
-                    reference: data.reference,
-                    comment: data.comment,
-                    status: 1,
-                    organizationId: req.user.organizationId,
-                    createdById: req.user.id,
-                    updatedById: req.user.id,
-                  });
-                } else if (purchase_total < remainig && remainig > 0) {
-                  await getCustomRepository(PaymentRepository).save({
-                    date: data.date,
-                    contactId: data.contactId,
-                    paymentType: data.paymentType,
-                    paymentMode: data.paymentMode,
-                    amount: parseInt(`-${purchase_total}`),
-                    runningPayment: data.runningPayment,
-                    billId: i.id,
-                    reference: data.reference,
-                    comment: data.comment,
-                    status: 1,
-                    organizationId: req.user.organizationId,
-                    createdById: req.user.id,
-                    updatedById: req.user.id,
-                  });
-                } else if (purchase_total === remainig && remainig > 0) {
-                  await getCustomRepository(PaymentRepository).save({
-                    date: data.date,
-                    contactId: data.contactId,
-                    paymentType: data.paymentType,
-                    paymentMode: data.paymentMode,
-                    amount: parseInt(`-${remainig}`),
-                    runningPayment: data.runningPayment,
-                    billId: i.id,
-                    reference: data.reference,
-                    comment: data.comment,
-                    status: 1,
-                    organizationId: req.user.organizationId,
-                    createdById: req.user.id,
-                    updatedById: req.user.id,
-                  });
-                }
-              }
             }
           }
         } else {
@@ -325,11 +253,14 @@ export class PaymentService {
             contactId: data.contactId,
             paymentType: data.paymentType,
             paymentMode: data.paymentMode,
+            transactionId: transaction.id,
             amount: data.amount,
             runningPayment: data.runningPayment,
             reference: data.reference,
+            entryType: 1,
             comment: data.comment,
             status: 1,
+            branchId: req.user.branchId,
             organizationId: req.user.organizationId,
             createdById: req.user.id,
             updatedById: req.user.id,
@@ -337,13 +268,13 @@ export class PaymentService {
         }
       } else if (data?.paymentMode === PaymentModes.INVOICES) {
         // for Invoices
-        credits = [
+        const credits = [
           {
             amount: data.amount,
             account_id: accounts.find((i) => i.code === '15004').id,
           },
         ];
-        debits = [
+        const debits = [
           {
             amount: data.amount,
             account_id:
@@ -360,151 +291,86 @@ export class PaymentService {
           amount: data.amount,
         };
 
-        if (data?.invoice_ids?.length > 0) {
-          const invoices = await getCustomRepository(PaymentRepository).query(`
-          select p."invoiceId", sum(p.amount) as balance, count(p.id) as total_payments
-          from payments p
-          where p."invoiceId" in (${data.invoice_ids})
-          and p.status = 1
-          and p."organizationId" = '${req.user.organizationId}'
-          group by p."invoiceId"
-      `);
+        const { data: transaction } = await http.post(
+          'accounts/transaction/api',
+          {
+            transactions: payload,
+          }
+        );
 
+        if (data?.invoice_ids?.length > 0) {
           const remainig = data.amount;
-          if (invoices.length > 0) {
-            for (const i of invoices) {
-              const purchase_total = Math.abs(parseFloat(i.balance));
-              if (purchase_total > remainig && remainig > 0) {
-                await getCustomRepository(PaymentRepository).save({
-                  date: data.date,
-                  contactId: data.contactId,
-                  paymentType: data.paymentType,
-                  paymentMode: data.paymentMode,
-                  amount: parseInt(`-${remainig}`),
-                  runningPayment: data.runningPayment,
-                  reference: data.reference,
-                  invoiceId: i.id,
-                  comment: data.comment,
-                  status: 1,
-                  organizationId: req.user.organizationId,
-                  createdById: req.user.id,
-                  updatedById: req.user.id,
-                });
-              } else if (purchase_total < remainig && remainig > 0) {
-                await getCustomRepository(PaymentRepository).save({
-                  date: data.date,
-                  contactId: data.contactId,
-                  paymentType: data.paymentType,
-                  paymentMode: data.paymentMode,
-                  amount: parseInt(`-${purchase_total}`),
-                  runningPayment: data.runningPayment,
-                  reference: data.reference,
-                  invoiceId: i.id,
-                  comment: data.comment,
-                  status: 1,
-                  organizationId: req.user.organizationId,
-                  createdById: req.user.id,
-                  updatedById: req.user.id,
-                });
-              } else if (purchase_total === remainig && remainig > 0) {
-                await getCustomRepository(PaymentRepository).save({
-                  date: data.date,
-                  contactId: data.contactId,
-                  paymentType: data.paymentType,
-                  paymentMode: data.paymentMode,
-                  amount: parseInt(`-${remainig}`),
-                  runningPayment: data.runningPayment,
-                  invoiceId: i.id,
-                  reference: data.reference,
-                  comment: data.comment,
-                  status: 1,
-                  organizationId: req.user.organizationId,
-                  createdById: req.user.id,
-                  updatedById: req.user.id,
-                });
-              }
-            }
-          } else {
-            if (data.invoice_ids.length === 1) {
+
+          const http = axios.create({
+            baseURL: 'http://localhost',
+            headers: {
+              [type]: value,
+            },
+          });
+
+          const { data: inv } = await http.post(`invoices/invoice/ids`, {
+            ids: data.invoice_ids,
+          });
+
+          for (const i of inv) {
+            const purchase_total = Math.abs(parseFloat(i.netTotal));
+            if (purchase_total > remainig && remainig > 0) {
               await getCustomRepository(PaymentRepository).save({
                 date: data.date,
                 contactId: data.contactId,
                 paymentType: data.paymentType,
                 paymentMode: data.paymentMode,
-                invoiceId: data.invoice_ids[0],
-                amount: parseInt(`-${data.amount}`),
+                amount: parseInt(`-${remainig}`),
                 runningPayment: data.runningPayment,
+                invoiceId: i.id,
                 reference: data.reference,
+                transactionId: transaction.id,
+                entryType: 1,
                 comment: data.comment,
                 status: 1,
+                branchId: req.user.branchId,
                 organizationId: req.user.organizationId,
                 createdById: req.user.id,
                 updatedById: req.user.id,
               });
-            } else {
-              const http = axios.create({
-                baseURL: 'http://localhost',
-                headers: {
-                  [type]: value,
-                },
+            } else if (purchase_total < remainig && remainig > 0) {
+              await getCustomRepository(PaymentRepository).save({
+                date: data.date,
+                contactId: data.contactId,
+                paymentType: data.paymentType,
+                paymentMode: data.paymentMode,
+                amount: parseInt(`-${purchase_total}`),
+                runningPayment: data.runningPayment,
+                reference: data.reference,
+                invoiceId: i.id,
+                transactionId: transaction.id,
+                entryType: 1,
+                comment: data.comment,
+                status: 1,
+                branchId: req.user.branchId,
+                organizationId: req.user.organizationId,
+                createdById: req.user.id,
+                updatedById: req.user.id,
               });
-
-              const { data: inv } = await http.post(`invoices/invoice/ids`, {
-                ids: data.invoice_ids,
+            } else if (purchase_total === remainig && remainig > 0) {
+              await getCustomRepository(PaymentRepository).save({
+                date: data.date,
+                contactId: data.contactId,
+                paymentType: data.paymentType,
+                paymentMode: data.paymentMode,
+                amount: parseInt(`-${remainig}`),
+                runningPayment: data.runningPayment,
+                transactionId: transaction.id,
+                reference: data.reference,
+                entryType: 1,
+                invoiceId: i.id,
+                comment: data.comment,
+                status: 1,
+                branchId: req.user.branchId,
+                organizationId: req.user.organizationId,
+                createdById: req.user.id,
+                updatedById: req.user.id,
               });
-
-              for (const i of inv) {
-                const purchase_total = Math.abs(parseFloat(i.netTotal));
-                if (purchase_total > remainig && remainig > 0) {
-                  await getCustomRepository(PaymentRepository).save({
-                    date: data.date,
-                    contactId: data.contactId,
-                    paymentType: data.paymentType,
-                    paymentMode: data.paymentMode,
-                    amount: parseInt(`-${remainig}`),
-                    runningPayment: data.runningPayment,
-                    invoiceId: i.id,
-                    reference: data.reference,
-                    comment: data.comment,
-                    status: 1,
-                    organizationId: req.user.organizationId,
-                    createdById: req.user.id,
-                    updatedById: req.user.id,
-                  });
-                } else if (purchase_total < remainig && remainig > 0) {
-                  await getCustomRepository(PaymentRepository).save({
-                    date: data.date,
-                    contactId: data.contactId,
-                    paymentType: data.paymentType,
-                    paymentMode: data.paymentMode,
-                    amount: parseInt(`-${purchase_total}`),
-                    runningPayment: data.runningPayment,
-                    reference: data.reference,
-                    invoiceId: i.id,
-                    comment: data.comment,
-                    status: 1,
-                    organizationId: req.user.organizationId,
-                    createdById: req.user.id,
-                    updatedById: req.user.id,
-                  });
-                } else if (purchase_total === remainig && remainig > 0) {
-                  await getCustomRepository(PaymentRepository).save({
-                    date: data.date,
-                    contactId: data.contactId,
-                    paymentType: data.paymentType,
-                    paymentMode: data.paymentMode,
-                    amount: parseInt(`-${remainig}`),
-                    runningPayment: data.runningPayment,
-                    reference: data.reference,
-                    invoiceId: i.id,
-                    comment: data.comment,
-                    status: 1,
-                    organizationId: req.user.organizationId,
-                    createdById: req.user.id,
-                    updatedById: req.user.id,
-                  });
-                }
-              }
             }
           }
         } else {
@@ -516,8 +382,11 @@ export class PaymentService {
             amount: parseInt(`-${data.amount}`),
             runningPayment: data.runningPayment,
             reference: data.reference,
+            entryType: 1,
+            transactionId: transaction.id,
             comment: data.comment,
             status: 1,
+            branchId: req.user.branchId,
             organizationId: req.user.organizationId,
             createdById: req.user.id,
             updatedById: req.user.id,
@@ -530,15 +399,18 @@ export class PaymentService {
   }
 
   async GetPaymentAgainstInvoiceId(
-    invoiceIds: PaymentInvoiceDto
+    invoiceIds: PaymentInvoiceDto,
+    user: IBaseUser
   ): Promise<IPayment[]> {
     const id = invoiceIds.type === 'INVOICE' ? '"invoiceId"' : '"billId"';
 
     const inv_arr = [];
     for (const i of invoiceIds.ids) {
       const [invoice] = await getCustomRepository(PaymentRepository).query(`
-        select COALESCE(SUM(amount), 0) as balance from payments p
+        select COALESCE(abs(SUM(amount)), 0) as balance from payments p
         where p.${id} = ${i}
+        and p."organizationId" = '${user.organizationId}'
+        and p."branchId" = '${user.branchId}'
         and p.status = 1
      `);
       inv_arr.push({ id: i, invoice });
@@ -548,16 +420,19 @@ export class PaymentService {
   }
 
   async GetPaymentAgainstContactId(
-    contactIds: PaymentContactDto
+    contactIds: PaymentContactDto,
+    user: IBaseUser
   ): Promise<IPayment[]> {
     const payment_arr = [];
     for (const i of contactIds.ids) {
-      const type = i.type === 1 ? `p.amount` : `ABS(p.amount)`;
+      const type = i.type === 2 ? `p.amount` : `ABS(p.amount)`;
       const [payment] = await getCustomRepository(PaymentRepository).query(`
       SELECT COALESCE(SUM(${type}), 0) as balance
       FROM payments p
       WHERE p."contactId" = '${i.id}'
-      and p."entryType" is not null
+      and p."entryType" is null
+      and p."organizationId" = '${user.organizationId}'
+      and p."branchId" = '${user.branchId}'
       and status = 1
     `);
 

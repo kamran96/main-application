@@ -38,6 +38,10 @@
     "pay_generate": "npm run pay_typeorm:cli -- migration:create -n",
     "pay_migration_run": "npm run pay_typeorm:cli -- migration:run",
     "pay_migration_revert": "npm run pay_typeorm:cli -- migration:revert",
+    "rep_typeorm:cli": "ts-node ./node_modules/typeorm/cli -f ./apps/reports-service/ormconfig.js",
+    "rep_generate": "npm run rep_typeorm:cli -- migration:create -n",
+    "rep_migration_run": "npm run rep_typeorm:cli -- migration:run",
+    "rep_migration_revert": "npm run rep_typeorm:cli -- migration:revert",
     "typeorm": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm",
     "semantic-release": "semantic-release"
   },
