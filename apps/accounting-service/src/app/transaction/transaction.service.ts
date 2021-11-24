@@ -119,8 +119,7 @@ export class TransactionService {
           pagination: {
             total,
             total_pages: Math.ceil(total / ps),
-            page_size: pn || 20,
-            // page_total: null,
+            page_size: ps || 20,
             page_no: pn,
             sort_column: sort_column,
             sort_order: sort_order,
@@ -208,80 +207,80 @@ export class TransactionService {
     return transaction;
   }
 
-  async TransactionApi(transactions, user: IBaseUser): Promise<void> {
+  async TransactionApi(transactions, user: IBaseUser): Promise<ITransaction> {
     try {
       console.log('making transaction...');
-      for (const data of transactions) {
-        if (data || data !== null || data || undefined) {
-          const debits = data['dr'];
-          const credits = data['cr'];
+      if (transactions) {
+        const debits = transactions['dr'];
+        const credits = transactions['cr'];
 
-          const debitIds = debits.map((i) => i.account_id);
-          const creditIds = credits.map((i) => i.account_id);
+        const debitIds = debits.map((i) => i.account_id);
+        const creditIds = credits.map((i) => i.account_id);
 
-          const initialValue = 0;
-          const amount = debits.reduce(function (previousValue, currentValue) {
-            return previousValue + currentValue.amount;
-          }, initialValue);
+        const initialValue = 0;
+        const amount = debits.reduce(function (previousValue, currentValue) {
+          return previousValue + currentValue.amount;
+        }, initialValue);
 
-          const intersection = debitIds.filter((element) =>
-            creditIds.includes(element)
+        const intersection = debitIds.filter((element) =>
+          creditIds.includes(element)
+        );
+
+        if (intersection.length > 0) {
+          throw new HttpException(
+            "There's no way to pass an entry on same accounts",
+            HttpStatus.BAD_REQUEST
           );
+        } else {
+          const transaction = await getCustomRepository(
+            TransactionRepository
+          ).save({
+            amount: transactions.amount ? transactions.amount : amount,
+            ref: transactions.invoice
+              ? transactions.invoice.reference
+              : transactions.reference,
+            date: transactions.createdAt || new Date(),
+            createdAt: transactions.createdAt || new Date().toDateString(),
+            narration: `System transaction against ${transactions?.invoice?.invoiceNumber}`,
+            branchId: user.branchId,
+            organizationId: user.organizationId,
+            createdById: user.id,
+            updatedById: user.id,
+            status: transactions?.invoice?.status === 2 ? 2 : 1 || 1,
+          });
 
-          if (intersection.length > 0) {
-            throw new HttpException(
-              "There's no way to pass an entry on same accounts",
-              HttpStatus.BAD_REQUEST
-            );
-          } else {
-            const transaction = await getCustomRepository(
-              TransactionRepository
-            ).save({
-              amount: data.amount ? data.amount : amount,
-              ref: data.invoice ? data.invoice.reference : data.reference,
-              date: data.createdAt || new Date(),
-              createdAt: data.createdAt || new Date().toDateString(),
-              ndataation: `System transaction against ${data?.invoice?.invoiceNumber}`,
-              // branchId: user.branchId,
+          getCustomRepository(TransactionItemRepository).save(
+            debits.map((dr) => ({
+              transactionId: transaction.id,
+              amount: dr.amount,
+              accountId: dr.account_id,
+              transactionType: Entries.DEBITS,
+              branchId: user.branchId,
               organizationId: user.organizationId,
               createdById: user.id,
               updatedById: user.id,
-              status: data?.invoice?.status === 2 ? 2 : 1 || 1,
-            });
+              createdAt: transaction.createdAt,
+              status: transaction.status,
+            }))
+          );
 
-            getCustomRepository(TransactionItemRepository).save(
-              debits.map((dr) => ({
-                transactionId: transaction.id,
-                amount: dr.amount,
-                accountId: dr.accountId,
-                transactionType: Entries.DEBITS,
-                // branchId: user.branchId,
-                organizationId: user.organizationId,
-                createdById: user.id,
-                updatedById: user.id,
-                createdAt: transaction.createdAt,
-                status: transaction.status,
-              }))
-            );
-
-            getCustomRepository(TransactionItemRepository).save(
-              credits.map((cr) => ({
-                transactionId: transaction.id,
-                amount: cr.amount,
-                accountId: cr.accountId,
-                transactionType: Entries.CREDITS,
-                // branchId: user.branchId,
-                organizationId: user.organizationId,
-                createdById: user.id,
-                updatedById: user.id,
-                createdAt: transaction.createdAt,
-                status: transaction.status,
-              }))
-            );
-          }
+          getCustomRepository(TransactionItemRepository).save(
+            credits.map((cr) => ({
+              transactionId: transaction.id,
+              amount: cr.amount,
+              accountId: cr.account_id,
+              transactionType: Entries.CREDITS,
+              branchId: user.branchId,
+              organizationId: user.organizationId,
+              createdById: user.id,
+              updatedById: user.id,
+              createdAt: transaction.createdAt,
+              status: transaction.status,
+            }))
+          );
+          return transaction;
         }
       }
-      throw new HttpException('Parameter is invalid', HttpStatus.BAD_REQUEST);
     } catch (error) {
       console.log(error);
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);

@@ -14,7 +14,12 @@ import { Request } from 'express';
 import { TransactionApiDto, TransactionDto } from '../dto/transaction.dto';
 import { TransactionService } from './transaction.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
-import { IRequest, IPage, ITransactionWithResponse } from '@invyce/interfaces';
+import {
+  IRequest,
+  IPage,
+  ITransactionWithResponse,
+  ITransaction,
+} from '@invyce/interfaces';
 import { ParamsDto } from '../dto/account.dto';
 
 @Controller('transaction')
@@ -103,7 +108,7 @@ export class TransactionController {
   async trasanctionApi(
     @Body() data: TransactionApiDto,
     @Req() req: IRequest
-  ): Promise<void> {
+  ): Promise<ITransaction> {
     return await this.transactionService.TransactionApi(
       data.transactions,
       req.user

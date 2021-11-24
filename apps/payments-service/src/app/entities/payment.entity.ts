@@ -27,6 +27,8 @@ export class Payments {
   @Column()
   entryType: number;
   @Column()
+  transactionId: number;
+  @Column()
   runningPayment: boolean;
   @Column()
   amount: number;
