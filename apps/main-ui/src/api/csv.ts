@@ -1,3 +1,4 @@
 import http from '../utils/http';
 
-export const CsvImportAPi = (payload: any) => http.post('csv/import', payload);
+export const CsvImportAPi = (payload: any) =>
+  http.post('exports/csv/import', payload);

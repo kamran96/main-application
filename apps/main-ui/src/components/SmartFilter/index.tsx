@@ -48,9 +48,9 @@ export const SmartFilter: FC<IProps> = ({
 
   useEffect(() => {
     if (search) {
-      let schema = search.split('query=');
+      const schema = search.split('query=');
       if (schema && schema[1] && schema[1] !== undefined) {
-        let initialState = atob(schema[1]).replace(/\%/g, '');
+        const initialState = atob(schema[1]).replace(/\%/g, '');
         setFilter(JSON.parse(initialState));
         setIsFiltered(true);
       }
@@ -58,7 +58,7 @@ export const SmartFilter: FC<IProps> = ({
   }, [search]);
 
   const handleChange = (accessor, value, formItem) => {
-    let item = { ...formSchema[accessor] };
+    const item = { ...formSchema[accessor] };
     item.value = value;
     if (item?.value?.length < 1) {
       delete filter[accessor];
@@ -74,20 +74,20 @@ export const SmartFilter: FC<IProps> = ({
     Object.keys(filter).forEach((item, index) => {
       if (filter[item].type === FilterType.SEARCH) {
         if (filter[item].isFullSearch) {
-          let obj = { ...filter[item], value: `%${filter[item].value}%` };
+          const obj = { ...filter[item], value: `%${filter[item].value}%` };
           generatedFilter = { ...generatedFilter, [item]: obj };
         } else {
-          let obj = { ...filter[item], value: `%${filter[item].value}` };
+          const obj = { ...filter[item], value: `%${filter[item].value}` };
           generatedFilter = { ...generatedFilter, [item]: obj };
         }
       } else {
-        let obj = { ...filter[item] };
+        const obj = { ...filter[item] };
         delete obj.isFullSearch;
         generatedFilter = { ...generatedFilter, [item]: obj };
       }
     });
 
-    let payload = btoa(JSON.stringify(generatedFilter));
+    const payload = btoa(JSON.stringify(generatedFilter));
     onFilter(payload, generatedFilter);
     setIsFiltered(true);
   };
@@ -101,7 +101,7 @@ export const SmartFilter: FC<IProps> = ({
 
   const menu = (
     <WrapperMenu className="ph-9">
-      <Menu  className="menu_wrapper">
+      <Menu className="menu_wrapper">
         {Object.keys(filter).map((key, index) => {
           return (
             <Menu.Item
@@ -116,7 +116,7 @@ export const SmartFilter: FC<IProps> = ({
           );
         })}
         <Menu.Item className="button_item">
-          <Button  onClick={ClearAll} type="primary" size={'small'}>
+          <Button onClick={ClearAll} type="primary" size={'small'}>
             Clear All
           </Button>
         </Menu.Item>
@@ -235,7 +235,7 @@ export const SmartFilter: FC<IProps> = ({
                   };
                   if (formItem.type === 'NESTED_FORM') {
                     const getVariantsWithId = (id) => {
-                      let [filtered] =
+                      const [filtered] =
                         formSchema &&
                         formSchema.categoryId &&
                         formSchema.categoryId.value.filter(
@@ -247,7 +247,7 @@ export const SmartFilter: FC<IProps> = ({
                         return [];
                       }
                     };
-                    let selectedCategory =
+                    const selectedCategory =
                       filter && filter.categoryId && filter.categoryId.value;
                     return (
                       <div className="mt-10">
@@ -255,13 +255,13 @@ export const SmartFilter: FC<IProps> = ({
                           getVariantsWithId(selectedCategory) &&
                           getVariantsWithId(selectedCategory).map(
                             (vari: IVariants, index: number) => {
-                              let valueAccessor =
+                              const valueAccessor =
                                 (filter &&
                                   filter.attributes &&
                                   filter.attributes.value) ||
                                 [];
 
-                              let [filteredItem] = valueAccessor.filter(
+                              const [filteredItem] = valueAccessor.filter(
                                 (item) => item.attributeId === vari.id
                               );
 
@@ -275,12 +275,12 @@ export const SmartFilter: FC<IProps> = ({
                                     onChange={(value) => {
                                       if (value !== undefined) {
                                         const allValue = [...attributeValues];
-                                        let changedValue = {
+                                        const changedValue = {
                                           attributeId: vari.id,
                                           value: value,
                                         };
                                         if (value === null || value === '') {
-                                          let indexed = allValue.findIndex(
+                                          const indexed = allValue.findIndex(
                                             (item) =>
                                               item.attributeId === vari.id
                                           );
@@ -294,7 +294,7 @@ export const SmartFilter: FC<IProps> = ({
                                             setAttributeValues(allValue);
                                           }
                                         } else {
-                                          let indexed =
+                                          const indexed =
                                             allValue &&
                                             allValue.findIndex(
                                               (ad) =>
@@ -385,7 +385,7 @@ export const WrapperMenu = styled.div`
     .filter_name {
       margin: 0 !important;
     }
-    .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected{
+    .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
       background: transparent !important;
     }
     .ant-menu-item {
@@ -417,7 +417,7 @@ export const WrapperMenu = styled.div`
       }
     }
 
-    .ant-menu-item:last-child .ant-menu-title-content{
+    .ant-menu-item:last-child .ant-menu-title-content {
       display: flex;
       justify-content: flex-end;
     }
