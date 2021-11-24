@@ -11,11 +11,11 @@ import { AppModule } from './app/app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = process.env.PORT || 3342;
-
   app.enableCors({
     origin: true,
     credentials: true,
   });
+
   if (process.env['NODE' + '_ENV'] === 'production') {
     app.setGlobalPrefix('/exports');
   }
