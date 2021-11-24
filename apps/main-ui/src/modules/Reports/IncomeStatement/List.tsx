@@ -1,34 +1,34 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { ColumnsType } from "antd/lib/table";
-import React, { FC, useEffect, useMemo, useRef, useState } from "react";
-import { useQuery } from "react-query";
-import styled from "styled-components";
-import { IncomeStatementAPI } from "../../../api";
-import { ButtonTag } from "../../../components/ButtonTags";
-import { Heading } from "../../../components/Heading";
-import { BoldText } from "../../../components/Para/BoldText";
-import { PrintFormat } from "../../../components/PrintFormat";
-import { PrintHeader } from "../../../components/PrintHeader";
-import { SmartFilter } from "../../../components/SmartFilter";
-import { TableCard } from "../../../components/TableCard";
-import { P } from "../../../components/Typography";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { Color, ISupportedRoutes } from "../../../modal";
-import { IAccountsResult } from "../../../modal/accounts";
-import moneyFormat from "../../../utils/moneyFormat";
-import printDiv from "../../../utils/Print";
-import FilterSchema from "./filter";
-import printIcon from "@iconify-icons/bytesize/print";
-import { IThemeProps } from "../../../hooks/useTheme/themeColors";
-import { CommonLoader } from "../../../components/FallBackLoader";
+import { ColumnsType } from 'antd/lib/table';
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
+import { useQuery } from 'react-query';
+import styled from 'styled-components';
+import { IncomeStatementAPI } from '../../../api';
+import { ButtonTag } from '../../../components/ButtonTags';
+import { Heading } from '../../../components/Heading';
+import { BoldText } from '../../../components/Para/BoldText';
+import { PrintFormat } from '../../../components/PrintFormat';
+import { PrintHeader } from '../../../components/PrintHeader';
+import { SmartFilter } from '../../../components/SmartFilter';
+import { TableCard } from '../../../components/TableCard';
+import { P } from '../../../components/Typography';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { Color, ISupportedRoutes } from '../../../modal';
+import { IAccountsResult } from '../../../modal/accounts';
+import moneyFormat from '../../../utils/moneyFormat';
+import printDiv from '../../../utils/Print';
+import FilterSchema from './filter';
+import printIcon from '@iconify-icons/bytesize/print';
+import { IThemeProps } from '../../../hooks/useTheme/themeColors';
+import { CommonLoader } from '../../../components/FallBackLoader';
 import {
   PrintHeaderFormat,
   TableDivisions,
-} from "../../../components/PrintHeader";
+} from '../../../components/PrintHeader';
 import {
   Addressbar,
   TopbarLogoWithDetails,
-} from "../../../components/PrintHeader/Formats";
+} from '../../../components/PrintHeader/Formats';
 // import FilterSchema from "./filterSchema";
 
 interface IBalanceSheetConfig {
@@ -57,16 +57,16 @@ export const IncomeStatementList: FC = () => {
   const { history } = routeHistory;
 
   const [config, setConfig] = useState({
-    query: "",
+    query: '',
   });
   const { query } = config;
 
   useEffect(() => {
     if (history?.location?.search) {
       let obj = {};
-      let queryArr = history.location.search.split("?")[1].split("&");
+      const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
-        let split = item.split("=");
+        const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
       setConfig({ ...config, ...obj });
@@ -81,7 +81,7 @@ export const IncomeStatementList: FC = () => {
   useEffect(() => {
     if (data?.data?.result) {
       const { result } = data?.data;
-      let { balance } = (result.length > 0 &&
+      const { balance } = (result.length > 0 &&
         result.reduce((a, b) => {
           return { balance: a.balance - b.balance };
         })) || { balance: 0 };
@@ -95,12 +95,12 @@ export const IncomeStatementList: FC = () => {
   const printRef = useRef();
 
   const onPrint = () => {
-    let printItem = printRef.current;
+    const printItem = printRef.current;
 
     printDiv(printItem);
   };
 
-  let searchedQueryItem: any = useMemo(() => {
+  const searchedQueryItem: any = useMemo(() => {
     return query ? JSON.parse(atob(query)) : query;
   }, [query]);
 
@@ -155,25 +155,23 @@ export const IncomeStatementList: FC = () => {
                       <th className="main-title-head">Particulars</th>
                       {searchedQueryItem?.date && (
                         <>
-                        <th className="main-title-head static-width-header">
-                          Opening
-                        </th>
-                        <th className="main-title-head static-width-header">
-                          Debit
-                       </th>
-                        <th className="main-title-head static-width-header">
-                          Credit
-                       </th>
-                        <th className="main-title-head static-width-header">
-                          Net Change
-                       </th>
+                          <th className="main-title-head static-width-header">
+                            Opening
+                          </th>
+                          <th className="main-title-head static-width-header">
+                            Debit
+                          </th>
+                          <th className="main-title-head static-width-header">
+                            Credit
+                          </th>
+                          <th className="main-title-head static-width-header">
+                            Net Change
+                          </th>
                         </>
-                        
                       )}
-                      
-                      
+
                       <th className="main-title-head static-width-header">
-                        {searchedQueryItem?.date ? "Closing" : "Amount"}
+                        {searchedQueryItem?.date ? 'Closing' : 'Amount'}
                       </th>
                       <th className="main-title-head static-width-header">
                         Total
@@ -188,7 +186,7 @@ export const IncomeStatementList: FC = () => {
                           colSpan={3}
                           className="textCenter nodata_loader"
                         >
-                          {isLoading ? <CommonLoader /> : "No Data Found"}
+                          {isLoading ? <CommonLoader /> : 'No Data Found'}
                         </td>
                       </tr>
                     ) : (
@@ -196,32 +194,31 @@ export const IncomeStatementList: FC = () => {
                         {incomeStatementData.map(
                           (accountHead: IBalanceSheetData, index: number) => {
                             return (
-                              <>
-                                <tr>
-                                  <td colSpan={searchedQueryItem?.date ? 7 : 3}>
-                                    <table style={{ width: "100%" }}>
-                                      <thead>
-                                        <th>{accountHead.name}</th>
-                                        <th className="static-width"></th>
-                                        <th className="static-width"></th>
-                                        {searchedQueryItem?.date && (
-                                         <>
+                              <tr>
+                                <td colSpan={searchedQueryItem?.date ? 7 : 3}>
+                                  <table style={{ width: '100%' }}>
+                                    <thead>
+                                      <th>{accountHead.name}</th>
+                                      <th className="static-width"></th>
+                                      <th className="static-width"></th>
+                                      {searchedQueryItem?.date && (
+                                        <>
                                           <th className="static-width"></th>
                                           <th className="static-width"></th>
                                           <th className="static-width"></th>
                                           <th className="static-width"></th>
-                                         </>
-                                        )}
-                                      </thead>
-                                      <tbody>
-                                        {accountHead.accounts.map(
-                                          (acc, index) => {
-                                            return (
-                                              <>
-                                                <tr>
-                                                  <td>{acc.name}</td>
-                                                  {searchedQueryItem?.date && (
-                                                   <>
+                                        </>
+                                      )}
+                                    </thead>
+                                    <tbody>
+                                      {accountHead.accounts.map(
+                                        (acc, index) => {
+                                          return (
+                                            <>
+                                              <tr>
+                                                <td>{acc.name}</td>
+                                                {searchedQueryItem?.date && (
+                                                  <>
                                                     <td className="static-width">
                                                       {moneyFormat(
                                                         acc?.opening_balance?.toFixed(
@@ -250,49 +247,48 @@ export const IncomeStatementList: FC = () => {
                                                         )
                                                       )}
                                                     </td>
-                                                   </>
-                                                  )}
-                                                  <td className="static-width">
-                                                    {moneyFormat(
-                                                      acc?.balance?.toFixed(2)
-                                                    )}
-                                                  </td>
-                                                  <td className="static-width"></td>
-                                                </tr>
-                                                {accountHead?.accounts?.length -
-                                                  1 ===
-                                                  index && (
-                                                  <tr>
-                                                    <td></td>
-                                                    {searchedQueryItem?.date && (
-                                                     <>
-                                                      <td />
-                                                      <td />
-                                                      <td />
-                                                      <td />
-                                                     </>
-                                                    )}
-                                                    <td></td>
-                                                    <td>
-                                                      <BoldText>
-                                                        {moneyFormat(
-                                                          accountHead.balance.toFixed(
-                                                            2
-                                                          )
-                                                        )}
-                                                      </BoldText>
-                                                    </td>
-                                                  </tr>
+                                                  </>
                                                 )}
-                                              </>
-                                            );
-                                          }
-                                        )}
-                                      </tbody>
-                                    </table>
-                                  </td>
-                                </tr>
-                              </>
+                                                <td className="static-width">
+                                                  {moneyFormat(
+                                                    acc?.balance?.toFixed(2)
+                                                  )}
+                                                </td>
+                                                <td className="static-width"></td>
+                                              </tr>
+                                              {accountHead?.accounts?.length -
+                                                1 ===
+                                                index && (
+                                                <tr>
+                                                  <td></td>
+                                                  {searchedQueryItem?.date && (
+                                                    <>
+                                                      <td />
+                                                      <td />
+                                                      <td />
+                                                      <td />
+                                                    </>
+                                                  )}
+                                                  <td></td>
+                                                  <td>
+                                                    <BoldText>
+                                                      {moneyFormat(
+                                                        accountHead.balance.toFixed(
+                                                          2
+                                                        )
+                                                      )}
+                                                    </BoldText>
+                                                  </td>
+                                                </tr>
+                                              )}
+                                            </>
+                                          );
+                                        }
+                                      )}
+                                    </tbody>
+                                  </table>
+                                </td>
+                              </tr>
                             );
                           }
                         )}

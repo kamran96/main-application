@@ -175,18 +175,21 @@ export class ContactService {
         type: con.contactType,
       }));
 
-      const { data: payments } = await http.post(`payments/payment/contact`, {
-        ids: mapContactIds,
-      });
-
       const cont_arr = [];
-      for (const i of contacts.result) {
-        const balance = payments.find((pay) => pay.id == i._id);
-
-        cont_arr.push({
-          ...i.toObject(),
-          balance: balance?.payment?.balance,
+      if (mapContactIds.length > 0) {
+        const { data: payments } = await http.post(`payments/payment/contact`, {
+          ids: mapContactIds,
         });
+
+        console.log(payments);
+        for (const i of contacts.result) {
+          const balance = payments.find((pay) => pay.id == i._id);
+
+          cont_arr.push({
+            ...i.toObject(),
+            balance: balance?.payment?.balance,
+          });
+        }
       }
 
       contacts = {

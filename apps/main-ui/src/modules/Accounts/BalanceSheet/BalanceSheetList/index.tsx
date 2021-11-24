@@ -1,33 +1,33 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import printIcon from "@iconify-icons/bytesize/print";
-import { Card } from "antd";
-import { ColumnsType } from "antd/lib/table";
-import React, { FC, useEffect, useMemo, useRef, useState } from "react";
-import { useQuery } from "react-query";
-import styled from "styled-components";
-import { BalanceSheetAPI } from "../../../../api";
-import { ButtonTag } from "../../../../components/ButtonTags";
-import { Heading } from "../../../../components/Heading";
-import { BoldText, BOLDTEXT } from "../../../../components/Para/BoldText";
-import { PrintFormat } from "../../../../components/PrintFormat";
+import printIcon from '@iconify-icons/bytesize/print';
+import { Card } from 'antd';
+import { ColumnsType } from 'antd/lib/table';
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
+import { useQuery } from 'react-query';
+import styled from 'styled-components';
+import { BalanceSheetAPI } from '../../../../api';
+import { ButtonTag } from '../../../../components/ButtonTags';
+import { Heading } from '../../../../components/Heading';
+import { BoldText, BOLDTEXT } from '../../../../components/Para/BoldText';
+import { PrintFormat } from '../../../../components/PrintFormat';
 import {
   PrintHeaderFormat,
   TableDivisions,
-} from "../../../../components/PrintHeader";
+} from '../../../../components/PrintHeader';
 import {
   Addressbar,
   TopbarLogoWithDetails,
-} from "../../../../components/PrintHeader/Formats";
-import { SmartFilter } from "../../../../components/SmartFilter";
-import { TableCard } from "../../../../components/TableCard";
-import { Capitalize, P } from "../../../../components/Typography";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
-import { IThemeProps } from "../../../../hooks/useTheme/themeColors";
-import { DivProps, ISupportedRoutes } from "../../../../modal";
-import { IAccountsResult } from "../../../../modal/accounts";
-import moneyFormat from "../../../../utils/moneyFormat";
-import printDiv from "../../../../utils/Print";
-import FilterSchema from "./filterSchema";
+} from '../../../../components/PrintHeader/Formats';
+import { SmartFilter } from '../../../../components/SmartFilter';
+import { TableCard } from '../../../../components/TableCard';
+import { Capitalize, P } from '../../../../components/Typography';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
+import { DivProps, ISupportedRoutes } from '../../../../modal';
+import { IAccountsResult } from '../../../../modal/accounts';
+import moneyFormat from '../../../../utils/moneyFormat';
+import printDiv from '../../../../utils/Print';
+import FilterSchema from './filterSchema';
 
 interface IBalanceSheetConfig {
   columns: ColumnsType<any>;
@@ -56,7 +56,7 @@ export const BalanceSheetList: FC = () => {
   const { history } = routeHistory;
 
   const [config, setConfig] = useState({
-    query: "",
+    query: '',
   });
 
   const { query } = config;
@@ -64,9 +64,9 @@ export const BalanceSheetList: FC = () => {
   useEffect(() => {
     if (history?.location?.search) {
       let obj = {};
-      let queryArr = history.location.search.split("?")[1].split("&");
+      const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
-        let split = item.split("=");
+        const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
       setConfig({ ...config, ...obj });
@@ -145,19 +145,18 @@ export const BalanceSheetList: FC = () => {
   const printRef = useRef();
 
   const onPrint = () => {
-    let printItem = printRef.current;
+    const printItem = printRef.current;
 
     printDiv(printItem);
   };
 
-  let searchedQueryItem: any = useMemo(() => {
+  const searchedQueryItem: any = useMemo(() => {
     return query ? JSON.parse(atob(query)) : query;
   }, [query]);
 
-
   return (
     <WrapperBalanceSheetList
-      adjustedWidth={searchedQueryItem?.date ? "106%" : `109%`}
+      adjustedWidth={searchedQueryItem?.date ? '106%' : `109%`}
     >
       <Card loading={isLoading} className="balancesheet-card">
         <div className="flex alignCenter justifySpaceBetween pb-20">
@@ -201,7 +200,7 @@ export const BalanceSheetList: FC = () => {
               </PrintHeaderFormat>
             </div>
             <div className="balance_sheet_table_wrapper">
-              <table style={{ width: "100%" }}>
+              <table style={{ width: '100%' }}>
                 <thead>
                   <tr>
                     <th>Particulars</th>
@@ -303,7 +302,7 @@ export const BalanceSheetList: FC = () => {
                                         moneyFormat(acc.balance.toFixed(2))}
                                     </td>
                                     <td>
-                                      {" "}
+                                      {' '}
                                       {accountHead.type ===
                                         ITransactionType.CREDIT &&
                                         moneyFormat(acc.balance.toFixed(2))}
@@ -355,12 +354,9 @@ export const BalanceSheetList: FC = () => {
   );
 };
 
-
 interface WrapperBalanceSheetProps extends DivProps {
   adjustedWidth?: string;
 }
-
-
 
 const WrapperBalanceSheetList = styled.div<WrapperBalanceSheetProps>`
   .balance_sheet_table_wrapper {
