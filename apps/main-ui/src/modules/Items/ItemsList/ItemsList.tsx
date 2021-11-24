@@ -220,7 +220,7 @@ export const ItemsList: FC = () => {
       key: 'code',
     },
     {
-      title: 'Purchase Price ',
+      title: 'Purchase Price',
       dataIndex: 'purchasePrice',
       key: 'purchasePrice',
       render: (price, row, index) => {
@@ -228,7 +228,7 @@ export const ItemsList: FC = () => {
       },
     },
     {
-      title: 'Sale Price ',
+      title: 'Sale Price',
       dataIndex: 'salePrice',
       key: 'salePrice',
       sorter: false,
@@ -238,7 +238,7 @@ export const ItemsList: FC = () => {
       },
     },
     {
-      title: 'Item Type ',
+      title: 'Item Type',
       dataIndex: 'itemType',
       key: 'itemType',
       sorter: false,
