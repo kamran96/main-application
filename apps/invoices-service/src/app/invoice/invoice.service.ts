@@ -17,6 +17,7 @@ import {
 } from '@invyce/interfaces';
 import {
   Integrations,
+  PaymentModes,
   XeroStatuses,
   XeroTypes,
 } from '@invyce/global-constants';
@@ -43,8 +44,8 @@ export class InvoiceService {
     const total = await getCustomRepository(InvoiceRepository).count({
       status,
       organizationId: req.user.organizationId,
+      branchId: req.user.branchId,
       invoiceType: invoice_type,
-      // branchId: user.branchId,
     });
 
     const invoice_arr = [];
@@ -59,6 +60,7 @@ export class InvoiceService {
           invoices = await getCustomRepository(InvoiceRepository).find({
             where: {
               status: 1,
+              branchId: req.user.branchId,
               organizationId: req.user.organizationId,
               [i]: ILike(val),
             },
@@ -70,6 +72,7 @@ export class InvoiceService {
           invoices = await getCustomRepository(InvoiceRepository).find({
             where: {
               status: 1,
+              branchId: req.user.branchId,
               organizationId: req.user.organizationId,
               [i]: In(data[i].value),
             },
@@ -84,6 +87,7 @@ export class InvoiceService {
             where: {
               status: 1,
               organizationId: req.user.organizationId,
+              branchId: req.user.branchId,
               [i]: Between(start_date, end_date),
             },
             skip: pn * ps - ps,
@@ -134,8 +138,8 @@ export class InvoiceService {
           where: {
             status: status,
             invoiceType: invoice_type,
+            branchId: req.user.branchId,
             organizationId: req.user.organizationId,
-            // branchId: user.branchId
           },
           skip: pn * ps - ps,
           take: ps,
@@ -163,10 +167,10 @@ export class InvoiceService {
       } else if (type === 'AWAITING_PAYMENT') {
         invoices = await getCustomRepository(InvoiceRepository).find({
           where: {
-            // status: status,
+            status: status,
             invoiceType: invoice_type,
+            branchId: req.user.branchId,
             organizationId: req.user.organizationId,
-            // branchId: user.branchId
           },
           skip: pn * ps - ps,
           take: ps,
@@ -196,10 +200,10 @@ export class InvoiceService {
       } else if (type === 'PAID') {
         invoices = await getCustomRepository(InvoiceRepository).find({
           where: {
-            // status: status,
+            status: status,
             invoiceType: invoice_type,
             organizationId: req.user.organizationId,
-            // branchId: user.branchId
+            branchId: req.user.branchId,
           },
           skip: pn * ps - ps,
           take: ps,
@@ -229,11 +233,11 @@ export class InvoiceService {
       } else if (type === 'DUE_PAYMENTS') {
         invoices = await getCustomRepository(InvoiceRepository).find({
           where: {
-            // status: status,
+            status: status,
             invoiceType: invoice_type,
             organizationId: req.user.organizationId,
             dueDate: LessThan(new Date()),
-            // branchId: user.branchId
+            branchId: req.user.branchId,
           },
           skip: pn * ps - ps,
           take: ps,
@@ -268,6 +272,8 @@ export class InvoiceService {
         where: {
           id: dto.id,
           organizationId: data.organizationId,
+          branchId: data.branchId,
+          status: 1,
         },
       });
 
@@ -431,6 +437,7 @@ export class InvoiceService {
       const [invoice] = await getCustomRepository(InvoiceRepository).find({
         where: {
           organizationId: user.organizationId,
+          branchId: user.branchId,
           status: 1,
           invoiceNumber: ILike(`%INV-${new Date().getFullYear()}%`),
         },
@@ -453,6 +460,7 @@ export class InvoiceService {
       const [bill] = await getCustomRepository(BillRepository).find({
         where: {
           organizationId: user.organizationId,
+          branchId: user.branchId,
           status: 1,
           invoiceNumber: ILike(`%BILL-${new Date().getFullYear()}%`),
         },
@@ -477,6 +485,7 @@ export class InvoiceService {
       ).find({
         where: {
           organizationId: user.organizationId,
+          branchId: user.branchId,
           status: 1,
           invoiceNumber: ILike(`%CN-${new Date().getFullYear()}%`),
         },
@@ -540,11 +549,13 @@ export class InvoiceService {
     req: IRequest,
     type: number
   ): Promise<IInvoice[]> {
-    if (type == 2) {
+    if (type == PaymentModes.INVOICES) {
       const invoices = await getCustomRepository(InvoiceRepository).find({
         where: {
           contactId: contactId,
           organizationId: req.user.organizationId,
+          branchId: req.user.branchId,
+          status: 1,
         },
       });
 
@@ -582,21 +593,25 @@ export class InvoiceService {
 
         for (const inv of invoices) {
           const balance = payments.find((pay) => pay.id === inv.id);
-
-          inv_arr.push({
-            ...inv,
-            balance:
-              inv.netTotal + (balance.invoice.balance || 0) || inv.netTotal,
-          });
+          const newBalance = balance.invoice.balance.toString().split('-')[1];
+          if (inv.netTotal != newBalance) {
+            inv_arr.push({
+              ...inv,
+              balance:
+                inv.netTotal + (balance.invoice.balance || 0) || inv.netTotal,
+            });
+          }
         }
       }
 
       return inv_arr;
-    } else if (type == 1) {
+    } else if (type == PaymentModes.BILLS) {
       const bills = await getCustomRepository(BillRepository).find({
         where: {
           contactId: contactId,
           organizationId: req.user.organizationId,
+          branchId: req.user.branchId,
+          status: 1,
         },
       });
 
