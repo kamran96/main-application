@@ -173,6 +173,44 @@ export class AccountsService {
     }
   }
 
+  async AccountWithType(type: string, user: IBaseUser) {
+    if (type === 'invoice') {
+      const primaryAccounts = await getCustomRepository(
+        PrimaryAccountRepository
+      ).find({
+        select: ['id'],
+        where: { name: In(['assets', 'equity', 'liability', 'income']) },
+      });
+
+      const mapPrimaryAccounts = primaryAccounts.map((p) => p.id);
+      const accounts = await getCustomRepository(AccountRepository).find({
+        where: {
+          primaryAccountId: In(mapPrimaryAccounts),
+          organizationId: user.organizationId,
+          status: 1,
+        },
+      });
+      return accounts;
+    } else if (type === 'bill') {
+      const primaryAccounts = await getCustomRepository(
+        PrimaryAccountRepository
+      ).find({
+        select: ['id'],
+        where: { name: In(['assets', 'expense', 'liability', 'income']) },
+      });
+
+      const mapPrimaryAccounts = primaryAccounts.map((p) => p.id);
+      const accounts = await getCustomRepository(AccountRepository).find({
+        where: {
+          primaryAccountId: In(mapPrimaryAccounts),
+          organizationId: user.organizationId,
+          status: 1,
+        },
+      });
+      return accounts;
+    }
+  }
+
   async SecondaryAccountName(user: IBaseUser): Promise<ISecondaryAccount[]> {
     return await getCustomRepository(SecondaryAccountRepository).find({
       where: {
