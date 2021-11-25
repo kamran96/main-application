@@ -122,7 +122,35 @@ export class BillService {
     };
   }
 
-  async CreateBill(dto: BillDto, data: IBaseUser): Promise<IBill> {
+  async CreateBill(dto: BillDto, req: IRequest): Promise<IBill> {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const tokenType =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [tokenType]: value,
+      },
+    });
+
+    const accountCodesArray = ['15002'];
+    const { data: accounts } = await http.post(`accounts/account/codes`, {
+      codes: accountCodesArray,
+    });
+
     const bill = await getCustomRepository(BillRepository).save({
       contactId: dto.contactId,
       reference: dto.reference,
@@ -139,13 +167,14 @@ export class BillService {
       isTaxIncluded: dto.isTaxIncluded,
       isReturn: dto.isReturn,
       comment: dto.comment,
-      organizationId: data.organizationId,
-      branchId: data.branchId,
-      createdById: data.id,
-      updatedById: data.id,
+      organizationId: req.user.organizationId,
+      branchId: req.user.branchId,
+      createdById: req.user.id,
+      updatedById: req.user.id,
       status: dto.status,
     });
 
+    const debitsArrray = [];
     for (const item of dto.invoice_items) {
       await getCustomRepository(BillItemRepository).save({
         itemId: item.itemId,
@@ -160,7 +189,31 @@ export class BillService {
         total: item.total,
         status: 1,
       });
+
+      const debits = {
+        amount: item.purchasePrice,
+        account_id: item.accountId,
+      };
+      debitsArrray.push(debits);
     }
+
+    const creditsArray = [
+      {
+        account_id: accounts.find((i) => i.code === '15002').id,
+        amount: dto.netTotal,
+      },
+    ];
+
+    const payload = {
+      dr: debitsArrray,
+      cr: creditsArray,
+      reference: dto.reference,
+      amount: dto.netTotal,
+    };
+
+    const { data: transaction } = await http.post('accounts/transaction/api', {
+      transactions: payload,
+    });
 
     return bill;
   }
