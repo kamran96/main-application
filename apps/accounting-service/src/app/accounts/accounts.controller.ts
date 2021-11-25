@@ -55,6 +55,19 @@ export class AccountsController {
     }
   }
 
+  @Get('type')
+  @UseGuards(GlobalAuthGuard)
+  async accountWithType(@Query() { type }, @Req() req: IRequest) {
+    const account = await this.accountService.AccountWithType(type, req.user);
+    if (account) {
+      return {
+        message: 'Account Fetched successfull',
+        status: true,
+        result: account,
+      };
+    }
+  }
+
   @Get('/secondary-accounts')
   @UseGuards(GlobalAuthGuard)
   async secondaryAccounts(

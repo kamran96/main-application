@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Between, getCustomRepository } from 'typeorm';
 import { PaymentRepository } from '../repositories/payment.repository';
 import { Sorting } from '@invyce/sorting';
-import { PaymentModes } from '@invyce/global-constants';
+import { PaymentModes, EntryType } from '@invyce/global-constants';
 import {
   IPage,
   IBaseUser,
@@ -176,19 +176,18 @@ export class PaymentService {
         if (data?.invoice_ids?.length > 0) {
           const remainig = data.amount;
 
-          const http = axios.create({
-            baseURL: 'http://localhost',
-            headers: {
-              [type]: value,
-            },
-          });
+          const bills = await getCustomRepository(PaymentRepository)
+            .query(`select p."billId", sum(p.amount) as balance, count(id) as total_payments 
+        from payments p
+        where p."billId" in (${data.invoice_ids})
+        and p.status = 1
+        and p."entryType" = 1
+        and p."organizationId" = '${req.user.organizationId}'
+        group by p."billId"
+        `);
 
-          const { data: inv } = await http.post(`invoices/bill/ids`, {
-            ids: data.invoice_ids,
-          });
-
-          for (const i of inv) {
-            const purchase_total = Math.abs(parseFloat(i.netTotal));
+          for (const i of bills) {
+            const purchase_total = Math.abs(parseFloat(i.balance));
             if (purchase_total > remainig && remainig > 0) {
               await getCustomRepository(PaymentRepository).save({
                 date: data.date,
@@ -198,8 +197,8 @@ export class PaymentService {
                 amount: parseInt(`-${remainig}`),
                 transactionId: transaction.id,
                 runningPayment: data.runningPayment,
-                entryType: 1,
-                billId: i.id,
+                entryType: EntryType.COLLECTION,
+                billId: i.billId,
                 reference: data.reference,
                 comment: data.comment,
                 status: 1,
@@ -216,10 +215,10 @@ export class PaymentService {
                 paymentMode: data.paymentMode,
                 amount: parseInt(`-${purchase_total}`),
                 runningPayment: data.runningPayment,
-                billId: i.id,
+                billId: i.billId,
                 transactionId: transaction.id,
                 reference: data.reference,
-                entryType: 1,
+                entryType: EntryType.COLLECTION,
                 comment: data.comment,
                 status: 1,
                 branchId: req.user.branchId,
@@ -236,8 +235,8 @@ export class PaymentService {
                 transactionId: transaction.id,
                 amount: parseInt(`-${remainig}`),
                 runningPayment: data.runningPayment,
-                billId: i.id,
-                entryType: 1,
+                billId: i.billId,
+                entryType: EntryType.COLLECTION,
                 reference: data.reference,
                 comment: data.comment,
                 status: 1,
@@ -257,7 +256,7 @@ export class PaymentService {
             amount: data.amount,
             runningPayment: data.runningPayment,
             reference: data.reference,
-            entryType: 1,
+            entryType: EntryType.COLLECTION,
             comment: data.comment,
             status: 1,
             branchId: req.user.branchId,
@@ -301,19 +300,18 @@ export class PaymentService {
         if (data?.invoice_ids?.length > 0) {
           const remainig = data.amount;
 
-          const http = axios.create({
-            baseURL: 'http://localhost',
-            headers: {
-              [type]: value,
-            },
-          });
+          const invoices = await getCustomRepository(PaymentRepository).query(`
+          select p."invoiceId", sum(p.amount) as balance, count(p.id) as total_payments
+          from payments p
+          where p."invoiceId" in (${data.invoice_ids})
+          and p.status = 1
+          and p."entryType" = 1
+          and p."organizationId" = '${req.user.organizationId}'
+          group by p."invoiceId"
+      `);
 
-          const { data: inv } = await http.post(`invoices/invoice/ids`, {
-            ids: data.invoice_ids,
-          });
-
-          for (const i of inv) {
-            const purchase_total = Math.abs(parseFloat(i.netTotal));
+          for (const i of invoices) {
+            const purchase_total = Math.abs(parseFloat(i.balance));
             if (purchase_total > remainig && remainig > 0) {
               await getCustomRepository(PaymentRepository).save({
                 date: data.date,
@@ -322,10 +320,10 @@ export class PaymentService {
                 paymentMode: data.paymentMode,
                 amount: parseInt(`-${remainig}`),
                 runningPayment: data.runningPayment,
-                invoiceId: i.id,
+                invoiceId: i.invoiceId,
                 reference: data.reference,
                 transactionId: transaction.id,
-                entryType: 1,
+                entryType: EntryType.COLLECTION,
                 comment: data.comment,
                 status: 1,
                 branchId: req.user.branchId,
@@ -342,9 +340,9 @@ export class PaymentService {
                 amount: parseInt(`-${purchase_total}`),
                 runningPayment: data.runningPayment,
                 reference: data.reference,
-                invoiceId: i.id,
+                invoiceId: i.invoiceId,
                 transactionId: transaction.id,
-                entryType: 1,
+                entryType: EntryType.COLLECTION,
                 comment: data.comment,
                 status: 1,
                 branchId: req.user.branchId,
@@ -362,8 +360,8 @@ export class PaymentService {
                 runningPayment: data.runningPayment,
                 transactionId: transaction.id,
                 reference: data.reference,
-                entryType: 1,
-                invoiceId: i.id,
+                entryType: EntryType.COLLECTION,
+                invoiceId: i.invoiceId,
                 comment: data.comment,
                 status: 1,
                 branchId: req.user.branchId,
@@ -382,7 +380,7 @@ export class PaymentService {
             amount: parseInt(`-${data.amount}`),
             runningPayment: data.runningPayment,
             reference: data.reference,
-            entryType: 1,
+            entryType: EntryType.COLLECTION,
             transactionId: transaction.id,
             comment: data.comment,
             status: 1,
@@ -393,6 +391,7 @@ export class PaymentService {
           });
         }
       }
+      await http.get(`contacts/contact/balance`);
     } catch (error) {
       throw new HttpException(error.status, HttpStatus.BAD_REQUEST);
     }
@@ -407,8 +406,9 @@ export class PaymentService {
     const inv_arr = [];
     for (const i of invoiceIds.ids) {
       const [invoice] = await getCustomRepository(PaymentRepository).query(`
-        select COALESCE(abs(SUM(amount)), 0) as balance from payments p
+        select COALESCE(SUM(amount), 0) as balance from payments p
         where p.${id} = ${i}
+        and p."entryType" = 2
         and p."organizationId" = '${user.organizationId}'
         and p."branchId" = '${user.branchId}'
         and p.status = 1
@@ -425,15 +425,15 @@ export class PaymentService {
   ): Promise<IPayment[]> {
     const payment_arr = [];
     for (const i of contactIds.ids) {
-      const type = i.type === 2 ? `p.amount` : `ABS(p.amount)`;
+      // const type = i.type === 2 ? `p.amount` : `ABS(p.amount)`;
       const [payment] = await getCustomRepository(PaymentRepository).query(`
-      SELECT COALESCE(SUM(${type}), 0) as balance
+      SELECT COALESCE(SUM(amount), 0) as balance
       FROM payments p
       WHERE p."contactId" = '${i.id}'
-      and p."entryType" is null
+      and p."entryType" is not null
       and p."organizationId" = '${user.organizationId}'
       and p."branchId" = '${user.branchId}'
-      and status = 1
+      and p.status = 1
     `);
 
       payment_arr.push({ id: i.id, payment });
@@ -456,6 +456,7 @@ export class PaymentService {
         importedPaymentId: i?.paymentId,
         importedFrom: i.importedFrom,
         organizationId: user.organizationId,
+        branchId: user.branchId,
         createdById: user.id,
         updatedById: user.id,
         status: i.status || 1,
