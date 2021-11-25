@@ -6,8 +6,8 @@ export enum Integrations {
 }
 
 export enum PaymentModes {
-  INVOICES = 2,
-  BILLS = 1,
+  INVOICES = 1,
+  BILLS = 2,
 }
 
 export enum XeroTypes {
@@ -27,4 +27,9 @@ export enum XeroStatuses {
 export enum Entries {
   DEBITS = 10,
   CREDITS = 20,
+}
+
+export enum EntryType {
+  CREDIT = 1,
+  COLLECTION = 2,
 }

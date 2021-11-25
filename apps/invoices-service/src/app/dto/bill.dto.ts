@@ -30,6 +30,7 @@ class BillItemsDto {
   unitPrice: string;
   tax: string;
   total: number;
+  accountId: number;
   sequence: number;
   costOfGoodAmount: number;
 }
