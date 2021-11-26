@@ -103,6 +103,12 @@ export class ItemController {
     return await this.itemService.FetchMultipleItems(body);
   }
 
+  @Post('manage-stock')
+  @UseGuards(GlobalAuthGuard)
+  async manageItemStock(@Body() body): Promise<void> {
+    return await this.itemService.ManageItemStock(body);
+  }
+
   @Post('sync')
   @UseGuards(GlobalAuthGuard)
   async SyncItems(@Body() body, @Req() req: IRequest): Promise<void> {
