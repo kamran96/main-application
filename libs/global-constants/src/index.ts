@@ -15,7 +15,7 @@ export enum XeroTypes {
   INVOICE = 'ACCREC',
 }
 
-export enum XeroStatuses {
+export enum Statuses {
   DRAFT = 2,
   SUBMITTED = 1,
   DELETED = 0,

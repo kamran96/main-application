@@ -7,15 +7,9 @@ export class ItemLedgers {
   @Column()
   itemId: string;
   @Column()
-  invoiceId: number;
-  @Column()
-  billId: number;
-  @Column()
-  creditNoteId: number;
-  @Column()
   description: string;
   @Column()
-  quantity: number;
+  details: string;
   @Column()
   branchId: string;
   @Column()

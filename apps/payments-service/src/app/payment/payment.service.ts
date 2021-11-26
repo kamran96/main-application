@@ -194,7 +194,7 @@ export class PaymentService {
                 contactId: data.contactId,
                 paymentType: data.paymentType,
                 paymentMode: data.paymentMode,
-                amount: parseInt(`-${remainig}`),
+                amount: remainig,
                 transactionId: transaction.id,
                 runningPayment: data.runningPayment,
                 entryType: EntryType.COLLECTION,
@@ -213,7 +213,7 @@ export class PaymentService {
                 contactId: data.contactId,
                 paymentType: data.paymentType,
                 paymentMode: data.paymentMode,
-                amount: parseInt(`-${purchase_total}`),
+                amount: purchase_total,
                 runningPayment: data.runningPayment,
                 billId: i.billId,
                 transactionId: transaction.id,
@@ -233,11 +233,12 @@ export class PaymentService {
                 paymentType: data.paymentType,
                 paymentMode: data.paymentMode,
                 transactionId: transaction.id,
-                amount: parseInt(`-${remainig}`),
+                amount: remainig,
                 runningPayment: data.runningPayment,
                 billId: i.billId,
                 entryType: EntryType.COLLECTION,
                 reference: data.reference,
+                branchId: req.user.branchId,
                 comment: data.comment,
                 status: 1,
                 organizationId: req.user.organizationId,
@@ -425,7 +426,6 @@ export class PaymentService {
   ): Promise<IPayment[]> {
     const payment_arr = [];
     for (const i of contactIds.ids) {
-      // const type = i.type === 2 ? `p.amount` : `ABS(p.amount)`;
       const [payment] = await getCustomRepository(PaymentRepository).query(`
       SELECT COALESCE(SUM(amount), 0) as balance
       FROM payments p
@@ -449,8 +449,10 @@ export class PaymentService {
         date: i?.date,
         reference: i.reference || 'Xero opeing balance',
         transactionId: i?.transactionId,
+        paymentType: i?.paymentType,
         contactId: i?.contactId,
         invoiceId: i?.invoiceId,
+        billId: i?.billId,
         entryType: i?.entryType,
 
         importedPaymentId: i?.paymentId,

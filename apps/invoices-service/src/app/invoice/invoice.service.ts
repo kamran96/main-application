@@ -19,7 +19,7 @@ import {
   EntryType,
   Integrations,
   PaymentModes,
-  XeroStatuses,
+  Statuses,
   XeroTypes,
 } from '@invyce/global-constants';
 import { BillItemRepository } from '../repositories/billItem.repository';
@@ -223,7 +223,7 @@ export class InvoiceService {
 
         for (const i of invoices) {
           const balance = balances.find((bal) => bal.id === i.id);
-          if (balance.invoice.balance > 0) {
+          if (balance.invoice.balance !== 0) {
             invoice_arr.push({
               ...i,
               paid_amount: balance.invoice.balance,
@@ -247,11 +247,17 @@ export class InvoiceService {
           },
           relations: ['invoiceItems'],
         });
+
+        for (const i of invoices) {
+          invoice_arr.push({
+            ...i,
+          });
+        }
       }
     }
 
     return {
-      result: invoice_arr.length > 0 ? invoice_arr : invoices,
+      result: invoice_arr,
       pagination: {
         total,
         total_pages: Math.ceil(total / ps),
@@ -288,9 +294,15 @@ export class InvoiceService {
       },
     });
 
-    const accountCodesArray = ['15004'];
+    const accountCodesArray = ['15004', '20002'];
     const { data: accounts } = await http.post(`accounts/account/codes`, {
       codes: accountCodesArray,
+    });
+
+    const mapItemIds = dto.invoice_items.map((ids) => ids.itemId);
+
+    const { data: items } = await http.post(`items/item/ids`, {
+      ids: mapItemIds,
     });
 
     if (dto && dto.isNewRecord === false) {
@@ -377,6 +389,7 @@ export class InvoiceService {
       });
 
       const creditsArrray = [];
+      const itemLedgerArray = [];
       for (const item of dto.invoice_items) {
         await getCustomRepository(InvoiceItemRepository).save({
           itemId: item.itemId,
@@ -392,51 +405,75 @@ export class InvoiceService {
           status: 1,
         });
 
-        const credits = {
-          amount: item.unitPrice,
+        const itemDetail = items.find((i) => i.id === item.itemId);
+        if (itemDetail.hasInventory) {
+          itemLedgerArray.push({
+            itemId: item.itemId,
+            value: item.quantity,
+            targetId: invoice.id,
+            type: 'decrease',
+          });
+        }
+
+        const credit1 = {
+          amount: dto.netTotal,
           account_id: item.accountId,
         };
+        const credit2 = {
+          amount: dto.discount,
+          account_id: await accounts.find((i) => i.code === '20002').id,
+        };
 
-        creditsArrray.push(credits);
+        if (dto.discount > 0) {
+          creditsArrray.push(credit1, credit2);
+        } else {
+          creditsArrray.push(credit1);
+        }
       }
 
-      const debitsArray = [
-        {
-          account_id: accounts.find((i) => i.code === '15004').id,
-          amount: dto.netTotal,
-        },
-      ];
+      if (invoice.status === Statuses.AUTHORISED) {
+        await http.post(`reports/inventory/manage`, {
+          payload: itemLedgerArray,
+        });
 
-      const payload = {
-        dr: debitsArray,
-        cr: creditsArrray,
-        reference: dto.reference,
-        amount: dto.netTotal,
-      };
+        const debitsArray = [
+          {
+            account_id: accounts.find((i) => i.code === '15004').id,
+            amount: dto.grossTotal,
+          },
+        ];
 
-      const { data: transaction } = await http.post(
-        'accounts/transaction/api',
-        {
-          transactions: payload,
-        }
-      );
+        const payload = {
+          dr: debitsArray,
+          cr: creditsArrray,
+          reference: dto.reference,
+          amount: dto.grossTotal,
+        };
 
-      const paymentArr = [
-        {
-          ...invoice,
-          invoiceId: invoice.id,
-          balance: invoice.netTotal,
-          data: invoice.issueDate,
-          transactionId: transaction.id,
-          entryType: EntryType.CREDIT,
-        },
-      ];
+        const { data: transaction } = await http.post(
+          'accounts/transaction/api',
+          {
+            transactions: payload,
+          }
+        );
 
-      await http.post(`payments/payment/add`, {
-        payments: paymentArr,
-      });
-      await http.get(`contacts/contact/balance`);
+        const paymentArr = [
+          {
+            ...invoice,
+            invoiceId: invoice.id,
+            balance: invoice.netTotal,
+            data: invoice.issueDate,
+            paymentType: PaymentModes.INVOICES,
+            transactionId: transaction.id,
+            entryType: EntryType.CREDIT,
+          },
+        ];
 
+        await http.post(`payments/payment/add`, {
+          payments: paymentArr,
+        });
+        await http.get(`contacts/contact/balance`);
+      }
       return invoice;
     }
   }
@@ -666,7 +703,6 @@ export class InvoiceService {
         for (const inv of invoices) {
           const balance = payments.find((pay) => pay.id === inv.id);
           const newBalance = balance.invoice.balance.toString().split('-')[1];
-          console.log(newBalance);
           if (inv.netTotal != newBalance) {
             inv_arr.push({
               ...inv,
@@ -698,11 +734,11 @@ export class InvoiceService {
 
         for (const inv of bills) {
           const balance = payments.find((pay) => pay.id === inv.id);
-          const newBalance = balance.invoice.balance.toString().split('-')[1];
+          const newBalance = balance.invoice.balance;
           if (inv.netTotal != newBalance) {
             inv_arr.push({
               ...inv,
-              balance: balance.invoice.balance || inv.netTotal,
+              balance: inv.netTotal - newBalance || inv.netTotal,
             });
           }
         }
@@ -799,7 +835,7 @@ export class InvoiceService {
           )._id,
           invoiceId: pay?.invoice?.invoiceID,
           paymentId: pay.paymentID,
-          status: XeroStatuses[`${pay.status}`],
+          status: Statuses[`${pay.status}`],
         });
       }
 
@@ -816,7 +852,7 @@ export class InvoiceService {
           currency: i.currencyCode,
           netTotal: i.subTotal,
           grossTotal: i.total,
-          status: XeroStatuses[`${i.status}`],
+          status: Statuses[`${i.status}`],
           importedCreditNoteId: i.creditNoteID,
           importedFrom: Integrations.XERO,
           organizationId: req.user.organizationId,
@@ -867,7 +903,7 @@ export class InvoiceService {
             organizationId: req.user.organizationId,
             createdById: req.user.id,
             updatedById: req.user.id,
-            status: XeroStatuses[`${inv.status}`],
+            status: Statuses[`${inv.status}`],
           });
 
           for (const j of inv.lineItems) {
@@ -926,7 +962,7 @@ export class InvoiceService {
             organizationId: req.user.organizationId,
             createdById: req.user.id,
             updatedById: req.user.id,
-            status: XeroStatuses[`${inv.status}`],
+            status: Statuses[`${inv.status}`],
           });
 
           for (const j of inv.lineItems) {
