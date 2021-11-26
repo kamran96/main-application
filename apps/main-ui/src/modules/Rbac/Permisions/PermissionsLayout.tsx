@@ -1,21 +1,21 @@
-import Checkbox from "antd/lib/checkbox/Checkbox";
-import React, { FC, useEffect, useState } from "react";
-import { queryCache, useMutation, useQuery } from "react-query";
-import styled from "styled-components";
+import Checkbox from 'antd/lib/checkbox/Checkbox';
+import React, { FC, useEffect, useState } from 'react';
+import { queryCache, useMutation, useQuery } from 'react-query';
+import styled from 'styled-components';
 import {
   addRolePermissionAPI,
   getPermissionModulesAPI,
   getRbacListAPI,
   permissionsShowAPI,
-} from "../../../api/rbac";
-import { CommonLoader } from "../../../components/FallBackLoader";
-import { BoldText } from "../../../components/Para/BoldText";
-import { PERMISSIONS } from "../../../components/Rbac/permissions";
-import { useRbac } from "../../../components/Rbac/useRbac";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { IThemeProps } from "../../../hooks/useTheme/themeColors";
-import { Color, ISupportedRoutes } from "../../../modal";
-import { P } from "../../../components/Para/P";
+} from '../../../api/rbac';
+import { CommonLoader } from '../../../components/FallBackLoader';
+import { BoldText } from '../../../components/Para/BoldText';
+import { PERMISSIONS } from '../../../components/Rbac/permissions';
+import { useRbac } from '../../../components/Rbac/useRbac';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { IThemeProps } from '../../../hooks/useTheme/themeColors';
+import { Color, ISupportedRoutes } from '../../../modal';
+import { P } from '../../../components/Para/P';
 
 export const PermissionsLayout: FC = () => {
   // const [modulesResult] = useState([]);
@@ -25,12 +25,11 @@ export const PermissionsLayout: FC = () => {
   const [permissions, setPermissions] = useState([]);
   const [selectedPermission, setSelectedPermission] = useState(null);
   const [permissionTable, setPermissionsTable] = useState([]);
-  const [mutateAddRolePermission, setMutateRolePermission] = useMutation(
-    addRolePermissionAPI
-  );
+  const [mutateAddRolePermission, setMutateRolePermission] =
+    useMutation(addRolePermissionAPI);
 
   const { data: modulesResponse, isLoading: modulesFetching } = useQuery(
-    ["permission_modules"],
+    ['permission_modules'],
     getPermissionModulesAPI
   );
 
@@ -43,12 +42,12 @@ export const PermissionsLayout: FC = () => {
 
   useEffect(() => {
     if (history.location.search) {
-      let module = history.location.search.split("?module=")[1];
+      const module = history.location.search.split('?module=')[1];
       setSelectedPermission(module);
     }
   }, [history]);
 
-  console.log(selectedPermission, "which permission is selected")
+  console.log(selectedPermission, 'which permission is selected');
 
   const {
     data: selectedPermissionData,
@@ -95,15 +94,14 @@ export const PermissionsLayout: FC = () => {
     ) {
       const { result } = selectedPermissionData.data;
 
-      let newResult = result.map((item, index) => {
-        let data = { ...item };
+      const newResult = result.map((item, index) => {
+        const data = { ...item };
 
-
-        let indexOfRolePermission = rolesList.findIndex(
+        const indexOfRolePermission = rolesList.findIndex(
           (i) => item.parentId === i.roleId
         );
 
-        let parents = [];
+        const parents = [];
         rolesList.forEach((role, index) => {
           if (index <= indexOfRolePermission) {
             parents.push(role.name);
@@ -116,7 +114,7 @@ export const PermissionsLayout: FC = () => {
     }
   }, [selectedPermissionData, rolesList]);
 
-  console.log(permissionTable, rolesList, "permission table data")
+  console.log(permissionTable, rolesList, 'permission table data');
 
   useEffect(() => {
     if (
@@ -144,7 +142,7 @@ export const PermissionsLayout: FC = () => {
               return (
                 <li
                   className={`${
-                    module === selectedPermission ? "active-module" : ""
+                    module === selectedPermission ? 'active-module' : ''
                   }`}
                   onClick={() => {
                     setSelectedPermission(module);
@@ -160,7 +158,7 @@ export const PermissionsLayout: FC = () => {
           </ul>
           <div
             className={`flex alignCenter justifyCenter accessor-loader ${
-              !modulesFetching ? "hide-loader" : ""
+              !modulesFetching ? 'hide-loader' : ''
             }`}
           >
             <CommonLoader />
@@ -172,14 +170,14 @@ export const PermissionsLayout: FC = () => {
           <div
             className={`flex alignCenter justifyCenter permissions-loader ${
               !selectedPermissionFetching && permissionsFetched
-                ? "hide-loader"
-                : ""
+                ? 'hide-loader'
+                : ''
             }`}
           >
             <CommonLoader />
           </div>
           <div>
-            <table className="dynamic_table" style={{ width: "100%" }}>
+            <table className="dynamic_table" style={{ width: '100%' }}>
               <thead>
                 <tr>
                   <th>
@@ -192,7 +190,7 @@ export const PermissionsLayout: FC = () => {
               </thead>
               <tbody>
                 {permissionTable.map((item, index) => {
-                  let indexOfRolePermission = rolesList.findIndex(
+                  const indexOfRolePermission = rolesList.findIndex(
                     (i) => i.roleId === item.roleId
                   );
                   return (
@@ -213,19 +211,19 @@ export const PermissionsLayout: FC = () => {
                               }
                               className={`${
                                 roleIndex === indexOfRolePermission
-                                  ? "active"
-                                  : "fade"
+                                  ? 'active'
+                                  : 'fade'
                               }`}
                               onChange={(e) => {
                                 const { checked } = e.target;
-                                let parents = [];
+                                const parents = [];
                                 rolesList.forEach((r, i) => {
                                   if (i < roleIndex) {
                                     parents.push(r.name);
                                   }
                                 });
 
-                                let allTableData = [...permissionTable];
+                                const allTableData = [...permissionTable];
                                 allTableData[index] = {
                                   ...allTableData[index],
                                   roleId: role.roleId,
@@ -262,7 +260,7 @@ const WrapperPermissionsLayout = styled.div`
   display: grid;
   grid-gap: 0px;
   padding: 0px;
-  grid-template-areas: "menu content content content content content content content content ";
+  grid-template-areas: 'menu content content content content content content content content ';
   .accessors {
     grid-area: menu;
     border-right: 1px solid
@@ -305,24 +303,24 @@ const WrapperPermissionsLayout = styled.div`
         cursor: pointer;
         &:hover {
           background: ${(props: IThemeProps) =>
-            props?.theme?.theme === "dark"
+            props?.theme?.theme === 'dark'
               ? props?.theme?.colors?.sidebarListActive
-              : "#f4f4f4"};
+              : '#f4f4f4'};
           color: ${(props: IThemeProps) =>
-            props?.theme?.theme === "dark"
+            props?.theme?.theme === 'dark'
               ? props?.theme?.colors?.sidebarListActiveText
-              : "#1890ff"};
+              : '#1890ff'};
         }
       }
       li.active-module {
         background: ${(props: IThemeProps) =>
-          props?.theme?.theme === "dark"
+          props?.theme?.theme === 'dark'
             ? props?.theme?.colors?.sidebarListActive
-            : "#f4f4f4"} !important;
+            : '#f4f4f4'} !important;
         color: ${(props: IThemeProps) =>
-          props?.theme?.theme === "dark"
+          props?.theme?.theme === 'dark'
             ? props?.theme?.colors?.sidebarListActiveText
-            : "#1890ff"} !important;
+            : '#1890ff'} !important;
       }
     }
   }
@@ -363,8 +361,7 @@ const WrapperPermissionsLayout = styled.div`
       position: absolute;
       width: 100%;
       height: 100%;
-      background: ${(props: IThemeProps) =>
-        props?.theme?.colors?.fallbackLoader};
+      background: ${(props: IThemeProps) => props?.theme?.colors?.layoutBg};
       left: 0;
       top: 0;
       display: flex;
@@ -391,9 +388,9 @@ const WrapperPermissionsLayout = styled.div`
         text-transform: capitalize;
 
         color: ${(props: IThemeProps) =>
-          props?.theme?.theme === "dark"
+          props?.theme?.theme === 'dark'
             ? props?.theme?.colors?.textTd
-            : "#00000"};
+            : '#00000'};
       }
       tbody {
         background: ${(props: IThemeProps) => props?.theme?.colors?.td};
