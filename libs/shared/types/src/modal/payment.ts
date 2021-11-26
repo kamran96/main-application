@@ -1,4 +1,4 @@
-import { IBase, IBaseRequest } from "./base";
+import { IBase, IBaseRequest } from './base';
 export enum PaymentMode {
   CREDIT = 1,
   CASH = 2,
@@ -10,8 +10,8 @@ export enum PaymentType {
   CASH = 2,
 }
 export enum TRANSACTION_MODE {
-  PAYABLES = 1,
-  RECEIVABLES = 2,
+  PAYABLES = 2,
+  RECEIVABLES = 1,
 }
 
 export interface IPaymentResponse extends IBaseRequest {

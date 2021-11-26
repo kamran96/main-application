@@ -1,23 +1,23 @@
 /* eslint-disable no-mixed-operators */
-import { ColumnsType } from "antd/lib/table";
-import React, { FC, useEffect, useMemo, useState } from "react";
-import { useQuery } from "react-query";
-import styled from "styled-components";
+import { ColumnsType } from 'antd/lib/table';
+import { FC, useEffect, useMemo, useState } from 'react';
+import { useQuery } from 'react-query';
+import styled from 'styled-components';
 
-import { TrialbalanceAPI } from "../../../../api";
-import { Heading } from "../../../../components/Heading";
-import { BoldText } from "../../../../components/Para/BoldText";
-import { SmartFilter } from "../../../../components/SmartFilter";
-import { CommonTable } from "../../../../components/Table";
-import { TableCard } from "../../../../components/TableCard";
-import { Color, ISupportedRoutes } from "../../../../modal";
-import { IAccountsResult } from "../../../../modal/accounts";
-import moneyFormat from "../../../../utils/moneyFormat";
-import FilterSchema from "./filterSchema";
-import { _csvColumnsTrialBalance } from "./exportableCols";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
-import dayjs from "dayjs";
-import {P} from "../../../../components/Typography";
+import { TrialbalanceAPI } from '../../../../api';
+import { Heading } from '../../../../components/Heading';
+import { BoldText } from '../../../../components/Para/BoldText';
+import { SmartFilter } from '../../../../components/SmartFilter';
+import { CommonTable } from '../../../../components/Table';
+import { TableCard } from '../../../../components/TableCard';
+import { ISupportedRoutes } from '../../../../modal';
+import { IAccountsResult } from '../../../../modal/accounts';
+import moneyFormat from '../../../../utils/moneyFormat';
+import FilterSchema from './filterSchema';
+import { _csvColumnsTrialBalance } from './exportableCols';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import dayjs from 'dayjs';
+import { P } from '../../../../components/Typography';
 interface IExtendedValues extends IAccountsResult {
   credit: number;
   debit: number;
@@ -25,7 +25,7 @@ interface IExtendedValues extends IAccountsResult {
 
 export const TrialBalanceList: FC = () => {
   const [config, setConfig] = useState({
-    query: "",
+    query: '',
   });
   const { query } = config;
   const [result, setResult] = useState<IExtendedValues[]>([]);
@@ -36,9 +36,9 @@ export const TrialBalanceList: FC = () => {
   useEffect(() => {
     if (history?.location?.search) {
       let obj = {};
-      let queryArr = history.location.search.split("?")[1].split("&");
+      const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
-        let split = item.split("=");
+        const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
       setConfig({ ...config, ...obj });
@@ -58,15 +58,15 @@ export const TrialBalanceList: FC = () => {
     }
   }, [data]);
 
-  let searchedQueryItem: any = useMemo(() => {
+  const searchedQueryItem: any = useMemo(() => {
     return query ? JSON.parse(atob(query)) : query;
   }, [query]);
 
   const cols: ColumnsType<any> = [
     {
-      title: "Particulars",
-      dataIndex: "name",
-      key: "name",
+      title: 'Particulars',
+      dataIndex: 'name',
+      key: 'name',
       render: (data, row, index) => {
         if (row.isLastIndex) {
           return <BoldText>{data}</BoldText>;
@@ -77,10 +77,10 @@ export const TrialBalanceList: FC = () => {
     },
     searchedQueryItem?.date && isFetched
       ? {
-          title: "Opening Balance",
-          dataIndex: "opening_balance",
-          key: "opening_balance",
-          className: "static-width",
+          title: 'Opening Balance',
+          dataIndex: 'opening_balance',
+          key: 'opening_balance',
+          className: 'static-width',
           render: (data, row, index) => {
             if (row.isLastIndex) {
               return null;
@@ -91,38 +91,38 @@ export const TrialBalanceList: FC = () => {
         }
       : {},
     {
-      title: "Debit",
-      dataIndex: "debit",
-      className: "static-width",
-      key: "debit",
+      title: 'Debit',
+      dataIndex: 'debit',
+      className: 'static-width',
+      key: 'debit',
       render: (data, row, index) => {
         if (row.isLastIndex) {
           return <BoldText>{moneyFormat(data.toFixed(2))}</BoldText>;
         } else {
-          return data ? data.toFixed(2) : "";
+          return data ? data.toFixed(2) : '';
         }
       },
     },
     {
-      title: "Credit",
-      dataIndex: "credit",
-      className: "static-width",
+      title: 'Credit',
+      dataIndex: 'credit',
+      className: 'static-width',
 
-      key: "credit",
+      key: 'credit',
       render: (data, row, index) => {
         if (row.isLastIndex) {
           return <BoldText>{moneyFormat(data.toFixed(2))}</BoldText>;
         } else {
-          return data ? data.toFixed(2) : "";
+          return data ? data.toFixed(2) : '';
         }
       },
     },
     searchedQueryItem?.date && isFetched
       ? {
-          title: "Closing balance",
-          dataIndex: "closing_balance",
-          key: "closing_balance",
-          className: "static-width",
+          title: 'Closing balance',
+          dataIndex: 'closing_balance',
+          key: 'closing_balance',
+          className: 'static-width',
           render: (data, row, index) => {
             if (row.isLastIndex) {
               return null;
@@ -138,13 +138,13 @@ export const TrialBalanceList: FC = () => {
     if (searchedQueryItem?.date) {
       return (
         <>
-          From the month of{" "}
+          From the month of{' '}
           <>
             {searchedQueryItem.date.value.map((item, index) => {
               return (
                 <span key={index}>
-                  {dayjs(item).format("MMMM D, YYYY")}&nbsp;
-                  {searchedQueryItem.date.value.length - 1 !== index && "to"}
+                  {dayjs(item).format('MMMM D, YYYY')}&nbsp;
+                  {searchedQueryItem.date.value.length - 1 !== index && 'to'}
                 </span>
               );
             })}
@@ -154,14 +154,14 @@ export const TrialBalanceList: FC = () => {
     } else if (searchedQueryItem?.dateIn) {
       return (
         <>
-          From {dayjs(searchedQueryItem?.dateIn?.value).format("MMMM D, YYYY")}{" "}
+          From {dayjs(searchedQueryItem?.dateIn?.value).format('MMMM D, YYYY')}{' '}
           to the start of this Business
         </>
       );
     } else {
       return (
         <>
-          From Today ({dayjs().format("MMMM D, YYYY")}) to the Start of Business
+          From Today ({dayjs().format('MMMM D, YYYY')}) to the Start of Business
         </>
       );
     }
@@ -172,9 +172,7 @@ export const TrialBalanceList: FC = () => {
       <div className="flex alignCenter justifySpaceBetween pv-20">
         <div>
           <Heading type="form-inner">Trial Balance</Heading>
-          <P  className="mr-20">
-            {renderDate()}
-          </P>
+          <P className="mr-20">{renderDate()}</P>
         </div>
       </div>
     );
@@ -187,7 +185,7 @@ export const TrialBalanceList: FC = () => {
           loading={isLoading}
           exportableProps={{
             fields: _csvColumnsTrialBalance,
-            fileName: "trialbalance",
+            fileName: 'trialbalance',
           }}
           customTopbar={renderTableHeaderLeft()}
           topbarRightPannel={
@@ -202,9 +200,9 @@ export const TrialBalanceList: FC = () => {
             />
           }
           hasPrint
-          printTitle={"Trial Balance"}
+          printTitle={'Trial Balance'}
           exportable
-          tableType={"default"}
+          tableType={'default'}
           pagination={false}
           columns={cols}
           dataSource={result}

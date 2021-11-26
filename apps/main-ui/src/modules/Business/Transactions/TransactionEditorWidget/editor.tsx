@@ -53,6 +53,8 @@ export const TransactionWidget: FC = () => {
     },
   ]);
 
+  console.log(transactionItems, 'transactions items');
+
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -71,6 +73,8 @@ export const TransactionWidget: FC = () => {
 
   const accounts: IAccountsResult[] =
     (accountsData && accountsData.data && accountsData.data.result) || [];
+
+  console.log(accounts);
   const recentAccounts: IAccountsResult[] =
     (recentAccountsData &&
       recentAccountsData.data &&
@@ -125,13 +129,13 @@ export const TransactionWidget: FC = () => {
       if (tranc && tranc.debit > 0) {
         debits.push({
           amount: tranc.debit,
-          accountId: tranc.account,
+          accountId: tranc.account?.value,
           description: tranc.description,
         });
       } else if (tranc && tranc.credit > 0) {
         credits.push({
           amount: tranc.credit,
-          accountId: tranc.account,
+          accountId: tranc.account?.value,
           description: tranc.description,
         });
       }
@@ -223,8 +227,8 @@ export const TransactionWidget: FC = () => {
                 style={{ width: '100%' }}
                 placeholder="Select Account"
                 optionFilterProp="children"
-                onChange={(val) => {
-                  onTableInputChange(val, index, 'account');
+                onChange={(value) => {
+                  onTableInputChange(value, index, 'account');
                 }}
               >
                 <>

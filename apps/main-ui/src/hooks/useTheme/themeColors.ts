@@ -49,6 +49,7 @@ export interface IThemeVariables {
   topbar: string;
   cmdbg: string;
   cardBg: string;
+  stroke: string;
 }
 
 export interface ITheme {
@@ -92,7 +93,7 @@ export const Themes: IThemes = {
     tableRowHover: '#151515',
     td: `#ffff`,
     seprator: '#F4F4F4',
-    bgTh: `#143C69`,
+    bgTh: `#1E75F1`,
     textTd: `#272727`,
     modalOverlay: `rgba(0, 0, 0, 0.45)`,
     placeHolder: ``,
@@ -119,6 +120,7 @@ export const Themes: IThemes = {
     fallbackLoader: '#ffffff8c',
     cmdbg: '#e5e5e5',
     cardBg: '#ffffff',
+    stroke: '#F2F2F2',
   },
   dark: {
     $PRIMARY: '#e4e4e4',
@@ -170,5 +172,6 @@ export const Themes: IThemes = {
     inputColorBg: `#121212`,
     cmdbg: `#272727`,
     cardBg: '#0B1822',
+    stroke: '#222e39',
   },
 };

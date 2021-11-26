@@ -1,7 +1,7 @@
-import styled from "styled-components";
-import { IThemeProps } from "../../hooks/useTheme/themeColors";
-import { Color } from "../../modal";
-import convertToRem from "../../utils/convertToRem";
+import styled from 'styled-components';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
+import { Color } from '../../modal';
+import convertToRem from '../../utils/convertToRem';
 
 export const WrapperTable = styled.div`
   overflow-x: auto;
@@ -24,8 +24,6 @@ export const WrapperTable = styled.div`
   }
 
   .ant-table-container table > thead > tr th {
-    background-color: ${(props: IThemeProps) => props.theme.colors.bgTh};
-    color: ${Color.$WHITE};
     transition: 0.3s all ease-in-out;
   }
   .ant-table-thead th.ant-table-column-has-sorters:hover {
@@ -92,8 +90,8 @@ export const WrapperTable = styled.div`
 
   /* Footer */
   .footer {
-    position: ${(props: any) => (props.pagination ? "absolute" : "unset")};
-    top: ${(props: any) => (props.pagination ? convertToRem(-72) : "unset")};
+    position: ${(props: any) => (props.pagination ? 'absolute' : 'unset')};
+    top: ${(props: any) => (props.pagination ? convertToRem(-72) : 'unset')};
     tr > td {
       padding: ${convertToRem(20)} 0;
     }
@@ -139,12 +137,12 @@ export const WrapperTable = styled.div`
     ` div.ant-table-body {
     overflow-y: scroll;
     max-height: calc(100vh - 360px) !important;
-  }`}/* .ant-table-tbody > tr.ant-table-row:hover > td {
+  }`} /* .ant-table-tbody > tr.ant-table-row:hover > td {
     background: ${(props: IThemeProps) =>
     props.theme.colors.tableRowHover} !important;
   } */
 
-  .ant-skeleton-paragraph{
+  .ant-skeleton-paragraph {
     margin: 0;
   }
 `;
@@ -186,6 +184,6 @@ export const DefaultWrapper = styled.div`
   .ant-table-thead > tr > th {
     padding: 13px 16px;
     color: ${(props: IThemeProps) =>
-      props?.theme?.theme === "dark" ? "#ffff" : "unset"};
+      props?.theme?.theme === 'dark' ? '#ffff' : 'unset'};
   }
 `;

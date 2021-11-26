@@ -1,1 +1,1 @@
-export * from "@invyce/shared/types";
+export * from '@invyce/shared/types';
