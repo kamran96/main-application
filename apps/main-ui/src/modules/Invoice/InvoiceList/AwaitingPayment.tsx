@@ -1,34 +1,34 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button } from "antd";
-import React, { FC, useEffect, useState } from "react";
+import { Button } from 'antd';
+import React, { FC, useEffect, useState } from 'react';
 import {
   queryCache,
   useMutation,
   usePaginatedQuery,
   useQuery,
-} from "react-query";
+} from 'react-query';
 
 import {
   deleteInvoiceDrafts,
   getAllContacts,
   getInvoiceListAPI,
-} from "../../../api";
-import { ConfirmModal } from "../../../components/ConfirmModal";
-import { PDFICON } from "../../../components/Icons";
-import { PurchaseListTopbar } from "../../../components/PurchasesListTopbar";
-import { SmartFilter } from "../../../components/SmartFilter";
-import { CommonTable } from "../../../components/Table";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { IContactTypes, IServerError, NOTIFICATIONTYPE } from "../../../modal";
+} from '../../../api';
+import { ConfirmModal } from '../../../components/ConfirmModal';
+import { PDFICON } from '../../../components/Icons';
+import { PurchaseListTopbar } from '../../../components/PurchasesListTopbar';
+import { SmartFilter } from '../../../components/SmartFilter';
+import { CommonTable } from '../../../components/Table';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { IContactTypes, IServerError, NOTIFICATIONTYPE } from '../../../modal';
 import {
   IInvoiceResponse,
   INVOICETYPE,
   ORDER_TYPE,
-} from "../../../modal/invoice";
-import { ISupportedRoutes } from "../../../modal/routing";
-import moneyFormat from "../../../utils/moneyFormat";
-import { _exportableCols } from "./commonCol";
-import InvoicesFilterSchema from "./InvoicesFilterSchema";
+} from '../../../modal/invoice';
+import { ISupportedRoutes } from '../../../modal/routing';
+import moneyFormat from '../../../utils/moneyFormat';
+import { _exportableCols } from './commonCol';
+import InvoicesFilterSchema from './InvoicesFilterSchema';
 
 interface IProps {
   columns?: any[];
@@ -36,8 +36,8 @@ interface IProps {
 export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
-    query: "",
-    sortid: "",
+    query: '',
+    sortid: '',
     pageSize: 10,
   });
 
@@ -71,9 +71,9 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
       routeHistory.history.location.search
     ) {
       let obj = {};
-      let queryArr = history.location.search.split("?")[1].split("&");
+      const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
-        let split = item.split("=");
+        const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
 
@@ -81,7 +81,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
     }
   }, [routeHistory]);
 
-  const allContacts = useQuery([`all-contacts`, "ALL"], getAllContacts);
+  const allContacts = useQuery([`all-contacts`, 'ALL'], getAllContacts);
 
   useEffect(() => {
     if (
@@ -90,7 +90,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
       allContacts.data.data.result
     ) {
       const { result } = allContacts.data.data;
-      let schema = invoiceFiltersSchema;
+      const schema = invoiceFiltersSchema;
       schema.contactId.value = result.filter(
         (item) => item.contactType === IContactTypes.CUSTOMER
       );
@@ -102,8 +102,8 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
     [
       `invoices-${ORDER_TYPE.SALE_INVOICE}-${INVOICETYPE.Payment_Awaiting}?page=${page}&query=${query}&sort=${sortid}&page_size=${pageSize}`,
       ORDER_TYPE.SALE_INVOICE,
-      INVOICETYPE.Payment_Awaiting,
-      "AWAITING_PAYMENT",
+      INVOICETYPE.Approved,
+      'AWAITING_PAYMENT',
       page,
       pageSize,
       query,
@@ -133,7 +133,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
     };
     await mutateDeleteOrders(payload, {
       onSuccess: () => {
-        ["invoices", "transactions?page", "items?page", "invoice-view"].forEach(
+        ['invoices', 'transactions?page', 'items?page', 'invoice-view'].forEach(
           (key) => {
             queryCache.invalidateQueries((q) =>
               q.queryKey[0].toString().startsWith(key)
@@ -171,7 +171,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
         <SmartFilter
           onFilter={(encode) => {
             setAllInvoicesConfig({ ...allInvoicesConfig, query: encode });
-            let route = `/app${ISupportedRoutes.INVOICES}?tabIndex=awating_payment&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
+            const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=awating_payment&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
             history.push(route);
           }}
           onClose={() => setFilterBar(false)}
@@ -192,8 +192,8 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
   // });
 
   cols.splice(6, 1, {
-    title: "Due Amount",
-    dataIndex: "due_amount",
+    title: 'Due Amount',
+    dataIndex: 'due_amount',
     render: (data, row) => {
       return <>{moneyFormat(Math.abs(data))}</>;
     },
@@ -205,12 +205,12 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
         exportable
         exportableProps={{
           fields: _exportableCols,
-          fileName: "awaiting-payments",
+          fileName: 'awaiting-payments',
         }}
         className="border-top-none"
         topbarRightPannel={renderTobarRight()}
         hasPrint
-        printTitle={"Payment Awaiting Invoices"}
+        printTitle={'Payment Awaiting Invoices'}
         customTopbar={
           <PurchaseListTopbar
             disabled={!selectedRow.length}
@@ -238,7 +238,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
               page: pagination.current,
               pageSize: pagination.pageSize,
             });
-            let route = `/app${ISupportedRoutes.INVOICES}?tabIndex=awating_payment&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+            const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=awating_payment&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
             history.push(route);
           } else {
             setAllInvoicesConfig({
@@ -246,16 +246,16 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
               page: pagination.current,
               pageSize: pagination.pageSize,
               sortid:
-                sorter && sorter.order === "descend"
+                sorter && sorter.order === 'descend'
                   ? `-${sorter.field}`
                   : sorter.field,
             });
-            let route = `/app${
+            const route = `/app${
               ISupportedRoutes.INVOICES
             }?tabIndex=awating_payment&sortid=null&page=${
               pagination.current
             }&page_size=${pagination.pageSize}&query=${query}&sortid=${
-              sorter && sorter.order === "descend"
+              sorter && sorter.order === 'descend'
                 ? `-${sorter.field}`
                 : sorter.field
             }`;
@@ -265,7 +265,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
         totalItems={pagination && pagination.total}
         pagination={{
           pageSize: pageSize,
-          position: ["bottomRight"],
+          position: ['bottomRight'],
           current: pagination && pagination.page_no,
           total: pagination && pagination.total,
         }}

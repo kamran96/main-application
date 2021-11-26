@@ -386,15 +386,12 @@ export const ItemsForm: FC = () => {
           </Col>
           <Col span={24}>
             <div className="pb-10">
-              <Checkbox
-                checked={hasInventory}
-                onChange={(e) => setHasInventory(e.target.checked)}
-              >
-                Has Inventory
-              </Checkbox>
+              <Form.Item name="hasInventory" valuePropName="checked">
+                <Checkbox checked={hasInventory}>Has Inventory</Checkbox>
+              </Form.Item>
             </div>
           </Col>
-          {!id && hasInventory && (
+          {!id && form.getFieldValue('hasInventory') && (
             <>
               <Col span={12}>
                 <FormLabel>Opening Inventory</FormLabel>

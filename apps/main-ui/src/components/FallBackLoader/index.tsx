@@ -1,8 +1,8 @@
-import React, { FC } from "react";
-import { LoadingOutlined } from "@ant-design/icons";
-import { Spin } from "antd";
-import styled from "styled-components";
-import { IThemeProps } from "../../hooks/useTheme/themeColors";
+import React, { FC } from 'react';
+import { LoadingOutlined } from '@ant-design/icons';
+import { Spin } from 'antd';
+import styled from 'styled-components';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
 const antIcon = <LoadingOutlined style={{ fontSize: 30 }} spin />;
 
@@ -25,7 +25,7 @@ const FallbackLoaderWrapper = styled.div`
   -webkit-justify-content: center;
   -ms-flex-pack: center;
   justify-content: center;
-  background: ${(props: IThemeProps) => props?.theme?.colors?.fallbackLoader};
+  background: ${(props: IThemeProps) => props?.theme?.colors?.layoutBg};
   border-radius: 5px;
 `;
 

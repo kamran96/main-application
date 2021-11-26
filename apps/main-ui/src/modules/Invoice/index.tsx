@@ -1,10 +1,10 @@
-import React, { FC } from "react";
-import fileInvoice from "@iconify-icons/la/file-invoice";
-import { Icon } from "@iconify/react";
-import styled from "styled-components";
+import React, { FC } from 'react';
+import fileInvoice from '@iconify-icons/la/file-invoice';
+import { Icon } from '@iconify/react';
+import styled from 'styled-components';
 
-import { Heading } from "../../components/Heading";
-import { InvoiceList } from "./InvoiceList";
+import { Heading } from '../../components/Heading';
+import { InvoiceList } from './InvoiceList';
 
 export const InvoiceContainer: FC = () => {
   return (
@@ -13,7 +13,7 @@ export const InvoiceContainer: FC = () => {
         <div className="flex alignCenter mb-10">
           <Icon
             className="mr-5"
-            style={{ fontSize: "28px" }}
+            style={{ fontSize: '28px' }}
             icon={fileInvoice}
           />
           <Heading type="table">Invoice</Heading>
