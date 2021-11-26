@@ -413,7 +413,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
             <Row gutter={24} className="w-100 _custom_row_refheader">
               <Col className="_custom_col_refheader" span={18}>
                 <Row gutter={24}>
-                  <Col span={6}>
+                  <Col span={5}>
                     <FormLabel>{formLabels.to}</FormLabel>
                     <Form.Item
                       name="contactId"
@@ -456,7 +456,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
                       </Select>
                     </Form.Item>
                   </Col>
-                  <Col span={6}>
+                  <Col span={5}>
                     <FormLabel>{formLabels.ref}</FormLabel>
                     <Form.Item
                       name="reference"
@@ -465,7 +465,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
                       <Input size="middle" />
                     </Form.Item>
                   </Col>
-                  <Col span={6}>
+                  <Col span={5}>
                     <FormLabel>{formLabels.issue_date}</FormLabel>
                     <Form.Item
                       name="issueDate"
@@ -484,8 +484,23 @@ const Editor: FC<IProps> = ({ type, id }) => {
                       />
                     </Form.Item>
                   </Col>
+                  <Col span={5}>
+                    <FormLabel>{formLabels.due_date}</FormLabel>
+                    <Form.Item
+                      name="dueDate"
+                      rules={[{ required: true, message: 'Required !' }]}
+                    >
+                      <DatePicker
+                        // disabledDate={(current) => {
+                        //   return current > dayjs().endOf('day');
+                        // }}
+                        style={{ width: '100%' }}
+                        size="middle"
+                      />
+                    </Form.Item>
+                  </Col>
 
-                  <Col span={6}>
+                  <Col span={4}>
                     <FormLabel>{formLabels.orderNo}</FormLabel>
                     <Form.Item
                       name="invoiceNumber"

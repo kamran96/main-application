@@ -169,6 +169,9 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
       issueDate: antFormCacheData?.issueDate
         ? dayjs(antFormCacheData?.issueDate)
         : dayjs(),
+      dueDate: antFormCacheData?.dueDate
+        ? dayjs(antFormCacheData?.dueDate)
+        : dayjs(),
     });
 
     const initialInvoiceItemsState: any = cachePurchasesData || [];
@@ -293,10 +296,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     [`accounts-${type}`, type === IInvoiceType.INVOICE ? 'invoice' : 'bill'],
     getAccountsByTypeAPI,
     {
-      enabled:
-        (type === IInvoiceType.INVOICE &&
-          organization.organizationType === 'EN') ||
-        (type === 'BILL' && organization.organizationType === 'EN'),
+      enabled: organization?.organizationType === IOrganizationType?.SAAS,
     }
   );
 
@@ -374,8 +374,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
   };
 
   const enableAccountColumn =
-    organization.organizationType === IOrganizationType.ENTERPRISE &&
-    type !== 'QO';
+    organization.organizationType === IOrganizationType.SAAS && type !== 'QO';
 
   const items: IItemsResult[] =
     type === IInvoiceType.INVOICE
@@ -768,7 +767,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
           width: width > 1500 ? 220 : 150,
           render: (value, row, index) => {
             return (
-              <CommonSelect
+              <EditableSelect
                 onClick={() => setAccountRowSelectedIndex(index)}
                 className={`border-less-select`}
                 value={{
@@ -791,21 +790,21 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       ...allItems[index],
                       accountId: val.value,
                     };
+
                     return allItems;
                   });
                 }}
               >
-                <div>
-                  {accountRowSelectedIndex === index &&
-                    accountsList.map((acc: IAccountsResult, index: number) => {
-                      return (
-                        <Option key={index} value={acc.id}>
-                          {acc.name}
-                        </Option>
-                      );
-                    })}
-                </div>
-              </CommonSelect>
+                <>
+                  {accountsList.map((acc: IAccountsResult, index: number) => {
+                    return (
+                      <Option key={index} value={acc.id}>
+                        {acc.name}
+                      </Option>
+                    );
+                  })}
+                </>
+              </EditableSelect>
             );
           },
         }
@@ -1007,7 +1006,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         setPaymentReset,
         ClearAll,
         handleAddRow,
-        isFetching: itemsLoading || invoiceLoading,
+        isFetching: itemsLoading || invoiceLoading || accountsLoading,
       }}
     >
       {children}

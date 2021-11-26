@@ -1,42 +1,39 @@
-import deleteIcon from "@iconify/icons-carbon/delete";
-import React, { FC, useEffect, useState } from "react";
-import { queryCache, useMutation, usePaginatedQuery } from "react-query";
-import styled from "styled-components";
+import deleteIcon from '@iconify/icons-carbon/delete';
+import React, { FC, useEffect, useState } from 'react';
+import { queryCache, useMutation, usePaginatedQuery } from 'react-query';
+import styled from 'styled-components';
 
-import { paymentDeleteAPI, paymentIndexAPI } from "../../../api/payment";
-import { ButtonTag } from "../../../components/ButtonTags";
-import { ConfirmModal } from "../../../components/ConfirmModal";
-import { SmartFilter } from "../../../components/SmartFilter";
-import { CommonTable } from "../../../components/Table";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import FilterSchema from "./paymentFilterSchema";
+import { paymentDeleteAPI, paymentIndexAPI } from '../../../api/payment';
+import { ButtonTag } from '../../../components/ButtonTags';
+import { ConfirmModal } from '../../../components/ConfirmModal';
+import { SmartFilter } from '../../../components/SmartFilter';
+import { CommonTable } from '../../../components/Table';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import FilterSchema from './paymentFilterSchema';
 import {
   IPaymentResponse,
   ISupportedRoutes,
   NOTIFICATIONTYPE,
-} from "../../../modal";
-import { useCols } from "./CommonCols";
-import { PDFICON } from "../../../components/Icons";
-import { Rbac } from "../../../components/Rbac";
-import { PERMISSIONS } from "../../../components/Rbac/permissions";
-import moneyFormat from "../../../utils/moneyFormat";
+  TRANSACTION_MODE,
+} from '../../../modal';
+import { useCols } from './CommonCols';
+import { PDFICON } from '../../../components/Icons';
+import { Rbac } from '../../../components/Rbac';
+import { PERMISSIONS } from '../../../components/Rbac/permissions';
+import moneyFormat from '../../../utils/moneyFormat';
 
 export const PaymentRecievedList: FC = () => {
   const { routeHistory, notificationCallback } = useGlobalContext();
   const { history } = routeHistory;
 
-  const [
-    mutatePaymentDelete,
-    { isLoading: paymentDeleteLoading },
-  ] = useMutation(paymentDeleteAPI);
+  const [mutatePaymentDelete, { isLoading: paymentDeleteLoading }] =
+    useMutation(paymentDeleteAPI);
 
-  const [
-    { result, pagination },
-    setPaymentResponse,
-  ] = useState<IPaymentResponse>({
-    pagination: {},
-    result: [],
-  });
+  const [{ result, pagination }, setPaymentResponse] =
+    useState<IPaymentResponse>({
+      pagination: {},
+      result: [],
+    });
 
   const [selectedRow, setSelectedRow] = useState([]);
   const [filterBar, setFilterBar] = useState(null);
@@ -44,9 +41,9 @@ export const PaymentRecievedList: FC = () => {
 
   const [config, setConfig] = useState({
     page: 1,
-    query: "",
-    sortid: "id",
-    sortItem: "",
+    query: '',
+    sortid: 'id',
+    sortItem: '',
     page_size: 20,
   });
   const { page, query, sortid, page_size } = config;
@@ -58,7 +55,7 @@ export const PaymentRecievedList: FC = () => {
       sortid,
       page_size,
       query,
-      2,
+      TRANSACTION_MODE.RECEIVABLES,
     ],
     paymentIndexAPI
   );
@@ -69,12 +66,12 @@ export const PaymentRecievedList: FC = () => {
   }, [resolvedData]);
 
   const handleDeletePayment = async () => {
-    let payload = {
+    const payload = {
       ids: [...selectedRow],
     };
     mutatePaymentDelete(payload, {
       onSuccess: () => {
-        ["payments-list?","transactions", "invoices"].forEach((key) => {
+        ['payments-list?', 'transactions', 'invoices'].forEach((key) => {
           queryCache.invalidateQueries((q) =>
             q.queryKey[0].toString().startsWith(`${key}`)
           );
@@ -83,9 +80,8 @@ export const PaymentRecievedList: FC = () => {
         setConfirmModal(false);
         notificationCallback(
           NOTIFICATIONTYPE.SUCCESS,
-          "Payment Deleted Successfully"
+          'Payment Deleted Successfully'
         );
-
       },
     });
   };
@@ -105,7 +101,7 @@ export const PaymentRecievedList: FC = () => {
     } else {
       history.push(
         `/app${ISupportedRoutes.PAYMENTS}?sortid=${
-          sorter && sorter.order === "descend"
+          sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field
         }&page=${pagination.current}&page_size=${
@@ -118,7 +114,7 @@ export const PaymentRecievedList: FC = () => {
         page: pagination.current,
         page_size: pagination.pageSize,
         sortid:
-          sorter && sorter.order === "descend"
+          sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field,
       });
@@ -130,8 +126,7 @@ export const PaymentRecievedList: FC = () => {
       <div className="payment_topbar">
         <div className="options_actions">
           <div className="edit">
-            <>
-              {/* {selectedRow && selectedRow.length === 1 && (
+            {/* {selectedRow && selectedRow.length === 1 && (
                   <ButtonTag
                     disabled={!selectedRow.length || selectedRow.length > 1}
                     title="Edit"
@@ -139,18 +134,17 @@ export const PaymentRecievedList: FC = () => {
                     size={"middle"}
                   />
                 )} */}
-              <Rbac permission={PERMISSIONS.PAYMENTS_DELETE}>
-                <ButtonTag
-                  className="mr-10"
-                  disabled={!selectedRow.length}
-                  onClick={() => setConfirmModal(true)}
-                  title="Delete"
-                  icon={deleteIcon}
-                  size={"middle"}
-                />
-              </Rbac>
-              {/* <MoreActions /> */}
-            </>
+            <Rbac permission={PERMISSIONS.PAYMENTS_DELETE}>
+              <ButtonTag
+                className="mr-10"
+                disabled={!selectedRow.length}
+                onClick={() => setConfirmModal(true)}
+                title="Delete"
+                icon={deleteIcon}
+                size={'middle'}
+              />
+            </Rbac>
+            {/* <MoreActions /> */}
           </div>
         </div>
       </div>
@@ -170,7 +164,7 @@ export const PaymentRecievedList: FC = () => {
         />
         <SmartFilter
           onFilter={(encode) => {
-            let route = `/app${ISupportedRoutes.PAYMENTS}?sortid=${sortid}&page=1&page_size=20&query=${encode}`;
+            const route = `/app${ISupportedRoutes.PAYMENTS}?sortid=${sortid}&page=1&page_size=20&query=${encode}`;
             history.push(route);
             setConfig({ ...config, query: encode });
           }}
@@ -190,9 +184,9 @@ export const PaymentRecievedList: FC = () => {
 
   const cols = [...columns];
   cols.splice(5, 1, {
-    title: "Amount",
-    dataIndex: "amount",
-    key: "amount",
+    title: 'Amount',
+    dataIndex: 'amount',
+    key: 'amount',
     render: (data) => (
       <>{data ? moneyFormat(Math.abs(data)) : moneyFormat(0)}</>
     ),
@@ -203,7 +197,7 @@ export const PaymentRecievedList: FC = () => {
       <CommonTable
         topbarRightPannel={renderTopbarRight()}
         hasPrint
-        printTitle={"Payments Recieved List"}
+        printTitle={'Payments Recieved List'}
         customTopbar={renderCustomTopbar()}
         data={result.map((pay) => {
           return { ...pay, key: pay.id };
@@ -214,7 +208,7 @@ export const PaymentRecievedList: FC = () => {
         totalItems={pagination && pagination.total}
         pagination={{
           pageSize: page_size,
-          position: ["bottomRight"],
+          position: ['bottomRight'],
           current: pagination && pagination.page_no,
           total: pagination && pagination.total,
         }}
