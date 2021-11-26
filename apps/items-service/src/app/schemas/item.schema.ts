@@ -17,7 +17,7 @@ export class Item {
   itemType: number;
   @Prop()
   isActive: boolean;
-  @Prop()
+  @Prop({ default: 0 })
   stock: number;
   @Prop()
   openingStock: number;

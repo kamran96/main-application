@@ -27,7 +27,7 @@ export class BillController {
     @Query() query: IPage
   ): Promise<IBillWithResponse> {
     try {
-      const bill = await this.billService.IndexBill(req.user, query);
+      const bill = await this.billService.IndexBill(req, query);
 
       if (bill) {
         return {
@@ -58,7 +58,7 @@ export class BillController {
     @Req() req: IRequest
   ): Promise<IBillWithResponse> {
     try {
-      const bill = await this.billService.CreateBill(billDto, req.user);
+      const bill = await this.billService.CreateBill(billDto, req);
 
       if (bill) {
         return {

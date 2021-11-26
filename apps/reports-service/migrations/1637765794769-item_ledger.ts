@@ -8,11 +8,8 @@ export class itemLedger1637765794769 implements MigrationInterface {
         columns: [
           { name: 'id', type: 'serial', isPrimary: true },
           { name: 'description', type: 'varchar', isNullable: true },
-          { name: 'quantity', type: 'float', isNullable: true },
           { name: 'itemId', type: 'varchar', isNullable: true },
-          { name: 'invoiceId', type: 'int', isNullable: true },
-          { name: 'billId', type: 'int', isNullable: true },
-          { name: 'creditNoteId', type: 'int', isNullable: true },
+          { name: 'details', type: 'jsonb', isNullable: true },
           { name: 'branchId', type: 'varchar', isNullable: true },
           { name: 'organizationId', type: 'varchar', isNullable: true },
           { name: 'createdById', type: 'varchar', isNullable: true },

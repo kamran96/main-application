@@ -204,8 +204,11 @@ export class AccountsController {
 
   @Post('codes')
   @UseGuards(GlobalAuthGuard)
-  async accountsByCodes(@Body() body: AccountCodesDto): Promise<IAccount[]> {
-    return await this.accountService.FindAccountsByCode(body.codes);
+  async accountsByCodes(
+    @Body() body: AccountCodesDto,
+    @Req() req: IRequest
+  ): Promise<IAccount[]> {
+    return await this.accountService.FindAccountsByCode(body.codes, req.user);
   }
 
   @Post('sync')

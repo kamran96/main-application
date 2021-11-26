@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as moment from 'moment';
 import axios from 'axios';
 import { Contact } from '../Schemas/contact.schema';
-import { Entries, Integrations } from '@invyce/global-constants';
+import { Entries, Integrations, PaymentModes } from '@invyce/global-constants';
 import {
   IPage,
   IRequest,
@@ -253,7 +253,10 @@ export class ContactService {
         await this.contactModel.updateOne(
           { _id: i.id },
           {
-            balance: balance.payment.balance,
+            balance:
+              i.contactType === PaymentModes.BILLS
+                ? Math.abs(balance.payment.balance)
+                : balance.payment.balance,
           }
         );
       }
