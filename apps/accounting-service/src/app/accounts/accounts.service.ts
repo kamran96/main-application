@@ -19,6 +19,7 @@ import {
   ISecondaryAccount,
 } from '@invyce/interfaces';
 import { AccountDto, AccountIdsDto } from '../dto/account.dto';
+import { userInfo } from 'os';
 
 @Injectable()
 export class AccountsService {
@@ -284,7 +285,7 @@ export class AccountsService {
     const { page_size, page_no, sort, query } = queryData;
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
-
+    console.log('okkkkk');
     let sql = `
             SELECT transaction_items.*, (
               select date from transactions
@@ -499,10 +500,11 @@ export class AccountsService {
     }
   }
 
-  async FindAccountsByCode(codes): Promise<IAccount[]> {
+  async FindAccountsByCode(codes, user: IBaseUser): Promise<IAccount[]> {
     return await getCustomRepository(AccountRepository).find({
       where: {
         code: In(codes),
+        organizationId: user.organizationId,
       },
     });
   }
