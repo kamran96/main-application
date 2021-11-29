@@ -1,12 +1,11 @@
 import { DivProps } from './../../modal/html';
-import { IThemeProps } from "./../../hooks/useTheme/themeColors";
-import styled, { keyframes } from "styled-components";
-import convertToRem from "../../utils/convertToRem";
+import { IThemeProps } from './../../hooks/useTheme/themeColors';
+import styled, { keyframes } from 'styled-components';
+import convertToRem from '../../utils/convertToRem';
 
 export const ContentArea = styled.section`
   background: ${(props: IThemeProps) => props.theme.colors.layoutBg};
- 
- 
+
   transition: 0.4s all ease-in-out;
   /* margin-left: ${(props: IThemeProps) =>
     props?.theme?.toggle ? convertToRem(206) : convertToRem(65)}; */
@@ -29,40 +28,37 @@ export const ContentArea = styled.section`
     padding-top: ${convertToRem(40)};
   }
 
-  .unverified_topbar{
+  .unverified_topbar {
     height: 34px;
-  left: 0px;
-  right: 0px;
-  top: 0px;
-  width: 100%;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    width: 100%;
 
-  background: #c23934;
+    background: #c23934;
 
-  p {
-    font-style: normal;
-    font-weight: normal;
-    font-size: 12px;
-    line-height: 18px;
-    /* identical to box height */
-
-
-    color: #ffffff;
-
-    .ant-btn-link {
+    p {
       font-style: normal;
-      font-weight: 600;
+      font-weight: normal;
       font-size: 12px;
       line-height: 18px;
       /* identical to box height */
 
-      text-transform: capitalize;
-
       color: #ffffff;
+
+      .ant-btn-link {
+        font-style: normal;
+        font-weight: 600;
+        font-size: 12px;
+        line-height: 18px;
+        /* identical to box height */
+
+        text-transform: capitalize;
+
+        color: #ffffff;
+      }
     }
   }
-  }
-
-  
 `;
 
 const animateRotate = keyframes`
@@ -75,8 +71,8 @@ const animateRotate = keyframes`
 
 `;
 
-interface IApplayoutWrapperProps extends DivProps{
-  darkModeLoading: boolean
+interface IApplayoutWrapperProps extends DivProps {
+  darkModeLoading: boolean;
 }
 
 export const WrapperApplayout = styled.div<IApplayoutWrapperProps>`
@@ -96,7 +92,7 @@ export const WrapperApplayout = styled.div<IApplayoutWrapperProps>`
     z-index: ${(props: IThemeProps) => (props.darkModeLoading ? 11111 : -1)};
     /* opacity: 1; */
     display: ${(props: IThemeProps) =>
-      props.darkModeLoading ? "flex" : "none"};
+      props.darkModeLoading ? 'flex' : 'none'};
     align-items: center;
     justify-content: center;
     color: ${(props: IThemeProps) => props.theme.colors.$BLACK};
@@ -112,9 +108,8 @@ export const WrapperApplayout = styled.div<IApplayoutWrapperProps>`
   }
 `;
 
-
-interface INewUserContentAreaProps extends DivProps{
-layoutChanged:boolean
+interface INewUserContentAreaProps extends DivProps {
+  layoutChanged: boolean;
 }
 
 export const NewUserContentArea = styled.div<INewUserContentAreaProps>`

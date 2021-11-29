@@ -32,7 +32,7 @@ export const TableTabs: FC<IProps> = ({
 } = defaultProps) => {
   const { routeHistory } = useGlobalContext();
   const onChangeTab = (key) => {
-    let location = routeHistory.location.pathname;
+    const location = routeHistory.location.pathname;
     routeHistory.history.push(`${location}?tabIndex=${key}`);
   };
 
@@ -72,29 +72,31 @@ const CustomizedTabs: any = styled(Tabs)`
     text-transform: uppercase;
     border: none;
     box-sizing: border-box;
-    border-radius: 5px;
+    border: 1px solid ${({ theme }: IThemeProps) => theme?.colors?.stroke} !important;
     margin-right: 8px !important;
-    border-radius: 5px !important;
     padding: ${convertToRem(10)} ${convertToRem(28)};
     transition: 0.3s all ease-in-out;
     .ant-tabs-tab-btn {
       font-style: normal;
       font-weight: normal;
       font-size: ${convertToRem(13)};
-      color: ${(props: IThemeProps)=> props?.theme?.colors?.$BLACK};
+      color: ${(props: IThemeProps) => props?.theme?.colors?.$BLACK};
     }
     &:hover {
-      background: ${(props: IThemeProps)=> props?.theme?.colors?.bgTh} !important;
+      border: 1px solid transparent !important;
+      background: ${(props: IThemeProps) =>
+        props?.theme?.colors?.bgTh} !important;
       .ant-tabs-tab-btn {
         color: ${Color.$WHITE};
       }
     }
   }
-  
+
   .ant-tabs-tab-active {
-    background: ${(props: IThemeProps)=> props?.theme?.colors?.bgTh} !important;
+    background: ${(props: IThemeProps) =>
+      props?.theme?.colors?.bgTh} !important;
     .ant-tabs-tab-btn {
-      color: white !important
+      color: white !important;
     }
   }
 `;

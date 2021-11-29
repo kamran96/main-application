@@ -122,6 +122,8 @@ export class ItemService {
               categoryId: itemDto.categoryId || item.categoryId,
               itemType: itemDto.itemType || item.itemType,
               isActive: itemDto.isActive || item.isActive,
+              hasInventory: itemDto.hasInventory || item.hasInventory,
+              hasCategory: itemDto.hasCategory || item.hasCategory,
               stock: itemDto.stock || item.stock,
               organizationId: item.organizationId,
               createdById: item.name,
@@ -152,6 +154,8 @@ export class ItemService {
           item.code = itemDto.code;
           item.barcode = itemDto.barcode;
           item.categoryId = itemDto.categoryId;
+          item.hasInventory = itemDto.hasInventory;
+          item.hasCategory = itemDto.hasCategory;
           item.itemType = itemDto.itemType;
           item.isActive = itemDto.isActive;
           item.stock = itemDto.stock;
@@ -210,6 +214,20 @@ export class ItemService {
       return await this.itemModel.find({
         importedItemId: { $in: data.payload },
       });
+    }
+  }
+
+  async ManageItemStock(data): Promise<void> {
+    for (const i of data.payload) {
+      const item = await this.itemModel.findById(i.itemId);
+
+      await this.itemModel.updateOne(
+        { _id: i.itemId },
+        {
+          stock:
+            i.type === 'decrease' ? item.stock - i.value : item.stock + i.value,
+        }
+      );
     }
   }
 

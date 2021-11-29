@@ -43,6 +43,12 @@ export class ContactController {
     }
   }
 
+  @Get('balance')
+  @UseGuards(GlobalAuthGuard)
+  async bal(@Req() req: IRequest) {
+    return await this.contactService.SyncContactBalances(req);
+  }
+
   @Post()
   @UseGuards(GlobalAuthGuard)
   async create(

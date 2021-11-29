@@ -1,42 +1,42 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* THIS PAGE BELONGS TO ALL PURCHASES ORDERS TAB */
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from 'react';
 import {
   queryCache,
   useMutation,
   usePaginatedQuery,
   useQuery,
-} from "react-query";
-import styled from "styled-components";
+} from 'react-query';
+import styled from 'styled-components';
 import {
   deletePurchaseDrafts,
   getAllContacts,
   getPoListAPI,
-} from "../../../../../api";
-import { CommonTable } from "../../../../../components/Table";
+} from '../../../../../api';
+import { CommonTable } from '../../../../../components/Table';
 import {
   IInvoiceResponse,
   IInvoiceTypes,
   INVOICETYPE,
   INVOICE_TYPE_STRINGS,
   ORDER_TYPE,
-} from "../../../../../modal/invoice";
-import convertToRem from "../../../../../utils/convertToRem";
-import { SmartFilter } from "../../../../../components/SmartFilter";
-import { ISupportedRoutes } from "../../../../../modal/routing";
-import { useGlobalContext } from "../../../../../hooks/globalContext/globalContext";
-import FilterSchema from "./PoFilterSchema";
-import { ConfirmModal } from "../../../../../components/ConfirmModal";
+} from '../../../../../modal/invoice';
+import convertToRem from '../../../../../utils/convertToRem';
+import { SmartFilter } from '../../../../../components/SmartFilter';
+import { ISupportedRoutes } from '../../../../../modal/routing';
+import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
+import FilterSchema from './PoFilterSchema';
+import { ConfirmModal } from '../../../../../components/ConfirmModal';
 import {
   IBaseAPIError,
   IContactType,
   IContactTypes,
   NOTIFICATIONTYPE,
-} from "../../../../../modal";
-import { PurchaseTopbar } from "./PurchaseTableTopbar";
-import { _csvExportable } from "./CommonCol";
-import { useRbac } from "../../../../../components/Rbac/useRbac";
-import { PERMISSIONS } from "../../../../../components/Rbac/permissions";
+} from '../../../../../modal';
+import { PurchaseTopbar } from './PurchaseTableTopbar';
+import { _csvExportable } from './CommonCol';
+import { useRbac } from '../../../../../components/Rbac/useRbac';
+import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
 
 interface IProps {
   columns?: any[];
@@ -45,9 +45,8 @@ interface IProps {
 export const ALLPurchasesList: FC<IProps> = ({ columns, activeTab }) => {
   /* HOOKS HERE */
   /* Mutations */
-  const [mutateDeleteOrders, resDeleteOrders] = useMutation(
-    deletePurchaseDrafts
-  );
+  const [mutateDeleteOrders, resDeleteOrders] =
+    useMutation(deletePurchaseDrafts);
 
   /* RBAC */
 
@@ -60,8 +59,8 @@ export const ALLPurchasesList: FC<IProps> = ({ columns, activeTab }) => {
   const [filterBar, setFilterbar] = useState(false);
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
-    query: "",
-    sortid: "",
+    query: '',
+    sortid: '',
     page_size: 10,
   });
   /* ********* DESTRUCTURING ALL INVOICESCONFIG *************** */
@@ -75,7 +74,7 @@ export const ALLPurchasesList: FC<IProps> = ({ columns, activeTab }) => {
 
   /*Query hook for  Fetching all accounts against ID */
   const { data: allContactsData } = useQuery(
-    [`all-contacts`, "ALL"],
+    [`all-contacts`, 'ALL'],
     getAllContacts
   );
   const allcontactsRes: IContactType[] =
@@ -83,7 +82,7 @@ export const ALLPurchasesList: FC<IProps> = ({ columns, activeTab }) => {
 
   useEffect(() => {
     if (allcontactsRes && allcontactsRes.length) {
-      let filteredSchema = {
+      const filteredSchema = {
         ...FilterSchema,
         contactId: {
           ...FilterSchema.contactId,
@@ -95,13 +94,11 @@ export const ALLPurchasesList: FC<IProps> = ({ columns, activeTab }) => {
       setFilteringSchema(filteredSchema);
     }
   }, [allcontactsRes]);
-  const [
-    { result, pagination },
-    setAllInvoicesRes,
-  ] = useState<IInvoiceResponse>({
-    result: [],
-    pagination: null,
-  });
+  const [{ result, pagination }, setAllInvoicesRes] =
+    useState<IInvoiceResponse>({
+      result: [],
+      pagination: null,
+    });
 
   useEffect(() => {
     if (
@@ -111,9 +108,9 @@ export const ALLPurchasesList: FC<IProps> = ({ columns, activeTab }) => {
       routeHistory.history.location.search
     ) {
       let obj = {};
-      let queryArr = history.location.search.split("?")[1].split("&");
+      const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
-        let split = item.split("=");
+        const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
 
@@ -160,15 +157,15 @@ export const ALLPurchasesList: FC<IProps> = ({ columns, activeTab }) => {
         onSuccess: () => {
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
-            "Deleted Successfully"
+            'Deleted Successfully'
           );
           [
-            "invoices",
-            "transactions",
-            "items?page",
-            "invoice-view",
-            "ledger-contact",
-            "all-items",
+            'invoices',
+            'transactions',
+            'items?page',
+            'invoice-view',
+            'ledger-contact',
+            'all-items',
           ].forEach((key) => {
             queryCache.invalidateQueries((q) =>
               q.queryKey[0].toString().startsWith(`${key}`)
@@ -200,12 +197,6 @@ export const ALLPurchasesList: FC<IProps> = ({ columns, activeTab }) => {
 
   const cols = [...columns];
 
-  cols.splice(2, 0, {
-    title: "Return",
-    dataIndex: "isReturn",
-    render: (data) => <>{data && data === true ? "Returned" : "-"}</>,
-  });
-
   const renerTopRightbar = () => {
     return (
       <div className="flex alignCenter">
@@ -215,7 +206,7 @@ export const ALLPurchasesList: FC<IProps> = ({ columns, activeTab }) => {
               ...allInvoicesConfig,
               query: encode,
             });
-            let route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=all&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
+            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=all&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
             history.push(route);
           }}
           onClose={() => setFilterbar(false)}
@@ -230,14 +221,13 @@ export const ALLPurchasesList: FC<IProps> = ({ columns, activeTab }) => {
   return (
     <ALlWrapper>
       <CommonTable
-       
         exportable
         exportableProps={{
           fields: _csvExportable,
-          fileName: "approved-purchases",
+          fileName: 'approved-purchases',
         }}
-        printTitle={"Approved Purchase Orders List"}
-        className={"border-top-none"}
+        printTitle={'Approved Purchase Orders List'}
+        className={'border-top-none'}
         hasPrint
         topbarRightPannel={renerTopRightbar()}
         customTopbar={
@@ -258,7 +248,7 @@ export const ALLPurchasesList: FC<IProps> = ({ columns, activeTab }) => {
               page: pagination.current,
               page_size: pagination.pageSize,
             });
-            let route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=all&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=all&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
             history.push(route);
           } else {
             setAllInvoicesConfig({
@@ -266,16 +256,16 @@ export const ALLPurchasesList: FC<IProps> = ({ columns, activeTab }) => {
               page: pagination.current,
               page_size: pagination.pageSize,
               sortid:
-                sorter && sorter.order === "descend"
+                sorter && sorter.order === 'descend'
                   ? `-${sorter.field}`
                   : sorter.field,
             });
-            let route = `/app${
+            const route = `/app${
               ISupportedRoutes.PURCHASES
             }?tabIndex=all&sortid=null&page=${pagination.current}&page_size=${
               pagination.pageSize
             }&query=${query}&sortid=${
-              sorter && sorter.order === "descend"
+              sorter && sorter.order === 'descend'
                 ? `-${sorter.field}`
                 : sorter.field
             }`;
@@ -285,9 +275,9 @@ export const ALLPurchasesList: FC<IProps> = ({ columns, activeTab }) => {
         totalItems={pagination && pagination.total}
         pagination={{
           showSizeChanger: true,
-          pageSizeOptions: ["10", "20", "50", "100"],
+          pageSizeOptions: ['10', '20', '50', '100'],
           pageSize: page_size,
-          position: ["bottomRight"],
+          position: ['bottomRight'],
           current: pagination?.page_no,
           total: pagination && pagination.total,
         }}

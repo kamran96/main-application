@@ -1,11 +1,11 @@
-import React, { FC, useEffect, useState } from "react";
-import { ColumnsType } from "antd/es/table";
-import styled from "styled-components";
-import { BoldText } from "../../../../components/Para/BoldText";
-import { CommonTable } from "../../../../components/Table";
-import { ITransactionItem, TransactionsType } from "../../../../modal";
-import { IAccountsResult } from "../../../../modal/accounts";
-import moneyFormat from "../../../../utils/moneyFormat";
+import React, { FC, useEffect, useState } from 'react';
+import { ColumnsType } from 'antd/es/table';
+import styled from 'styled-components';
+import { BoldText } from '../../../../components/Para/BoldText';
+import { CommonTable } from '../../../../components/Table';
+import { ITransactionItem, TransactionsType } from '../../../../modal';
+import { IAccountsResult } from '../../../../modal/accounts';
+import moneyFormat from '../../../../utils/moneyFormat';
 
 interface IProps {
   data: ITransactionItem[];
@@ -17,24 +17,24 @@ export const TransactionItemTable: FC<IProps> = ({ data, allAccounts }) => {
 
   useEffect(() => {
     if (data && data.length) {
-      let creditItems: any[] = data.filter(
+      const creditItems: any[] = data.filter(
         (trItem) => trItem.transactionType === TransactionsType.CREDIT
       );
-      let debitItems: any[] = data.filter(
+      const debitItems: any[] = data.filter(
         (trItem) => trItem.transactionType === TransactionsType.DEBIT
       );
 
-      let sumCredits = (creditItems.length > 0 &&
+      const sumCredits = (creditItems.length > 0 &&
         creditItems.reduce((a, b) => {
           return { amount: a.amount + b.amount };
         })) || { amount: 0 };
 
-      let sumDebits = (debitItems.length > 0 &&
+      const sumDebits = (debitItems.length > 0 &&
         debitItems.reduce((a, b) => {
           return { amount: a.amount + b.amount };
         })) || { amount: 0 };
 
-      let allData: any = [...data];
+      const allData: any = [...data];
       allData.push({
         isLastIndex: true,
         totalCredits: sumCredits.amount,
@@ -47,61 +47,61 @@ export const TransactionItemTable: FC<IProps> = ({ data, allAccounts }) => {
 
   const columns: ColumnsType<any> = [
     {
-      title: "Account",
-      dataIndex: "account",
-      key: "account",
+      title: 'Account',
+      dataIndex: 'account',
+      key: 'account',
       render: (itemData, row, index) => (
-        <>
+        <div>
           {row.isLastIndex ? (
             <BoldText>Total</BoldText>
           ) : (
             <>
-              {itemData.name} &nbsp;&nbsp;{" "}
+              {itemData.name} &nbsp;&nbsp;{' '}
               {row && row.bank && `(${row.bank.name})`}
             </>
           )}
-        </>
+        </div>
       ),
     },
     {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-      render: (data, row, index) => <>{data ? data : "-"}</>,
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
+      render: (data, row, index) => <>{data ? data : '-'}</>,
     },
     {
-      title: "Debit",
-      dataIndex: "amount",
-      key: "amount",
+      title: 'Debit',
+      dataIndex: 'amount',
+      key: 'amount',
       render: (data, row, index) => {
         return (
-          <>
+          <div>
             {row.isLastIndex ? (
               <BoldText>{moneyFormat(row.totalDebits)}</BoldText>
             ) : row.transactionType === TransactionsType.DEBIT ? (
               <> {moneyFormat(data)}</>
             ) : (
-              "-"
+              '-'
             )}
-          </>
+          </div>
         );
       },
     },
     {
-      title: "Credit",
-      dataIndex: "amount",
-      key: "amount",
+      title: 'Credit',
+      dataIndex: 'amount',
+      key: 'amount',
       render: (data, row, index) => {
         return (
-          <>
+          <div>
             {row.isLastIndex ? (
               <BoldText>{moneyFormat(row.totalCredits)}</BoldText>
             ) : row.transactionType === TransactionsType.CREDIT ? (
               <> {moneyFormat(data)}</>
             ) : (
-              "-"
+              '-'
             )}
-          </>
+          </div>
         );
       },
     },

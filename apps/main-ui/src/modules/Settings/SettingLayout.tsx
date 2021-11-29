@@ -1,17 +1,17 @@
-import React, { FC } from "react";
-import styled from "styled-components";
-import { Heading } from "../../components/Heading";
-import { renderRoutes, RouteConfigComponentProps } from "react-router-config";
-import convertToRem from "../../utils/convertToRem";
+import React, { FC } from 'react';
+import styled from 'styled-components';
+import { Heading } from '../../components/Heading';
+import { renderRoutes, RouteConfigComponentProps } from 'react-router-config';
+import convertToRem from '../../utils/convertToRem';
 import {
   ISettingRoutesSchema,
   settingRoutingScheam,
-} from "./utils/settingRoutingSchema";
-import { Link } from "react-router-dom";
-import Icon from "@iconify/react";
+} from './utils/settingRoutingSchema';
+import { Link } from 'react-router-dom';
+import Icon from '@iconify/react';
+import { ITheme, IThemeProps } from '@invyce/shared/invyce-theme';
 
 export const SettingLayout: FC = (props: RouteConfigComponentProps) => {
-
   return (
     <WrapperSettingLayout>
       <Heading type="container">Setting</Heading>
@@ -21,7 +21,7 @@ export const SettingLayout: FC = (props: RouteConfigComponentProps) => {
             {settingRoutingScheam.map(
               (route: ISettingRoutesSchema, index: number) => {
                 let activeRoute =
-                  props?.location?.pathname === route?.route ? "active" : "";
+                  props?.location?.pathname === route?.route ? 'active' : '';
 
                 return (
                   <li>
@@ -29,7 +29,7 @@ export const SettingLayout: FC = (props: RouteConfigComponentProps) => {
                       className={`flex alignCenter ${activeRoute} `}
                       to={route?.route}
                     >
-                      {" "}
+                      {' '}
                       <span className="flex alignCenter route-icon mr-10">
                         <Icon icon={route?.icon} />
                       </span>
@@ -77,12 +77,20 @@ const WrapperSettingLayout = styled.div`
         transition: 0.4s all ease-in-out;
       }
       li:hover a {
-        color: #090909;
-        background: #f5f5f5;
+        color: ${({ theme }: IThemeProps) =>
+          theme?.theme === 'dark'
+            ? theme?.colors?.sidebarListActiveText
+            : '#090909'};
+        background: ${({ theme }: IThemeProps) =>
+          theme?.theme === 'dark' ? theme?.colors?.sidebarListActive : '#fff'};
       }
       li a.active {
-        color: #090909;
-        background: #f5f5f5;
+        color: ${({ theme }: IThemeProps) =>
+          theme?.theme === 'dark'
+            ? theme?.colors?.sidebarListActiveText
+            : '#090909'};
+        background: ${({ theme }: IThemeProps) =>
+          theme?.theme === 'dark' ? theme?.colors?.sidebarListActive : '#fff'};
       }
     }
   }

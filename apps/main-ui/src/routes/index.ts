@@ -1,78 +1,75 @@
-import { Integrations } from "./../modules/Settings/Integrations/index";
-import { PermissionsSettingsContainer } from "./../modules/Rbac/Permisions/settings";
-import { PurchasesList } from "./../modules/Business/PurchaseOrder/PurchaseEntriesList/index";
-import { RouteConfig } from "react-router-config";
-import { RootLayout } from "../Layout/RootLayout";
-import { DefaultLayout } from "../Layout/DefaultLayout";
-import { Login } from "../Containers/Login/Login";
-import { RedirectToLogin } from "./RedirectToLogin";
-import { Register } from "../Containers/Register";
-import { DashboardLayout } from "../Layout/DashboardLayout";
-import { ISupportedRoutes } from "../modal/routing";
-import { ContactsContainer } from "../modules/Contacts";
-import { ContactsEditorWidget } from "../modules/Contacts/ContactsEditorWiget";
-import { TestComponents } from "./../Containers/TestComponents/index";
-import { BillsToPay } from "./../modules/Business/BillsToPay/index";
-import { Items } from "./../modules/Items/index";
-import { UsersContainer } from "./../modules/Users/index";
-import { Accounts } from "./../modules/Accounts/index";
-// import { ProfileSettings } from "../modules/Settings/ProfileSettings";
-import { AccountSettings } from "../modules/Settings/AccountSettings";
-import { GeneralPreferances } from "../modules/Settings/GeneralPreferances";
-import { InvoiceContainer } from "../modules/Invoice";
-import { PurchaseOrderContainer } from "../modules/Business/PurchaseOrder";
-import { PurchaseOrderEditorWidget } from "../modules/Business/PurchaseOrder/PurchaseOrderEditorWidget";
-import { TransactionContainer } from "../modules/Business/Transactions";
-import { QuotesContainer } from "../modules/Business/Quote";
-import { BillsEditorWidget } from "../modules/Business/BillsToPay/BillsEditorWidget";
-import { QuoteEditorWidget } from "../modules/Business/Quote/QuoteEditorWidget";
-import { AccountsLedger } from "../modules/Accounts/AccountsLedger";
-import { BankAccounts } from "../modules/Business/BankAccounts";
-import { TraialBalance } from "../modules/Business/TrialBalance";
-import { BalanceSheet } from "../modules/Accounts/BalanceSheet";
-import { ContactLedger } from "../modules/Contacts/ContactLedger";
-import { JournalEditor } from "../modules/Business/Transactions/TransactionEditorWidget";
-import { PaymentContainer } from "../modules/Payment";
-import { PurchaseEntryEditor } from "../modules/Business/PurchaseOrder/PurchaseEntry";
-import CategoriesRoot from "../modules/Categories";
-import { ItemsViewContainer } from "../modules/Items/ItemsList/ItemsView";
-import { DashboardContainer } from "../modules/Dashboard";
-import { InvoiceEditorWidget } from "../modules/Invoice/InvoiceEditorWidget";
-import { InvoiceView } from "../modules/Invoice/InvoiceView";
-import { PurchaseView } from "../modules/Business/PurchaseOrder/PurchaseOrderList/View";
-import { InvoiceDashboard } from "../modules/Invoice/InvoiceDashboard";
-import { DispatchingContainer } from "../modules/Dispatching";
-import { QuoteView } from "../modules/Business/Quote/QuoteView";
-import { PurchaseEntryView } from "../modules/Business/PurchaseOrder/PurchaseEntriesList/View";
-import { RbacContainer } from "../modules/Rbac";
-import { PermissionsContainer } from "../modules/Rbac/Permisions";
-import { PERMISSIONS } from "../components/Rbac/permissions";
-import { PermissionDenied } from "../components/PermissionDenied";
-import { IncomeStatement } from "../modules/Reports/IncomeStatement";
-import { CashActivityReport } from "../modules/Reports/CashActivityReport";
-import { SettingLayout } from "../modules/Settings/SettingLayout";
-import { SettingRoutes } from "../modules/Settings/utils/SettingRoutes";
-import { VerificationLayout } from "../Layout/VerificationLayout";
-import { VerifyQuickBooks } from "../modules/Settings/Integrations/Quickbooks/VerifyQuickbooks";
-import { VerifyXero } from "../modules/Settings/Integrations/Xero/VerifyXero";
-import { CreditNoteEditorWidget } from "../modules/Invoice/CreditNoteWidget";
-import { Import } from "../components/Import";
-import { JoinUser } from "../Containers/JoinUser";
-import { VerifyUser } from "../Containers/JoinUser/VerifyUser";
-import { CreditNoteList } from "../modules/Invoice/CreditNoteList";
-import { CreditNoteView } from "../modules/Invoice/CreditNoteList/View";
-import { VerifyGmail } from "../modules/Settings/Integrations/Gmail/VerifyGmail";
-import { OrganizationWidget } from "../Containers/AddOrganization/OrganizationWidget";
-import { ManageInventoryForm } from "../modules/Items/InventoryManagementForm";
-import { Organizations } from "../Containers/AddOrganization";
-import { ForgotPassowrdContainer } from "../Containers/ForgetPassword";
+import { Integrations } from './../modules/Settings/Integrations/index';
+import { PermissionsSettingsContainer } from './../modules/Rbac/Permisions/settings';
+import { PurchasesList } from './../modules/Business/PurchaseOrder/PurchaseEntriesList/index';
+import { RouteConfig } from 'react-router-config';
+import { RootLayout } from '../Layout/RootLayout';
+import { DefaultLayout } from '../Layout/DefaultLayout';
+import { Login } from '../Containers/Login/Login';
+import { RedirectToLogin } from './RedirectToLogin';
+import { Register } from '../Containers/Register';
+import { DashboardLayout } from '../Layout/DashboardLayout';
+import { ISupportedRoutes } from '../modal';
+import { ContactsContainer } from '../modules/Contacts';
+import { ContactsEditorWidget } from '../modules/Contacts/ContactsEditorWiget';
+import { TestComponents } from './../Containers/TestComponents/index';
+import { Items } from './../modules/Items/index';
+import { UsersContainer } from './../modules/Users/index';
+import { Accounts } from './../modules/Accounts/index';
+import { AccountSettings } from '../modules/Settings/AccountSettings';
+import { GeneralPreferances } from '../modules/Settings/GeneralPreferances';
+import { InvoiceContainer } from '../modules/Invoice';
+import { PurchaseOrderContainer } from '../modules/Business/PurchaseOrder';
+import { PurchaseOrderEditorWidget } from '../modules/Business/PurchaseOrder/PurchaseOrderEditorWidget';
+import { TransactionContainer } from '../modules/Business/Transactions';
+import { QuotesContainer } from '../modules/Business/Quote';
+import { QuoteEditorWidget } from '../modules/Business/Quote/QuoteEditorWidget';
+import { AccountsLedger } from '../modules/Accounts/AccountsLedger';
+import { BankAccounts } from '../modules/Business/BankAccounts';
+import { TraialBalance } from '../modules/Business/TrialBalance';
+import { BalanceSheet } from '../modules/Accounts/BalanceSheet';
+import { ContactLedger } from '../modules/Contacts/ContactLedger';
+import { JournalEditor } from '../modules/Business/Transactions/TransactionEditorWidget';
+import { PaymentContainer } from '../modules/Payment';
+import { PurchaseEntryEditor } from '../modules/Business/PurchaseOrder/PurchaseEntry';
+import CategoriesRoot from '../modules/Categories';
+import { ItemsViewContainer } from '../modules/Items/ItemsList/ItemsView';
+import { DashboardContainer } from '../modules/Dashboard';
+import { InvoiceEditorWidget } from '../modules/Invoice/InvoiceEditorWidget';
+import { InvoiceView } from '../modules/Invoice/InvoiceView';
+import { PurchaseView } from '../modules/Business/PurchaseOrder/PurchaseOrderList/View';
+import { InvoiceDashboard } from '../modules/Invoice/InvoiceDashboard';
+import { DispatchingContainer } from '../modules/Dispatching';
+import { QuoteView } from '../modules/Business/Quote/QuoteView';
+import { PurchaseEntryView } from '../modules/Business/PurchaseOrder/PurchaseEntriesList/View';
+import { RbacContainer } from '../modules/Rbac';
+import { PermissionsContainer } from '../modules/Rbac/Permisions';
+import { PERMISSIONS } from '../components/Rbac/permissions';
+import { PermissionDenied } from '../components/PermissionDenied';
+import { IncomeStatement } from '../modules/Reports/IncomeStatement';
+import { CashActivityReport } from '../modules/Reports/CashActivityReport';
+import { SettingLayout } from '../modules/Settings/SettingLayout';
+import { SettingRoutes } from '../modules/Settings/utils/SettingRoutes';
+import { VerificationLayout } from '../Layout/VerificationLayout';
+import { VerifyQuickBooks } from '../modules/Settings/Integrations/Quickbooks/VerifyQuickbooks';
+import { VerifyXero } from '../modules/Settings/Integrations/Xero/VerifyXero';
+import { CreditNoteEditorWidget } from '../modules/Invoice/CreditNoteWidget';
+import { Import } from '../components/Import';
+import { JoinUser } from '../Containers/JoinUser';
+import { VerifyUser } from '../Containers/JoinUser/VerifyUser';
+import { CreditNoteList } from '../modules/Invoice/CreditNoteList';
+import { CreditNoteView } from '../modules/Invoice/CreditNoteList/View';
+import { VerifyGmail } from '../modules/Settings/Integrations/Gmail/VerifyGmail';
+import { OrganizationWidget } from '../Containers/AddOrganization/OrganizationWidget';
+import { ManageInventoryForm } from '../modules/Items/InventoryManagementForm';
+import { Organizations } from '../Containers/AddOrganization';
+import { ForgotPassowrdContainer } from '../Containers/ForgetPassword';
 
-export const routes = (root = "/app"): RouteConfig[] => [
+export const routes = (root = '/app'): RouteConfig[] => [
   {
     component: RootLayout,
     routes: [
       {
-        path: "/verify",
+        path: '/verify',
         component: VerificationLayout,
         routes: [
           {
@@ -382,14 +379,7 @@ export const routes = (root = "/app"): RouteConfig[] => [
             restricted: true,
             permission: PERMISSIONS.QUOTATIONS_CREATE,
           },
-          {
-            path: `${root}${ISupportedRoutes.CREATE_BILL}`,
-            component: BillsEditorWidget,
-          },
-          {
-            path: `${root}${ISupportedRoutes.BILLS}`,
-            component: BillsToPay,
-          },
+
           {
             path: `${root}${ISupportedRoutes.BANK_ACCOUNTS}`,
             component: BankAccounts,
@@ -499,7 +489,7 @@ export const routes = (root = "/app"): RouteConfig[] => [
         ],
       },
       {
-        path: "/",
+        path: '/',
         component: RedirectToLogin,
       },
     ],

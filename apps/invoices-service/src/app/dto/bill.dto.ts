@@ -15,6 +15,7 @@ export class BillDto {
   indirectTax: number;
   isTaxIncluded: number;
   isReturn: boolean;
+  isNewRecord: boolean;
   comment: string;
   status: number;
   invoice_items: Array<BillItemsDto>;
@@ -30,6 +31,7 @@ class BillItemsDto {
   unitPrice: string;
   tax: string;
   total: number;
+  accountId: number;
   sequence: number;
   costOfGoodAmount: number;
 }

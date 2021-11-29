@@ -92,10 +92,7 @@ export class InvoiceController {
     @Req() req: IRequest
   ): Promise<IInvoiceWithResponse> {
     try {
-      const invoice = await this.invoiceService.CreateInvoice(
-        invoiceDto,
-        req.user
-      );
+      const invoice = await this.invoiceService.CreateInvoice(invoiceDto, req);
 
       if (invoice) {
         return {

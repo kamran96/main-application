@@ -1,37 +1,37 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button } from "antd";
-import React, { FC, lazy, Suspense, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import styled from "styled-components";
-import { FallBackLoader } from "../../../../components/FallBackLoader";
-import { Heading } from "../../../../components/Heading";
+import { Button } from 'antd';
+import React, { FC, lazy, Suspense, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
+import { FallBackLoader } from '../../../../components/FallBackLoader';
+import { Heading } from '../../../../components/Heading';
 
-import { TableTabs, TableTabsContent } from "../../../../components/TableTabs";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
-import { ISupportedRoutes } from "../../../../modal/routing";
-import AwaitingPurchaseList from "./List/AwaitingPayment";
-import { PurchaseOrderColumns } from "./List/CommonCol";
-import DueExpiredPurchases from "./List/DueExpired";
-import PaidPurchaseEntries from "./List/Paid";
+import { TableTabs, TableTabsContent } from '../../../../components/TableTabs';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { ISupportedRoutes } from '../../../../modal/routing';
+import AwaitingPurchaseList from './List/AwaitingPayment';
+import { PurchaseOrderColumns } from './List/CommonCol';
+import DueExpiredPurchases from './List/DueExpired';
+import PaidPurchaseEntries from './List/Paid';
 
 export const PurchasesList: FC = () => {
   /* Dynamic Imports */
-  const AllPurchases = lazy(() => import("./List/All"));
-  const DraftPurchases = lazy(() => import("./List/Draft"));
+  const AllPurchases = lazy(() => import('./List/All'));
+  const DraftPurchases = lazy(() => import('./List/Draft'));
 
-  const [activeTab, setActiveTab] = useState("");
+  const [activeTab, setActiveTab] = useState('');
   const { routeHistory } = useGlobalContext();
   const { search } = routeHistory.history.location;
   useEffect(() => {
     if (!activeTab) {
-      setActiveTab("all");
+      setActiveTab('all');
     }
   }, [activeTab]);
 
   useEffect(() => {
     if (search) {
-      let filterTab = search.split("?")[1].split("&")[0].split("=")[1];
-      if (filterTab !== null && filterTab !== "id") {
+      const filterTab = search.split('?')[1].split('&')[0].split('=')[1];
+      if (filterTab !== null && filterTab !== 'id') {
         if (activeTab !== filterTab) {
           setActiveTab(filterTab);
         }
@@ -43,7 +43,7 @@ export const PurchasesList: FC = () => {
     return (
       <Link to={`/app${ISupportedRoutes.CREATE_PURCHASE_Entry}`}>
         <Button type="primary" size="middle">
-          New Purchase Entry
+          New Bill
         </Button>
       </Link>
     );
@@ -52,7 +52,7 @@ export const PurchasesList: FC = () => {
   return (
     <WrapperList>
       <div className="pb-20">
-        <Heading type="table">Purchases</Heading>
+        <Heading type="table">Bills</Heading>
       </div>
       <TableTabs
         defaultkey={`${activeTab}`}
