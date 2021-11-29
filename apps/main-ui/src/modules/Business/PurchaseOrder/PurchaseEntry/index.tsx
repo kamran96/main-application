@@ -12,7 +12,16 @@ import { useGlobalContext } from '../../../../hooks/globalContext/globalContext'
 export const PurchaseEntryEditor: FC = () => {
   const { routeHistory } = useGlobalContext();
   const { location } = routeHistory;
-  const id = location && location.pathname.split('/app/purchase-entry/')[1];
+  console.log(
+    location,
+    `/app/${ISupportedRoutes.CREATE_PURCHASE_Entry}/`,
+    'location'
+  );
+  const id =
+    location &&
+    location.pathname.split(
+      `/app${ISupportedRoutes.CREATE_PURCHASE_Entry}/`
+    )[1];
 
   return (
     <WrapperPurchaseEntry>

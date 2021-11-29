@@ -56,8 +56,7 @@ export const TransactionItemTable: FC<IProps> = ({ data, allAccounts }) => {
             <BoldText>Total</BoldText>
           ) : (
             <>
-              {itemData.name} &nbsp;&nbsp;{' '}
-              {row && row.bank && `(${row.bank.name})`}
+              {itemData?.name} &nbsp;&nbsp; {row?.bank?.name}
             </>
           )}
         </div>

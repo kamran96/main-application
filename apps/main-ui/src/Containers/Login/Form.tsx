@@ -1,6 +1,6 @@
-import React, { FC, useEffect } from 'react';
+import { FC } from 'react';
 import styled from 'styled-components';
-import { Form, Input, Button, Row, Col } from 'antd';
+import { Form, Input, Button, Row, Col, Checkbox } from 'antd';
 import { FormLabel } from '../../components/FormLabel';
 import { useMutation } from 'react-query';
 import { LoginAPI } from '../../api';
@@ -10,56 +10,68 @@ import { updateToken } from '../../utils/http';
 import { ISupportedRoutes, NOTIFICATIONTYPE } from '../../modal';
 import { IBaseAPIError } from '../../modal/base';
 import { HeadingTemplate1 } from '../../components/HeadingTemplates';
-import Checkbox from 'antd/lib/checkbox/Checkbox';
-import { Link } from 'react-router-dom';
 import { BOLDTEXT } from '../../components/Para/BoldText';
 
 export const LoginForm: FC = () => {
   const [mutateLogin, responseMutateLogin] = useMutation(LoginAPI);
 
-  const {
-    notificationCallback,
-    routeHistory,
-    setAutherized,
-    handleLogin,
-  }: any = useGlobalContext();
+  const { notificationCallback, routeHistory, handleLogin }: any =
+    useGlobalContext();
   const { history } = routeHistory;
+  const [form] = Form.useForm();
 
   const onFinish = async (values) => {
-    try {
-      await mutateLogin(values, {
-        onSuccess: (data) => {
-          if(process.env.NODE_ENV==="production"){
-            handleLogin({
-              type: ILoginActions.LOGIN,
-              payload: { autherization: true }
-            });
-
-          }else{
-            handleLogin({
-              type: ILoginActions.LOGIN,
-              payload: data?.data,
-            });
-            updateToken(data?.data.access_token);
-
-          }
-          notificationCallback(
-            NOTIFICATIONTYPE.SUCCESS,
-            `Logged in SuccessFully`
-          );
-        },
-      });
-    } catch (errorRes: IBaseAPIError | any) {
-      if (errorRes && errorRes.response && errorRes.response.data) {
-        const { message } = errorRes.response.data;
-        notificationCallback(NOTIFICATIONTYPE.ERROR, `${message}`);
-      } else {
+    await mutateLogin(values, {
+      onSuccess: (data) => {
+        if (process.env.NODE_ENV === 'production') {
+          handleLogin({
+            type: ILoginActions.LOGIN,
+            payload: { autherization: true },
+          });
+        } else {
+          handleLogin({
+            type: ILoginActions.LOGIN,
+            payload: data?.data,
+          });
+          updateToken(data?.data.access_token);
+        }
         notificationCallback(
-          NOTIFICATIONTYPE.ERROR,
-          `Please check your internet connection`
+          NOTIFICATIONTYPE.SUCCESS,
+          `Logged in SuccessFully`
         );
-      }
-    }
+      },
+      onError: (errorRes: IBaseAPIError) => {
+        if (errorRes.response.data) {
+          if (errorRes?.response?.status === 404) {
+            form.setFields([
+              {
+                name: 'username',
+                value: values?.username,
+                errors: [`${errorRes?.response?.data?.message}`],
+              },
+            ]);
+          } else if (errorRes?.response?.status === 400) {
+            form.setFields([
+              {
+                name: 'password',
+                value: values?.password,
+                errors: [`${errorRes?.response?.data?.message}`],
+              },
+            ]);
+          } else {
+            notificationCallback(
+              NOTIFICATIONTYPE.ERROR,
+              `${errorRes?.response?.data?.message}`
+            );
+          }
+        } else {
+          notificationCallback(
+            NOTIFICATIONTYPE.ERROR,
+            `Please check your internet connection`
+          );
+        }
+      },
+    });
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -86,6 +98,7 @@ export const LoginForm: FC = () => {
           </Col>
         </Row>
         <Form
+          form={form}
           autoComplete="off"
           className="mt-20"
           initialValues={{ remember: true }}
