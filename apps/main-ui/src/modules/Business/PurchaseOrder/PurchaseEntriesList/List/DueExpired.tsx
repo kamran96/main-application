@@ -186,7 +186,9 @@ export const DueExpiredPurchases: FC<IProps> = ({ columns, activeTab }) => {
           }
         },
       });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   /* METHOD TO UPDATE SELECTED ROW OF TABLE */
