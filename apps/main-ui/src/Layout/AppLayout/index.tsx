@@ -15,6 +15,7 @@ import { ILoginActions } from '../../hooks/globalContext/globalManager';
 import { RoutingSchema } from '../../Schema/routingSchema';
 import { InvyceCmdPalette } from './CommandPalette';
 import { ContentArea, NewUserContentArea, WrapperApplayout } from './styles';
+import { ErrorBoundary } from '@invyce/error-boundry';
 
 interface IProps {
   children: ReactNode;
@@ -115,7 +116,9 @@ export const AppLayout: FC<IProps> = ({ children }) => {
                 </p>
               </div>
             )}
-            <main className="content">{children}</main>
+            <ErrorBoundary>
+              <main className="content">{children}</main>
+            </ErrorBoundary>
           </ContentArea>
         </section>
       ) : (
