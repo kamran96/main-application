@@ -1,6 +1,6 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Form, Input, Button, Row, Col } from 'antd';
+import { Form, Input, Button, Row, Col, Modal } from 'antd';
 import { FormLabel } from '../../components/FormLabel';
 import { useMutation } from 'react-query';
 import { LoginAPI } from '../../api';
@@ -13,6 +13,7 @@ import { HeadingTemplate1 } from '../../components/HeadingTemplates';
 import Checkbox from 'antd/lib/checkbox/Checkbox';
 import { Link } from 'react-router-dom';
 import { BOLDTEXT } from '../../components/Para/BoldText';
+import { CommonModal } from '../../components/Modal';
 
 export const LoginForm: FC = () => {
   const [mutateLogin, responseMutateLogin] = useMutation(LoginAPI);
@@ -29,19 +30,17 @@ export const LoginForm: FC = () => {
     try {
       await mutateLogin(values, {
         onSuccess: (data) => {
-          if(process.env.NODE_ENV==="production"){
+          if (process.env.NODE_ENV === 'production') {
             handleLogin({
               type: ILoginActions.LOGIN,
-              payload: { autherization: true }
+              payload: { autherization: true },
             });
-
-          }else{
+          } else {
             handleLogin({
               type: ILoginActions.LOGIN,
               payload: data?.data,
             });
             updateToken(data?.data.access_token);
-
           }
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
@@ -65,6 +64,8 @@ export const LoginForm: FC = () => {
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
+  //--------------------------------------------------------
+ 
 
   return (
     <LoginFormWrapper>
@@ -168,12 +169,25 @@ export const LoginForm: FC = () => {
             </Col>
           </Row>
         </Form>
+        
       </div>
     </LoginFormWrapper>
   );
 };
 
+
+
 export const LoginFormWrapper = styled.div`
+  .import-btn {
+    font: normal 13px/123% Roboto;
+    letter-spacing: 0.02em;
+    color: #3e3e3c;
+    padding: 8px 20px;
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 4px;
+    cursor: pointer;
+  }
   width: 100%;
   height: 100vh;
   padding: 0 90px;

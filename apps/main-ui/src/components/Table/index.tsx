@@ -1,5 +1,6 @@
 
 import printIcon from "@iconify-icons/bytesize/print";
+import downloadIcon from '@iconify/icons-bi/download';
 import {
   ExportTableButton,
   IExportFieldButtonProps,
@@ -40,6 +41,7 @@ interface IProps extends TableProps<any> {
   defaultTopbar?: boolean;
   columns?: ColumnsType<any> | any;
   hasPrint?: boolean;
+  hasImport?:boolean;
   topbarRightPannel?: ReactElement<any>;
   printTitle?: string;
   printColumns?: ColumnsType<any>;
@@ -80,6 +82,7 @@ export const CommonTable: FC<IProps> = ({
   pdfExportable,
   themeScroll,
   loading,
+  hasImport,
   tableType = "primary",
   ...rest
 } = defaultProps) => {
@@ -131,7 +134,7 @@ const printScrollconfig = { ...rest, scroll: {} };
     if(loading){
      
      setLoadingConfig(()=>{
-       let cols= columns?.map((col)=>{
+       const cols= columns?.map((col)=>{
          return {...col, render: ()=> <Skeleton title={false} paragraph={{rows:1}} active/>}
        })
  
@@ -157,13 +160,13 @@ const printScrollconfig = { ...rest, scroll: {} };
   /* ***********************COMPONENT UTILITY FUNCTIONS *************** */
   
   const onPrint = () => {
-    let printItem = printRef.current;
+    const printItem = printRef.current;
 
     printDiv(printItem);
   };
 
   const onPDF = () => {
-    let printItem = printRef.current;
+    const printItem = printRef.current;
 
     ConvertDivToPDFAndDownload(printItem);
   };
@@ -185,6 +188,15 @@ const printScrollconfig = { ...rest, scroll: {} };
                   </ExportTableButton>
                 </div>
               )}
+                {/* {hasImport && (
+                  <ButtonTag
+                  className="mr-10"
+                    onClick={onPrint}
+                    title="Import"
+                    size="middle"
+                    icon={downloadIcon}
+                  />
+                )} */}
               {hasPrint && (
                 <ButtonTag
                 className="mr-10"
