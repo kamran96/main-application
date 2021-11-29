@@ -1,10 +1,10 @@
-import http from "../utils/http";
+import http from '../utils/http';
 
 enum ACCOUNT {
   INDEX = `accounts/account`,
   RAILS_LIST = `accounts/account`,
   SECONDARY_ACCOUNTS = `accounts/account/secondary-accounts`,
-  CREATE_ACCOUNT = `accounts/account`
+  CREATE_ACCOUNT = `accounts/account`,
 }
 
 export const createUpdateAccountAPI = (payload) =>
@@ -32,8 +32,7 @@ export const getAllAccountsAPI = (
 export const getAllAccounts = (key?: string, purpose?: string) =>
   http.get(`${ACCOUNT.RAILS_LIST}?purpose=${purpose}`);
 
-export const getSecondaryAccounts = () =>
-  http.get(ACCOUNT.SECONDARY_ACCOUNTS);
+export const getSecondaryAccounts = () => http.get(ACCOUNT.SECONDARY_ACCOUNTS);
 
 export const getAccountByIDAPI = (key, id) =>
   http.get(`${ACCOUNT.INDEX}/${id}`);
@@ -47,8 +46,8 @@ export const getBankAccounts = () => http.get(`accounts/bank/account`);
 export const getAccountLedger = (
   key,
   id: number,
-  pageSize: number = 20,
-  page: number = 1,
+  pageSize = 20,
+  page = 1,
   query?: string
 ) => {
   let url = `${ACCOUNT.INDEX}/ledger/${id}?page_size=${pageSize}&page_no=${page}`;
@@ -63,5 +62,5 @@ export const getAccountLedger = (
 export const getRecentAccounts = (key?: string) =>
   http.get(`accounts/recent_accounts`);
 
-export const getAccountsByTypeAPI = (key?: string, type: string = "invoice") =>
-  http(`account?type=${type}`);
+export const getAccountsByTypeAPI = (key?: string, type = 'invoice') =>
+  http(`accounts/account/type?type=${type}`);

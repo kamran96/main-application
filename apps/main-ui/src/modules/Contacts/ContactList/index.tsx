@@ -1,36 +1,36 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button } from "antd";
-import React, { FC, lazy, Suspense, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Button } from 'antd';
+import React, { FC, lazy, Suspense, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
-import { Heading } from "../../../components/Heading";
-import { TableTabs, TableTabsContent } from "../../../components/TableTabs";
-import { ISupportedRoutes } from "../../../modal/routing";
-import { ContactMainWrapper } from "./styles";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { FallBackLoader } from "../../../components/FallBackLoader";
-import { Rbac } from "../../../components/Rbac/index";
-import { PERMISSIONS } from "../../../components/Rbac/permissions";
+import { Heading } from '../../../components/Heading';
+import { TableTabs, TableTabsContent } from '../../../components/TableTabs';
+import { ISupportedRoutes } from '../../../modal/routing';
+import { ContactMainWrapper } from './styles';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { FallBackLoader } from '../../../components/FallBackLoader';
+import { Rbac } from '../../../components/Rbac/index';
+import { PERMISSIONS } from '../../../components/Rbac/permissions';
 
 export const ContactList: FC = () => {
   /* DYNAMIC IMPORTS */
 
-  const Customers = lazy(() => import("./Customers"));
-  const Suppliers = lazy(() => import("./Suppliers"));
+  const Customers = lazy(() => import('./Customers'));
+  const Suppliers = lazy(() => import('./Suppliers'));
 
   const { routeHistory } = useGlobalContext();
-  const [activeTab, setActiveTab] = useState("");
+  const [activeTab, setActiveTab] = useState('');
   const { search } = routeHistory.history.location;
   useEffect(() => {
     if (!activeTab) {
-      setActiveTab("customers");
+      setActiveTab('customers');
     }
   }, []);
 
   useEffect(() => {
     if (search) {
-      const filterTab = search.split("?")[1].split("&")[0].split("=")[1];
-      if (filterTab !== null && filterTab !== "id") {
+      const filterTab = search.split('?')[1].split('&')[0].split('=')[1];
+      if (filterTab !== null && filterTab !== 'id') {
         if (activeTab !== filterTab) {
           setActiveTab(filterTab);
         }

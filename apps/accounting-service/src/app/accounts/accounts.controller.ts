@@ -55,6 +55,19 @@ export class AccountsController {
     }
   }
 
+  @Get('type')
+  @UseGuards(GlobalAuthGuard)
+  async accountWithType(@Query() { type }, @Req() req: IRequest) {
+    const account = await this.accountService.AccountWithType(type, req.user);
+    if (account) {
+      return {
+        message: 'Account Fetched successfull',
+        status: true,
+        result: account,
+      };
+    }
+  }
+
   @Get('/secondary-accounts')
   @UseGuards(GlobalAuthGuard)
   async secondaryAccounts(
@@ -191,8 +204,11 @@ export class AccountsController {
 
   @Post('codes')
   @UseGuards(GlobalAuthGuard)
-  async accountsByCodes(@Body() body: AccountCodesDto): Promise<IAccount[]> {
-    return await this.accountService.FindAccountsByCode(body.codes);
+  async accountsByCodes(
+    @Body() body: AccountCodesDto,
+    @Req() req: IRequest
+  ): Promise<IAccount[]> {
+    return await this.accountService.FindAccountsByCode(body.codes, req.user);
   }
 
   @Post('sync')

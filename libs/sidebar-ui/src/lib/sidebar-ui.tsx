@@ -41,7 +41,7 @@ interface IPopOverProps {
 const MenuPopOver: FC<IPopOverProps> = ({ route }) => {
   const history = useHistory();
 
-  let _activeIndex: any = route?.children?.findIndex(
+  const _activeIndex: any = route?.children?.findIndex(
     (i) => i?.route === history?.location?.pathname
   );
 
@@ -75,6 +75,7 @@ const MenuPopOver: FC<IPopOverProps> = ({ route }) => {
         placement="rightTop"
         content={content}
         title={false}
+        overlayClassName={'open_popover'}
       >
         <li
           className={`route_list_item_parent flex alignCenter pointer fs-14 ${
@@ -103,14 +104,13 @@ export const SidebarUi: FC<SidebarUiProps> = ({
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  let toggleCached: null | string = localStorage?.getItem('isToggle') || null;
+  const toggleCached: null | string = localStorage?.getItem('isToggle') || null;
 
-  useEffect(()=>{
-    if(toggleCached){
-        setSidebarOpen(JSON.parse(toggleCached))
+  useEffect(() => {
+    if (toggleCached) {
+      setSidebarOpen(JSON.parse(toggleCached));
     }
-  },[toggleCached])
-
+  }, [toggleCached]);
 
   return (
     <SidebarWrapper toggle={sidebarOpen}>
@@ -121,7 +121,7 @@ export const SidebarUi: FC<SidebarUiProps> = ({
         <span
           onClick={() => {
             setSidebarOpen(!sidebarOpen);
-            localStorage.setItem('isToggle', JSON.stringify(!sidebarOpen))
+            localStorage.setItem('isToggle', JSON.stringify(!sidebarOpen));
           }}
           className="collapse pointer"
         >
@@ -129,11 +129,14 @@ export const SidebarUi: FC<SidebarUiProps> = ({
         </span>
       </div>
       <hr className="mt-10" />
-      <div onClick={()=> {
-        if(activeUserInfo?.link){
-          history?.push(activeUserInfo.link);
-        }
-      }} className="sidebar-userinfo flex alignCenter pointer ph-10">
+      <div
+        onClick={() => {
+          if (activeUserInfo?.link) {
+            history?.push(activeUserInfo.link);
+          }
+        }}
+        className="sidebar-userinfo flex alignCenter pointer ph-10"
+      >
         <div className="avatar_area">
           {activeUserInfo?.userImage ? (
             <Avatar
@@ -142,7 +145,11 @@ export const SidebarUi: FC<SidebarUiProps> = ({
               src={activeUserInfo?.userImage}
             />
           ) : (
-            <Avatar  size={41} className="user_avatar flex alignCenter justifyCenter" icon={<UserOutlined size={28} />} />
+            <Avatar
+              size={41}
+              className="user_avatar flex alignCenter justifyCenter"
+              icon={<UserOutlined size={28} />}
+            />
           )}
         </div>
         <div className="sidebar_userinfo_detail ml-10  route_tag">
@@ -165,7 +172,7 @@ export const SidebarUi: FC<SidebarUiProps> = ({
           <ul className="route_list">
             {routes?.nestedRoutes?.map((parent, index) => {
               return (
-                <>
+                <div>
                   {parent?.children?.length ? (
                     <MenuPopOver route={parent} />
                   ) : (
@@ -189,7 +196,7 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                       </Link>
                     </li>
                   )}
-                </>
+                </div>
               );
             })}
           </ul>

@@ -16,9 +16,10 @@ import {
   IInvoiceWithResponse,
 } from '@invyce/interfaces';
 import {
+  EntryType,
   Integrations,
   PaymentModes,
-  XeroStatuses,
+  Statuses,
   XeroTypes,
 } from '@invyce/global-constants';
 import { BillItemRepository } from '../repositories/billItem.repository';
@@ -222,7 +223,7 @@ export class InvoiceService {
 
         for (const i of invoices) {
           const balance = balances.find((bal) => bal.id === i.id);
-          if (balance.invoice.balance > 0) {
+          if (balance.invoice.balance !== 0) {
             invoice_arr.push({
               ...i,
               paid_amount: balance.invoice.balance,
@@ -246,11 +247,17 @@ export class InvoiceService {
           },
           relations: ['invoiceItems'],
         });
+
+        for (const i of invoices) {
+          invoice_arr.push({
+            ...i,
+          });
+        }
       }
     }
 
     return {
-      result: invoice_arr.length > 0 ? invoice_arr : invoices,
+      result: invoice_arr,
       pagination: {
         total,
         total_pages: Math.ceil(total / ps),
@@ -263,7 +270,41 @@ export class InvoiceService {
     };
   }
 
-  async CreateInvoice(dto: InvoiceDto, data: IBaseUser): Promise<IInvoice> {
+  async CreateInvoice(dto: InvoiceDto, req: IRequest): Promise<IInvoice> {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const tokenType =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [tokenType]: value,
+      },
+    });
+
+    const accountCodesArray = ['15004', '20002'];
+    const { data: accounts } = await http.post(`accounts/account/codes`, {
+      codes: accountCodesArray,
+    });
+
+    const mapItemIds = dto.invoice_items.map((ids) => ids.itemId);
+
+    const { data: items } = await http.post(`items/item/ids`, {
+      ids: mapItemIds,
+    });
+
     if (dto && dto.isNewRecord === false) {
       // we need to update invoice
       const invoice: IInvoice = await getCustomRepository(
@@ -271,8 +312,8 @@ export class InvoiceService {
       ).findOne({
         where: {
           id: dto.id,
-          organizationId: data.organizationId,
-          branchId: data.branchId,
+          organizationId: req.user.organizationId,
+          branchId: req.user.branchId,
           status: 1,
         },
       });
@@ -297,7 +338,7 @@ export class InvoiceService {
           organizationId: invoice.organizationId,
           branchId: invoice.branchId,
           createdById: invoice.createdById,
-          updatedById: data.id,
+          updatedById: req.user.id,
           status: dto.status || invoice.status,
         }
       );
@@ -340,13 +381,15 @@ export class InvoiceService {
         indirectTax: dto.indirectTax,
         isTaxIncluded: dto.isTaxIncluded,
         comment: dto.comment,
-        organizationId: data.organizationId,
-        branchId: data.branchId,
-        createdById: data.id,
-        updatedById: data.id,
+        organizationId: req.user.organizationId,
+        branchId: req.user.branchId,
+        createdById: req.user.id,
+        updatedById: req.user.id,
         status: dto.status,
       });
 
+      const creditsArrray = [];
+      const itemLedgerArray = [];
       for (const item of dto.invoice_items) {
         await getCustomRepository(InvoiceItemRepository).save({
           itemId: item.itemId,
@@ -361,8 +404,76 @@ export class InvoiceService {
           total: item.total,
           status: 1,
         });
+
+        const itemDetail = items.find((i) => i.id === item.itemId);
+        if (itemDetail.hasInventory) {
+          itemLedgerArray.push({
+            itemId: item.itemId,
+            value: item.quantity,
+            targetId: invoice.id,
+            type: 'decrease',
+          });
+        }
+
+        const credit1 = {
+          amount: dto.netTotal,
+          account_id: item.accountId,
+        };
+        const credit2 = {
+          amount: dto.discount,
+          account_id: await accounts.find((i) => i.code === '20002').id,
+        };
+
+        if (dto.discount > 0) {
+          creditsArrray.push(credit1, credit2);
+        } else {
+          creditsArrray.push(credit1);
+        }
       }
 
+      if (invoice.status === Statuses.AUTHORISED) {
+        await http.post(`reports/inventory/manage`, {
+          payload: itemLedgerArray,
+        });
+
+        const debitsArray = [
+          {
+            account_id: accounts.find((i) => i.code === '15004').id,
+            amount: dto.grossTotal,
+          },
+        ];
+
+        const payload = {
+          dr: debitsArray,
+          cr: creditsArrray,
+          reference: dto.reference,
+          amount: dto.grossTotal,
+        };
+
+        const { data: transaction } = await http.post(
+          'accounts/transaction/api',
+          {
+            transactions: payload,
+          }
+        );
+
+        const paymentArr = [
+          {
+            ...invoice,
+            invoiceId: invoice.id,
+            balance: invoice.netTotal,
+            data: invoice.issueDate,
+            paymentType: PaymentModes.INVOICES,
+            transactionId: transaction.id,
+            entryType: EntryType.CREDIT,
+          },
+        ];
+
+        await http.post(`payments/payment/add`, {
+          payments: paymentArr,
+        });
+        await http.get(`contacts/contact/balance`);
+      }
       return invoice;
     }
   }
@@ -549,6 +660,29 @@ export class InvoiceService {
     req: IRequest,
     type: number
   ): Promise<IInvoice[]> {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const tokenType =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [tokenType]: value,
+      },
+    });
+
     if (type == PaymentModes.INVOICES) {
       const invoices = await getCustomRepository(InvoiceRepository).find({
         where: {
@@ -559,46 +693,20 @@ export class InvoiceService {
         },
       });
 
+      const invoiceIds = invoices?.map((i) => i.id);
       const inv_arr = [];
       if (invoices.length > 0) {
-        let token;
-        if (process.env.NODE_ENV === 'development') {
-          const header = req.headers?.authorization?.split(' ')[1];
-          token = header;
-        } else {
-          if (!req || !req.cookies) return null;
-          token = req.cookies['access_token'];
-        }
-
-        const type =
-          process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-        const value =
-          process.env.NODE_ENV === 'development'
-            ? `Bearer ${token}`
-            : `access_token=${token}`;
-
-        const invoiceIds = invoices?.map((i) => i.id);
-
-        const http = axios.create({
-          baseURL: 'http://localhost',
-          headers: {
-            [type]: value,
-          },
-        });
-
         const { data: payments } = await http.post(`payments/payment/invoice`, {
           ids: invoiceIds,
           type: 'INVOICE',
         });
-
         for (const inv of invoices) {
           const balance = payments.find((pay) => pay.id === inv.id);
           const newBalance = balance.invoice.balance.toString().split('-')[1];
           if (inv.netTotal != newBalance) {
             inv_arr.push({
               ...inv,
-              balance:
-                inv.netTotal + (balance.invoice.balance || 0) || inv.netTotal,
+              balance: inv.netTotal - newBalance || inv.netTotal,
             });
           }
         }
@@ -617,30 +725,7 @@ export class InvoiceService {
 
       const inv_arr = [];
       if (bills.length > 0) {
-        let token;
-        if (process.env.NODE_ENV === 'development') {
-          const header = req.headers?.authorization?.split(' ')[1];
-          token = header;
-        } else {
-          if (!req || !req.cookies) return null;
-          token = req.cookies['access_token'];
-        }
-
-        const type =
-          process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-        const value =
-          process.env.NODE_ENV === 'development'
-            ? `Bearer ${token}`
-            : `access_token=${token}`;
-
         const invoiceIds = bills?.map((i) => i.id);
-
-        const http = axios.create({
-          baseURL: 'http://localhost',
-          headers: {
-            [type]: value,
-          },
-        });
 
         const { data: payments } = await http.post(`payments/payment/invoice`, {
           ids: invoiceIds,
@@ -649,12 +734,13 @@ export class InvoiceService {
 
         for (const inv of bills) {
           const balance = payments.find((pay) => pay.id === inv.id);
-
-          inv_arr.push({
-            ...inv,
-            balance:
-              inv.netTotal + (balance.invoice.balance || 0) || inv.netTotal,
-          });
+          const newBalance = balance.invoice.balance;
+          if (inv.netTotal != newBalance) {
+            inv_arr.push({
+              ...inv,
+              balance: inv.netTotal - newBalance || inv.netTotal,
+            });
+          }
         }
       }
       return inv_arr;
@@ -749,7 +835,7 @@ export class InvoiceService {
           )._id,
           invoiceId: pay?.invoice?.invoiceID,
           paymentId: pay.paymentID,
-          status: XeroStatuses[`${pay.status}`],
+          status: Statuses[`${pay.status}`],
         });
       }
 
@@ -766,7 +852,7 @@ export class InvoiceService {
           currency: i.currencyCode,
           netTotal: i.subTotal,
           grossTotal: i.total,
-          status: XeroStatuses[`${i.status}`],
+          status: Statuses[`${i.status}`],
           importedCreditNoteId: i.creditNoteID,
           importedFrom: Integrations.XERO,
           organizationId: req.user.organizationId,
@@ -817,7 +903,7 @@ export class InvoiceService {
             organizationId: req.user.organizationId,
             createdById: req.user.id,
             updatedById: req.user.id,
-            status: XeroStatuses[`${inv.status}`],
+            status: Statuses[`${inv.status}`],
           });
 
           for (const j of inv.lineItems) {
@@ -876,7 +962,7 @@ export class InvoiceService {
             organizationId: req.user.organizationId,
             createdById: req.user.id,
             updatedById: req.user.id,
-            status: XeroStatuses[`${inv.status}`],
+            status: Statuses[`${inv.status}`],
           });
 
           for (const j of inv.lineItems) {

@@ -53,6 +53,9 @@
     "email-service": {
       "tags": []
     },
+    "error-boundry": {
+      "tags": []
+    },
     "exports-service": {
       "tags": []
     },

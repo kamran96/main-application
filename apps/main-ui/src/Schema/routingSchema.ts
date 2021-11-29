@@ -57,13 +57,8 @@ export const RoutingSchema: IRoutingSchema = {
         },
         {
           route: `${root}${ISupportedRoutes.PURCHASES}`,
-          tag: 'Purchases',
-          permission: PERMISSIONS.PURCHASES_INDEX,
-        },
-        {
-          route: `${root}${ISupportedRoutes.BILLS}`,
           tag: 'Bills',
-          // permission: PERMISSIONS.bill,
+          permission: PERMISSIONS.PURCHASES_INDEX,
         },
       ],
     },
