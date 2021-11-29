@@ -382,6 +382,28 @@
         }
       }
     },
+    "error-boundry": {
+      "root": "libs/error-boundry",
+      "sourceRoot": "libs/error-boundry/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["libs/error-boundry/**/*.{ts,tsx,js,jsx}"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/error-boundry"],
+          "options": {
+            "jestConfig": "libs/error-boundry/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "exports-service": {
       "root": "apps/exports-service",
       "sourceRoot": "apps/exports-service/src",
