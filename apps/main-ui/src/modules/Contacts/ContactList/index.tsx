@@ -29,7 +29,7 @@ export const ContactList: FC = () => {
 
   useEffect(() => {
     if (search) {
-      let filterTab = search.split("?")[1].split("&")[0].split("=")[1];
+      const filterTab = search.split("?")[1].split("&")[0].split("=")[1];
       if (filterTab !== null && filterTab !== "id") {
         if (activeTab !== filterTab) {
           setActiveTab(filterTab);

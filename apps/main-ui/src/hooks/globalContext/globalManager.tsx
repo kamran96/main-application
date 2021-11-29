@@ -32,7 +32,6 @@ const stylesheets = {
 
 const isProductionEnv = process.env.NODE_ENV === 'production' || false;
 
-console.log(isProductionEnv, 'what is dot env');
 
 const AUTH_CHECK_API = isProductionEnv ? CheckAuthAPI : CheckAuthAPIDev;
 
@@ -161,6 +160,10 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   const [rolePermissions, setRolePermissions] = useState<IRolePermissions[]>(
     []
   );
+
+  const [contactsImportConfig, setContactsImportConfig] = useState<IModalsConfig>({
+    visibility: true,
+  })
 
   const [verifiedModal, setVerifiedModal] = useState(false);
 
@@ -510,6 +513,10 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         },
         verifiedModal,
         setVerifiedModal,
+        contactsImportConfig,
+        setContactsImportConfig: (visibility: boolean) => {
+          setContactsImportConfig({ visibility });
+        }
       }}
     >
       <WrapperChildren>
