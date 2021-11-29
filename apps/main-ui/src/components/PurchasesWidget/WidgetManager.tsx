@@ -43,7 +43,7 @@ import convertToRem from '../../utils/convertToRem';
 import { calculateInvoice, totalDiscountInInvoice } from '../../utils/formulas';
 import moneyFormat from '../../utils/moneyFormat';
 import { useWindowSize } from '../../utils/useWindowSize';
-import CommonSelect, { Option } from '../CommonSelect';
+import { Option } from '../CommonSelect';
 import { Editable, EditableSelect } from '../Editable';
 import defaultItems, { defaultFormData, defaultPayment } from './defaultStates';
 import { invycePersist } from '@invyce/invyce-persist';
@@ -119,6 +119,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
       ? getPurchasesById
       : getInvoiceByIDAPI;
 
+  console.log(id, 'what is id');
+
   const [rowsErrors, setRowsErrors] = useState([]);
   const [width] = useWindowSize();
 
@@ -137,8 +139,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     dueDate: dayjs(),
     paymentType: null,
   });
-  const [accountRowSelectedIndex, setAccountRowSelectedIndex] = useState(null);
-  const [selectedIndex, setSelectedIndex] = useState(null);
 
   /* Antd antd form */
   /* And Form Hook */
@@ -418,9 +418,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
       render: (value, record, index) => {
         return (
           <EditableSelect
-            onClick={() => {
-              setSelectedIndex(index);
-            }}
             className={`border-less-select ${
               index === invoiceItems.length - 1 ? 'scrollIntoView' : ''
             }`}
@@ -768,7 +765,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
           render: (value, row, index) => {
             return (
               <EditableSelect
-                onClick={() => setAccountRowSelectedIndex(index)}
                 className={`border-less-select`}
                 value={{
                   value: value !== null ? value : '',

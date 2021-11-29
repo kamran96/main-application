@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState, ReactElement } from 'react';
-import { Input, InputNumber } from 'antd';
+import { Input, InputNumber, Tooltip } from 'antd';
 import { SizeType } from 'antd/lib/config-provider/SizeContext';
 import { ClickOutSide } from './../../utils/clickoutside';
 import { LiteralUnion } from 'antd/lib/_util/type';
@@ -110,13 +110,12 @@ export const Editable: FC<IProps> = ({
               }
             />
           ) : (
-            <div className="rendered-text" onClick={() => setIsEditable(true)}>
+            <div
+              className="rendered-text"
+              onClick={() => setIsEditable(true)}
+              title={inputVal ? inputVal : placeholder ? placeholder : ''}
+            >
               {inputVal ? inputVal : placeholder ? placeholder : 0}
-              <div className="tooltip">
-                <span>
-                  {inputVal ? inputVal : placeholder ? placeholder : 0}
-                </span>
-              </div>
             </div>
           )
         ) : isEditable ? (
@@ -137,14 +136,12 @@ export const Editable: FC<IProps> = ({
           />
         ) : (
           <div
+            title={inputVal ? inputVal : placeholder ? placeholder : ''}
             style={{ ...style, overflow: 'hidden' }}
             className="rendered-text"
             onClick={() => (!disabled ? setIsEditable(true) : null)}
           >
             {inputVal ? inputVal : placeholder}
-            <div className="tooltip">
-              <span>{inputVal ? inputVal : placeholder ? placeholder : 0}</span>
-            </div>
           </div>
         )}
       </WrapperEditable>
@@ -202,6 +199,7 @@ export const WrapperEditable = styled.div<WrapperProps>`
     text-overflow: ellipsis;
     white-space: nowrap;
     min-height: 32px;
+    position: relative;
     cursor: ${(props: WrapperProps) =>
       props.disabled ? 'not-allowed' : 'pointer'};
     .tooltip {
@@ -213,7 +211,8 @@ export const WrapperEditable = styled.div<WrapperProps>`
       z-index: 11111;
       padding: 3px 8px;
       color: #eaeaea;
-      &:after {
+
+      /* &:after {
         content: '';
         position: absolute;
         left: 0;
@@ -224,7 +223,7 @@ export const WrapperEditable = styled.div<WrapperProps>`
         background-color: #292929;
         margin: auto;
         transform: rotate(45deg);
-      }
+      } */
     }
   }
 
@@ -324,14 +323,12 @@ export const EditableSelect: FC<IEditableSelectProps> = ({
           </Select>
         ) : (
           <div
+            title={renderValue()}
             style={{ ...style, overflow: 'hidden' }}
             onClick={() => setIsEditable(true)}
             className="rendered-text"
           >
             {renderValue()}
-            <div className="tooltip">
-              <span>{renderValue()}</span>
-            </div>
           </div>
         )}
       </WrapperEditableSelect>

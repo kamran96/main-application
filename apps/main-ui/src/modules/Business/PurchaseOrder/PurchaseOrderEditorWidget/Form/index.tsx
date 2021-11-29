@@ -1,41 +1,42 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable array-callback-return */
-import React, { FC, useCallback, useEffect, useRef, useState } from "react";
-import { WrapperPurchaseOrderForm } from "./styles";
-import { Button, Row, Select, Col, Form, Input, Spin, Checkbox } from "antd";
-import { CommonTable } from "./../../../../../components/Table/index";
-import { FormLabel } from "../../../../../components/FormLabel";
-import { TableCard } from "../../../../../components/TableCard";
-import { getAllContacts, getPurchasesById } from "../../../../../api";
-import { queryCache, useMutation, useQuery } from "react-query";
-import { PItem } from "./PItem";
-import TextArea from "antd/lib/input/TextArea";
-import { Link } from "react-router-dom";
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { WrapperPurchaseOrderForm } from './styles';
+import { Button, Row, Select, Col, Form, Input, Spin, Checkbox } from 'antd';
+import { CommonTable } from './../../../../../components/Table/index';
+import { FormLabel } from '../../../../../components/FormLabel';
+import { TableCard } from '../../../../../components/TableCard';
+import { getAllContacts, getPurchasesById } from '../../../../../api';
+import { queryCache, useMutation, useQuery } from 'react-query';
+import { PItem } from './PItem';
+import TextArea from 'antd/lib/input/TextArea';
+import { Link } from 'react-router-dom';
 import {
   IContactType,
   IContactTypes,
   NOTIFICATIONTYPE,
-} from "../../../../../modal";
-import { useGlobalContext } from "../../../../../hooks/globalContext/globalContext";
-import { ISupportedRoutes } from "../../../../../modal/routing";
-import { DragableBodyRow } from "./draggable";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import update from "immutability-helper";
-import { createDndContext, DndProvider } from "react-dnd";
-import dayjs from "dayjs";
-import { DatePicker } from "../../../../../components/DatePicker";
-import { LoadingOutlined } from "@ant-design/icons";
-import { IItemsResult } from "../../../../../modal/items";
-import { PrintFormat } from "../../../../../components/PrintFormat";
-import { PrintViewPurchaseWidget } from "../../../../../components/PurchasesWidget/PrintViewPurchaseWidget";
-import printDiv, { DownloadPDF } from "../../../../../utils/Print";
-import { ConfirmModal } from "../../../../../components/ConfirmModal";
-import scrollIntoView from "scroll-into-view";
+} from '../../../../../modal';
+import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
+import { ISupportedRoutes } from '../../../../../modal/routing';
+import { DragableBodyRow } from './draggable';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import update from 'immutability-helper';
+import { createDndContext, DndProvider } from 'react-dnd';
+import dayjs from 'dayjs';
+import { DatePicker } from '../../../../../components/DatePicker';
+import { LoadingOutlined } from '@ant-design/icons';
+import { IItemsResult } from '../../../../../modal/items';
+import { PrintFormat } from '../../../../../components/PrintFormat';
+import { PrintViewPurchaseWidget } from '../../../../../components/PurchasesWidget/PrintViewPurchaseWidget';
+import printDiv, { DownloadPDF } from '../../../../../utils/Print';
+import { ConfirmModal } from '../../../../../components/ConfirmModal';
+import scrollIntoView from 'scroll-into-view';
 import {
   PurchaseOrderWidgetManager,
   usePurchaseOrderContext,
-} from "./PurchaseOrderWidgetManager";
-import { CreatePurchaseOrderAPI } from "../../../../../api/purchaseOrder";
+} from './PurchaseOrderWidgetManager';
+import { CreatePurchaseOrderAPI } from '../../../../../api/purchaseOrder';
+import { EditableTable } from '@invyce/editable-table';
 
 const RNDContext = createDndContext(HTML5Backend);
 const antIcon = <LoadingOutlined style={{ fontSize: 30 }} spin />;
@@ -48,31 +49,19 @@ interface IProps {
 
 const Editor: FC<IProps> = ({ id }) => {
   const [mutatePO, resPO] = useMutation(CreatePurchaseOrderAPI);
-  const {
-    notificationCallback,
-    handleUploadPDF,
-    routeHistory,
-    userDetails,
-  } = useGlobalContext();
+  const { notificationCallback, handleUploadPDF, routeHistory, userDetails } =
+    useGlobalContext();
   const { history } = routeHistory;
-  const { state, setState, columns, items, reset } = usePurchaseOrderContext();
+  const { state, setState, columns, reset, loading } =
+    usePurchaseOrderContext();
   const [contactList, setContactList] = useState<IContactType[]>([]);
 
   const [printModal, setPrintModal] = useState(false);
   const [status, setStatus] = useState(1);
 
-  const { data: purchaseViewData, isLoading: purchaseItemsFetching } = useQuery(
-    [`PO-view-${id}`, id],
-    getPurchasesById,
-    {
-      cacheTime: Infinity,
-      enabled: id,
-    }
-  );
-
   /*Query hook for  Fetching all accounts against ID */
   const { isLoading: allContactsLoading, data: contactsData } = useQuery(
-    [`all-contacts`, "ALL"],
+    [`all-contacts`, 'ALL'],
     getAllContacts,
     {
       cacheTime: Infinity,
@@ -91,33 +80,14 @@ const Editor: FC<IProps> = ({ id }) => {
 
   const Printref = useRef();
 
-  useEffect(() => {
-    if (
-      purchaseViewData &&
-      purchaseViewData.data &&
-      purchaseViewData.data.result
-    ) {
-      const { result } = purchaseViewData.data;
-      form.setFieldsValue({
-        ...result,
-        dueDate: dayjs(result.dueDate),
-        issueDate: dayjs(result.issueDate),
-      });
-      const { purchase_items } = result;
-      let sortedItems = purchase_items.sort((a, b) => {
-        return a.sequence - b.sequence;
-      });
-      setState(sortedItems);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [purchaseViewData]);
+  console.log(state, 'check state');
 
   const [form] = Form.useForm();
 
   /* Scroll to last added item */
 
   const handleScroll = () => {
-    let ele = document.querySelector(".scrollViewLastItem");
+    const ele = document.querySelector('.scrollViewLastItem');
     if (ele) {
       scrollIntoView(ele, {
         align: {
@@ -132,7 +102,7 @@ const Editor: FC<IProps> = ({ id }) => {
       return prev.concat({
         itemId: null,
         quantity: 1,
-        description: "",
+        description: '',
         index: prev.length,
       });
     });
@@ -153,13 +123,13 @@ const Editor: FC<IProps> = ({ id }) => {
 
     if (id) {
       queryCache.removeQueries(`PO-view-${id}`);
-      let route = history.location.pathname.split("/");
+      let route = history.location.pathname.split('/');
       if (route.length > 3) {
-        let removeIndex = route.length - 1;
+        const removeIndex = route.length - 1;
         route.splice(removeIndex, 1);
-        route = route.join("/");
+        route = route.join('/');
       } else {
-        route = route.join("/");
+        route = route.join('/');
       }
 
       history.push(route);
@@ -175,15 +145,15 @@ const Editor: FC<IProps> = ({ id }) => {
     const printItem = Printref.current;
     let email = ``;
 
-    let [filteredContact] =
+    const [filteredContact] =
       contactList && contactList.filter((cont) => cont.id === contactId);
 
     if (filteredContact) {
       email = filteredContact.email;
     }
 
-    let pdf = DownloadPDF(printItem);
-    let payload = {
+    const pdf = DownloadPDF(printItem);
+    const payload = {
       email,
       html: `${pdf}`,
       message,
@@ -196,13 +166,13 @@ const Editor: FC<IProps> = ({ id }) => {
   }, []);
 
   const onFinish = async (value) => {
-    let invId = id && typeof id === "string" ? parseInt(id) : id;
+    const invId = id && typeof id === 'string' ? parseInt(id) : id;
 
     let payload = {
       invoice: {
         ...value,
         status: value?.status?.status,
-        invoiceType: "PO",
+        invoiceType: 'PO',
         isNewRecord: true,
       },
       invoice_items: state.map((item, index) => {
@@ -224,7 +194,7 @@ const Editor: FC<IProps> = ({ id }) => {
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
             `Purchase Order ${
-              payload.invoice.status === 1 ? "Created" : "Saved"
+              payload.invoice.status === 1 ? 'Created' : 'Saved'
             }`
           );
           if (value.email_pdf) {
@@ -236,17 +206,17 @@ const Editor: FC<IProps> = ({ id }) => {
             {
               itemId: null,
               quantity: 0,
-              description: "",
+              description: '',
               index: 0,
             },
           ]);
           [
-            "invoices",
-            "transactions?page",
-            "items?page",
-            "invoice-view",
-            "ledger-contact",
-            "all-items",
+            'invoices',
+            'transactions?page',
+            'items?page',
+            'invoice-view',
+            'ledger-contact',
+            'all-items',
           ].forEach((key) => {
             queryCache.invalidateQueries((q) =>
               q.queryKey[0].toString().startsWith(key)
@@ -261,7 +231,7 @@ const Editor: FC<IProps> = ({ id }) => {
         },
       });
     } catch (error) {
-      notificationCallback(NOTIFICATIONTYPE.ERROR, "Purchase Order Failed ");
+      notificationCallback(NOTIFICATIONTYPE.ERROR, 'Purchase Order Failed ');
     }
   };
 
@@ -270,9 +240,9 @@ const Editor: FC<IProps> = ({ id }) => {
   };
 
   const handleAddItem = (id, index) => {
-    let allItems = [...state];
-    let filterIndex = state.findIndex((item) => item.itemId === id);
-    let lastIndex = allItems.length - 1;
+    const allItems = [...state];
+    const filterIndex = state.findIndex((item) => item.itemId === id);
+    const lastIndex = allItems.length - 1;
 
     if (state.length && filterIndex !== -1) {
       allItems[filterIndex].quantity = allItems[filterIndex].quantity + 1;
@@ -293,7 +263,7 @@ const Editor: FC<IProps> = ({ id }) => {
       allItems.push({
         itemId: id,
         quantity: 1,
-        description: "",
+        description: '',
         index: allItems.length,
       });
     }
@@ -301,7 +271,7 @@ const Editor: FC<IProps> = ({ id }) => {
       allItems.push({
         itemId: id,
         quantity: 1,
-        description: "",
+        description: '',
         index: allItems.length,
       });
     }
@@ -336,8 +306,8 @@ const Editor: FC<IProps> = ({ id }) => {
       <div ref={Printref} className="_visibleOnPrint">
         <PrintFormat>
           <PrintViewPurchaseWidget
-            heading={"Purchase Order"}
-            type={"PO"}
+            heading={'Purchase Order'}
+            type={'PO'}
             hideCalculation={true}
             data={
               (resPO &&
@@ -351,7 +321,7 @@ const Editor: FC<IProps> = ({ id }) => {
       </div>
       <TableCard>
         <Row gutter={24}>
-          <Col span={18}>
+          <Col span={24}>
             <div className="flex alignFEnd justifySpaceBetween pv-13">
               <div></div>
               <h4 className="bold m-reset">
@@ -372,13 +342,13 @@ const Editor: FC<IProps> = ({ id }) => {
                     <FormLabel>Vendor</FormLabel>
                     <Form.Item
                       name="contactId"
-                      rules={[{ required: true, message: "Required !" }]}
+                      rules={[{ required: true, message: 'Required !' }]}
                     >
                       <Select
                         loading={allContactsLoading}
                         size="middle"
                         showSearch
-                        style={{ width: "100%" }}
+                        style={{ width: '100%' }}
                         placeholder="Select Contact"
                         optionFilterProp="children"
                       >
@@ -396,7 +366,7 @@ const Editor: FC<IProps> = ({ id }) => {
                     <FormLabel>Issue Date</FormLabel>
                     <Form.Item
                       name="issueDate"
-                      rules={[{ required: true, message: "Required !" }]}
+                      rules={[{ required: true, message: 'Required !' }]}
                     >
                       <DatePicker
                         onChange={(val) =>
@@ -404,7 +374,7 @@ const Editor: FC<IProps> = ({ id }) => {
                             dueDate: val,
                           })
                         }
-                        style={{ width: "100%" }}
+                        style={{ width: '100%' }}
                         size="middle"
                       />
                     </Form.Item>
@@ -413,16 +383,16 @@ const Editor: FC<IProps> = ({ id }) => {
                     <FormLabel>Delivery Date</FormLabel>
                     <Form.Item
                       name="dueDate"
-                      rules={[{ required: true, message: "Required !" }]}
+                      rules={[{ required: true, message: 'Required !' }]}
                     >
                       <DatePicker
                         disabledDate={(current) => {
                           return (
                             current &&
-                            current < dayjs(form.getFieldValue("issueDate"))
+                            current < dayjs(form.getFieldValue('issueDate'))
                           );
                         }}
-                        style={{ width: "100%" }}
+                        style={{ width: '100%' }}
                         size="middle"
                       />
                     </Form.Item>
@@ -431,7 +401,7 @@ const Editor: FC<IProps> = ({ id }) => {
                     <FormLabel>Order Number</FormLabel>
                     <Form.Item
                       name="invoiceNumber"
-                      rules={[{ required: false, message: "Required !" }]}
+                      rules={[{ required: false, message: 'Required !' }]}
                     >
                       <Input disabled={true} size="middle" type="number" />
                     </Form.Item>
@@ -440,7 +410,7 @@ const Editor: FC<IProps> = ({ id }) => {
                     <FormLabel>Reference</FormLabel>
                     <Form.Item
                       name="reference"
-                      rules={[{ required: false, message: "Required !" }]}
+                      rules={[{ required: false, message: 'Required !' }]}
                     >
                       <Input size="middle" />
                     </Form.Item>
@@ -449,50 +419,32 @@ const Editor: FC<IProps> = ({ id }) => {
                     <FormLabel>Currency</FormLabel>
                     <Form.Item
                       name="currency"
-                      rules={[{ required: false, message: "Required !" }]}
+                      rules={[{ required: false, message: 'Required !' }]}
                     >
                       <Select
                         disabled
                         size="middle"
                         showSearch
-                        style={{ width: "100%" }}
+                        style={{ width: '100%' }}
                         placeholder="Select Currency"
                         optionFilterProp="children"
                       >
-                        {["PKR", " USD", " CND", "EUR"].map((curr, index) => {
+                        {['PKR', ' USD', ' CND', 'EUR'].map((curr, index) => {
                           return <Option value={curr}>{curr}</Option>;
                         })}
                       </Select>
                     </Form.Item>
                   </Col>
                 </Row>
-              </div>
-              <div className="table">
-                <DndProvider manager={manager.current.dragDropManager}>
-                  <CommonTable
-                    loading={purchaseItemsFetching}
-                    rowClassName={(record, index) =>
-                      `${
-                        index === state.length - 1 ? "scrollViewLastItem" : ""
-                      }`
-                    }
-                    size="middle"
+                <div className="table">
+                  <EditableTable
+                    loading={loading}
+                    dragable={(data) => setState(data)}
                     columns={columns}
-                    dataSource={state}
-                    pagination={false}
-                    components={components}
-                    scroll={{ y: 350 }}
-                    onRow={(record: any, index: any) => {
-                      let row: any = {
-                        index,
-                        moveRow,
-                      };
-                      return {
-                        ...row,
-                      };
-                    }}
+                    data={state}
+                    scrollable={{ offsetY: 400, offsetX: 0 }}
                   />
-                </DndProvider>
+                </div>
               </div>
               <div className="add_purcahseitem  pv-20">
                 <Button onClick={handleAddRow} type="default">
@@ -555,43 +507,6 @@ const Editor: FC<IProps> = ({ id }) => {
                 </Form.Item>
               </div>
             </Form>
-          </Col>
-          <Col span={6} className="_col_border_lft">
-            <div className="quick_access">
-              <p className="quick_access_head">Recommended items</p>
-              <div
-                className={`quick_item_wrapper ${
-                  items.itemsLoading ? "flex alignCenter justifyCenter" : ""
-                } `}
-              >
-                {items.itemsLoading ? (
-                  <div className="flex alignItems justifyCenter">
-                    <Spin indicator={antIcon} />
-                  </div>
-                ) : (
-                  <>
-                    {items?.data?.map((item: IItemsResult, index: number) => {
-                      if (index < 5) {
-                        return (
-                          <PItem
-                            key={index}
-                            title={item.name}
-                            stock={"5"}
-                            description={item.description}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleAddItem(item.id, index);
-                            }}
-                          />
-                        );
-                      }else{
-                        return null
-                      }
-                    })}
-                  </>
-                )}
-              </div>
-            </div>
           </Col>
         </Row>
       </TableCard>

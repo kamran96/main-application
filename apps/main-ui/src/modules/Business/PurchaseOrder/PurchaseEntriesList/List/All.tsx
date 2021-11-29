@@ -20,10 +20,10 @@ import {
   INVOICETYPE,
   INVOICE_TYPE_STRINGS,
   ORDER_TYPE,
-} from '../../../../../modal/invoice';
+  ISupportedRoutes,
+} from '../../../../../modal';
 import convertToRem from '../../../../../utils/convertToRem';
 import { SmartFilter } from '../../../../../components/SmartFilter';
-import { ISupportedRoutes } from '../../../../../modal/routing';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import FilterSchema from './PoFilterSchema';
 import { ConfirmModal } from '../../../../../components/ConfirmModal';
@@ -187,7 +187,9 @@ export const ALLPurchasesList: FC<IProps> = ({ columns, activeTab }) => {
           }
         },
       });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   /* METHOD TO UPDATE SELECTED ROW OF TABLE */

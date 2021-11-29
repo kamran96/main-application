@@ -1,41 +1,41 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from 'react';
 import {
   queryCache,
   useMutation,
   usePaginatedQuery,
   useQuery,
-} from "react-query";
-import styled from "styled-components";
+} from 'react-query';
+import styled from 'styled-components';
 
 import {
   deletePurchaseDrafts,
   getAllContacts,
   getPoListAPI,
-} from "../../../../../api";
-import { ConfirmModal } from "../../../../../components/ConfirmModal";
-import { SmartFilter } from "../../../../../components/SmartFilter";
-import { CommonTable } from "../../../../../components/Table";
-import { useGlobalContext } from "../../../../../hooks/globalContext/globalContext";
+} from '../../../../../api';
+import { ConfirmModal } from '../../../../../components/ConfirmModal';
+import { SmartFilter } from '../../../../../components/SmartFilter';
+import { CommonTable } from '../../../../../components/Table';
+import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import {
   IContactType,
   IContactTypes,
   IErrorMessages,
   IServerError,
   NOTIFICATIONTYPE,
-} from "../../../../../modal";
+} from '../../../../../modal';
 import {
   IInvoiceResponse,
   INVOICETYPE,
   INVOICE_TYPE_STRINGS,
   ORDER_TYPE,
-} from "../../../../../modal/invoice";
-import { ISupportedRoutes } from "../../../../../modal/routing";
-import FilterSchema from "./PoFilterSchema";
-import { PurchaseTopbar } from "./PurchaseTableTopbar";
-import { _csvExportable } from "./CommonCol";
-import { PERMISSIONS } from "../../../../../components/Rbac/permissions";
-import { useRbac } from "../../../../../components/Rbac/useRbac";
+  ISupportedRoutes,
+} from '../../../../../modal';
+import FilterSchema from './PoFilterSchema';
+import { PurchaseTopbar } from './PurchaseTableTopbar';
+import { _csvExportable } from './CommonCol';
+import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
+import { useRbac } from '../../../../../components/Rbac/useRbac';
 
 interface IProps {
   columns?: any[];
@@ -46,35 +46,32 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
   /* THIS MUTATION IS RESPONSIBLE FOR APPROVED DRAFT ORDERS */
 
   /* THIS MUTATION IS RESPONSIBLE FOR DELETE ORDERS */
-  const [mutateDeleteOrders, resDeleteOrders] = useMutation(
-    deletePurchaseDrafts
-  );
+  const [mutateDeleteOrders, resDeleteOrders] =
+    useMutation(deletePurchaseDrafts);
   /* COMPONENT STATE MANAGEMENT HOOKS */
   const [selectedRow, setSelectedRow] = useState([]);
   const [filterBar, setFilterbar] = useState(false);
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
-    query: "",
-    sortid: "",
+    query: '',
+    sortid: '',
     page_size: 10,
   });
   const { page, query, sortid, page_size } = allInvoicesConfig;
 
   const [confirmModal, setConfirmModal] = useState(false);
-  const [
-    { result, pagination },
-    setAllInvoicesRes,
-  ] = useState<IInvoiceResponse>({
-    result: [],
-    pagination: null,
-  });
+  const [{ result, pagination }, setAllInvoicesRes] =
+    useState<IInvoiceResponse>({
+      result: [],
+      pagination: null,
+    });
 
   const { rbac } = useRbac(null);
   const [filteringSchema, setFilteringSchema] = useState(FilterSchema);
 
   /*Query hook for  Fetching all accounts against ID */
   const { data: allContactsData } = useQuery(
-    [`all-contacts`, "ALL"],
+    [`all-contacts`, 'ALL'],
     getAllContacts
   );
   const allcontactsRes: IContactType[] =
@@ -82,7 +79,7 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
 
   useEffect(() => {
     if (allcontactsRes && allcontactsRes.length) {
-      let filteredSchema = {
+      const filteredSchema = {
         ...FilterSchema,
         contactId: {
           ...FilterSchema.contactId,
@@ -109,9 +106,9 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
       routeHistory.history.location.search
     ) {
       let obj = {};
-      let queryArr = history.location.search.split("?")[1].split("&");
+      const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
-        let split = item.split("=");
+        const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
 
@@ -142,12 +139,12 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
     };
     await mutateDeleteOrders(payload, {
       onSuccess: () => {
-        ["invoices", "invoice-view"].forEach((key) => {
+        ['invoices', 'invoice-view'].forEach((key) => {
           queryCache.invalidateQueries((q) =>
             q.queryKey[0].toString().startsWith(`${key}`)
           );
         });
-        notificationCallback(NOTIFICATIONTYPE.SUCCESS, "Deleted Successfully");
+        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Deleted Successfully');
 
         setSelectedRow([]);
         setConfirmModal(false);
@@ -199,7 +196,7 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
               ...allInvoicesConfig,
               query: encode,
             });
-            let route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=draft&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
+            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=draft&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
             history.push(route);
           }}
           onClose={() => setFilterbar(false)}
@@ -217,10 +214,10 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
         exportableProps={{
           fields: _csvExportable,
         }}
-        className={"border-top-none"}
+        className={'border-top-none'}
         topbarRightPannel={renerTopRightbar()}
         hasPrint
-        printTitle={"Draft Purchase Orders List"}
+        printTitle={'Draft Purchase Orders List'}
         customTopbar={
           <PurchaseTopbar
             disabled={!selectedRow.length}
@@ -230,7 +227,7 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
               setConfirmModal(true);
             }}
             onEdit={() => {
-              let id = selectedRow[0];
+              const id = selectedRow[0];
               history.push(
                 `/app${ISupportedRoutes.CREATE_PURCHASE_Entry}/${id}`
               );
@@ -248,7 +245,7 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
               page: pagination.current,
               page_size: pagination.pageSize,
             });
-            let route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=draft&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}`;
+            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=draft&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}`;
             history.push(route);
           } else {
             setAllInvoicesConfig({
@@ -256,16 +253,16 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
               page: pagination.current,
               page_size: pagination.pageSize,
               sortid:
-                sorter && sorter.order === "descend"
+                sorter && sorter.order === 'descend'
                   ? `-${sorter.field}`
                   : sorter.field,
             });
-            let route = `/app${
+            const route = `/app${
               ISupportedRoutes.PURCHASES
-            }?tabIndex=draft&sortid=null&page=${
-              pagination.current
-            }&page_size=${pagination.pageSize}&query=${query}&sortid=${
-              sorter && sorter.order === "descend"
+            }?tabIndex=draft&sortid=null&page=${pagination.current}&page_size=${
+              pagination.pageSize
+            }&query=${query}&sortid=${
+              sorter && sorter.order === 'descend'
                 ? `-${sorter.field}`
                 : sorter.field
             }`;
@@ -275,9 +272,9 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
         totalItems={pagination && pagination.total}
         pagination={{
           showSizeChanger: true,
-          pageSizeOptions: ["10", "20", "50", "100"],
+          pageSizeOptions: ['10', '20', '50', '100'],
           pageSize: page_size,
-          position: ["bottomRight"],
+          position: ['bottomRight'],
           current: pagination?.page_no,
           total: pagination && pagination.total,
         }}

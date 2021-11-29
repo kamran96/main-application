@@ -4,19 +4,19 @@ import React, {
   ReactElement,
   useContext,
   useState,
-} from "react";
-import { ColumnsType } from "antd/lib/table";
-import { Select } from "antd";
-import { Editable } from "../../../../../components/Editable";
-import { useQuery } from "react-query";
-import { getAllItems } from "../../../../../api";
-import deleteIcon from "@iconify/icons-carbon/delete";
-import convertToRem from "../../../../../utils/convertToRem";
-import { Color } from "../../../../../modal";
-import { SortableHandle } from "react-sortable-hoc";
-import { Icon } from "@iconify/react";
-import dotsGrid from "@iconify-icons/mdi/dots-grid";
-import { useShortcut } from "../../../../../hooks/useShortcut";
+} from 'react';
+import { ColumnsType } from 'antd/lib/table';
+import { Select } from 'antd';
+import { Editable, EditableSelect } from '../../../../../components/Editable';
+import { useQuery } from 'react-query';
+import { getAllItems } from '../../../../../api';
+import deleteIcon from '@iconify/icons-carbon/delete';
+import convertToRem from '../../../../../utils/convertToRem';
+import { Color } from '../../../../../modal';
+import { SortableHandle } from 'react-sortable-hoc';
+import { Icon } from '@iconify/react';
+import dotsGrid from '@iconify-icons/mdi/dots-grid';
+import { useShortcut } from '../../../../../hooks/useShortcut';
 
 const { Option } = Select;
 
@@ -24,9 +24,9 @@ let setStateTimeOut: any;
 
 const DragHandle = SortableHandle(() => (
   <Icon
-    style={{ cursor: "move", color: "#999", fontSize: 17 }}
+    style={{ cursor: 'move', color: '#999', fontSize: 17 }}
     icon={dotsGrid}
-    color={"#B1B1B1"}
+    color={'#B1B1B1'}
   />
 ));
 
@@ -43,39 +43,48 @@ export const PurchaseOrderWidgetManager: FC<IProps> = ({ children }) => {
     {
       itemId: null,
       quantity: 1,
-      description: "",
+      description: '',
       index: 0,
     },
   ]);
 
   const handleDelete = (index) => {
-    let allItems = [...state];
-    allItems.splice(index, 1);
-    setState(allItems);
+    setState((prev) => {
+      const allItems = [...prev];
+      allItems.splice(index, 1);
+      return allItems;
+    });
   };
   /*Query hook for  Fetching all items against ID */
-  const responseItems = useQuery([`all-items`, "ALL"], getAllItems);
-  const allItemsResult =
-    (responseItems.data &&
-      responseItems.data.data &&
-      responseItems.data.data.result) ||
-    [];
+  const {
+    data: itemsData,
+    isLoading: itemsLoading,
+    isError,
+    isFetched,
+  } = useQuery([`all-items`, 'ALL'], getAllItems);
+  const allItemsResult = itemsData?.data?.result || [];
+
+  console.log(state, 'what is state now');
 
   const handleAddRow = () => {
-    let allItems = [...state];
-    allItems.push({
-      itemId: null,
-      quantity: 1,
-      description: "",
-      index: allItems.length - 1,
+    setState((prev) => {
+      const allItems = [...prev];
+      allItems.push({
+        itemId: null,
+        quantity: 1,
+        description: '',
+        index: allItems.length - 1,
+      });
+      return allItems;
     });
-    setState(allItems);
   };
   const removeRowFromLastIndex = () => {
-    let allItems = [...state];
-    let lastIndex = allItems.length - 1;
-    allItems.splice(lastIndex, 1);
-    setState(allItems);
+    setState((prev) => {
+      const allItems = [...prev];
+      const lastIndex = allItems.length - 1;
+      allItems.splice(lastIndex, 1);
+      return allItems;
+    });
   };
 
   const ClearAll = () => {
@@ -83,54 +92,56 @@ export const PurchaseOrderWidgetManager: FC<IProps> = ({ children }) => {
       {
         itemId: null,
         quantity: 1,
-        description: "",
+        description: '',
         index: 0,
       },
     ]);
   };
 
-  useShortcut("i", handleAddRow);
-  useShortcut("b", removeRowFromLastIndex);
-  useShortcut("/", ClearAll);
+  useShortcut('i', handleAddRow);
+  useShortcut('b', removeRowFromLastIndex);
+  useShortcut('/', ClearAll);
 
   const getItemWithItemId = (id) => {
     if (allItemsResult && allItemsResult.length) {
-      let [filtered] = allItemsResult.filter((item) => item.id === id);
+      const [filtered] = allItemsResult.filter((item) => item.id === id);
 
       return filtered;
     }
   };
 
+  console.log(state, 'itemsdata');
+
   const columns: ColumnsType<any> = [
     {
-      title: "",
-      dataIndex: "sort",
+      title: '',
+      dataIndex: 'sort',
       width: 30,
-      className: "drag-visible",
+      className: 'drag-visible',
       render: () => <DragHandle />,
     },
     {
-      title: "#",
-      dataIndex: "key",
-      key: "key",
-      align: "center",
+      title: '#',
+      dataIndex: 'key',
+      key: 'key',
+      align: 'center',
       width: 50,
-      className: "drag-visible",
+      className: 'drag-visible',
       render: (value, record, index) => {
         return <>{index + 1}</>;
       },
     },
     {
       width: 200,
-      title: "Item",
-      dataIndex: "itemId",
-      className: "drag-visible",
-      key: "itemId",
+      title: 'Item',
+      dataIndex: 'itemId',
+      className: 'drag-visible',
+      key: 'itemId',
       render: (value, record, index) => {
         return (
-          <Select
+          <EditableSelect
             value={{
-              value: value !== null ? value : "",
+              value: value !== null ? value : '',
               label: `${
                 value !== null && allItemsResult.length
                   ? allItemsResult &&
@@ -138,28 +149,30 @@ export const PurchaseOrderWidgetManager: FC<IProps> = ({ children }) => {
                     `${getItemWithItemId(value).code} / ${
                       getItemWithItemId(value).name
                     }`
-                  : "Select Item"
+                  : 'Select Item'
               }`,
             }}
             size="middle"
-            style={{ width: "100%", minWidth: "180px" }}
+            style={{ width: '100%', minWidth: '180px' }}
             showSearch
             placeholder="Select Items"
             optionFilterProp="children"
             labelInValue={true}
             onChange={(val) => {
-              let allItems = [...state];
-              allItems[index] = { ...allItems[index], itemId: val.value };
-              setState(allItems);
+              console.log(val, 'value');
+              setState((prev) => {
+                prev[index] = { ...prev[index], itemId: val?.value };
+                return prev;
+              });
             }}
           >
             {allItemsResult.map((item, index) => {
-              let usedIds = [];
+              const usedIds = [];
               state.forEach((st) => {
                 if (st.itemId !== null) {
                   usedIds.push(st.itemId);
-                }else{
-                  return null
+                } else {
+                  return null;
                 }
               });
               if (!usedIds.includes(item.id)) {
@@ -168,75 +181,79 @@ export const PurchaseOrderWidgetManager: FC<IProps> = ({ children }) => {
                     {item.code} / {item.name}
                   </Option>
                 );
-              }else{
-                return null
+              } else {
+                return null;
               }
             })}
-          </Select>
+          </EditableSelect>
         );
       },
     },
     {
-      title: "Qty",
-      dataIndex: "quantity",
-      key: "quantity",
+      title: 'Qty',
+      dataIndex: 'quantity',
+      key: 'quantity',
       width: 100,
       render: (data, record, index) => {
         return (
           <Editable
             disabled={!record.itemId}
             onChange={(value) => {
-              let inputvalue = value;
+              const inputvalue = value;
               clearTimeout(setStateTimeOut);
 
               setStateTimeOut = setTimeout(() => {
-                let allItems = [...state];
-                allItems[index] = {
-                  ...allItems[index],
-                  quantity: inputvalue,
-                };
-                setState(allItems);
+                setState((prev) => {
+                  const allItems = [...prev];
+                  allItems[index] = {
+                    ...allItems[index],
+                    quantity: inputvalue,
+                  };
+                  return allItems;
+                });
               }, 300);
             }}
             type="number"
             placeholder="QTY"
             value={data}
-            size={"middle"}
+            size={'middle'}
           />
         );
       },
     },
     {
-      title: "description",
-      dataIndex: "description",
-      key: "description",
+      title: 'description',
+      dataIndex: 'description',
+      key: 'description',
       render: (data, record, index) => {
         return (
           <Editable
             disabled={!record.itemId}
             onChange={(e) => {
-              let value = e.target.value;
+              const value = e.target.value;
               clearTimeout(setStateTimeOut);
               setStateTimeOut = setTimeout(() => {
-                let allItems = [...state];
-                allItems[index] = {
-                  ...allItems[index],
-                  description: value,
-                };
-                setState(allItems);
+                setState((prev) => {
+                  const allItems = [...prev];
+                  allItems[index] = {
+                    ...allItems[index],
+                    description: value,
+                  };
+                  return allItems;
+                });
               }, 300);
             }}
             placeholder="Description"
             value={data}
-            size={"middle"}
+            size={'middle'}
           />
         );
       },
     },
     {
-      title: "",
-      dataIndex: "",
-      key: "",
+      title: '',
+      dataIndex: '',
+      key: '',
       width: 50,
       render: (data, record, index) => {
         return (
@@ -245,7 +262,7 @@ export const PurchaseOrderWidgetManager: FC<IProps> = ({ children }) => {
               style={{
                 fontSize: convertToRem(20),
                 color: Color.$GRAY,
-                cursor: "pointer",
+                cursor: 'pointer',
               }}
               icon={deleteIcon}
             />
@@ -261,16 +278,13 @@ export const PurchaseOrderWidgetManager: FC<IProps> = ({ children }) => {
         state,
         setState,
         columns,
-        items: {
-          data: allItemsResult,
-          itemsLoading: responseItems.isLoading,
-        },
+        loading: itemsLoading,
         reset: () => {
           setState([
             {
               itemId: null,
               quantity: 1,
-              description: "",
+              description: '',
               index: 0,
             },
           ]);
