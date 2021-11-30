@@ -219,15 +219,31 @@ export class ItemService {
 
   async ManageItemStock(data): Promise<void> {
     for (const i of data.payload) {
-      const item = await this.itemModel.findById(i.itemId);
+      if (i.action === 'create') {
+        const item = await this.itemModel.findById(i.itemId);
 
-      await this.itemModel.updateOne(
-        { _id: i.itemId },
-        {
-          stock:
-            i.type === 'decrease' ? item.stock - i.value : item.stock + i.value,
-        }
-      );
+        await this.itemModel.updateOne(
+          { _id: i.itemId },
+          {
+            stock:
+              i.type === 'decrease'
+                ? item.stock - i.value
+                : item.stock + i.value,
+          }
+        );
+      } else if (i.action === 'delete') {
+        const item = await this.itemModel.findById(i.itemId);
+
+        await this.itemModel.updateOne(
+          { _id: i.itemId },
+          {
+            stock:
+              i.type === 'decrease'
+                ? item.stock + i.value
+                : item.stock - i.value,
+          }
+        );
+      }
     }
   }
 
