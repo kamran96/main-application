@@ -21,6 +21,7 @@ import {
 import { useQuery } from 'react-query';
 import { SortableHandle } from 'react-sortable-hoc';
 import styled from 'styled-components';
+
 import {
   getAllContacts,
   getAllItems,
@@ -49,7 +50,11 @@ import {
 } from '../../../../utils/formulas';
 import moneyFormat from '../../../../utils/moneyFormat';
 import { useWindowSize } from '../../../../utils/useWindowSize';
-import defaultItems, { defaultFormData, defaultPayment } from './defaultStates';
+import defaultItems, {
+  defaultFormData,
+  defaultPayment,
+  Requires,
+} from './defaultStates';
 import c from './keys';
 
 export const PurchaseContext: any = createContext({});
@@ -348,6 +353,10 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
     return filtered;
   };
+
+  // const handleCheckValidation = ()=>{
+
+  // }
 
   const columns: ColumnsType<any> = useMemo(() => {
     return [

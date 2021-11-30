@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 import { Heading } from '../../../components/Heading';
 import { TableTabs, TableTabsContent } from '../../../components/TableTabs';
-import { ISupportedRoutes } from '../../../modal/routing';
+import { ISupportedRoutes } from '../../../modal';
 import { ContactMainWrapper } from './styles';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { FallBackLoader } from '../../../components/FallBackLoader';

@@ -64,8 +64,6 @@ export const PurchaseOrderWidgetManager: FC<IProps> = ({ children }) => {
   } = useQuery([`all-items`, 'ALL'], getAllItems);
   const allItemsResult = itemsData?.data?.result || [];
 
-  console.log(state, 'what is state now');
-
   const handleAddRow = () => {
     setState((prev) => {
       const allItems = [...prev];
@@ -109,8 +107,6 @@ export const PurchaseOrderWidgetManager: FC<IProps> = ({ children }) => {
       return filtered;
     }
   };
-
-  console.log(state, 'itemsdata');
 
   const columns: ColumnsType<any> = [
     {
@@ -161,9 +157,18 @@ export const PurchaseOrderWidgetManager: FC<IProps> = ({ children }) => {
             onChange={(val) => {
               console.log(val, 'value');
               setState((prev) => {
-                prev[index] = { ...prev[index], itemId: val?.value };
-                return prev;
+                const allItems = [...prev];
+                allItems?.splice(index, 1, {
+                  ...record,
+                  itemId: val?.value,
+                });
+
+                return allItems;
               });
+              // setState((prev) => {
+              //   prev[index] = { ...prev[index], itemId: val?.value };
+              //   return prev;
+              // });
             }}
           >
             {allItemsResult.map((item, index) => {
@@ -275,6 +280,7 @@ export const PurchaseOrderWidgetManager: FC<IProps> = ({ children }) => {
   return (
     <PurchaseOrderContext.Provider
       value={{
+        addRow: handleAddRow,
         state,
         setState,
         columns,

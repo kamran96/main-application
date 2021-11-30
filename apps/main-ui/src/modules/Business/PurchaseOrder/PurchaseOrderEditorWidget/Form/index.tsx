@@ -1,63 +1,48 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable array-callback-return */
-import { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { WrapperPurchaseOrderForm } from './styles';
-import { Button, Row, Select, Col, Form, Input, Spin, Checkbox } from 'antd';
-import { CommonTable } from './../../../../../components/Table/index';
-import { FormLabel } from '../../../../../components/FormLabel';
-import { TableCard } from '../../../../../components/TableCard';
-import { getAllContacts, getPurchasesById } from '../../../../../api';
-import { queryCache, useMutation, useQuery } from 'react-query';
-import { PItem } from './PItem';
+import { EditableTable } from '@invyce/editable-table';
+import { Button, Checkbox, Col, Form, Input, Row, Select, Card } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
+import dayjs from 'dayjs';
+import { FC, useEffect, useRef, useState } from 'react';
+import { queryCache, useMutation, useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
+
+import { getAllContacts } from '../../../../../api';
+import { CreatePurchaseOrderAPI } from '../../../../../api/purchaseOrder';
+import { ConfirmModal } from '../../../../../components/ConfirmModal';
+import { DatePicker } from '../../../../../components/DatePicker';
+import { FormLabel } from '../../../../../components/FormLabel';
+import { PrintFormat } from '../../../../../components/PrintFormat';
+import { PrintViewPurchaseWidget } from '../../../../../components/PurchasesWidget/PrintViewPurchaseWidget';
+import { TableCard } from '../../../../../components/TableCard';
+import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import {
   IContactType,
   IContactTypes,
   NOTIFICATIONTYPE,
 } from '../../../../../modal';
-import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import { ISupportedRoutes } from '../../../../../modal/routing';
-import { DragableBodyRow } from './draggable';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import update from 'immutability-helper';
-import { createDndContext, DndProvider } from 'react-dnd';
-import dayjs from 'dayjs';
-import { DatePicker } from '../../../../../components/DatePicker';
-import { LoadingOutlined } from '@ant-design/icons';
-import { IItemsResult } from '../../../../../modal/items';
-import { PrintFormat } from '../../../../../components/PrintFormat';
-import { PrintViewPurchaseWidget } from '../../../../../components/PurchasesWidget/PrintViewPurchaseWidget';
 import printDiv, { DownloadPDF } from '../../../../../utils/Print';
-import { ConfirmModal } from '../../../../../components/ConfirmModal';
-import scrollIntoView from 'scroll-into-view';
 import {
   PurchaseOrderWidgetManager,
   usePurchaseOrderContext,
 } from './PurchaseOrderWidgetManager';
-import { CreatePurchaseOrderAPI } from '../../../../../api/purchaseOrder';
-import { EditableTable } from '@invyce/editable-table';
-
-const RNDContext = createDndContext(HTML5Backend);
-const antIcon = <LoadingOutlined style={{ fontSize: 30 }} spin />;
+import { WrapperPurchaseOrderForm } from './styles';
 
 const { Option } = Select;
-
 interface IProps {
   id?: number | string;
 }
 
 const Editor: FC<IProps> = ({ id }) => {
-  const [mutatePO, resPO] = useMutation(CreatePurchaseOrderAPI);
-  const { notificationCallback, handleUploadPDF, routeHistory, userDetails } =
-    useGlobalContext();
-  const { history } = routeHistory;
-  const { state, setState, columns, reset, loading } =
-    usePurchaseOrderContext();
-  const [contactList, setContactList] = useState<IContactType[]>([]);
-
+  /* LOCAL STATE */
   const [printModal, setPrintModal] = useState(false);
   const [status, setStatus] = useState(1);
+
+  /* ******** API CALL STAKE ************ */
+  const [mutatePO, resPO] = useMutation(CreatePurchaseOrderAPI);
+  const [contactList, setContactList] = useState<IContactType[]>([]);
 
   /*Query hook for  Fetching all accounts against ID */
   const { isLoading: allContactsLoading, data: contactsData } = useQuery(
@@ -67,6 +52,17 @@ const Editor: FC<IProps> = ({ id }) => {
       cacheTime: Infinity,
     }
   );
+
+  /* ********* API CALL STAKE ENDS HERE *******/
+
+  /* GLOBAL CONTEXT (GLOBAL STATE) */
+  const { notificationCallback, handleUploadPDF, routeHistory, userDetails } =
+    useGlobalContext();
+  const { history } = routeHistory;
+
+  /* WIDGET CONTEXT */
+  const { state, setState, columns, reset, loading, addRow } =
+    usePurchaseOrderContext();
 
   useEffect(() => {
     if (contactsData && contactsData.data && contactsData.data.result) {
@@ -80,37 +76,9 @@ const Editor: FC<IProps> = ({ id }) => {
 
   const Printref = useRef();
 
-  console.log(state, 'check state');
-
   const [form] = Form.useForm();
 
   /* Scroll to last added item */
-
-  const handleScroll = () => {
-    const ele = document.querySelector('.scrollViewLastItem');
-    if (ele) {
-      scrollIntoView(ele, {
-        align: {
-          top: 0,
-        },
-      });
-    }
-  };
-
-  const handleAddRow = () => {
-    setState((prev) => {
-      return prev.concat({
-        itemId: null,
-        quantity: 1,
-        description: '',
-        index: prev.length,
-      });
-    });
-  };
-
-  useEffect(() => {
-    handleScroll();
-  }, [state.length]);
 
   const ClearAll = () => {
     form.resetFields();
@@ -188,6 +156,10 @@ const Editor: FC<IProps> = ({ id }) => {
         invoice: { ...payload.invoice, id: invId, isNewRecord: false },
       };
     }
+
+    console.log(payload);
+
+    return false;
     try {
       await mutatePO(payload, {
         onSuccess: () => {
@@ -239,68 +211,6 @@ const Editor: FC<IProps> = ({ id }) => {
     console.log(errorInfo);
   };
 
-  const handleAddItem = (id, index) => {
-    const allItems = [...state];
-    const filterIndex = state.findIndex((item) => item.itemId === id);
-    const lastIndex = allItems.length - 1;
-
-    if (state.length && filterIndex !== -1) {
-      allItems[filterIndex].quantity = allItems[filterIndex].quantity + 1;
-
-      // allItems.splice(filterIndex, 1, {
-      //   ...state[filterIndex],
-      //   quantity: allItems[filterIndex].quantity + 1,
-      // });
-    }
-    if (state.length && state[lastIndex].itemId === null) {
-      allItems.splice(lastIndex, 1, {
-        ...state[lastIndex],
-        itemId: id,
-        quantity: 1,
-      });
-    }
-    if (state.length && filterIndex === -1 && state[lastIndex].itemId) {
-      allItems.push({
-        itemId: id,
-        quantity: 1,
-        description: '',
-        index: allItems.length,
-      });
-    }
-    if (!state.length) {
-      allItems.push({
-        itemId: id,
-        quantity: 1,
-        description: '',
-        index: allItems.length,
-      });
-    }
-    setState(allItems);
-  };
-
-  const components = {
-    body: {
-      row: DragableBodyRow,
-    },
-  };
-
-  const moveRow: any = useCallback(
-    (dragIndex, hoverIndex) => {
-      const dragRow = state[dragIndex];
-      setState(
-        update(state, {
-          $splice: [
-            [dragIndex, 1],
-            [hoverIndex, 0, dragRow],
-          ],
-        })
-      );
-    },
-    [state]
-  );
-
-  const manager = useRef(RNDContext);
-
   return (
     <WrapperPurchaseOrderForm>
       <div ref={Printref} className="_visibleOnPrint">
@@ -319,7 +229,7 @@ const Editor: FC<IProps> = ({ id }) => {
           />
         </PrintFormat>
       </div>
-      <TableCard>
+      <Card>
         <Row gutter={24}>
           <Col span={24}>
             <div className="flex alignFEnd justifySpaceBetween pv-13">
@@ -445,11 +355,11 @@ const Editor: FC<IProps> = ({ id }) => {
                     scrollable={{ offsetY: 400, offsetX: 0 }}
                   />
                 </div>
-              </div>
-              <div className="add_purcahseitem  pv-20">
-                <Button onClick={handleAddRow} type="default">
-                  Add new purchase item
-                </Button>
+                <div className="add_purcahseitem  pv-20">
+                  <Button onClick={addRow} type="default">
+                    Add new purchase item
+                  </Button>
+                </div>
               </div>
               <Col span={12}>
                 <div className="pv-10">
@@ -509,7 +419,7 @@ const Editor: FC<IProps> = ({ id }) => {
             </Form>
           </Col>
         </Row>
-      </TableCard>
+      </Card>
       <ConfirmModal
         visible={printModal}
         onCancel={onCancelPrint}
