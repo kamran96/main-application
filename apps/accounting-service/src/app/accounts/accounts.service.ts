@@ -19,7 +19,6 @@ import {
   ISecondaryAccount,
 } from '@invyce/interfaces';
 import { AccountDto, AccountIdsDto } from '../dto/account.dto';
-import { userInfo } from 'os';
 
 @Injectable()
 export class AccountsService {
@@ -180,7 +179,9 @@ export class AccountsService {
         PrimaryAccountRepository
       ).find({
         select: ['id'],
-        where: { name: In(['assets', 'equity', 'liability', 'income']) },
+        where: {
+          name: In(['asset', 'expense', 'liability', 'revenue']),
+        },
       });
 
       const mapPrimaryAccounts = primaryAccounts.map((p) => p.id);
@@ -197,7 +198,7 @@ export class AccountsService {
         PrimaryAccountRepository
       ).find({
         select: ['id'],
-        where: { name: In(['assets', 'expense', 'liability', 'income']) },
+        where: { name: In(['asset']) },
       });
 
       const mapPrimaryAccounts = primaryAccounts.map((p) => p.id);
@@ -285,7 +286,6 @@ export class AccountsService {
     const { page_size, page_no, sort, query } = queryData;
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
-    console.log('okkkkk');
     let sql = `
             SELECT transaction_items.*, (
               select date from transactions

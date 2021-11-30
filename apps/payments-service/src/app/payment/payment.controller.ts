@@ -18,6 +18,7 @@ import {
   IPayment,
 } from '@invyce/interfaces';
 import {
+  DeletePaymentDto,
   PaymentContactDto,
   PaymentDto,
   PaymentInvoiceDto,
@@ -97,5 +98,17 @@ export class PaymentController {
   @UseGuards(GlobalAuthGuard)
   async addPayment(@Body() body, @Req() req: IRequest): Promise<void> {
     return await this.paymentService.AddPayment(body, req.user);
+  }
+
+  @Post('delete')
+  @UseGuards(GlobalAuthGuard)
+  async deletePaymentAgainstInvoiceOrBillId(
+    @Body() body: DeletePaymentDto,
+    @Req() req: IRequest
+  ) {
+    return await this.paymentService.DeletePaymentAgainstInvoiceOrBillId(
+      body,
+      req
+    );
   }
 }

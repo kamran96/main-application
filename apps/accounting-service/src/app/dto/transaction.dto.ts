@@ -39,3 +39,7 @@ class EntryData {
 export class ParamsDto {
   id: number;
 }
+
+export class DeleteTransactionsDto {
+  ids: Array<number>;
+}

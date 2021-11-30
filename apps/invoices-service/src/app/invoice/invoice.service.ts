@@ -305,7 +305,9 @@ export class InvoiceService {
       ids: mapItemIds,
     });
 
-    if (dto && dto.isNewRecord === false) {
+    const creditsArrray = [];
+    const itemLedgerArray = [];
+    if (dto?.isNewRecord === false) {
       // we need to update invoice
       const invoice: IInvoice = await getCustomRepository(
         InvoiceRepository
@@ -314,7 +316,6 @@ export class InvoiceService {
           id: dto.id,
           organizationId: req.user.organizationId,
           branchId: req.user.branchId,
-          status: 1,
         },
       });
 
@@ -329,7 +330,7 @@ export class InvoiceService {
           discount: dto.discount || invoice.discount,
           grossTotal: dto.grossTotal || invoice.grossTotal,
           netTotal: dto.netTotal || invoice.netTotal,
-          date: dto.date || invoice.date,
+          date: dto.issueDate || invoice.date,
           invoiceType: dto.invoiceType || invoice.invoiceType,
           directTax: dto.directTax || invoice.directTax,
           indirectTax: dto.indirectTax || invoice.indirectTax,
@@ -361,8 +362,88 @@ export class InvoiceService {
           total: item.total,
           status: 1,
         });
+
+        const itemDetail = items.find((i) => i.id === item.itemId);
+        if (itemDetail.hasInventory) {
+          itemLedgerArray.push({
+            itemId: item.itemId,
+            value: item.quantity,
+            targetId: invoice.id,
+            type: 'decrease',
+            action: 'create',
+          });
+        }
+
+        const credit1 = {
+          amount: item.total,
+          account_id: item.accountId,
+        };
+        const credit2 = {
+          amount: dto.discount,
+          account_id: await accounts.find((i) => i.code === '20002').id,
+        };
+
+        if (dto?.discount > 0) {
+          creditsArrray.push(credit1, credit2);
+        } else {
+          creditsArrray.push(credit1);
+        }
       }
 
+      const updatedInvoice: IInvoice = await getCustomRepository(
+        InvoiceRepository
+      ).findOne({
+        where: {
+          id: dto.id,
+          organizationId: req.user.organizationId,
+        },
+      });
+
+      if (updatedInvoice.status === Statuses.AUTHORISED) {
+        await http.post(`reports/inventory/manage`, {
+          payload: itemLedgerArray,
+        });
+
+        const debitsArray = [
+          {
+            account_id: await accounts.find((i) => i.code === '15004').id,
+            amount: dto.grossTotal,
+          },
+        ];
+
+        const payload = {
+          dr: debitsArray,
+          cr: creditsArrray,
+          type: 'invoice',
+          reference: dto.reference,
+          amount: dto.grossTotal,
+          status: updatedInvoice.status,
+        };
+
+        const { data: transaction } = await http.post(
+          'accounts/transaction/api',
+          {
+            transactions: payload,
+          }
+        );
+
+        const paymentArr = [
+          {
+            ...updatedInvoice,
+            invoiceId: invoice.id,
+            balance: invoice.netTotal,
+            data: invoice.issueDate,
+            paymentType: PaymentModes.INVOICES,
+            transactionId: transaction.id,
+            entryType: EntryType.CREDIT,
+          },
+        ];
+
+        await http.post(`payments/payment/add`, {
+          payments: paymentArr,
+        });
+        await http.get(`contacts/contact/balance`);
+      }
       return invoice;
     } else {
       // we need to create invoice
@@ -375,12 +456,12 @@ export class InvoiceService {
         discount: dto.discount,
         grossTotal: dto.grossTotal,
         netTotal: dto.netTotal,
-        date: dto.date,
+        date: dto.issueDate,
         invoiceType: dto.invoiceType,
-        directTax: dto.directTax,
-        indirectTax: dto.indirectTax,
-        isTaxIncluded: dto.isTaxIncluded,
-        comment: dto.comment,
+        // directTax: dto.directTax,
+        // indirectTax: dto.indirectTax,
+        isTaxIncluded: dto?.isTaxIncluded,
+        comment: dto?.comment,
         organizationId: req.user.organizationId,
         branchId: req.user.branchId,
         createdById: req.user.id,
@@ -388,8 +469,6 @@ export class InvoiceService {
         status: dto.status,
       });
 
-      const creditsArrray = [];
-      const itemLedgerArray = [];
       for (const item of dto.invoice_items) {
         await getCustomRepository(InvoiceItemRepository).save({
           itemId: item.itemId,
@@ -412,11 +491,12 @@ export class InvoiceService {
             value: item.quantity,
             targetId: invoice.id,
             type: 'decrease',
+            action: 'create',
           });
         }
 
         const credit1 = {
-          amount: dto.netTotal,
+          amount: item.total,
           account_id: item.accountId,
         };
         const credit2 = {
@@ -424,7 +504,7 @@ export class InvoiceService {
           account_id: await accounts.find((i) => i.code === '20002').id,
         };
 
-        if (dto.discount > 0) {
+        if (dto?.discount > 0) {
           creditsArrray.push(credit1, credit2);
         } else {
           creditsArrray.push(credit1);
@@ -438,7 +518,7 @@ export class InvoiceService {
 
         const debitsArray = [
           {
-            account_id: accounts.find((i) => i.code === '15004').id,
+            account_id: await accounts.find((i) => i.code === '15004').id,
             amount: dto.grossTotal,
           },
         ];
@@ -446,8 +526,10 @@ export class InvoiceService {
         const payload = {
           dr: debitsArray,
           cr: creditsArrray,
+          type: 'invoice',
           reference: dto.reference,
           amount: dto.grossTotal,
+          status: invoice.status,
         };
 
         const { data: transaction } = await http.post(
@@ -549,7 +631,6 @@ export class InvoiceService {
         where: {
           organizationId: user.organizationId,
           branchId: user.branchId,
-          status: 1,
           invoiceNumber: ILike(`%INV-${new Date().getFullYear()}%`),
         },
         order: {
@@ -572,7 +653,6 @@ export class InvoiceService {
         where: {
           organizationId: user.organizationId,
           branchId: user.branchId,
-          status: 1,
           invoiceNumber: ILike(`%BILL-${new Date().getFullYear()}%`),
         },
         order: {
@@ -597,7 +677,6 @@ export class InvoiceService {
         where: {
           organizationId: user.organizationId,
           branchId: user.branchId,
-          status: 1,
           invoiceNumber: ILike(`%CN-${new Date().getFullYear()}%`),
         },
         order: {
@@ -644,12 +723,98 @@ export class InvoiceService {
     console.log(data.data);
   }
 
-  async deleteInvoice(invoiceIds: InvoiceIdsDto): Promise<boolean> {
+  async deleteInvoice(
+    invoiceIds: InvoiceIdsDto,
+    req: IRequest
+  ): Promise<boolean> {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const tokenType =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [tokenType]: value,
+      },
+    });
+
+    const itemLedgerArray = [];
+    const itemArray = [];
     for (const i of invoiceIds.ids) {
+      const invoice_items = await getCustomRepository(
+        InvoiceItemRepository
+      ).find({
+        where: { invoiceId: i },
+      });
+
+      const mapItemIds = invoice_items.map((ids) => ids.itemId);
+      const { data: items } = await http.post(`items/item/ids`, {
+        ids: mapItemIds,
+      });
+      itemArray.push(items);
+    }
+
+    const newItemArray = itemArray.flat();
+    for (const i of invoiceIds.ids) {
+      const invoice = await getCustomRepository(InvoiceRepository).findOne({
+        where: {
+          id: i,
+        },
+      });
+
       await getCustomRepository(InvoiceRepository).update(
         { id: i },
         { status: 0 }
       );
+
+      const invoice_items = await getCustomRepository(
+        InvoiceItemRepository
+      ).find({
+        where: { invoiceId: i },
+      });
+
+      for (const j of invoice_items) {
+        await getCustomRepository(InvoiceItemRepository).update(
+          { invoiceId: i },
+          { status: 0 }
+        );
+
+        if (invoice.status === Statuses.AUTHORISED) {
+          const itemDetail = newItemArray.find((i) => i.id === j.itemId);
+          if (itemDetail.hasInventory) {
+            itemLedgerArray.push({
+              itemId: j.itemId,
+              value: j.quantity,
+              targetId: i,
+              type: 'decrease',
+              action: 'delete',
+            });
+          }
+        }
+      }
+    }
+
+    if (itemLedgerArray.length > 0) {
+      await http.post('payments/payment/delete', {
+        ids: invoiceIds.ids,
+        type: PaymentModes.INVOICES,
+      });
+
+      await http.post(`reports/inventory/manage`, {
+        payload: itemLedgerArray,
+      });
     }
 
     return true;

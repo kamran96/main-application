@@ -270,17 +270,18 @@ export class BillService {
       },
     });
 
-    const accountCodesArray = ['15002', '50003'];
+    const accountCodesArray = ['40001', '50003'];
     const { data: accounts } = await http.post(`accounts/account/codes`, {
       codes: accountCodesArray,
     });
 
     const mapItemIds = dto.invoice_items.map((ids) => ids.itemId);
-
     const { data: items } = await http.post(`items/item/ids`, {
       ids: mapItemIds,
     });
 
+    const itemLedgerArray = [];
+    const debitsArrray = [];
     if (dto?.isNewRecord === false) {
       const bill: IBill = await getCustomRepository(BillRepository).findOne({
         where: {
@@ -332,6 +333,87 @@ export class BillService {
           total: item.total,
           status: 1,
         });
+
+        const itemDetail = items.find((i) => i.id === item.itemId);
+        if (itemDetail.hasInventory) {
+          itemLedgerArray.push({
+            itemId: item.itemId,
+            value: item.quantity,
+            targetId: bill.id,
+            type: 'increase',
+            action: 'create',
+          });
+        }
+
+        const debit1 = {
+          amount: item.total,
+          account_id: item.accountId,
+        };
+        const debit2 = {
+          amount: dto.discount,
+          account_id: await accounts.find((i) => i.code === '50003').id,
+        };
+
+        if (dto?.discount > 0) {
+          debitsArrray.push(debit1, debit2);
+        } else {
+          debitsArrray.push(debit1);
+        }
+      }
+
+      const updatedBill: IBill = await getCustomRepository(
+        BillRepository
+      ).findOne({
+        where: {
+          id: dto.id,
+          organizationId: req.user.organizationId,
+        },
+      });
+
+      if (updatedBill.status === Statuses.AUTHORISED) {
+        await http.post(`reports/inventory/manage`, {
+          payload: itemLedgerArray,
+        });
+
+        const creditsArray = [
+          {
+            account_id: await accounts.find((i) => i.code === '40001').id,
+            amount: dto.grossTotal,
+          },
+        ];
+
+        const payload = {
+          dr: debitsArrray,
+          cr: creditsArray,
+          type: 'bill',
+          reference: dto.reference,
+          amount: dto.grossTotal,
+          status: updatedBill.status,
+        };
+
+        const { data: transaction } = await http.post(
+          'accounts/transaction/api',
+          {
+            transactions: payload,
+          }
+        );
+
+        const paymentArr = [
+          {
+            ...updatedBill,
+            billId: bill.id,
+            balance: `-${bill.netTotal}`,
+            data: bill.issueDate,
+            paymentType: PaymentModes.BILLS,
+            transactionId: transaction.id,
+            entryType: EntryType.CREDIT,
+          },
+        ];
+
+        await http.post(`payments/payment/add`, {
+          payments: paymentArr,
+        });
+        await http.get(`contacts/contact/balance`);
       }
 
       return bill;
@@ -359,8 +441,6 @@ export class BillService {
         status: dto.status,
       });
 
-      const debitsArrray = [];
-      const itemLedgerArray = [];
       for (const item of dto.invoice_items) {
         await getCustomRepository(BillItemRepository).save({
           itemId: item.itemId,
@@ -380,14 +460,15 @@ export class BillService {
         if (itemDetail.hasInventory) {
           itemLedgerArray.push({
             itemId: item.itemId,
-            value: dto.netTotal,
+            value: item.quantity,
             targetId: bill.id,
             type: 'increase',
+            action: 'create',
           });
         }
 
         const debit1 = {
-          amount: dto.netTotal,
+          amount: item.total,
           account_id: item.accountId,
         };
         const debit2 = {
@@ -409,7 +490,7 @@ export class BillService {
 
         const creditsArray = [
           {
-            account_id: await accounts.find((i) => i.code === '15002').id,
+            account_id: await accounts.find((i) => i.code === '40001').id,
             amount: dto.grossTotal,
           },
         ];
@@ -417,8 +498,10 @@ export class BillService {
         const payload = {
           dr: debitsArrray,
           cr: creditsArray,
+          type: 'bill',
           reference: dto.reference,
           amount: dto.grossTotal,
+          status: bill.status,
         };
 
         const { data: transaction } = await http.post(
@@ -513,12 +596,91 @@ export class BillService {
     return new_bill ? new_bill : bill;
   }
 
-  async deleteBill(billIds: BillIdsDto): Promise<boolean> {
+  async deleteBill(billIds: BillIdsDto, req: IRequest): Promise<boolean> {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const tokenType =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [tokenType]: value,
+      },
+    });
+
+    const itemLedgerArray = [];
+    const itemArray = [];
     for (const i of billIds.ids) {
+      const bill_items = await getCustomRepository(BillItemRepository).find({
+        where: { billId: i },
+      });
+
+      const mapItemIds = bill_items.map((ids) => ids.itemId);
+      const { data: items } = await http.post(`items/item/ids`, {
+        ids: mapItemIds,
+      });
+      itemArray.push(items);
+    }
+
+    const newItemArray = itemArray.flat();
+    for (const i of billIds.ids) {
+      const bill = await getCustomRepository(BillRepository).findOne({
+        where: {
+          id: i,
+        },
+      });
+
       await getCustomRepository(BillRepository).update(
         { id: i },
         { status: 0 }
       );
+
+      const bill_items = await getCustomRepository(BillItemRepository).find({
+        where: { billId: i },
+      });
+
+      for (const j of bill_items) {
+        await getCustomRepository(BillItemRepository).update(
+          { billId: i },
+          { status: 0 }
+        );
+
+        if (bill.status === Statuses.AUTHORISED) {
+          const itemDetail = newItemArray.find((i) => i.id === j.itemId);
+          if (itemDetail.hasInventory) {
+            itemLedgerArray.push({
+              itemId: j.itemId,
+              value: j.quantity,
+              targetId: i,
+              type: 'increase',
+              action: 'delete',
+            });
+          }
+        }
+      }
+    }
+
+    if (itemLedgerArray.length > 0) {
+      await http.post('payments/payment/delete', {
+        ids: billIds.ids,
+        type: PaymentModes.BILLS,
+      });
+
+      await http.post(`reports/inventory/manage`, {
+        payload: itemLedgerArray,
+      });
     }
 
     return true;

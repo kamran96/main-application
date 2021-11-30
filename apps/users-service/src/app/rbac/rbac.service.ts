@@ -149,6 +149,7 @@ export class RbacService {
     const role = await this.roleModel
       .find({
         organizationId: user.organizationId,
+        status: 1,
       })
       .populate('parent')
       .sort({ level: 'ASC' });
