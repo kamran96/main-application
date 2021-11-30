@@ -105,8 +105,11 @@ export class BillController {
 
   @Put()
   @UseGuards(GlobalAuthGuard)
-  async delete(@Body() billIds: BillIdsDto): Promise<IBillWithResponse> {
-    const bill = await this.billService.deleteBill(billIds);
+  async delete(
+    @Body() billIds: BillIdsDto,
+    @Req() req: IRequest
+  ): Promise<IBillWithResponse> {
+    const bill = await this.billService.deleteBill(billIds, req);
 
     if (bill) {
       return {
