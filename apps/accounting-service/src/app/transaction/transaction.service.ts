@@ -16,7 +16,7 @@ import {
   ITransactionWithResponse,
   IRequest,
 } from '@invyce/interfaces';
-import { TransactionDto } from '../dto/transaction.dto';
+import { DeleteTransactionsDto, TransactionDto } from '../dto/transaction.dto';
 import { Entries } from '@invyce/global-constants';
 
 @Injectable()
@@ -236,17 +236,19 @@ export class TransactionService {
             TransactionRepository
           ).save({
             amount: transactions.amount ? transactions.amount : amount,
-            ref: transactions.invoice
-              ? transactions.invoice.reference
-              : transactions.reference,
+            ref: transactions.reference,
             date: transactions.createdAt || new Date(),
             createdAt: transactions.createdAt || new Date().toDateString(),
-            narration: `System transaction against ${transactions?.invoice?.invoiceNumber}`,
+            narration: `System transaction against ${
+              transactions.invoiceNumber.length > 0
+                ? transactions.invoiceNumber.toString()
+                : transactions.invoiceNumber
+            }`,
             branchId: user.branchId,
             organizationId: user.organizationId,
             createdById: user.id,
             updatedById: user.id,
-            status: transactions?.invoice?.status === 2 ? 2 : 1 || 1,
+            status: transactions?.status === 2 ? 2 : 1 || 1,
           });
 
           getCustomRepository(TransactionItemRepository).save(
@@ -282,7 +284,6 @@ export class TransactionService {
         }
       }
     } catch (error) {
-      console.log(error);
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -365,5 +366,31 @@ export class TransactionService {
     await http.post(`payments/payment/add`, {
       payments: paymentArr,
     });
+  }
+
+  async DeleteJornalEntry(
+    trasnactionIds: DeleteTransactionsDto
+  ): Promise<void> {
+    for (const transactionId of trasnactionIds.ids) {
+      await getCustomRepository(TransactionRepository).update(
+        { id: transactionId },
+        { status: 0 }
+      );
+
+      const items = await getCustomRepository(TransactionItemRepository).find({
+        where: {
+          transactionId: transactionId,
+        },
+      });
+
+      for (const i of items) {
+        await getCustomRepository(TransactionItemRepository).update(
+          { id: i.id },
+          {
+            status: 0,
+          }
+        );
+      }
+    }
   }
 }

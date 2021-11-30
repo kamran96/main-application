@@ -173,9 +173,10 @@ export class InvoiceController {
   @Put()
   @UseGuards(GlobalAuthGuard)
   async delete(
-    @Body() inoviceIds: InvoiceIdsDto
+    @Body() inoviceIds: InvoiceIdsDto,
+    @Req() req: IRequest
   ): Promise<IInvoiceWithResponse> {
-    const invoice = await this.invoiceService.deleteInvoice(inoviceIds);
+    const invoice = await this.invoiceService.deleteInvoice(inoviceIds, req);
 
     if (invoice) {
       return {
