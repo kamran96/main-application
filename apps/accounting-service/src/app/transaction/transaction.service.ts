@@ -239,11 +239,7 @@ export class TransactionService {
             ref: transactions.reference,
             date: transactions.createdAt || new Date(),
             createdAt: transactions.createdAt || new Date().toDateString(),
-            narration: `System transaction against ${
-              transactions.invoiceNumber.length > 0
-                ? transactions.invoiceNumber.toString()
-                : transactions.invoiceNumber
-            }`,
+            narration: `System transaction against ${transactions.type}`,
             branchId: user.branchId,
             organizationId: user.organizationId,
             createdById: user.id,
