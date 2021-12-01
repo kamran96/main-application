@@ -118,7 +118,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
       invoiceDiscount: 0,
     });
 
-    let initialInvoiceItemsState = [];
+    const initialInvoiceItemsState = [];
     for (let i = 0; i <= 2; i++) {
       initialInvoiceItemsState.push({
         ...defaultItems,
@@ -162,7 +162,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
       // const { payment } = result;
       const { discount } = result;
 
-      let key = 'invoice_items';
+      const key = 'invoiceItems';
       const itemsDiscount =
         (result && totalDiscountInInvoice(result[key], 'itemDiscount', type)) ||
         0;
@@ -178,14 +178,14 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
         invoiceDiscount,
       });
 
-      let invoice_items = [];
+      const invoice_items = [];
       result[key].forEach((item, index) => {
-        let purchasePrice = item.purchasePrice ? item.purchasePrice : 0;
-        let unitPrice = item.unitPrice ? item.unitPrice : 0;
-        let tax = item.tax ? item.tax : 0;
-        let total = item.total ? item.total : 0;
-        let itemDiscount = item.itemDiscount ? item.itemDiscount : 0;
-        let quantity = item.quantity ? item.quantity : 1;
+        const purchasePrice = item.purchasePrice ? item.purchasePrice : 0;
+        const unitPrice = item.unitPrice ? item.unitPrice : 0;
+        const tax = item.tax ? item.tax : 0;
+        const total = item.total ? item.total : 0;
+        const itemDiscount = item.itemDiscount ? item.itemDiscount : 0;
+        const quantity = item.quantity ? item.quantity : 1;
         delete item.item;
         invoice_items.push({
           ...item,
@@ -198,7 +198,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
         });
       });
 
-      let sortedItems = invoice_items.sort((a, b) => {
+      const sortedItems = invoice_items.sort((a, b) => {
         return a.sequence - b.sequence;
       });
 
@@ -261,17 +261,17 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
     return totalDiscountInInvoice(invoiceItems, 'itemDiscount', type);
   }, [invoiceItems, type]);
 
-  let GrandTotal: any = useMemo(() => {
+  const GrandTotal: any = useMemo(() => {
     return invoiceItems.length
       ? invoiceItems.reduce((a, b) => ({ total: a.total + b.total }))
       : { total: 0 };
   }, [invoiceItems]);
 
-  let IDiscount: number = useMemo(() => {
+  const IDiscount: number = useMemo(() => {
     return invoiceDiscount ? invoiceDiscount : 0;
   }, [invoiceDiscount]);
 
-  let NetTotal = useMemo(() => {
+  const NetTotal = useMemo(() => {
     return GrandTotal.total - IDiscount;
   }, [GrandTotal, IDiscount]);
 
@@ -286,15 +286,15 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
 
   const handleDelete = (index) => {
     setInvoiceItems((prev) => {
-      let alldata = [...prev];
+      const alldata = [...prev];
       alldata.splice(index, 1);
       return alldata;
     });
   };
 
-  const getItemWithItemId = (id: Number) => {
+  const getItemWithItemId = (id: number) => {
     if (items && items.length) {
-      let [filtered] = items.filter((item) => item.id === id);
+      const [filtered] = items.filter((item) => item.id === id);
 
       return filtered;
     } else {
@@ -303,7 +303,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   };
 
   const getAccountNameByID = (id) => {
-    let [filtered] = accountsList?.filter((item) => item?.id === id);
+    const [filtered] = accountsList?.filter((item) => item?.id === id);
 
     return filtered ? filtered?.name : id;
   };
@@ -378,35 +378,35 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
             onChange={(val) => {
               if (val.value !== 'new_item') {
                 setInvoiceItems((prev) => {
-                  let [selectedItem] = items.filter(
+                  const [selectedItem] = items.filter(
                     (item) => item.id === val.value
                   );
-                  let allItems = [...prev];
-                  let unitPrice =
+                  const allItems = [...prev];
+                  const unitPrice =
                     (selectedItem &&
                       selectedItem.price &&
                       selectedItem.price.salePrice) ||
                     0;
-                  let purchasePrice =
+                  const purchasePrice =
                     (selectedItem &&
                       selectedItem.price &&
                       selectedItem.price.purchasePrice) ||
                     0;
-                  let itemDiscount =
+                  const itemDiscount =
                     (selectedItem &&
                       selectedItem.price &&
                       selectedItem.price.discount) ||
                     '0';
-                  let tax =
+                  const tax =
                     (selectedItem &&
                       selectedItem.price &&
                       selectedItem.price.tax) ||
                     '0';
-                  let costOfGoodAmount =
+                  const costOfGoodAmount =
                     purchasePrice * allItems[index].quantity;
 
                   if (type === 'CN' && selectedItem.stock < record.quantity) {
-                    let allErrors = [...rowsErrors];
+                    const allErrors = [...rowsErrors];
                     allErrors[index] = { hasError: true };
                     setRowsErrors(allErrors);
                     notificationCallback(
@@ -414,14 +414,14 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
                       `You are out of stock! Only ${selectedItem.stock} items left in your stock`
                     );
                   } else {
-                    let allErrors = [...rowsErrors];
+                    const allErrors = [...rowsErrors];
                     allErrors[index] = { hasError: false };
                     setRowsErrors(allErrors);
                   }
 
-                  let description = `${selectedItem?.category?.title || ''}/`;
+                  const description = `${selectedItem?.category?.title || ''}/`;
 
-                  let total = calculateInvoice(unitPrice, tax, itemDiscount);
+                  const total = calculateInvoice(unitPrice, tax, itemDiscount);
 
                   allItems[index] = {
                     ...allItems[index],
@@ -456,7 +456,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
               </Option>
               {/* </Rbac> */}
               {items.map((item: IItemsResult, index: number) => {
-                let usedIds = [];
+                const usedIds = [];
                 invoiceItems?.forEach((st) => {
                   if (st.itemId !== null) {
                     usedIds.push(st.itemId);
@@ -490,13 +490,13 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
         return (
           <Editable
             onChange={(e) => {
-              let value = e.target.value;
+              const value = e.target.value;
               e.preventDefault();
               clearTimeout(setStateTimeOut);
               setStateTimeOut = setTimeout(() => {
                 if (value) {
                   setInvoiceItems((prev) => {
-                    let allItems = [...prev];
+                    const allItems = [...prev];
                     allItems[index] = {
                       ...allItems[index],
                       description: value,
@@ -528,22 +528,22 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
               setStateTimeOut = setTimeout(() => {
                 if (value) {
                   setInvoiceItems((prev) => {
-                    let [selectedItem] = items.filter(
+                    const [selectedItem] = items.filter(
                       (item) => item.id === record.itemId
                     );
                     let quantity = value;
                     if (quantity === null || quantity === undefined) {
                       quantity = 0;
                     }
-                    let allItems = [...prev];
-                    let unitPrice = record.unitPrice;
-                    let itemDiscount = record.itemDiscount;
+                    const allItems = [...prev];
+                    const unitPrice = record.unitPrice;
+                    const itemDiscount = record.itemDiscount;
 
-                    let costOfGoodAmount = record.purchasePrice * quantity;
-                    let tax = record.tax;
+                    const costOfGoodAmount = record.purchasePrice * quantity;
+                    const tax = record.tax;
 
                     if (type === 'CN' && selectedItem.stock < value) {
-                      let allErrors = [...rowsErrors];
+                      const allErrors = [...rowsErrors];
                       allErrors[index] = { hasError: true };
                       setRowsErrors(allErrors);
                       notificationCallback(
@@ -551,12 +551,12 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
                         `You are out of stock! Only ${selectedItem.stock} items left in your stock`
                       );
                     } else {
-                      let allErrors = [...rowsErrors];
+                      const allErrors = [...rowsErrors];
                       allErrors[index] = { hasError: false };
                       setRowsErrors(allErrors);
                     }
 
-                    let total =
+                    const total =
                       calculateInvoice(unitPrice, tax, itemDiscount) * quantity;
                     allItems[index] = {
                       ...allItems[index],
@@ -591,11 +591,11 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
               clearTimeout(setStateTimeOut);
               setStateTimeOut = setTimeout(() => {
                 setInvoiceItems((prev) => {
-                  let allItems = [...prev];
-                  let unitPrice = value;
-                  let itemDiscount = record.itemDiscount;
-                  let tax = record.tax;
-                  let total =
+                  const allItems = [...prev];
+                  const unitPrice = value;
+                  const itemDiscount = record.itemDiscount;
+                  const tax = record.tax;
+                  const total =
                     calculateInvoice(unitPrice, tax, itemDiscount) *
                     parseInt(record.quantity);
 
@@ -633,15 +633,15 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
               clearTimeout(setStateTimeOut);
               setStateTimeOut = setTimeout(() => {
                 setInvoiceItems((prev) => {
-                  let allItems = [...prev];
+                  const allItems = [...prev];
                   let itemDiscount = value.replace(/\b0+/g, '');
 
                   if (itemDiscount === '') {
                     itemDiscount = '0';
                   }
-                  let unitPrice = record.unitPrice;
-                  let tax = record.tax;
-                  let total =
+                  const unitPrice = record.unitPrice;
+                  const tax = record.tax;
+                  const total =
                     calculateInvoice(unitPrice, tax, itemDiscount) *
                     parseInt(record.quantity);
 
@@ -684,7 +684,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
                 optionFilterProp="children"
                 onChange={(val) => {
                   setInvoiceItems((prev) => {
-                    let allItems = [...prev];
+                    const allItems = [...prev];
                     allItems[index] = {
                       ...allItems[index],
                       accountId: val.value,
@@ -741,13 +741,13 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
             onClick={() => {
               if (record.id) {
                 setDeleteIds((prev) => {
-                  let allDeleteIds = [...prev];
+                  const allDeleteIds = [...prev];
                   allDeleteIds.push(record.id);
                   return allDeleteIds;
                 });
               }
               setRowsErrors((prev) => {
-                let allErrors = [...prev];
+                const allErrors = [...prev];
                 allErrors.splice(index, 1);
                 return allErrors;
               });
@@ -785,7 +785,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   //   };
 
   const handleAddRow = () => {
-    let items = [...invoiceItems];
+    const items = [...invoiceItems];
     items.push({ ...defaultItems, index: items.length });
     setInvoiceItems(items);
     setTimeout(() => {
@@ -795,8 +795,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
 
   /* This function is responsible to remove invoice item from last index like (LIFO) */
   const removeRowFromLastIndex = () => {
-    let allItems = [...invoiceItems];
-    let lastIndex = allItems.length - 1;
+    const allItems = [...invoiceItems];
+    const lastIndex = allItems.length - 1;
     allItems.splice(lastIndex, 1);
     setInvoiceItems(allItems);
   };
