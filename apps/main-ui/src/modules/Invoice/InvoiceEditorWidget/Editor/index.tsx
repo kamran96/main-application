@@ -84,6 +84,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     paymentReset,
     handleAddRow,
     ClearAll,
+    handleCheckValidation,
   } = usePurchaseWidget();
 
   const __columns =
@@ -157,6 +158,9 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   const onFinish = async (value) => {
+    // handleCheckValidation();
+
+    // return false;
     const InvoiceItemsValidation = [];
 
     organization?.organizationType !== IOrganizationType.ENTERPRISE &&

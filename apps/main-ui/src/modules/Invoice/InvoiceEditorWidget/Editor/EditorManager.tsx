@@ -113,6 +113,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
   });
   const [accountRowSelectedIndex, setAccountRowSelectedIndex] = useState(null);
 
+  console.log(invoiceItems, 'invoice items');
+
   /* Antd antd form */
   /* And Form Hook */
   const [AntForm] = Form.useForm();
@@ -354,9 +356,26 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     return filtered;
   };
 
-  // const handleCheckValidation = ()=>{
-
-  // }
+  const handleCheckValidation = () => {
+    const findErrors = invoiceItems?.map((item, index) => {
+      let activeItem = { ...item };
+      Object?.keys(item)?.forEach((key, keyIndex) => {
+        if (Requires[key]?.require === true && !item[key]) {
+          activeItem = { ...activeItem, [`${key}Error`]: true };
+        } else {
+          console.log(index, activeItem[`${key}Error}`]);
+          if (activeItem[`${key}Error}`] === true) {
+            delete activeItem[`${key}Error}`];
+            return { ...activeItem };
+          } else {
+            return { ...activeItem };
+          }
+        }
+      });
+      return activeItem;
+    });
+    setInvoiceItems(findErrors);
+  };
 
   const columns: ColumnsType<any> = useMemo(() => {
     return [
@@ -388,6 +407,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         render: (value, record, index) => {
           return (
             <EditableSelect
+              error={record?.itemIdError}
               className={`border-less-select ${
                 index === invoiceItems.length - 1 ? 'scrollIntoView' : ''
               }`}
@@ -917,6 +937,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         ClearAll,
         handleAddRow,
         isFetching: itemsLoading || invoiceLoading || accountsLoading,
+        handleCheckValidation,
       }}
     >
       <LayoutWrapper>

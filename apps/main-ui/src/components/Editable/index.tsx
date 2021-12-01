@@ -250,6 +250,7 @@ interface IEditableSelectProps {
   children?: ReactElement<any>;
   onClick?: () => void;
   value?: any;
+  error?: boolean;
 }
 
 export const Option = Select.Option;
@@ -267,6 +268,7 @@ export const EditableSelect: FC<IEditableSelectProps> = ({
   children,
   onClick,
   value,
+  error,
 }) => {
   const [isEditable, setIsEditable] = useState(false);
   const [selectValue, setSelectValue] = useState(value);
@@ -294,7 +296,7 @@ export const EditableSelect: FC<IEditableSelectProps> = ({
       notEffectingClass={`rendered-text`}
       timeout={100}
     >
-      <WrapperEditableSelect>
+      <WrapperEditableSelect error={error}>
         {isEditable ? (
           <Select
             open={isEditable}
@@ -336,14 +338,14 @@ export const EditableSelect: FC<IEditableSelectProps> = ({
   );
 };
 
-const WrapperEditableSelect = styled.div`
+const WrapperEditableSelect = styled.div<any>`
   overflow: hidden;
   .rendered-text {
     font-size: 14px;
     color: #626262;
     padding: 8px 11px;
     display: block;
-    border: 1px solid transparent;
+    border: 1px solid ${({ error }): any => (error ? 'red' : 'transparent')};
     transition: 0.3s all ease-in-out;
     border-radius: 5px;
     text-overflow: ellipsis;
