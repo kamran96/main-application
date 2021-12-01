@@ -8,7 +8,7 @@ import { Heading } from '../../../../components/Heading';
 
 import { TableTabs, TableTabsContent } from '../../../../components/TableTabs';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { ISupportedRoutes } from '../../../../modal/routing';
+import { ISupportedRoutes } from '../../../../modal';
 import AwaitingPurchaseList from './List/AwaitingPayment';
 import { PurchaseOrderColumns } from './List/CommonCol';
 import DueExpiredPurchases from './List/DueExpired';

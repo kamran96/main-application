@@ -22,7 +22,7 @@ import {
 } from '../../../../../modal/invoice';
 import convertToRem from '../../../../../utils/convertToRem';
 import { SmartFilter } from '../../../../../components/SmartFilter';
-import { ISupportedRoutes } from '../../../../../modal/routing';
+import { ISupportedRoutes } from '../../../../../modal';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import FilterSchema from './PoFilterSchema';
 import { ConfirmModal } from '../../../../../components/ConfirmModal';
@@ -182,7 +182,9 @@ export const AwaitingPurchaseList: FC<IProps> = ({ columns, activeTab }) => {
           }
         },
       });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   /* METHOD TO UPDATE SELECTED ROW OF TABLE */

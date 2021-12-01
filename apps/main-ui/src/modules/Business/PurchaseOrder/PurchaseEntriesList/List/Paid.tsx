@@ -22,7 +22,6 @@ import {
 } from '../../../../../modal/invoice';
 import convertToRem from '../../../../../utils/convertToRem';
 import { SmartFilter } from '../../../../../components/SmartFilter';
-import { ISupportedRoutes } from '../../../../../modal/routing';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import FilterSchema from './PoFilterSchema';
 import { ConfirmModal } from '../../../../../components/ConfirmModal';
@@ -31,6 +30,7 @@ import {
   IContactType,
   IContactTypes,
   NOTIFICATIONTYPE,
+  ISupportedRoutes,
 } from '../../../../../modal';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
 import { _csvExportable } from './CommonCol';
@@ -187,7 +187,9 @@ export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
           }
         },
       });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   /* METHOD TO UPDATE SELECTED ROW OF TABLE */
