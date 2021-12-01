@@ -120,7 +120,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
     const printItem = printRef.current;
     let email = ``;
 
-    let [filteredContact] = contactResult.filter(
+    const [filteredContact] = contactResult.filter(
       (cont) => cont.id === contactId
     );
 
@@ -128,8 +128,8 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
       email = filteredContact.email;
     }
 
-    let pdf = DownloadPDF(printItem);
-    let payload = {
+    const pdf = DownloadPDF(printItem);
+    const payload = {
       email,
       html: `${pdf}`,
       message,
@@ -140,7 +140,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   const onFinish = async (value) => {
-    let InvoiceItemsValidation = [];
+    const InvoiceItemsValidation = [];
     organization?.organizationType !== IOrganizationType.ENTERPRISE &&
       invoiceItems.forEach(async (i, index) => {
         if (i.itemId === null) {
@@ -155,7 +155,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
         })}] Please Select any item otherwise delete empty row.`
       );
     } else {
-      let paymentData = { ...payment };
+      const paymentData = { ...payment };
       delete paymentData.totalAmount;
       delete paymentData.totalDiscount;
       let payload: any = {
@@ -193,7 +193,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
               setPrintModal(true);
             }
             if (payload.status !== 2) {
-              let messages = {
+              const messages = {
                 invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
                 quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
               };
@@ -248,7 +248,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
       queryCache.removeQueries(`${type}-${id}-view`);
       let route = history.location.pathname.split('/');
       if (route.length > 3) {
-        let removeIndex = route.length - 1;
+        const removeIndex = route.length - 1;
         route.splice(removeIndex, 1);
         route = route.join('/');
       } else {
@@ -468,36 +468,6 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
               data={invoiceItems}
               scrollable={{ offsetY: 400, offsetX: 0 }}
             />
-            {/* <DndProvider manager={manager.current.dragDropManager}>
-              <CommonTable
-                rowClassName={(record, index) =>
-                  ` ${
-                    rowsErrors[index] && rowsErrors[index].hasError
-                      ? "row_warning"
-                      : ""
-                  } 
-                  
-                  ${index === invoiceItems?.length - 1 ? `scroll-row` : ""}
-                  `
-                }
-                loading={isFetching}
-                dataSource={invoiceItems}
-                columns={__columns}
-                pagination={false}
-                scroll={{ y: 350 }}
-                // scroll={{ y: 350, x: 0 }}
-                components={components}
-                onRow={(record: any, index: any) => {
-                  let row: any = {
-                    index,
-                    moveRow,
-                  };
-                  return {
-                    ...row,
-                  };
-                }}
-              />
-            </DndProvider> */}
           </Form>
           <div className="add_item">
             <Button
@@ -549,7 +519,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                       <Form.Item name="invoiceDiscount">
                         <InputNumber
                           onChange={(val) => {
-                            let value = val;
+                            const value = val;
                             clearTimeout(debounce);
 
                             debounce = setTimeout(() => {

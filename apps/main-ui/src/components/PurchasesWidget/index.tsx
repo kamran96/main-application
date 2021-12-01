@@ -7,8 +7,6 @@ import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import dayjs from 'dayjs';
 import { FC, useRef, useState } from 'react';
-import { createDndContext } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import { queryCache, useMutation } from 'react-query';
 
 import { createPurchaseEntryAPI, InvoiceCreateAPI } from '../../api';
@@ -27,19 +25,14 @@ import printDiv, { DownloadPDF } from '../../utils/Print';
 import { ConfirmModal } from '../ConfirmModal';
 import { DatePicker } from '../DatePicker';
 import { FormLabel } from '../FormLabel';
-import { Payment } from '../Payment';
 import { PrintFormat } from '../PrintFormat';
 import { Rbac } from '../Rbac';
 import { PERMISSIONS } from '../Rbac/permissions';
 import { Seprator } from '../Seprator';
-import defaultItems from './defaultStates';
-import { DragableBodyRow } from './draggable';
 import c from './keys';
 import { PrintViewPurchaseWidget } from './PrintViewPurchaseWidget';
 import { WrapperInvoiceForm } from './styles';
 import { PurchaseManager, usePurchaseWidget } from './WidgetManager';
-
-const RNDContext = createDndContext(HTML5Backend);
 
 const { Option } = Select;
 
@@ -344,14 +337,6 @@ const Editor: FC<IProps> = ({ type, id }) => {
         ? 'Order No'
         : 'Order No',
   };
-
-  const components = {
-    body: {
-      row: DragableBodyRow,
-    },
-  };
-
-  const manager = useRef(RNDContext);
 
   /* JSX  */
   return (

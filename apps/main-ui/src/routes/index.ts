@@ -246,6 +246,7 @@ export const routes = (root = '/app'): RouteConfig[] => [
             component: CreditNoteEditorWidget,
             restricted: true,
             permission: PERMISSIONS.INVOICES_CREATE,
+            exact: true,
           },
           {
             path: `${root}${ISupportedRoutes.CREDIT_NOTES}/:id`,

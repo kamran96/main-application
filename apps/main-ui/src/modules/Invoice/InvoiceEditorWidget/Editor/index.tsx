@@ -84,6 +84,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     paymentReset,
     handleAddRow,
     ClearAll,
+    handleCheckValidation,
   } = usePurchaseWidget();
 
   const __columns =
@@ -157,21 +158,27 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   const onFinish = async (value) => {
+    // handleCheckValidation();
+
+    // return false;
     const InvoiceItemsValidation = [];
 
     organization?.organizationType !== IOrganizationType.ENTERPRISE &&
       invoiceItems.forEach(async (i, index) => {
-        if (i.itemId === null) {
-          InvoiceItemsValidation.push(index + 1);
+        if (i.itemId === null || i.accountId === null) {
+          InvoiceItemsValidation.push({
+            index: index + 1,
+            item: i.itemId === null ? 'Item' : 'Account',
+          });
         }
       });
 
     if (InvoiceItemsValidation.length > 0) {
       notificationCallback(
         NOTIFICATIONTYPE.ERROR,
-        `Error in [${InvoiceItemsValidation.map((i) => {
-          return `${i}`;
-        })}] Please Select any item otherwise delete empty row.`
+        `Error in ${InvoiceItemsValidation.map((i) => {
+          return `${i.index} Please Select any ${i.item} otherwise delete empty row.`;
+        })}`
       );
     } else {
       const paymentData = { ...payment };

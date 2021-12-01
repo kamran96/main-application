@@ -33,6 +33,8 @@ export const TableTabs: FC<IProps> = ({
   const { routeHistory } = useGlobalContext();
   const onChangeTab = (key) => {
     const location = routeHistory.location.pathname;
+    console.log(`${location}?tabIndex=${key}`);
+
     routeHistory.history.push(`${location}?tabIndex=${key}`);
   };
 

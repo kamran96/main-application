@@ -1,6 +1,6 @@
 import { message } from 'antd';
 import { ReactNode } from 'react';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState, useMemo } from 'react';
 import { queryCache, useMutation, useQuery } from 'react-query';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
@@ -258,68 +258,57 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
       const decriptedData = DecriptionData(checkIsAuthSaved);
       const user: IUser = decriptedData?.users;
 
-      setAuth(decriptedData);
-      setUserDetails(user);
+      setAuth((prev) => {
+        if (JSON.stringify(prev) !== JSON.stringify(decriptedData)) {
+          console.log('in effect auth');
+          return decriptedData;
+        } else {
+          return prev;
+        }
+      });
+      setUserDetails((prev) => {
+        if (JSON.stringify(prev) !== JSON.stringify(user)) {
+          console.log('in effect user');
+          return user;
+        } else {
+          return prev;
+        }
+      });
     }
   }, [checkIsAuthSaved]);
 
   const userId = auth?.users?.id || null;
 
   /* LoggedInUser is Fetched */
-  const { isLoading, isFetched } = useQuery(
-    [`loggedInUser`, userId],
-    AUTH_CHECK_API,
-    {
-      cacheTime: Infinity,
-      enabled: isProductionEnv ? checkAutherized : userId,
+  const {
+    isLoading,
+    isFetched,
+    isFetching: loggedInUserCheckingAgain,
+  } = useQuery([`loggedInUser`, userId], AUTH_CHECK_API, {
+    cacheTime: Infinity,
+    enabled: isProductionEnv ? checkAutherized : userId,
 
-      onSuccess: (data) => {
-        if (isProductionEnv) {
-          setUserDetails(data?.data?.users);
-          setIsUserLogin(true);
-        } else {
-          const { result } = data?.data;
-          setUserDetails(result);
-          setIsUserLogin(true);
-          if (result?.theme) {
-            setTheme(result?.theme);
-          }
+    onSuccess: (data) => {
+      if (isProductionEnv) {
+        setUserDetails(data?.data?.users);
+        setIsUserLogin(true);
+      } else {
+        const { result } = data?.data;
+        setUserDetails(result);
+        setIsUserLogin(true);
+        if (result?.theme) {
+          setTheme(result?.theme);
         }
-      },
-      onError: (err: IBaseAPIError) => {
-        // CancelRequest();
-        if (err?.response?.data?.statusCode === 401) {
-          handleLogin({ type: ILoginActions.LOGOUT });
-        }
-        setAutherized(false);
-      },
-    }
-  );
-
-  // const { isLoading, data, error, isFetched } = useQuery(
-  //   [`loggedInUser`, userId],
-  //   getUserAPI,
-  //   {
-  //     enabled: userId,
-  //     staleTime: Infinity,
-  //     cacheTime: Infinity,
-  //     onSuccess: () => {
-  //       setIsUserLogin(true);
-  //     },
-  //     onError: (error: IBaseAPIError) => {
-  //       setIsUserLogin(false);
-  //       if (
-  //         error &&
-  //         error.response &&
-  //         error.response.data &&
-  //         error.response.data.message
-  //       ) {
-  //         const { message } = error.response.data;
-  //         notificationCallback(NOTIFICATIONTYPE.ERROR, `${message}`);
-  //       }
-  //     },
-  //   }
-  // );
+      }
+    },
+    onError: (err: IBaseAPIError) => {
+      // CancelRequest();
+      if (err?.response?.data?.statusCode === 401) {
+        handleLogin({ type: ILoginActions.LOGOUT });
+      }
+      setAutherized(false);
+    },
+  });
 
   useEffect(() => {
     toggleTheme(theme);
@@ -329,6 +318,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     data: allRolesAndPermissionsData,
     isLoading: permissionsFetching,
     isFetched: permissionsFetched,
+    isFetching,
   } = useQuery([`roles-permissions`], getAllRolesWithPermission, {
     enabled: isUserLogin,
     cacheTime: Infinity,
@@ -358,29 +348,10 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     }
   }, [allRolesAndPermissionsData]);
 
-  // const errResp: any = error;
-
-  // useEffect(() => {
-  //   if (data?.data) {
-  //     const userData: IUser = data.data.result;
-  //     const { result } = data?.data;
-  //     if (result?.theme) {
-  //       setTheme(result?.theme);
-  //     }
-  //     setUserDetails({ ...userData });
-  //   } else if (errResp?.message === 'Network Error') {
-  //     notificationCallback(
-  //       NOTIFICATIONTYPE.ERROR,
-  //       `${errResp.message} please check your Internet Connection`
-  //     );
-  //   }
-  // }, [data, checkIsAuthSaved, errResp]);
-
-  message.config({
-    top: 101,
-  });
-
   const notificationCallback = (type, info: string) => {
+    message.config({
+      top: 101,
+    });
     switch (type) {
       case NOTIFICATIONTYPE.SUCCESS:
         message.success(info);
@@ -402,39 +373,68 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const { theme: appTheme, themeLoading } = useTheme(theme);
 
+  console.log({ loggedInUserCheckingAgain, isFetching, themeLoading, theme });
   const checkingUser = (isLoading && !isFetched) || permissionsFetching;
 
   return (
     <globalContext.Provider
       value={{
-        checkAutherized,
+        checkAutherized: useMemo(() => {
+          return checkAutherized;
+        }, [checkAutherized]),
         setAutherized,
-        rolePermissions, // Will return all permissions from BE
-        isOnline, // gets info about online and offline network
-        isUserLogin, // true or false
-        userDetails, // user details
+        rolePermissions: useMemo(() => {
+          return rolePermissions;
+        }, [rolePermissions]), // Will return all permissions from BE
+        isOnline: useMemo(() => {
+          return isOnline;
+        }, [isOnline]), // gets info about online and offline network
+        isUserLogin: useMemo(() => {
+          return isUserLogin;
+        }, [isUserLogin]), // true or false
+        userDetails: useMemo(() => {
+          return userDetails;
+        }, [userDetails]), // user details
         setUserDetails, // to set user details
         handleLogin, // handle login from signup and login page
         routeHistory: { history, location: history?.location }, // to get route history
-        userInviteModal, // gets user invite model config
+        userInviteModal: useMemo(() => {
+          return userInviteModal;
+        }, [userInviteModal]), // gets user invite model config
         setUserInviteModal, // sets user invite modal config
         notificationCallback, // responsible for notifications callbacs
-        itemsModalConfig, // gets items model config
+        itemsModalConfig: useMemo(() => {
+          return itemsModalConfig;
+        }, [itemsModalConfig]), // gets items model config
         setItemsModalConfig: (visibility, id) =>
           setItemsModalConfig({ visibility: visibility, id: id }), // sets items model config
-        preferancesModal,
+        preferancesModal: useMemo(() => {
+          return preferancesModal;
+        }, [preferancesModal]),
         setPreferancesModal,
-        transactionModal,
+        transactionModal: useMemo(() => {
+          return transactionModal;
+        }, [transactionModal]),
         setTransactionModal,
-        auth,
-        accountsModalConfig,
+        auth: useMemo(() => {
+          return auth;
+        }, [auth]),
+        accountsModalConfig: useMemo(() => {
+          return accountsModalConfig;
+        }, [accountsModalConfig]),
         setAccountsModalConfig,
-        organizationModalConfig,
+        organizationModalConfig: useMemo(() => {
+          return organizationModalConfig;
+        }, [organizationModalConfig]),
         setOrganizationConfig: (visibility: boolean, id: number = null) => {
           setOrganizationConfig({ visibility: visibility, id: id });
         },
-        isCheckingLoginUser: checkingUser,
-        pricingModalConfig,
+        isCheckingLoginUser: useMemo(() => {
+          return checkingUser;
+        }, [checkingUser]),
+        pricingModalConfig: useMemo(() => {
+          return pricingModalConfig;
+        }, [pricingModalConfig]),
         setPricingModalConfig: (
           visibility: boolean,
           obj: unknown = null,
@@ -442,12 +442,16 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         ) => {
           setPricingModalConfig({ visibility, obj, updateId });
         },
-        banksModalConfig,
+        banksModalConfig: useMemo(() => {
+          return banksModalConfig;
+        }, [banksModalConfig]),
         setBanksModalConfig: (visibility: boolean, id: number = null) => {
           setBanksModalConfig({ visibility, id });
         },
 
-        branchModalConfig,
+        branchModalConfig: useMemo(() => {
+          return branchModalConfig;
+        }, [branchModalConfig]),
         setBranchModalConfig: (
           visibility: boolean,
           id: number = null,
@@ -455,11 +459,15 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         ) => {
           setBranchModalConfig({ visibility, id, branchId });
         },
-        paymentsModalConfig,
+        paymentsModalConfig: useMemo(() => {
+          return paymentsModalConfig;
+        }, [paymentsModalConfig]),
         setPaymentsModalConfig: (visibility: boolean, id: number = null) => {
           setPaymentsModalConfig({ visibility, id });
         },
-        categoryModalConfig,
+        categoryModalConfig: useMemo(() => {
+          return categoryModalConfig;
+        }, [categoryModalConfig]),
         setCategoryModalConfig: (
           visibility: boolean,
           parent_id: number = null,
@@ -468,18 +476,24 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         ) => {
           setCategoryModalConfig({ parent_id, visibility, updateId, isChild });
         },
-        attributeConfig,
+        attributeConfig: useMemo(() => {
+          return attributeConfig;
+        }, [attributeConfig]),
         setAttributeConfig: (
           visibility: boolean,
           categoryObj: unknown = null
         ) => {
           setAttributeConfig({ visibility, categoryObj });
         },
-        dispatchConfigModal,
+        dispatchConfigModal: useMemo(() => {
+          return dispatchConfigModal;
+        }, [dispatchConfigModal]),
         setDispatchConfigModal: (visibility: boolean) => {
           setDispatchConfigModal({ visibility });
         },
-        reviewConfigModal,
+        reviewConfigModal: useMemo(() => {
+          return reviewConfigModal;
+        }, [reviewConfigModal]),
         setreviewConfigModal: (visibility: boolean) => {
           setreviewConfigModal({ visibility });
         },
@@ -489,16 +503,24 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
           pdfUploaded,
           sendingPDF,
         },
-        rbacConfigModal,
+        rbacConfigModal: useMemo(() => {
+          return rbacConfigModal;
+        }, [rbacConfigModal]),
         setRbacConfigModal: (visibility: boolean, id: number = null) => {
           setRbacConfigModal({ visibility, id });
         },
-        permissionsConfigModal,
+        permissionsConfigModal: useMemo(() => {
+          return permissionsConfigModal;
+        }, [permissionsConfigModal]),
         setPermissionConfigModal: (visibility: boolean, id: number = null) => {
           setPermissionConfigModal({ visibility, id });
         },
-        theme: appTheme,
-        darkModeLoading: themeLoading,
+        theme: useMemo(() => {
+          return appTheme;
+        }, [appTheme]),
+        darkModeLoading: useMemo(() => {
+          return themeLoading;
+        }, [themeLoading]),
         setTheme: (payload) => {
           setTheme((prev) => {
             if (prev !== payload) {
@@ -508,7 +530,9 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
             }
           });
         },
-        verifiedModal,
+        verifiedModal: useMemo(() => {
+          return verifiedModal;
+        }, [verifiedModal]),
         setVerifiedModal,
       }}
     >
