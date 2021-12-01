@@ -270,7 +270,7 @@ export class BillService {
       },
     });
 
-    const accountCodesArray = ['40001', '50003'];
+    const accountCodesArray = ['40001', '55002'];
     const { data: accounts } = await http.post(`accounts/account/codes`, {
       codes: accountCodesArray,
     });
@@ -345,20 +345,12 @@ export class BillService {
           });
         }
 
-        const debit1 = {
+        const debit = {
           amount: item.total,
           account_id: item.accountId,
         };
-        const debit2 = {
-          amount: dto.discount,
-          account_id: await accounts.find((i) => i.code === '50003').id,
-        };
 
-        if (dto?.discount > 0) {
-          debitsArrray.push(debit1, debit2);
-        } else {
-          debitsArrray.push(debit1);
-        }
+        debitsArrray.push(debit);
       }
 
       const updatedBill: IBill = await getCustomRepository(
@@ -374,6 +366,14 @@ export class BillService {
         await http.post(`reports/inventory/manage`, {
           payload: itemLedgerArray,
         });
+
+        if (dto?.discount > 0) {
+          const debitDiscount = {
+            amount: dto.discount,
+            account_id: await accounts.find((i) => i.code === '50003').id,
+          };
+          debitsArrray.push(debitDiscount);
+        }
 
         const creditsArray = [
           {
@@ -467,20 +467,12 @@ export class BillService {
           });
         }
 
-        const debit1 = {
+        const debit = {
           amount: item.total,
           account_id: item.accountId,
         };
-        const debit2 = {
-          amount: dto.discount,
-          account_id: await accounts.find((i) => i.code === '50003').id,
-        };
 
-        if (dto?.discount > 0) {
-          debitsArrray.push(debit1, debit2);
-        } else {
-          debitsArrray.push(debit1);
-        }
+        debitsArrray.push(debit);
       }
 
       if (bill.status === Statuses.AUTHORISED) {
@@ -491,7 +483,11 @@ export class BillService {
         const creditsArray = [
           {
             account_id: await accounts.find((i) => i.code === '40001').id,
-            amount: dto.grossTotal,
+            amount: dto.netTotal,
+          },
+          {
+            amount: dto.discount,
+            account_id: await accounts.find((i) => i.code === '55002').id,
           },
         ];
 
