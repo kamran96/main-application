@@ -15,6 +15,7 @@ import {
   PaymentDto,
   PaymentContactDto,
   PaymentInvoiceDto,
+  PaymentIdsDto,
 } from '../dto/payment.dto';
 
 @Injectable()
@@ -160,17 +161,12 @@ export class PaymentService {
         ];
 
         if (data?.invoice_ids?.length > 0) {
-          const { data: billData } = await http.post(`invoices/bill/ids`, {
-            ids: data.invoice_ids,
-          });
-
-          const mapInvoiceNumbers = billData.map((bill) => bill.invoiceNumber);
           const payload = {
             dr: debits,
             cr: credits,
             reference: data.reference,
             amount: data.amount,
-            invoiceNumber: mapInvoiceNumbers,
+            type: 'bill payment',
             status: 1,
           };
 
@@ -194,8 +190,6 @@ export class PaymentService {
 
           for (const i of bills) {
             const purchase_total = Math.abs(parseFloat(i.balance));
-            console.log(purchase_total, 'total');
-            console.log(remaining, 'remaining');
             if (purchase_total > remaining && remaining > 0) {
               await getCustomRepository(PaymentRepository).save({
                 date: data.date,
@@ -298,21 +292,10 @@ export class PaymentService {
         ];
 
         if (data?.invoice_ids?.length > 0) {
-          const { data: invoiceData } = await http.post(
-            'invoices/invoice/ids',
-            {
-              ids: data.invoice_ids,
-            }
-          );
-
-          const mapInvoiceNumbers = invoiceData.map(
-            (invoice) => invoice.invoiceNumber
-          );
-
           const payload = {
             dr: debits,
             cr: credits,
-            invoiceNumber: mapInvoiceNumbers,
+            type: 'invoice payment',
             reference: data.reference,
             amount: data.amount,
             status: 1,
@@ -544,5 +527,57 @@ export class PaymentService {
         status: i.status || 1,
       });
     }
+  }
+
+  async DeletePayment(paymentIds: PaymentIdsDto, req): Promise<boolean> {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const tokenType =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [tokenType]: value,
+      },
+    });
+
+    const transactionArray = [];
+    for (const i of paymentIds.ids) {
+      const payment = await getCustomRepository(PaymentRepository).findOne({
+        id: i,
+        organizationId: req.user.organizationId,
+      });
+
+      if (payment?.id !== null) {
+        transactionArray.push(payment);
+      }
+
+      await getCustomRepository(PaymentRepository).update(
+        { id: i, organizationId: req.user.organizationId },
+        { status: 0 }
+      );
+    }
+
+    await http.get(`contacts/contact/balance`);
+    const mapTransactionIds = transactionArray.map((ids) => ids.transactionId);
+    if (mapTransactionIds.length > 0) {
+      await http.post(`accounts/transaction/delete`, {
+        ids: mapTransactionIds,
+      });
+    }
+
+    return true;
   }
 }

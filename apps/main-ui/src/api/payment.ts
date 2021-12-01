@@ -2,7 +2,7 @@ import http from '../utils/http';
 
 enum PAYMENTS {
   CREATE = `/payments/payment`,
-  INDEX  = `payments/payment`
+  INDEX = `payments/payment`,
 }
 
 export const getInvoiceAgainstID = (key?: string, payload?: any) =>
@@ -34,4 +34,4 @@ interface IPaymentDeletePayload {
 }
 
 export const paymentDeleteAPI = (payload?: IPaymentDeletePayload) =>
-  http.put('payments/delete', payload);
+  http.put('payments/payment/delete', payload);
