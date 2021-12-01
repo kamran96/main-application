@@ -374,20 +374,12 @@ export class InvoiceService {
           });
         }
 
-        const credit1 = {
+        const credit = {
           amount: item.total,
           account_id: item.accountId,
         };
-        const credit2 = {
-          amount: dto.discount,
-          account_id: await accounts.find((i) => i.code === '20002').id,
-        };
 
-        if (dto?.discount > 0) {
-          creditsArrray.push(credit1, credit2);
-        } else {
-          creditsArrray.push(credit1);
-        }
+        creditsArrray.push(credit);
       }
 
       const updatedInvoice: IInvoice = await getCustomRepository(
@@ -403,6 +395,15 @@ export class InvoiceService {
         await http.post(`reports/inventory/manage`, {
           payload: itemLedgerArray,
         });
+
+        if (dto?.discount > 0) {
+          const creditDiscount = {
+            amount: dto.discount,
+            account_id: await accounts.find((i) => i.code === '20002').id,
+          };
+
+          creditsArrray.push(creditDiscount);
+        }
 
         const debitsArray = [
           {
@@ -495,26 +496,27 @@ export class InvoiceService {
           });
         }
 
-        const credit1 = {
+        const credit = {
           amount: item.total,
           account_id: item.accountId,
         };
-        const credit2 = {
-          amount: dto.discount,
-          account_id: await accounts.find((i) => i.code === '20002').id,
-        };
 
-        if (dto?.discount > 0) {
-          creditsArrray.push(credit1, credit2);
-        } else {
-          creditsArrray.push(credit1);
-        }
+        creditsArrray.push(credit);
       }
 
       if (invoice.status === Statuses.AUTHORISED) {
         await http.post(`reports/inventory/manage`, {
           payload: itemLedgerArray,
         });
+
+        if (dto?.discount > 0) {
+          const creditDiscount = {
+            amount: dto.discount,
+            account_id: await accounts.find((i) => i.code === '20002').id,
+          };
+
+          creditsArrray.push(creditDiscount);
+        }
 
         const debitsArray = [
           {

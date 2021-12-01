@@ -8,6 +8,7 @@ import {
   HttpStatus,
   Get,
   Query,
+  Put,
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
@@ -21,6 +22,7 @@ import {
   DeletePaymentDto,
   PaymentContactDto,
   PaymentDto,
+  PaymentIdsDto,
   PaymentInvoiceDto,
 } from '../dto/payment.dto';
 
@@ -110,5 +112,18 @@ export class PaymentController {
       body,
       req
     );
+  }
+
+  @Put('delete')
+  @UseGuards(GlobalAuthGuard)
+  async delete(@Body() body: PaymentIdsDto, @Req() req: Request) {
+    const payment = await this.paymentService.DeletePayment(body, req);
+
+    if (payment) {
+      return {
+        message: 'Payment deleted successfully.',
+        status: true,
+      };
+    }
   }
 }

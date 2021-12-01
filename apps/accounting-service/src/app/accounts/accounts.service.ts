@@ -180,7 +180,7 @@ export class AccountsService {
       ).find({
         select: ['id'],
         where: {
-          name: In(['asset', 'expense', 'liability', 'revenue']),
+          name: In(['revenue']),
         },
       });
 
