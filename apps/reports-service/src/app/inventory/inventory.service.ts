@@ -32,20 +32,22 @@ export class InventoryService {
     });
 
     for (const i of data.payload) {
-      const details = {
-        type: i.type,
-        targetId: i.targetId,
-        value: i.value,
-      };
-      await getCustomRepository(ItemLedgerRepository).save({
-        itemId: i.itemId,
-        details: JSON.stringify(details),
-        branchId: req.user.branchId,
-        organizationId: req.user.organizationId,
-        createdById: req.user.id,
-        updatedById: req.user.id,
-        status: 1,
-      });
+      if (i.action === 'create') {
+        const details = {
+          type: i.type,
+          targetId: i.targetId,
+          value: i.value,
+        };
+        await getCustomRepository(ItemLedgerRepository).save({
+          itemId: i.itemId,
+          details: JSON.stringify(details),
+          branchId: req.user.branchId,
+          organizationId: req.user.organizationId,
+          createdById: req.user.id,
+          updatedById: req.user.id,
+          status: 1,
+        });
+      }
     }
 
     await http.post(`items/item/manage-stock`, {
