@@ -20,6 +20,8 @@ export class CreditNotes {
   @Column()
   invoiceNumber: string;
   @Column()
+  invoiceType: string;
+  @Column()
   discount: number;
   @Column()
   grossTotal: number;
