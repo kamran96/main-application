@@ -18,7 +18,7 @@ import {
   UserRegisterDto,
 } from '../dto/user.dto';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 import {
   IUser,
   IRequest,
@@ -75,7 +75,7 @@ export class AuthController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GlobalAuthGuard)
   @Post('access-controll')
   async access(@Req() req: IRequest): Promise<IUserWithResponseAndStatus> {
     try {
@@ -96,7 +96,7 @@ export class AuthController {
   }
 
   @Get('/check')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GlobalAuthGuard)
   async check(@Req() req: IRequest): Promise<IUserCheck> {
     try {
       const user = await this.authService.Check(req);
@@ -117,6 +117,7 @@ export class AuthController {
     }
   }
 
+  @UseGuards(GlobalAuthGuard)
   @Post('/resend-otp')
   async resendOtp(@Body() body: SendOtp): Promise<IUserWithResponse> {
     try {
@@ -135,12 +136,14 @@ export class AuthController {
     }
   }
 
+  @UseGuards(GlobalAuthGuard)
   @Post('logout')
   async logout(@Res() res: Response): Promise<Response> {
     // res.setHeader('Set-Cookie', await this.authService.Logout());
     return await this.authService.Logout(res);
   }
 
+  @UseGuards(GlobalAuthGuard)
   @Post('/forget-password')
   async forgetPassword(
     @Body() userDto: ForgetPasswordDto
@@ -161,6 +164,7 @@ export class AuthController {
     }
   }
 
+  @UseGuards(GlobalAuthGuard)
   @Post('/change-password')
   async changePassword(
     @Body() userDto: PasswordDto
@@ -185,6 +189,7 @@ export class AuthController {
     }
   }
 
+  @UseGuards(GlobalAuthGuard)
   @Post('verify-otp')
   async verifyOtp(@Body() body: SendOtp): Promise<IUserWithResponse> {
     try {

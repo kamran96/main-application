@@ -130,7 +130,10 @@ export class TransactionController {
 
   @Post('delete')
   @UseGuards(GlobalAuthGuard)
-  async deleteJournalEntry(@Body() data: DeleteTransactionsDto) {
-    return await this.transactionService.DeleteJornalEntry(data);
+  async deleteJournalEntry(
+    @Body() data: DeleteTransactionsDto,
+    @Req() req: IRequest
+  ) {
+    return await this.transactionService.DeleteJornalEntry(data, req.user);
   }
 }
