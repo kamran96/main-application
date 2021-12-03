@@ -56,7 +56,7 @@ export class CreditNoteController {
     try {
       const credit_note = await this.creditNoteService.CreateCreditNote(
         creditNoteDto,
-        req.user
+        req
       );
 
       if (credit_note) {

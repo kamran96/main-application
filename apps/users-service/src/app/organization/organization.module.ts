@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from '../auth/auth.module';
+import { AuthStrategy } from '../auth/auth.strategy';
 import { RbacModule } from '../rbac/rbac.module';
 import { Branch, BranchSchema } from '../schemas/branch.schema';
 import {

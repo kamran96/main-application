@@ -13,7 +13,7 @@ import {
 import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { IRequest, IOrganizationResponse } from '@invyce/interfaces';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 import { OrganizationDto, OrganizationParams } from '../dto/organization.dto';
 import { OrganizationService } from './organization.service';
 
@@ -22,7 +22,7 @@ export class OrganizationController {
   constructor(private organizationService: OrganizationService) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GlobalAuthGuard)
   async index(@Req() req: IRequest): Promise<IOrganizationResponse> {
     try {
       const organization = await this.organizationService.ListOrganizations(
@@ -45,7 +45,7 @@ export class OrganizationController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GlobalAuthGuard)
   async create(
     @Body() organizationDto: OrganizationDto,
     @Req() req: IRequest,

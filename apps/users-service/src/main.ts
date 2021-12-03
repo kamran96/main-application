@@ -20,9 +20,6 @@ async function bootstrap() {
   };
 
   app.enableCors(options);
-
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser());
 
   console.log(process.env['NODE' + '_ENV']);

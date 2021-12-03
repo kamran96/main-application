@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { DecriptionData } from './encription';
 
-const localIP = `http://192.168.6.65/`;
+const localIP = `http://192.168.6.142/`;
 
 let RailsBaseURL = '';
 let NodeBaseURL = ``;

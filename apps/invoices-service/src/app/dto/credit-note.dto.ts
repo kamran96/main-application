@@ -2,9 +2,12 @@ export class CreditNoteDto {
   id: number;
   reference: string;
   contactId: string;
+  invoiceId: number;
+  billId: number;
   issueDate: string;
   dueDate: string;
   invoiceNumber: string;
+  invoiceType: string;
   discount: number;
   grossTotal: number;
   currency: number;
@@ -12,7 +15,7 @@ export class CreditNoteDto {
   date: string;
   type: string;
   comment: string;
-  credit_note_items: Array<CreditNoteItemDto>;
+  invoice_items: Array<CreditNoteItemDto>;
 }
 
 class CreditNoteItemDto {
@@ -25,6 +28,7 @@ class CreditNoteItemDto {
   tax: string;
   total: number;
   sequence: number;
+  accountId: number;
   costOfGoodAmount: number;
 }
 

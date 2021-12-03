@@ -159,10 +159,29 @@ export class InvoiceService {
 
         for (const i of invoices) {
           const balance = balances.find((bal) => bal.id === i.id);
+
+          const paid_amount = balance?.invoice?.balance || 0;
+          const due_amount = balance?.invoice?.balance
+            ? i.netTotal - balance?.invoice?.balance
+            : i.netTotal;
+
+          const payment_status = () => {
+            if (paid_amount < due_amount && due_amount < i?.netTotal) {
+              return 'Partial Payment';
+            } else if (due_amount === i?.netTotal) {
+              return 'Payment Pending';
+            } else if (paid_amount === i?.netTotal) {
+              return 'Full Payment';
+            } else {
+              return null;
+            }
+          };
+
           invoice_arr.push({
             ...i,
-            paid_amount: balance.invoice.balance,
-            due_amount: i.netTotal - balance.invoice.balance,
+            paid_amount,
+            due_amount: i.netTotal - balance.invoice.balance || 0,
+            payment_status: payment_status(),
           });
         }
       } else if (type === 'AWAITING_PAYMENT') {
@@ -190,11 +209,29 @@ export class InvoiceService {
 
         for (const i of invoices) {
           const balance = balances.find((bal) => bal.id === i.id);
+
+          const paid_amount = balance?.invoice?.balance || 0;
+          const due_amount = balance?.invoice?.balance
+            ? i.netTotal - balance?.invoice?.balance
+            : i.netTotal;
+
+          const payment_status = () => {
+            if (paid_amount < due_amount && due_amount < i?.netTotal) {
+              return 'Partial Payment';
+            } else if (due_amount === i?.netTotal) {
+              return 'Payment Pending';
+            } else if (paid_amount === i?.netTotal) {
+              return 'Full Payment';
+            } else {
+              return null;
+            }
+          };
           if (balance.invoice.balance === 0) {
             invoice_arr.push({
               ...i,
-              paid_amount: balance.invoice.balance,
-              due_amount: i.netTotal - balance.invoice.balance,
+              paid_amount,
+              due_amount: i.netTotal - balance.invoice.balance || 0,
+              payment_status: payment_status(),
             });
           }
         }
@@ -223,11 +260,29 @@ export class InvoiceService {
 
         for (const i of invoices) {
           const balance = balances.find((bal) => bal.id === i.id);
+
+          const paid_amount = balance?.invoice?.balance || 0;
+          const due_amount = balance?.invoice?.balance
+            ? i.netTotal - balance?.invoice?.balance
+            : i.netTotal;
+
+          const payment_status = () => {
+            if (paid_amount < due_amount && due_amount < i?.netTotal) {
+              return 'Partial Payment';
+            } else if (due_amount === i?.netTotal) {
+              return 'Payment Pending';
+            } else if (paid_amount === i?.netTotal) {
+              return 'Full Payment';
+            } else {
+              return null;
+            }
+          };
           if (balance.invoice.balance !== 0) {
             invoice_arr.push({
               ...i,
-              paid_amount: balance.invoice.balance,
-              due_amount: i.netTotal - balance.invoice.balance,
+              paid_amount,
+              due_amount: i.netTotal - balance.invoice.balance || 0,
+              payment_status: payment_status(),
             });
           }
         }
@@ -294,7 +349,7 @@ export class InvoiceService {
       },
     });
 
-    const accountCodesArray = ['15004', '20002'];
+    const accountCodesArray = ['15004', '20002', '50001'];
     const { data: accounts } = await http.post(`accounts/account/codes`, {
       codes: accountCodesArray,
     });
@@ -375,7 +430,7 @@ export class InvoiceService {
         }
 
         const credit = {
-          amount: item.total,
+          amount: Number(item.quantity) * Number(item.unitPrice),
           account_id: item.accountId,
         };
 
@@ -396,21 +451,21 @@ export class InvoiceService {
           payload: itemLedgerArray,
         });
 
+        const debitsArray = [];
+        const debit = {
+          account_id: await accounts.find((i) => i.code === '15004').id,
+          amount: dto.netTotal,
+        };
         if (dto?.discount > 0) {
-          const creditDiscount = {
+          const debitDiscount = {
             amount: dto.discount,
             account_id: await accounts.find((i) => i.code === '20002').id,
           };
 
-          creditsArrray.push(creditDiscount);
+          debitsArray.push(debit, debitDiscount);
+        } else {
+          debitsArray.push(debit);
         }
-
-        const debitsArray = [
-          {
-            account_id: await accounts.find((i) => i.code === '15004').id,
-            amount: dto.grossTotal,
-          },
-        ];
 
         const payload = {
           dr: debitsArray,
@@ -481,6 +536,7 @@ export class InvoiceService {
           costOfGoodAmount: item.costOfGoodAmount,
           sequence: item.sequence,
           tax: item.tax,
+          accountId: item.accountId,
           total: item.total,
           status: 1,
         });
@@ -497,7 +553,7 @@ export class InvoiceService {
         }
 
         const credit = {
-          amount: item.total,
+          amount: Number(item.quantity) * Number(item.unitPrice),
           account_id: item.accountId,
         };
 
@@ -509,21 +565,21 @@ export class InvoiceService {
           payload: itemLedgerArray,
         });
 
+        const debitsArray = [];
+        const debit = {
+          account_id: await accounts.find((i) => i.code === '15004').id,
+          amount: dto.netTotal,
+        };
         if (dto?.discount > 0) {
-          const creditDiscount = {
+          const debitDiscount = {
             amount: dto.discount,
             account_id: await accounts.find((i) => i.code === '20002').id,
           };
 
-          creditsArrray.push(creditDiscount);
+          debitsArray.push(debit, debitDiscount);
+        } else {
+          debitsArray.push(debit);
         }
-
-        const debitsArray = [
-          {
-            account_id: await accounts.find((i) => i.code === '15004').id,
-            amount: dto.grossTotal,
-          },
-        ];
 
         const payload = {
           dr: debitsArray,
@@ -604,10 +660,40 @@ export class InvoiceService {
         },
       });
 
+      const { data: payments } = await http.post(`payments/payment/invoice`, {
+        ids: [invoiceId],
+        type: 'INVOICE',
+      });
+
       const { data: contact } = await axios(contactRequest as unknown);
       const { data: items } = await http.post(`items/item/ids`, {
         ids: itemIdsArray,
       });
+
+      const balance = payments.find((bal) => parseInt(bal.id) === invoice.id);
+      const paid_amount = balance?.invoice?.balance || 0;
+      const due_amount = balance?.invoice?.balance
+        ? invoice.netTotal - balance?.invoice?.balance
+        : invoice.netTotal;
+
+      const payment_status = () => {
+        if (paid_amount < due_amount && due_amount < invoice?.netTotal) {
+          return 'Partial Payment';
+        } else if (due_amount === invoice?.netTotal) {
+          return 'Payment Pending';
+        } else if (paid_amount === invoice?.netTotal) {
+          return 'Full Payment';
+        } else {
+          return null;
+        }
+      };
+
+      const newInvoice = {
+        ...invoice,
+        paid_amount,
+        due_amount,
+        payment_status: payment_status(),
+      };
 
       const invoiceItemArr = [];
       for (const i of invoice.invoiceItems) {
@@ -617,7 +703,7 @@ export class InvoiceService {
 
       if (invoiceItemArr.length > 0) {
         new_invoice = {
-          ...invoice,
+          ...newInvoice,
           contact: contact.result,
           invoiceItems: invoiceItemArr,
         };

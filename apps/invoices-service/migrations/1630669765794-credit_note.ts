@@ -20,6 +20,7 @@ export class creditNote1630669765794 implements MigrationInterface {
           { name: 'dueDate', type: 'varchar', isNullable: true },
           { name: 'date', type: 'varchar', isNullable: true },
           { name: 'invoiceNumber', type: 'varchar', isNullable: true },
+          { name: 'invoiceType', type: 'varchar', isNullable: true },
           { name: 'discount', type: 'float', isNullable: true },
           { name: 'grossTotal', type: 'float', isNullable: true },
           { name: 'currency', type: 'varchar', isNullable: true },
