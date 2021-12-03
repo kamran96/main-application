@@ -30,6 +30,8 @@ export interface EditableTableProps {
   loading?: boolean;
   cacheKey?: string;
   resetCache?: boolean;
+  customMount?: any;
+
   // onMoveCard: (data: any[])=>void;
 }
 
@@ -41,6 +43,7 @@ export function EditableTable({
   loading,
   cacheKey,
   resetCache,
+  customMount,
 }: EditableTableProps) {
   const [{ tableColumns, tableData }, setLoadingConfig] = useState<{
     tableColumns: EditableColumnsType[];
@@ -120,7 +123,6 @@ export function EditableTable({
       dragIndex !== dropIndex &&
       dragEnd
     ) {
-      console.log(dragIndex, dropIndex);
       const _dragItem = data[dragIndex];
 
       const allRows = [...data];
@@ -176,6 +178,7 @@ export function EditableTable({
                 index={index}
                 row={item}
                 columns={tableColumns}
+                customMount={customMount}
               />
             );
           })}

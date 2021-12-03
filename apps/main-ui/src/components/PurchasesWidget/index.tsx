@@ -143,7 +143,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
   const onFinish = async (value) => {
     const InvoiceItemsValidation = [];
 
-    organization?.organizationType !== IOrganizationType.ENTERPRISE &&
+    organization?.organizationType !== IOrganizationType.SAAS &&
       invoiceItems.forEach(async (i, index) => {
         if (i.itemId === null) {
           InvoiceItemsValidation.push(index + 1);
@@ -225,24 +225,24 @@ const Editor: FC<IProps> = ({ type, id }) => {
               setPrintModal(true);
             }
 
-            if (payload.status !== 2) {
-              if (
-                type !== IInvoiceType.PURCHASE_ENTRY &&
-                type !== IInvoiceType.QUOTE
-              ) {
-                const messages = {
-                  invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.reference}`,
-                  quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.reference}`,
-                };
+            // if (payload.status !== 2) {
+            //   if (
+            //     type !== IInvoiceType.PURCHASE_ENTRY &&
+            //     type !== IInvoiceType.QUOTE
+            //   ) {
+            //     const messages = {
+            //       invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.reference}`,
+            //       quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.reference}`,
+            //     };
 
-                onSendPDF(
-                  value.contactId,
-                  type === IInvoiceType.INVOICE
-                    ? messages.invoice
-                    : messages.quotes
-                );
-              }
-            }
+            //     onSendPDF(
+            //       value.contactId,
+            //       type === IInvoiceType.INVOICE
+            //         ? messages.invoice
+            //         : messages.quotes
+            //     );
+            //   }
+            // }
 
             ClearAll();
 

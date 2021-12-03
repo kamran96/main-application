@@ -10,7 +10,7 @@ import { ISupportedRoutes } from '../../../../../modal';
 export const PurchaseEntryView = () => {
   const { routeHistory } = useGlobalContext();
   const { pathname } = routeHistory.location;
-  const invId = pathname.split('app/purchases/')[1];
+  const invId = pathname.split(`app${ISupportedRoutes.BILLS}/`)[1];
 
   return (
     <>

@@ -1,29 +1,29 @@
-import React, { FC, useEffect, useState } from "react";
-import Icon from "@iconify/react";
-import { Button, Col, Row, Select } from "antd";
-import { Card } from "../../../../components/Card";
-import fileText from "@iconify-icons/feather/file-text";
-import bxDollar from "@iconify-icons/bx/bx-dollar";
-import alertOutline from "@iconify-icons/mdi/alert-outline";
-import graphDown from "@iconify-icons/bi/graph-down";
-import graphUp from "@iconify-icons/bi/graph-up";
-import checkboxMultipleBlankOutline from "@iconify-icons/mdi/checkbox-multiple-blank-outline";
-import { Heading } from "../../../../components/Heading";
-import { Seprator } from "../../../../components/Seprator";
-import { Option } from "antd/lib/mentions";
-import { WrapperItemsView } from "./SummaryItem/styles";
-import { TopItemsOverview } from "./TopItemOverview";
-import { SummaryItem } from "./SummaryItem";
-import { ItemSalesGraph } from "./ItemSalesGraph";
-import { Link } from "react-router-dom";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
-import { useQuery } from "react-query";
-import { getItemDetail, getTopRunningItemsAPI } from "../../../../api";
-import { IItemViewResponse } from "../../../../modal/items";
-import dayjs from "dayjs";
-import moneyFormat from "../../../../utils/moneyFormat";
-import { CustomDateRange } from "../../../../components/DateRange";
-import { ISupportedRoutes } from "../../../../modal";
+import graphDown from '@iconify-icons/bi/graph-down';
+import graphUp from '@iconify-icons/bi/graph-up';
+import bxDollar from '@iconify-icons/bx/bx-dollar';
+import fileText from '@iconify-icons/feather/file-text';
+import alertOutline from '@iconify-icons/mdi/alert-outline';
+import checkboxMultipleBlankOutline from '@iconify-icons/mdi/checkbox-multiple-blank-outline';
+import Icon from '@iconify/react';
+import { Button, Col, Row } from 'antd';
+import dayjs from 'dayjs';
+import React, { FC, useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
+import { Link } from 'react-router-dom';
+
+import { getItemDetail } from '../../../../api';
+import { Card } from '../../../../components/Card';
+import { CustomDateRange } from '../../../../components/DateRange';
+import { Heading } from '../../../../components/Heading';
+import { Seprator } from '../../../../components/Seprator';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { ISupportedRoutes } from '../../../../modal';
+import { IItemViewResponse } from '../../../../modal/items';
+import moneyFormat from '../../../../utils/moneyFormat';
+import { ItemSalesGraph } from './ItemSalesGraph';
+import { SummaryItem } from './SummaryItem';
+import { WrapperItemsView } from './SummaryItem/styles';
+import { TopItemsOverview } from './TopItemOverview';
 
 export const ItemsViewContainer: FC = () => {
   /* HOOKS HERE */
@@ -38,12 +38,15 @@ export const ItemsViewContainer: FC = () => {
   const { id, start, end } = apiConfig;
   const [{ result, message }, setItemDetails] = useState<IItemViewResponse>({
     result: null,
-    message: "",
+    message: '',
   });
 
   useEffect(() => {
-    let routeId = location.pathname.split("/app/items/")[1];
+    const routeId = location.pathname.split(
+      `${ISupportedRoutes.DASHBOARD_LAYOUT}${ISupportedRoutes.ITEMS}/`
+    )[1];
     setApiConfig({ ...apiConfig, id: routeId });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
   const { data: itemDetailData, isLoading: itemDetailFetching } = useQuery(
@@ -192,7 +195,7 @@ export const ItemsViewContainer: FC = () => {
                 <p>
                   {result &&
                     result.addeddate &&
-                    dayjs(result.addeddate).format("DD/MM/YYYY h:mm A")}
+                    dayjs(result.addeddate).format('DD/MM/YYYY h:mm A')}
                 </p>
               </Col>
               <Col span={7}>
@@ -258,15 +261,15 @@ export const ItemsViewContainer: FC = () => {
             </div>
             <div className="flex datalinkcard">
               <Icon icon={graphUp} />
-              <Link to=''>Fast moving items</Link>
+              <Link to="">Fast moving items</Link>
             </div>
             <div className="flex datalinkcard">
               <Icon icon={alertOutline} />
-              <Link to=''>Expiring soon items</Link>
+              <Link to="">Expiring soon items</Link>
             </div>
             <div className="flex datalinkcard">
               <Icon icon={checkboxMultipleBlankOutline} />
-              <Link to=''>Suggested items for purchase order</Link>
+              <Link to="">Suggested items for purchase order</Link>
             </div>
           </Card>
         </Col>
