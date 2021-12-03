@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import React, { FC } from 'react';
-import { IInvoiceResult, IAddress } from '../../modal/invoice';
+import { IInvoiceResult, IAddress } from '../../modal';
 import { totalDiscountInInvoice } from '../../utils/formulas';
 import moneyFormat from '../../utils/moneyFormat';
 import { BoldText } from '../Para/BoldText';
