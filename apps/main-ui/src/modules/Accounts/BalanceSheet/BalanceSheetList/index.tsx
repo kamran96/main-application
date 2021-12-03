@@ -22,7 +22,7 @@ import { SmartFilter } from '../../../../components/SmartFilter';
 import { TableCard } from '../../../../components/TableCard';
 import { Capitalize, P } from '../../../../components/Typography';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
+import { IThemeProps } from '@invyce/shared/invyce-theme';
 import { DivProps, ISupportedRoutes } from '../../../../modal';
 import { IAccountsResult } from '../../../../modal/accounts';
 import moneyFormat from '../../../../utils/moneyFormat';
@@ -203,23 +203,23 @@ export const BalanceSheetList: FC = () => {
               <table style={{ width: '100%' }}>
                 <thead>
                   <tr>
-                    <th>Particulars</th>
+                    <th className="ant-table-cell textLeft">Particulars</th>
                     {searchedQueryItem?.date ? (
                       <>
-                        <th className="textCenter" colSpan={2}>
+                        <th className="textCenter ant-table-cell" colSpan={2}>
                           Opening
                         </th>
-                        <th className="textCenter" colSpan={2}>
+                        <th className="textCenter ant-table-cell" colSpan={2}>
                           Changed
                         </th>
-                        <th className="textCenter" colSpan={2}>
+                        <th className="textCenter ant-table-cell" colSpan={2}>
                           Closing
                         </th>
                       </>
                     ) : (
                       <>
-                        <th>Debit</th>
-                        <th>Credit</th>
+                        <th className="ant-table-cell">Debit</th>
+                        <th className="ant-table-cell">Credit</th>
                       </>
                     )}
                   </tr>
@@ -382,10 +382,10 @@ const WrapperBalanceSheetList = styled.div<WrapperBalanceSheetProps>`
 
       /* text label */
 
-      color: #3e3e3c;
+      color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
     }
     table tbody tr:nth-child(even) td {
-      background: #fcfcfc;
+      background: ${(props: IThemeProps) => props?.theme?.colors?.td};
     }
     table tbody tr td:first-child {
       padding-left: 24px;
@@ -393,8 +393,10 @@ const WrapperBalanceSheetList = styled.div<WrapperBalanceSheetProps>`
 
     .calculated_groups {
       td {
-        border-top: 1px solid #d2d2d2;
-        border-bottom: 1px solid #d2d2d2;
+        border-top: 1px solid
+          ${(props: IThemeProps) => props?.theme?.colors?.seprator};
+        border-bottom: 1px solid
+          ${(props: IThemeProps) => props?.theme?.colors?.seprator};
       }
     }
   }

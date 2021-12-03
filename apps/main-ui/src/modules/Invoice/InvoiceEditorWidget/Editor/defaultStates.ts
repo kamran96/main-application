@@ -32,7 +32,7 @@ export const Requires = {
     message: 'Item is Requred to Proceed invoice',
   },
   purchasePrice: {
-    require: true,
+    require: false,
     message: 'Item is Requred to Proceed invoice',
   },
   itemDiscount: {

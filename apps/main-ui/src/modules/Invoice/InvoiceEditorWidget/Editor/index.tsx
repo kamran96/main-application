@@ -158,9 +158,9 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   const onFinish = async (value) => {
-    // handleCheckValidation();
+    handleCheckValidation();
 
-    // return false;
+    return false;
     const InvoiceItemsValidation = [];
 
     organization?.organizationType !== IOrganizationType.ENTERPRISE &&
@@ -417,7 +417,6 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                         <Option
                           style={{
                             textAlign: 'left',
-                            border: '1px solid white',
                           }}
                           value={'contact-create'}
                         >

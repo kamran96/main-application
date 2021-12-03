@@ -11,7 +11,7 @@ export const getPriceWithTax = (price: number, taxPercent: number) => {
 };
 
 export const checkisPercentage = (value: string) => {
-  let splitedData = value && value.split('%');
+  const splitedData = value && value.split('%');
   if (splitedData.length === 2) {
     return {
       value: splitedData[0],
@@ -30,59 +30,63 @@ export const calculateInvoice = (
   tax?: string,
   discount?: string
 ) => {
-  let taxV = checkisPercentage(tax);
-  let disV = checkisPercentage(discount);
+  const taxV = checkisPercentage(tax);
+  const disV = checkisPercentage(discount);
 
   if (taxV.isPercentage && disV.isPercentage) {
-    let withPriceAndDiscount = CalculatePercentage(
+    const withPriceAndDiscount = CalculatePercentage(
       price,
       parseFloat(disV.value)
     );
-    let priceWithDisandTax = getPriceWithTax(
+    const priceWithDisandTax = getPriceWithTax(
       withPriceAndDiscount,
       parseFloat(taxV.value)
     );
 
     return priceWithDisandTax;
   } else if (taxV.isPercentage && !disV.isPercentage) {
-    let withPriceAndDiscount = price - parseFloat(disV.value);
-    let priceWithDisandTax = getPriceWithTax(
+    const withPriceAndDiscount = price - parseFloat(disV.value);
+    const priceWithDisandTax = getPriceWithTax(
       withPriceAndDiscount,
       parseFloat(taxV.value)
     );
 
     return priceWithDisandTax;
   } else if (!taxV.isPercentage && disV.isPercentage) {
-    let withPriceAndDiscount = CalculatePercentage(
+    const withPriceAndDiscount = CalculatePercentage(
       price,
       parseFloat(disV.value)
     );
-    let priceWithDisandTax = withPriceAndDiscount + parseFloat(taxV.value);
+    const priceWithDisandTax = withPriceAndDiscount + parseFloat(taxV.value);
 
     return priceWithDisandTax;
   } else if (!taxV.isPercentage && !disV.isPercentage) {
-    let withPriceAndDiscount = price - parseFloat(disV.value);
-    let priceWithDisandTax = withPriceAndDiscount + parseFloat(taxV.value);
+    const withPriceAndDiscount = price - parseFloat(disV.value);
+    const priceWithDisandTax = withPriceAndDiscount + parseFloat(taxV.value);
 
     return priceWithDisandTax;
-  }else{
-    return null
+  } else {
+    return null;
   }
 };
 
 export const totalDiscountInInvoice = (array, key, type) => {
-  let discountArray = [];
+  const discountArray = [];
   Array.isArray(array) &&
     array.length &&
     array.forEach((item) => {
-      let keyItem = (item && item[key]) || '0';
-      let v = checkisPercentage(keyItem);
-      let priceAccessor = type === 'POE' ? item.purchasePrice : item.unitPrice;
+      const keyItem = (item && item[key]) || '0';
+      const v = checkisPercentage(keyItem);
+      const priceAccessor =
+        type === 'POE' ? item.purchasePrice : item.unitPrice;
       if (v.isPercentage) {
-        let val = CalculateDiscountPerItem(priceAccessor, parseFloat(v.value));
+        const val = CalculateDiscountPerItem(
+          priceAccessor,
+          parseFloat(v.value)
+        );
         discountArray.push(val * item.quantity);
       } else {
-        let val = priceAccessor - priceAccessor + parseFloat(v.value);
+        const val = priceAccessor - priceAccessor + parseFloat(v.value);
         discountArray.push(val * item.quantity);
       }
     });
@@ -95,13 +99,13 @@ export const getCostofGoodSold = (
   discount?: any,
   quantity?: number
 ) => {
-  let v = checkisPercentage(discount);
+  const v = checkisPercentage(discount);
 
   if (v.isPercentage) {
     return CalculateDiscountPerItem(price, parseFloat(v.value)) * quantity;
   } else if (!v.isPercentage) {
     return (price - quantity) * discount;
-  }else{
-    return null
+  } else {
+    return null;
   }
 };
