@@ -372,10 +372,14 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
           }
         }
       });
+
+      console.log(activeItem, 'what is active item now');
       return activeItem;
     });
     setInvoiceItems(findErrors);
   };
+
+  console.log(invoiceItems, 'invoice items ');
 
   const columns: ColumnsType<any> = useMemo(() => {
     return [
@@ -487,6 +491,16 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       itemDiscount
                     );
 
+                    [
+                      'itemId',
+                      'unitPrice',
+                      'tax',
+                      'description',
+                      'itemDiscount',
+                    ]?.forEach((key) => {
+                      delete record[`${key}Error`];
+                    });
+
                     allItems.splice(index, 1, {
                       ...record,
                       itemId: val.value,
@@ -497,7 +511,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       costOfGoodAmount,
                       description,
                     });
-
                     return allItems;
                   });
                 }
@@ -542,6 +555,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         render: (data, record, index) => {
           return (
             <Editable
+              error={record?.descriptionError}
               style={{
                 width: '100%',
                 minWidth: '180px',
@@ -555,6 +569,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                   if (value) {
                     setInvoiceItems((prev) => {
                       const allItems = [...prev];
+
+                      delete allItems[index]?.descriptionError;
                       allItems[index] = {
                         ...allItems[index],
                         description: value,
@@ -580,6 +596,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         render: (value, record, index) => {
           return (
             <Editable
+              error={record?.quantityError}
               disabled={!record.itemId}
               onChange={(value: number) => {
                 clearTimeout(setStateTimeOut);
@@ -597,6 +614,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       const unitPrice = record.unitPrice;
                       const purchasePrice = record.purchasePrice;
                       const itemDiscount = record.itemDiscount;
+                      delete allItems[index]?.quantityError;
 
                       const costOfGoodAmount = purchasePrice * quantity;
                       const tax = record.tax;
@@ -650,19 +668,19 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         render: (value, record, index) => {
           return (
             <Editable
+              error={record?.unitPriceError}
               onChange={(value) => {
                 clearTimeout(setStateTimeOut);
                 setStateTimeOut = setTimeout(() => {
                   setInvoiceItems((prev) => {
                     const allItems = [...prev];
                     const unitPrice = value;
-                    const purchasePrice = record.purchasePrice;
                     const itemDiscount = record.itemDiscount;
                     const tax = record.tax;
                     const total =
                       calculateInvoice(unitPrice, tax, itemDiscount) *
                       parseInt(record.quantity);
-
+                    delete allItems[index]?.unitPriceError;
                     allItems[index] = {
                       ...allItems[index],
                       unitPrice,
@@ -689,6 +707,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         render: (value, record, index) => {
           return (
             <Editable
+              error={record?.itemDiscountError}
               disabled={!record.itemId}
               type="text"
               value={value}
@@ -708,7 +727,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                     const total =
                       calculateInvoice(unitPrice, tax, itemDiscount) *
                       parseInt(record.quantity);
-
+                    delete allItems[index]?.itemDiscountError;
                     allItems[index] = {
                       ...allItems[index],
                       itemDiscount,
@@ -732,6 +751,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
             render: (value, row, index) => {
               return (
                 <EditableSelect
+                  error={row?.accountIdError}
                   onClick={() => setAccountRowSelectedIndex(index)}
                   className={`border-less-select`}
                   value={{
@@ -750,6 +770,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                   onChange={(val) => {
                     setInvoiceItems((prev) => {
                       const allItems = [...prev];
+                      delete allItems[index]?.accountIdError;
                       allItems[index] = {
                         ...allItems[index],
                         accountId: val.value,

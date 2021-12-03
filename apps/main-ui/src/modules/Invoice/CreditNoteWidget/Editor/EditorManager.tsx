@@ -103,8 +103,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
     dueDate: dayjs(),
     paymentType: null,
   });
-  const [accountRowSelectedIndex, setAccountRowSelectedIndex] = useState(null);
-  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [contactType, setContactType] = useState(null);
 
   /* Antd antd form */
   /* And Form Hook */
@@ -144,7 +143,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   );
 
   const { data: invoiceNumberData } = useQuery(
-    [, ORDER_TYPE?.CREDIT_NOTE],
+    [null, ORDER_TYPE?.CREDIT_NOTE],
     getInvoiceNumber
   );
 
@@ -215,30 +214,30 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
     }
   );
 
-  const contactResult: IContactType[] =
-    (data &&
-      data.data &&
-      data.data.result &&
-      data.data.result.filter((cnt: IContactType) => {
-        if (type === 'CN') {
-          return cnt.contactType === IContactTypes.CUSTOMER;
-        } else {
-          return cnt;
-        }
-      })) ||
-    [];
+  const contactResult: IContactType[] = data?.data?.result || [];
 
   // Accounts Fetched By Types
 
-  const { data: accountsData, isLoading: accountsLoading } = useQuery(
-    [`accounts-${type}`, type === 'CN' ? 'invoice' : 'bill'],
+  const {
+    data: accountsData,
+    isLoading: accountsLoading,
+    isPreviousData,
+  } = useQuery(
+    [
+      `accounts-${type}-contactType=${contactType}`,
+      contactType === IContactTypes?.CUSTOMER ? 'invoice' : 'bill' || 'invoice',
+    ],
     getAccountsByTypeAPI,
     {
-      enabled: type === 'CN' && organization.organizationType === 'EN',
+      enabled: IOrganizationType.SAAS && contactType,
     }
   );
 
+  console.log(isPreviousData, 'check');
+
   const accountsList: IAccountsResult[] = accountsData?.data?.result || [];
+
+  console.log(accountsList, 'accounts list');
 
   const getSubTotal = useCallback(() => {
     let subTotal = 0;
@@ -309,7 +308,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   };
 
   const enableAccountColumn =
-    organization.organizationType === IOrganizationType.ENTERPRISE;
+    organization.organizationType === IOrganizationType.SAAS;
 
   const items: IItemsResult[] =
     type === 'CN'
@@ -352,7 +351,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
       render: (value, record, index) => {
         return (
           <EditableSelect
-            onClick={() => setSelectedIndex(index)}
             className={`border-less-select ${
               index === invoiceItems.length - 1 ? 'scrollIntoView' : ''
             }`}
@@ -666,9 +664,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
           width: width > 1500 ? 220 : 150,
           render: (value, row, index) => {
             return (
-              <CommonSelect
-                onClick={() => setAccountRowSelectedIndex(index)}
-                className={`border-less-select`}
+              <EditableSelect
+                className={`border-less-select contacttype-${contactType}`}
                 value={{
                   value: value !== null ? value : '',
                   label:
@@ -689,21 +686,21 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
                       ...allItems[index],
                       accountId: val.value,
                     };
+
                     return allItems;
                   });
                 }}
               >
                 <>
-                  {accountRowSelectedIndex === index &&
-                    accountsList.map((acc: IAccountsResult, index: number) => {
-                      return (
-                        <Option key={index} value={acc.id}>
-                          {acc.name}
-                        </Option>
-                      );
-                    })}
+                  {accountsList.map((acc: IAccountsResult, index: number) => {
+                    return (
+                      <Option key={index} value={acc.id}>
+                        {acc.name}
+                      </Option>
+                    );
+                  })}
                 </>
-              </CommonSelect>
+              </EditableSelect>
             );
           },
         }
@@ -865,7 +862,10 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
         setPaymentReset,
         ClearAll,
         handleAddRow,
-        isFetching: itemsLoading || invoiceLoading,
+        isFetching: itemsLoading || invoiceLoading || accountsLoading,
+        contactType,
+        setContactType,
+        accountsList,
       }}
     >
       {children}

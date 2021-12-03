@@ -1,11 +1,12 @@
-import React from "react";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { IUser } from "../../modal";
+import React from 'react';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { IUser } from '../../modal';
+import { getCountryById } from '@invyce/shared/utils';
 
 interface IProps {}
 
 export const TopbarLogoWithDetails = () => {
-  const userDetails: IUser = useGlobalContext().userDetails;
+  const { userDetails } = useGlobalContext();
   const _logo = userDetails?.profile?.attachment?.path;
   const organizationName = userDetails?.organization?.name;
   return (
@@ -17,20 +18,20 @@ export const TopbarLogoWithDetails = () => {
               <img
                 className="header_company_logo"
                 src={_logo}
-                alt={"company_logo"}
+                alt={'company_logo'}
               />
             ) : null}
           </td>
           <td className="company_details">
             <h2
-              style={{ textTransform: "capitalize" }}
+              style={{ textTransform: 'capitalize' }}
               className="company_name"
             >
               {organizationName}
             </h2>
-            <p>322-232-2323</p>
-            <p>email@email.com</p>
-            <p>www.abcdefg.com</p>
+            <p>{userDetails?.profile?.phoneNumber}</p>
+            <p>{userDetails?.profile?.email}</p>
+            <p>{userDetails?.profile?.website || ''}</p>
           </td>
         </tr>
       </table>
@@ -39,26 +40,26 @@ export const TopbarLogoWithDetails = () => {
 };
 
 export const Addressbar = () => {
+  const { userDetails } = useGlobalContext();
+  const { country } = userDetails?.organization?.address;
+  const { city } = userDetails?.organization?.address;
+  const { postalCode } = userDetails?.organization?.address;
+
   return (
     <table className="address_bar_table">
       <tr>
         <td>
-          <p>4945 Forest Avenue</p>
+          <p>{getCountryById(parseInt(country))?.name}</p>
         </td>
       </tr>
       <tr>
         <td>
-          <p>New York</p>
+          <p>{city}</p>
         </td>
       </tr>
       <tr>
         <td>
-          <p>10004</p>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <p>United States</p>
+          <p>{postalCode}</p>
         </td>
       </tr>
     </table>
@@ -70,10 +71,10 @@ export const BlockDesignLogo = () => {
   const organizationName = userDetails?.organization?.name;
   return (
     <div
-      style={{ textAlign: "center", width: "max-content" }}
+      style={{ textAlign: 'center', width: 'max-content' }}
       className="BlockDesignLogo"
     >
-      <img className="header_company_logo" src={_logo} alt={"company_logo"} />
+      <img className="header_company_logo" src={_logo} alt={'company_logo'} />
       <h2 className="company_name">{organizationName}</h2>
     </div>
   );

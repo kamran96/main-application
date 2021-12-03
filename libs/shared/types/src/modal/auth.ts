@@ -1,5 +1,6 @@
 import { IBase } from './base';
 import { ICurrency, IOrganizationType } from './organization';
+import { IAddress } from './index';
 
 export interface IAuth {
   access_token?: string;
@@ -28,15 +29,14 @@ export interface IUser extends IBase {
 export interface IOrganization extends IBase {
   id?: number;
   name?: string;
-  permanentAddress?: string;
   niche?: string;
-  residentialAddress?: string;
   financialEnding?: string;
   status?: number;
   organizationType?: IOrganizationType;
 
   branches?: IBranch[];
   currency?: ICurrency;
+  address?: IAddress;
 }
 
 export interface IBranch extends IBase {

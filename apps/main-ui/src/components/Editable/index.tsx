@@ -44,6 +44,7 @@ interface IProps {
   onClick?: () => void;
   reg?: any;
   style?: CSS.Properties;
+  error?: boolean;
 }
 
 export const Editable: FC<IProps> = ({
@@ -57,6 +58,7 @@ export const Editable: FC<IProps> = ({
   onClick,
   reg,
   style,
+  error,
 }) => {
   const [isEditable, setIsEditable] = useState(false);
   const [inputVal, setInputValue] = useState(value);
@@ -86,7 +88,7 @@ export const Editable: FC<IProps> = ({
         }
       }}
     >
-      <WrapperEditable disabled={disabled}>
+      <WrapperEditable error={error} disabled={disabled}>
         {type === 'number' ? (
           isEditable ? (
             <InputNumber
@@ -151,6 +153,7 @@ export const Editable: FC<IProps> = ({
 
 interface WrapperProps {
   disabled: boolean;
+  error: boolean;
 }
 
 export const WrapperEditable = styled.div<WrapperProps>`
@@ -173,7 +176,8 @@ export const WrapperEditable = styled.div<WrapperProps>`
   .input-para {
     width: 100%;
     height: 100%;
-    border: 1px solid transparent;
+    border: 1px solid
+      ${(props: WrapperProps) => (props?.error ? 'red' : 'transparent')};
     border-radius: 5px;
     padding: 7px 12px;
     min-height: 31px;

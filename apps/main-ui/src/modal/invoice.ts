@@ -45,6 +45,7 @@ export interface IInvoiceResult extends IBase {
   comment: string;
   user: IUser;
   organization?: IOrganization;
+  payment_status: string;
   [key: string]: any;
 }
 
@@ -151,7 +152,7 @@ export class InvoiceResultClass {
 
   getRemaningAmount() {
     if (this.paid_amount) {
-      let remainingAmount = this.netTotal - Math.abs(this.paid_amount);
+      const remainingAmount = this.netTotal - Math.abs(this.paid_amount);
       return remainingAmount;
     } else {
       return this.netTotal;
@@ -160,8 +161,8 @@ export class InvoiceResultClass {
 
   getStatus() {
     let itemStatus = `Pending`;
-    if (this.paid_amount && this.payments?.length) {
-      let paidAmount = Math.abs(this.paid_amount);
+    if (this.paid_amount) {
+      const paidAmount = Math.abs(this.paid_amount);
 
       if (this.netTotal - paidAmount === this.netTotal) {
         itemStatus = `Pending`;
@@ -175,7 +176,7 @@ export class InvoiceResultClass {
   }
 }
 
-export interface IInvoiceCreatedResponse extends IInvoiceResult {}
+export type IInvoiceCreatedResponse = IInvoiceResult;
 
 export interface IInvoiceDashboardDetails {
   id: number;

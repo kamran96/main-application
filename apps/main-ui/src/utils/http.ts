@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { DecriptionData } from './encription';
 
-const localIP = `http://192.168.6.65/`;
+const localIP = `http://192.168.6.142/`;
 
 let RailsBaseURL = '';
 let NodeBaseURL = ``;
@@ -58,7 +58,6 @@ const access_token = encriptionData
 
 export const updateToken = (token: string) => {
   http.defaults.headers.common.Authorization = `Bearer ${token}`;
-  railsHttp.defaults.headers.common.Authorization = `Bearer ${token}`;
 };
 
 export const CancelRequest = () => {
