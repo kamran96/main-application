@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { IPage, IRequest, IUserWithResponse } from '@invyce/interfaces';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 import { ParamsDto } from '../dto/rbac.dto';
 import {
   InvitedUserDetailDto,
@@ -29,7 +29,7 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GlobalAuthGuard)
   async index(
     @Req() req: IRequest,
     @Query() query: IPage
@@ -47,7 +47,7 @@ export class UserController {
   }
 
   @Get('/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GlobalAuthGuard)
   async show(
     @Param() params: ParamsDto,
     @Req() req: IRequest
@@ -70,7 +70,7 @@ export class UserController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GlobalAuthGuard)
   @Post('invite')
   async inviteUsers(
     @Body() userDto: InvitedUserDto,
@@ -94,7 +94,7 @@ export class UserController {
   }
 
   @Post('/resend-invitation')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GlobalAuthGuard)
   async resendInvitation(
     @Body() userDto: InvitedUserDetailDto,
     @Req() req: IRequest
@@ -139,7 +139,7 @@ export class UserController {
   }
 
   @Post('update-theme')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GlobalAuthGuard)
   async updateTheme(
     @Body() body: UserThemeDto,
     @Req() req: IRequest
@@ -155,7 +155,7 @@ export class UserController {
   }
 
   @Put('profile/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GlobalAuthGuard)
   async updateProfile(
     @Body() userDto: InvitedUserDetailDto,
     @Param() params: ParamsDto,
@@ -184,7 +184,7 @@ export class UserController {
   }
 
   @Put('/update-invited-user/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GlobalAuthGuard)
   async updateVerifiedUser(
     @Body() userDto: InvitedUserDetailDto,
     @Param() params: ParamsDto,

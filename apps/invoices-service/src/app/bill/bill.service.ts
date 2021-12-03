@@ -136,10 +136,29 @@ export class BillService {
 
         for (const i of bills) {
           const balance = balances.find((bal) => bal.id === i.id);
+
+          const paid_amount = balance?.invoice?.balance || 0;
+          const due_amount = balance?.invoice?.balance
+            ? i.netTotal - balance?.invoice?.balance
+            : i.netTotal;
+
+          const payment_status = () => {
+            if (paid_amount < due_amount && due_amount < i?.netTotal) {
+              return 'Partial Payment';
+            } else if (due_amount === i?.netTotal) {
+              return 'Payment Pending';
+            } else if (paid_amount === i?.netTotal) {
+              return 'Full Payment';
+            } else {
+              return null;
+            }
+          };
+
           bill_arr.push({
             ...i,
-            paid_amount: balance?.invoice?.balance,
-            due_amount: i?.netTotal - balance?.invoice?.balance,
+            paid_amount,
+            due_amount: i?.netTotal - balance?.invoice?.balance || 0,
+            payment_status: payment_status(),
           });
         }
       } else if (type === 'AWATING_PAYMENT') {
@@ -167,11 +186,30 @@ export class BillService {
 
         for (const i of bills) {
           const balance = balances.find((bal) => bal.id === i.id);
+
+          const paid_amount = balance?.invoice?.balance || 0;
+          const due_amount = balance?.invoice?.balance
+            ? i.netTotal - balance?.invoice?.balance
+            : i.netTotal;
+
+          const payment_status = () => {
+            if (paid_amount < due_amount && due_amount < i?.netTotal) {
+              return 'Partial Payment';
+            } else if (due_amount === i?.netTotal) {
+              return 'Payment Pending';
+            } else if (paid_amount === i?.netTotal) {
+              return 'Full Payment';
+            } else {
+              return null;
+            }
+          };
+
           if (balance.invoice.balance === 0) {
             bill_arr.push({
               ...i,
-              paid_amount: balance.invoice.balance,
-              due_amount: i.netTotal - balance.invoice.balance,
+              paid_amount,
+              due_amount: i.netTotal - balance.invoice.balance || 0,
+              payment_status: payment_status(),
             });
           }
         }
@@ -200,11 +238,30 @@ export class BillService {
 
         for (const i of bills) {
           const balance = balances.find((bal) => bal.id === i.id);
+
+          const paid_amount = balance?.invoice?.balance || 0;
+          const due_amount = balance?.invoice?.balance
+            ? i.netTotal - balance?.invoice?.balance
+            : i.netTotal;
+
+          const payment_status = () => {
+            if (paid_amount < due_amount && due_amount < i?.netTotal) {
+              return 'Partial Payment';
+            } else if (due_amount === i?.netTotal) {
+              return 'Payment Pending';
+            } else if (paid_amount === i?.netTotal) {
+              return 'Full Payment';
+            } else {
+              return null;
+            }
+          };
+
           if (balance.invoice.balance !== 0) {
             bill_arr.push({
               ...i,
-              paid_amount: balance.invoice.balance,
-              due_amount: i.netTotal - balance.invoice.balance,
+              paid_amount,
+              due_amount: i.netTotal - balance.invoice.balance || 0,
+              payment_status: payment_status(),
             });
           }
         }
@@ -346,7 +403,7 @@ export class BillService {
         }
 
         const debit = {
-          amount: item.total,
+          amount: Number(item.quantity) * Number(item.purchasePrice),
           account_id: item.accountId,
         };
 
@@ -367,20 +424,20 @@ export class BillService {
           payload: itemLedgerArray,
         });
 
+        const creditsArray = [];
+        const credit = {
+          account_id: await accounts.find((i) => i.code === '40001').id,
+          amount: dto.netTotal,
+        };
         if (dto?.discount > 0) {
-          const debitDiscount = {
+          const creditDiscount = {
             amount: dto.discount,
-            account_id: await accounts.find((i) => i.code === '50003').id,
+            account_id: await accounts.find((i) => i.code === '55002').id,
           };
-          debitsArrray.push(debitDiscount);
+          creditsArray.push(credit, creditDiscount);
+        } else {
+          creditsArray.push(credit);
         }
-
-        const creditsArray = [
-          {
-            account_id: await accounts.find((i) => i.code === '40001').id,
-            amount: dto.grossTotal,
-          },
-        ];
 
         const payload = {
           dr: debitsArrray,
@@ -468,7 +525,7 @@ export class BillService {
         }
 
         const debit = {
-          amount: item.total,
+          amount: Number(item.quantity) * Number(item.purchasePrice),
           account_id: item.accountId,
         };
 
@@ -480,16 +537,20 @@ export class BillService {
           payload: itemLedgerArray,
         });
 
-        const creditsArray = [
-          {
-            account_id: await accounts.find((i) => i.code === '40001').id,
-            amount: dto.netTotal,
-          },
-          {
+        const creditsArray = [];
+        const credit = {
+          account_id: await accounts.find((i) => i.code === '40001').id,
+          amount: dto.netTotal,
+        };
+        if (dto?.discount > 0) {
+          const creditDiscount = {
             amount: dto.discount,
             account_id: await accounts.find((i) => i.code === '55002').id,
-          },
-        ];
+          };
+          creditsArray.push(credit, creditDiscount);
+        } else {
+          creditsArray.push(credit);
+        }
 
         const payload = {
           dr: debitsArrray,
@@ -570,20 +631,54 @@ export class BillService {
         },
       });
 
+      const { data: payments } = await http.post(`payments/payment/invoice`, {
+        ids: [billId],
+        type: 'BILL',
+      });
+
       const { data: contact } = await axios(contactRequest as unknown);
       const { data: items } = await http.post(`items/item/ids`, {
         ids: itemIdsArray,
       });
 
+      const balance = payments.find((bal) => parseInt(bal.id) === bill.id);
+      const paid_amount = balance?.invoice?.balance || 0;
+      const due_amount = balance?.invoice?.balance
+        ? bill.netTotal - balance?.invoice?.balance
+        : bill.netTotal;
+
+      const payment_status = () => {
+        if (paid_amount < due_amount && due_amount < bill?.netTotal) {
+          return 'Partial Payment';
+        } else if (due_amount === bill?.netTotal) {
+          return 'Payment Pending';
+        } else if (paid_amount === bill?.netTotal) {
+          return 'Full Payment';
+        } else {
+          return null;
+        }
+      };
+
+      const newBill = {
+        ...bill,
+        paid_amount,
+        due_amount,
+        payment_status: payment_status(),
+      };
+
       const billItemArr = [];
       for (const i of bill.purchaseItems) {
         const item = items.find((j) => i.itemId === j.id);
-        billItemArr.push({ ...i, item });
+
+        billItemArr.push({
+          ...i,
+          item,
+        });
       }
 
       if (billItemArr.length > 0) {
         new_bill = {
-          ...bill,
+          ...newBill,
           contact: contact.result,
           purchaseItems: billItemArr,
         };
