@@ -641,7 +641,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
               </table>
             </div>
           </Col>
-          {true&& (
+          {response?.comment&& (
             <Col span={10}>
               <div className="notes">
                 <h5 className="label">
