@@ -1,6 +1,7 @@
-import styled from "styled-components";
-import { Color } from "../../modal";
-import convertToRem from "../../utils/convertToRem";
+import styled from 'styled-components';
+import { Color } from '../../modal';
+import convertToRem from '../../utils/convertToRem';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
 export const WrapperInvoiceForm = styled.div`
   margin: 0 0 ${convertToRem(20)} 0;
@@ -54,7 +55,7 @@ export const WrapperInvoiceForm = styled.div`
 
     letter-spacing: 0.08em;
     text-transform: capitalize;
-    color: #3e3e3c;
+    color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
   }
 
   p.light {
@@ -68,7 +69,7 @@ export const WrapperInvoiceForm = styled.div`
 
     /* text label */
 
-    color: #3e3e3c;
+    color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
   }
 
   ._total_aggragate {
@@ -164,10 +165,9 @@ export const WrapperInvoiceForm = styled.div`
     }
   }
 
-
   /* loading state */
 
-  .ant-skeleton.ant-skeleton-active{
+  .ant-skeleton.ant-skeleton-active {
     padding: 12px 0;
   }
 `;
