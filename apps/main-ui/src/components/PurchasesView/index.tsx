@@ -641,7 +641,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
               </table>
             </div>
           </Col>
-          {response?.comment && (
+          {true&& (
             <Col span={10}>
               <div className="notes">
                 <h5 className="label">
@@ -759,7 +759,7 @@ const WrapperNewPurchaseView = styled.div`
     padding: 0px 22px;
   }
   .topbar_logo_details_wrapper .company_details .company_name {
-    color: #143c69;
+    color: ${(props: IThemeProps) => props?.theme?.theme === 'dark' ? props?.theme?.colors?.$BLACK : props?.theme?.colors?.$Secondary};
     font-size: 25px;
     margin: 0;
     font-weight: 800;
@@ -767,7 +767,7 @@ const WrapperNewPurchaseView = styled.div`
   .topbar_logo_details_wrapper .company_details p {
     font-size: 16px;
     line-height: 19px;
-    color: #6f6f84;
+    color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
     margin-bottom: 5px;
   }
 
@@ -785,7 +785,7 @@ const WrapperNewPurchaseView = styled.div`
     font-size: 16px;
     line-height: 19px;
     text-align: right;
-    color: #6f6f84;
+    color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
   }
   /* ************* ADDRESS BAR STYLES ENDS HERE ********************** */
 
@@ -840,7 +840,7 @@ const WrapperNewPurchaseView = styled.div`
 
         text-align: right;
 
-        color: #143c69;
+        color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
       }
     }
   }
@@ -878,7 +878,7 @@ const WrapperNewPurchaseView = styled.div`
 
       /* Fonts/Primary */
 
-      color: #222234;
+      color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
     }
     tr:last-child {
       td,
@@ -901,7 +901,7 @@ const WrapperNewPurchaseView = styled.div`
 
       /* Fonts/Parent Variant */
 
-      color: #6f6f84;
+      color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
     }
     p {
       margin: 0;
@@ -912,7 +912,7 @@ const WrapperNewPurchaseView = styled.div`
 
       /* Fonts/Primary */
 
-      color: #222234;
+      color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
     }
   }
 
