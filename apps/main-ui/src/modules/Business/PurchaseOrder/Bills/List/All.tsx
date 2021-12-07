@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+/* THIS PAGE BELONGS TO ALL PURCHASES ORDERS TAB */
 import React, { FC, useEffect, useState } from 'react';
 import {
   queryCache,
@@ -7,49 +8,54 @@ import {
   useQuery,
 } from 'react-query';
 import styled from 'styled-components';
-
 import {
   deletePurchaseDrafts,
   getAllContacts,
   getPoListAPI,
 } from '../../../../../api';
-import { ConfirmModal } from '../../../../../components/ConfirmModal';
-import { SmartFilter } from '../../../../../components/SmartFilter';
 import { CommonTable } from '../../../../../components/Table';
-import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
-import {
-  IContactType,
-  IContactTypes,
-  IErrorMessages,
-  IServerError,
-  NOTIFICATIONTYPE,
-} from '../../../../../modal';
 import {
   IInvoiceResponse,
+  IInvoiceTypes,
   INVOICETYPE,
   INVOICE_TYPE_STRINGS,
   ORDER_TYPE,
   ISupportedRoutes,
 } from '../../../../../modal';
+import convertToRem from '../../../../../utils/convertToRem';
+import { SmartFilter } from '../../../../../components/SmartFilter';
+import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import FilterSchema from './PoFilterSchema';
+import { ConfirmModal } from '../../../../../components/ConfirmModal';
+import {
+  IBaseAPIError,
+  IContactType,
+  IContactTypes,
+  NOTIFICATIONTYPE,
+} from '../../../../../modal';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
 import { _csvExportable } from './CommonCol';
-import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
+import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
 
 interface IProps {
   columns?: any[];
+  activeTab?: string;
 }
-export const DraftPurchases: FC<IProps> = ({ columns }) => {
+export const ALLBillsList: FC<IProps> = ({ columns, activeTab }) => {
   /* HOOKS HERE */
   /* Mutations */
-  /* THIS MUTATION IS RESPONSIBLE FOR APPROVED DRAFT ORDERS */
-
-  /* THIS MUTATION IS RESPONSIBLE FOR DELETE ORDERS */
   const [mutateDeleteOrders, resDeleteOrders] =
     useMutation(deletePurchaseDrafts);
-  /* COMPONENT STATE MANAGEMENT HOOKS */
-  const [selectedRow, setSelectedRow] = useState([]);
+
+  /* RBAC */
+
+  const { rbac } = useRbac(null);
+
+  /* ****** Global Context ******* */
+  const { notificationCallback } = useGlobalContext();
+
+  /*  ********** COMPONENT STATE HOOKS  *********** */
   const [filterBar, setFilterbar] = useState(false);
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
@@ -57,16 +63,13 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
     sortid: '',
     page_size: 10,
   });
+  /* ********* DESTRUCTURING ALL INVOICESCONFIG *************** */
   const { page, query, sortid, page_size } = allInvoicesConfig;
 
   const [confirmModal, setConfirmModal] = useState(false);
-  const [{ result, pagination }, setAllInvoicesRes] =
-    useState<IInvoiceResponse>({
-      result: [],
-      pagination: null,
-    });
-
-  const { rbac } = useRbac(null);
+  const { routeHistory } = useGlobalContext();
+  const { history } = routeHistory;
+  const [selectedRow, setSelectedRow] = useState([]);
   const [filteringSchema, setFilteringSchema] = useState(FilterSchema);
 
   /*Query hook for  Fetching all accounts against ID */
@@ -91,12 +94,11 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
       setFilteringSchema(filteredSchema);
     }
   }, [allcontactsRes]);
-
-  /* *************** STATES ENDS HERE ************** */
-
-  /* GLOBAL MANAGER CONTEXT API */
-  const { routeHistory, notificationCallback } = useGlobalContext();
-  const { history } = routeHistory;
+  const [{ result, pagination }, setAllInvoicesRes] =
+    useState<IInvoiceResponse>({
+      result: [],
+      pagination: null,
+    });
 
   useEffect(() => {
     if (
@@ -115,63 +117,24 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
       setAllInvoicesConfig({ ...allInvoicesConfig, ...obj });
     }
   }, [routeHistory, history]);
+  /*  ////////////// - METHODS HERE - \\\\\\\\\\\\ */
 
-  /* ********* PAGINATED QUERY FOR FETCHING DRAFT ORDERS *************** */
+  /* ******* PAGINATED QUERY TO FETCH LIST OF PURCHASES ********** */
+  /* ******* ORDERS ONLY TYPE (PROCESSED PURCHASE ORDERS) ********** */
   const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
     [
-      `invoices-purchases-${INVOICETYPE.DRAFT}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
-      ORDER_TYPE.PURCAHSE_ORDER,
-      INVOICETYPE.DRAFT,
-      'ALL',
+      `invoices-purchases-${INVOICETYPE.Approved}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
+      [ORDER_TYPE.PURCAHSE_ORDER],
+      INVOICETYPE.Approved,
+      INVOICETYPE.ALL,
       page,
       page_size,
-      sortid,
       query,
     ],
     getPoListAPI
   );
 
-  /* ********** METHODS HERE *************** */
-  /* ************** ASYNC FUNCTION IS TO  DELETE ORDER ******** */
-  const handleDelete = async () => {
-    const payload = {
-      ids: [...selectedRow],
-    };
-    await mutateDeleteOrders(payload, {
-      onSuccess: () => {
-        ['invoices', 'invoice-view'].forEach((key) => {
-          queryCache.invalidateQueries((q) =>
-            q.queryKey[0].toString().startsWith(`${key}`)
-          );
-        });
-        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Deleted Successfully');
-
-        setSelectedRow([]);
-        setConfirmModal(false);
-      },
-      onError: (error: IServerError) => {
-        if (
-          error &&
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
-          const { message } = error.response.data;
-          notificationCallback(NOTIFICATIONTYPE.ERROR, message);
-        } else {
-          notificationCallback(
-            NOTIFICATIONTYPE.ERROR,
-            IErrorMessages.NETWORK_ERROR
-          );
-        }
-      },
-    });
-  };
-
-  const onSelectedRow = (item) => {
-    setSelectedRow(item.selectedRowKeys);
-  };
-
+  /* CONDITIONAL RENDERING LIFE CYCLE HOOK TO UPDATE ALL INVOICES STATE WHEN API CALL IS DONE */
   useEffect(() => {
     if (resolvedData && resolvedData.data && resolvedData.data.result) {
       const { result } = resolvedData.data;
@@ -184,7 +147,56 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
     }
   }, [resolvedData]);
 
-  /* Columns are overided to add  actions column in table */
+  /* DELETE PURCHASE ORDER METHOD */
+  const handleDelete = async () => {
+    const payload = {
+      ids: [...selectedRow],
+    };
+    try {
+      await mutateDeleteOrders(payload, {
+        onSuccess: () => {
+          notificationCallback(
+            NOTIFICATIONTYPE.SUCCESS,
+            'Deleted Successfully'
+          );
+          [
+            'invoices',
+            'transactions',
+            'items?page',
+            'invoice-view',
+            'ledger-contact',
+            'all-items',
+          ].forEach((key) => {
+            queryCache.invalidateQueries((q) =>
+              q.queryKey[0].toString().startsWith(`${key}`)
+            );
+          });
+
+          setSelectedRow([]);
+          setConfirmModal(false);
+        },
+        onError: (error: IBaseAPIError) => {
+          if (
+            error &&
+            error.response &&
+            error.response.data &&
+            error.response.data.message
+          ) {
+            const { message } = error.response.data;
+            notificationCallback(NOTIFICATIONTYPE.ERROR, message);
+          }
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  /* METHOD TO UPDATE SELECTED ROW OF TABLE */
+  const onSelectedRow = (item) => {
+    setSelectedRow(item.selectedRowKeys);
+  };
+
   const cols = [...columns];
 
   const renerTopRightbar = () => {
@@ -196,7 +208,7 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
               ...allInvoicesConfig,
               query: encode,
             });
-            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=draft&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
+            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=all&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
             history.push(route);
           }}
           onClose={() => setFilterbar(false)}
@@ -207,31 +219,24 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
     );
   };
 
+  /* JSX HERE */
   return (
     <ALlWrapper>
       <CommonTable
         exportable
         exportableProps={{
           fields: _csvExportable,
+          fileName: 'approved-purchases',
         }}
+        printTitle={'Approved Purchase Orders List'}
         className={'border-top-none'}
-        topbarRightPannel={renerTopRightbar()}
         hasPrint
-        printTitle={'Draft Purchase Orders List'}
+        topbarRightPannel={renerTopRightbar()}
         customTopbar={
           <PurchaseTopbar
-            disabled={!selectedRow.length}
-            isEditable={selectedRow.length === 1}
+            onDelete={() => setConfirmModal(true)}
             isAbleToDelete={rbac.can(PERMISSIONS.PURCHASES_DELETE)}
-            onDelete={() => {
-              setConfirmModal(true);
-            }}
-            onEdit={() => {
-              const id = selectedRow[0];
-              history.push(
-                `/app${ISupportedRoutes.CREATE_PURCHASE_Entry}/${id}`
-              );
-            }}
+            disabled={!selectedRow.length}
           />
         }
         data={result}
@@ -245,7 +250,7 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
               page: pagination.current,
               page_size: pagination.pageSize,
             });
-            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=draft&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}`;
+            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=all&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
             history.push(route);
           } else {
             setAllInvoicesConfig({
@@ -259,7 +264,7 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
             });
             const route = `/app${
               ISupportedRoutes.PURCHASES
-            }?tabIndex=draft&sortid=null&page=${pagination.current}&page_size=${
+            }?tabIndex=all&sortid=null&page=${pagination.current}&page_size=${
               pagination.pageSize
             }&query=${query}&sortid=${
               sorter && sorter.order === 'descend'
@@ -294,6 +299,25 @@ export const DraftPurchases: FC<IProps> = ({ columns }) => {
   );
 };
 
-export default DraftPurchases;
+export default ALLBillsList;
 
-export const ALlWrapper = styled.div``;
+/* COMPONENT STYLES HERE */
+export const ALlWrapper = styled.div`
+  .custom_topbar {
+    padding: ${convertToRem(20)} 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .edit {
+    flex: 8;
+  }
+
+  .search {
+    flex: 4;
+  }
+
+  .custom_button {
+  }
+`;
