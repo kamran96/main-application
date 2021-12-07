@@ -177,7 +177,7 @@ export const WrapperEditable = styled.div<WrapperProps>`
     width: 100%;
     height: 100%;
     border: 1px solid
-      ${(props: WrapperProps) => (props?.error ? 'red' : 'transparent')};
+      ${(props: WrapperProps) => (props?.error ? '#ff940f' : 'transparent')};
     border-radius: 5px;
     padding: 7px 12px;
     min-height: 31px;
@@ -196,7 +196,8 @@ export const WrapperEditable = styled.div<WrapperProps>`
     color: #626262;
     padding: 8px 11px;
     display: block;
-    border: 1px solid transparent;
+    border: 1px solid
+      ${(props: WrapperProps) => (props?.error ? '#ff940f' : 'transparent')};
     -webkit-transition: 0.3s all ease-in-out;
     transition: 0.3s all ease-in-out;
     border-radius: 5px;
@@ -348,7 +349,7 @@ const WrapperEditableSelect = styled.div<any>`
     color: #626262;
     padding: 8px 11px;
     display: block;
-    border: 1px solid ${({ error }): any => (error ? 'red' : 'transparent')};
+    border: 1px solid ${({ error }): any => (error ? '#ff940f' : 'transparent')};
     transition: 0.3s all ease-in-out;
     border-radius: 5px;
     text-overflow: ellipsis;

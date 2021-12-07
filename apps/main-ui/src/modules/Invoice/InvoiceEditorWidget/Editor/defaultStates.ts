@@ -20,8 +20,8 @@ export const Requires = {
     message: 'Item is Requred to Proceed invoice',
   },
   description: {
-    require: true,
-    message: 'Item is Requred to Proceed invoice',
+    require: false,
+    message: '',
   },
   quantity: {
     require: true,
@@ -30,6 +30,7 @@ export const Requires = {
   unitPrice: {
     require: true,
     message: 'Item is Requred to Proceed invoice',
+    condition: (value) => value > 0,
   },
   purchasePrice: {
     require: false,

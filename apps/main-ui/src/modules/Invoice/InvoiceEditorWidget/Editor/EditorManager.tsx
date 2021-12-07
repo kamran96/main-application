@@ -28,7 +28,7 @@ import {
   getInvoiceByIDAPI,
 } from '../../../../api';
 import { getAccountsByTypeAPI } from '../../../../api/accounts';
-import CommonSelect, { Option } from '../../../../components/CommonSelect';
+import { Option } from '../../../../components/CommonSelect';
 import { Editable, EditableSelect } from '../../../../components/Editable';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { useShortcut } from '../../../../hooks/useShortcut';
@@ -354,6 +354,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
   };
 
   const handleCheckValidation = () => {
+    const errors = [];
     const mutatedItems = [];
     invoiceItems?.forEach((item, index) => {
       const activeItem = { ...item };
@@ -361,6 +362,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
       Object?.keys(item)?.forEach((key, keyIndex) => {
         if (Requires[key]?.require === true && !activeItem[key]) {
           if (activeItem?.errors?.length) {
+            errors?.push(`In Row ${index + 1}, ${key} is required`);
             if (!activeItem?.errors?.includes(key)) {
               activeItem.errors.push(key);
             }
@@ -379,6 +381,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     });
 
     setInvoiceItems(mutatedItems);
+
+    return errors;
   };
 
   const columns: ColumnsType<any> = useMemo(() => {
@@ -557,7 +561,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         render: (data, record, index) => {
           return (
             <Editable
-              error={true}
+              error={record?.errors?.includes('description')}
               style={{
                 width: '100%',
                 minWidth: '180px',
@@ -572,9 +576,12 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                     setInvoiceItems((prev) => {
                       const allItems = [...prev];
 
-                      delete allItems[index]?.descriptionError;
+                      const indexed = record.errors?.indexOf('description');
+                      if (indexed !== -1) {
+                        record.errors.splice(indexed, 1);
+                      }
                       allItems[index] = {
-                        ...allItems[index],
+                        ...record,
                         description: value,
                       };
                       return allItems;
@@ -598,7 +605,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         render: (value, record, index) => {
           return (
             <Editable
-              error={record?.quantityError}
+              error={record?.errors?.includes('quantity')}
               disabled={!record.itemId}
               onChange={(value: number) => {
                 clearTimeout(setStateTimeOut);
@@ -641,8 +648,13 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       const total =
                         calculateInvoice(unitPrice, tax, itemDiscount) *
                         quantity;
+
+                      const indexed = record.errors?.indexOf('quantity');
+                      if (indexed !== -1) {
+                        record.errors.splice(indexed, 1);
+                      }
                       allItems[index] = {
-                        ...allItems[index],
+                        ...record,
                         quantity,
                         total,
                         costOfGoodAmount,
@@ -670,7 +682,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         render: (value, record, index) => {
           return (
             <Editable
-              error={record?.unitPriceError}
+              error={record?.errors?.includes('unitPrice')}
               onChange={(value) => {
                 clearTimeout(setStateTimeOut);
                 setStateTimeOut = setTimeout(() => {
@@ -682,9 +694,15 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                     const total =
                       calculateInvoice(unitPrice, tax, itemDiscount) *
                       parseInt(record.quantity);
-                    delete allItems[index]?.unitPriceError;
+
+                    const indexed = record.errors?.indexOf('unitPrice');
+
+                    if (indexed !== -1) {
+                      record.errors.splice(indexed, 1);
+                    }
+
                     allItems[index] = {
-                      ...allItems[index],
+                      ...record,
                       unitPrice,
                       total,
                     };
@@ -709,7 +727,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         render: (value, record, index) => {
           return (
             <Editable
-              error={record?.itemDiscountError}
+              error={record?.errors?.includes('itemDiscount')}
               disabled={!record.itemId}
               type="text"
               value={value}
@@ -729,9 +747,13 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                     const total =
                       calculateInvoice(unitPrice, tax, itemDiscount) *
                       parseInt(record.quantity);
-                    delete allItems[index]?.itemDiscountError;
+                    const indexed = record.errors?.indexOf('itemDiscount');
+                    if (indexed !== -1) {
+                      record.errors.splice(indexed, 1);
+                    }
+
                     allItems[index] = {
-                      ...allItems[index],
+                      ...record,
                       itemDiscount,
                       total,
                     };

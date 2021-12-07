@@ -14,7 +14,7 @@ import { PurchaseOrderColumns } from './List/CommonCol';
 import DueExpiredPurchases from './List/DueExpired';
 import PaidPurchaseEntries from './List/Paid';
 
-export const PurchasesList: FC = () => {
+export const BillsList: FC = () => {
   /* Dynamic Imports */
   const AllPurchases = lazy(() => import('./List/All'));
   const DraftPurchases = lazy(() => import('./List/Draft'));

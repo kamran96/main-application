@@ -156,30 +156,9 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   const onFinish = async (value) => {
-    handleCheckValidation(invoiceItems);
+    const errors = handleCheckValidation(invoiceItems);
 
-    return false;
-
-    const InvoiceItemsValidation = [];
-
-    organization?.organizationType !== IOrganizationType.ENTERPRISE &&
-      invoiceItems.forEach(async (i, index) => {
-        if (i.itemId === null || i.accountId === null) {
-          InvoiceItemsValidation.push({
-            index: index + 1,
-            item: i.itemId === null ? 'Item' : 'Account',
-          });
-        }
-      });
-
-    if (InvoiceItemsValidation.length > 0) {
-      notificationCallback(
-        NOTIFICATIONTYPE.ERROR,
-        `Error in ${InvoiceItemsValidation.map((i) => {
-          return `${i.index} Please Select any ${i.item} otherwise delete empty row.`;
-        })}`
-      );
-    } else {
+    if (!errors.length) {
       const paymentData = { ...payment };
       delete paymentData.totalAmount;
       delete paymentData.totalDiscount;
@@ -198,23 +177,6 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
           return { ...item, sequence: index };
         }),
       };
-      // let payments = {
-      //   ...paymentData,
-      //   amount:
-      //     payment.paymentMode === PaymentMode.CREDIT
-      //       ? 0
-      //       : payment.paymentMode === PaymentMode.CASH
-      //       ? NetTotal
-      //       : parseFloat(payment.amount),
-      // };
-
-      // if (type !== IInvoiceType.QUOTE && payload.invoice.status !== 2) {
-      //   if (payments.paymentMode === PaymentMode.CASH) {
-      //     delete payments.dueDate;
-      //   }
-
-      //   payload = { ...payload, payment: payments };
-      // }
 
       delete payload.invoiceDiscount;
       delete payload.total;
@@ -227,66 +189,61 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
           deleted_ids: deleteIds,
         };
       }
-      try {
-        await muatateCreateInvoice(payload, {
-          onSuccess: () => {
-            notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Invoice Created');
 
-            if (value && value.status.print) {
-              setPrintModal(true);
-            }
+      await muatateCreateInvoice(payload, {
+        onSuccess: () => {
+          notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Invoice Created');
 
-            if (payload.invoice.status !== 2) {
-              const messages = {
-                invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
-                quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
-              };
+          if (value && value.status.print) {
+            setPrintModal(true);
+          }
 
-              onSendPDF(
-                value.contactId,
-                type === IInvoiceType.INVOICE
-                  ? messages.invoice
-                  : messages.quotes
-              );
-            }
+          if (payload.invoice.status !== 2) {
+            const messages = {
+              invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
+              quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
+            };
 
-            ClearAll();
+            onSendPDF(
+              value.contactId,
+              type === IInvoiceType.INVOICE ? messages.invoice : messages.quotes
+            );
+          }
 
-            /* this will clear invoice items, formdata and payment */
+          ClearAll();
 
-            [
-              'invoices',
-              'transactions?page',
-              'items?page',
-              'invoice-view',
-              'ledger-contact',
-              'all-items',
-            ].forEach((key) => {
-              queryCache.invalidateQueries((q) =>
-                q.queryKey[0].toString().startsWith(key)
-              );
-            });
-          },
-          onError: (error: IServerError) => {
-            if (
-              error &&
-              error.response &&
-              error.response.data &&
-              error.response.data.message
-            ) {
-              const { message } = error.response.data;
-              notificationCallback(NOTIFICATIONTYPE.ERROR, message);
-            } else {
-              notificationCallback(
-                NOTIFICATIONTYPE.ERROR,
-                IErrorMessages.NETWORK_ERROR
-              );
-            }
-          },
-        });
-      } catch (error) {
-        return null;
-      }
+          /* this will clear invoice items, formdata and payment */
+
+          [
+            'invoices',
+            'transactions?page',
+            'items?page',
+            'invoice-view',
+            'ledger-contact',
+            'all-items',
+          ].forEach((key) => {
+            queryCache.invalidateQueries((q) =>
+              q.queryKey[0].toString().startsWith(key)
+            );
+          });
+        },
+        onError: (error: IServerError) => {
+          if (
+            error &&
+            error.response &&
+            error.response.data &&
+            error.response.data.message
+          ) {
+            const { message } = error.response.data;
+            notificationCallback(NOTIFICATIONTYPE.ERROR, message);
+          } else {
+            notificationCallback(
+              NOTIFICATIONTYPE.ERROR,
+              IErrorMessages.NETWORK_ERROR
+            );
+          }
+        },
+      });
     }
   };
   const onCancelPrint = () => {
