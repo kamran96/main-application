@@ -1,4 +1,4 @@
-import http, { railsHttp } from '../utils/http';
+import http from '../utils/http';
 
 enum USERS {
   INDEX = 'users/user',
@@ -18,24 +18,24 @@ export const getUsersListAPI = (
     url = `${url}&query=${query}`;
   }
 
-  return railsHttp.get(url);
+  return http.get(url);
 };
 
 export const deleteUserAPI = (ids) => http.put(USERS.DELETE, ids);
 
 export const inviteUserAPI = (payload) => http.post(USERS.INVITE, payload);
 
-export const getAllUsers = () => railsHttp.get(`/users/index?purpose=ALL`);
+export const getAllUsers = () => http.get(`/users/index?purpose=ALL`);
 
 export const getALLBranches = () => http.get(`/users/branch`);
 
 export const verifyUserInvitationAPI = (payload) =>
   http?.post(`users/user/verify-invited-user`, payload);
 
-export const userCheckAPI = (payload) =>
-  railsHttp?.post(`/users/check`, payload);
+export const userCheckAPI = (payload) => http?.post(`/users/check`, payload);
 
 export const userJoinAPI = (payload) =>
   http?.put(`${USERS.INDEX}/update-invited-user/${payload?.id}`, payload);
 
-export const resendInvitation = (payload)=> http?.post(`${USERS.INDEX}/resend-invitation`, payload);
+export const resendInvitation = (payload) =>
+  http?.post(`${USERS.INDEX}/resend-invitation`, payload);

@@ -1,7 +1,7 @@
-import { railsHttp } from "../utils/http";
+import http from '../utils/http';
 
 export const branchDeleteAPI = (payload) =>
-  railsHttp.put(`/users/branch/delete`, payload);
+  http.put(`/users/branch/delete`, payload);
 
 export const getBranchByIdAPI = (key?: string, id?: number) =>
-  railsHttp.get(`/users/branch/${id}`);
+  http.get(`/users/branch/${id}`);

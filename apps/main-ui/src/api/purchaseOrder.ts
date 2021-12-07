@@ -1,7 +1,7 @@
-import { railsHttp } from "./../utils/http";
+import http from './../utils/http';
 
 export const CreatePurchaseOrderAPI = (payload?: any) =>
-  railsHttp.post("/purchase_order/create", payload);
+  http.post('/purchase_order/create', payload);
 
 export const purchaseOrderList = (
   key?: string,
@@ -15,5 +15,5 @@ export const purchaseOrderList = (
   if (query) {
     url = `${url}&query=${query}`;
   }
-  return railsHttp.get(url);
+  return http.get(url);
 };
