@@ -1,4 +1,4 @@
-import http, { railsHttp } from '../utils/http';
+import http from '../utils/http';
 
 export const TrialbalanceAPI = (key?: string, query?: string) => {
   let URL = `accounts/reports/trial-balance`;
@@ -32,5 +32,5 @@ export const CashActivityStatementAPI = (key?: string, query?: string) => {
     URL = `${URL}?query=${query}`;
   }
 
-  return railsHttp.get(URL);
+  return http.get(URL);
 };

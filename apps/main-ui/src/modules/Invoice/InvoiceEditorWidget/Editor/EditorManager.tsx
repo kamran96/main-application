@@ -111,9 +111,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     dueDate: dayjs(),
     paymentType: null,
   });
-  const [accountRowSelectedIndex, setAccountRowSelectedIndex] = useState(null);
-
-  console.log(invoiceItems, 'invoice items');
 
   /* Antd antd form */
   /* And Form Hook */
@@ -357,29 +354,32 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
   };
 
   const handleCheckValidation = () => {
-    const findErrors = invoiceItems?.map((item, index) => {
-      let activeItem = { ...item };
+    const mutatedItems = [];
+    invoiceItems?.forEach((item, index) => {
+      const activeItem = { ...item };
+
       Object?.keys(item)?.forEach((key, keyIndex) => {
-        if (Requires[key]?.require === true && !item[key]) {
-          activeItem = { ...activeItem, [`${key}Error`]: true };
-        } else {
-          console.log(index, activeItem[`${key}Error}`]);
-          if (activeItem[`${key}Error}`] === true) {
-            delete activeItem[`${key}Error}`];
-            return { ...activeItem };
+        if (Requires[key]?.require === true && !activeItem[key]) {
+          if (activeItem?.errors?.length) {
+            if (!activeItem?.errors?.includes(key)) {
+              activeItem.errors.push(key);
+            }
           } else {
-            return { ...activeItem };
+            activeItem.errors = [key];
+          }
+        } else {
+          const indexed = activeItem.errors?.indexOf(key);
+          if (indexed !== -1) {
+            activeItem.errors.splice(indexed, 1);
           }
         }
       });
 
-      console.log(activeItem, 'what is active item now');
-      return activeItem;
+      mutatedItems.push(activeItem);
     });
-    setInvoiceItems(findErrors);
-  };
 
-  console.log(invoiceItems, 'invoice items ');
+    setInvoiceItems(mutatedItems);
+  };
 
   const columns: ColumnsType<any> = useMemo(() => {
     return [
@@ -411,7 +411,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         render: (value, record, index) => {
           return (
             <EditableSelect
-              error={record?.itemIdError}
+              error={record?.errors?.includes('itemId')}
               className={`border-less-select ${
                 index === invoiceItems.length - 1 ? 'scrollIntoView' : ''
               }`}
@@ -498,7 +498,10 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       'description',
                       'itemDiscount',
                     ]?.forEach((key) => {
-                      delete record[`${key}Error`];
+                      const index = record.errors?.indexOf(key);
+                      if (index !== -1) {
+                        record.errors.splice(index, 1);
+                      }
                     });
 
                     allItems.splice(index, 1, {
@@ -533,7 +536,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                 </Option>
                 {/* </Rbac> */}
                 {filteredItems().map((item: IItemsResult, mapIndex: number) => {
-                  console.log(index, invoiceItems, 'items here');
                   return (
                     <Option key={mapIndex} title={item.name} value={item.id}>
                       {item.code} / {item.name}
@@ -555,7 +557,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         render: (data, record, index) => {
           return (
             <Editable
-              error={record?.descriptionError}
+              error={true}
               style={{
                 width: '100%',
                 minWidth: '180px',
@@ -748,11 +750,10 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
             title: 'Account',
             dataIndex: 'accountId',
             width: width > 1500 ? 220 : 150,
-            render: (value, row, index) => {
+            render: (value, record, index) => {
               return (
                 <EditableSelect
-                  error={row?.accountIdError}
-                  onClick={() => setAccountRowSelectedIndex(index)}
+                  error={record?.errors?.includes('accountId')}
                   className={`border-less-select`}
                   value={{
                     value: value !== null ? value : '',
@@ -770,9 +771,14 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                   onChange={(val) => {
                     setInvoiceItems((prev) => {
                       const allItems = [...prev];
-                      delete allItems[index]?.accountIdError;
+                      const indexed = record?.errors?.indexOf('accountId');
+
+                      if (indexed !== -1) {
+                        record?.errors?.splice(indexed, 1);
+                      }
+
                       allItems[index] = {
-                        ...allItems[index],
+                        ...record,
                         accountId: val.value,
                       };
 
