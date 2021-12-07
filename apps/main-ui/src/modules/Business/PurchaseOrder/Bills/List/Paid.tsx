@@ -22,7 +22,6 @@ import {
 } from '../../../../../modal/invoice';
 import convertToRem from '../../../../../utils/convertToRem';
 import { SmartFilter } from '../../../../../components/SmartFilter';
-import { ISupportedRoutes } from '../../../../../modal';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import FilterSchema from './PoFilterSchema';
 import { ConfirmModal } from '../../../../../components/ConfirmModal';
@@ -31,6 +30,7 @@ import {
   IContactType,
   IContactTypes,
   NOTIFICATIONTYPE,
+  ISupportedRoutes,
 } from '../../../../../modal';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
 import { _csvExportable } from './CommonCol';
@@ -42,7 +42,7 @@ interface IProps {
   columns?: any[];
   activeTab?: string;
 }
-export const AwaitingPurchaseList: FC<IProps> = ({ columns, activeTab }) => {
+export const PaidBills: FC<IProps> = ({ columns, activeTab }) => {
   /* HOOKS HERE */
   /* Mutations */
   const [mutateDeleteOrders, resDeleteOrders] =
@@ -101,7 +101,12 @@ export const AwaitingPurchaseList: FC<IProps> = ({ columns, activeTab }) => {
     });
 
   useEffect(() => {
-    if (routeHistory?.history?.location?.search) {
+    if (
+      routeHistory &&
+      routeHistory.history &&
+      routeHistory.history.location &&
+      routeHistory.history.location.search
+    ) {
       let obj = {};
       const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
@@ -118,10 +123,10 @@ export const AwaitingPurchaseList: FC<IProps> = ({ columns, activeTab }) => {
   /* ******* ORDERS ONLY TYPE (PROCESSED PURCHASE ORDERS) ********** */
   const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
     [
-      `invoices-purchases-${INVOICETYPE.Payment_Awaiting}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
+      `invoices-purchases-${INVOICETYPE.Approved}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
       [ORDER_TYPE.PURCAHSE_ORDER],
       INVOICETYPE.Approved,
-      INVOICE_TYPE_STRINGS.Payment_Awaiting,
+      INVOICE_TYPE_STRINGS.Paid,
       page,
       page_size,
       query,
@@ -194,10 +199,10 @@ export const AwaitingPurchaseList: FC<IProps> = ({ columns, activeTab }) => {
 
   const cols = [...columns];
 
-  cols.splice(6, 1, {
-    title: 'Due Amount',
-    dataIndex: 'due_amount',
-    render: (data, row) => {
+  cols.splice(5, 1, {
+    title: 'Paid Amount',
+    dataIndex: 'paid_amount',
+    render: (data) => {
       return <>{moneyFormat(Math.abs(data))}</>;
     },
   });
@@ -211,7 +216,7 @@ export const AwaitingPurchaseList: FC<IProps> = ({ columns, activeTab }) => {
               ...allInvoicesConfig,
               query: encode,
             });
-            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=awating_payment&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
+            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=paid&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
             history.push(route);
           }}
           onClose={() => setFilterbar(false)}
@@ -253,7 +258,8 @@ export const AwaitingPurchaseList: FC<IProps> = ({ columns, activeTab }) => {
               page: pagination.current,
               page_size: pagination.pageSize,
             });
-            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=awating_payment&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+
+            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=paid&sortid=null&page=1&page_size=20&sortid=${sortid}`;
             history.push(route);
           } else {
             setAllInvoicesConfig({
@@ -266,10 +272,10 @@ export const AwaitingPurchaseList: FC<IProps> = ({ columns, activeTab }) => {
                   : sorter.field,
             });
             const route = `/app${
-              ISupportedRoutes.INVOICES
-            }?tabIndex=awating_payment&sortid=null&page=${
-              pagination.current
-            }&page_size=${pagination.pageSize}&query=${query}&sortid=${
+              ISupportedRoutes.PURCHASES
+            }?tabIndex=paid&sortid=null&page=${pagination.current}&page_size=${
+              pagination.pageSize
+            }&query=${query}&sortid=${
               sorter && sorter.order === 'descend'
                 ? `-${sorter.field}`
                 : sorter.field
@@ -277,14 +283,14 @@ export const AwaitingPurchaseList: FC<IProps> = ({ columns, activeTab }) => {
             history.push(route);
           }
         }}
-        totalItems={pagination && pagination.total}
+        totalItems={pagination?.total}
         pagination={{
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '50', '100'],
           pageSize: page_size,
           position: ['bottomRight'],
           current: pagination?.page_no,
-          total: pagination && pagination.total,
+          total: pagination?.total,
         }}
         hasfooter={true}
         onSelectRow={onSelectedRow}
@@ -302,7 +308,7 @@ export const AwaitingPurchaseList: FC<IProps> = ({ columns, activeTab }) => {
   );
 };
 
-export default AwaitingPurchaseList;
+export default PaidBills;
 
 /* COMPONENT STYLES HERE */
 export const ALlWrapper = styled.div`
