@@ -197,15 +197,7 @@ export const PaidBills: FC<IProps> = ({ columns, activeTab }) => {
     setSelectedRow(item.selectedRowKeys);
   };
 
-  const cols = [...columns];
 
-  cols.splice(5, 1, {
-    title: 'Paid Amount',
-    dataIndex: 'paid_amount',
-    render: (data) => {
-      return <>{moneyFormat(Math.abs(data))}</>;
-    },
-  });
 
   const renerTopRightbar = () => {
     return (
@@ -248,7 +240,7 @@ export const PaidBills: FC<IProps> = ({ columns, activeTab }) => {
           />
         }
         data={result}
-        columns={cols}
+        columns={columns}
         loading={isFetching || isLoading}
         onChange={(pagination, filters, sorter: any, extra) => {
           if (sorter.order === undefined) {
