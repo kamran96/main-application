@@ -1,18 +1,19 @@
-import http, { railsHttp } from '../utils/http';
+import http from '../utils/http';
 
 export const LoginAPI = (payload) => http.post(`users/auth`, payload);
 
-export const RegisterAPI = (payload) => http.post(`users/auth/register`, payload);
+export const RegisterAPI = (payload) =>
+  http.post(`users/auth/register`, payload);
 
 interface IActiveBranchPayload {
   organizationId: number;
   branchId: number;
 }
 export const activeBranchAPI = (payload?: any, userId?: number) =>
-  railsHttp.put(`users/organization/${payload.UserId}`, payload);
+  http.put(`users/organization/${payload.UserId}`, payload);
 
 export const updateThemeAPI = (payload?: any) =>
-  railsHttp.post(`users/user/update-theme`, payload);
+  http.post(`users/user/update-theme`, payload);
 
 export const requestResetPasswordAPI = (payload: any) =>
   http?.post('users/auth/forget-password', payload);
@@ -27,6 +28,7 @@ export const resendVerificationCodeAPI = (payload: any) =>
   http?.post(`users/auth/resend-otp`, payload);
 
 export const CheckAuthAPI = (key?: string) => http.get(`users/auth/check`);
-export const CheckAuthAPIDev = (key?: string, id?: number)=> http?.get(`users/user/${id}`);
+export const CheckAuthAPIDev = (key?: string, id?: number) =>
+  http?.get(`users/user/${id}`);
 
 export const LogoutAPI = (key?: string) => http.post(`users/auth/logout`);

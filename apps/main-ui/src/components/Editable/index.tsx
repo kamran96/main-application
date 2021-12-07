@@ -316,7 +316,6 @@ export const EditableSelect: FC<IEditableSelectProps> = ({
             optionFilterProp={optionFilterProp}
             onChange={(val: any, option: any) => {
               setSelectValue(option);
-              console.log({ val, option }, 'value');
               if (onChange) {
                 onChange(option);
               }

@@ -9,14 +9,14 @@ import dayjs from 'dayjs';
 import { FC, useRef, useState } from 'react';
 import { queryCache, useMutation } from 'react-query';
 
-import { createPurchaseEntryAPI, InvoiceCreateAPI } from '../../api';
-import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import {
-  IErrorMessages,
-  IServerError,
-  ISupportedRoutes,
-  NOTIFICATIONTYPE,
-} from '../../modal';
+  create_update_contact,
+  createPurchaseEntryAPI,
+  InvoiceCreateAPI,
+} from '../../api';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { IErrorMessages, IServerError, NOTIFICATIONTYPE } from '../../modal';
+import { IContactTypes } from '../../modal';
 import { IInvoiceStatus, IInvoiceType, ITaxTypes } from '../../modal/invoice';
 import { IOrganizationType } from '../../modal/organization';
 import { addition } from '../../utils/helperFunctions';
@@ -69,6 +69,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
   const [issueDate, setIssueDate] = useState(dayjs());
   const [printModal, setPrintModal] = useState(false);
   const [taxType, setTaxType] = useState<ITaxTypes>(ITaxTypes.TAX_INCLUSIVE);
+  const [createContactName, setCreateContactName] = useState('');
 
   const {
     rowsErrors,
@@ -109,6 +110,11 @@ const Editor: FC<IProps> = ({ type, id }) => {
       : InvoiceCreateAPI;
   /* React Query useMutation hook and ASYNC method to create invoice */
   const [muatateCreateInvoice, resMutateInvoice] = useMutation(APISTAKE);
+
+  //  CONTACT CREATE API
+  const [mutateCreateContact, resMutateCreateContact] = useMutation(
+    create_update_contact
+  );
   const [submitType, setSubmitType] = useState('');
   /* ********** HOOKS ENDS HERE ************** */
 
@@ -136,6 +142,18 @@ const Editor: FC<IProps> = ({ type, id }) => {
       message,
     };
     handleUploadPDF(payload);
+  };
+
+  const onCreateContact = async () => {
+    await mutateCreateContact(
+      { name: createContactName, contactType: IContactTypes.SUPPLIER },
+      {
+        onSuccess: (data) => {
+          queryCache?.invalidateQueries('all-contacts');
+          notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Contact Created');
+        },
+      }
+    );
   };
 
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
@@ -410,21 +428,40 @@ const Editor: FC<IProps> = ({ type, id }) => {
                         showSearch
                         style={{ width: '100%' }}
                         placeholder="Select Contact"
-                        optionFilterProp="children"
-                        onChange={(val) => {
-                          if (val !== 'newContact') {
-                            AntForm.setFieldsValue({ contactId: val });
+                        // optionFilterProp="children"
+                        filterOption={(input, option) => {
+                          setCreateContactName(input);
+                          if (typeof option?.children === 'string') {
+                            return (
+                              option?.value
+                                ?.toLowerCase()
+                                .includes(input?.toLocaleLowerCase()) ||
+                              option?.children
+                                ?.toLowerCase()
+                                .includes(input?.toLocaleLowerCase())
+                            );
+                          } else {
+                            return true;
                           }
                         }}
+                        // onChange={(val) => {
+                        //   if (val !== 'newContact') {
+                        //     AntForm.setFieldsValue({ contactId: val });
+                        //   }
+                        // }}
                       >
-                        <Option value={'contact-create'}>
+                        <Option
+                          style={{
+                            textAlign: 'left',
+                          }}
+                          value={'contact-create'}
+                        >
                           <Button
-                            onClick={() => {
-                              history.push(
-                                `/app${ISupportedRoutes.CREATE_CONTACT}`
-                              );
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onCreateContact();
                             }}
-                            type="link"
+                            type="default"
                             size="middle"
                           >
                             Create Contact
