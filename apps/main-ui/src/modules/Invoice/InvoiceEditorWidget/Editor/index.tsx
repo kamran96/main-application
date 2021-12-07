@@ -3,6 +3,7 @@ import printIcon from '@iconify-icons/bytesize/print';
 import Icon from '@iconify/react';
 import { EditableTable } from '@invyce/editable-table';
 import { invycePersist } from '@invyce/invyce-persist';
+import { IContactTypes } from '@invyce/shared/types';
 import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import dayjs from 'dayjs';
@@ -10,10 +11,10 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { queryCache, useMutation, useQuery } from 'react-query';
 
 import { getInvoiceNumber, InvoiceCreateAPI } from '../../../../api';
+import { create_update_contact } from '../../../../api/Contact';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import { DatePicker } from '../../../../components/DatePicker';
 import { FormLabel } from '../../../../components/FormLabel';
-import { Payment } from '../../../../components/Payment';
 import { PrintFormat } from '../../../../components/PrintFormat';
 import { PrintViewPurchaseWidget } from '../../../../components/PurchasesWidget/PrintViewPurchaseWidget';
 import { Rbac } from '../../../../components/Rbac';
@@ -23,7 +24,6 @@ import { useGlobalContext } from '../../../../hooks/globalContext/globalContext'
 import {
   IErrorMessages,
   IServerError,
-  ISupportedRoutes,
   NOTIFICATIONTYPE,
 } from '../../../../modal';
 import { IInvoiceType, ITaxTypes } from '../../../../modal/invoice';
@@ -34,8 +34,6 @@ import printDiv, { DownloadPDF } from '../../../../utils/Print';
 import { PurchaseManager, usePurchaseWidget } from './EditorManager';
 import c from './keys';
 import { WrapperInvoiceForm } from './styles';
-import { create_update_contact } from '../../../../api/Contact';
-import { IContactTypes } from '@invyce/shared/types';
 
 const { Option } = Select;
 
@@ -158,9 +156,10 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   const onFinish = async (value) => {
-    handleCheckValidation();
+    handleCheckValidation(invoiceItems);
 
     return false;
+
     const InvoiceItemsValidation = [];
 
     organization?.organizationType !== IOrganizationType.ENTERPRISE &&
