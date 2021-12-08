@@ -594,7 +594,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
         </div>
         <Seprator />
         <Row gutter={24}>
-          <Col span={8} offset={10} pull={10}>
+          <Col span={8} offset={8} pull={8}>
             <div className="payment_details_card mt-35">
               <div className="flex alignStart pv-2 ">
                 <BoldText className="bold_text">Status</BoldText>
@@ -614,7 +614,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
               </div>
             </div>
           </Col>
-          <Col span={6}>
+          <Col span={8}>
             <div className="calculation textRight">
               <table>
                 <tr>
@@ -660,13 +660,13 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
               <h5 className="label">
                 <BOLDTEXT>Terms & Conditions</BOLDTEXT>
               </h5>
-              <p>
+              {/* <p>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nec id
                 turpis malesuada nibh. Faucibus vitae, blandit aliquet
                 scelerisque faucibus magna volutpat. Vitae aliquet maecenas
                 purus sem. Egestas pellentesque varius elit quisque placerat
                 integer elit sed senectus.
-              </p>
+              </p> */}
             </div>
           </Col>
         </Row>
@@ -730,6 +730,10 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
 const WrapperNewPurchaseView = styled.div`
   /* Print Header styles */
   padding: 0 188px;
+
+  @media screen and (max-width: 1600px) {
+    padding: 0 40px;
+  }
   /* Used For all prints */
   .print_header_area .header_company_logo {
     width: 50px;
