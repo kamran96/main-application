@@ -15,6 +15,8 @@ export interface IBill extends IBase {
   indirectTax: number;
   isTaxIncluded: number;
   currency: string;
+  paid_amount?: number;
+  due_amount?: number;
   comment: string;
   importedFrom: string;
   importedBillId: string;

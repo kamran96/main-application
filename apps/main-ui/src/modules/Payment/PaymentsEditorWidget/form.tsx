@@ -85,6 +85,8 @@ export const PaymentsForm: FC = () => {
       return { balance: a.balance + b.balance };
     })) || { balance: 0 };
 
+  console.log(amountPaid, 'amount paid ');
+
   const paid = amountPaid ? amountPaid : 0;
 
   const remainingTotal = Math.abs(balance) - paid;
@@ -194,14 +196,12 @@ export const PaymentsForm: FC = () => {
   };
 
   const handleChangedValue = (changedValues, allValues) => {
+    console.log(changedValues);
     if (changedValues && changedValues.contactId) {
       const { contactId } = changedValues;
       setContactId(contactId);
     }
-    if (changedValues && changedValues.amountPaid) {
-      const { amountPaid } = changedValues;
-      setAmountPaid(amountPaid);
-    }
+
     if (changedValues && changedValues.paymentMode) {
       const { paymentMode } = changedValues;
       setFormData({ ...formData, paymentMode });
@@ -445,6 +445,15 @@ export const PaymentsForm: FC = () => {
                 <Form.Item
                   className="amount_input flex-1 textRight"
                   name="amount"
+                  getValueFromEvent={(value) => {
+                    if (value === null) {
+                      setAmountPaid(0);
+                      return 0;
+                    } else {
+                      setAmountPaid(value);
+                      return value;
+                    }
+                  }}
                   rules={[
                     {
                       required: true,
@@ -464,7 +473,12 @@ export const PaymentsForm: FC = () => {
                     },
                   ]}
                 >
-                  <InputNumber size="middle" />
+                  <InputNumber
+                    onChange={(val) => {
+                      console.log(val, 'value');
+                    }}
+                    size="middle"
+                  />
                 </Form.Item>
               </div>
               <hr className="sep" />

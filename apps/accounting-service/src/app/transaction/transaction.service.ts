@@ -16,8 +16,12 @@ import {
   ITransactionWithResponse,
   IRequest,
 } from '@invyce/interfaces';
-import { TransactionDto } from '../dto/transaction.dto';
+import { DeleteTransactionsDto, TransactionDto } from '../dto/transaction.dto';
 import { Entries } from '@invyce/global-constants';
+
+const transactionNature = {
+  reverse: true,
+};
 
 @Injectable()
 export class TransactionService {
@@ -100,18 +104,33 @@ export class TransactionService {
           };
         }
       } else {
+        // transactions = await getCustomRepository(TransactionRepository)
+        //   .createQueryBuilder('transaction')
+        //   .where('transaction.status = 1')
+        //   .andWhere('transaction.organizationId = :organizationId', {
+        //     organizationId: user.organizationId,
+        //   })
+        //   .andWhere('transaction.branchId = :branchId', {
+        //     branchId: user.branchId,
+        //   })
+        //   .leftJoinAndSelect('transaction.transactionItems', 'transactionItems')
+        //   .leftJoinAndSelect('transactionItems.account', 'account')
+        //   .orderBy({ 'transaction.date': 'DESC', 'transactionItems.id': 'ASC' })
+        //   .skip(pn * ps - ps)
+        //   .take(ps)
+        //   .getMany();
         transactions = await getCustomRepository(TransactionRepository).find({
           where: {
             status: 1,
             organizationId: user.organizationId,
-            // branchId: user.branchId,
+            branchId: user.branchId,
           },
           skip: pn * ps - ps,
           take: ps,
+          relations: ['transactionItems', 'transactionItems.account'],
           order: {
             date: 'DESC',
           },
-          relations: ['transactionItems', 'transactionItems.account'],
         });
 
         return {
@@ -236,17 +255,15 @@ export class TransactionService {
             TransactionRepository
           ).save({
             amount: transactions.amount ? transactions.amount : amount,
-            ref: transactions.invoice
-              ? transactions.invoice.reference
-              : transactions.reference,
+            ref: transactions.reference,
             date: transactions.createdAt || new Date(),
             createdAt: transactions.createdAt || new Date().toDateString(),
-            narration: `System transaction against ${transactions?.invoice?.invoiceNumber}`,
+            narration: `System transaction against ${transactions.type}`,
             branchId: user.branchId,
             organizationId: user.organizationId,
             createdById: user.id,
             updatedById: user.id,
-            status: transactions?.invoice?.status === 2 ? 2 : 1 || 1,
+            status: transactions?.status === 2 ? 2 : 1 || 1,
           });
 
           getCustomRepository(TransactionItemRepository).save(
@@ -282,7 +299,6 @@ export class TransactionService {
         }
       }
     } catch (error) {
-      console.log(error);
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -365,5 +381,98 @@ export class TransactionService {
     await http.post(`payments/payment/add`, {
       payments: paymentArr,
     });
+  }
+
+  async reverseTransaction(transactionId: DeleteTransactionsDto, user) {
+    const transactions = await getCustomRepository(TransactionRepository).find({
+      where: {
+        id: In(transactionId.ids),
+      },
+      relations: ['transactionItems'],
+    });
+
+    for (const i of transactions) {
+      const newTransaction = await getCustomRepository(
+        TransactionRepository
+      ).save({
+        amount: i.amount,
+        ref: i.ref,
+        date: new Date(),
+        // createdAt: transactions.createdAt || new Date().toDateString(),
+        narration: `System reverse entry transaction against ${i.id}`,
+        branchId: user.branchId,
+        organizationId: user.organizationId,
+        createdById: user.id,
+        updatedById: user.id,
+        status: 1,
+      });
+
+      for (const j of i.transactionItems) {
+        if (j.transactionType === Entries.DEBITS) {
+          await getCustomRepository(TransactionItemRepository).save({
+            transactionId: newTransaction.id,
+            amount: j.amount,
+            accountId: j.accountId,
+            transactionType: Entries.CREDITS,
+            branchId: user.branchId,
+            organizationId: user.organizationId,
+            createdById: user.id,
+            updatedById: user.id,
+            // createdAt: transaction.createdAt,
+            status: 1,
+          });
+        } else if (j.transactionType === Entries.CREDITS) {
+          await getCustomRepository(TransactionItemRepository).save({
+            transactionId: newTransaction.id,
+            amount: j.amount,
+            accountId: j.accountId,
+            transactionType: Entries.DEBITS,
+            branchId: user.branchId,
+            organizationId: user.organizationId,
+            createdById: user.id,
+            updatedById: user.id,
+            // createdAt: transaction.createdAt,
+            status: 1,
+          });
+        }
+      }
+    }
+
+    return true;
+  }
+
+  async DeleteTransaction(trasnactionIds) {
+    for (const transactionId of trasnactionIds.ids) {
+      await getCustomRepository(TransactionRepository).update(
+        { id: transactionId },
+        { status: 0 }
+      );
+
+      const items = await getCustomRepository(TransactionItemRepository).find({
+        where: {
+          transactionId: transactionId,
+        },
+      });
+
+      for (const i of items) {
+        await getCustomRepository(TransactionItemRepository).update(
+          { id: i.id },
+          {
+            status: 0,
+          }
+        );
+      }
+    }
+  }
+
+  async DeleteJornalEntry(
+    trasnactionIds: DeleteTransactionsDto,
+    user: IBaseUser
+  ): Promise<void> {
+    if (transactionNature.reverse) {
+      await this.reverseTransaction(trasnactionIds, user);
+    } else {
+      await this.DeleteTransaction(trasnactionIds);
+    }
   }
 }

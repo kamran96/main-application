@@ -3,8 +3,11 @@ import { IBase, IPagination } from '..';
 export interface ICreditNote extends IBase {
   reference: string;
   contactId: string;
+  invoiceId: number;
+  billId: number;
   issueDate: string;
   dueDate: string;
+  invoiceType: string;
   invoiceNumber: string;
   discount: number;
   grossTotal: number;

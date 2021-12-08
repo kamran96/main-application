@@ -3,6 +3,7 @@ class ItemLedgerDto {
   targetId: number;
   value: number;
   itemId: string;
+  action: string;
 }
 
 export class ItemLedgerDetailDto {

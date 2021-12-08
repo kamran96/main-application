@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* THIS PAGE BELONGS TO ALL PURCHASES ORDERS TAB */
 import React, { FC, useEffect, useState } from 'react';
 import {
   queryCache,
@@ -8,54 +7,49 @@ import {
   useQuery,
 } from 'react-query';
 import styled from 'styled-components';
+
 import {
   deletePurchaseDrafts,
   getAllContacts,
   getPoListAPI,
 } from '../../../../../api';
+import { ConfirmModal } from '../../../../../components/ConfirmModal';
+import { SmartFilter } from '../../../../../components/SmartFilter';
 import { CommonTable } from '../../../../../components/Table';
+import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
+import {
+  IContactType,
+  IContactTypes,
+  IErrorMessages,
+  IServerError,
+  NOTIFICATIONTYPE,
+} from '../../../../../modal';
 import {
   IInvoiceResponse,
   INVOICETYPE,
   INVOICE_TYPE_STRINGS,
   ORDER_TYPE,
-} from '../../../../../modal/invoice';
-import convertToRem from '../../../../../utils/convertToRem';
-import { SmartFilter } from '../../../../../components/SmartFilter';
-import { ISupportedRoutes } from '../../../../../modal/routing';
-import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
-import FilterSchema from './PoFilterSchema';
-import { ConfirmModal } from '../../../../../components/ConfirmModal';
-import {
-  IBaseAPIError,
-  IContactType,
-  IContactTypes,
-  NOTIFICATIONTYPE,
+  ISupportedRoutes,
 } from '../../../../../modal';
+import FilterSchema from './PoFilterSchema';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
 import { _csvExportable } from './CommonCol';
-import { useRbac } from '../../../../../components/Rbac/useRbac';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
-import moneyFormat from '../../../../../utils/moneyFormat';
+import { useRbac } from '../../../../../components/Rbac/useRbac';
 
 interface IProps {
   columns?: any[];
-  activeTab?: string;
 }
-export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
+export const DraftBills: FC<IProps> = ({ columns }) => {
   /* HOOKS HERE */
   /* Mutations */
+  /* THIS MUTATION IS RESPONSIBLE FOR APPROVED DRAFT ORDERS */
+
+  /* THIS MUTATION IS RESPONSIBLE FOR DELETE ORDERS */
   const [mutateDeleteOrders, resDeleteOrders] =
     useMutation(deletePurchaseDrafts);
-
-  /* RBAC */
-
-  const { rbac } = useRbac(null);
-
-  /* ****** Global Context ******* */
-  const { notificationCallback } = useGlobalContext();
-
-  /*  ********** COMPONENT STATE HOOKS  *********** */
+  /* COMPONENT STATE MANAGEMENT HOOKS */
+  const [selectedRow, setSelectedRow] = useState([]);
   const [filterBar, setFilterbar] = useState(false);
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
@@ -63,13 +57,16 @@ export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
     sortid: '',
     page_size: 10,
   });
-  /* ********* DESTRUCTURING ALL INVOICESCONFIG *************** */
   const { page, query, sortid, page_size } = allInvoicesConfig;
 
   const [confirmModal, setConfirmModal] = useState(false);
-  const { routeHistory } = useGlobalContext();
-  const { history } = routeHistory;
-  const [selectedRow, setSelectedRow] = useState([]);
+  const [{ result, pagination }, setAllInvoicesRes] =
+    useState<IInvoiceResponse>({
+      result: [],
+      pagination: null,
+    });
+
+  const { rbac } = useRbac(null);
   const [filteringSchema, setFilteringSchema] = useState(FilterSchema);
 
   /*Query hook for  Fetching all accounts against ID */
@@ -94,11 +91,12 @@ export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
       setFilteringSchema(filteredSchema);
     }
   }, [allcontactsRes]);
-  const [{ result, pagination }, setAllInvoicesRes] =
-    useState<IInvoiceResponse>({
-      result: [],
-      pagination: null,
-    });
+
+  /* *************** STATES ENDS HERE ************** */
+
+  /* GLOBAL MANAGER CONTEXT API */
+  const { routeHistory, notificationCallback } = useGlobalContext();
+  const { history } = routeHistory;
 
   useEffect(() => {
     if (
@@ -117,24 +115,63 @@ export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
       setAllInvoicesConfig({ ...allInvoicesConfig, ...obj });
     }
   }, [routeHistory, history]);
-  /*  ////////////// - METHODS HERE - \\\\\\\\\\\\ */
 
-  /* ******* PAGINATED QUERY TO FETCH LIST OF PURCHASES ********** */
-  /* ******* ORDERS ONLY TYPE (PROCESSED PURCHASE ORDERS) ********** */
+  /* ********* PAGINATED QUERY FOR FETCHING DRAFT ORDERS *************** */
   const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
     [
-      `invoices-purchases-${INVOICETYPE.Approved}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
-      [ORDER_TYPE.PURCAHSE_ORDER],
-      INVOICETYPE.Approved,
-      INVOICE_TYPE_STRINGS.Paid,
+      `invoices-purchases-${INVOICETYPE.DRAFT}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
+      ORDER_TYPE.PURCAHSE_ORDER,
+      INVOICETYPE.DRAFT,
+      'ALL',
       page,
       page_size,
+      sortid,
       query,
     ],
     getPoListAPI
   );
 
-  /* CONDITIONAL RENDERING LIFE CYCLE HOOK TO UPDATE ALL INVOICES STATE WHEN API CALL IS DONE */
+  /* ********** METHODS HERE *************** */
+  /* ************** ASYNC FUNCTION IS TO  DELETE ORDER ******** */
+  const handleDelete = async () => {
+    const payload = {
+      ids: [...selectedRow],
+    };
+    await mutateDeleteOrders(payload, {
+      onSuccess: () => {
+        ['invoices', 'invoice-view'].forEach((key) => {
+          queryCache.invalidateQueries((q) =>
+            q.queryKey[0].toString().startsWith(`${key}`)
+          );
+        });
+        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Deleted Successfully');
+
+        setSelectedRow([]);
+        setConfirmModal(false);
+      },
+      onError: (error: IServerError) => {
+        if (
+          error &&
+          error.response &&
+          error.response.data &&
+          error.response.data.message
+        ) {
+          const { message } = error.response.data;
+          notificationCallback(NOTIFICATIONTYPE.ERROR, message);
+        } else {
+          notificationCallback(
+            NOTIFICATIONTYPE.ERROR,
+            IErrorMessages.NETWORK_ERROR
+          );
+        }
+      },
+    });
+  };
+
+  const onSelectedRow = (item) => {
+    setSelectedRow(item.selectedRowKeys);
+  };
+
   useEffect(() => {
     if (resolvedData && resolvedData.data && resolvedData.data.result) {
       const { result } = resolvedData.data;
@@ -147,63 +184,8 @@ export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
     }
   }, [resolvedData]);
 
-  /* DELETE PURCHASE ORDER METHOD */
-  const handleDelete = async () => {
-    const payload = {
-      ids: [...selectedRow],
-    };
-    try {
-      await mutateDeleteOrders(payload, {
-        onSuccess: () => {
-          notificationCallback(
-            NOTIFICATIONTYPE.SUCCESS,
-            'Deleted Successfully'
-          );
-          [
-            'invoices',
-            'transactions',
-            'items?page',
-            'invoice-view',
-            'ledger-contact',
-            'all-items',
-          ].forEach((key) => {
-            queryCache.invalidateQueries((q) =>
-              q.queryKey[0].toString().startsWith(`${key}`)
-            );
-          });
-
-          setSelectedRow([]);
-          setConfirmModal(false);
-        },
-        onError: (error: IBaseAPIError) => {
-          if (
-            error &&
-            error.response &&
-            error.response.data &&
-            error.response.data.message
-          ) {
-            const { message } = error.response.data;
-            notificationCallback(NOTIFICATIONTYPE.ERROR, message);
-          }
-        },
-      });
-    } catch (error) {}
-  };
-
-  /* METHOD TO UPDATE SELECTED ROW OF TABLE */
-  const onSelectedRow = (item) => {
-    setSelectedRow(item.selectedRowKeys);
-  };
-
+  /* Columns are overided to add  actions column in table */
   const cols = [...columns];
-
-  cols.splice(5, 1, {
-    title: 'Paid Amount',
-    dataIndex: 'paid_amount',
-    render: (data) => {
-      return <>{moneyFormat(Math.abs(data))}</>;
-    },
-  });
 
   const renerTopRightbar = () => {
     return (
@@ -214,7 +196,7 @@ export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
               ...allInvoicesConfig,
               query: encode,
             });
-            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=paid&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
+            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=draft&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
             history.push(route);
           }}
           onClose={() => setFilterbar(false)}
@@ -225,24 +207,31 @@ export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
     );
   };
 
-  /* JSX HERE */
   return (
     <ALlWrapper>
       <CommonTable
         exportable
         exportableProps={{
           fields: _csvExportable,
-          fileName: 'approved-purchases',
         }}
-        printTitle={'Approved Purchase Orders List'}
         className={'border-top-none'}
-        hasPrint
         topbarRightPannel={renerTopRightbar()}
+        hasPrint
+        printTitle={'Draft Purchase Orders List'}
         customTopbar={
           <PurchaseTopbar
-            onDelete={() => setConfirmModal(true)}
-            isAbleToDelete={rbac.can(PERMISSIONS.PURCHASES_DELETE)}
             disabled={!selectedRow.length}
+            isEditable={selectedRow.length === 1}
+            isAbleToDelete={rbac.can(PERMISSIONS.PURCHASES_DELETE)}
+            onDelete={() => {
+              setConfirmModal(true);
+            }}
+            onEdit={() => {
+              const id = selectedRow[0];
+              history.push(
+                `/app${ISupportedRoutes.CREATE_PURCHASE_Entry}/${id}`
+              );
+            }}
           />
         }
         data={result}
@@ -256,8 +245,7 @@ export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
               page: pagination.current,
               page_size: pagination.pageSize,
             });
-
-            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=paid&sortid=null&page=1&page_size=20&sortid=${sortid}`;
+            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=draft&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}`;
             history.push(route);
           } else {
             setAllInvoicesConfig({
@@ -271,7 +259,7 @@ export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
             });
             const route = `/app${
               ISupportedRoutes.PURCHASES
-            }?tabIndex=paid&sortid=null&page=${pagination.current}&page_size=${
+            }?tabIndex=draft&sortid=null&page=${pagination.current}&page_size=${
               pagination.pageSize
             }&query=${query}&sortid=${
               sorter && sorter.order === 'descend'
@@ -281,14 +269,14 @@ export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
             history.push(route);
           }
         }}
-        totalItems={pagination?.total}
+        totalItems={pagination && pagination.total}
         pagination={{
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '50', '100'],
           pageSize: page_size,
           position: ['bottomRight'],
           current: pagination?.page_no,
-          total: pagination?.total,
+          total: pagination && pagination.total,
         }}
         hasfooter={true}
         onSelectRow={onSelectedRow}
@@ -306,25 +294,6 @@ export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
   );
 };
 
-export default PaidPurchaseEntries;
+export default DraftBills;
 
-/* COMPONENT STYLES HERE */
-export const ALlWrapper = styled.div`
-  .custom_topbar {
-    padding: ${convertToRem(20)} 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .edit {
-    flex: 8;
-  }
-
-  .search {
-    flex: 4;
-  }
-
-  .custom_button {
-  }
-`;
+export const ALlWrapper = styled.div``;

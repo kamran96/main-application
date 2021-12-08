@@ -38,16 +38,22 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: IBaseUser): Promise<IUser> {
-    const newData = { ...data, user: payload };
-    const user: IUserAccessControlResponse =
-      await this.authService.AccessControll(newData as IRequest);
+    try {
+      const newData = { ...data, user: payload };
+      const user: IUserAccessControlResponse =
+        await this.authService.AccessControll(newData as IRequest);
 
-    if (user?.statusCode === HttpStatus.OK) {
-      return user?.user;
-    }
+      if (user?.statusCode === HttpStatus.OK) {
+        console.log(user.user, ' user data');
+        return user?.user;
+      }
 
-    if (user?.statusCode === HttpStatus.FORBIDDEN) {
-      throw new HttpException(user?.message, user?.statusCode);
+      if (user?.statusCode === HttpStatus.FORBIDDEN) {
+        console.log('error');
+        throw new HttpException(user?.message, user?.statusCode);
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
 }

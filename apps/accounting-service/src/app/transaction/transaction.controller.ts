@@ -11,7 +11,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { TransactionApiDto, TransactionDto } from '../dto/transaction.dto';
+import {
+  DeleteTransactionsDto,
+  TransactionApiDto,
+  TransactionDto,
+} from '../dto/transaction.dto';
 import { TransactionService } from './transaction.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 import {
@@ -122,5 +126,14 @@ export class TransactionController {
     @Req() req: IRequest
   ): Promise<void> {
     return await this.transactionService.AddTransaction(data, req);
+  }
+
+  @Post('delete')
+  @UseGuards(GlobalAuthGuard)
+  async deleteJournalEntry(
+    @Body() data: DeleteTransactionsDto,
+    @Req() req: IRequest
+  ) {
+    return await this.transactionService.DeleteJornalEntry(data, req.user);
   }
 }

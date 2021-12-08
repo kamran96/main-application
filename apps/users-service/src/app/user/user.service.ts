@@ -243,7 +243,6 @@ export class UserService {
   ): Promise<IUser[]> {
     try {
       const {
-        username,
         fullname,
         country,
         phoneNumber,
@@ -263,7 +262,6 @@ export class UserService {
       await this.userModel.updateOne(
         { _id: userId },
         {
-          username: username || user.username,
           password: password ? await bcrypt.hashSync(password) : user.password,
           isVerified: true,
           $set: {
@@ -282,7 +280,7 @@ export class UserService {
       );
 
       const new_user = await this.authService.CheckUser({
-        username: username ? username : email,
+        username: email ? email : user.username,
       });
 
       return await this.authService.Login(new_user, res);

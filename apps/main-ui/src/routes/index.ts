@@ -1,6 +1,6 @@
 import { Integrations } from './../modules/Settings/Integrations/index';
 import { PermissionsSettingsContainer } from './../modules/Rbac/Permisions/settings';
-import { PurchasesList } from './../modules/Business/PurchaseOrder/PurchaseEntriesList/index';
+import { BillsList } from '../modules/Business/PurchaseOrder/Bills';
 import { RouteConfig } from 'react-router-config';
 import { RootLayout } from '../Layout/RootLayout';
 import { DefaultLayout } from '../Layout/DefaultLayout';
@@ -30,7 +30,7 @@ import { BalanceSheet } from '../modules/Accounts/BalanceSheet';
 import { ContactLedger } from '../modules/Contacts/ContactLedger';
 import { JournalEditor } from '../modules/Business/Transactions/TransactionEditorWidget';
 import { PaymentContainer } from '../modules/Payment';
-import { PurchaseEntryEditor } from '../modules/Business/PurchaseOrder/PurchaseEntry';
+import { BillsEditorWidget } from '../modules/Business/PurchaseOrder/BillsEditorWidget';
 import CategoriesRoot from '../modules/Categories';
 import { ItemsViewContainer } from '../modules/Items/ItemsList/ItemsView';
 import { DashboardContainer } from '../modules/Dashboard';
@@ -40,7 +40,7 @@ import { PurchaseView } from '../modules/Business/PurchaseOrder/PurchaseOrderLis
 import { InvoiceDashboard } from '../modules/Invoice/InvoiceDashboard';
 import { DispatchingContainer } from '../modules/Dispatching';
 import { QuoteView } from '../modules/Business/Quote/QuoteView';
-import { PurchaseEntryView } from '../modules/Business/PurchaseOrder/PurchaseEntriesList/View';
+import { PurchaseEntryView } from '../modules/Business/PurchaseOrder/Bills/View';
 import { RbacContainer } from '../modules/Rbac';
 import { PermissionsContainer } from '../modules/Rbac/Permisions';
 import { PERMISSIONS } from '../components/Rbac/permissions';
@@ -246,6 +246,7 @@ export const routes = (root = '/app'): RouteConfig[] => [
             component: CreditNoteEditorWidget,
             restricted: true,
             permission: PERMISSIONS.INVOICES_CREATE,
+            exact: true,
           },
           {
             path: `${root}${ISupportedRoutes.CREDIT_NOTES}/:id`,
@@ -276,7 +277,7 @@ export const routes = (root = '/app'): RouteConfig[] => [
           },
           {
             path: `${root}${ISupportedRoutes.PURCHASES}`,
-            component: PurchasesList,
+            component: BillsList,
             exact: true,
             restricted: true,
             permission: PERMISSIONS.PURCHASES_INDEX,
@@ -311,14 +312,14 @@ export const routes = (root = '/app'): RouteConfig[] => [
           },
           {
             path: `${root}${ISupportedRoutes.CREATE_PURCHASE_Entry}`,
-            component: PurchaseEntryEditor,
+            component: BillsEditorWidget,
             exact: true,
             restricted: true,
             permission: PERMISSIONS.PURCHASES_CREATE,
           },
           {
             path: `${root}${ISupportedRoutes.CREATE_PURCHASE_Entry}/:id`,
-            component: PurchaseEntryEditor,
+            component: BillsEditorWidget,
             exact: true,
             restricted: true,
             permission: PERMISSIONS.PURCHASES_CREATE,

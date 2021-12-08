@@ -1,14 +1,14 @@
-import http, { railsHttp } from "../utils/http";
+import http from '../utils/http';
 
 export const TrialbalanceAPI = (key?: string, query?: string) => {
-  let URL = `/reports/trial-balance`;
+  let URL = `accounts/reports/trial-balance`;
   if (query) {
     URL = `${URL}?query=${query}`;
   }
   return http.get(URL);
 };
 export const BalanceSheetAPI = (key?: string, query?: string) => {
-  let URL = `/reports/balance-sheet`;
+  let URL = `accounts/reports/balance-sheet`;
   if (query) {
     URL = `${URL}?query=${query}`;
   }
@@ -16,7 +16,7 @@ export const BalanceSheetAPI = (key?: string, query?: string) => {
 };
 
 export const IncomeStatementAPI = (key?: string, query?: string) => {
-  let URL = `/reports/income-statement`;
+  let URL = `accounts/reports/income-statement`;
 
   if (query) {
     URL = `${URL}?query=${query}`;
@@ -32,5 +32,5 @@ export const CashActivityStatementAPI = (key?: string, query?: string) => {
     URL = `${URL}?query=${query}`;
   }
 
-  return railsHttp.get(URL);
+  return http.get(URL);
 };

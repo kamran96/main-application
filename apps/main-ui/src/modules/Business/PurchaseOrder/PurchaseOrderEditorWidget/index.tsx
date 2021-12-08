@@ -1,17 +1,17 @@
-import React, { FC } from "react";
-import { Breadcrumb } from "antd";
-import styled from "styled-components";
-import { BreadCrumbArea } from "../../../../components/BreadCrumbArea";
-import { Heading } from "../../../../components/Heading";
-import { PurchaseOrderForm } from "./Form";
-import { Link } from "react-router-dom";
-import { ISupportedRoutes } from "../../../../modal/routing";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
+import React, { FC } from 'react';
+import { Breadcrumb } from 'antd';
+import styled from 'styled-components';
+import { BreadCrumbArea } from '../../../../components/BreadCrumbArea';
+import { Heading } from '../../../../components/Heading';
+import { PurchaseOrderForm } from './Form';
+import { Link } from 'react-router-dom';
+import { ISupportedRoutes } from '../../../../modal/routing';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 
 export const PurchaseOrderEditorWidget: FC = () => {
   const { routeHistory } = useGlobalContext();
   const { location } = routeHistory;
-  let id = location && location.pathname.split("/app/create-order/")[1];
+  const id = location && location.pathname.split('/app/create-order/')[1];
 
   return (
     <WrapperWidget>

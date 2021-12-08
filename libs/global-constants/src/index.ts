@@ -33,3 +33,8 @@ export enum EntryType {
   CREDIT = 1,
   COLLECTION = 2,
 }
+
+export enum CreditNoteType {
+  ACCRECCREDIT = 'ACCRECCREDIT',
+  ACCPAYCREDIT = 'ACCPAYCREDIT',
+}
