@@ -87,6 +87,8 @@ interface IGlobalContextvalues {
   setTheme: (payload: 'light' | 'dark') => void;
   verifiedModal: boolean;
   setVerifiedModal: (payload: boolean) => void;
+  contactsImportConfig: IModalsConfig;
+  setContactsImportConfig: (visibility: boolean) => void;
 }
 
 export const globalContext = createContext<Partial<IGlobalContextvalues>>({});

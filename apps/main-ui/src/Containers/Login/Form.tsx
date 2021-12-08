@@ -11,6 +11,7 @@ import { ISupportedRoutes, NOTIFICATIONTYPE } from '../../modal';
 import { IBaseAPIError } from '../../modal/base';
 import { HeadingTemplate1 } from '../../components/HeadingTemplates';
 import { BOLDTEXT } from '../../components/Para/BoldText';
+import { CommonModal } from '../../components/Modal';
 
 export const LoginForm: FC = () => {
   const [mutateLogin, responseMutateLogin] = useMutation(LoginAPI);
@@ -77,6 +78,8 @@ export const LoginForm: FC = () => {
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
+  //--------------------------------------------------------
+ 
 
   return (
     <LoginFormWrapper>
@@ -181,12 +184,25 @@ export const LoginForm: FC = () => {
             </Col>
           </Row>
         </Form>
+        
       </div>
     </LoginFormWrapper>
   );
 };
 
+
+
 export const LoginFormWrapper = styled.div`
+  .import-btn {
+    font: normal 13px/123% Roboto;
+    letter-spacing: 0.02em;
+    color: #3e3e3c;
+    padding: 8px 20px;
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 4px;
+    cursor: pointer;
+  }
   width: 100%;
   height: 100vh;
   padding: 0 90px;

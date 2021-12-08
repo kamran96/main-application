@@ -160,6 +160,10 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     []
   );
 
+  const [contactsImportConfig, setContactsImportConfig] = useState<IModalsConfig>({
+    visibility: false,
+  })
+
   const [verifiedModal, setVerifiedModal] = useState(false);
 
   window.addEventListener('offline', (event) => {
@@ -529,6 +533,10 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
           return verifiedModal;
         }, [verifiedModal]),
         setVerifiedModal,
+        contactsImportConfig,
+        setContactsImportConfig: (visibility: boolean) => {
+          setContactsImportConfig({ visibility });
+        }
       }}
     >
       <WrapperChildren>
