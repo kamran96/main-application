@@ -16,13 +16,14 @@ import {
 import { CommonTable } from '../../../../../components/Table';
 import {
   IInvoiceResponse,
+  IInvoiceTypes,
   INVOICETYPE,
   INVOICE_TYPE_STRINGS,
   ORDER_TYPE,
-} from '../../../../../modal/invoice';
+  ISupportedRoutes,
+} from '../../../../../modal';
 import convertToRem from '../../../../../utils/convertToRem';
 import { SmartFilter } from '../../../../../components/SmartFilter';
-import { ISupportedRoutes } from '../../../../../modal/routing';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import FilterSchema from './PoFilterSchema';
 import { ConfirmModal } from '../../../../../components/ConfirmModal';
@@ -41,7 +42,7 @@ interface IProps {
   columns?: any[];
   activeTab?: string;
 }
-export const DueExpiredPurchases: FC<IProps> = ({ columns, activeTab }) => {
+export const ALLBillsList: FC<IProps> = ({ columns, activeTab }) => {
   /* HOOKS HERE */
   /* Mutations */
   const [mutateDeleteOrders, resDeleteOrders] =
@@ -125,7 +126,7 @@ export const DueExpiredPurchases: FC<IProps> = ({ columns, activeTab }) => {
       `invoices-purchases-${INVOICETYPE.Approved}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
       [ORDER_TYPE.PURCAHSE_ORDER],
       INVOICETYPE.Approved,
-      INVOICETYPE.Date_Expired,
+      INVOICETYPE.ALL,
       page,
       page_size,
       query,
@@ -207,7 +208,7 @@ export const DueExpiredPurchases: FC<IProps> = ({ columns, activeTab }) => {
               ...allInvoicesConfig,
               query: encode,
             });
-            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=due_expired&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
+            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=all&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
             history.push(route);
           }}
           onClose={() => setFilterbar(false)}
@@ -249,7 +250,7 @@ export const DueExpiredPurchases: FC<IProps> = ({ columns, activeTab }) => {
               page: pagination.current,
               page_size: pagination.pageSize,
             });
-            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=due_expired&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=all&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
             history.push(route);
           } else {
             setAllInvoicesConfig({
@@ -263,9 +264,9 @@ export const DueExpiredPurchases: FC<IProps> = ({ columns, activeTab }) => {
             });
             const route = `/app${
               ISupportedRoutes.PURCHASES
-            }?tabIndex=due_expired&sortid=null&page=${
-              pagination.current
-            }&page_size=${pagination.pageSize}&query=${query}&sortid=${
+            }?tabIndex=all&sortid=null&page=${pagination.current}&page_size=${
+              pagination.pageSize
+            }&query=${query}&sortid=${
               sorter && sorter.order === 'descend'
                 ? `-${sorter.field}`
                 : sorter.field
@@ -273,14 +274,14 @@ export const DueExpiredPurchases: FC<IProps> = ({ columns, activeTab }) => {
             history.push(route);
           }
         }}
-        totalItems={pagination?.total}
+        totalItems={pagination && pagination.total}
         pagination={{
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '50', '100'],
           pageSize: page_size,
           position: ['bottomRight'],
           current: pagination?.page_no,
-          total: pagination?.total,
+          total: pagination && pagination.total,
         }}
         hasfooter={true}
         onSelectRow={onSelectedRow}
@@ -298,7 +299,7 @@ export const DueExpiredPurchases: FC<IProps> = ({ columns, activeTab }) => {
   );
 };
 
-export default DueExpiredPurchases;
+export default ALLBillsList;
 
 /* COMPONENT STYLES HERE */
 export const ALlWrapper = styled.div`

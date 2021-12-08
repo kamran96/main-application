@@ -1,18 +1,18 @@
-import { IBranch, IOrganization, IUser } from "./auth";
-import { IBase, IBaseRequest } from "./base";
-import { IContactType } from "./contact";
+import { IBranch, IOrganization, IUser } from './auth';
+import { IBase, IBaseRequest } from './base';
+import { IContactType } from './contact';
 
 export interface IInvoiceResponse extends IBaseRequest {
   result?: IInvoiceResult[];
 }
 
 export enum IInvoiceType {
-  BILL = "BILL",
-  INVOICE = "SI",
-  PURCHASE_ENTRY = "POE",
-  PURCHASE_ORDER = "PO",
-  QUOTE = "QO",
-  CREDIT_NOTE = 'credit-note'
+  BILL = 'BILL',
+  INVOICE = 'SI',
+  PURCHASE_ENTRY = 'POE',
+  PURCHASE_ORDER = 'PO',
+  QUOTE = 'QO',
+  CREDIT_NOTE = 'credit-note',
 }
 
 export interface IInvoiceResult extends IBase {
@@ -45,6 +45,8 @@ export interface IInvoiceResult extends IBase {
   comment: string;
   user: IUser;
   organization?: IOrganization;
+  payment_status?: string;
+  due_amount?: string;
   [key: string]: any;
 }
 
@@ -79,13 +81,13 @@ export interface IInvoiceItem extends IBase {
 }
 
 export enum ORDER_TYPE {
-  SALE_INVOICE = "SI",
-  PURCAHSE_ORDER = "PO",
-  POE = "POE",
-  QUOTE = "QO",
-  BILL = "BILL",
-  CREDIT_NOTE = "CN",
-  DEBIT_NOTE = "DN",
+  SALE_INVOICE = 'SI',
+  PURCAHSE_ORDER = 'PO',
+  POE = 'POE',
+  QUOTE = 'QO',
+  BILL = 'BILL',
+  CREDIT_NOTE = 'CN',
+  DEBIT_NOTE = 'DN',
 }
 
 export enum INVOICETYPE {
@@ -94,19 +96,19 @@ export enum INVOICETYPE {
   Payment_Awaiting = 4,
   Awaiting_Approval = 6,
   PAID = 5,
-  ALL = "ALL",
+  ALL = 'ALL',
   RETURNED = 3,
-  Date_Expired = "DUE_PAYMENTS"
+  Date_Expired = 'DUE_PAYMENTS',
 }
 
-export enum INVOICE_TYPE_STRINGS{
-  Approved = "PROCESSED",
-  Draft = "DRAFT",
-  Payment_Awaiting= "AWATING_PAYMENT",
-  Date_Expired ="DUE_PAYMENTS",
-  Paid = "PAID",
-  Returned = "RETURNED",
-  Awaiting_Aproval = "AWAITING_APROVAL"
+export enum INVOICE_TYPE_STRINGS {
+  Approved = 'PROCESSED',
+  Draft = 'DRAFT',
+  Payment_Awaiting = 'AWATING_PAYMENT',
+  Date_Expired = 'DUE_PAYMENTS',
+  Paid = 'PAID',
+  Returned = 'RETURNED',
+  Awaiting_Aproval = 'AWAITING_APROVAL',
 }
 
 export interface IInvoicePayment extends IBase {
@@ -126,32 +128,32 @@ export interface IInvoicePayment extends IBase {
 }
 
 export class InvoiceResultClass {
-  id: number;
-  reference: string;
-  contactId: number;
-  issueDate: string;
-  dueDate: string;
-  discount: string;
-  grossTotal: number | string;
-  netTotal: number;
-  date: string;
-  directTax: number | string;
-  indirectTax: number | string;
-  branchId: number;
-  status: number;
-  organizationId: number;
-  invoiceType: number;
-  invoiceNumber: string;
-  invoiceStatus: number;
-  isTaxIncluded: number;
-  currency: string;
-  invoice_items: IInvoiceItem[];
-  payments: IInvoicePayment[];
-  paid_amount: number;
+  id!: number;
+  reference!: string;
+  contactId!: number;
+  issueDate!: string;
+  dueDate!: string;
+  discount!: string;
+  grossTotal!: number | string;
+  netTotal!: number;
+  date!: string;
+  directTax!: number | string;
+  indirectTax!: number | string;
+  branchId!: number;
+  status!: number;
+  organizationId!: number;
+  invoiceType!: number;
+  invoiceNumber!: string;
+  invoiceStatus!: number;
+  isTaxIncluded!: number;
+  currency!: string;
+  invoice_items!: IInvoiceItem[];
+  payments!: IInvoicePayment[];
+  paid_amount!: number;
 
   getRemaningAmount() {
     if (this.paid_amount) {
-      let remainingAmount = this.netTotal - Math.abs(this.paid_amount);
+      const remainingAmount = this.netTotal - Math.abs(this.paid_amount);
       return remainingAmount;
     } else {
       return this.netTotal;
@@ -161,21 +163,21 @@ export class InvoiceResultClass {
   getStatus() {
     let itemStatus = `Pending`;
     if (this.paid_amount && this.payments.length) {
-      let paidAmount = Math.abs(this.paid_amount);
+      const paidAmount = Math.abs(this.paid_amount);
 
       if (this.netTotal - paidAmount === this.netTotal) {
         itemStatus = `Pending`;
       } else if (this.netTotal === paidAmount) {
         itemStatus = `Full Payment`;
       } else if (this.netTotal > paidAmount) {
-        itemStatus = "Partial Payment";
+        itemStatus = 'Partial Payment';
       }
     }
     return itemStatus;
   }
 }
 
-export interface IInvoiceCreatedResponse extends IInvoiceResult {}
+export type IInvoiceCreatedResponse = IInvoiceResult;
 
 export interface IInvoiceDashboardDetails {
   id: number;
@@ -222,17 +224,21 @@ export enum ITaxTypes {
   TAX_EXCLUSIVE = 2,
   NO_TAX = 3,
 }
-export enum IInvoiceStatus{
-  approve =1,
-  draft =2,
-  returned= 3,
+export enum IInvoiceStatus {
+  approve = 1,
+  draft = 2,
+  returned = 3,
 }
 
-export enum IInvoiceTypes{
-  INVOICE = "SI",
-  PURCAHSE_ENTRY = "POE",
-  QUOTATION = "QO",
-  PURCHASE_ORDER = "PO",
-  BILL = "BILL",
-  
+export enum IInvoiceTypes {
+  INVOICE = 'SI',
+  PURCAHSE_ENTRY = 'POE',
+  QUOTATION = 'QO',
+  PURCHASE_ORDER = 'PO',
+  BILL = 'BILL',
+}
+
+export enum CreditNoteType {
+  CREDITNOTE = 'ACCRECCREDIT',
+  DEBITNOTE = 'ACCPAYCREDIT',
 }

@@ -25,10 +25,6 @@ export class ErrorBoundary extends React.Component<IProps, IState> {
   }
 
   render() {
-    console.log(
-      { props: this.props, state: this.state },
-      'whta are props here'
-    );
     if (this.state.hasError) {
       // You can render any custom fallback UI
       return <div>Error Occured</div>;

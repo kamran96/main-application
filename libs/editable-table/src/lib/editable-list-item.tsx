@@ -10,6 +10,7 @@ export interface EditableListItemProps extends DivProps {
   index: number;
   id: string;
   selectedIndex: number | null;
+  customMount: any;
 }
 
 const _EditableListItem = ({
@@ -49,7 +50,8 @@ export const EditableListItem = memo(
   (prevprops, nextProps) => {
     return (
       JSON.stringify(prevprops.row) === JSON.stringify(nextProps.row) &&
-      JSON.stringify(prevprops.columns) === JSON.stringify(nextProps.columns)
+      JSON.stringify(prevprops.columns) === JSON.stringify(nextProps.columns) &&
+      prevprops?.customMount === nextProps?.customMount
     );
   }
 );

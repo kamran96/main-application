@@ -88,8 +88,8 @@ export const getInvoiceNumber = (
 export const getCreditNotes = (
   key?: string,
   status: string | number = 1,
-  page: number = 1,
-  pageSize: number = 10,
+  page = 1,
+  pageSize = 10,
   query?: string
 ) => {
   let url = `${INVOICES_API.CREDIT_NOTE}?page_size=${pageSize}&page_no=${page}&status=${status}`;

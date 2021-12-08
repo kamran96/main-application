@@ -1,7 +1,7 @@
-import { IThemeProps } from "./../../../../../hooks/useTheme/themeColors";
-import styled from "styled-components";
+import { IThemeProps } from './../../../../../hooks/useTheme/themeColors';
+import styled from 'styled-components';
 
-import convertToRem from "../../../../../utils/convertToRem";
+import convertToRem from '../../../../../utils/convertToRem';
 
 export const WrapperPurchaseOrderForm = styled.div`
   .row-dragging {
@@ -19,16 +19,6 @@ export const WrapperPurchaseOrderForm = styled.div`
   }
   .ref_header {
     padding: ${convertToRem(19)} ${convertToRem(26)};
-    background: ${(props: IThemeProps) =>
-      props?.theme?.theme === "dark"
-        ? props?.theme?.colors?.layoutBg
-        : "#f8f8f8"};
-    /* background: #f8f8f8; */
-    border: ${convertToRem(1)} solid
-      ${(props: IThemeProps) =>
-        props?.theme?.theme === "dark"
-          ? props?.theme?.colors?.layoutBg
-          : " #e4e4e4"};
     border-bottom: ${convertToRem(0)};
     box-sizing: border-box;
     border-radius: ${convertToRem(5)} ${convertToRem(5)} 0 0;

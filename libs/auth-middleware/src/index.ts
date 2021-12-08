@@ -34,6 +34,7 @@ export class Authenticate extends PassportStrategy(Strategy) {
 
   async validate(payload) {
     try {
+      console.log('nooooooooo');
       const type =
         process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
       const value =

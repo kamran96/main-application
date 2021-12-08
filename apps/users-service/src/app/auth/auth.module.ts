@@ -13,7 +13,6 @@ import { AuthStrategy } from './auth.strategy';
 @Module({
   controllers: [AuthController],
   imports: [
-    // PassportModule.register({ defaultStrategy: 'jwt' }),
     PassportModule,
     ConfigModule,
     JwtModule.registerAsync({
@@ -45,6 +44,6 @@ import { AuthStrategy } from './auth.strategy';
     ]),
   ],
   providers: [AuthService, AuthStrategy],
-  exports: [AuthService],
+  exports: [AuthService, AuthStrategy],
 })
 export class AuthModule {}

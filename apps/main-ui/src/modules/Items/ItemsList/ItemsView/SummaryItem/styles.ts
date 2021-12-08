@@ -1,6 +1,7 @@
-import styled from "styled-components";
-import { Color } from "../../../../../modal";
-import convertToRem from "../../../../../utils/convertToRem";
+import { IThemeProps } from '@invyce/shared/invyce-theme';
+import styled from 'styled-components';
+import { Color } from '../../../../../modal';
+import convertToRem from '../../../../../utils/convertToRem';
 
 export const WrapperItemsView = styled.div`
   ._itemviewcard {
@@ -19,7 +20,7 @@ export const WrapperItemsView = styled.div`
   }
   ._itemdetailcard {
     min-height: ${convertToRem(272)};
-    background: ${Color.$WHITE};
+    background: ${(props: IThemeProps) => props?.theme?.colors?.cardBg};
     margin-bottom: ${convertToRem(16)};
     h3 {
       margin-left: ${convertToRem(20)};
@@ -31,19 +32,19 @@ export const WrapperItemsView = styled.div`
     }
   }
   ._salesitemcard {
-    background: ${Color.$WHITE};
+    background: ${(props: IThemeProps) => props?.theme?.colors?.cardBg};
     min-height: ${convertToRem(272)};
     margin-bottom: ${convertToRem(16)};
   }
   ._topitemcard {
     margin-bottom: ${convertToRem(16)};
-    background: ${Color.$WHITE};
+    background: ${(props: IThemeProps) => props?.theme?.colors?.cardBg};
     min-height: ${convertToRem(310)};
   }
   ._otherlinkcard {
     margin-bottom: ${convertToRem(16)};
     min-height: ${convertToRem(310)};
-    background: ${Color.$WHITE};
+    background: ${(props: IThemeProps) => props?.theme?.colors?.cardBg};
     .datalinkcard {
       margin-bottom: ${convertToRem(26)};
       margin-top: ${convertToRem(26)};

@@ -25,3 +25,12 @@ class ContactType {
   type: number;
   id: string;
 }
+
+export class DeletePaymentDto {
+  type: number;
+  ids: Array<number>;
+}
+
+export class PaymentIdsDto {
+  ids: Array<number>;
+}

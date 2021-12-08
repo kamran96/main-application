@@ -7,18 +7,16 @@ import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import dayjs from 'dayjs';
 import { FC, useRef, useState } from 'react';
-import { createDndContext } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import { queryCache, useMutation } from 'react-query';
 
-import { createPurchaseEntryAPI, InvoiceCreateAPI } from '../../api';
-import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import {
-  IErrorMessages,
-  IServerError,
-  ISupportedRoutes,
-  NOTIFICATIONTYPE,
-} from '../../modal';
+  create_update_contact,
+  createPurchaseEntryAPI,
+  InvoiceCreateAPI,
+} from '../../api';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { IErrorMessages, IServerError, NOTIFICATIONTYPE } from '../../modal';
+import { IContactTypes } from '../../modal';
 import { IInvoiceStatus, IInvoiceType, ITaxTypes } from '../../modal/invoice';
 import { IOrganizationType } from '../../modal/organization';
 import { addition } from '../../utils/helperFunctions';
@@ -27,19 +25,14 @@ import printDiv, { DownloadPDF } from '../../utils/Print';
 import { ConfirmModal } from '../ConfirmModal';
 import { DatePicker } from '../DatePicker';
 import { FormLabel } from '../FormLabel';
-import { Payment } from '../Payment';
 import { PrintFormat } from '../PrintFormat';
 import { Rbac } from '../Rbac';
 import { PERMISSIONS } from '../Rbac/permissions';
 import { Seprator } from '../Seprator';
-import defaultItems from './defaultStates';
-import { DragableBodyRow } from './draggable';
 import c from './keys';
 import { PrintViewPurchaseWidget } from './PrintViewPurchaseWidget';
 import { WrapperInvoiceForm } from './styles';
 import { PurchaseManager, usePurchaseWidget } from './WidgetManager';
-
-const RNDContext = createDndContext(HTML5Backend);
 
 const { Option } = Select;
 
@@ -76,9 +69,9 @@ const Editor: FC<IProps> = ({ type, id }) => {
   const [issueDate, setIssueDate] = useState(dayjs());
   const [printModal, setPrintModal] = useState(false);
   const [taxType, setTaxType] = useState<ITaxTypes>(ITaxTypes.TAX_INCLUSIVE);
+  const [createContactName, setCreateContactName] = useState('');
 
   const {
-    rowsErrors,
     columns,
     contactResult,
     GrossTotal,
@@ -92,11 +85,10 @@ const Editor: FC<IProps> = ({ type, id }) => {
     payment,
     setPayment,
     AntForm,
-    moveRow,
     isFetching,
-    paymentReset,
     handleAddRow,
     ClearAll,
+    handleCheckValidation,
   } = usePurchaseWidget();
 
   const __columns =
@@ -116,6 +108,11 @@ const Editor: FC<IProps> = ({ type, id }) => {
       : InvoiceCreateAPI;
   /* React Query useMutation hook and ASYNC method to create invoice */
   const [muatateCreateInvoice, resMutateInvoice] = useMutation(APISTAKE);
+
+  //  CONTACT CREATE API
+  const [mutateCreateContact, resMutateCreateContact] = useMutation(
+    create_update_contact
+  );
   const [submitType, setSubmitType] = useState('');
   /* ********** HOOKS ENDS HERE ************** */
 
@@ -145,26 +142,24 @@ const Editor: FC<IProps> = ({ type, id }) => {
     handleUploadPDF(payload);
   };
 
+  const onCreateContact = async () => {
+    await mutateCreateContact(
+      { name: createContactName, contactType: IContactTypes.SUPPLIER },
+      {
+        onSuccess: (data) => {
+          queryCache?.invalidateQueries('all-contacts');
+          notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Contact Created');
+        },
+      }
+    );
+  };
+
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   const onFinish = async (value) => {
-    const InvoiceItemsValidation = [];
+    const errors = handleCheckValidation();
 
-    organization?.organizationType !== IOrganizationType.ENTERPRISE &&
-      invoiceItems.forEach(async (i, index) => {
-        if (i.itemId === null) {
-          InvoiceItemsValidation.push(index + 1);
-        }
-      });
-
-    if (InvoiceItemsValidation.length > 0) {
-      notificationCallback(
-        NOTIFICATIONTYPE.ERROR,
-        `Error in [${InvoiceItemsValidation.map((i) => {
-          return `${i}`;
-        })}] Please Select any item otherwise delete empty row.`
-      );
-    } else {
+    if (!errors?.length) {
       const paymentData = { ...payment };
       delete paymentData.totalAmount;
       delete paymentData.totalDiscount;
@@ -224,68 +219,64 @@ const Editor: FC<IProps> = ({ type, id }) => {
         payload.relation = relation;
       }
 
-      try {
-        await muatateCreateInvoice(payload, {
-          onSuccess: () => {
-            notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Invoice Created');
-            if (value && value.status.print) {
-              setPrintModal(true);
-            }
+      await muatateCreateInvoice(payload, {
+        onSuccess: () => {
+          notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Invoice Created');
+          if (value && value.status.print) {
+            setPrintModal(true);
+          }
 
-            if (payload.status !== 2) {
-              if (
-                type !== IInvoiceType.PURCHASE_ENTRY &&
-                type !== IInvoiceType.QUOTE
-              ) {
-                const messages = {
-                  invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.reference}`,
-                  quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.reference}`,
-                };
+          // if (payload.status !== 2) {
+          //   if (
+          //     type !== IInvoiceType.PURCHASE_ENTRY &&
+          //     type !== IInvoiceType.QUOTE
+          //   ) {
+          //     const messages = {
+          //       invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.reference}`,
+          //       quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.reference}`,
+          //     };
 
-                onSendPDF(
-                  value.contactId,
-                  type === IInvoiceType.INVOICE
-                    ? messages.invoice
-                    : messages.quotes
-                );
-              }
-            }
+          //     onSendPDF(
+          //       value.contactId,
+          //       type === IInvoiceType.INVOICE
+          //         ? messages.invoice
+          //         : messages.quotes
+          //     );
+          //   }
+          // }
 
-            ClearAll();
+          ClearAll();
 
-            [
-              'invoices',
-              'transactions?page',
-              'items?page',
-              'invoice-view',
-              'ledger-contact',
-              'all-items',
-            ].forEach((key) => {
-              queryCache.invalidateQueries((q) =>
-                q.queryKey[0].toString().startsWith(key)
-              );
-            });
-          },
-          onError: (error: IServerError) => {
-            if (
-              error &&
-              error.response &&
-              error.response.data &&
-              error.response.data.message
-            ) {
-              const { message } = error.response.data;
-              notificationCallback(NOTIFICATIONTYPE.ERROR, message);
-            } else {
-              notificationCallback(
-                NOTIFICATIONTYPE.ERROR,
-                IErrorMessages.NETWORK_ERROR
-              );
-            }
-          },
-        });
-      } catch (error) {
-        console.log(error);
-      }
+          [
+            'invoices',
+            'transactions?page',
+            'items?page',
+            'invoice-view',
+            'ledger-contact',
+            'all-items',
+          ].forEach((key) => {
+            queryCache.invalidateQueries((q) =>
+              q.queryKey[0].toString().startsWith(key)
+            );
+          });
+        },
+        onError: (error: IServerError) => {
+          if (
+            error &&
+            error.response &&
+            error.response.data &&
+            error.response.data.message
+          ) {
+            const { message } = error.response.data;
+            notificationCallback(NOTIFICATIONTYPE.ERROR, message);
+          } else {
+            notificationCallback(
+              NOTIFICATIONTYPE.ERROR,
+              IErrorMessages.NETWORK_ERROR
+            );
+          }
+        },
+      });
     }
   };
   const onCancelPrint = () => {
@@ -344,14 +335,6 @@ const Editor: FC<IProps> = ({ type, id }) => {
         ? 'Order No'
         : 'Order No',
   };
-
-  const components = {
-    body: {
-      row: DragableBodyRow,
-    },
-  };
-
-  const manager = useRef(RNDContext);
 
   /* JSX  */
   return (
@@ -425,21 +408,40 @@ const Editor: FC<IProps> = ({ type, id }) => {
                         showSearch
                         style={{ width: '100%' }}
                         placeholder="Select Contact"
-                        optionFilterProp="children"
-                        onChange={(val) => {
-                          if (val !== 'newContact') {
-                            AntForm.setFieldsValue({ contactId: val });
+                        // optionFilterProp="children"
+                        filterOption={(input, option) => {
+                          setCreateContactName(input);
+                          if (typeof option?.children === 'string') {
+                            return (
+                              option?.value
+                                ?.toLowerCase()
+                                .includes(input?.toLocaleLowerCase()) ||
+                              option?.children
+                                ?.toLowerCase()
+                                .includes(input?.toLocaleLowerCase())
+                            );
+                          } else {
+                            return true;
                           }
                         }}
+                        // onChange={(val) => {
+                        //   if (val !== 'newContact') {
+                        //     AntForm.setFieldsValue({ contactId: val });
+                        //   }
+                        // }}
                       >
-                        <Option value={'contact-create'}>
+                        <Option
+                          style={{
+                            textAlign: 'left',
+                          }}
+                          value={'contact-create'}
+                        >
                           <Button
-                            onClick={() => {
-                              history.push(
-                                `/app${ISupportedRoutes.CREATE_CONTACT}`
-                              );
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onCreateContact();
                             }}
-                            type="link"
+                            type="default"
                             size="middle"
                           >
                             Create Contact

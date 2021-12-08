@@ -21,7 +21,7 @@ import {
   pushDraftToPurchaseAPI,
 } from '../../api';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
-import { IAddress, IInvoiceItem, IInvoiceResult } from '../../modal/invoice';
+import { IAddress, IInvoiceItem, IInvoiceResult } from '../../modal';
 import { queryCache, useMutation, useQuery } from 'react-query';
 import {
   IErrorMessages,
@@ -125,14 +125,6 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
 
   /*Query hook for  Fetching all accounts against ID */
   // const allContactsRes = useQuery([`all-contacts`, "ALL"], getAllContacts);
-
-  const allUsersRes = useQuery([`all-users`, 'ALL'], getAllUsers);
-
-  const allUsers =
-    (allUsersRes.data &&
-      allUsersRes.data.data &&
-      allUsersRes.data.data.result) ||
-    [];
 
   /* ************** QUERIES ENDS HERE ************** */
 
@@ -292,23 +284,6 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
     handleUploadPDF(payload);
   };
 
-  const checkStatus = () => {
-    let itemStatus: any = <BoldText>Credit</BoldText>;
-    if (response && response.paid_amount && response.payments.length) {
-      const { paid_amount, netTotal } = response;
-      const paidAmount = Math.abs(paid_amount);
-
-      if (netTotal - paidAmount === netTotal) {
-        itemStatus = `Credit`;
-      } else if (netTotal === paidAmount) {
-        itemStatus = `Full Payment`;
-      } else if (netTotal > paidAmount) {
-        itemStatus = 'Partial Payment';
-      }
-    }
-    return itemStatus;
-  };
-
   /* *********************CALCULATIONS**************** */
   /* ****************** THIS WILL CALCULATE DISCOUNT *************** */
   const calculatedDisc: number = response && response.discount;
@@ -323,8 +298,6 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
     0;
 
   const invoiceDiscount = calculatedDisc - itemsDiscount;
-  const { data: bankData } = useQuery([`all-banks`], getBanks);
-  const banksList = (bankData && bankData.data && bankData.data.result) || [];
 
   /* ************* THIS WILL CALCULATE TOTAL TAX ************* */
   const TotalTax =
@@ -335,14 +308,6 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
         type === 'PO' ? 'POE' : 'SI'
       )) ||
     0;
-
-  const getPaidAmount = () => {
-    let paid_amount = 0;
-    if (response && response.paid_amount) {
-      paid_amount = Math.abs(response.paid_amount);
-    }
-    return paid_amount;
-  };
 
   const getRemainigAmount = () => {
     const { netTotal, paid_amount } = response;
@@ -519,12 +484,12 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
                     </tr>
                     <tr>
                       <td>
-                        {type === 'SI' || type === 'credit-note'
+                        {/* {type === 'SI' || type === 'credit-note'
                           ? response?.contact?.addresses?.length &&
                             response?.contact?.addresses[0]?.description
                           : userDetails &&
                             orgInfo &&
-                            orgInfo.residentialAddress}
+                            orgInfo.residentialAddress} */}
                       </td>
                     </tr>
                     <tr>
@@ -630,27 +595,24 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
         <Seprator />
         <Row gutter={24}>
           <Col span={8} offset={10} pull={10}>
-            {response &&
-              response.payments &&
-              Array.isArray(response.payments) &&
-              response.payments.length > 0 && (
-                <div className="payment_details_card mt-35">
-                  <div className="flex alignStart pv-2 ">
-                    <BoldText className="bold_text">Status</BoldText>
-                    <P className="plain_text">{checkStatus()}</P>
-                  </div>
-                  <div className="flex alignStart pv-2 ">
-                    <BoldText className="bold_text">Paid Amount</BoldText>
-                    <P className="plain_text">{moneyFormat(getPaidAmount())}</P>
-                  </div>
-                  <div className="flex alignStart pv-2 ">
-                    <BoldText className="bold_text">Remaining Amount</BoldText>
-                    <P className="plain_text">
-                      {moneyFormat(getRemainigAmount())}
-                    </P>
-                  </div>
-                </div>
-              )}
+            <div className="payment_details_card mt-35">
+              <div className="flex alignStart pv-2 ">
+                <BoldText className="bold_text">Status</BoldText>
+                <P className="plain_text">{response?.payment_status}</P>
+              </div>
+              <div className="flex alignStart pv-2 ">
+                <BoldText className="bold_text">Paid Amount</BoldText>
+                <P className="plain_text">
+                  {moneyFormat(response?.paid_amount)}
+                </P>
+              </div>
+              <div className="flex alignStart pv-2 ">
+                <BoldText className="bold_text">Remaining Amount</BoldText>
+                <P className="plain_text">
+                  {moneyFormat(response?.due_amount)}
+                </P>
+              </div>
+            </div>
           </Col>
           <Col span={6}>
             <div className="calculation textRight">
@@ -679,7 +641,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
               </table>
             </div>
           </Col>
-          {response?.comment && (
+          {response?.comment&& (
             <Col span={10}>
               <div className="notes">
                 <h5 className="label">
@@ -797,7 +759,7 @@ const WrapperNewPurchaseView = styled.div`
     padding: 0px 22px;
   }
   .topbar_logo_details_wrapper .company_details .company_name {
-    color: #143c69;
+    color: ${(props: IThemeProps) => props?.theme?.theme === 'dark' ? props?.theme?.colors?.$BLACK : props?.theme?.colors?.$Secondary};
     font-size: 25px;
     margin: 0;
     font-weight: 800;
@@ -805,7 +767,7 @@ const WrapperNewPurchaseView = styled.div`
   .topbar_logo_details_wrapper .company_details p {
     font-size: 16px;
     line-height: 19px;
-    color: #6f6f84;
+    color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
     margin-bottom: 5px;
   }
 
@@ -823,7 +785,7 @@ const WrapperNewPurchaseView = styled.div`
     font-size: 16px;
     line-height: 19px;
     text-align: right;
-    color: #6f6f84;
+    color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
   }
   /* ************* ADDRESS BAR STYLES ENDS HERE ********************** */
 
@@ -878,7 +840,7 @@ const WrapperNewPurchaseView = styled.div`
 
         text-align: right;
 
-        color: #143c69;
+        color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
       }
     }
   }
@@ -916,7 +878,7 @@ const WrapperNewPurchaseView = styled.div`
 
       /* Fonts/Primary */
 
-      color: #222234;
+      color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
     }
     tr:last-child {
       td,
@@ -939,7 +901,7 @@ const WrapperNewPurchaseView = styled.div`
 
       /* Fonts/Parent Variant */
 
-      color: #6f6f84;
+      color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
     }
     p {
       margin: 0;
@@ -950,7 +912,7 @@ const WrapperNewPurchaseView = styled.div`
 
       /* Fonts/Primary */
 
-      color: #222234;
+      color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
     }
   }
 

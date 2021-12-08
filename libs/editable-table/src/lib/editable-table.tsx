@@ -14,7 +14,7 @@ export interface EditableColumnsType {
   id?: string;
   ref?: any;
   width?: number;
-  render?: (data: any, row: Object, index: number) => JSX.Element;
+  render?: (data: any, row: unknown, index: number) => JSX.Element;
 }
 
 export interface Scrollable {
@@ -30,6 +30,8 @@ export interface EditableTableProps {
   loading?: boolean;
   cacheKey?: string;
   resetCache?: boolean;
+  customMount?: any;
+
   // onMoveCard: (data: any[])=>void;
 }
 
@@ -41,6 +43,7 @@ export function EditableTable({
   loading,
   cacheKey,
   resetCache,
+  customMount,
 }: EditableTableProps) {
   const [{ tableColumns, tableData }, setLoadingConfig] = useState<{
     tableColumns: EditableColumnsType[];
@@ -60,7 +63,7 @@ export function EditableTable({
     if (resetCache && true && cacheKey) {
       localStorage.removeItem(cacheKey);
     }
-  }, [resetCache]);
+  }, [resetCache, cacheKey]);
 
   useEffect(() => {
     if (cacheKey) {
@@ -120,7 +123,6 @@ export function EditableTable({
       dragIndex !== dropIndex &&
       dragEnd
     ) {
-      console.log(dragIndex, dropIndex);
       const _dragItem = data[dragIndex];
 
       const allRows = [...data];
@@ -141,44 +143,47 @@ export function EditableTable({
 
   return (
     <EditableTableWrapper scrollable={scrollable ? scrollable : null}>
-      <colgroup>
-        {columns.map((col, index) => {
-          const style = { width: col?.width ? `${col.width}px` : '' };
-          return <col key={index} style={style} />;
-        })}
-      </colgroup>
-      <thead className="ant-table-thead ">
-        <tr>
-          {columns?.map((col, index) => {
+      <table>
+        <colgroup>
+          {columns.map((col, index) => {
+            const style = { width: col?.width ? `${col.width}px` : '' };
+            return <col key={index} style={style} />;
+          })}
+        </colgroup>
+        <thead className="ant-table-thead ">
+          <tr>
+            {columns?.map((col, index) => {
+              return (
+                <th className="ant-table-cell" key={col.key + index}>
+                  {col.title}
+                </th>
+              );
+            })}
+          </tr>
+        </thead>
+        <tbody className="ant-table-tbody">
+          {tableData.map((item, index) => {
             return (
-              <th className="ant-table-cell" key={col.key + index}>
-                {col.title}
-              </th>
+              <EditableListItem
+                onMouseOver={() => setSelectedIndex(index)}
+                selectedIndex={selectedIndex}
+                onDragStart={() => onDragStart(index)}
+                onDragOver={() => {
+                  onMouseOver(index);
+                }}
+                onDragEnd={() => setDragEnd(true)}
+                draggable={true}
+                key={index}
+                id={`item-level-${index}`}
+                index={index}
+                row={item}
+                columns={tableColumns}
+                customMount={customMount}
+              />
             );
           })}
-        </tr>
-      </thead>
-      <tbody className="ant-table-tbody">
-        {tableData.map((item, index) => {
-          return (
-            <EditableListItem
-              onMouseOver={() => setSelectedIndex(index)}
-              selectedIndex={selectedIndex}
-              onDragStart={() => onDragStart(index)}
-              onDragOver={() => {
-                onMouseOver(index);
-              }}
-              onDragEnd={() => setDragEnd(true)}
-              draggable={true}
-              key={index}
-              id={`item-level-${index}`}
-              index={index}
-              row={item}
-              columns={tableColumns}
-            />
-          );
-        })}
-      </tbody>
+        </tbody>
+      </table>
     </EditableTableWrapper>
   );
 }

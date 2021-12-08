@@ -9,13 +9,22 @@ import { TableCard } from '../../../../components/TableCard';
 import { PurchasesWidget } from '../../../../components/PurchasesWidget';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 
-export const PurchaseEntryEditor: FC = () => {
+export const BillsEditorWidget: FC = () => {
   const { routeHistory } = useGlobalContext();
   const { location } = routeHistory;
-  const id = location && location.pathname.split('/app/purchase-entry/')[1];
+  console.log(
+    location,
+    `/app/${ISupportedRoutes.CREATE_PURCHASE_Entry}/`,
+    'location'
+  );
+  const id =
+    location &&
+    location.pathname.split(
+      `/app${ISupportedRoutes.CREATE_PURCHASE_Entry}/`
+    )[1];
 
   return (
-    <WrapperPurchaseEntry>
+    <WrapperBillsEditor>
       <Heading>Create Bill</Heading>
       <BreadCrumbArea>
         <Breadcrumb>
@@ -29,8 +38,8 @@ export const PurchaseEntryEditor: FC = () => {
         <PurchasesWidget type="POE" id={id} />
         {/* <InvoiceForm type="PO" /> */}
       </TableCard>
-    </WrapperPurchaseEntry>
+    </WrapperBillsEditor>
   );
 };
 
-const WrapperPurchaseEntry = styled.div``;
+const WrapperBillsEditor = styled.div``;
