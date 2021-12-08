@@ -59,6 +59,8 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
 
   const Paywall = lazy(() => import('../modules/Paywall'));
 
+  const ContactsImportWidget = lazy(()=>import('../modules/Contacts/ContactsImport/ContactImportWidget'));
+
   const { isUserLogin, userDetails, routeHistory, theme, itemsModalConfig } =
     useGlobalContext();
 
@@ -137,6 +139,9 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
         </Suspense>
         <Suspense fallback={<></>}>
           <VerifyAccountModal />
+        </Suspense>
+        <Suspense fallback={<></>}>
+          <ContactsImportWidget />
         </Suspense>
       </DashboardWrapper>
     </ThemeProvider>
