@@ -83,6 +83,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     handleAddRow,
     ClearAll,
     handleCheckValidation,
+    getCachedInvoice,
   } = usePurchaseWidget();
 
   const __columns =
