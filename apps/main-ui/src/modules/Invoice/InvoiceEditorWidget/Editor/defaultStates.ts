@@ -11,7 +11,6 @@ export default {
   tax: '0',
   total: 0,
   costOfGoodAmount: 0,
-  index: 0,
   accountId: null,
 };
 export const Requires = {
@@ -71,6 +70,7 @@ export const defaultPayment = {
 
 export const defaultFormData = {
   issueDate: dayjs(),
+  dueDate: dayjs(),
   currency: 'PKR',
   invoiceDiscount: 0,
 };
