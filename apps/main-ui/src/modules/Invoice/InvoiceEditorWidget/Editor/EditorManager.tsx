@@ -56,6 +56,7 @@ import defaultItems, {
   Requires,
 } from './defaultStates';
 import c from './keys';
+import { usePrevious } from '../../../../hooks/usePrevious';
 
 export const PurchaseContext: any = createContext({});
 export const usePurchaseWidget: any = () => useContext(PurchaseContext);
@@ -121,38 +122,62 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     '',
     'localStorage'
   ).get();
+
   const antFormCacheData =
     invycePersist(c.ANTFORMCACHE + type, '', 'localStorage').get() || {};
 
-  useEffect(() => {
-    invycePersist(c.CACHEKEY + type, invoiceItems, 'localStorage').set();
+  const previousCachedInvoiceData = usePrevious(cachedInvoiceData);
+  const previousCachedFormData: any = usePrevious(antFormCacheData);
+
+  const getCachedInvoice = () => {
+    setInvoiceItems(previousCachedInvoiceData);
+    AntForm.setFieldsValue({
+      ...previousCachedFormData,
+      dueDate: dayjs(previousCachedFormData.dueDate),
+      issueDate: dayjs(previousCachedFormData.issueDate),
+    });
+    setHasCachedData(false);
+  };
+
+  const destroyCachedInvoice = () => {
+    resetPersist();
+    setHasCachedData(false);
+  };
+
+  const [hasCachedData, setHasCachedData] = useState(false);
+
+  const memoInvoiceItems = useMemo(() => {
+    return invoiceItems;
   }, [invoiceItems]);
+
+  useEffect(() => {
+    if (
+      cachedInvoiceData &&
+      JSON.stringify(cachedInvoiceData) !== JSON.stringify(memoInvoiceItems)
+    ) {
+      setHasCachedData(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (!hasCachedData) {
+        setTimeout(() => {
+          if (!hasCachedData) {
+            invycePersist(
+              c.CACHEKEY + type,
+              invoiceItems,
+              'localStorage'
+            ).set();
+          }
+        }, 400);
+      }
+    }, 400);
+  }, [memoInvoiceItems]);
 
   /* Component did mount */
   useEffect(() => {
-    AntForm.setFieldsValue({
-      currency: 'PKR',
-      invoiceDiscount: 0,
-      ...antFormCacheData,
-      issueDate: antFormCacheData?.issueDate
-        ? dayjs(antFormCacheData?.issueDate)
-        : dayjs(),
-      dueDate: antFormCacheData?.dueDate
-        ? dayjs(antFormCacheData?.dueDate)
-        : dayjs(),
-    });
-
-    const initialInvoiceItemsState: any = cachedInvoiceData || [];
-    if (!cachedInvoiceData) {
-      for (let i = 0; i <= 2; i++) {
-        initialInvoiceItemsState.push({
-          ...defaultItems,
-          index: 1 + 1,
-          accountId: null,
-        });
-      }
-    }
-    setInvoiceItems(initialInvoiceItemsState);
+    AntForm.setFieldsValue(defaultFormData);
   }, [AntForm]);
 
   const { notificationCallback, setItemsModalConfig, userDetails } =
@@ -503,8 +528,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       'itemDiscount',
                     ]?.forEach((key) => {
                       const index = record.errors?.indexOf(key);
-                      if (index !== -1) {
-                        record.errors.splice(index, 1);
+                      if (index !== -1 && record?.errors?.length) {
+                        record?.errors?.splice(index, 1);
                       }
                     });
 
@@ -920,6 +945,11 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
   /* This function is responsible to clear all invoice items and reset form */
 
+  const resetPersist = () => {
+    invycePersist().resetData(c.CACHEKEY + type, 'localStorage');
+    invycePersist().resetData(c.ANTFORMCACHE + type, 'localStorage');
+  };
+
   const ClearAll = () => {
     AntForm.resetFields();
     setInvoiceDiscount(0);
@@ -928,8 +958,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     AntForm.setFieldsValue({
       ...defaultFormData,
     });
-    invycePersist().resetData(c.CACHEKEY + type, 'localStorage');
-    invycePersist().resetData(c.ANTFORMCACHE + type, 'localStorage');
+    setDeleteIds([]);
+    resetPersist();
     setPaymentReset(true);
     setTimeout(() => {
       setPaymentReset(false);
@@ -987,10 +1017,50 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         handleAddRow,
         isFetching: itemsLoading || invoiceLoading || accountsLoading,
         handleCheckValidation,
+        getCachedInvoice,
       }}
     >
       <LayoutWrapper>
         <div className="table_content">
+          {hasCachedData && (
+            <div className="notifier">
+              <span>
+                Do you want to continue from where you left before?
+                <br />
+                <Button
+                  onClick={getCachedInvoice}
+                  className="mr-5 mt-5"
+                  type="primary"
+                  ghost
+                >
+                  yes
+                </Button>
+                <Button
+                  onClick={destroyCachedInvoice}
+                  type="primary"
+                  ghost
+                  danger
+                  className="mt-5"
+                >
+                  No
+                </Button>
+              </span>
+            </div>
+          )}
+          {/* <FloatingNotifier
+            message={
+              <div>
+                Do you want to fill the invoice that you have left last time?{' '}
+                <br />
+                <Button onClick={getCachedInvoice} className="mr-5 " type="link">
+                  yes
+                </Button>
+                <Button onClick={destroyCachedInvoice} type="link">
+                  No
+                </Button>
+              </div>
+            }
+          /> */}
           <Card>{children}</Card>
         </div>
         {/* <div className="sider"><EmailSider/></div> */}
@@ -1003,5 +1073,17 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 const LayoutWrapper = styled.section`
   .table_content {
     width: calc(100% - 0);
+    position: relative;
+
+    .notifier {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      z-index: 1111;
+      background: #ffffffdb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   }
 `;
