@@ -409,6 +409,9 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
       })}
     </Menu>
   );
+
+  const { addresses } = response?.contact;
+
   return (
     <WrapperNewPurchaseView>
       <div className="pv-10">
@@ -464,22 +467,20 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
                 <td className="sent_to">
                   <table>
                     <tr>
-                      <td className="head">To,</td>
+                      <td className="head">To</td>
                     </tr>
                     <tr>
                       <td>
-                        {type === 'SI' || type === 'credit-note' ? (
-                          <Link
-                            className="mt-8"
-                            to={`/app${ISupportedRoutes.CONTACTS}/${
-                              response && response.contactId
-                            }`}
-                          >
-                            <Capitalize> {response?.contact?.name}</Capitalize>
-                          </Link>
-                        ) : (
-                          <P>{userDetails.organization.name}</P>
-                        )}
+                        <Link
+                          className="mt-8"
+                          to={`/app${ISupportedRoutes.CONTACTS}/${
+                            response && response.contactId
+                          }`}
+                        >
+                          <Capitalize>
+                            <BOLDTEXT>{response?.contact?.name}</BOLDTEXT>{' '}
+                          </Capitalize>
+                        </Link>
                       </td>
                     </tr>
                     <tr>
@@ -494,22 +495,25 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
                     </tr>
                     <tr>
                       <td>
-                        {type === 'SI' ||
-                          (type === 'credit-note' &&
-                            response?.contact?.addressId &&
-                            response?.contact?.addresses[0]?.city) ||
-                          ''}
+                        <Capitalize></Capitalize>
                       </td>
                     </tr>
-                    <tr>
-                      <td>
-                        {type === 'SI' ||
-                          (type === 'credit-note' &&
-                            response?.contact?.addressId &&
-                            response?.contact?.addresses[0]?.city) ||
-                          ''}
-                      </td>
-                    </tr>
+                    {addresses?.length && (
+                      <>
+                        <tr>
+                          <td className="head">Address</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <Capitalize>
+                              {addresses[0]?.country},&nbsp;
+                              {addresses[0]?.city},&nbsp;
+                              {addresses[0]?.postalCode}&nbsp;
+                            </Capitalize>
+                          </td>
+                        </tr>
+                      </>
+                    )}
                   </table>
                 </td>
                 <td className="invoice_reference">
@@ -641,7 +645,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
               </table>
             </div>
           </Col>
-          {response?.comment&& (
+          {response?.comment && (
             <Col span={10}>
               <div className="notes">
                 <h5 className="label">
@@ -655,7 +659,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
               </div>
             </Col>
           )}
-          <Col span={14}>
+          {/* <Col span={14}>
             <div className="notes">
               <h5 className="label">
                 <BOLDTEXT>Terms & Conditions</BOLDTEXT>
@@ -668,7 +672,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
                 integer elit sed senectus.
               </p>
             </div>
-          </Col>
+          </Col> */}
         </Row>
       </Card>
       <CommonModal
@@ -759,7 +763,10 @@ const WrapperNewPurchaseView = styled.div`
     padding: 0px 22px;
   }
   .topbar_logo_details_wrapper .company_details .company_name {
-    color: ${(props: IThemeProps) => props?.theme?.theme === 'dark' ? props?.theme?.colors?.$BLACK : props?.theme?.colors?.$Secondary};
+    color: ${(props: IThemeProps) =>
+      props?.theme?.theme === 'dark'
+        ? props?.theme?.colors?.$BLACK
+        : props?.theme?.colors?.$Secondary};
     font-size: 25px;
     margin: 0;
     font-weight: 800;
@@ -840,7 +847,10 @@ const WrapperNewPurchaseView = styled.div`
 
         text-align: right;
 
-        color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
+        color: ${({ theme }: IThemeProps) =>
+          theme?.theme === 'dark'
+            ? theme?.colors?.$BLACK
+            : theme?.colors?.$Secondary};
       }
     }
   }

@@ -2,7 +2,7 @@ import dotsGrid from '@iconify-icons/mdi/dots-grid';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import addLine from '@iconify/icons-ri/add-line';
 import Icon from '@iconify/react';
-import { Button, Form } from 'antd';
+import { Button, Card, Form } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import dayjs from 'dayjs';
 import update from 'immutability-helper';
@@ -52,6 +52,8 @@ import defaultItems, {
 } from './defaultStates';
 import { invycePersist } from '@invyce/invyce-persist';
 import c from './keys';
+import styled from 'styled-components';
+import usePrevious from '../../hooks/usePrevious';
 
 interface IManagerContext {
   rowsErrors: number[];
@@ -131,7 +133,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
   /* Component State Hooks */
   const [invoiceDiscount, setInvoiceDiscount] = useState(0);
-  const [invoiceItems, setInvoiceItems] = useState<any>([]);
+  const [invoiceItems, setInvoiceItems] = useState<any>([defaultItems]);
   const [invoiceStatus, setInvoiceStatus] = useState(1);
   const [deleteIds, setDeleteIds] = useState([]);
   const [paymentReset, setPaymentReset] = useState(false);
@@ -142,6 +144,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     dueDate: dayjs(),
     paymentType: null,
   });
+  const [hasCachedData, setHasCachedData] = useState(false);
 
   /* Antd antd form */
   /* And Form Hook */
@@ -157,37 +160,58 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
   const antFormCacheData =
     invycePersist(c.ANTFORMCACHE + type, '', 'localStorage').get() || {};
 
-  useEffect(() => {
-    invycePersist(c.CACHEKEY + type, invoiceItems, 'localStorage').set();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const previousCachedTableData = usePrevious(cachePurchasesData);
+  const previousCachedAntFormData: any = usePrevious(antFormCacheData);
+
+  const getCachedTableData = () => {
+    setInvoiceItems(previousCachedTableData);
+    AntForm.setFieldsValue({
+      ...previousCachedAntFormData,
+      dueDate: dayjs(previousCachedAntFormData.dueDate),
+      issueDate: dayjs(previousCachedAntFormData.issueDate),
+    });
+    setHasCachedData(false);
+  };
+
+  const destroyCachedInvoice = () => {
+    resetPersist();
+    setHasCachedData(false);
+  };
+
+  const memoInvoiceItems = useMemo(() => {
+    return invoiceItems;
   }, [invoiceItems]);
+
+  useEffect(() => {
+    if (
+      cachePurchasesData &&
+      JSON.stringify(cachePurchasesData) !== JSON.stringify(memoInvoiceItems)
+    ) {
+      setHasCachedData(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (!hasCachedData) {
+        setTimeout(() => {
+          if (!hasCachedData) {
+            invycePersist(
+              c.CACHEKEY + type,
+              invoiceItems,
+              'localStorage'
+            ).set();
+          }
+        }, 400);
+      }
+    }, 400);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [memoInvoiceItems]);
   /* CACHING ANT FORM DATA AND RETRIVE DATA HANDLERS ENDS HERE */
 
   /* Component did mount */
   useEffect(() => {
-    AntForm.setFieldsValue({
-      currency: 'PKR',
-      invoiceDiscount: 0,
-      ...antFormCacheData,
-      issueDate: antFormCacheData?.issueDate
-        ? dayjs(antFormCacheData?.issueDate)
-        : dayjs(),
-      dueDate: antFormCacheData?.dueDate
-        ? dayjs(antFormCacheData?.dueDate)
-        : dayjs(),
-    });
-
-    const initialInvoiceItemsState: any = cachePurchasesData || [];
-    if (!cachePurchasesData) {
-      for (let i = 0; i <= 2; i++) {
-        initialInvoiceItemsState.push({
-          ...defaultItems,
-          index: 1 + 1,
-          accountId: type === IInvoiceType.INVOICE ? 321 : null,
-        });
-      }
-    }
-    setInvoiceItems(initialInvoiceItemsState);
+    AntForm.setFieldsValue(defaultFormData);
   }, [AntForm]);
 
   const { notificationCallback, setItemsModalConfig, userDetails } =
@@ -409,7 +433,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
           }
         } else {
           const indexed = activeItem.errors?.indexOf(key);
-          if (indexed !== -1) {
+          if (indexed !== -1 && activeItem.errors?.length) {
             activeItem.errors.splice(indexed, 1);
           }
         }
@@ -535,8 +559,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                     'itemDiscount',
                   ]?.forEach((key) => {
                     const index = record.errors?.indexOf(key);
-                    if (index !== -1) {
-                      record.errors.splice(index, 1);
+                    if (index !== -1 && record?.errors?.length) {
+                      record?.errors?.splice(index, 1);
                     }
                   });
                   allItems[index] = {
@@ -625,7 +649,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                   setInvoiceItems((prev) => {
                     const allItems = [...prev];
                     const indexed = record.errors?.indexOf('description');
-                    if (indexed !== -1) {
+                    if (indexed !== -1 && record?.errors?.length) {
                       record.errors.splice(indexed, 1);
                     }
                     allItems[index] = {
@@ -700,7 +724,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                           quantity;
 
                     const indexed = allItems[index].errors?.indexOf('quantity');
-                    if (indexed !== -1) {
+                    if (indexed !== -1 && allItems[index].errors?.length) {
                       allItems[index].errors.splice(indexed, 1);
                     }
                     allItems[index] = {
@@ -851,7 +875,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                     const allItems = [...prev];
                     const indexed =
                       allItems[index].errors?.indexOf('accountId');
-                    if (indexed !== -1) {
+                    if (indexed !== -1 && allItems[index].errors?.length) {
                       allItems[index].errors.splice(indexed, 1);
                     }
                     allItems[index] = {
@@ -1015,7 +1039,10 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
   };
 
   /* This function is responsible to clear all invoice items and reset form */
-
+  const resetPersist = () => {
+    invycePersist().resetData(c.CACHEKEY + type, 'localStorage');
+    invycePersist().resetData(c.ANTFORMCACHE + type, 'localStorage');
+  };
   const ClearAll = () => {
     AntForm.resetFields();
     setInvoiceItems([{ ...defaultItems }]);
@@ -1024,8 +1051,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
       ...defaultFormData,
     });
     setInvoiceDiscount(0);
-    invycePersist().resetData(c.CACHEKEY + type, 'localStorage');
-    invycePersist().resetData(c.ANTFORMCACHE + type, 'localStorage');
+    resetPersist();
     setPaymentReset(true);
     setTimeout(() => {
       setPaymentReset(false);
@@ -1085,7 +1111,57 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         isFetching: itemsLoading || invoiceLoading || accountsLoading,
       }}
     >
-      {children}
+      <LayoutWrapper>
+        <div className="table_content">
+          {hasCachedData && (
+            <div className="notifier">
+              <span>
+                Do you want to continue from where you left before?
+                <br />
+                <Button
+                  onClick={getCachedTableData}
+                  className="mr-5 mt-5"
+                  type="primary"
+                  ghost
+                >
+                  yes
+                </Button>
+                <Button
+                  onClick={destroyCachedInvoice}
+                  type="primary"
+                  ghost
+                  danger
+                  className="mt-5"
+                >
+                  No
+                </Button>
+              </span>
+            </div>
+          )}
+
+          <Card>{children}</Card>
+        </div>
+        {/* <div className="sider"><EmailSider/></div> */}
+        {/* {children} */}
+      </LayoutWrapper>
     </PurchaseContext.Provider>
   );
 };
+
+const LayoutWrapper = styled.div`
+  .table_content {
+    width: calc(100% - 0);
+    position: relative;
+
+    .notifier {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      z-index: 1111;
+      background: #ffffffdb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+`;
