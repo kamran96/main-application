@@ -160,9 +160,10 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     []
   );
 
-  const [contactsImportConfig, setContactsImportConfig] = useState<IModalsConfig>({
-    visibility: false,
-  })
+  const [contactsImportConfig, setContactsImportConfig] =
+    useState<IModalsConfig>({
+      visibility: false,
+    });
 
   const [verifiedModal, setVerifiedModal] = useState(false);
 
@@ -536,7 +537,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         contactsImportConfig,
         setContactsImportConfig: (visibility: boolean) => {
           setContactsImportConfig({ visibility });
-        }
+        },
       }}
     >
       <WrapperChildren>

@@ -107,7 +107,10 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   const [submitType, setSubmitType] = useState('');
   /* ********** HOOKS ENDS HERE ************** */
 
-  const { data: invoiceNumberData } = useQuery([], getInvoiceNumber);
+  const { data: invoiceNumberData, refetch: refetchInvoiceNumber } = useQuery(
+    [],
+    getInvoiceNumber
+  );
 
   useEffect(() => {
     if (invoiceNumberData?.data?.result) {
@@ -121,7 +124,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     printDiv(printItem);
   };
 
-  const onSendPDF = (contactId, message) => {
+  const onSendPDF = (contactId, invoiceId) => {
     const printItem = printRef.current;
     let email = ``;
 
@@ -135,9 +138,10 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
 
     const pdf = DownloadPDF(printItem);
     const payload = {
-      email,
+      email: 'kamran@invyce.com',
       html: `${pdf}`,
-      message,
+      id: invoiceId,
+      type: type,
     };
     handleUploadPDF(payload);
   };
@@ -192,28 +196,21 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
       }
 
       await muatateCreateInvoice(payload, {
-        onSuccess: () => {
+        onSuccess: (data) => {
           notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Invoice Created');
 
           if (value && value.status.print) {
             setPrintModal(true);
           }
 
-          if (payload.invoice.status !== 2) {
-            const messages = {
-              invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
-              quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
-            };
-
-            onSendPDF(
-              value.contactId,
-              type === IInvoiceType.INVOICE ? messages.invoice : messages.quotes
-            );
+          if (payload?.invoice?.status !== 2) {
+            onSendPDF(value.contactId, data?.data?.result?.id);
           }
 
           ClearAll();
 
           /* this will clear invoice items, formdata and payment */
+          refetchInvoiceNumber();
 
           [
             'invoices',
@@ -224,17 +221,12 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
             'all-items',
           ].forEach((key) => {
             queryCache.invalidateQueries((q) =>
-              q.queryKey[0].toString().startsWith(key)
+              q?.queryKey[0]?.toString()?.startsWith(key)
             );
           });
         },
         onError: (error: IServerError) => {
-          if (
-            error &&
-            error.response &&
-            error.response.data &&
-            error.response.data.message
-          ) {
+          if (error?.response?.data?.message) {
             const { message } = error.response.data;
             notificationCallback(NOTIFICATIONTYPE.ERROR, message);
           } else {
@@ -719,27 +711,6 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                       }
                     >
                       <>
-                        <Button
-                          disabled={resMutateInvoice.isLoading}
-                          loading={
-                            resMutateInvoice.isLoading &&
-                            submitType === ISUBMITTYPE.RETURN
-                          }
-                          htmlType="submit"
-                          size={'middle'}
-                          onClick={() => {
-                            setSubmitType(ISUBMITTYPE.RETURN);
-                            AntForm.setFieldsValue({
-                              status: {
-                                status: 3,
-                                print: false,
-                              },
-                            });
-                          }}
-                        >
-                          Return
-                        </Button>
-
                         <Button
                           disabled={resMutateInvoice.isLoading}
                           loading={
