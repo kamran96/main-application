@@ -85,14 +85,11 @@ export const PaymentsForm: FC = () => {
       return { balance: a.balance + b.balance };
     })) || { balance: 0 };
 
-  console.log(amountPaid, 'amount paid ');
-
   const paid = amountPaid ? amountPaid : 0;
 
   const remainingTotal = Math.abs(balance) - paid;
 
   const { paymentsModalConfig, setPaymentsModalConfig } = useGlobalContext();
-  console.log(paymentsModalConfig?.visibility);
   const onFinish = async (values) => {
     const paid_invyces = _invoiceData.map(
       (invyce: IInvoiceItem, index: number) => {
@@ -196,7 +193,6 @@ export const PaymentsForm: FC = () => {
   };
 
   const handleChangedValue = (changedValues, allValues) => {
-    console.log(changedValues);
     if (changedValues && changedValues.contactId) {
       const { contactId } = changedValues;
       setContactId(contactId);
@@ -473,12 +469,7 @@ export const PaymentsForm: FC = () => {
                     },
                   ]}
                 >
-                  <InputNumber
-                    onChange={(val) => {
-                      console.log(val, 'value');
-                    }}
-                    size="middle"
-                  />
+                  <InputNumber size="middle" />
                 </Form.Item>
               </div>
               <hr className="sep" />

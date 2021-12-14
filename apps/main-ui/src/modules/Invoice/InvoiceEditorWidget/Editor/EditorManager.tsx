@@ -153,7 +153,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
   useEffect(() => {
     if (
       cachedInvoiceData &&
-      JSON.stringify(cachedInvoiceData) !== JSON.stringify(memoInvoiceItems)
+      JSON.stringify(cachedInvoiceData) !== JSON.stringify(memoInvoiceItems) &&
+      !id
     ) {
       setHasCachedData(true);
     }
@@ -161,7 +162,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
   useEffect(() => {
     setTimeout(() => {
-      if (!hasCachedData) {
+      if (!hasCachedData && !id) {
         setTimeout(() => {
           if (!hasCachedData) {
             invycePersist(
@@ -396,8 +397,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
           }
         } else {
           const indexed = activeItem.errors?.indexOf(key);
-          if (indexed !== -1) {
-            activeItem.errors.splice(indexed, 1);
+          if (indexed !== -1 && activeItem?.errors?.length) {
+            activeItem?.errors?.splice(indexed, 1);
           }
         }
       });
@@ -602,7 +603,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       const allItems = [...prev];
 
                       const indexed = record.errors?.indexOf('description');
-                      if (indexed !== -1) {
+                      if (indexed !== -1 && record?.errors?.length) {
                         record.errors.splice(indexed, 1);
                       }
                       allItems[index] = {
@@ -675,7 +676,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                         quantity;
 
                       const indexed = record.errors?.indexOf('quantity');
-                      if (indexed !== -1) {
+                      if (indexed !== -1 && record?.errors?.length) {
                         record.errors.splice(indexed, 1);
                       }
                       allItems[index] = {
@@ -722,7 +723,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
                     const indexed = record.errors?.indexOf('unitPrice');
 
-                    if (indexed !== -1) {
+                    if (indexed !== -1 && record?.errors?.length) {
                       record.errors.splice(indexed, 1);
                     }
 
@@ -773,7 +774,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       calculateInvoice(unitPrice, tax, itemDiscount) *
                       parseInt(record.quantity);
                     const indexed = record.errors?.indexOf('itemDiscount');
-                    if (indexed !== -1) {
+                    if (indexed !== -1 && record?.errors?.length) {
                       record.errors.splice(indexed, 1);
                     }
 
@@ -820,7 +821,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       const allItems = [...prev];
                       const indexed = record?.errors?.indexOf('accountId');
 
-                      if (indexed !== -1) {
+                      if (indexed !== -1 && record?.errors?.length) {
                         record?.errors?.splice(indexed, 1);
                       }
 
@@ -1047,20 +1048,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
               </span>
             </div>
           )}
-          {/* <FloatingNotifier
-            message={
-              <div>
-                Do you want to fill the invoice that you have left last time?{' '}
-                <br />
-                <Button onClick={getCachedInvoice} className="mr-5 " type="link">
-                  yes
-                </Button>
-                <Button onClick={destroyCachedInvoice} type="link">
-                  No
-                </Button>
-              </div>
-            }
-          /> */}
+
           <Card>{children}</Card>
         </div>
         {/* <div className="sider"><EmailSider/></div> */}
