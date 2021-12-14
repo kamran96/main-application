@@ -410,7 +410,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
     </Menu>
   );
 
-  const { addresses } = response?.contact;
+  const addresses = response?.contact?.addresses || [];
 
   return (
     <WrapperNewPurchaseView>
@@ -659,20 +659,6 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
               </div>
             </Col>
           )}
-          {/* <Col span={14}>
-            <div className="notes">
-              <h5 className="label">
-                <BOLDTEXT>Terms & Conditions</BOLDTEXT>
-              </h5>
-              {/* <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nec id
-                turpis malesuada nibh. Faucibus vitae, blandit aliquet
-                scelerisque faucibus magna volutpat. Vitae aliquet maecenas
-                purus sem. Egestas pellentesque varius elit quisque placerat
-                integer elit sed senectus.
-              </p> */}
-            </div>
-          </Col> */}
         </Row>
       </Card>
       <CommonModal
