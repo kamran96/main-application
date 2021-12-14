@@ -185,7 +185,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
   useEffect(() => {
     if (
       cachePurchasesData &&
-      JSON.stringify(cachePurchasesData) !== JSON.stringify(memoInvoiceItems)
+      JSON.stringify(cachePurchasesData) !== JSON.stringify(memoInvoiceItems) &&
+      !id
     ) {
       setHasCachedData(true);
     }
@@ -193,7 +194,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
   useEffect(() => {
     setTimeout(() => {
-      if (!hasCachedData) {
+      if (!hasCachedData && !id) {
         setTimeout(() => {
           if (!hasCachedData) {
             invycePersist(
