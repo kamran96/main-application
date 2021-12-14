@@ -2,7 +2,7 @@ import dotsGrid from '@iconify-icons/mdi/dots-grid';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import addLine from '@iconify/icons-ri/add-line';
 import Icon from '@iconify/react';
-import { Button, Form } from 'antd';
+import { Button, Card, Form } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import dayjs from 'dayjs';
 import update from 'immutability-helper';
@@ -868,7 +868,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
         accountsList,
       }}
     >
-      {children}
+      <Card>{children}</Card>
     </PurchaseContext.Provider>
   );
 };

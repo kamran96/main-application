@@ -34,10 +34,8 @@ export const BillsEditorWidget: FC = () => {
           <Breadcrumb.Item>Create Bill</Breadcrumb.Item>
         </Breadcrumb>
       </BreadCrumbArea>
-      <TableCard>
-        <PurchasesWidget type="POE" id={id} />
-        {/* <InvoiceForm type="PO" /> */}
-      </TableCard>
+      <PurchasesWidget type="POE" id={id} />
+      {/* <InvoiceForm type="PO" /> */}
     </WrapperBillsEditor>
   );
 };
