@@ -7,7 +7,7 @@ enum USERS {
 }
 
 export const getUsersListAPI = (
-  key?: string,
+  key: any,
   page?: number,
   sortid?: string,
   page_size?: number,

@@ -1,22 +1,21 @@
-import { Button, Checkbox, Form, Input } from "antd";
-import TextArea from "antd/lib/input/TextArea";
-import React, { FC, useEffect } from "react";
-import { queryCache, useMutation, useQuery } from "react-query";
-import styled from "styled-components";
-import { createCategoryAPI, getCategoryByIdAPI } from "../../../api";
-import { CommonModal } from "../../../components";
-import { FormLabel } from "../../../components/FormLabel";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { NOTIFICATIONTYPE } from "../../../modal";
+import { Button, Checkbox, Form, Input } from 'antd';
+import TextArea from 'antd/lib/input/TextArea';
+import { FC, useEffect } from 'react';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
+import styled from 'styled-components';
+import { createCategoryAPI, getCategoryByIdAPI } from '../../../api';
+import { CommonModal } from '../../../components';
+import { FormLabel } from '../../../components/FormLabel';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { NOTIFICATIONTYPE } from '../../../modal';
 
 const CategoryEditorWidget: FC = () => {
+  const queryCache = useQueryClient();
   const [form] = Form.useForm();
-  const {
-    categoryModalConfig,
-    setCategoryModalConfig,
-    notificationCallback,
-  } = useGlobalContext();
-  const [mutateCategory, resCategoryCreate] = useMutation(createCategoryAPI);
+  const { categoryModalConfig, setCategoryModalConfig, notificationCallback } =
+    useGlobalContext();
+  const { mutate: mutateCategory, isLoading: creatingCategory } =
+    useMutation(createCategoryAPI);
 
   const { visibility, parent_id, updateId, isChild } = categoryModalConfig;
 
@@ -24,7 +23,7 @@ const CategoryEditorWidget: FC = () => {
     [`category-${updateId}`, updateId],
     getCategoryByIdAPI,
     {
-      enabled: updateId && updateId!==null,
+      enabled: !!updateId,
     }
   );
 
@@ -43,13 +42,13 @@ const CategoryEditorWidget: FC = () => {
 
   const onFormFinish = async (values) => {
     let payload = {
-        ...values,
-        parentId: null,
-        isNewRecord: updateId ? false : true,
+      ...values,
+      parentId: null,
+      isNewRecord: updateId ? false : true,
     };
 
     if (updateId) {
-      payload= { ...payload, id: updateId };
+      payload = { ...payload, id: updateId };
     }
 
     if (parent_id) {
@@ -63,28 +62,24 @@ const CategoryEditorWidget: FC = () => {
           setCategoryModalConfig(false);
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
-            `Category ${values.title} is ${updateId ? "Updated" : "Created"}`
+            `Category ${values.title} is ${updateId ? 'Updated' : 'Created'}`
           );
           if (!parent_id) {
             [
-              "categories-list",
-              "child-categories",
+              'categories-list',
+              'child-categories',
               `category-${updateId}`,
-              "all-categories",
+              'all-categories',
             ].forEach((key) => {
-              queryCache.invalidateQueries((q) =>
-                q.queryKey[0].toString().startsWith(key)
-              );
+              (queryCache.invalidateQueries as any)((q) => q.startsWith(key));
             });
           } else {
             [
               `category-${updateId}`,
-              "child-categories",
-              "all-categories",
+              'child-categories',
+              'all-categories',
             ].forEach((key) => {
-              queryCache.invalidateQueries((q) =>
-                q.queryKey[0].toString().startsWith(key)
-              );
+              (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
             });
           }
         },
@@ -111,17 +106,17 @@ const CategoryEditorWidget: FC = () => {
           <FormLabel>Title</FormLabel>
           <Form.Item
             name="title"
-            rules={[{ required: true, message: "Title is required !" }]}
+            rules={[{ required: true, message: 'Title is required !' }]}
           >
             <Input
               size="middle"
-              placeholder={"eg. Baking, Dairy, Crockery etc"}
+              placeholder={'eg. Baking, Dairy, Crockery etc'}
             />
           </Form.Item>
           <FormLabel>Description</FormLabel>
           <Form.Item
             name="description"
-            rules={[{ required: true, message: "Description is required !" }]}
+            rules={[{ required: true, message: 'Description is required !' }]}
           >
             <TextArea rows={4} />
           </Form.Item>
@@ -143,13 +138,13 @@ const CategoryEditorWidget: FC = () => {
                 Cancel
               </Button>
               <Button
-                loading={resCategoryCreate.isLoading}
+                loading={creatingCategory}
                 type="primary"
                 htmlType="submit"
               >
                 {updateId
-                  ? "Update"
-                  : `${isChild ? "Add Child" : `Add Category`}`}
+                  ? 'Update'
+                  : `${isChild ? 'Add Child' : `Add Category`}`}
               </Button>
             </div>
           </Form.Item>

@@ -6,7 +6,7 @@ import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
 import Checkbox from 'antd/lib/checkbox/Checkbox';
 import TextArea from 'antd/lib/input/TextArea';
 import dayjs from 'dayjs';
-import { queryCache, useMutation, useQuery } from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 import { getAllContacts } from '../../../api';
 import { getBankAccounts } from '../../../api/accounts';
@@ -29,6 +29,7 @@ import Columns from './columns';
 const { Option } = Select;
 
 export const PaymentsForm: FC = () => {
+  const queryCache = useQueryClient();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [formData, setFormData] = useState<any>({
     runningPayment: false,
@@ -36,7 +37,7 @@ export const PaymentsForm: FC = () => {
   const [form] = Form.useForm();
   const [contact_id, setContactId] = useState(null);
   const [amountPaid, setAmountPaid] = useState<any>(0);
-  const [mutatePayment, { isLoading: paymentMutateLoading }] =
+  const { mutate: mutatePayment, isLoading: paymentMutateLoading } =
     useMutation(paymentCreateAPI);
   const { notificationCallback, routeHistory } = useGlobalContext();
   const { history } = routeHistory;
@@ -115,8 +116,8 @@ export const PaymentsForm: FC = () => {
           notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Payment Created');
           ['all-credit-invoices', 'payments-list', 'invoices'].forEach(
             (key) => {
-              queryCache.invalidateQueries((q) =>
-                q.queryKey[0].toString().startsWith(`${key}`)
+              (queryCache.invalidateQueries as any)((q) =>
+                q?.startsWith(`${key}`)
               );
             }
           );

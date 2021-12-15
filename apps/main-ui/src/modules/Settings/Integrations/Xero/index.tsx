@@ -19,13 +19,20 @@ export const Xero: FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [step, setStep] = useState(1);
   const [importList, setImportList] = useState([]);
-  const [mutateIntegration, { isLoading, data }] =
-    useMutation(XeroIntegrationAPI);
+  const {
+    mutate: mutateIntegration,
+    isLoading,
+    data,
+  } = useMutation(XeroIntegrationAPI);
 
-  const [muateteCopyModules, resCopyModules] = useMutation(XeroCopyModulesAPI);
+  const { mutate: muateteCopyModules, isLoading: xeroCopyingModules } =
+    useMutation(XeroCopyModulesAPI);
 
-  const [verifyXero, { data: verify, isLoading: verifyLoading }] =
-    useMutation(XeroVerification);
+  const {
+    mutate: verifyXero,
+    data: verify,
+    isLoading: verifyLoading,
+  } = useMutation(XeroVerification);
 
   const { routeHistory } = useGlobalContext();
   const { history } = routeHistory;
@@ -73,12 +80,14 @@ export const Xero: FC = () => {
   };
 
   const _xeroAuthenticate = async () => {
-    const res = await mutateIntegration();
-
-    if (res?.data?.result) {
-      const { result } = res?.data;
-      window.location.replace(result);
-    }
+    await mutateIntegration(null, {
+      onSuccess: (data) => {
+        if (data?.data?.result) {
+          const { result } = data?.data;
+          window.location.replace(result);
+        }
+      },
+    });
   };
 
   const _xeroCopyModules = async () => {
@@ -175,7 +184,7 @@ export const Xero: FC = () => {
                   Cancel
                 </Button>
                 <Button
-                  loading={resCopyModules.isLoading}
+                  loading={xeroCopyingModules}
                   onClick={_xeroCopyModules}
                   type="primary"
                   size="middle"

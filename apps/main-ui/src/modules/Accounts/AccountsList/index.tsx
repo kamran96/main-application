@@ -1,36 +1,32 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import deleteIcon from "@iconify/icons-carbon/delete";
-import editSolid from "@iconify/icons-clarity/edit-solid";
-import { ColumnsType } from "antd/es/table";
-import React, { FC, useEffect, useMemo, useRef, useState } from "react";
-import {
-  queryCache,
-  useMutation,
-  usePaginatedQuery,
-  useQuery
-} from "react-query";
-import { Link } from "react-router-dom";
+import deleteIcon from '@iconify/icons-carbon/delete';
+import editSolid from '@iconify/icons-clarity/edit-solid';
+import { ColumnsType } from 'antd/es/table';
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
+import { usePaginatedQuery } from '../../../hooks/usePaginatedQuery';
+import { Link } from 'react-router-dom';
 import {
   deleteAccountsAPI,
   getAllAccountsAPI,
-  getSecondaryAccounts
-} from "../../../api/accounts";
-import { ButtonTag } from "../../../components/ButtonTags";
-import { ConfirmModal } from "../../../components/ConfirmModal";
-import { PDFICON } from "../../../components/Icons";
-import { Rbac } from "../../../components/Rbac";
-import { PERMISSIONS } from "../../../components/Rbac/permissions";
-import { SmartFilter } from "../../../components/SmartFilter";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { IAccounts } from "../../../modal/accounts";
-import { ISupportedRoutes } from "../../../modal/routing";
-import moneyFormat from "../../../utils/moneyFormat";
-import { useWindowSize } from "../../../utils/useWindowSize";
-import { CommonTable } from "./../../../components/Table";
-import AccountsFilterringSchema from "./AccountsFilteringSchema";
-import { _csvColumnsAccount } from "./exportableCols";
-import { AccountsWrapper, ListWrapper } from "./styles";
-
+  getSecondaryAccounts,
+} from '../../../api/accounts';
+import { ButtonTag } from '../../../components/ButtonTags';
+import { ConfirmModal } from '../../../components/ConfirmModal';
+import { PDFICON } from '../../../components/Icons';
+import { Rbac } from '../../../components/Rbac';
+import { PERMISSIONS } from '../../../components/Rbac/permissions';
+import { SmartFilter } from '../../../components/SmartFilter';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { IAccounts } from '../../../modal/accounts';
+import { ISupportedRoutes } from '../../../modal/routing';
+import moneyFormat from '../../../utils/moneyFormat';
+import { useWindowSize } from '../../../utils/useWindowSize';
+import { CommonTable } from './../../../components/Table';
+import AccountsFilterringSchema from './AccountsFilteringSchema';
+import { _csvColumnsAccount } from './exportableCols';
+import { AccountsWrapper, ListWrapper } from './styles';
+import { IErrorResponse } from '@invyce/shared/types';
 
 interface IProps {
   columns: ColumnsType;
@@ -38,16 +34,17 @@ interface IProps {
 }
 
 export const AccountsList: FC<IProps> = ({ data }) => {
+  const queryCache = useQueryClient();
   const [accountsConfig, setAccountConfig] = useState({
     page: 1,
-    query: "",
-    sortid: "",
+    query: '',
+    sortid: '',
     page_size: 20,
   });
   const [confirmModal, setConfirmModal] = useState<boolean>(false);
   const [filterBar, setFilterBar] = useState<boolean>(false);
   const [scrollConfig, setScrollConfig] = useState({
-    y: "100vh",
+    y: '100vh',
   });
 
   const [width] = useWindowSize();
@@ -63,9 +60,9 @@ export const AccountsList: FC<IProps> = ({ data }) => {
       routeHistory.history.location.search
     ) {
       let obj = {};
-      let queryArr = history.location.search.split("?")[1].split("&");
+      const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
-        let split = item.split("=");
+        const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
 
@@ -75,9 +72,8 @@ export const AccountsList: FC<IProps> = ({ data }) => {
 
   /* Mutations */
   /* this mutation is used for deleting contacts against bunch of ids */
-  const [mutateDeleteAccounts, deleteAccountsResponse] = useMutation(
-    deleteAccountsAPI
-  );
+  const { isLoading: isDeleting, mutate: mutateDeleteAccounts } =
+    useMutation(deleteAccountsAPI);
 
   const { page, query, sortid, page_size } = accountsConfig;
 
@@ -116,7 +112,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
       secondaryAccounts.data.data.result
     ) {
       const { result } = secondaryAccounts.data.data;
-      let schema = { ...filterSchema };
+      const schema = { ...filterSchema };
       schema.secondaryAccountId.value = [...result];
       setFilterSchema(schema);
     }
@@ -124,27 +120,26 @@ export const AccountsList: FC<IProps> = ({ data }) => {
 
   /* this Async function is responsible for delete contacts */
   const onHandleDelete = async () => {
-    let payload = {
+    const payload = {
       ids: [...selectedRow],
     };
 
-    try {
-      await mutateDeleteAccounts(payload, {
-        onSuccess: () => {
-          queryCache.invalidateQueries(
-            `accounts?page=${page}&query=${query}sort=${sortid}`
-          );
-          setConfirmModal(false);
-        },
-      });
-    } catch (error) {
-      throw error;
-    }
+    await mutateDeleteAccounts(payload, {
+      onSuccess: () => {
+        queryCache.invalidateQueries(
+          `accounts?page=${page}&query=${query}sort=${sortid}`
+        );
+        setConfirmModal(false);
+      },
+      onError: (error: IErrorResponse) => {
+        console.log(error);
+      },
+    });
   };
   useEffect(() => {
     if (resolvedData && resolvedData.data) {
       const { result }: IAccounts = resolvedData.data;
-      let newResult = [];
+      const newResult = [];
       result.forEach((accItem) => {
         newResult.push({ ...accItem, key: accItem.id });
       });
@@ -159,63 +154,60 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         return { ...prev, x: true };
       });
     } else {
-      setScrollConfig({ y: "100vh" });
+      setScrollConfig({ y: '100vh' });
     }
   }, [width]);
 
   const columns: ColumnsType<any> = useMemo(
     () => [
       {
-        title: "Code",
-        dataIndex: "code",
-        key: "code",
+        title: 'Code',
+        dataIndex: 'code',
+        key: 'code',
       },
       {
-        title: "Account Head",
-        dataIndex: "name",
-        key: "name",
+        title: 'Account Head',
+        dataIndex: 'name',
+        key: 'name',
         render: (data, row, index) => {
           return (
-            <>
-              <Link
-                className="account_name"
-                to={`/app${ISupportedRoutes.ACCOUNTS}/${row.id}`}
-              >
-                {data}
-              </Link>
-            </>
+            <Link
+              className="account_name"
+              to={`/app${ISupportedRoutes.ACCOUNTS}/${row.id}`}
+            >
+              {data}
+            </Link>
           );
         },
       },
       {
-        title: "Type",
-        dataIndex: "type",
-        key: "type",
-       
+        title: 'Type',
+        dataIndex: 'type',
+        key: 'type',
       },
       {
         width: 100,
-        title: "Tax Rate",
-        dataIndex: "tax_rate",
-        key: "tax_rate",
-        render: (data) => <>{data ? data : "-"}</>,
+        title: 'Tax Rate',
+        dataIndex: 'tax_rate',
+        key: 'tax_rate',
+        render: (data) => <>{data ? data : '-'}</>,
       },
       {
-        title: "Total Debits",
-        dataIndex: "total_debits",
-        key: "total_debits",
+        title: 'Total Debits',
+        dataIndex: 'total_debits',
+        key: 'total_debits',
         render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
       },
       {
-        title: "Total Credits",
-        dataIndex: "total_credits",
-        key: "total_credits",
+        title: 'Total Credits',
+        dataIndex: 'total_credits',
+        key: 'total_credits',
         render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
       },
       {
-        title: "Amount",
-        dataIndex: "balance",
-        key: "balance",
+        title: 'Amount',
+        dataIndex: 'balance',
+        key: 'balance',
         render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
       },
     ],
@@ -241,7 +233,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
                     id: selectedRow[0],
                   })
                 }
-                title={"Edit"}
+                title={'Edit'}
                 icon={editSolid}
                 size="middle"
               />
@@ -250,7 +242,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
               <ButtonTag
                 disabled={true}
                 onClick={() => setConfirmModal(true)}
-                title={"Delete"}
+                title={'Delete'}
                 icon={deleteIcon}
                 size="middle"
               />
@@ -275,7 +267,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         <SmartFilter
           onFilter={(encode) => {
             setAccountConfig({ ...accountsConfig, query: encode });
-            let route = `/app${ISupportedRoutes.ACCOUNTS}?sortid=null&page=1&page_size=20&query=${encode}`;
+            const route = `/app${ISupportedRoutes.ACCOUNTS}?sortid=null&page=1&page_size=20&query=${encode}`;
             history.push(route);
           }}
           onClose={() => setFilterBar(false)}
@@ -300,7 +292,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
     } else {
       history.push(
         `/app${ISupportedRoutes.ACCOUNTS}?sortid=${
-          sorter && sorter.order === "descend"
+          sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field
         }&page=${pagination.current}&page_size=${
@@ -312,13 +304,12 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         page: pagination.current,
         page_size: pagination.pageSize,
         sortid:
-          sorter && sorter.order === "descend"
+          sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field,
       });
     }
   };
-
 
   const ref: any = useRef();
 
@@ -326,12 +317,12 @@ export const AccountsList: FC<IProps> = ({ data }) => {
     <AccountsWrapper ref={ref}>
       <ListWrapper>
         <CommonTable
-        themeScroll
-          printTitle={"Chart of Accounts List"}
+          themeScroll
+          printTitle={'Chart of Accounts List'}
           exportable
           exportableProps={{
             fields: _csvColumnsAccount,
-            fileName: "accounts-list",
+            fileName: 'accounts-list',
           }}
           hasPrint
           topbarRightPannel={topbarRightPannel()}
@@ -343,7 +334,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
           totalItems={pagination && pagination.total}
           pagination={{
             pageSize: page_size,
-            position: ["bottomRight"],
+            position: ['bottomRight'],
             current: pagination && pagination.page_no,
             total: pagination && pagination.total,
             showSizeChanger: true,
@@ -354,7 +345,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         />
       </ListWrapper>
       <ConfirmModal
-        loading={deleteAccountsResponse.isLoading}
+        loading={isDeleting}
         visible={confirmModal}
         onCancel={() => setConfirmModal(false)}
         onConfirm={onHandleDelete}

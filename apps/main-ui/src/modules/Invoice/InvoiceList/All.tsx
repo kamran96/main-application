@@ -1,12 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Button } from 'antd';
 import React, { FC, useEffect, useState } from 'react';
-import {
-  queryCache,
-  useMutation,
-  usePaginatedQuery,
-  useQuery,
-} from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import {
   deleteInvoiceDrafts,
   getAllContacts,
@@ -35,6 +30,7 @@ interface IProps {
   columns?: any[];
 }
 export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
+  const queryCache = useQueryClient();
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
     query: '',
@@ -98,7 +94,11 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
 
   const { page, query, sortid, page_size } = allInvoicesConfig;
 
-  const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
+  const {
+    isLoading,
+    data: resolvedData,
+    isFetching,
+  } = useQuery(
     [
       `invoices-${ORDER_TYPE.SALE_INVOICE}-${INVOICETYPE.Approved}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
       ORDER_TYPE.SALE_INVOICE,
@@ -108,9 +108,12 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
       page_size,
       query,
     ],
-    getInvoiceListAPI
+    getInvoiceListAPI,
+    {
+      keepPreviousData: true,
+    }
   );
-  const [mutateDeleteOrders, resDeleteOrders] =
+  const { mutate: mutateDeleteOrders, isLoading: deletingInvoice } =
     useMutation(deleteInvoiceDrafts);
 
   const onSelectedRow = (item) => {
@@ -145,7 +148,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
           'ledger-contact',
           'all-items',
         ].forEach((key) => {
-          queryCache.invalidateQueries((q) =>
+          (queryCache.invalidateQueries as any)((q) =>
             q?.queryKey[0]?.toString()?.startsWith(`${key}`)
           );
         });
@@ -276,7 +279,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
         enableRowSelection
       />
       <ConfirmModal
-        loading={resDeleteOrders.isLoading}
+        loading={deletingInvoice}
         visible={confirmModal}
         onCancel={() => setConfirmModal(false)}
         onConfirm={handleDelete}

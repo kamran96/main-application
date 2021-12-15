@@ -2,7 +2,7 @@
 import { Button, Form, Input, Select } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import React, { FC, useEffect } from 'react';
-import { queryCache, useMutation, useQuery } from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 import {
   CreateRoleAPI,
@@ -18,17 +18,19 @@ import convertToRem from '../../../utils/convertToRem';
 const { Option } = Select;
 
 export const RolesEditorWidget: FC = () => {
+  const queryCache = useQueryClient();
   const { rbacConfigModal, setRbacConfigModal } = useGlobalContext();
   const { id } = rbacConfigModal;
   const { visibility } = rbacConfigModal;
-  const [mutateAddRoles, resMutateRoles] = useMutation(CreateRoleAPI);
+  const { mutate: mutateAddRoles, isLoading: addingRoles } =
+    useMutation(CreateRoleAPI);
   const [form] = Form.useForm();
 
   const { data: roleIdData, isLoading: roleLoading } = useQuery(
     [`role=${id}`, id],
     getRoleByIDAPI,
     {
-      enabled: id,
+      enabled: !!id,
     }
   );
 
@@ -128,11 +130,7 @@ export const RolesEditorWidget: FC = () => {
               <Button onClick={onCancel} className="mr-10" type="default">
                 Cancel
               </Button>
-              <Button
-                loading={resMutateRoles.isLoading}
-                htmlType={'submit'}
-                type="primary"
-              >
+              <Button loading={addingRoles} htmlType={'submit'} type="primary">
                 Create
               </Button>
             </div>

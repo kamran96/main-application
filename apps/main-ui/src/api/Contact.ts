@@ -6,7 +6,7 @@ enum ContactServiceAPI {
 }
 
 export const getContacts = (
-  key?: string,
+  key?: any,
   type?: number,
   page?: number,
   sortid?: string,
@@ -21,7 +21,7 @@ export const getContacts = (
   return http.get(url);
 };
 
-export const viewSingleContact = (key?: string, id?: number) =>
+export const viewSingleContact = (key?: any, id?: number) =>
   http.get(`${ContactServiceAPI.default}/${id}`);
 
 export const deleteContacts = (payload) =>
@@ -32,11 +32,11 @@ export const create_update_contact = (payload) => {
   return http.post(url, payload);
 };
 
-export const getAllContacts = (key?: string, purpose?: string) =>
+export const getAllContacts = (key?: any, purpose?: string) =>
   http.get(`${ContactServiceAPI.default}?purpose=${purpose}`);
 
 export const getContactLedger = (
-  key?: string,
+  key?: any,
   id?: number,
   type?: number,
   query?: string,

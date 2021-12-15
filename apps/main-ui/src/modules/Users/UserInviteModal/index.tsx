@@ -2,7 +2,12 @@ import { PlusOutlined } from '@ant-design/icons';
 import trash2 from '@iconify-icons/feather/trash-2';
 import { Icon } from '@iconify/react';
 import React, { FC } from 'react';
-import { queryCache, useMutation, useQuery } from 'react-query';
+import {
+  useQueryClient,
+  useMutation,
+  useQuery,
+  InvalidateQueryFilters,
+} from 'react-query';
 import styled from 'styled-components';
 import { getRbacListAPI } from '../../../api';
 import { CommonModal } from '../../../components';
@@ -21,6 +26,7 @@ const { Option } = Select;
 export const UserInviteModal: FC = () => {
   const { userInviteModal, setUserInviteModal, notificationCallback } =
     useGlobalContext();
+  const queryClient = useQueryClient();
   const formInitialValues = [
     {
       email: '',
@@ -29,7 +35,8 @@ export const UserInviteModal: FC = () => {
     },
   ];
 
-  const [mutateInviteUser, resMutateInviteUser] = useMutation(inviteUserAPI);
+  const { mutate: mutateInviteUser, isLoading: invitingUser } =
+    useMutation(inviteUserAPI);
 
   const { data, isLoading: branchesLoading } = useQuery(
     [`all-branches`],
@@ -56,8 +63,8 @@ export const UserInviteModal: FC = () => {
     mutateInviteUser(values, {
       onSuccess: () => {
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, `Invited Successfully`);
-        queryCache.invalidateQueries((q) =>
-          q.queryKey[0].toString().startsWith('users-list')
+        (queryClient.invalidateQueries as any)((q: any) =>
+          q.startsWith(`all-branches`)
         );
         onCancel();
       },

@@ -15,7 +15,7 @@ export const InvoiceCreateAPI = (payload) =>
 export const CreditNoteCreateAPI = (payload) =>
   http.post(INVOICES_API.CREDIT_NOTE, payload);
 export const getInvoiceListAPI = (
-  key?: string,
+  key?: any,
   invoice_type?: number | string,
   status?: string | number,
   type?: string,
@@ -31,7 +31,7 @@ export const getInvoiceListAPI = (
   return http.get(url);
 };
 
-export const getInvoiceByIDAPI = (key?: string, id?: number) =>
+export const getInvoiceByIDAPI = (key?: any, id?: number) =>
   http.get(`${INVOICES_API.INDEX}/${id}`);
 
 export const purchaseOrderCreateAPI = (payload) =>
@@ -74,19 +74,19 @@ export const deletePurchaseDrafts = (payload?: any) =>
 export const deleteInvoiceDrafts = (payload?: any) =>
   http.put(INVOICES_API.INDEX, payload);
 
-export const invoiceDashboardDetailsAPI = (key?: string) =>
+export const invoiceDashboardDetailsAPI = (key?: any) =>
   http.get(`/invoice-details`);
 
-export const draftInvoicesSuggestAPI = (key?: string) =>
+export const draftInvoicesSuggestAPI = (key?: any) =>
   http.get('/invoice-draft');
 
 export const getInvoiceNumber = (
-  key?: string,
+  key?: any,
   type: ORDER_TYPE = ORDER_TYPE?.SALE_INVOICE
 ) => http?.get(`${INVOICES_API.INDEX}/number?type=${type}`);
 
 export const getCreditNotes = (
-  key?: string,
+  key?: any,
   status: string | number = 1,
   page = 1,
   pageSize = 10,
@@ -101,9 +101,9 @@ export const getCreditNotes = (
 
 export const creditNoteViewAPI = (key, id) =>
   http?.get(`${INVOICES_API?.CREDIT_NOTE}/${id}`);
-export const topSuggestInvoicesAPI = (key?: string) => http.get('invoices-top');
+export const topSuggestInvoicesAPI = (key?: any) => http.get('invoices-top');
 
-export const invoiceFlowChartAPI = (key?: string) =>
+export const invoiceFlowChartAPI = (key?: any) =>
   http.get('/invoice-flow-chart');
 
 export const quotationApproveAPI = (id: string | number) =>

@@ -1,24 +1,24 @@
-import Icon from "@iconify/react";
-import { Button, Col, Row, Select } from "antd";
-import { ColumnsType } from "antd/lib/table";
-import React, { FC, useEffect, useState } from "react";
-import { queryCache, useMutation, useQuery } from "react-query";
-import { getAllItems, StockUpdateAPI } from "../../../api";
-import CommonSelect from "../../../components/CommonSelect";
-import { Editable, EditableSelect } from "../../../components/Editable";
-import { Heading } from "../../../components/Heading";
-import { CommonTable } from "../../../components/Table";
-import { TableCard } from "../../../components/TableCard";
-import { IItemsResult } from "../../../modal/items";
-import { WrapperInventoryManagement } from "./styles";
-import bxPlus from "@iconify-icons/bx/bx-plus";
-import convertToRem from "../../../utils/convertToRem";
-import { Color, NOTIFICATIONTYPE } from "../../../modal";
-import deleteIcon from "@iconify/icons-carbon/delete";
-import { P } from "../../../components/Typography";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { getAllAccounts } from "apps/main-ui/src/api/accounts";
-import { IAccountsResult } from "apps/main-ui/src/modal/accounts";
+import Icon from '@iconify/react';
+import { Button, Col, Row, Select } from 'antd';
+import { ColumnsType } from 'antd/lib/table';
+import React, { FC, useEffect, useState } from 'react';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
+import { getAllItems, StockUpdateAPI } from '../../../api';
+import CommonSelect from '../../../components/CommonSelect';
+import { Editable, EditableSelect } from '../../../components/Editable';
+import { Heading } from '../../../components/Heading';
+import { CommonTable } from '../../../components/Table';
+import { TableCard } from '../../../components/TableCard';
+import { IItemsResult } from '../../../modal/items';
+import { WrapperInventoryManagement } from './styles';
+import bxPlus from '@iconify-icons/bx/bx-plus';
+import convertToRem from '../../../utils/convertToRem';
+import { Color, NOTIFICATIONTYPE } from '../../../modal';
+import deleteIcon from '@iconify/icons-carbon/delete';
+import { P } from '../../../components/Typography';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { getAllAccounts } from '../../../api/accounts';
+import { IAccountsResult } from '../../../modal';
 
 const { Option } = Select;
 
@@ -35,17 +35,19 @@ const defaultState = {
 
 let setStateTimeOut: any;
 
-export const ManageInventoryForm: FC = ({}) => {
+export const ManageInventoryForm: FC = () => {
+  const queryCache = useQueryClient();
   const [inventoryList, setInventoryList] = useState([]);
-  const [
-    mutateStockUpdate,
-    { data: StockUpdateRes, isLoading: stockUpdating },
-  ] = useMutation(StockUpdateAPI);
+  const {
+    mutate: mutateStockUpdate,
+    data: StockUpdateRes,
+    isLoading: stockUpdating,
+  } = useMutation(StockUpdateAPI);
   const { notificationCallback } = useGlobalContext();
 
   useEffect(() => {
     if (defaultState) {
-      let state = [];
+      const state = [];
       for (let index = 0; index < 3; index++) {
         state.push(defaultState);
       }
@@ -55,7 +57,7 @@ export const ManageInventoryForm: FC = ({}) => {
 
   const resetForm = () => {
     if (defaultState) {
-      let state = [];
+      const state = [];
       for (let index = 0; index < 3; index++) {
         state.push(defaultState);
       }
@@ -65,7 +67,7 @@ export const ManageInventoryForm: FC = ({}) => {
 
   /*Query hook for  Fetching all items against ID */
   const { data: itemsData, isLoading: itemsLoading } = useQuery(
-    [`all-items`, "ALL"],
+    [`all-items`, 'ALL'],
     getAllItems,
     {
       cacheTime: Infinity,
@@ -73,29 +75,29 @@ export const ManageInventoryForm: FC = ({}) => {
     }
   );
   const { isLoading: accountsLoading, data: accountsData } = useQuery(
-    [`all-accounts`, "ALL"],
+    [`all-accounts`, 'ALL'],
     getAllAccounts
   );
 
-  let accountsList: IAccountsResult[] = accountsData?.data?.result || [];
+  const accountsList: IAccountsResult[] = accountsData?.data?.result || [];
 
-  let itemsList: IItemsResult[] = itemsData?.data?.result || [];
+  const itemsList: IItemsResult[] = itemsData?.data?.result || [];
 
-  const getItemWithItemId = (id:number|string) => {
+  const getItemWithItemId = (id: number | string) => {
     if (itemsList && itemsList.length) {
-      let [filtered] = itemsList.filter((item) => item.id === id);
+      const [filtered] = itemsList.filter((item) => item.id === id);
 
       return filtered;
-    }else{
-      return null
+    } else {
+      return null;
     }
   };
 
   const columns: ColumnsType<any> = [
     {
-      title: "Item",
-      dataIndex: "itemId",
-      key: "itemId",
+      title: 'Item',
+      dataIndex: 'itemId',
+      key: 'itemId',
       width: 200,
       render: (data, row, index) => {
         return (
@@ -103,27 +105,27 @@ export const ManageInventoryForm: FC = ({}) => {
             labelInValue
             showSearch
             value={{
-              value: data !== null ? data : "",
+              value: data !== null ? data : '',
               label:
                 data !== null
                   ? itemsList
                     ? `${getItemWithItemId(data)?.code} / ${
                         getItemWithItemId(data).name
                       }`
-                    : ""
-                  : "Select Item",
+                    : ''
+                  : 'Select Item',
             }}
             size="middle"
             onClick={() => {
-              let _list = [...inventoryList];
+              const _list = [...inventoryList];
               _list[index] = { ...inventoryList[index], active: true };
               setInventoryList(_list);
             }}
-            style={{ width: "100%", minWidth: "180px" }}
+            style={{ width: '100%', minWidth: '180px' }}
             placeholder="Select Item"
             optionFilterProp="children"
             onChange={(val) => {
-              let [filtered] = itemsList?.filter(
+              const [filtered] = itemsList?.filter(
                 (item) => item?.id === val?.value
               );
 
@@ -158,9 +160,9 @@ export const ManageInventoryForm: FC = ({}) => {
       },
     },
     {
-      title: "Quantity",
-      dataIndex: "quantity",
-      key: "quantity",
+      title: 'Quantity',
+      dataIndex: 'quantity',
+      key: 'quantity',
       width: 150,
       render: (data, record, index) => {
         return (
@@ -171,7 +173,7 @@ export const ManageInventoryForm: FC = ({}) => {
               clearTimeout(setStateTimeOut);
               setStateTimeOut = setTimeout(() => {
                 if (value) {
-                  let allItems = [...inventoryList];
+                  const allItems = [...inventoryList];
                   allItems[index] = { ...allItems[index], quantity: value };
                   setInventoryList(allItems);
                 }
@@ -184,108 +186,112 @@ export const ManageInventoryForm: FC = ({}) => {
       },
     },
     {
-      title: "Code",
-      dataIndex: "code",
-      key: "code",
+      title: 'Code',
+      dataIndex: 'code',
+      key: 'code',
     },
     {
-      title: "Debit",
-      dataIndex: "debit",
-      key: "debit",
-      render: (data, row, index)=>{
-        return(
+      title: 'Debit',
+      dataIndex: 'debit',
+      key: 'debit',
+      render: (data, row, index) => {
+        return (
           <EditableSelect
-          placeholder="Select Debit Account"
-          className="w-100"
-          value={data}
-          size="middle"
-          onChange={(value)=>{
-            setInventoryList((prev) => {
-              return [
-                ...prev,
-                prev?.splice(index, 1, {
-                  ...prev[index],
-                  debit: value,
-                }),
-              ];
-            });
-          }}
+            placeholder="Select Debit Account"
+            className="w-100"
+            value={data}
+            size="middle"
+            onChange={(value) => {
+              setInventoryList((prev) => {
+                return [
+                  ...prev,
+                  prev?.splice(index, 1, {
+                    ...prev[index],
+                    debit: value,
+                  }),
+                ];
+              });
+            }}
           >
             <>
-            {accountsList?.map((acc: IAccountsResult, index)=>{
-              return(
-                <Option key={index} value={acc?.id}>{acc?.name}</Option>
-              )
-            })}
+              {accountsList?.map((acc: IAccountsResult, index) => {
+                return (
+                  <Option key={index} value={acc?.id}>
+                    {acc?.name}
+                  </Option>
+                );
+              })}
             </>
           </EditableSelect>
-        )
-      }
+        );
+      },
     },
     {
-      title: "Credit",
-      dataIndex: "credit",
-      key: "credit",
-      render: (data, row, index)=>{
-        return(
+      title: 'Credit',
+      dataIndex: 'credit',
+      key: 'credit',
+      render: (data, row, index) => {
+        return (
           <EditableSelect
-          placeholder="Select Credit Account"
-          className="w-100"
-          value={data}
-          size="middle"
-          onChange={(value)=>{
-            setInventoryList((prev) => {
-              return [
-                ...prev,
-                prev?.splice(index, 1, {
-                  ...prev[index],
-                  credit: value,
-                }),
-              ];
-            });
-          }}
+            placeholder="Select Credit Account"
+            className="w-100"
+            value={data}
+            size="middle"
+            onChange={(value) => {
+              setInventoryList((prev) => {
+                return [
+                  ...prev,
+                  prev?.splice(index, 1, {
+                    ...prev[index],
+                    credit: value,
+                  }),
+                ];
+              });
+            }}
           >
             <>
-            {accountsList?.map((acc: IAccountsResult, index)=>{
-              return(
-                <Option key={index} value={acc?.id}>{acc?.name}</Option>
-              )
-            })}
+              {accountsList?.map((acc: IAccountsResult, index) => {
+                return (
+                  <Option key={index} value={acc?.id}>
+                    {acc?.name}
+                  </Option>
+                );
+              })}
             </>
           </EditableSelect>
-        )
-      }
+        );
+      },
     },
     {
-      title: "Current Stock",
-      dataIndex: "stock",
-      key: "stock",
+      title: 'Current Stock',
+      dataIndex: 'stock',
+      key: 'stock',
     },
     {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
     },
     {
-      title: "",
-      dataIndex: "",
-      key: "action",
+      title: '',
+      dataIndex: '',
+      key: 'action',
       width: 50,
       render: (data, row, index) => {
         return (
           <i
             onClick={() => {
-              let _list = [...inventoryList];
+              const _list = [...inventoryList];
               _list?.splice(index, 1);
               setInventoryList(_list);
             }}
           >
-            {" "}
+            {' '}
             <Icon
               style={{
                 fontSize: convertToRem(20),
                 color: Color.$GRAY,
-                cursor: "pointer",
+                cursor: 'pointer',
               }}
               icon={deleteIcon}
             />
@@ -296,7 +302,7 @@ export const ManageInventoryForm: FC = ({}) => {
   ];
 
   const handleSaveInventory = async () => {
-    let errorIndexes = [];
+    const errorIndexes = [];
     setInventoryList((prev) => {
       return prev?.map((item, index) => {
         if (!item?.itemId || !item?.quantity) {
@@ -323,12 +329,10 @@ export const ManageInventoryForm: FC = ({}) => {
           onSuccess: () => {
             notificationCallback(
               NOTIFICATIONTYPE?.SUCCESS,
-              "Updated Stocks Successfully"
+              'Updated Stocks Successfully'
             );
-            [`all-items`, "items?page", `transactions?page`]?.forEach((key) => {
-              queryCache?.invalidateQueries((q) =>
-                q?.queryKey[0]?.toString()?.startsWith(key)
-              );
+            [`all-items`, 'items?page', `transactions?page`]?.forEach((key) => {
+              (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
             });
             resetForm();
           },
@@ -348,7 +352,7 @@ export const ManageInventoryForm: FC = ({}) => {
               </div>
               <CommonTable
                 rowClassName={(record, index) =>
-                  `${record?.error ? "has-error" : ``}`
+                  `${record?.error ? 'has-error' : ``}`
                 }
                 columns={columns}
                 dataSource={inventoryList}
@@ -362,13 +366,13 @@ export const ManageInventoryForm: FC = ({}) => {
                   className="flex alignCenter"
                   onClick={() => {
                     if (inventoryList?.length <= 15) {
-                      let all = [...inventoryList];
+                      const all = [...inventoryList];
                       all?.push({ ...defaultState });
                       setInventoryList(all);
                     } else {
                       notificationCallback(
                         NOTIFICATIONTYPE?.WARNING,
-                        "Your can only add 15 items only !"
+                        'Your can only add 15 items only !'
                       );
                     }
                   }}
@@ -386,7 +390,7 @@ export const ManageInventoryForm: FC = ({}) => {
               <Button
                 onClick={resetForm}
                 className="mr-10"
-                size={"middle"}
+                size={'middle'}
                 type="default"
               >
                 Cancel
@@ -394,7 +398,7 @@ export const ManageInventoryForm: FC = ({}) => {
               <Button
                 disabled={stockUpdating}
                 loading={stockUpdating}
-                size={"middle"}
+                size={'middle'}
                 onClick={handleSaveInventory}
                 type="primary"
                 //   onClick={() => {

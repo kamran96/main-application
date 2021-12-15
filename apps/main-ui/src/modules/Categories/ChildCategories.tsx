@@ -1,27 +1,28 @@
-import bxLayerPlus from "@iconify-icons/bx/bx-layer-plus";
-import deleteIcon from "@iconify/icons-carbon/delete";
-import editSolid from "@iconify/icons-clarity/edit-solid";
-import Icon from "@iconify/react";
-import { Button, Tooltip } from "antd";
-import { ColumnsType } from "antd/lib/table";
-import dayjs from "dayjs";
-import React, { FC, useState } from "react";
-import { queryCache, useMutation, useQuery } from "react-query";
-import styled from "styled-components";
+import bxLayerPlus from '@iconify-icons/bx/bx-layer-plus';
+import deleteIcon from '@iconify/icons-carbon/delete';
+import editSolid from '@iconify/icons-clarity/edit-solid';
+import Icon from '@iconify/react';
+import { Button, Tooltip } from 'antd';
+import { ColumnsType } from 'antd/lib/table';
+import dayjs from 'dayjs';
+import { FC, useState } from 'react';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
+import styled from 'styled-components';
 
-import { deleteCategoryAPI, getChildCategoriesAPI } from "../../api";
-import { getAllUsers } from "../../api/users";
-import { ButtonTag } from "../../components/ButtonTags";
-import { ConfirmModal } from "../../components/ConfirmModal";
-import { CommonTable } from "../../components/Table";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { Color, NOTIFICATIONTYPE } from "../../modal";
+import { deleteCategoryAPI, getChildCategoriesAPI } from '../../api';
+import { getAllUsers } from '../../api/users';
+import { ButtonTag } from '../../components/ButtonTags';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { CommonTable } from '../../components/Table';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { Color, NOTIFICATIONTYPE } from '../../modal';
 
 interface IProps {
   id?: number;
 }
 
 export const ChildCategory: FC<IProps> = ({ id }) => {
+  const queryCache = useQueryClient();
   const { data, isLoading } = useQuery(
     [`child-categories`, id],
     getChildCategoriesAPI
@@ -31,15 +32,11 @@ export const ChildCategory: FC<IProps> = ({ id }) => {
 
   const [selectedRow, setSelectedRow] = useState([]);
 
-  const [mutateDeleteCategory, resDeleteCategory] = useMutation(
-    deleteCategoryAPI
-  );
+  const { mutate: mutateDeleteCategory, isLoading: deletingCategory } =
+    useMutation(deleteCategoryAPI);
 
-  const {
-    setCategoryModalConfig,
-    setAttributeConfig,
-    notificationCallback,
-  } = useGlobalContext();
+  const { setCategoryModalConfig, setAttributeConfig, notificationCallback } =
+    useGlobalContext();
 
   const result =
     (data &&
@@ -50,7 +47,7 @@ export const ChildCategory: FC<IProps> = ({ id }) => {
     [];
 
   const handleDeleteCategory = async () => {
-    let payload = {
+    const payload = {
       ids: [...selectedRow],
       isLeaf: true,
     };
@@ -63,8 +60,8 @@ export const ChildCategory: FC<IProps> = ({ id }) => {
             `Leaf Category deleted Successfully`
           );
 
-          queryCache.invalidateQueries((q) =>
-            q.queryKey[0].toString().startsWith("child-categories")
+          (queryCache.invalidateQueries as any)((q) =>
+            q?.startsWith('child-categories')
           );
           setConfirmModal(false);
           setSelectedRow([]);
@@ -80,20 +77,20 @@ export const ChildCategory: FC<IProps> = ({ id }) => {
   };
 
   const columns: ColumnsType<any> = [
-    { title: "Category", dataIndex: "title", key: "title" },
-    { title: "Description", dataIndex: "description", key: "description" },
+    { title: 'Category', dataIndex: 'title', key: 'title' },
+    { title: 'Description', dataIndex: 'description', key: 'description' },
     {
-      title: "Created Date",
-      dataIndex: "createdAt",
-      key: "createdAt",
+      title: 'Created Date',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
       render: (data, row, index) => (
-        <>{dayjs(data).format("MM/DD/YYYY h:mm A")}</>
+        <>{dayjs(data).format('MM/DD/YYYY h:mm A')}</>
       ),
     },
     {
       width: 40,
       render: (data, row, index) => (
-        <Tooltip placement="top" title={"Add Attribute"}>
+        <Tooltip placement="top" title={'Add Attribute'}>
           <i
             className="flex alignCenter justifyCenter attribute-icon pointer"
             onClick={() => setAttributeConfig(true, row)}
@@ -107,7 +104,7 @@ export const ChildCategory: FC<IProps> = ({ id }) => {
 
   const renderCustomTopbar = () => {
     return (
-      <div className={"add_action flex alignCenter justifySpaceBetween pv-10 "}>
+      <div className={'add_action flex alignCenter justifySpaceBetween pv-10 '}>
         <div className="edit">
           <div className="flex alignCenter ">
             {true && (
@@ -119,7 +116,7 @@ export const ChildCategory: FC<IProps> = ({ id }) => {
                   disabled={!selectedRow.length || selectedRow.length > 1}
                   title="Edit"
                   icon={editSolid}
-                  size={"middle"}
+                  size={'middle'}
                 />
                 <ButtonTag
                   className="mr-10"
@@ -127,7 +124,7 @@ export const ChildCategory: FC<IProps> = ({ id }) => {
                   onClick={() => setConfirmModal(true)}
                   title="Delete"
                   icon={deleteIcon}
-                  size={"middle"}
+                  size={'middle'}
                 />
               </>
             )}
@@ -158,21 +155,16 @@ export const ChildCategory: FC<IProps> = ({ id }) => {
         columns={columns}
         pagination={false}
         expandable={{
-          onExpand: (expanded, record) => {},
           expandedRowRender: (record, index) => {
             // const childCategories: ITransactionItem[] =
             //   record.transaction_items;
-            return (
-              <AttributesTable
-                attributes={ record?.attributes || []}
-              />
-            );
+            return <AttributesTable attributes={record?.attributes || []} />;
           },
         }}
       />
 
       <ConfirmModal
-        loading={resDeleteCategory.isLoading}
+        loading={deletingCategory}
         visible={confirmModal}
         onCancel={() => setConfirmModal(false)}
         onConfirm={handleDeleteCategory}
@@ -184,11 +176,11 @@ export const ChildCategory: FC<IProps> = ({ id }) => {
 };
 
 const AttributesTable = ({ attributes }) => {
-  const { data } = useQuery([`all-users`, "ALL"], getAllUsers);
+  const { data } = useQuery([`all-users`, 'ALL'], getAllUsers);
 
   const finduserById = (id) => {
     const { result } = data.data;
-    let [filtered] = result.filter((item) => item.id === id);
+    const [filtered] = result.filter((item) => item.id === id);
     if (filtered) {
       return filtered.name;
     } else {
@@ -197,22 +189,22 @@ const AttributesTable = ({ attributes }) => {
   };
 
   const columns: ColumnsType<any> = [
-    { title: "#", width: 30, render: (data, row, index) => <>{index + 1}</> },
-    { title: "title", dataIndex: "title", key: "title" },
-    { title: "Value Type", dataIndex: "valueType", key: "valueType" },
+    { title: '#', width: 30, render: (data, row, index) => <>{index + 1}</> },
+    { title: 'title', dataIndex: 'title', key: 'title' },
+    { title: 'Value Type', dataIndex: 'valueType', key: 'valueType' },
     {
-      title: "Created By",
-      dataIndex: "createdById",
-      key: "createdById",
+      title: 'Created By',
+      dataIndex: 'createdById',
+      key: 'createdById',
       render: (data, row, index) => (
         <>{data && data.data && data.data.result && finduserById(data)}</>
       ),
     },
     {
-      title: "Values",
-      dataIndex: "values",
-      key: "values",
-      render: (data, row, index) => <>{data ? data : "-"}</>,
+      title: 'Values',
+      dataIndex: 'values',
+      key: 'values',
+      render: (data, row, index) => <>{data ? data : '-'}</>,
     },
   ];
 

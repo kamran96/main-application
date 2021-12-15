@@ -5,7 +5,7 @@ enum PAYMENTS {
   INDEX = `payments/payment`,
 }
 
-export const getInvoiceAgainstID = (key?: string, payload?: any) =>
+export const getInvoiceAgainstID = (key?: any, payload?: any) =>
   http.get(
     `invoices/invoice/contact/${payload.id}?type=${payload.paymentMode}`
   );
@@ -14,7 +14,7 @@ export const paymentCreateAPI = (payload) => {
 };
 
 export const paymentIndexAPI = (
-  key?: string,
+  key?: any,
   page?: number,
   sortid?: string,
   page_size?: number,

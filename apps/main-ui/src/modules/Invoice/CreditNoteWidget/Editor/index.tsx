@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import { FC, useRef, useState } from 'react';
 import { createDndContext } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { queryCache, useMutation } from 'react-query';
+import { useQueryClient, useMutation } from 'react-query';
 
 import { CreditNoteCreateAPI } from '../../../../api';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
@@ -107,10 +107,14 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
   /* Context API hook that manages some sort of states throughout the app */
   /* NotificationCallBack is a function to render notification on API calls sucess and failed */
   const { notificationCallback, handleUploadPDF } = useGlobalContext();
-
+  const queryCache = useQueryClient();
   const APISTAKE = CreditNoteCreateAPI;
   /* React Query useMutation hook and ASYNC method to create invoice */
-  const [muatateCreateInvoice, resMutateInvoice] = useMutation(APISTAKE);
+  const {
+    mutate: muatateCreateInvoice,
+    isLoading: creatingInvoice,
+    data: responseCreatedInvoice,
+  } = useMutation(APISTAKE);
   const [submitType, setSubmitType] = useState('');
   /* ********** HOOKS ENDS HERE ************** */
 
@@ -226,9 +230,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
               'ledger-contact',
               'all-items',
             ].forEach((key) => {
-              queryCache.invalidateQueries((q) =>
-                q.queryKey[0]?.toString()?.startsWith(key)
-              );
+              (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
             });
           },
           onError: (error: IServerError) => {
@@ -295,13 +297,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
             type={'credit-note'}
             heading={'Credit Note'}
             hideCalculation={type === IInvoiceType.INVOICE ? false : true}
-            data={
-              (resMutateInvoice &&
-                resMutateInvoice.data &&
-                resMutateInvoice.data.data &&
-                resMutateInvoice.data.data.result) ||
-              {}
-            }
+            data={responseCreatedInvoice?.data?.result || {}}
           />
         </PrintFormat>
       </div>
@@ -568,10 +564,9 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                   </Button>
                   <Button
                     loading={
-                      resMutateInvoice.isLoading &&
-                      submitType === ISUBMITTYPE.DRAFT
+                      creatingInvoice && submitType === ISUBMITTYPE.DRAFT
                     }
-                    disabled={resMutateInvoice.isLoading}
+                    disabled={creatingInvoice}
                     htmlType="submit"
                     size={'middle'}
                     onClick={() => {
@@ -590,10 +585,9 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                     <Rbac permission={PERMISSIONS.INVOICES_DRAFT_APPROVE}>
                       <>
                         <Button
-                          disabled={resMutateInvoice.isLoading}
+                          disabled={creatingInvoice}
                           loading={
-                            resMutateInvoice.isLoading &&
-                            submitType === ISUBMITTYPE.RETURN
+                            creatingInvoice && submitType === ISUBMITTYPE.RETURN
                           }
                           htmlType="submit"
                           size={'middle'}
@@ -611,9 +605,9 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                         </Button>
 
                         <Button
-                          disabled={resMutateInvoice.isLoading}
+                          disabled={creatingInvoice}
                           loading={
-                            resMutateInvoice.isLoading &&
+                            creatingInvoice &&
                             submitType === ISUBMITTYPE.APPROVE_PRINT
                           }
                           htmlType="submit"
@@ -635,9 +629,9 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                           </span>
                         </Button>
                         <Button
-                          disabled={resMutateInvoice.isLoading}
+                          disabled={creatingInvoice}
                           loading={
-                            resMutateInvoice.isLoading &&
+                            creatingInvoice &&
                             submitType === ISUBMITTYPE.ONLYAPPROVE
                           }
                           htmlType="submit"

@@ -1,6 +1,6 @@
 import { Button, Col, Form, Input, Row, Select } from 'antd';
 import React, { FC, useEffect } from 'react';
-import { queryCache, useMutation, useQuery } from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 import { createPricingAPI, getPriceByIDAPI } from '../../../api';
 import { CommonModal } from '../../../components';
@@ -11,9 +11,11 @@ import { NOTIFICATIONTYPE } from '../../../modal';
 const { Option } = Select;
 
 const PricingEditorWidget: FC = () => {
+  const queryCache = useQueryClient();
   const { pricingModalConfig, setPricingModalConfig, notificationCallback } =
     useGlobalContext();
-  const [mutateAddItemPrice, respCreatePice] = useMutation(createPricingAPI);
+  const { mutate: mutateAddItemPrice, isLoading: creatingPrice } =
+    useMutation(createPricingAPI);
   const [form] = Form.useForm();
   const { obj } = pricingModalConfig;
 
@@ -32,8 +34,8 @@ const PricingEditorWidget: FC = () => {
   useEffect(() => {
     if (data && data.data && data.data.result) {
       const { result } = data.data;
-      let salePrice = (result.salePrice && result.salePrice.toString()) || '';
-      let purchasePrice =
+      const salePrice = (result.salePrice && result.salePrice.toString()) || '';
+      const purchasePrice =
         (result.purchasePrice && result.purchasePrice.toString()) || '';
       form.setFieldsValue({ ...result, salePrice, purchasePrice });
     }
@@ -82,15 +84,15 @@ const PricingEditorWidget: FC = () => {
             } sucessfully`
           );
           form.resetFields();
-          queryCache.invalidateQueries((q) =>
-            q.queryKey[0].toString().startsWith('items')
-          );
+          (queryCache.invalidateQueries as any)((q) => q.startsWith('items'));
           queryCache.invalidateQueries(`all-items`);
           setPricingModalConfig(false);
           queryCache.invalidateQueries(`price-${id}`);
         },
       });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -209,7 +211,7 @@ const PricingEditorWidget: FC = () => {
                     Cancel
                   </Button>
                   <Button
-                    loading={respCreatePice.isLoading}
+                    loading={creatingPrice}
                     type="primary"
                     htmlType="submit"
                     size="middle"
