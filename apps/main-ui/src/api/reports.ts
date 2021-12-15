@@ -7,7 +7,7 @@ export const TrialbalanceAPI = (key?: any, query?: string) => {
   }
   return http.get(URL);
 };
-export const BalanceSheetAPI = (key?: string, query?: string) => {
+export const BalanceSheetAPI = (key?: any, query?: string) => {
   let URL = `accounts/reports/balance-sheet`;
   if (query) {
     URL = `${URL}?query=${query}`;

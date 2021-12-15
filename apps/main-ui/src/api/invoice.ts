@@ -38,7 +38,7 @@ export const purchaseOrderCreateAPI = (payload) =>
   http.post(`purchases/create`, payload);
 
 export const getPoListAPI = (
-  key?: string,
+  key?: any,
   invoice_type?: number | string,
   status?: string | number,
   type?: string,

@@ -1,30 +1,27 @@
-import { Col, Row } from "antd";
-import { ColumnsType } from "antd/lib/table";
-import React, { FC, useEffect, useRef, useState } from "react";
-import { useQuery } from "react-query";
-import { CashActivityStatementAPI } from "../../../api";
-import { ButtonTag } from "../../../components/ButtonTags";
-import { Heading } from "../../../components/Heading";
-import { BoldText } from "../../../components/Para/BoldText";
-import { CommonTable } from "../../../components/Table";
-import { TableCard } from "../../../components/TableCard";
-import { P } from "../../../components/Typography";
-import { ICashFlow, ICashFlowResult } from "../../../modal/reports";
-import moneyFormat from "../../../utils/moneyFormat";
-import { WrapperCashActivity } from "./styles";
-import printIcon from "@iconify-icons/bytesize/print";
-import { SmartFilter } from "../../../components/SmartFilter";
-import { PrintFormat } from "../../../components/PrintFormat";
-import { PrintHeader } from "../../../components/PrintHeader";
-import printDiv from "../../../utils/Print";
+import printIcon from '@iconify-icons/bytesize/print';
+import { Col, Row } from 'antd';
+import React, { FC, useEffect, useRef, useState } from 'react';
+import { useQuery } from 'react-query';
+
+import { CashActivityStatementAPI } from '../../../api';
+import { ButtonTag } from '../../../components/ButtonTags';
+import { BoldText } from '../../../components/Para/BoldText';
+import { PrintFormat } from '../../../components/PrintFormat';
 import {
   PrintHeaderFormat,
   TableDivisions,
-} from "../../../components/PrintHeader";
+} from '../../../components/PrintHeader';
 import {
   Addressbar,
   TopbarLogoWithDetails,
-} from "../../../components/PrintHeader/Formats";
+} from '../../../components/PrintHeader/Formats';
+import { SmartFilter } from '../../../components/SmartFilter';
+import { TableCard } from '../../../components/TableCard';
+import { P } from '../../../components/Typography';
+import { ICashFlow, ICashFlowResult } from '../../../modal/reports';
+import moneyFormat from '../../../utils/moneyFormat';
+import printDiv from '../../../utils/Print';
+import { WrapperCashActivity } from './styles';
 
 export const CashActivityReport: FC = () => {
   const [result, setResult] = useState<ICashFlowResult>({
@@ -33,18 +30,18 @@ export const CashActivityReport: FC = () => {
   });
 
   const { data, isLoading } = useQuery(
-    ["cash-activity-report"],
+    ['cash-activity-report'],
     CashActivityStatementAPI
   );
 
   useEffect(() => {
     if (data?.data?.result) {
-      let { result } = data?.data;
+      const { result } = data?.data;
 
       Object?.keys(result)?.forEach((key, index) => {
-        let __arr: ICashFlow[] | any = result[key];
+        const __arr: ICashFlow[] | any = result[key];
 
-        let balance =
+        const balance =
           (__arr?.length &&
             __arr?.reduce((a, b) => ({ balance: a.balance + b.balance }))
               ?.balance) ||
@@ -54,7 +51,7 @@ export const CashActivityReport: FC = () => {
           isLastIndex: true,
           balance,
           account: {
-            name: "Total",
+            name: 'Total',
           },
         });
 
@@ -68,7 +65,7 @@ export const CashActivityReport: FC = () => {
   const printRef = useRef();
 
   const onPrint = () => {
-    let printItem = printRef.current;
+    const printItem = printRef.current;
 
     printDiv(printItem);
   };
@@ -129,7 +126,7 @@ export const CashActivityReport: FC = () => {
                           <table>
                             <thead>
                               <tr>
-                                <th>{key?.split("_").join(" ")}</th>
+                                <th>{key?.split('_').join(' ')}</th>
                                 <th></th>
                               </tr>
                             </thead>

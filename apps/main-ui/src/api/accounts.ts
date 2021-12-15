@@ -34,7 +34,7 @@ export const getAllAccounts = (key?: any, purpose?: string) =>
 
 export const getSecondaryAccounts = () => http.get(ACCOUNT.SECONDARY_ACCOUNTS);
 
-export const getAccountByIDAPI = (key, id) =>
+export const getAccountByIDAPI = (key: any, id?: number | string) =>
   http.get(`${ACCOUNT.INDEX}/${id}`);
 
 export const deleteAccountsAPI = (ids) => http.put(ACCOUNT.INDEX, ids);

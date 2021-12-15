@@ -1,7 +1,7 @@
 import { message } from 'antd';
 import { ReactNode } from 'react';
 import { FC, useEffect, useState, useMemo } from 'react';
-import { queryCache, useMutation, useQuery } from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import {
@@ -70,13 +70,16 @@ interface IAction {
 }
 
 export const GlobalManager: FC<IProps> = ({ children }) => {
+  const queryCache = useQueryClient();
   /* MUTATIONS */
-  const [
-    mutateSendPDF,
-    { isLoading: sendingPDF, isSuccess: pdfUploaded, reset: resetUPloadPDF },
-  ] = useMutation(uploadPdfAPI);
+  const {
+    mutate: mutateSendPDF,
+    isLoading: sendingPDF,
+    isSuccess: pdfUploaded,
+    reset: resetUPloadPDF,
+  } = useMutation(uploadPdfAPI);
 
-  const [mutateLogout, resLogout] = useMutation(LogoutAPI);
+  const { mutate: mutateLogout, isLoading: logouting } = useMutation(LogoutAPI);
 
   const [isOnline, setIsOnline] = useState(true);
   const [checkAutherized, setAutherized] = useState(true);
@@ -287,7 +290,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     isFetching: loggedInUserCheckingAgain,
   } = useQuery([`loggedInUser`, userId], AUTH_CHECK_API, {
     cacheTime: Infinity,
-    enabled: isProductionEnv ? checkAutherized : userId,
+    enabled: isProductionEnv ? checkAutherized : !!userId,
 
     onSuccess: (data) => {
       if (isProductionEnv) {

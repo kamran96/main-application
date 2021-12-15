@@ -1,12 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* THIS PAGE BELONGS TO ALL PURCHASES ORDERS TAB */
 import React, { FC, useEffect, useState } from 'react';
-import {
-  queryCache,
-  useMutation,
-  usePaginatedQuery,
-  useQuery,
-} from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 import {
   deletePurchaseDrafts,
@@ -43,9 +38,10 @@ interface IProps {
   activeTab?: string;
 }
 export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
+  const queryCache = useQueryClient();
   /* HOOKS HERE */
   /* Mutations */
-  const [mutateDeleteOrders, resDeleteOrders] =
+  const { mutate: mutateDeleteOrders, isLoading: deletingPurchaseOrder } =
     useMutation(deletePurchaseDrafts);
 
   /* RBAC */
@@ -116,7 +112,11 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
 
   /* ******* PAGINATED QUERY TO FETCH LIST OF PURCHASES ********** */
   /* ******* ORDERS ONLY TYPE (PROCESSED PURCHASE ORDERS) ********** */
-  const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
+  const {
+    isLoading,
+    data: resolvedData,
+    isFetching,
+  } = useQuery(
     [
       `invoices-purchases-${INVOICETYPE.Payment_Awaiting}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
       [ORDER_TYPE.PURCAHSE_ORDER],
@@ -126,7 +126,10 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
       page_size,
       query,
     ],
-    getPoListAPI
+    getPoListAPI,
+    {
+      keepPreviousData: true,
+    }
   );
 
   /* CONDITIONAL RENDERING LIFE CYCLE HOOK TO UPDATE ALL INVOICES STATE WHEN API CALL IS DONE */
@@ -162,8 +165,8 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
             'ledger-contact',
             'all-items',
           ].forEach((key) => {
-            queryCache.invalidateQueries((q) =>
-              q.queryKey[0].toString().startsWith(`${key}`)
+            (queryCache.invalidateQueries as any)((q) =>
+              q?.startsWith(`${key}`)
             );
           });
 
@@ -291,7 +294,7 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
         enableRowSelection
       />
       <ConfirmModal
-        loading={resDeleteOrders.isLoading}
+        loading={deletingPurchaseOrder}
         visible={confirmModal}
         onCancel={() => setConfirmModal(false)}
         onConfirm={handleDelete}
