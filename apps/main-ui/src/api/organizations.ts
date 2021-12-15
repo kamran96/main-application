@@ -10,5 +10,5 @@ export const addBrnachAPI = (payload) => http.post(`/users/branch`, payload);
 export const deleteOrganizationAPI = (payload) =>
   http.put(`/organizations/delete`, payload);
 
-export const getOrganizationByIdAPI = (key?: string, id?: number) =>
+export const getOrganizationByIdAPI = (key?: any, id?: number) =>
   http.get(`/users/organization/${id}`);

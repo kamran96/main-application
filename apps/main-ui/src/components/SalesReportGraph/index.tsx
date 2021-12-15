@@ -1,16 +1,16 @@
-import React, { FC, useEffect, useState } from "react";
-import styled from "styled-components";
+import React, { FC, useEffect, useState } from 'react';
+import styled from 'styled-components';
 
-import { Card } from "../Card";
-import { Color } from "../../modal";
-import * as echarts from "echarts";
-import { useWindowSize } from "../../utils/useWindowSize";
-import { SalesOverviewGraphAPI } from "../../api/mainDashboard";
-import { useQuery } from "react-query";
-import dayjs from "dayjs";
-import { H4 } from "../Typography";
-import { Seprator } from "../Seprator";
-import { IThemeProps } from "../../hooks/useTheme/themeColors";
+import { Card } from '../Card';
+import { Color } from '../../modal';
+import * as echarts from 'echarts';
+import { useWindowSize } from '../../utils/useWindowSize';
+import { SalesOverviewGraphAPI } from '../../api/mainDashboard';
+import { useQuery } from 'react-query';
+import dayjs from 'dayjs';
+import { H4 } from '../Typography';
+import { Seprator } from '../Seprator';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
 export const SalesReportGraph: FC = () => {
   const [width, height] = useWindowSize();
@@ -28,10 +28,10 @@ export const SalesReportGraph: FC = () => {
       const { result } = salesGraphData.data;
       setGraphData({
         labels: result.map((item, index) => {
-          return dayjs(item.date).format("ddd");
+          return dayjs(item.date).format('ddd');
         }),
         series: result.map((item, index) => {
-          return { value: item.todaySale, itemStyle: { color: "#1890FF" } };
+          return { value: item.todaySale, itemStyle: { color: '#1890FF' } };
         }),
       });
     }
@@ -41,31 +41,30 @@ export const SalesReportGraph: FC = () => {
     renderChart();
   }, [width, height, graphData]);
 
-  let chartHeight = width <= 1200 && width >= 768 ? "171px" : "250px";
+  const chartHeight = width <= 1200 && width >= 768 ? '171px' : '250px';
 
   const renderChart = () => {
     const chartDom: any = document.getElementById(`sales_chart_card`)!;
     if (chartDom) {
-      var myChart = echarts.init(chartDom);
-      var option;
-      option = {
+      const myChart = echarts.init(chartDom);
+      const option = {
         tooltip: {
-          trigger: "axis",
+          trigger: 'axis',
           axisPointer: {
             // 坐标轴指示器，坐标轴触发有效
-            type: "shadow", // 默认为直线，可选为：'line' | 'shadow'
+            type: 'shadow', // 默认为直线，可选为：'line' | 'shadow'
           },
         },
         grid: {
-          top: "5%",
-          left: "2%",
-          right: "2%",
-          bottom: "2%",
+          top: '5%',
+          left: '2%',
+          right: '2%',
+          bottom: '2%',
           containLabel: true,
         },
         xAxis: [
           {
-            type: "category",
+            type: 'category',
             data: graphData.labels,
             axisTick: {
               alignWithLabel: true,
@@ -74,14 +73,14 @@ export const SalesReportGraph: FC = () => {
         ],
         yAxis: [
           {
-            type: "value",
+            type: 'value',
           },
         ],
         series: [
           {
-            name: "Sales",
-            type: "bar",
-            barWidth: "20%",
+            name: 'Sales',
+            type: 'bar',
+            barWidth: '20%',
             data: graphData.series,
           },
         ],
@@ -102,7 +101,7 @@ export const SalesReportGraph: FC = () => {
         <Seprator />
         <div className="chart_area">
           <div
-            style={{ height: chartHeight, width: "100%" }}
+            style={{ height: chartHeight, width: '100%' }}
             id={`sales_chart_card`}
           ></div>
         </div>
@@ -119,7 +118,7 @@ const WrapperSlaesReportGraph = styled.div`
     position: relative;
     &::after {
       position: absolute;
-      content: "No Data Found";
+      content: 'No Data Found';
       font-size: 16px;
       font-weight: 400;
       left: 0;

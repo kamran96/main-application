@@ -65,7 +65,7 @@ export const deleteInvoicesAPI = (payload?: any) =>
 export const createPurchaseEntryAPI = (payload?: any) =>
   http.post(`${INVOICES_API.BILL}`, payload);
 
-export const getPurchasesById = (key?: string, id?: number) =>
+export const getPurchasesById = (key?: any, id?: number) =>
   http.get(`${INVOICES_API.PO}/${id}`);
 
 export const deletePurchaseDrafts = (payload?: any) =>

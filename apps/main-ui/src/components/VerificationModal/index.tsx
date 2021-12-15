@@ -1,29 +1,29 @@
-import React, { FC } from "react";
-import styled, { keyframes } from "styled-components";
-import CommonModal from "../Modal";
-import ReactInputVerificationCode from "react-input-verification-code";
-import { Button, Form } from "antd";
-import convertToRem from "../../utils/convertToRem";
-import { queryCache, useMutation } from "react-query";
-import { resendVerificationCodeAPI, verifyAccountAPI } from "../../api";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { IErrorMessages, IServerError, NOTIFICATIONTYPE } from "../../modal";
-import { useState } from "react";
+import React, { FC } from 'react';
+import styled, { keyframes } from 'styled-components';
+import CommonModal from '../Modal';
+import ReactInputVerificationCode from 'react-input-verification-code';
+import { Button, Form } from 'antd';
+import convertToRem from '../../utils/convertToRem';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
+import { resendVerificationCodeAPI, verifyAccountAPI } from '../../api';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { IErrorMessages, IServerError, NOTIFICATIONTYPE } from '../../modal';
+import { useState } from 'react';
 
 export const VerificationModal: FC = () => {
+  const queryCache = useQueryClient();
   const { userDetails, notificationCallback, setVerifiedModal, verifiedModal } =
     useGlobalContext();
   const { email } = userDetails;
   const [form] = Form.useForm();
-  const [muateteVerify, resVerify] = useMutation(verifyAccountAPI);
-  const [mutateResendOtp, resResendOtp] = useMutation(
-    resendVerificationCodeAPI
-  );
+  const { mutate: muateteVerify, isLoading: verifyingAccount } =
+    useMutation(verifyAccountAPI);
+  const { mutate: mutateResendOtp, isLoading: resendingVerificationCode } =
+    useMutation(resendVerificationCodeAPI);
 
-  
-  const [{message, hasError}, setHasErrors] = useState({
-      message: '',
-      hasError: false
+  const [{ message, hasError }, setHasErrors] = useState({
+    message: '',
+    hasError: false,
   });
 
   const closeVerifyModal = () => {
@@ -40,7 +40,7 @@ export const VerificationModal: FC = () => {
             NOTIFICATIONTYPE.SUCCESS,
             `Verified SuccessFully`
           );
-          queryCache?.invalidateQueries("loggedInUser");
+          queryCache?.invalidateQueries('loggedInUser');
           closeVerifyModal();
           form.resetFields();
         },
@@ -50,7 +50,10 @@ export const VerificationModal: FC = () => {
               NOTIFICATIONTYPE.ERROR,
               `${err?.response?.data?.message}`
             );
-            setHasErrors({message: err?.response?.data?.message, hasError: true});
+            setHasErrors({
+              message: err?.response?.data?.message,
+              hasError: true,
+            });
           } else {
             notificationCallback(
               NOTIFICATIONTYPE.ERROR,
@@ -74,12 +77,11 @@ export const VerificationModal: FC = () => {
           form.resetFields();
         },
         onError: (err: IServerError) => {
-            if (err?.response?.data?.message) {
-                notificationCallback(
-                    NOTIFICATIONTYPE.ERROR,
+          if (err?.response?.data?.message) {
+            notificationCallback(
+              NOTIFICATIONTYPE.ERROR,
               `${err?.response?.data?.message}`
             );
-           
           } else {
             notificationCallback(
               NOTIFICATIONTYPE.ERROR,
@@ -105,18 +107,14 @@ export const VerificationModal: FC = () => {
           <p className="description textCenter">
             Enter the verification code we send to your account
           </p>
-          <Form.Item name="otp"
-          
-          >
+          <Form.Item name="otp">
             <ReactInputVerificationCode
-          
-            
               length={5}
-              placeholder={"*"}
+              placeholder={'*'}
               onChange={(value) => {
-                let bool = value.split("")[0]?.includes("*");
+                const bool = value.split('')[0]?.includes('*');
                 if (hasError && bool) {
-                    setHasErrors({message: '', hasError: false});
+                  setHasErrors({ message: '', hasError: false });
                 }
                 form.setFieldsValue({ otp: value });
               }}
@@ -124,18 +122,20 @@ export const VerificationModal: FC = () => {
             <p className="error textCenter">{message}</p>
           </Form.Item>
           <p className="resend_code textCenter">
-            Didn’t get the code?&nbsp;<span onClick={onResendOTP} className="resend_link">Resend</span>
-            
+            Didn’t get the code?&nbsp;
+            <span onClick={onResendOTP} className="resend_link">
+              Resend
+            </span>
           </p>
           <Form.Item className="textCenter">
             <Button
-              loading={resVerify?.isLoading}
+              loading={verifyingAccount}
               className="mt-20 submit-button"
               type="primary"
               size="middle"
               htmlType="submit"
             >
-              {"  "}Verify{"  "}
+              {'  '}Verify{'  '}
             </Button>
           </Form.Item>
         </Form>
@@ -179,8 +179,8 @@ const shake = keyframes`
 
 `;
 
-interface IWrapperModalBodyProps{
-  isError: boolean
+interface IWrapperModalBodyProps {
+  isError: boolean;
 }
 
 const WrapperModalBody = styled.div<IWrapperModalBodyProps>`
@@ -219,14 +219,14 @@ const WrapperModalBody = styled.div<IWrapperModalBodyProps>`
     font-weight: normal;
     font-size: 14px;
     line-height: 16px;
-    
+
     /* Text / main */
-    
+
     color: #292731;
-    span{
+    span {
       color: #1890ff;
-    font-weight: 500;
-    cursor: pointer;
+      font-weight: 500;
+      cursor: pointer;
     }
   }
   .css-10g6fhb {
@@ -254,17 +254,14 @@ const WrapperModalBody = styled.div<IWrapperModalBodyProps>`
     width: 180px;
   }
 
-  p.error{
-      
+  p.error {
     margin: 0;
     color: red;
     font-size: 10px;
     margin-top: 5px;
-
-    
   }
 
-  .ant-form-item{
-      margin-bottom: 0;
+  .ant-form-item {
+    margin-bottom: 0;
   }
 `;

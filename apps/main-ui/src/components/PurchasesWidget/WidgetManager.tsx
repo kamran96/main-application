@@ -224,7 +224,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     [`${type}-${id}-view`, id],
     APISTAKE_GETORDERS,
     {
-      enabled: id,
+      enabled: !!id,
       cacheTime: Infinity,
     }
   );

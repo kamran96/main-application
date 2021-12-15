@@ -2,7 +2,7 @@
 import { Button, Col, Form, Input, Row, Select } from 'antd';
 import dayjs from 'dayjs';
 import { FC, useEffect } from 'react';
-import { queryCache, useMutation, useQuery } from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 import en from 'world_countries_lists/data/en/world.json';
 
@@ -29,8 +29,12 @@ interface IProps {
 }
 
 export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
-  const [mutateAddOrganization, { isLoading, data: updateResponseData }] =
-    useMutation(addOrganizationAPI);
+  const queryCache = useQueryClient();
+  const {
+    mutate: mutateAddOrganization,
+    isLoading,
+    data: updateResponseData,
+  } = useMutation(addOrganizationAPI);
 
   const [form] = Form.useForm();
 
@@ -83,9 +87,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
         form.resetFields();
         setOrganizationConfig(false);
         ['loggedInUser', 'all-organizations']?.forEach((key) => {
-          queryCache?.invalidateQueries((q) =>
-            q?.queryKey[0]?.toString().startsWith(key)
-          );
+          (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
         });
         queryCache.invalidateQueries(``);
         queryCache.invalidateQueries(``);
