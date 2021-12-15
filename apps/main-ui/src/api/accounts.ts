@@ -11,7 +11,7 @@ export const createUpdateAccountAPI = (payload) =>
   http.post(`${ACCOUNT.CREATE_ACCOUNT}`, payload);
 
 export const getAllAccountsAPI = (
-  key?: string,
+  key?: any,
   page?: number,
   sortid?: string,
   page_size?: number,
@@ -29,7 +29,7 @@ export const getAllAccountsAPI = (
   return http.get(url);
 };
 
-export const getAllAccounts = (key?: string, purpose?: string) =>
+export const getAllAccounts = (key?: any, purpose?: string) =>
   http.get(`${ACCOUNT.RAILS_LIST}?purpose=${purpose}`);
 
 export const getSecondaryAccounts = () => http.get(ACCOUNT.SECONDARY_ACCOUNTS);
@@ -45,7 +45,7 @@ export const getBankAccounts = () => http.get(`accounts/bank/account`);
 
 export const getAccountLedger = (
   key,
-  id: number,
+  id?: number,
   pageSize = 20,
   page = 1,
   query?: string
@@ -59,8 +59,8 @@ export const getAccountLedger = (
   return http.get(url);
 };
 
-export const getRecentAccounts = (key?: string) =>
+export const getRecentAccounts = (key?: any) =>
   http.get(`accounts/recent_accounts`);
 
-export const getAccountsByTypeAPI = (key?: string, type = 'invoice') =>
+export const getAccountsByTypeAPI = (key?: any, type = 'invoice') =>
   http(`accounts/account/type?type=${type}`);

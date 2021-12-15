@@ -1,20 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { ColumnsType } from "antd/lib/table";
-import dayjs from "dayjs";
-import  { FC, useEffect, useState } from "react";
-import { usePaginatedQuery } from "react-query";
-import { getAllTransactionsAPI } from "../../../../api";
-import { SmartFilter } from "../../../../components/SmartFilter";
-import { CommonTable } from "../../../../components/Table";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
-import { IResponseTransactions } from "../../../../modal";
-import { IAccountsResult } from "../../../../modal/accounts";
-import { ISupportedRoutes } from "../../../../modal/routing";
-import moneyFormat from "../../../../utils/moneyFormat";
-import { WrapperTransactionCustomBar, WrapperTransactionsList } from "./styles";
-import { TransactionItemTable } from "./TransactionItemsTable";
-import transactionsFilterSchema from "./transactionsFilterSchema";
-
+import { ColumnsType } from 'antd/lib/table';
+import dayjs from 'dayjs';
+import { FC, useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
+import { getAllTransactionsAPI } from '../../../../api';
+import { SmartFilter } from '../../../../components/SmartFilter';
+import { CommonTable } from '../../../../components/Table';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { IResponseTransactions } from '../../../../modal';
+import { IAccountsResult } from '../../../../modal/accounts';
+import { ISupportedRoutes } from '../../../../modal/routing';
+import moneyFormat from '../../../../utils/moneyFormat';
+import { WrapperTransactionCustomBar, WrapperTransactionsList } from './styles';
+import { TransactionItemTable } from './TransactionItemsTable';
+import transactionsFilterSchema from './transactionsFilterSchema';
 
 export const TransactionsList: FC = () => {
   const [filterBar, setFilterbar] = useState<boolean>(false);
@@ -32,8 +31,8 @@ export const TransactionsList: FC = () => {
 
   const [transactionConfig, setTransactionsConfig] = useState({
     page: 1,
-    query: "",
-    sortid: "id",
+    query: '',
+    sortid: 'id',
     page_size: 20,
   });
 
@@ -46,9 +45,9 @@ export const TransactionsList: FC = () => {
   useEffect(() => {
     if (history?.location?.search) {
       let obj = {};
-      let queryArr = history.location.search.split("?")[1].split("&");
+      const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
-        let split = item.split("=");
+        const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
 
@@ -56,14 +55,17 @@ export const TransactionsList: FC = () => {
     }
   }, [history]);
 
-  const { isLoading, resolvedData } = usePaginatedQuery(
+  const { isLoading, data: resolvedData } = useQuery(
     [
       `transactions?page=${page}&query=${query}&page_size=${page_size}`,
       page,
       page_size,
       query,
     ],
-    getAllTransactionsAPI
+    getAllTransactionsAPI,
+    {
+      keepPreviousData: true,
+    }
   );
 
   useEffect(() => {
@@ -98,42 +100,42 @@ export const TransactionsList: FC = () => {
 
   const columns: ColumnsType<any> = [
     {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
+      title: 'ID',
+      dataIndex: 'id',
+      key: 'id',
       width: 20,
     },
     {
-      title: "Ref",
-      dataIndex: "ref",
-      key: "ref",
+      title: 'Ref',
+      dataIndex: 'ref',
+      key: 'ref',
     },
     {
-      title: "Date",
-      dataIndex: "date",
-      key: "date",
+      title: 'Date',
+      dataIndex: 'date',
+      key: 'date',
       render: (data) => {
         return <>{dayjs(data).format(`MMMM D, YYYY h:mm A`)}</>;
       },
     },
 
     {
-      title: "Narration",
-      dataIndex: "narration",
-      key: "narration",
-      render: (data, row, index) => <>{data ? data : "-"}</>,
+      title: 'Narration',
+      dataIndex: 'narration',
+      key: 'narration',
+      render: (data, row, index) => <>{data ? data : '-'}</>,
     },
     {
-      title: "Note",
-      dataIndex: "notes",
-      key: "notes",
-      render: (data, row, index) => <>{data ? data : "-"}</>,
+      title: 'Note',
+      dataIndex: 'notes',
+      key: 'notes',
+      render: (data, row, index) => <>{data ? data : '-'}</>,
     },
     {
-      title: "Amount",
-      dataIndex: "amount",
-      key: "amount",
-      render: (data, row, index) => <>{data ? moneyFormat(data) : "-"}</>,
+      title: 'Amount',
+      dataIndex: 'amount',
+      key: 'amount',
+      render: (data, row, index) => <>{data ? moneyFormat(data) : '-'}</>,
     },
   ];
 
@@ -148,7 +150,7 @@ export const TransactionsList: FC = () => {
               page_size: 20,
               page: 1,
             });
-            let route = `/app${ISupportedRoutes.TRANSACTIONS}?sortid=null&page=1&page_size=20&query=${encode}`;
+            const route = `/app${ISupportedRoutes.TRANSACTIONS}?sortid=null&page=1&page_size=20&query=${encode}`;
             history.push(route);
           }}
           onClose={() => setFilterbar(false)}
@@ -167,7 +169,7 @@ export const TransactionsList: FC = () => {
         page: pagination.current,
         page_size: pagination.pageSize,
       });
-      let route = `/app${ISupportedRoutes.TRANSACTIONS}?sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}`;
+      const route = `/app${ISupportedRoutes.TRANSACTIONS}?sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}`;
       history.push(route);
     } else {
       setTransactionsConfig({
@@ -175,16 +177,16 @@ export const TransactionsList: FC = () => {
         page: pagination.current,
         page_size: pagination.pageSize,
         sortid:
-          sorter?.order === "descend" ? `-${sorter?.field}` : sorter?.field,
+          sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field,
       });
-      let route = `/app${ISupportedRoutes.TRANSACTIONS}?sortid=${
-        sorter?.order === "descend" ? -sorter?.field : sorter?.field
+      const route = `/app${ISupportedRoutes.TRANSACTIONS}?sortid=${
+        sorter?.order === 'descend' ? -sorter?.field : sorter?.field
       }&page=${pagination.current}&page_size=${pagination.pageSize}`;
       history.push(route);
     }
   };
 
-  let pageSizeOptions = [
+  const pageSizeOptions = [
     10,
     20,
     50,
@@ -199,7 +201,6 @@ export const TransactionsList: FC = () => {
     <WrapperTransactionsList>
       <CommonTable
         expandable={{
-          onExpand: (expanded, record) => {},
           expandedRowRender: (record, index) => {
             return (
               <TransactionItemTable
@@ -217,7 +218,7 @@ export const TransactionsList: FC = () => {
         totalItems={pagination?.total}
         pagination={{
           pageSize: pagination?.page_size,
-          position: ["bottomRight"],
+          position: ['bottomRight'],
           current: pagination?.page_no,
           total: pagination?.total,
           showSizeChanger: true,

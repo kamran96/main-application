@@ -6,12 +6,7 @@ import { Button } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { plainToClass } from 'class-transformer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import {
-  queryCache,
-  useMutation,
-  usePaginatedQuery,
-  useQuery,
-} from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { deleteItems, getAllCategories, getItemsList } from '../../../api';
 import { ButtonTag } from '../../../components/ButtonTags';
@@ -40,7 +35,7 @@ import packageIcon from '@iconify-icons/feather/package';
 
 export const ItemsList: FC = () => {
   /* HOOKS */
-
+  const queryCache = useQueryClient();
   const [filterbar, setFilterbar] = useState<boolean>(false);
   const [itemsFilterningSchema, setItemsFilteringSchema] =
     useState(filterSchema);
@@ -65,7 +60,8 @@ export const ItemsList: FC = () => {
   const [selectedRow, setSelectedRow] = useState([]);
   const [confirmModal, setConfirmModal] = useState<boolean>(false);
 
-  const [mutateDeleteItems, deleteResponse] = useMutation(deleteItems);
+  const { mutate: mutateDeleteItems, isLoading: isDeletingItem } =
+    useMutation(deleteItems);
   const [width, height] = useWindowSize();
   const [scrollConfig, setScrollConfig] = useState({
     y: `100vh`,
@@ -126,7 +122,11 @@ export const ItemsList: FC = () => {
   const pageSize =
     typeof page_size === 'string' ? parseInt(page_size) : page_size;
 
-  const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
+  const {
+    isLoading,
+    data: resolvedData,
+    isFetching,
+  } = useQuery(
     [
       `items?page=${page}&query=${query}&sortId=${sortid}&page_size=${pageSize}`,
       { page, sortid, query, pageSize },
@@ -134,6 +134,7 @@ export const ItemsList: FC = () => {
     getItemsList,
     {
       cacheTime: Infinity,
+      keepPreviousData: true,
     }
   );
 
@@ -178,9 +179,7 @@ export const ItemsList: FC = () => {
             'Item Deleted Successfully'
           );
           ['all-items', 'items?page'].forEach((key) => {
-            queryCache.invalidateQueries((q) =>
-              q.queryKey[0].toString().startsWith(key)
-            );
+            (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           });
           setConfirmModal(false);
         },
@@ -462,7 +461,7 @@ export const ItemsList: FC = () => {
           enableRowSelection
         />
         <ConfirmModal
-          loading={deleteResponse.isLoading}
+          loading={isDeletingItem}
           visible={confirmModal}
           onCancel={() => setConfirmModal(false)}
           onConfirm={handleDelete}

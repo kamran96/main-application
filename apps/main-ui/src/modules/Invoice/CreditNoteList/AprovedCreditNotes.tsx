@@ -1,27 +1,27 @@
-import { ColumnsType } from "antd/lib/table";
-import dayjs from "dayjs";
-import React, { FC } from "react";
-import { useEffect } from "react";
-import { useState } from "react";
-import { usePaginatedQuery, useQuery } from "react-query";
-import styled from "styled-components";
-import { getAllContacts, getCreditNotes } from "../../../api";
-import { CommonTable } from "../../../components/Table";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { IContactTypes, ISupportedRoutes } from "../../../modal";
-import { IInvoiceResponse } from "../../../modal/invoice";
-import { ButtonTag } from "../../../components/ButtonTags";
-import editSolid from "@iconify-icons/clarity/edit-solid";
-import { SmartFilter } from "../../../components/SmartFilter";
-import { PDFICON } from "../../../components/Icons";
-import FilteringSchema from "./FilteringSchema";
-import columns from "./commonCols";
+import { ColumnsType } from 'antd/lib/table';
+import dayjs from 'dayjs';
+import React, { FC } from 'react';
+import { useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from 'react-query';
+import styled from 'styled-components';
+import { getAllContacts, getCreditNotes } from '../../../api';
+import { CommonTable } from '../../../components/Table';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { IContactTypes, ISupportedRoutes } from '../../../modal';
+import { IInvoiceResponse } from '../../../modal/invoice';
+import { ButtonTag } from '../../../components/ButtonTags';
+import editSolid from '@iconify-icons/clarity/edit-solid';
+import { SmartFilter } from '../../../components/SmartFilter';
+import { PDFICON } from '../../../components/Icons';
+import FilteringSchema from './FilteringSchema';
+import columns from './commonCols';
 
 export const AprovedCreditNotes: FC = () => {
   /* HOOKS HERE */
 
   const { routeHistory } = useGlobalContext();
-  const {history} = routeHistory;
+  const { history } = routeHistory;
   const { location } = history;
 
   /* LOCATL STATES */
@@ -35,7 +35,7 @@ export const AprovedCreditNotes: FC = () => {
   const [creditNoteConfig, setCreditNoteConfig] = useState({
     page: 1,
     pageSize: 20,
-    query: "",
+    query: '',
   });
   const { page, pageSize, query } = creditNoteConfig;
 
@@ -43,7 +43,7 @@ export const AprovedCreditNotes: FC = () => {
 
   /* API CALLS STACKS GOES HERE */
   /* PAGINATED QUERY TO FETCH CREDIT NOTES WITH PAGINATION */
-  const { data: creditNoteListData, isLoading } = usePaginatedQuery(
+  const { data: creditNoteListData, isLoading } = useQuery(
     [
       `credit-notes?page=${page}&type=${1}&pageSize=${pageSize}&query=${query}`,
       1, // this specifies APPROVED CREDIT NOTES
@@ -51,18 +51,21 @@ export const AprovedCreditNotes: FC = () => {
       pageSize,
       query,
     ],
-    getCreditNotes
+    getCreditNotes,
+    {
+      keepPreviousData: true,
+    }
   );
 
   const { data: contactsData } = useQuery(
-    [`all-contacts`, "ALL"],
+    [`all-contacts`, 'ALL'],
     getAllContacts
   );
 
   useEffect(() => {
     if (contactsData?.data?.result) {
       const { result } = contactsData.data;
-      let schema = FilteringSchema;
+      const schema = FilteringSchema;
       schema.contactId.value = result.filter(
         (item) => item.contactType === IContactTypes.CUSTOMER
       );
@@ -77,9 +80,9 @@ export const AprovedCreditNotes: FC = () => {
   useEffect(() => {
     if (location?.search) {
       let obj = {};
-      let queryArr = history.location.search.split("?")[1].split("&");
+      const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
-        let split = item.split("=");
+        const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
 
@@ -104,7 +107,7 @@ export const AprovedCreditNotes: FC = () => {
     return (
       <div className="pv-10">
         <ButtonTag
-        disabled
+          disabled
           onClick={() => {
             history.push(
               `/app${ISupportedRoutes.ADD_CREDIT_NOTE}/${selectedRows[0]}`
@@ -112,7 +115,7 @@ export const AprovedCreditNotes: FC = () => {
           }}
           title="Edit"
           icon={editSolid}
-          size={"middle"}
+          size={'middle'}
         />
       </div>
     );
@@ -130,7 +133,7 @@ export const AprovedCreditNotes: FC = () => {
         />
         <SmartFilter
           onFilter={(encode) => {
-            let route = `/app${ISupportedRoutes?.CREDIT_NOTES}?tabIndex=aproved&page=1&page_size=20&query=${encode}`;
+            const route = `/app${ISupportedRoutes?.CREDIT_NOTES}?tabIndex=aproved&page=1&page_size=20&query=${encode}`;
             history.push(route);
             setCreditNoteConfig({ ...creditNoteConfig, query: encode });
           }}
@@ -153,19 +156,19 @@ export const AprovedCreditNotes: FC = () => {
         customTopbar={renderCustomTableTobar()}
         topbarRightPannel={renderTopbarRight()}
         exportable
-        printTitle={"Credit Notes"}
+        printTitle={'Credit Notes'}
         onChange={(pagination, filters, sorter: any, extra) => {
           setCreditNoteConfig({
             ...creditNoteConfig,
             page: pagination.current,
             pageSize: pagination.pageSize,
           });
-          let route = `/app${ISupportedRoutes.CREDIT_NOTES}?tabIndex=aproved&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+          const route = `/app${ISupportedRoutes.CREDIT_NOTES}?tabIndex=aproved&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
           history.push(route);
         }}
         pagination={{
           pageSize: pageSize,
-          position: ["bottomRight"],
+          position: ['bottomRight'],
           current: pagination && pagination.page_no,
           total: pagination && pagination.total,
         }}

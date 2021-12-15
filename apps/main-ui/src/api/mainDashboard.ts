@@ -1,7 +1,7 @@
 import http from '../utils/http';
 
 export const DailyStalesDashboardAPI = (
-  key: string,
+  key: any,
   startDate?: string,
   endDate?: string
 ) => http(`/invoice-sale-detail?start=${startDate}&ends=${endDate}`);

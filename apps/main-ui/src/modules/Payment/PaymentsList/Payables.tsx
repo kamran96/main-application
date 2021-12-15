@@ -1,6 +1,6 @@
 import deleteIcon from '@iconify/icons-carbon/delete';
 import React, { FC, useEffect, useState } from 'react';
-import { queryCache, useMutation, usePaginatedQuery } from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 
 import { paymentDeleteAPI, paymentIndexAPI } from '../../../api/payment';
@@ -25,9 +25,10 @@ import filterSchema from './paymentFilterSchema';
 export const PaymentPaidList: FC = () => {
   const { routeHistory, notificationCallback } = useGlobalContext();
   const { history } = routeHistory;
+  const queryCache = useQueryClient();
 
   /* Mutations */
-  const [mutatePaymentDelete, { isLoading: paymentDeleteLoading }] =
+  const { mutate: mutatePaymentDelete, isLoading: paymentDeleteLoading } =
     useMutation(paymentDeleteAPI);
 
   /* Mutations Ends here */
@@ -51,7 +52,11 @@ export const PaymentPaidList: FC = () => {
   });
   const { page, query, sortid, page_size } = config;
 
-  const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
+  const {
+    isLoading,
+    data: resolvedData,
+    isFetching,
+  } = useQuery(
     [
       `payments-list?page_no=${page}&sort=${sortid}&page_size=${page_size}&query=${query}&paymentType=payables`,
       page,
@@ -60,7 +65,10 @@ export const PaymentPaidList: FC = () => {
       query,
       TRANSACTION_MODE.PAYABLES,
     ],
-    paymentIndexAPI
+    paymentIndexAPI,
+    {
+      keepPreviousData: true,
+    }
   );
 
   useEffect(() => {
@@ -83,9 +91,7 @@ export const PaymentPaidList: FC = () => {
           'Payment Deleted Successfully'
         );
         ['payments-list', 'transactions', 'invoices'].forEach((key) => {
-          queryCache.invalidateQueries((q) =>
-            q.queryKey[0].toString().startsWith(key)
-          );
+          (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
         });
         setConfirmModal(false);
       },

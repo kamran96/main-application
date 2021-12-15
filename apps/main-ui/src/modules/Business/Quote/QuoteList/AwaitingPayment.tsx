@@ -1,18 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, useEffect, useState } from "react";
-import { usePaginatedQuery, useQuery } from "react-query";
-import { getAllContacts, getInvoiceListAPI } from "../../../../api";
-import { SmartFilter } from "../../../../components/SmartFilter";
-import { CommonTable } from "../../../../components/Table";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
+import { FC, useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
+import { getAllContacts, getInvoiceListAPI } from '../../../../api';
+import { SmartFilter } from '../../../../components/SmartFilter';
+import { CommonTable } from '../../../../components/Table';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import {
   IInvoiceResponse,
   INVOICETYPE,
   ORDER_TYPE,
-} from "../../../../modal/invoice";
-import { ISupportedRoutes } from "../../../../modal/routing";
-import { CommonTopbar } from "../../../Invoice/InvoiceList/CommonTopbar";
-import DraftQuoteFilters from "./QuotesFilters";
+} from '../../../../modal/invoice';
+import { ISupportedRoutes } from '../../../../modal/routing';
+import { CommonTopbar } from '../../../Invoice/InvoiceList/CommonTopbar';
+import DraftQuoteFilters from './QuotesFilters';
 
 interface IProps {
   columns?: any[];
@@ -20,28 +20,29 @@ interface IProps {
 export const PaymentAwaitingQuotesList: FC<IProps> = ({ columns }) => {
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
-    query: "",
-    sortid: "",
+    query: '',
+    sortid: '',
     pageSize: 10,
   });
   const [filterBar, setFilterBar] = useState<boolean>(false);
-  const [quotesFilterSchema, setQuotesFilterSchema] = useState(
-    DraftQuoteFilters
-  );
+  const [quotesFilterSchema, setQuotesFilterSchema] =
+    useState(DraftQuoteFilters);
 
   const [selectedRow, setSelectedRow] = useState([]);
 
-  const [
-    { result, pagination },
-    setAllInvoicesRes,
-  ] = useState<IInvoiceResponse>({
-    result: [],
-    pagination: null,
-  });
+  const [{ result, pagination }, setAllInvoicesRes] =
+    useState<IInvoiceResponse>({
+      result: [],
+      pagination: null,
+    });
 
   const { page, query, sortid, pageSize } = allInvoicesConfig;
 
-  const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
+  const {
+    isLoading,
+    data: resolvedData,
+    isFetching,
+  } = useQuery(
     [
       `awaiting_qoutes?page=${page}&query=${query}&sort=${sortid}&page_size=${pageSize}`,
       ORDER_TYPE.QUOTE,
@@ -50,7 +51,10 @@ export const PaymentAwaitingQuotesList: FC<IProps> = ({ columns }) => {
       pageSize,
       sortid,
     ],
-    getInvoiceListAPI
+    getInvoiceListAPI,
+    {
+      keepPreviousData: true,
+    }
   );
 
   const onSelectedRow = (item) => {
@@ -69,7 +73,7 @@ export const PaymentAwaitingQuotesList: FC<IProps> = ({ columns }) => {
     }
   }, [resolvedData]);
 
-  const allContacts = useQuery([`all-contacts`, "ALL"], getAllContacts);
+  const allContacts = useQuery([`all-contacts`, 'ALL'], getAllContacts);
 
   useEffect(() => {
     if (
@@ -78,7 +82,7 @@ export const PaymentAwaitingQuotesList: FC<IProps> = ({ columns }) => {
       allContacts.data.data.result
     ) {
       const { result } = allContacts.data.data;
-      let schema = quotesFilterSchema;
+      const schema = quotesFilterSchema;
       schema.contactId.value = [...result];
       setQuotesFilterSchema(schema);
     }
@@ -88,16 +92,11 @@ export const PaymentAwaitingQuotesList: FC<IProps> = ({ columns }) => {
   const { history } = routeHistory;
 
   useEffect(() => {
-    if (
-      routeHistory &&
-      routeHistory.history &&
-      routeHistory.history.location &&
-      routeHistory.history.location.search
-    ) {
+    if (routeHistory?.history?.location?.search) {
       let obj = {};
-      let queryArr = history.location.search.split("?")[1].split("&");
+      const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
-        let split = item.split("=");
+        const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
 
@@ -117,7 +116,7 @@ export const PaymentAwaitingQuotesList: FC<IProps> = ({ columns }) => {
             <SmartFilter
               onFilter={(encode) => {
                 setAllInvoicesConfig({ ...allInvoicesConfig, query: encode });
-                let route = `/app${ISupportedRoutes.QUOTE}?tabIndex=draft&sortid=${sortid}&page=1&page_size=${pageSize}&sortid=${sortid}&query=${encode}`;
+                const route = `/app${ISupportedRoutes.QUOTE}?tabIndex=draft&sortid=${sortid}&page=1&page_size=${pageSize}&sortid=${sortid}&query=${encode}`;
                 history.push(route);
               }}
               onClose={() => setFilterBar(false)}
@@ -137,7 +136,7 @@ export const PaymentAwaitingQuotesList: FC<IProps> = ({ columns }) => {
             page: pagination.current,
             pageSize: pagination.pageSize,
           });
-          let route = `/app${ISupportedRoutes.QUOTE}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+          const route = `/app${ISupportedRoutes.QUOTE}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
           history.push(route);
         } else {
           setAllInvoicesConfig({
@@ -145,12 +144,12 @@ export const PaymentAwaitingQuotesList: FC<IProps> = ({ columns }) => {
             page: pagination.current,
             pageSize: pagination.pageSize,
             sortid:
-              sorter && sorter.order === "descend"
+              sorter && sorter.order === 'descend'
                 ? `-${sorter.field}`
                 : sorter.field,
           });
-          let route = `/app${ISupportedRoutes.QUOTE}?tabIndex=draft&sortid=${
-            sorter && sorter.order === "descend"
+          const route = `/app${ISupportedRoutes.QUOTE}?tabIndex=draft&sortid=${
+            sorter && sorter.order === 'descend'
               ? `-${sorter.field}`
               : sorter.field
           }&page=${pagination.current}&page_size=${pageSize}&query=${query}`;
@@ -160,7 +159,7 @@ export const PaymentAwaitingQuotesList: FC<IProps> = ({ columns }) => {
       totalItems={pagination && pagination.total}
       pagination={{
         pageSize: pageSize,
-        position: ["bottomRight"],
+        position: ['bottomRight'],
         current: pagination && pagination.page_no,
         total: pagination && pagination.total,
       }}

@@ -5,7 +5,7 @@ import deleteIcon from '@iconify/icons-carbon/delete';
 import { ColumnsType } from 'antd/es/table';
 import { Button } from 'antd';
 import { FC, useEffect, useState } from 'react';
-import { queryCache, useMutation, usePaginatedQuery } from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 
 import {
@@ -24,6 +24,7 @@ import { CommonTable } from './../../../components/Table';
 import UserFilterSchema from './UsersFilterSchema';
 
 export const UsersList: FC = () => {
+  const queryCache = useQueryClient();
   const { notificationCallback } = useGlobalContext();
   const [{ result, pagination }, setUsersResponse] = useState<any>({
     result: [],
@@ -31,8 +32,9 @@ export const UsersList: FC = () => {
   });
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
-  const [mutateDeleteUser, resDeleteUser] = useMutation(deleteUserAPI);
-  const [mutateResendInvitation, { isLoading: resendLoading }] =
+  const { mutate: mutateDeleteUser, isLoading: deletingUser } =
+    useMutation(deleteUserAPI);
+  const { isLoading: resendLoading, mutate: mutateResendInvitation } =
     useMutation(resendInvitation);
 
   const [selectedRow, setSelectedRow] = useState([]);
@@ -47,7 +49,11 @@ export const UsersList: FC = () => {
 
   const { page, query, sortid, page_size } = usersConfig;
 
-  const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
+  const {
+    isLoading,
+    data: resolvedData,
+    isFetching,
+  } = useQuery(
     [
       `users-list?page=${page}page_size=${page_size}sort=${sortid}&query=${query}`,
 
@@ -56,7 +62,10 @@ export const UsersList: FC = () => {
       page_size,
       query,
     ],
-    getUsersListAPI
+    getUsersListAPI,
+    {
+      keepPreviousData: true,
+    }
   );
 
   const { routeHistory } = useGlobalContext();
@@ -109,9 +118,7 @@ export const UsersList: FC = () => {
     mutateDeleteUser(payload, {
       onSuccess: () => {
         setDeleteConfirm(false);
-        queryCache.invalidateQueries((q) =>
-          q.queryKey[0].toString().startsWith('users-list?page')
-        );
+        queryCache.invalidateQueries('users-list');
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'User Deleted');
       },
     });
@@ -316,7 +323,7 @@ export const UsersList: FC = () => {
       </div>
       <ConfirmModal
         text={'Are you sure want to delete?'}
-        loading={resDeleteUser.isLoading}
+        loading={deletingUser}
         visible={deleteConfirm}
         onCancel={() => setDeleteConfirm(false)}
         onConfirm={handledelete}

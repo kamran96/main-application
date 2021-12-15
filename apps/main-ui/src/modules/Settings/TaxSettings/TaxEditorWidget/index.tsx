@@ -1,14 +1,14 @@
-import { Form, Space, Input, Checkbox, Button } from "antd";
-import React, { FC } from "react";
-import styled from "styled-components";
-import { CommonModal } from "../../../../components";
-import trash2 from "@iconify-icons/feather/trash-2";
-import { Icon } from "@iconify/react";
-import { PlusOutlined } from "@ant-design/icons";
-import { queryCache, useMutation, useQuery } from "react-query";
-import { createTaxAPI, getTaxByIdAPI } from "../../../../api";
-import { useEffect } from "react";
-import { useState } from "react";
+import { Form, Space, Input, Checkbox, Button } from 'antd';
+import React, { FC } from 'react';
+import styled from 'styled-components';
+import { CommonModal } from '../../../../components';
+import trash2 from '@iconify-icons/feather/trash-2';
+import { Icon } from '@iconify/react';
+import { PlusOutlined } from '@ant-design/icons';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
+import { createTaxAPI, getTaxByIdAPI } from '../../../../api';
+import { useEffect } from 'react';
+import { useState } from 'react';
 
 interface IProps {
   visibility: boolean;
@@ -21,13 +21,15 @@ export const TaxEditorWidget: FC<IProps> = ({
   setVisibility,
   id,
 }) => {
+  const queryCache = useQueryClient();
   const [form] = Form.useForm();
-  const [mutateCreateTax, resCreateTax] = useMutation(createTaxAPI);
+  const { mutate: mutateCreateTax, isLoading: createTaxLoading } =
+    useMutation(createTaxAPI);
   const [deletedIds, setDeletedIds] = useState([]);
   const formInitialValues = [
     {
-      tax_component: "",
-      rate: "",
+      tax_component: '',
+      rate: '',
       compound: false,
       id: null,
     },
@@ -37,7 +39,7 @@ export const TaxEditorWidget: FC<IProps> = ({
     [`tax-rate?id=${id}`, id],
     getTaxByIdAPI,
     {
-      enabled: id,
+      enabled: !!id,
     }
   );
 
@@ -47,29 +49,28 @@ export const TaxEditorWidget: FC<IProps> = ({
     }
   }, [taxViewData]);
 
-
-  const resetForm = ()=>{
+  const resetForm = () => {
     form?.resetFields();
     setVisibility(false);
-  }
+  };
 
   const onFinish = async (values) => {
+    let payload = {
+      ...values,
+      isNewRecord: id ? false : true,
+      deleted_ids: deletedIds,
+    };
 
-    let payload = {...values, isNewRecord: id ? false : true, deleted_ids:deletedIds};
-
-    if(id){
-      payload = {...payload, id}
+    if (id) {
+      payload = { ...payload, id };
     }
-
 
     await mutateCreateTax(payload, {
       onSuccess: () => {
-        ["tax_rate", 'tax-rate?']?.forEach((key) => {
-          queryCache?.invalidateQueries((q) =>
-            q.queryKey[0]?.toString().startsWith(key)
-          );
+        ['tax_rate', 'tax-rate?']?.forEach((key) => {
+          (queryCache?.invalidateQueries as any)((q) => q.startsWith(key));
         });
-        resetForm()
+        resetForm();
       },
     });
   };
@@ -88,7 +89,7 @@ export const TaxEditorWidget: FC<IProps> = ({
           name="dynamic_form_nest_item"
           onFinish={onFinish}
           autoComplete="off"
-          layout={"vertical"}
+          layout={'vertical'}
         >
           <div className="form_list">
             <Form.Item name="title" label="Tax rate display title">
@@ -98,7 +99,7 @@ export const TaxEditorWidget: FC<IProps> = ({
               {(fields, { add, remove }) => (
                 <>
                   {fields?.map((field, index) => {
-                    console.log(field, "field");
+                    console.log(field, 'field');
                     return (
                       <Space
                         className="flex alignCenter  form-list-item"
@@ -107,34 +108,34 @@ export const TaxEditorWidget: FC<IProps> = ({
                       >
                         <Form.Item
                           {...field}
-                          label={"Tax Component"}
-                          name={[field.name, "name"]}
+                          label={'Tax Component'}
+                          name={[field.name, 'name']}
                           rules={[
                             {
                               required: true,
-                              message: "tax component is required!",
+                              message: 'tax component is required!',
                             },
                           ]}
                         >
-                          <Input placeholder={"Federal Tax"} size="middle" />
+                          <Input placeholder={'Federal Tax'} size="middle" />
                         </Form.Item>
                         <Form.Item
                           {...field}
-                          label={"Rate"}
-                          name={[field.name, "rate"]}
+                          label={'Rate'}
+                          name={[field.name, 'rate']}
                           rules={[
-                            { required: true, message: "Rate is required!" },
+                            { required: true, message: 'Rate is required!' },
                           ]}
                         >
-                          <Input placeholder={"4.5%"} size="middle" />
+                          <Input placeholder={'4.5%'} size="middle" />
                         </Form.Item>
                         <Form.Item
                           {...field}
                           valuePropName="checked"
-                          label={"Compound"}
-                          name={[field.name, "compound"]}
+                          label={'Compound'}
+                          name={[field.name, 'compound']}
                           rules={[
-                            { required: false, message: "Rate is required!" },
+                            { required: false, message: 'Rate is required!' },
                           ]}
                         >
                           <Checkbox />
@@ -146,7 +147,7 @@ export const TaxEditorWidget: FC<IProps> = ({
                             if (taxViewData?.data?.result) {
                               const { result } = taxViewData?.data;
                               setDeletedIds((prev) => {
-                                let val = [...prev];
+                                const val = [...prev];
                                 val?.push(result?.tax_rate_items[index].id);
 
                                 return val;

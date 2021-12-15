@@ -1,29 +1,21 @@
-import React, { FC, useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import styled from "styled-components";
-import { draftInvoicesSuggestAPI } from "../../../api";
-import { IThemeProps } from "../../../hooks/useTheme/themeColors";
-import { IInvoiceDraftsDashboard } from "../../../modal/invoice";
-import Data from "./var";
+import React, { FC, useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
+import styled from 'styled-components';
+import { draftInvoicesSuggestAPI } from '../../../api';
+import { IThemeProps } from '../../../hooks/useTheme/themeColors';
+import { IInvoiceDraftsDashboard } from '../../../modal/invoice';
+import Data from './var';
 
 export const DraftInvoices: FC = () => {
-  const [
-    { result },
-    setDraftInvoiceResponse,
-  ] = useState<IInvoiceDraftsDashboard>({
-    result: [],
-  });
-  const {
-    data: draftInvoicesData,
-    isLoading: draftInvoicesFetching,
-  } = useQuery(["draft-invoices-to-process"], draftInvoicesSuggestAPI);
+  const [{ result }, setDraftInvoiceResponse] =
+    useState<IInvoiceDraftsDashboard>({
+      result: [],
+    });
+  const { data: draftInvoicesData, isLoading: draftInvoicesFetching } =
+    useQuery(['draft-invoices-to-process'], draftInvoicesSuggestAPI);
 
   useEffect(() => {
-    if (
-      draftInvoicesData &&
-      draftInvoicesData.data &&
-      draftInvoicesData.data.result
-    ) {
+    if (draftInvoicesData?.data?.result) {
       setDraftInvoiceResponse(draftInvoicesData.data);
     }
   }, [draftInvoicesData]);
@@ -33,7 +25,7 @@ export const DraftInvoices: FC = () => {
       <table>
         <thead>
           <tr>
-            {["#", "To", "Payment Date", "Amount", "Invoice Items"].map(
+            {['#', 'To', 'Payment Date', 'Amount', 'Invoice Items'].map(
               (head, index) => {
                 return <th key={index}>{head}</th>;
               }
@@ -63,7 +55,7 @@ const WrapperDraftInvoices = styled.div`
     width: 100%;
     thead > tr > th {
       color: ${(props: IThemeProps) =>
-        props?.theme?.theme === "dark"
+        props?.theme?.theme === 'dark'
           ? props?.theme?.colors?.$BLACK
           : props?.theme?.colors?.$Primary2};
     }

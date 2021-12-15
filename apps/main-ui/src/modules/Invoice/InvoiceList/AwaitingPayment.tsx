@@ -1,12 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Button } from 'antd';
 import React, { FC, useEffect, useState } from 'react';
-import {
-  queryCache,
-  useMutation,
-  usePaginatedQuery,
-  useQuery,
-} from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 
 import {
   deleteInvoiceDrafts,
@@ -34,6 +29,7 @@ interface IProps {
   columns?: any[];
 }
 export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
+  const queryCache = useQueryClient();
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
     query: '',
@@ -43,7 +39,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
 
   const [confirmModal, setConfirmModal] = useState(false);
 
-  const [mutateDeleteOrders, resDeleteOrders] =
+  const { mutate: mutateDeleteOrders, isLoading: deletingInvoice } =
     useMutation(deleteInvoiceDrafts);
 
   const [filterBar, setFilterBar] = useState<boolean>(false);
@@ -98,7 +94,11 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
     }
   }, [allContacts.data, invoiceFiltersSchema]);
 
-  const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
+  const {
+    isLoading,
+    data: resolvedData,
+    isFetching,
+  } = useQuery(
     [
       `invoices-${ORDER_TYPE.SALE_INVOICE}-${INVOICETYPE.Payment_Awaiting}?page=${page}&query=${query}&sort=${sortid}&page_size=${pageSize}`,
       ORDER_TYPE.SALE_INVOICE,
@@ -108,7 +108,10 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
       pageSize,
       query,
     ],
-    getInvoiceListAPI
+    getInvoiceListAPI,
+    {
+      keepPreviousData: true,
+    }
   );
 
   const onSelectedRow = (item) => {
@@ -135,9 +138,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
       onSuccess: () => {
         ['invoices', 'transactions?page', 'items?page', 'invoice-view'].forEach(
           (key) => {
-            queryCache.invalidateQueries((q) =>
-              q.queryKey[0].toString().startsWith(key)
-            );
+            (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           }
         );
 
@@ -274,7 +275,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
         enableRowSelection
       />
       <ConfirmModal
-        loading={resDeleteOrders.isLoading}
+        loading={deletingInvoice}
         visible={confirmModal}
         onCancel={() => setConfirmModal(false)}
         onConfirm={handleDelete}

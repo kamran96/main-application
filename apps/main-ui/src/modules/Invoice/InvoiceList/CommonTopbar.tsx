@@ -1,16 +1,16 @@
-import React, { ReactElement, FC, useState } from "react";
-import deleteIcon from "@iconify/icons-carbon/delete";
-import editSolid from "@iconify/icons-clarity/edit-solid";
-import { Icon } from "@iconify/react";
-import { queryCache, useMutation } from "react-query";
-import styled from "styled-components";
+import { ReactElement, FC, useState } from 'react';
+import deleteIcon from '@iconify/icons-carbon/delete';
+import editSolid from '@iconify/icons-clarity/edit-solid';
+import { Icon } from '@iconify/react';
+import { useQueryClient, useMutation } from 'react-query';
+import styled from 'styled-components';
 
-import { deleteInvoicesAPI } from "../../../api";
-import { ConfirmModal } from "../../../components/ConfirmModal";
-import { MoreActions, TableActions } from "../../../components/TableActions";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { Color, NOTIFICATIONTYPE } from "../../../modal";
-import convertToRem from "../../../utils/convertToRem";
+import { deleteInvoicesAPI } from '../../../api';
+import { ConfirmModal } from '../../../components/ConfirmModal';
+import { MoreActions, TableActions } from '../../../components/TableActions';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { Color, NOTIFICATIONTYPE } from '../../../modal';
+import convertToRem from '../../../utils/convertToRem';
 
 interface IProps {
   selectedRow?: number[];
@@ -29,11 +29,11 @@ export const CommonTopbar: FC<IProps> = ({
   onFilterClick,
   renderFilter,
 }) => {
+  const queryCache = useQueryClient();
   const [confirmModal, setConfirmModal] = useState(false);
 
-  const [mutateDeleteInvoices, resDeleteInvoices] = useMutation(
-    deleteInvoicesAPI
-  );
+  const { mutate: mutateDeleteInvoices, isLoading: deletingInvoice } =
+    useMutation(deleteInvoicesAPI);
   const { notificationCallback } = useGlobalContext();
 
   const handleDelete = async () => {
@@ -43,16 +43,18 @@ export const CommonTopbar: FC<IProps> = ({
     try {
       await mutateDeleteInvoices(payload, {
         onSuccess: () => {
-          queryCache.invalidateQueries((q) =>
-            q.queryKey[0].toString().startsWith("invoices")
+          (queryCache.invalidateQueries as any)((q) =>
+            q.startsWith('invoices')
           );
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
-            "Invoice Deleted Successfully"
+            'Invoice Deleted Successfully'
           );
         },
       });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -68,7 +70,7 @@ export const CommonTopbar: FC<IProps> = ({
                       style={{
                         fontSize: convertToRem(16),
                         color: Color.$GRAY_LIGHT,
-                        cursor: "pointer",
+                        cursor: 'pointer',
                       }}
                       icon={editSolid}
                     />
@@ -79,7 +81,7 @@ export const CommonTopbar: FC<IProps> = ({
                     style={{
                       fontSize: convertToRem(16),
                       color: Color.$GRAY_LIGHT,
-                      cursor: "pointer",
+                      cursor: 'pointer',
                     }}
                     icon={deleteIcon}
                   />
@@ -94,7 +96,7 @@ export const CommonTopbar: FC<IProps> = ({
         </div>
       </div>
       <ConfirmModal
-        loading={resDeleteInvoices.isLoading}
+        loading={deletingInvoice}
         visible={confirmModal}
         onCancel={() => setConfirmModal(false)}
         onConfirm={handleDelete}

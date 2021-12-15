@@ -1,11 +1,11 @@
-import http from "../utils/http";
+import http from '../utils/http';
 
 enum CATEGORY_API {
-  INDEX = "items/category",
+  INDEX = 'items/category',
 }
 
 export const getCategoriesAPI = (
-  key?: string,
+  key?: any,
   page?: number,
   sortid?: string,
   page_size?: number,
@@ -17,7 +17,7 @@ export const getCategoriesAPI = (
 
   return http.get(url);
 };
-export const getChildCategoriesAPI = (key?: string, parentId?: number) => {
+export const getChildCategoriesAPI = (key?: any, parentId?: number) => {
   let url = `${CATEGORY_API.INDEX}`;
 
   url = `${url}/?page_size=${10}&page_no=1`;
@@ -40,8 +40,8 @@ export const getAllCategories = () =>
 export const deleteCategoryAPI = (payload?: any) =>
   http.put(`${CATEGORY_API.INDEX}`, payload);
 
-export const getCategoryByIdAPI = (key?: string, id?: number) =>
+export const getCategoryByIdAPI = (key?: any, id?: number) =>
   http.get(`${CATEGORY_API.INDEX}/${id}`);
 
-export const getCategoryAttributesAPI = (key?: string, id?: number) =>
+export const getCategoryAttributesAPI = (key?: any, id?: number) =>
   http.get(`${CATEGORY_API.INDEX}/${id}`);

@@ -1,25 +1,27 @@
-import React, { FC } from "react";
-import styled from "styled-components";
-import { Modal, Select } from "antd";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { Form, Input, Button } from "antd";
-import { FormLabel } from "../../../components/FormLabel";
-import { queryCache, useMutation, useQuery } from "react-query";
-import { getALLBranches, inviteUserAPI } from "../../../api/users";
-import { NOTIFICATIONTYPE, IBaseAPIError } from "../../../modal";
-import { IRoles } from "../../../api/roles";
-import { getRbacListAPI } from "../../../api";
-import { CommonModal } from "../../../components";
+import React, { FC } from 'react';
+import styled from 'styled-components';
+import { Modal, Select } from 'antd';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { Form, Input, Button } from 'antd';
+import { FormLabel } from '../../../components/FormLabel';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
+import { getALLBranches, inviteUserAPI } from '../../../api/users';
+import { NOTIFICATIONTYPE, IBaseAPIError } from '../../../modal';
+import { IRoles } from '../../../api/roles';
+import { getRbacListAPI } from '../../../api';
+import { CommonModal } from '../../../components';
 
 const { Option } = Select;
 
 const UserInviteModal2: FC = () => {
   const { userInviteModal, setUserInviteModal, notificationCallback } =
     useGlobalContext();
+  const queryCache = useQueryClient();
 
   const [form] = Form.useForm();
 
-  const [mutateInviteUser, respInviteUser] = useMutation(inviteUserAPI);
+  const { mutate: mutateInviteUser, isLoading: invitingUser } =
+    useMutation(inviteUserAPI);
 
   const { data, isLoading: branchesLoading } = useQuery(
     [`all-branches`],
@@ -65,7 +67,7 @@ const UserInviteModal2: FC = () => {
             `User Invited Successfully`
           );
           queryCache.invalidateQueries(
-            `users-list?page=${1}page_size=${20}sort=${"id"}&query=${""}`
+            `users-list?page=${1}page_size=${20}sort=${'id'}&query=${''}`
           );
           form.resetFields();
           setUserInviteModal(false);
@@ -91,7 +93,7 @@ const UserInviteModal2: FC = () => {
   };
 
   const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
+    console.log('Failed:', errorInfo);
   };
 
   return (
@@ -111,7 +113,7 @@ const UserInviteModal2: FC = () => {
             rules={[
               {
                 required: true,
-                message: "Full Name required !",
+                message: 'Full Name required !',
               },
             ]}
           >
@@ -123,7 +125,7 @@ const UserInviteModal2: FC = () => {
             rules={[
               {
                 required: true,
-                message: "Username required !",
+                message: 'Username required !',
               },
             ]}
           >
@@ -135,7 +137,7 @@ const UserInviteModal2: FC = () => {
             rules={[
               {
                 required: true,
-                message: "Email required !",
+                message: 'Email required !',
               },
             ]}
           >
@@ -144,13 +146,13 @@ const UserInviteModal2: FC = () => {
           <FormLabel>Branch</FormLabel>
           <Form.Item
             name="branchId"
-            rules={[{ required: true, message: "Please select any branch" }]}
+            rules={[{ required: true, message: 'Please select any branch' }]}
           >
             <Select
               loading={branchesLoading}
               size="middle"
               showSearch
-              style={{ width: "100%" }}
+              style={{ width: '100%' }}
               placeholder="Select a Branch"
               optionFilterProp="children"
             >
@@ -169,14 +171,14 @@ const UserInviteModal2: FC = () => {
             rules={[
               {
                 required: true,
-                message: "Role required !",
+                message: 'Role required !',
               },
             ]}
           >
             <Select
               size="middle"
               showSearch
-              style={{ width: "100%" }}
+              style={{ width: '100%' }}
               placeholder="Select a Role"
               optionFilterProp="children"
             >
@@ -188,7 +190,7 @@ const UserInviteModal2: FC = () => {
           <FormLabel>Password</FormLabel>
           <Form.Item
             name="password"
-            rules={[{ required: true, message: "Password Required !" }]}
+            rules={[{ required: true, message: 'Password Required !' }]}
           >
             <Input.Password size="middle" />
           </Form.Item>
@@ -203,7 +205,7 @@ const UserInviteModal2: FC = () => {
                 Cancel
               </Button>
               <Button
-                loading={respInviteUser.isLoading}
+                loading={invitingUser}
                 type="primary"
                 size="middle"
                 htmlType="submit"

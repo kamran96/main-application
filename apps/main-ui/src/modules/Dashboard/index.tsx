@@ -1,22 +1,20 @@
-import { Col, Row } from "antd";
-import dayjs from "dayjs";
-import React, { FC, useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import styled from "styled-components";
-import { DailyStalesDashboardAPI } from "../../api/mainDashboard";
-import { CustomDateRange } from "../../components/DateRange";
-import { EmailSider } from "../../components/EmailSider";
+import { Col, Row } from 'antd';
+import dayjs from 'dayjs';
+import { FC, useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
+import styled from 'styled-components';
+import { DailyStalesDashboardAPI } from '../../api/mainDashboard';
+import { CustomDateRange } from '../../components/DateRange';
 
-import { ExpensesOverview } from "../../components/ExpensesOverview";
-import { Heading } from "../../components/Heading";
-import { InvoiceOverview } from "../../components/InvoiceDetailOverview";
-import { InvoicesOverview } from "../../components/InvoicesOverview";
-import { P } from "../../components/Para/P";
-import { ProfitAndLossOverview } from "../../components/ProfitAndLoss";
-import { Sales } from "../../components/SalesOverview";
-import { SalesReportGraph } from "../../components/SalesReportGraph";
-import { SystemMessages } from "../../components/SystemMessages/SystemMessages";
-import { IDashboardSalesOverview } from "../../modal";
+import { ExpensesOverview } from '../../components/ExpensesOverview';
+import { Heading } from '../../components/Heading';
+import { InvoiceOverview } from '../../components/InvoiceDetailOverview';
+import { InvoicesOverview } from '../../components/InvoicesOverview';
+import { ProfitAndLossOverview } from '../../components/ProfitAndLoss';
+import { Sales } from '../../components/SalesOverview';
+import { SalesReportGraph } from '../../components/SalesReportGraph';
+import { SystemMessages } from '../../components/SystemMessages/SystemMessages';
+import { IDashboardSalesOverview } from '../../modal';
 
 export const DashboardContainer: FC<any> = () => {
   const [dailySales, setDailySales] = useState<IDashboardSalesOverview>({
@@ -36,7 +34,7 @@ export const DashboardContainer: FC<any> = () => {
   });
 
   const [apiConfig, setApiConfig] = useState({
-    start: dayjs().subtract(7, "day"),
+    start: dayjs().subtract(7, 'day'),
     end: dayjs(),
   });
 
@@ -93,10 +91,10 @@ export const DashboardContainer: FC<any> = () => {
               lg={{ span: 24 }}
               sm={{ span: 24 }}
               xs={{ span: 24 }}
-              className={"pb-24"}
+              className={'pb-24'}
             >
               <Row gutter={24}>
-                <Col span={24} className={"pb-24"}>
+                <Col span={24} className={'pb-24'}>
                   <SystemMessages />
                 </Col>
                 <Col
@@ -114,7 +112,7 @@ export const DashboardContainer: FC<any> = () => {
                   lg={{ span: 8 }}
                   sm={{ span: 12 }}
                   xs={{ span: 24 }}
-                  className={"pt-24-max-xs"}
+                  className={'pt-24-max-xs'}
                 >
                   <InvoicesOverview data={dailySales} />
                 </Col>
@@ -124,7 +122,7 @@ export const DashboardContainer: FC<any> = () => {
                   lg={{ span: 8 }}
                   sm={{ span: 12 }}
                   xs={{ span: 24 }}
-                  className={"pt-24-max-sm"}
+                  className={'pt-24-max-sm'}
                 >
                   <ExpensesOverview data={dailySales} />
                 </Col>
@@ -134,7 +132,7 @@ export const DashboardContainer: FC<any> = () => {
                   lg={{ span: 24 }}
                   sm={{ span: 12 }}
                   xs={{ span: 24 }}
-                  className={"pt-24"}
+                  className={'pt-24'}
                 >
                   <SalesReportGraph />
                 </Col>
@@ -154,7 +152,7 @@ export const DashboardContainer: FC<any> = () => {
                   lg={{ span: 12 }}
                   xl={{ span: 24 }}
                   xxl={{ span: 24 }}
-                  className={"pb-24"}
+                  className={'pb-24'}
                 >
                   <InvoiceOverview />
                 </Col>
