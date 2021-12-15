@@ -1,26 +1,25 @@
-import deleteIcon from "@iconify/icons-carbon/delete";
-import editSolid from "@iconify/icons-clarity/edit-solid";
-import { Button } from "antd";
-import { ColumnsType } from "antd/lib/table";
-import React, { FC, useEffect, useState } from "react";
-import { queryCache, useMutation, useQuery } from "react-query";
+import deleteIcon from '@iconify/icons-carbon/delete';
+import editSolid from '@iconify/icons-clarity/edit-solid';
+import { Button } from 'antd';
+import { ColumnsType } from 'antd/lib/table';
+import React, { FC, useEffect, useState } from 'react';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 
 import {
   deleteOrganizationAPI,
   getOrganizations,
-} from "../../api/organizations";
-import { ButtonTag } from "../../components/ButtonTags";
-import { ConfirmModal } from "../../components/ConfirmModal";
-import { Heading } from "../../components/Heading";
-import { CommonTable } from "../../components/Table";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { NOTIFICATIONTYPE } from "../../modal";
-import { BranchesContainer } from "./Branches";
-import { AddOrganizationWrapper } from "./styled";
+} from '../../api/organizations';
+import { ButtonTag } from '../../components/ButtonTags';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { Heading } from '../../components/Heading';
+import { CommonTable } from '../../components/Table';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { NOTIFICATIONTYPE } from '../../modal';
+import { BranchesContainer } from './Branches';
+import { AddOrganizationWrapper } from './styled';
 
-interface IProps {}
-
-export const OrganizationsList: FC<IProps> = () => {
+export const OrganizationsList: FC = () => {
+  const queryCache = useQueryClient();
   const { setOrganizationConfig, notificationCallback } = useGlobalContext();
   const [{ result }, setResponse] = useState<any>({
     result: [],
@@ -28,9 +27,8 @@ export const OrganizationsList: FC<IProps> = () => {
   const [confirmModal, setConfirmModal] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
 
-  const [mutateDeleteOrganizations, resDeleteOrganizations] = useMutation(
-    deleteOrganizationAPI
-  );
+  const { mutate: mutateDeleteOrganizations, isLoading: deletingOrganization } =
+    useMutation(deleteOrganizationAPI);
 
   const { isLoading, data } = useQuery([`all-organizations`], getOrganizations);
 
@@ -42,23 +40,23 @@ export const OrganizationsList: FC<IProps> = () => {
 
   const columns: ColumnsType<any> = [
     {
-      title: "#",
-      dataIndex: "",
-      key: "",
+      title: '#',
+      dataIndex: '',
+      key: '',
       width: 50,
       render: (data, row, index) => <>{index + 1}</>,
     },
-    { title: "Name", dataIndex: "name", key: "name" },
-    { title: "Niche", dataIndex: "niche", key: "niche" },
+    { title: 'Name', dataIndex: 'name', key: 'name' },
+    { title: 'Niche', dataIndex: 'niche', key: 'niche' },
     {
-      title: "Financial Ending",
-      dataIndex: "financialEnding",
-      key: "financialEnding",
+      title: 'Financial Ending',
+      dataIndex: 'financialEnding',
+      key: 'financialEnding',
     },
     {
-      title: "Address",
-      dataIndex: "residentialAddress",
-      key: "residentialAddress",
+      title: 'Address',
+      dataIndex: 'residentialAddress',
+      key: 'residentialAddress',
     },
   ];
 
@@ -67,24 +65,22 @@ export const OrganizationsList: FC<IProps> = () => {
   };
 
   const handleDelete = async () => {
-    let payload = {
+    const payload = {
       ids: [...selectedRows],
     };
 
-    try {
-      await mutateDeleteOrganizations(payload, {
-        onSuccess: () => {
-          queryCache.invalidateQueries(`all-organizations`);
-          queryCache.invalidateQueries(`loggedInUser`);
-          notificationCallback(
-            NOTIFICATIONTYPE.SUCCESS,
-            "Organization Deleted"
-          );
-          setConfirmModal(false);
-          setSelectedRows([]);
-        },
-      });
-    } catch (error) {}
+    await mutateDeleteOrganizations(payload, {
+      onSuccess: () => {
+        queryCache.invalidateQueries(`all-organizations`);
+        queryCache.invalidateQueries(`loggedInUser`);
+        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Organization Deleted');
+        setConfirmModal(false);
+        setSelectedRows([]);
+      },
+      onError: (err) => {
+        console.log(err);
+      },
+    });
   };
 
   const renderCustomTopbar = () => {
@@ -99,7 +95,7 @@ export const OrganizationsList: FC<IProps> = () => {
                   disabled={!selectedRows.length || selectedRows.length > 1}
                   title="Edit"
                   icon={editSolid}
-                  size={"middle"}
+                  size={'middle'}
                 />
               )}
               <ButtonTag
@@ -108,7 +104,7 @@ export const OrganizationsList: FC<IProps> = () => {
                 onClick={() => setConfirmModal(true)}
                 title="Delete"
                 icon={deleteIcon}
-                size={"middle"}
+                size={'middle'}
               />
               {/* <MoreActions /> */}
             </div>
@@ -156,7 +152,7 @@ export const OrganizationsList: FC<IProps> = () => {
         }}
       />
       <ConfirmModal
-        loading={resDeleteOrganizations.isLoading}
+        loading={deletingOrganization}
         visible={confirmModal}
         onCancel={() => setConfirmModal(false)}
         onConfirm={handleDelete}

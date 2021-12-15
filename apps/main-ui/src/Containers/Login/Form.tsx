@@ -14,7 +14,7 @@ import { BOLDTEXT } from '../../components/Para/BoldText';
 import { CommonModal } from '../../components/Modal';
 
 export const LoginForm: FC = () => {
-  const [mutateLogin, responseMutateLogin] = useMutation(LoginAPI);
+  const { mutate: mutateLogin, isLoading: logginIn } = useMutation(LoginAPI);
 
   const { notificationCallback, routeHistory, handleLogin }: any =
     useGlobalContext();
@@ -79,7 +79,6 @@ export const LoginForm: FC = () => {
     console.log('Failed:', errorInfo);
   };
   //--------------------------------------------------------
- 
 
   return (
     <LoginFormWrapper>
@@ -158,7 +157,7 @@ export const LoginForm: FC = () => {
                   style={{ width: '100%' }}
                   type="primary"
                   size="middle"
-                  loading={responseMutateLogin.isLoading}
+                  loading={logginIn}
                 >
                   Sign In
                 </Button>
@@ -184,13 +183,10 @@ export const LoginForm: FC = () => {
             </Col>
           </Row>
         </Form>
-        
       </div>
     </LoginFormWrapper>
   );
 };
-
-
 
 export const LoginFormWrapper = styled.div`
   .import-btn {

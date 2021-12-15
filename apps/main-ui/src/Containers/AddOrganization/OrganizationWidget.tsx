@@ -1,6 +1,6 @@
 import { Button, Col, Form, Input, Row, Select } from 'antd';
 import { FC } from 'react';
-import { queryCache, useMutation } from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 import en from 'world_countries_lists/data/en/world.json';
 import { addOrganizationAPI } from '../../api/organizations';
@@ -21,9 +21,11 @@ import phoneCodes from '../../utils/phoneCodes';
 const { Option } = Select;
 
 export const OrganizationWidget: FC = () => {
+  const queryCache = useQueryClient();
   const { handleLogin, routeHistory } = useGlobalContext();
   const { history } = routeHistory;
-  const [mutateOrganization, { isLoading }] = useMutation(addOrganizationAPI);
+  const { mutate: mutateOrganization, isLoading } =
+    useMutation(addOrganizationAPI);
   const [form] = Form.useForm();
   const getFlag = (short: string) => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -53,9 +55,7 @@ export const OrganizationWidget: FC = () => {
         }
         ['loggedInUser', 'all-organizations', 'roles-permissions']?.forEach(
           (key) => {
-            queryCache?.invalidateQueries((q) =>
-              q?.queryKey[0].toString().startsWith(key)
-            );
+            (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
           }
         );
 

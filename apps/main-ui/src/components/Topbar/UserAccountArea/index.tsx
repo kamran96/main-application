@@ -1,37 +1,39 @@
-import React, { FC, useRef, useState } from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
-import { Color, NOTIFICATIONTYPE } from '../../../modal';
-import { Icon } from '@iconify/react';
-import addAlt from '@iconify/icons-carbon/add-alt';
-import settings from '@iconify-icons/feather/settings';
-import arrowDown from '@iconify-icons/fe/arrow-down';
-import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import convertToRem from '../../../utils/convertToRem';
-import { Link } from 'react-router-dom';
-import { ISupportedRoutes } from '../../../modal/routing';
 import { UserOutlined } from '@ant-design/icons';
-import { Avatar, Button, Menu, Popover } from 'antd';
-import { OrganizationMenu } from './OrganizationMenu';
-import Clickoutside from '../../Clickoutside';
-import { getOrganizations } from '../../../api/organizations';
-import { queryCache, useMutation, useQuery } from 'react-query';
-import { IOrganizations, IOrganizationType } from '../../../modal/organization';
-import { H2, H3, P } from '../../Typography';
-import { activeBranchAPI, updateThemeAPI } from '../../../api';
+import arrowDown from '@iconify-icons/fe/arrow-down';
 import checkIcon from '@iconify-icons/fe/check';
+import LogOutIcon from '@iconify-icons/feather/log-out';
+import settings from '@iconify-icons/feather/settings';
+import { Icon } from '@iconify/react';
+import { Avatar, Button, Popover, Switch } from 'antd';
+import { FC, useRef, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { Link } from 'react-router-dom';
+import styled, { createGlobalStyle } from 'styled-components';
+
+import { activeBranchAPI, updateThemeAPI } from '../../../api';
+import { getOrganizations } from '../../../api/organizations';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { ILoginActions } from '../../../hooks/globalContext/globalManager';
+import { IThemeProps } from '../../../hooks/useTheme/themeColors';
+import { Color, NOTIFICATIONTYPE } from '../../../modal';
+import { IOrganizations, IOrganizationType } from '../../../modal/organization';
+import { ISupportedRoutes } from '../../../modal/routing';
+import convertToRem from '../../../utils/convertToRem';
+import Clickoutside from '../../Clickoutside';
+import { BOLDTEXT } from '../../Para/BoldText';
 import { Rbac } from '../../Rbac';
 import { PERMISSIONS } from '../../Rbac/permissions';
-import { Switch } from 'antd';
-import { IThemeProps } from '../../../hooks/useTheme/themeColors';
-import { ILoginActions } from '../../../hooks/globalContext/globalManager';
-import { Seprator } from '../../Seprator';
-import LogOutIcon from '@iconify-icons/feather/log-out';
-import { BOLDTEXT } from '../../Para/BoldText';
+import { P } from '../../Typography';
 
 export const UserAccountArea: FC = () => {
-  const [mutateActiveBranch] = useMutation(activeBranchAPI);
+  const queryCache = useQueryClient();
+  const { mutate: mutateActiveBranch } = useMutation(activeBranchAPI);
   const { notificationCallback, isOnline } = useGlobalContext();
-  const [muateTheme, resMutateTheme] = useMutation(updateThemeAPI);
+  const {
+    mutate: muateTheme,
+    isLoading: themeChanging,
+    data: themeChangeResponse,
+  } = useMutation(updateThemeAPI);
   const [branchMenu, setBranchMenu] = useState(false);
   const {
     userDetails,
@@ -69,7 +71,7 @@ export const UserAccountArea: FC = () => {
     return filtered;
   };
 
-  const getActiveBranch = (id: Number | string) => {
+  const getActiveBranch = (id: number | string) => {
     const activeOrgBranches = getActiveOrganization(organizationId)?.branches;
     if (activeOrgBranches?.length > 0) {
       const [filtered] = activeOrgBranches.filter((item) => item.id === id);
@@ -84,24 +86,25 @@ export const UserAccountArea: FC = () => {
     organizationId: number
   ) => {
     const UserId: number = userDetails.id;
-    let payload: any = {
+    const payload: any = {
       branchId,
       organizationId,
       UserId,
     };
 
-    try {
-      await mutateActiveBranch(payload, {
-        onSuccess: () => {
-          notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Branch Updated');
-          queryCache.clear();
+    await mutateActiveBranch(payload, {
+      onSuccess: () => {
+        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Branch Updated');
+        queryCache.clear();
 
-          setTimeout(() => {
-            window.location.reload();
-          }, 500);
-        },
-      });
-    } catch (error) {}
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      },
+      onError: (err) => {
+        console.log(err);
+      },
+    });
   };
 
   const handleThemeSwitch = async (theme) => {
@@ -131,8 +134,7 @@ export const UserAccountArea: FC = () => {
             to={`/app${ISupportedRoutes.SETTINGS}${ISupportedRoutes.PROFILE_SETTING}`}
           >
             Edit Profile
-            </Link>
-          
+          </Link>
         </div>
       </div>
       <hr />

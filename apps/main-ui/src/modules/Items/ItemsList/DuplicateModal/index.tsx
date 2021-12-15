@@ -1,17 +1,17 @@
-import copyIcon from "@iconify-icons/feather/copy";
-import { Button, Col, Form, Progress, Row, Select } from "antd";
-import React, { FC, useEffect, useState } from "react";
-import { useMutation, useQuery } from "react-query";
-import styled from "styled-components";
-import { duplicateItemsAPI } from "../../../../api";
-import { getOrganizations } from "../../../../api/organizations";
-import { CommonModal } from "../../../../components";
-import { ButtonTag } from "../../../../components/ButtonTags";
-import { FormLabel } from "../../../../components/FormLabel";
-import { BoldText } from "../../../../components/Para/BoldText";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
-import { Color } from "../../../../modal";
-import { IOrganizations } from "../../../../modal/organization";
+import copyIcon from '@iconify-icons/feather/copy';
+import { Button, Col, Form, Progress, Row, Select } from 'antd';
+import React, { FC, useEffect, useState } from 'react';
+import { useMutation, useQuery } from 'react-query';
+import styled from 'styled-components';
+import { duplicateItemsAPI } from '../../../../api';
+import { getOrganizations } from '../../../../api/organizations';
+import { CommonModal } from '../../../../components';
+import { ButtonTag } from '../../../../components/ButtonTags';
+import { FormLabel } from '../../../../components/FormLabel';
+import { BoldText } from '../../../../components/Para/BoldText';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { Color } from '../../../../modal';
+import { IOrganizations } from '../../../../modal/organization';
 
 const { Option } = Select;
 
@@ -41,10 +41,13 @@ export const DuplicateModal: FC<IProps> = ({ disabled = false, itemsData }) => {
     }
   }, [itemsData, visibleModal]);
 
-  const [
-    mutateCopy,
-    { isError, isLoading, data: responseData, status },
-  ] = useMutation(duplicateItemsAPI);
+  const {
+    mutate: mutateCopy,
+    isError,
+    isLoading,
+    data: responseData,
+    status,
+  } = useMutation(duplicateItemsAPI);
 
   const [form] = Form.useForm();
 
@@ -65,10 +68,10 @@ export const DuplicateModal: FC<IProps> = ({ disabled = false, itemsData }) => {
   };
 
   const onFinish = async (values) => {
-    let progressCount = 100 / itemsData.length;
+    const progressCount = 100 / itemsData.length;
     let progressLoading = 0;
 
-    let mutatedItems = [...duplicateItemsState];
+    const mutatedItems = [...duplicateItemsState];
 
     const callback = async () => {
       for (let index = 0; index < itemsData.length; index++) {
@@ -79,33 +82,34 @@ export const DuplicateModal: FC<IProps> = ({ disabled = false, itemsData }) => {
           },
         };
 
-        let response = await mutateCopy(payload, {
-          onSuccess: () => {
+        await mutateCopy(payload, {
+          onSuccess: (response) => {
             if (index === 0) {
               setProgress(progressCount);
             } else if (index === itemsData.length - 1) {
               setProgress(100);
             } else {
-              let prg = progress + progressCount;
+              const prg = progress + progressCount;
               setProgress(prg);
+            }
+
+            if (response) {
+              mutatedItems[index] = {
+                ...mutatedItems[index],
+                responseStatus: 'Complete',
+              };
+            } else {
+              mutatedItems[index] = {
+                ...mutatedItems[index],
+                responseStatus: 'Already Exist',
+              };
             }
           },
           onError: () => {
-            let prg = progress + progressCount;
+            const prg = progress + progressCount;
             setProgress(prg);
           },
         });
-        if (response) {
-          mutatedItems[index] = {
-            ...mutatedItems[index],
-            responseStatus: "Complete",
-          };
-        } else {
-          mutatedItems[index] = {
-            ...mutatedItems[index],
-            responseStatus: "Already Exist",
-          };
-        }
 
         if (index === 0) {
           progressLoading = progressCount;
@@ -143,7 +147,7 @@ export const DuplicateModal: FC<IProps> = ({ disabled = false, itemsData }) => {
         visible={visibleModal}
         width={700}
         footer={false}
-        title={"Duplicate Items"}
+        title={'Duplicate Items'}
         onCancel={() => setVisibleModal(false)}
       >
         <MainWrapper>
@@ -170,7 +174,7 @@ export const DuplicateModal: FC<IProps> = ({ disabled = false, itemsData }) => {
                 <Form.Item
                   name="to"
                   rules={[
-                    { required: true, message: "Please add target branch" },
+                    { required: true, message: 'Please add target branch' },
                   ]}
                 >
                   <Select size="middle">
@@ -187,7 +191,7 @@ export const DuplicateModal: FC<IProps> = ({ disabled = false, itemsData }) => {
                 </Form.Item>
               </Col>
               <Col span={24} className="pb-20">
-                <table className="duplicate-list" width={"100%"}>
+                <table className="duplicate-list" width={'100%'}>
                   <thead>
                     <tr>
                       <th></th>
@@ -212,15 +216,15 @@ export const DuplicateModal: FC<IProps> = ({ disabled = false, itemsData }) => {
                           <td
                             className={
                               item?.responseStatus
-                                ? item?.responseStatus === "Complete"
-                                  ? "isCompleted"
-                                  : "iserror"
-                                : "isReady"
+                                ? item?.responseStatus === 'Complete'
+                                  ? 'isCompleted'
+                                  : 'iserror'
+                                : 'isReady'
                             }
                           >
                             {item?.responseStatus
                               ? item.responseStatus
-                              : "Ready"}
+                              : 'Ready'}
                           </td>
                         </tr>
                       );
