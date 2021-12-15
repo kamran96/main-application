@@ -27,8 +27,8 @@ export const verifyAccountAPI = (payload: any) =>
 export const resendVerificationCodeAPI = (payload: any) =>
   http?.post(`users/auth/resend-otp`, payload);
 
-export const CheckAuthAPI = (key?: string) => http.get(`users/auth/check`);
-export const CheckAuthAPIDev = (key?: string, id?: number) =>
+export const CheckAuthAPI = (key?: any) => http.get(`users/auth/check`);
+export const CheckAuthAPIDev = (key?: any, id?: number) =>
   http?.get(`users/user/${id}`);
 
-export const LogoutAPI = (key?: string) => http.post(`users/auth/logout`);
+export const LogoutAPI = (key?: any) => http.post(`users/auth/logout`);

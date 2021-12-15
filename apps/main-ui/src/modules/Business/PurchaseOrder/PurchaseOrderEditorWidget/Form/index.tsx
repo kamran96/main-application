@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable array-callback-return */
 import { EditableTable } from '@invyce/editable-table';
-import { Button, Checkbox, Col, Form, Input, Row, Select, Card } from 'antd';
+import { Button, Card, Checkbox, Col, Form, Input, Row, Select } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import dayjs from 'dayjs';
 import { FC, useEffect, useRef, useState } from 'react';
-import { queryCache, useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
 
 import { getAllContacts } from '../../../../../api';
@@ -15,7 +15,6 @@ import { DatePicker } from '../../../../../components/DatePicker';
 import { FormLabel } from '../../../../../components/FormLabel';
 import { PrintFormat } from '../../../../../components/PrintFormat';
 import { PrintViewPurchaseWidget } from '../../../../../components/PurchasesWidget/PrintViewPurchaseWidget';
-import { TableCard } from '../../../../../components/TableCard';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import {
   IContactType,
@@ -36,12 +35,17 @@ interface IProps {
 }
 
 const Editor: FC<IProps> = ({ id }) => {
+  const queryCache = useQueryClient();
   /* LOCAL STATE */
   const [printModal, setPrintModal] = useState(false);
   const [status, setStatus] = useState(1);
 
   /* ******** API CALL STAKE ************ */
-  const [mutatePO, resPO] = useMutation(CreatePurchaseOrderAPI);
+  const {
+    mutate: mutatePO,
+    isLoading: creatingPurchaseOrder,
+    data: responseCreatedPO,
+  } = useMutation(CreatePurchaseOrderAPI);
   const [contactList, setContactList] = useState<IContactType[]>([]);
 
   /*Query hook for  Fetching all accounts against ID */
@@ -157,9 +161,6 @@ const Editor: FC<IProps> = ({ id }) => {
       };
     }
 
-    console.log(payload);
-
-    return false;
     try {
       await mutatePO(payload, {
         onSuccess: () => {
@@ -190,9 +191,7 @@ const Editor: FC<IProps> = ({ id }) => {
             'ledger-contact',
             'all-items',
           ].forEach((key) => {
-            queryCache.invalidateQueries((q) =>
-              q.queryKey[0].toString().startsWith(key)
-            );
+            (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           });
           if (value?.status?.type === 2) {
             setPrintModal(true);
@@ -219,13 +218,7 @@ const Editor: FC<IProps> = ({ id }) => {
             heading={'Purchase Order'}
             type={'PO'}
             hideCalculation={true}
-            data={
-              (resPO &&
-                resPO.data &&
-                resPO.data.data &&
-                resPO.data.data.result) ||
-              {}
-            }
+            data={responseCreatedPO?.data?.result || {}}
           />
         </PrintFormat>
       </div>
@@ -388,7 +381,7 @@ const Editor: FC<IProps> = ({ id }) => {
                       });
                       setStatus(2);
                     }}
-                    loading={resPO.isLoading && status === 2}
+                    loading={creatingPurchaseOrder && status === 2}
                     type="default"
                     size="middle"
                     className="mr-10"
@@ -406,7 +399,7 @@ const Editor: FC<IProps> = ({ id }) => {
                       });
                       setStatus(2);
                     }}
-                    loading={resPO.isLoading && status === 2}
+                    loading={creatingPurchaseOrder && status === 2}
                     type="primary"
                     size="middle"
                     className="mr-10"

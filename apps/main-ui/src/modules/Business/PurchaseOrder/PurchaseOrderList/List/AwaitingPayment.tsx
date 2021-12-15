@@ -1,18 +1,18 @@
-import React, { FC, useEffect, useState } from "react";
-import Button from "antd/es/button";
-import { usePaginatedQuery } from "react-query";
-import styled from "styled-components";
-import { getInvoiceListAPI } from "../../../../../api";
-import { Action } from "../../../../../components/Common";
-import { CommonTable } from "../../../../../components/Table";
+import React, { FC, useEffect, useState } from 'react';
+import Button from 'antd/es/button';
+import { useQuery } from 'react-query';
+import styled from 'styled-components';
+import { getInvoiceListAPI } from '../../../../../api';
+import { Action } from '../../../../../components/Common';
+import { CommonTable } from '../../../../../components/Table';
 import {
   IInvoiceResponse,
   INVOICETYPE,
   ORDER_TYPE,
-} from "../../../../../modal/invoice";
-import convertToRem from "../../../../../utils/convertToRem";
-import { Link } from "react-router-dom";
-import { _csvColumns } from "./CommonCol";
+} from '../../../../../modal/invoice';
+import convertToRem from '../../../../../utils/convertToRem';
+import { Link } from 'react-router-dom';
+import { _csvColumns } from './CommonCol';
 
 interface IProps {
   columns?: any[];
@@ -20,24 +20,26 @@ interface IProps {
 export const AwaitingPayment: FC<IProps> = ({ columns }) => {
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
-    query: "",
-    sortid: "",
+    query: '',
+    sortid: '',
     pageSize: 10,
   });
 
   const [selectedRow, setSelectedRow] = useState([]);
 
-  const [
-    { result, pagination },
-    setAllInvoicesRes,
-  ] = useState<IInvoiceResponse>({
-    result: [],
-    pagination: null,
-  });
+  const [{ result, pagination }, setAllInvoicesRes] =
+    useState<IInvoiceResponse>({
+      result: [],
+      pagination: null,
+    });
 
   const { page, query, sortid, pageSize } = allInvoicesConfig;
 
-  const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
+  const {
+    isLoading,
+    data: resolvedData,
+    isFetching,
+  } = useQuery(
     [
       `awaitingPayment_purchaseOrders?page=${page}&query=${query}&sort=${sortid}&page_size=${pageSize}`,
       ORDER_TYPE.PURCAHSE_ORDER,
@@ -46,7 +48,10 @@ export const AwaitingPayment: FC<IProps> = ({ columns }) => {
       pageSize,
       sortid,
     ],
-    getInvoiceListAPI
+    getInvoiceListAPI,
+    {
+      keepPreviousData: true,
+    }
   );
 
   const onSelectedRow = (item) => {
@@ -83,7 +88,7 @@ export const AwaitingPayment: FC<IProps> = ({ columns }) => {
             {selectedRow && selectedRow.length > 0 && selectedRow.length < 2 && (
               <Link to={`create-bill?bill-type=purchase&po=${selectedRow[0]}`}>
                 <Button type="primary" size="middle">
-                  Create Purchase Bill{" "}
+                  Create Purchase Bill{' '}
                 </Button>
               </Link>
             )}
@@ -99,7 +104,7 @@ export const AwaitingPayment: FC<IProps> = ({ columns }) => {
         exportable
         exportableProps={{
           fields: _csvColumns,
-          fileName: "payment-awaiting-POs",
+          fileName: 'payment-awaiting-POs',
         }}
         customTopbar={renderTopbar()}
         data={result}
@@ -119,7 +124,7 @@ export const AwaitingPayment: FC<IProps> = ({ columns }) => {
               page: pagination.current,
               pageSize: pagination.pageSize,
               sortid:
-                sorter && sorter.order === "descend"
+                sorter && sorter.order === 'descend'
                   ? `-${sorter.field}`
                   : sorter.field,
             });
@@ -128,9 +133,9 @@ export const AwaitingPayment: FC<IProps> = ({ columns }) => {
         totalItems={pagination && pagination.total}
         pagination={{
           showSizeChanger: true,
-          pageSizeOptions: ["10", "20", "50", "100", "150"],
+          pageSizeOptions: ['10', '20', '50', '100', '150'],
           pageSize: pageSize,
-          position: ["bottomRight"],
+          position: ['bottomRight'],
           current: page,
           total: pagination && pagination.total,
         }}
