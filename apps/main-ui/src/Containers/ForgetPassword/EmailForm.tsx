@@ -1,20 +1,22 @@
-import { Button, Col, Form, Input, Row } from "antd";
-import React from "react";
-import { FC } from "react";
-import styled from "styled-components";
-import InvyceLog from "../../assets/invyceLogo.png";
-import LoginIllustration from "../../assets/forgot.png";
-import { HeadingTemplate1 } from "../../components/HeadingTemplates";
-import convertToRem from "../../utils/convertToRem";
-import { useMutation } from "react-query";
-import { requestResetPasswordAPI } from "../../api";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { NOTIFICATIONTYPE } from "../../modal";
+import { Button, Col, Form, Input, Row } from 'antd';
+import React from 'react';
+import { FC } from 'react';
+import styled from 'styled-components';
+import InvyceLog from '../../assets/invyceLogo.png';
+import LoginIllustration from '../../assets/forgot.png';
+import { HeadingTemplate1 } from '../../components/HeadingTemplates';
+import convertToRem from '../../utils/convertToRem';
+import { useMutation } from 'react-query';
+import { requestResetPasswordAPI } from '../../api';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { NOTIFICATIONTYPE } from '../../modal';
 
 export const EmailForm: FC = () => {
-  const [mutateRequestResetPassword, resResetRequest] = useMutation(
-    requestResetPasswordAPI
-  );
+  const {
+    mutate: mutateRequestResetPassword,
+    isSuccess,
+    isLoading,
+  } = useMutation(requestResetPasswordAPI);
   const { notificationCallback } = useGlobalContext();
 
   const onFinish = async (payload) => {
@@ -32,7 +34,7 @@ export const EmailForm: FC = () => {
     <WrapperEmailForm>
       <div className="illustration">
         <div className="invyce_logo">
-          <img src={InvyceLog} alt={"invyce logo"} />
+          <img src={InvyceLog} alt={'invyce logo'} />
         </div>
         <h2 className="slogan">
           Forgot Your Password
@@ -64,20 +66,18 @@ export const EmailForm: FC = () => {
                   label="Email / Username"
                   name="username"
                   rules={[
-                    { required: true, message: "Please enter your email" },
-                    { type: "email" },
+                    { required: true, message: 'Please enter your email' },
+                    { type: 'email' },
                   ]}
                   hasFeedback
                 >
                   <Input size="middle" />
                 </Form.Item>
-                <Form.Item
-                  hasFeedback={resResetRequest?.isSuccess ? true : false}
-                >
+                <Form.Item hasFeedback={isSuccess ? true : false}>
                   <Button
-                    loading={resResetRequest?.isLoading}
+                    loading={isLoading}
                     className="mt-10"
-                    style={{ width: "100%" }}
+                    style={{ width: '100%' }}
                     size="middle"
                     type="primary"
                     htmlType="submit"

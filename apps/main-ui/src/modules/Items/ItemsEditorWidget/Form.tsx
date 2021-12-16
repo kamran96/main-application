@@ -96,7 +96,7 @@ export const ItemsForm: FC = () => {
 
   /*Query hook for  Fetching single contact against ID */
   const { data } = useQuery([`item-id=${id}`, id], fetchSingleItem, {
-    enabled: id && id !== null,
+    enabled: !!id,
     onSuccess: (data) => {
       if (data?.data?.result) {
         const { result } = data.data;

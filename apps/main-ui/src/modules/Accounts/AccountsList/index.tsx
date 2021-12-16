@@ -4,7 +4,6 @@ import editSolid from '@iconify/icons-clarity/edit-solid';
 import { ColumnsType } from 'antd/es/table';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
-import { usePaginatedQuery } from '../../../hooks/usePaginatedQuery';
 import { Link } from 'react-router-dom';
 import {
   deleteAccountsAPI,
@@ -88,7 +87,11 @@ export const AccountsList: FC<IProps> = ({ data }) => {
 
   const { setAccountsModalConfig } = useGlobalContext();
 
-  const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
+  const {
+    isLoading,
+    data: resolvedData,
+    isFetching,
+  } = useQuery(
     [
       `accounts?page=${page}&query=${query}sort=${sortid}`,
       page,
@@ -96,7 +99,10 @@ export const AccountsList: FC<IProps> = ({ data }) => {
       page_size,
       query,
     ],
-    getAllAccountsAPI
+    getAllAccountsAPI,
+    {
+      keepPreviousData: true,
+    }
   );
 
   /*Query hook for  Fetching secondary accounts if already fetched it will pick account from cache */

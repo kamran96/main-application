@@ -12,56 +12,56 @@ import GlobalStyle from './globalStyles';
 
 export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
   /* Dynamic Imports */
-  const UserInviteModal = lazy(
-    () => import('../modules/Users/UserInviteModal')
-  );
+  // const UserInviteModal = lazy(
+  //   () => import('../modules/Users/UserInviteModal')
+  // );
   const ItemsEditorWidget = lazy(
     () => import('../modules/Items/ItemsEditorWidget')
-  );
-  const PricingEditorWidget = lazy(
-    () => import('../modules/Items/PricingEditorWidget')
   );
   const CategoryEditorWidget = lazy(
     () => import('../modules/Categories/CategoryEditorWidget')
   );
-  const PaymentsEditorWidget = lazy(
-    () => import('../modules/Payment/PaymentsEditorWidget')
-  );
-  const BranchEditorWidget = lazy(
-    () => import('../modules/Branch/BranchEditorWidget')
-  );
   const AttributeEditorWidget = lazy(
     () => import('../modules/Categories/AttributeEditorWidget')
   );
-  const AddBankWidget = lazy(
-    () => import('../modules/Business/BankAccounts/AddBank')
-  );
-  const AddOrganizationForm = lazy(
-    () => import('../Containers/AddOrganization/AddOrganizationForm')
-  );
-  const RolesEditorWidget = lazy(
-    () => import('../modules/Rbac/RolesEditorWidget/index')
-  );
-  const PermissionsEditorWidget = lazy(
-    () => import('../modules/Rbac/PermissionsEditorWidget/index')
+  const PricingEditorWidget = lazy(
+    () => import('../modules/Items/PricingEditorWidget')
   );
   const AddAccount = lazy(() => import('../modules/Accounts/AddAccount'));
-  const EnableDispatchModal = lazy(
-    () => import('../modules/Dispatching/DispatchingWall/EnableDispatch')
-  );
-  const ReviewModal = lazy(
-    () => import('../modules/Dispatching/DispatchingWall/ReviewModal')
-  );
+  // const PaymentsEditorWidget = lazy(
+  //   () => import('../modules/Payment/PaymentsEditorWidget')
+  // );
+  // const BranchEditorWidget = lazy(
+  //   () => import('../modules/Branch/BranchEditorWidget')
+  // );
+  // const AddBankWidget = lazy(
+  //   () => import('../modules/Business/BankAccounts/AddBank')
+  // );
+  // const AddOrganizationForm = lazy(
+  //   () => import('../Containers/AddOrganization/AddOrganizationForm')
+  // );
+  // const RolesEditorWidget = lazy(
+  //   () => import('../modules/Rbac/RolesEditorWidget/index')
+  // );
+  // const PermissionsEditorWidget = lazy(
+  //   () => import('../modules/Rbac/PermissionsEditorWidget/index')
+  // );
+  // const EnableDispatchModal = lazy(
+  //   () => import('../modules/Dispatching/DispatchingWall/EnableDispatch')
+  // );
+  // const ReviewModal = lazy(
+  //   () => import('../modules/Dispatching/DispatchingWall/ReviewModal')
+  // );
 
-  const VerifyAccountModal = lazy(
-    () => import('../components/VerificationModal')
-  );
+  // const VerifyAccountModal = lazy(
+  //   () => import('../components/VerificationModal')
+  // );
 
-  const Paywall = lazy(() => import('../modules/Paywall'));
+  // const Paywall = lazy(() => import('../modules/Paywall'));
 
-  const ContactsImportWidget = lazy(
-    () => import('../modules/Contacts/ContactsImport/ContactImportWidget')
-  );
+  // const ContactsImportWidget = lazy(
+  //   () => import('../modules/Contacts/ContactsImport/ContactImportWidget')
+  // );
 
   const { isUserLogin, userDetails, routeHistory, theme, itemsModalConfig } =
     useGlobalContext();
@@ -92,23 +92,30 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
       <DashboardWrapper>
         <GlobalStyle />
         <AppLayout>{checkLayout(renderRoutes(props.route.routes))}</AppLayout>
-        {/* <UserInviteModal2 /> */}
         <Suspense fallback={<div></div>}>
-          <UserInviteModal />
+          <ItemsEditorWidget />
         </Suspense>
-        <Suspense fallback={<></>}>
-          <ItemsEditorWidget visibility={itemsModalConfig?.visibility} />
+        <Suspense fallback={<div></div>}>
+          <CategoryEditorWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <AttributeEditorWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <PricingEditorWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <AddAccount />
+        </Suspense>
+        {/* <UserInviteModal2 /> */}
+        {/* <Suspense fallback={<div></div>}>
+          <UserInviteModal />
         </Suspense>
         <GeneralPreferencesWidget />
         <Suspense fallback={<></>}>
-          <AddAccount />
-        </Suspense>
-        <Suspense fallback={<></>}>
           <AddOrganizationForm />
         </Suspense>
-        <Suspense fallback={<></>}>
-          <PricingEditorWidget />
-        </Suspense>
+        
         <Suspense fallback={<></>}>
           <AddBankWidget />
         </Suspense>
@@ -118,12 +125,8 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
         <Suspense fallback={<></>}>
           <PaymentsEditorWidget />
         </Suspense>
-        <Suspense fallback={<></>}>
-          <CategoryEditorWidget />
-        </Suspense>
-        <Suspense fallback={<></>}>
-          <AttributeEditorWidget />
-        </Suspense>
+        
+       
         <Suspense fallback={<></>}>
           <EnableDispatchModal />
         </Suspense>
@@ -144,7 +147,7 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
         </Suspense>
         <Suspense fallback={<></>}>
           <ContactsImportWidget />
-        </Suspense>
+        </Suspense> */}
       </DashboardWrapper>
     </ThemeProvider>
   );

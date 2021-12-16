@@ -90,7 +90,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
 
   /*Query hook for  Fetching single contact against ID */
   const { data } = useQuery([`contact-${id}`, id], viewSingleContact, {
-    enabled: id,
+    enabled: !!id,
     onSuccess: () => {
       /* when successfully created OR updated toast will be apear */
       /* three type of parameters are passed

@@ -1,3 +1,4 @@
+import { QueryKey } from '../modal';
 import http from '../utils/http';
 
 enum ContactServiceAPI {
@@ -5,14 +6,13 @@ enum ContactServiceAPI {
   index = 'contacts/contact',
 }
 
-export const getContacts = (
-  key?: any,
-  type?: number,
-  page?: number,
-  sortid?: string,
-  page_size?: number,
-  query?: string
-) => {
+export const getContacts = ({ queryKey }: QueryKey) => {
+  const type = queryKey[1];
+  const page = queryKey[2];
+  const sortid = queryKey[3];
+  const page_size = queryKey[4];
+  const query = queryKey[5];
+
   let url = `${ContactServiceAPI.default}?page_size=${page_size}&page_no=${page}&sort=${sortid}&type=${type}`;
   if (query) {
     url = `${url}&query=${query}`;
@@ -21,8 +21,10 @@ export const getContacts = (
   return http.get(url);
 };
 
-export const viewSingleContact = (key?: any, id?: number) =>
-  http.get(`${ContactServiceAPI.default}/${id}`);
+export const viewSingleContact = ({ queryKey }: QueryKey) => {
+  const id = queryKey[1];
+  return http.get(`${ContactServiceAPI.default}/${id}`);
+};
 
 export const deleteContacts = (payload) =>
   http.put(`${ContactServiceAPI.default}`, payload);
@@ -32,17 +34,17 @@ export const create_update_contact = (payload) => {
   return http.post(url, payload);
 };
 
-export const getAllContacts = (key?: any, purpose?: string) =>
-  http.get(`${ContactServiceAPI.default}?purpose=${purpose}`);
+export const getAllContacts = ({ queryKey }: QueryKey) => {
+  const purpose: string = queryKey[1];
+  return http.get(`${ContactServiceAPI.default}?purpose=${purpose}`);
+};
 
-export const getContactLedger = (
-  key?: any,
-  id?: number,
-  type?: number,
-  query?: string,
-  page_size?: number,
-  page_no?: number
-) => {
+export const getContactLedger = ({ queryKey }: QueryKey) => {
+  const id: number = queryKey[1];
+  const type: number = queryKey[2];
+  const query: string = queryKey[3];
+  const page_size: number = queryKey[4];
+  const page_no: number = queryKey[5];
   let url = `/contacts/ledger/${id}?type=${type}&page_size=${page_size}&page_no=${page_no}`;
   if (query) {
     url = `${url}&query=${query}`;

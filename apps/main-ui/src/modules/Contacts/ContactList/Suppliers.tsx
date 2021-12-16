@@ -107,24 +107,21 @@ export const Suppliers: FC = () => {
   /* usePagination hook React Query */
   /* this hook fetches contact list against page number and also sorts request data against sort id */
   /* eg. sortid = name (assending) -name (descending) */
+  const params: any = [
+    `contacts-list-suppliers?page_no=${page}&sort=${sortid}&page_size=${page_size}&type=${IContactTypes.SUPPLIER}&query=${query}`,
+    IContactTypes.SUPPLIER,
+    page,
+    sortid,
+    page_size,
+    query,
+  ];
   const {
     isLoading,
     data: resolvedData,
     isFetching,
-  } = useQuery(
-    [
-      `contacts-list-suppliers?page_no=${page}&sort=${sortid}&page_size=${page_size}&type=${IContactTypes.SUPPLIER}&query=${query}`,
-      IContactTypes.SUPPLIER,
-      page,
-      sortid,
-      page_size,
-      query,
-    ],
-    getContacts,
-    {
-      keepPreviousData: true,
-    }
-  );
+  } = useQuery(params, getContacts, {
+    keepPreviousData: true,
+  });
 
   /* ComponentDidUpdate hook for updaing contactResponse state when successfully API fetches contact list data */
   useEffect(() => {

@@ -129,7 +129,10 @@ export const ItemsList: FC = () => {
   } = useQuery(
     [
       `items?page=${page}&query=${query}&sortId=${sortid}&page_size=${pageSize}`,
-      { page, sortid, query, pageSize },
+      page,
+      sortid,
+      query,
+      pageSize,
     ],
     getItemsList,
     {

@@ -8,6 +8,7 @@ import { QueryClientProvider, QueryClient } from 'react-query';
 import AppContainer from '../Containers/App/AppContainer';
 import { GlobalManager } from '../hooks/globalContext/globalManager';
 import { GlobalStylesWrapper } from './globalStyles';
+import { ReactQueryDevtools } from 'react-query/devtools';
 
 /* Ant design css */
 // import "antd/dist/antd.css";
@@ -18,16 +19,24 @@ import { GlobalStylesWrapper } from './globalStyles';
 //   },
 // };
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      cacheTime: 1000 * 10 * 60, // 10 min,
+      staleTime: 1000 * 2 * 60, // 2 min,
+    },
+  },
+});
 
 const App: FC = () => {
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider contextSharing={true} client={queryClient}>
       <GlobalStylesWrapper>
         <GlobalManager>
           <AppContainer />
         </GlobalManager>
       </GlobalStylesWrapper>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 };
