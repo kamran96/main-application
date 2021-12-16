@@ -44,12 +44,10 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
         await this.authService.AccessControll(newData as IRequest);
 
       if (user?.statusCode === HttpStatus.OK) {
-        console.log(user.user, ' user data');
         return user?.user;
       }
 
       if (user?.statusCode === HttpStatus.FORBIDDEN) {
-        console.log('error');
         throw new HttpException(user?.message, user?.statusCode);
       }
     } catch (error) {

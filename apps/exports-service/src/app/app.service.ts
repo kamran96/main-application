@@ -39,7 +39,7 @@ export class AppService {
 
       fs.writeFileSync('./build.pdf', pdf);
 
-      let invoice_arr = [];
+      const invoice_arr = [];
       if (data?.id) {
         let token;
         if (process.env.NODE_ENV === 'development') {
@@ -50,7 +50,7 @@ export class AppService {
           token = req.cookies['access_token'];
         }
 
-        const type =
+        const tokenType =
           process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
         const value =
           process.env.NODE_ENV === 'development'
@@ -60,11 +60,11 @@ export class AppService {
         if (data?.type === 'SI') {
           const invoiceId = data?.id;
 
-          const request: any = {
+          const request: unknown = {
             url: `http://localhost/invoices/invoice/${invoiceId}`,
             method: 'GET',
             headers: {
-              [type]: value,
+              [tokenType]: value,
             },
           };
 
@@ -73,7 +73,7 @@ export class AppService {
         }
       }
 
-      let invoice = { ...invoice_arr[0].result };
+      const invoice = { ...invoice_arr[0].result };
       delete invoice.invoiceItems;
       delete invoice.contact;
 
@@ -88,15 +88,13 @@ export class AppService {
         TemplateModel: {
           ...invoice,
           contactName: invoice_arr[0].result.contact.name,
-          invoice_details: invoice_arr[0].result.invoiceItems?.map(
-            (item, index) => {
-              return {
-                ...item,
-                itemName: item?.item?.name,
-                price: item?.unitPrice,
-              };
-            }
-          ),
+          invoice_details: invoice_arr[0].result.invoiceItems?.map((item) => {
+            return {
+              ...item,
+              itemName: item?.item?.name,
+              price: item?.unitPrice,
+            };
+          }),
         },
       };
 

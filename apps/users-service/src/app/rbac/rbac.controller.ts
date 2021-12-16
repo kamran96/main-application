@@ -66,7 +66,6 @@ export class RbacController {
   @Get('/role')
   @UseGuards(GlobalAuthGuard)
   async getRoles(@Req() req: IRequest): Promise<IRoleWithResponse> {
-    console.log(req.user, 'role with user');
     const roles = await this.rbacService.GetRoles(req.user);
 
     if (roles) {
