@@ -28,7 +28,7 @@ import {
   getInvoiceByIDAPI,
 } from '../../../../api';
 import { getAccountsByTypeAPI } from '../../../../api/accounts';
-import CommonSelect, { Option } from '../../../../components/CommonSelect';
+import { Option } from '../../../../components/CommonSelect';
 import { Editable, EditableSelect } from '../../../../components/Editable';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { useShortcut } from '../../../../hooks/useShortcut';
@@ -56,6 +56,7 @@ import defaultItems, {
   Requires,
 } from './defaultStates';
 import c from './keys';
+import { usePrevious } from '../../../../hooks/usePrevious';
 
 export const PurchaseContext: any = createContext({});
 export const usePurchaseWidget: any = () => useContext(PurchaseContext);
@@ -111,9 +112,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     dueDate: dayjs(),
     paymentType: null,
   });
-  const [accountRowSelectedIndex, setAccountRowSelectedIndex] = useState(null);
-
-  console.log(invoiceItems, 'invoice items');
 
   /* Antd antd form */
   /* And Form Hook */
@@ -124,38 +122,63 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     '',
     'localStorage'
   ).get();
+
   const antFormCacheData =
     invycePersist(c.ANTFORMCACHE + type, '', 'localStorage').get() || {};
 
-  useEffect(() => {
-    invycePersist(c.CACHEKEY + type, invoiceItems, 'localStorage').set();
+  const previousCachedInvoiceData = usePrevious(cachedInvoiceData);
+  const previousCachedFormData: any = usePrevious(antFormCacheData);
+
+  const getCachedInvoice = () => {
+    setInvoiceItems(previousCachedInvoiceData);
+    AntForm.setFieldsValue({
+      ...previousCachedFormData,
+      dueDate: dayjs(previousCachedFormData.dueDate),
+      issueDate: dayjs(previousCachedFormData.issueDate),
+    });
+    setHasCachedData(false);
+  };
+
+  const destroyCachedInvoice = () => {
+    resetPersist();
+    setHasCachedData(false);
+  };
+
+  const [hasCachedData, setHasCachedData] = useState(false);
+
+  const memoInvoiceItems = useMemo(() => {
+    return invoiceItems;
   }, [invoiceItems]);
+
+  useEffect(() => {
+    if (
+      cachedInvoiceData &&
+      JSON.stringify(cachedInvoiceData) !== JSON.stringify(memoInvoiceItems) &&
+      !id
+    ) {
+      setHasCachedData(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (!hasCachedData && !id) {
+        setTimeout(() => {
+          if (!hasCachedData) {
+            invycePersist(
+              c.CACHEKEY + type,
+              invoiceItems,
+              'localStorage'
+            ).set();
+          }
+        }, 400);
+      }
+    }, 400);
+  }, [memoInvoiceItems]);
 
   /* Component did mount */
   useEffect(() => {
-    AntForm.setFieldsValue({
-      currency: 'PKR',
-      invoiceDiscount: 0,
-      ...antFormCacheData,
-      issueDate: antFormCacheData?.issueDate
-        ? dayjs(antFormCacheData?.issueDate)
-        : dayjs(),
-      dueDate: antFormCacheData?.dueDate
-        ? dayjs(antFormCacheData?.dueDate)
-        : dayjs(),
-    });
-
-    const initialInvoiceItemsState: any = cachedInvoiceData || [];
-    if (!cachedInvoiceData) {
-      for (let i = 0; i <= 2; i++) {
-        initialInvoiceItemsState.push({
-          ...defaultItems,
-          index: 1 + 1,
-          accountId: null,
-        });
-      }
-    }
-    setInvoiceItems(initialInvoiceItemsState);
+    AntForm.setFieldsValue(defaultFormData);
   }, [AntForm]);
 
   const { notificationCallback, setItemsModalConfig, userDetails } =
@@ -357,29 +380,36 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
   };
 
   const handleCheckValidation = () => {
-    const findErrors = invoiceItems?.map((item, index) => {
-      let activeItem = { ...item };
+    const errors = [];
+    const mutatedItems = [];
+    invoiceItems?.forEach((item, index) => {
+      const activeItem = { ...item };
+
       Object?.keys(item)?.forEach((key, keyIndex) => {
-        if (Requires[key]?.require === true && !item[key]) {
-          activeItem = { ...activeItem, [`${key}Error`]: true };
-        } else {
-          console.log(index, activeItem[`${key}Error}`]);
-          if (activeItem[`${key}Error}`] === true) {
-            delete activeItem[`${key}Error}`];
-            return { ...activeItem };
+        if (Requires[key]?.require === true && !activeItem[key]) {
+          if (activeItem?.errors?.length) {
+            errors?.push(`In Row ${index + 1}, ${key} is required`);
+            if (!activeItem?.errors?.includes(key)) {
+              activeItem.errors.push(key);
+            }
           } else {
-            return { ...activeItem };
+            activeItem.errors = [key];
+          }
+        } else {
+          const indexed = activeItem.errors?.indexOf(key);
+          if (indexed !== -1 && activeItem?.errors?.length) {
+            activeItem?.errors?.splice(indexed, 1);
           }
         }
       });
 
-      console.log(activeItem, 'what is active item now');
-      return activeItem;
+      mutatedItems.push(activeItem);
     });
-    setInvoiceItems(findErrors);
-  };
 
-  console.log(invoiceItems, 'invoice items ');
+    setInvoiceItems(mutatedItems);
+
+    return errors;
+  };
 
   const columns: ColumnsType<any> = useMemo(() => {
     return [
@@ -411,7 +441,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         render: (value, record, index) => {
           return (
             <EditableSelect
-              error={record?.itemIdError}
+              error={record?.errors?.includes('itemId')}
               className={`border-less-select ${
                 index === invoiceItems.length - 1 ? 'scrollIntoView' : ''
               }`}
@@ -498,7 +528,10 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       'description',
                       'itemDiscount',
                     ]?.forEach((key) => {
-                      delete record[`${key}Error`];
+                      const index = record.errors?.indexOf(key);
+                      if (index !== -1 && record?.errors?.length) {
+                        record?.errors?.splice(index, 1);
+                      }
                     });
 
                     allItems.splice(index, 1, {
@@ -533,7 +566,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                 </Option>
                 {/* </Rbac> */}
                 {filteredItems().map((item: IItemsResult, mapIndex: number) => {
-                  console.log(index, invoiceItems, 'items here');
                   return (
                     <Option key={mapIndex} title={item.name} value={item.id}>
                       {item.code} / {item.name}
@@ -555,7 +587,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         render: (data, record, index) => {
           return (
             <Editable
-              error={record?.descriptionError}
+              error={record?.errors?.includes('description')}
               style={{
                 width: '100%',
                 minWidth: '180px',
@@ -570,9 +602,12 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                     setInvoiceItems((prev) => {
                       const allItems = [...prev];
 
-                      delete allItems[index]?.descriptionError;
+                      const indexed = record.errors?.indexOf('description');
+                      if (indexed !== -1 && record?.errors?.length) {
+                        record.errors.splice(indexed, 1);
+                      }
                       allItems[index] = {
-                        ...allItems[index],
+                        ...record,
                         description: value,
                       };
                       return allItems;
@@ -596,7 +631,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         render: (value, record, index) => {
           return (
             <Editable
-              error={record?.quantityError}
+              error={record?.errors?.includes('quantity')}
               disabled={!record.itemId}
               onChange={(value: number) => {
                 clearTimeout(setStateTimeOut);
@@ -639,8 +674,13 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       const total =
                         calculateInvoice(unitPrice, tax, itemDiscount) *
                         quantity;
+
+                      const indexed = record.errors?.indexOf('quantity');
+                      if (indexed !== -1 && record?.errors?.length) {
+                        record.errors.splice(indexed, 1);
+                      }
                       allItems[index] = {
-                        ...allItems[index],
+                        ...record,
                         quantity,
                         total,
                         costOfGoodAmount,
@@ -668,7 +708,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         render: (value, record, index) => {
           return (
             <Editable
-              error={record?.unitPriceError}
+              error={record?.errors?.includes('unitPrice')}
               onChange={(value) => {
                 clearTimeout(setStateTimeOut);
                 setStateTimeOut = setTimeout(() => {
@@ -680,9 +720,15 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                     const total =
                       calculateInvoice(unitPrice, tax, itemDiscount) *
                       parseInt(record.quantity);
-                    delete allItems[index]?.unitPriceError;
+
+                    const indexed = record.errors?.indexOf('unitPrice');
+
+                    if (indexed !== -1 && record?.errors?.length) {
+                      record.errors.splice(indexed, 1);
+                    }
+
                     allItems[index] = {
-                      ...allItems[index],
+                      ...record,
                       unitPrice,
                       total,
                     };
@@ -707,7 +753,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         render: (value, record, index) => {
           return (
             <Editable
-              error={record?.itemDiscountError}
+              error={record?.errors?.includes('itemDiscount')}
               disabled={!record.itemId}
               type="text"
               value={value}
@@ -727,9 +773,13 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                     const total =
                       calculateInvoice(unitPrice, tax, itemDiscount) *
                       parseInt(record.quantity);
-                    delete allItems[index]?.itemDiscountError;
+                    const indexed = record.errors?.indexOf('itemDiscount');
+                    if (indexed !== -1 && record?.errors?.length) {
+                      record.errors.splice(indexed, 1);
+                    }
+
                     allItems[index] = {
-                      ...allItems[index],
+                      ...record,
                       itemDiscount,
                       total,
                     };
@@ -748,11 +798,10 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
             title: 'Account',
             dataIndex: 'accountId',
             width: width > 1500 ? 220 : 150,
-            render: (value, row, index) => {
+            render: (value, record, index) => {
               return (
                 <EditableSelect
-                  error={row?.accountIdError}
-                  onClick={() => setAccountRowSelectedIndex(index)}
+                  error={record?.errors?.includes('accountId')}
                   className={`border-less-select`}
                   value={{
                     value: value !== null ? value : '',
@@ -770,9 +819,14 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                   onChange={(val) => {
                     setInvoiceItems((prev) => {
                       const allItems = [...prev];
-                      delete allItems[index]?.accountIdError;
+                      const indexed = record?.errors?.indexOf('accountId');
+
+                      if (indexed !== -1 && record?.errors?.length) {
+                        record?.errors?.splice(indexed, 1);
+                      }
+
                       allItems[index] = {
-                        ...allItems[index],
+                        ...record,
                         accountId: val.value,
                       };
 
@@ -892,6 +946,11 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
   /* This function is responsible to clear all invoice items and reset form */
 
+  const resetPersist = () => {
+    invycePersist().resetData(c.CACHEKEY + type, 'localStorage');
+    invycePersist().resetData(c.ANTFORMCACHE + type, 'localStorage');
+  };
+
   const ClearAll = () => {
     AntForm.resetFields();
     setInvoiceDiscount(0);
@@ -900,8 +959,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     AntForm.setFieldsValue({
       ...defaultFormData,
     });
-    invycePersist().resetData(c.CACHEKEY + type, 'localStorage');
-    invycePersist().resetData(c.ANTFORMCACHE + type, 'localStorage');
+    setDeleteIds([]);
+    resetPersist();
     setPaymentReset(true);
     setTimeout(() => {
       setPaymentReset(false);
@@ -959,10 +1018,37 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         handleAddRow,
         isFetching: itemsLoading || invoiceLoading || accountsLoading,
         handleCheckValidation,
+        getCachedInvoice,
       }}
     >
       <LayoutWrapper>
         <div className="table_content">
+          {hasCachedData && (
+            <div className="notifier">
+              <span>
+                Do you want to continue from where you left before?
+                <br />
+                <Button
+                  onClick={getCachedInvoice}
+                  className="mr-5 mt-5"
+                  type="primary"
+                  ghost
+                >
+                  yes
+                </Button>
+                <Button
+                  onClick={destroyCachedInvoice}
+                  type="primary"
+                  ghost
+                  danger
+                  className="mt-5"
+                >
+                  No
+                </Button>
+              </span>
+            </div>
+          )}
+
           <Card>{children}</Card>
         </div>
         {/* <div className="sider"><EmailSider/></div> */}
@@ -975,5 +1061,17 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 const LayoutWrapper = styled.section`
   .table_content {
     width: calc(100% - 0);
+    position: relative;
+
+    .notifier {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      z-index: 1111;
+      background: #ffffffdb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   }
 `;

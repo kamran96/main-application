@@ -21,6 +21,7 @@ import printIcon from "@iconify-icons/bytesize/print";
 import { Rbac } from "../../../components/Rbac";
 import { PERMISSIONS } from "../../../components/Rbac/permissions";
 import moneyFormat from "../../../utils/moneyFormat";
+import ContactsImport from "../ContactsImport"
 
 export const Customers: FC = () => {
   /* HOOKS */
@@ -61,9 +62,9 @@ export const Customers: FC = () => {
       routeHistory.history.location.search
     ) {
       let obj = {};
-      let queryArr = history.location.search.split("?")[1].split("&");
+      const queryArr = history.location.search.split("?")[1].split("&");
       queryArr.forEach((item, index) => {
-        let split = item.split("=");
+        const split = item.split("=");
         obj = { ...obj, [split[0]]: split[1] };
       });
 
@@ -125,7 +126,7 @@ export const Customers: FC = () => {
   useEffect(() => {
     if (resolvedData && resolvedData.data && resolvedData.data.result) {
       const { result, pagination } = resolvedData.data;
-      let generatedResult = [];
+      const generatedResult = [];
       result.forEach((item) => {
         generatedResult.push({ ...item, key: item.id });
       });
@@ -199,7 +200,7 @@ export const Customers: FC = () => {
 
   /* this Async function is responsible for delete contacts */
   const onHandleDelete = async () => {
-    let payload = {
+    const payload = {
       ids: [...selectedRow],
     };
 
@@ -266,6 +267,8 @@ export const Customers: FC = () => {
   const renderTopbarRight = () => {
     return (
       <div className="flex alignCenter">
+       
+       <ContactsImport/>
         <ButtonTag
           disabled
           className="mr-10"
@@ -276,7 +279,7 @@ export const Customers: FC = () => {
         />
         <SmartFilter
           onFilter={(encode) => {
-            let route = `/app/contacts?tabIndex=customers&sortid=${sortid}&page=1&page_size=20&query=${encode}`;
+            const route = `/app/contacts?tabIndex=customers&sortid=${sortid}&page=1&page_size=20&query=${encode}`;
             history.push(route);
             setConfig({ ...config, query: encode });
           }}

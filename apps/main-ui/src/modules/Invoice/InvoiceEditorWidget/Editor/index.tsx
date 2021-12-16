@@ -3,6 +3,7 @@ import printIcon from '@iconify-icons/bytesize/print';
 import Icon from '@iconify/react';
 import { EditableTable } from '@invyce/editable-table';
 import { invycePersist } from '@invyce/invyce-persist';
+import { IContactTypes } from '@invyce/shared/types';
 import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import dayjs from 'dayjs';
@@ -10,10 +11,10 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { queryCache, useMutation, useQuery } from 'react-query';
 
 import { getInvoiceNumber, InvoiceCreateAPI } from '../../../../api';
+import { create_update_contact } from '../../../../api/Contact';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import { DatePicker } from '../../../../components/DatePicker';
 import { FormLabel } from '../../../../components/FormLabel';
-import { Payment } from '../../../../components/Payment';
 import { PrintFormat } from '../../../../components/PrintFormat';
 import { PrintViewPurchaseWidget } from '../../../../components/PurchasesWidget/PrintViewPurchaseWidget';
 import { Rbac } from '../../../../components/Rbac';
@@ -23,7 +24,6 @@ import { useGlobalContext } from '../../../../hooks/globalContext/globalContext'
 import {
   IErrorMessages,
   IServerError,
-  ISupportedRoutes,
   NOTIFICATIONTYPE,
 } from '../../../../modal';
 import { IInvoiceType, ITaxTypes } from '../../../../modal/invoice';
@@ -34,8 +34,6 @@ import printDiv, { DownloadPDF } from '../../../../utils/Print';
 import { PurchaseManager, usePurchaseWidget } from './EditorManager';
 import c from './keys';
 import { WrapperInvoiceForm } from './styles';
-import { create_update_contact } from '../../../../api/Contact';
-import { IContactTypes } from '@invyce/shared/types';
 
 const { Option } = Select;
 
@@ -85,6 +83,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     handleAddRow,
     ClearAll,
     handleCheckValidation,
+    getCachedInvoice,
   } = usePurchaseWidget();
 
   const __columns =
@@ -108,7 +107,10 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   const [submitType, setSubmitType] = useState('');
   /* ********** HOOKS ENDS HERE ************** */
 
-  const { data: invoiceNumberData } = useQuery([], getInvoiceNumber);
+  const { data: invoiceNumberData, refetch: refetchInvoiceNumber } = useQuery(
+    [],
+    getInvoiceNumber
+  );
 
   useEffect(() => {
     if (invoiceNumberData?.data?.result) {
@@ -122,7 +124,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     printDiv(printItem);
   };
 
-  const onSendPDF = (contactId, message) => {
+  const onSendPDF = (contactId, invoiceId) => {
     const printItem = printRef.current;
     let email = ``;
 
@@ -136,9 +138,10 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
 
     const pdf = DownloadPDF(printItem);
     const payload = {
-      email,
+      email: 'kamran@invyce.com',
       html: `${pdf}`,
-      message,
+      id: invoiceId,
+      type: type,
     };
     handleUploadPDF(payload);
   };
@@ -158,29 +161,9 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   const onFinish = async (value) => {
-    handleCheckValidation();
+    const errors = handleCheckValidation(invoiceItems);
 
-    return false;
-    const InvoiceItemsValidation = [];
-
-    organization?.organizationType !== IOrganizationType.ENTERPRISE &&
-      invoiceItems.forEach(async (i, index) => {
-        if (i.itemId === null || i.accountId === null) {
-          InvoiceItemsValidation.push({
-            index: index + 1,
-            item: i.itemId === null ? 'Item' : 'Account',
-          });
-        }
-      });
-
-    if (InvoiceItemsValidation.length > 0) {
-      notificationCallback(
-        NOTIFICATIONTYPE.ERROR,
-        `Error in ${InvoiceItemsValidation.map((i) => {
-          return `${i.index} Please Select any ${i.item} otherwise delete empty row.`;
-        })}`
-      );
-    } else {
+    if (!errors.length) {
       const paymentData = { ...payment };
       delete paymentData.totalAmount;
       delete paymentData.totalDiscount;
@@ -199,23 +182,6 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
           return { ...item, sequence: index };
         }),
       };
-      // let payments = {
-      //   ...paymentData,
-      //   amount:
-      //     payment.paymentMode === PaymentMode.CREDIT
-      //       ? 0
-      //       : payment.paymentMode === PaymentMode.CASH
-      //       ? NetTotal
-      //       : parseFloat(payment.amount),
-      // };
-
-      // if (type !== IInvoiceType.QUOTE && payload.invoice.status !== 2) {
-      //   if (payments.paymentMode === PaymentMode.CASH) {
-      //     delete payments.dueDate;
-      //   }
-
-      //   payload = { ...payload, payment: payments };
-      // }
 
       delete payload.invoiceDiscount;
       delete payload.total;
@@ -228,66 +194,49 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
           deleted_ids: deleteIds,
         };
       }
-      try {
-        await muatateCreateInvoice(payload, {
-          onSuccess: () => {
-            notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Invoice Created');
 
-            if (value && value.status.print) {
-              setPrintModal(true);
-            }
+      await muatateCreateInvoice(payload, {
+        onSuccess: (data) => {
+          notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Invoice Created');
 
-            if (payload.invoice.status !== 2) {
-              const messages = {
-                invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
-                quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
-              };
+          if (value && value.status.print) {
+            setPrintModal(true);
+          }
 
-              onSendPDF(
-                value.contactId,
-                type === IInvoiceType.INVOICE
-                  ? messages.invoice
-                  : messages.quotes
-              );
-            }
+          if (payload?.invoice?.status !== 2) {
+            onSendPDF(value.contactId, data?.data?.result?.id);
+          }
 
-            ClearAll();
+          ClearAll();
 
-            /* this will clear invoice items, formdata and payment */
+          /* this will clear invoice items, formdata and payment */
+          refetchInvoiceNumber();
 
-            [
-              'invoices',
-              'transactions?page',
-              'items?page',
-              'invoice-view',
-              'ledger-contact',
-              'all-items',
-            ].forEach((key) => {
-              queryCache.invalidateQueries((q) =>
-                q.queryKey[0].toString().startsWith(key)
-              );
-            });
-          },
-          onError: (error: IServerError) => {
-            if (
-              error &&
-              error.response &&
-              error.response.data &&
-              error.response.data.message
-            ) {
-              const { message } = error.response.data;
-              notificationCallback(NOTIFICATIONTYPE.ERROR, message);
-            } else {
-              notificationCallback(
-                NOTIFICATIONTYPE.ERROR,
-                IErrorMessages.NETWORK_ERROR
-              );
-            }
-          },
-        });
-      } catch (error) {
-        return null;
-      }
+          [
+            'invoices',
+            'transactions?page',
+            'items?page',
+            'invoice-view',
+            'ledger-contact',
+            'all-items',
+          ].forEach((key) => {
+            queryCache.invalidateQueries((q) =>
+              q?.queryKey[0]?.toString()?.startsWith(key)
+            );
+          });
+        },
+        onError: (error: IServerError) => {
+          if (error?.response?.data?.message) {
+            const { message } = error.response.data;
+            notificationCallback(NOTIFICATIONTYPE.ERROR, message);
+          } else {
+            notificationCallback(
+              NOTIFICATIONTYPE.ERROR,
+              IErrorMessages.NETWORK_ERROR
+            );
+          }
+        },
+      });
     }
   };
   const onCancelPrint = () => {
@@ -762,27 +711,6 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                       }
                     >
                       <>
-                        <Button
-                          disabled={resMutateInvoice.isLoading}
-                          loading={
-                            resMutateInvoice.isLoading &&
-                            submitType === ISUBMITTYPE.RETURN
-                          }
-                          htmlType="submit"
-                          size={'middle'}
-                          onClick={() => {
-                            setSubmitType(ISUBMITTYPE.RETURN);
-                            AntForm.setFieldsValue({
-                              status: {
-                                status: 3,
-                                print: false,
-                              },
-                            });
-                          }}
-                        >
-                          Return
-                        </Button>
-
                         <Button
                           disabled={resMutateInvoice.isLoading}
                           loading={

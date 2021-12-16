@@ -3,8 +3,6 @@ import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { IUser } from '../../modal';
 import { getCountryById } from '@invyce/shared/utils';
 
-interface IProps {}
-
 export const TopbarLogoWithDetails = () => {
   const { userDetails } = useGlobalContext();
   const _logo = userDetails?.profile?.attachment?.path;

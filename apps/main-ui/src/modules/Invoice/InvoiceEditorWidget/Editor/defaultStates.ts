@@ -11,7 +11,6 @@ export default {
   tax: '0',
   total: 0,
   costOfGoodAmount: 0,
-  index: 0,
   accountId: null,
 };
 export const Requires = {
@@ -20,8 +19,8 @@ export const Requires = {
     message: 'Item is Requred to Proceed invoice',
   },
   description: {
-    require: true,
-    message: 'Item is Requred to Proceed invoice',
+    require: false,
+    message: '',
   },
   quantity: {
     require: true,
@@ -30,6 +29,7 @@ export const Requires = {
   unitPrice: {
     require: true,
     message: 'Item is Requred to Proceed invoice',
+    condition: (value) => value > 0,
   },
   purchasePrice: {
     require: false,
@@ -70,6 +70,7 @@ export const defaultPayment = {
 
 export const defaultFormData = {
   issueDate: dayjs(),
+  dueDate: dayjs(),
   currency: 'PKR',
   invoiceDiscount: 0,
 };
