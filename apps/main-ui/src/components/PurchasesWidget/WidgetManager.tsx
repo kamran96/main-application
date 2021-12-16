@@ -320,6 +320,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
   // Accounts Fetched By Types
 
+  console.log(type, 'type');
+
   const { data: accountsData, isLoading: accountsLoading } = useQuery(
     [`accounts-${type}`, type === IInvoiceType.INVOICE ? 'invoice' : 'bill'],
     getAccountsByTypeAPI,

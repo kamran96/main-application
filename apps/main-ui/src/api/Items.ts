@@ -1,3 +1,4 @@
+import { QueryKey } from '../modal';
 import http from './../utils/http';
 
 enum ItemsServiceAPI {
@@ -5,16 +6,12 @@ enum ItemsServiceAPI {
   PRICE = 'items/price',
 }
 
-export const getItemsList = (
-  key: any,
-  payload?: {
-    page: number;
-    sortid: string;
-    query: string;
-    pageSize: number;
-  }
-) => {
-  const { page, sortid, query, pageSize = 20 } = payload;
+export const getItemsList = ({ queryKey }: QueryKey) => {
+  const page = queryKey[1];
+  const sortid = queryKey[2];
+  const query = queryKey[3];
+  const pageSize = (queryKey[4] = 20);
+
   let url = `${ItemsServiceAPI.default}?page_size=${pageSize}&page_no=${page}&sort=${sortid}`;
   if (query) {
     url = `${url}&query=${query}`;
@@ -22,8 +19,10 @@ export const getItemsList = (
   return http.get(url);
 };
 
-export const fetchSingleItem = (key: any, id?: number) =>
-  http.get(`${ItemsServiceAPI.default}/${id}`);
+export const fetchSingleItem = ({ queryKey }: QueryKey) => {
+  const id: number = queryKey[1];
+  return http.get(`${ItemsServiceAPI.default}/${id}`);
+};
 export const deleteItems = (payload) =>
   http.put(`${ItemsServiceAPI.default}`, payload);
 
@@ -36,14 +35,20 @@ export const createPricingAPI = (payload) => {
   return http.post(`${ItemsServiceAPI.PRICE}`, payload);
 };
 
-export const getAllItems = (key?: any, purpose?: string) =>
-  http.get(`${ItemsServiceAPI.default}?purpose=ALL`);
+export const getAllItems = ({ queryKey }: QueryKey) => {
+  const purpose: string = queryKey[1];
+  return http.get(`${ItemsServiceAPI.default}?purpose=ALL`);
+};
 
-export const getItemByIDAPI = (key?: string, id?: number) =>
-  http.get(`item/${id}`);
+export const getItemByIDAPI = ({ queryKey }: QueryKey) => {
+  const id: number = queryKey[1];
+  return http.get(`item/${id}`);
+};
 
-export const getPriceByIDAPI = (key?: any, id?: number) =>
-  http.get(`${ItemsServiceAPI.PRICE}/${id}`);
+export const getPriceByIDAPI = ({ queryKey }: QueryKey) => {
+  const id = queryKey[1];
+  return http.get(`${ItemsServiceAPI.PRICE}/${id}`);
+};
 
 interface IItemGetPaylod {
   id: number;

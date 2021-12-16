@@ -21,6 +21,7 @@ import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
 import moneyFormat from '../../../utils/moneyFormat';
 import ContactsImport from '../ContactsImport';
+import { useHistory } from 'react-router-dom';
 
 export const Customers: FC = () => {
   /* HOOKS */
@@ -49,15 +50,10 @@ export const Customers: FC = () => {
     useMutation(deleteContacts);
 
   const { routeHistory, notificationCallback } = useGlobalContext();
-  const { history } = routeHistory;
+  const history = useHistory();
 
   useEffect(() => {
-    if (
-      routeHistory &&
-      routeHistory.history &&
-      routeHistory.history.location &&
-      routeHistory.history.location.search
-    ) {
+    if (routeHistory?.history?.location?.search) {
       let obj = {};
       const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
@@ -107,24 +103,19 @@ export const Customers: FC = () => {
   /* usePagination hook React Query */
   /* this hook fetches contact list against page number and also sorts request data against sort id */
   /* eg. sortid = name (assending) -name (descending) */
+  const params: any = [
+    `contacts-list-customers?page_no=${page}&sort=${sortid}&page_size=${page_size}&type=${IContactTypes.CUSTOMER}&query=${query}`,
+    IContactTypes.CUSTOMER,
+    page,
+    sortid,
+    page_size,
+    query,
+  ];
   const {
     isLoading,
     data: resolvedData,
     isFetching,
-  } = useQuery(
-    [
-      `contacts-list-customers?page_no=${page}&sort=${sortid}&page_size=${page_size}&type=${IContactTypes.CUSTOMER}&query=${query}`,
-      IContactTypes.CUSTOMER,
-      page,
-      sortid,
-      page_size,
-      query,
-    ],
-    getContacts,
-    {
-      keepPreviousData: true,
-    }
-  );
+  } = useQuery(params, getContacts);
 
   /* ComponentDidUpdate hook for updaing contactResponse state when successfully API fetches contact list data */
   useEffect(() => {

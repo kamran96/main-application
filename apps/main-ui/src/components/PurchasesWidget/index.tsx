@@ -163,6 +163,8 @@ const Editor: FC<IProps> = ({ type, id }) => {
   const onFinish = async (value) => {
     const errors = handleCheckValidation();
 
+    console.log(errors);
+
     if (!errors?.length) {
       const paymentData = { ...payment };
       delete paymentData.totalAmount;
@@ -364,7 +366,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
                 ? false
                 : true
             }
-            data={responseInvoiceCreatedData.data.result || {}}
+            data={responseInvoiceCreatedData?.data?.result || {}}
           />
         </PrintFormat>
       </div>

@@ -71,7 +71,7 @@ const CategoryEditorWidget: FC = () => {
               `category-${updateId}`,
               'all-categories',
             ].forEach((key) => {
-              (queryCache.invalidateQueries as any)((q) => q.startsWith(key));
+              (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
             });
           } else {
             [

@@ -1,18 +1,22 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, useEffect } from "react";
-import { useMutation } from "react-query";
-import styled from "styled-components";
-import { XeroVerification } from "../../../../api";
-import { VerifiedIcon } from "../../../../assets/icons";
-import XeroLogo from "../../../../assets/xero.svg";
-import { Loader } from "../../../../components/Loader";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
-import { ISupportedRoutes } from "../../../../modal";
+import React, { FC, useEffect } from 'react';
+import { useMutation } from 'react-query';
+import styled from 'styled-components';
+import { XeroVerification } from '../../../../api';
+import { VerifiedIcon } from '../../../../assets/icons';
+import XeroLogo from '../../../../assets/xero.svg';
+import { Loader } from '../../../../components/Loader';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { ISupportedRoutes } from '../../../../modal';
 
 export const VerifyXero: FC = () => {
   const { routeHistory } = useGlobalContext();
   const { location } = routeHistory?.history;
-  const [mutateVerify, { isLoading, data }] = useMutation(XeroVerification);
+  const {
+    mutate: mutateVerify,
+    isLoading,
+    data,
+  } = useMutation(XeroVerification);
 
   const Verified = async (search) => {
     const payload = {
@@ -25,7 +29,7 @@ export const VerifyXero: FC = () => {
   useEffect(() => {
     if (data?.data?.result?.modules) {
       setTimeout(() => {
-        let redirectURL = `${ISupportedRoutes.DASHBOARD_LAYOUT}${
+        const redirectURL = `${ISupportedRoutes.DASHBOARD_LAYOUT}${
           ISupportedRoutes?.SETTINGS
         }${ISupportedRoutes?.INTEGRATIONS}?xero=verified&fetchItems=${btoa(
           JSON.stringify(data?.data?.result?.modules)
@@ -52,19 +56,19 @@ export const VerifyXero: FC = () => {
           <img
             className="company_logo"
             src={XeroLogo}
-            alt={"quickbooks logo"}
+            alt={'quickbooks logo'}
           />
           <h2>Xero</h2>
         </div>
         <div className="description">
           <p className="textCenter">
-            Verification is {isLoading ? "in progress" : "finished"}
+            Verification is {isLoading ? 'in progress' : 'finished'}
           </p>
         </div>
         <div className="loading_wrapper">
           <div className="verified_icon">
             {isLoading ? <Loader /> : <VerifiedIcon />}
-            <p className="label">{isLoading ? "Please wait" : "Verified"}</p>
+            <p className="label">{isLoading ? 'Please wait' : 'Verified'}</p>
           </div>
         </div>
       </div>

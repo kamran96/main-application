@@ -1,4 +1,5 @@
 import http from '../utils/http';
+import { QueryKey } from '../modal';
 
 export const LoginAPI = (payload) => http.post(`users/auth`, payload);
 
@@ -28,7 +29,9 @@ export const resendVerificationCodeAPI = (payload: any) =>
   http?.post(`users/auth/resend-otp`, payload);
 
 export const CheckAuthAPI = (key?: any) => http.get(`users/auth/check`);
-export const CheckAuthAPIDev = (key?: any, id?: number) =>
-  http?.get(`users/user/${id}`);
+export const CheckAuthAPIDev = ({ queryKey }: QueryKey) => {
+  const id = queryKey[1];
+  return http?.get(`users/user/${id}`);
+};
 
 export const LogoutAPI = (key?: any) => http.post(`users/auth/logout`);

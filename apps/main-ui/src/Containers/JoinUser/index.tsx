@@ -1,54 +1,65 @@
-import React, { FC, useEffect } from "react";
-import styled from "styled-components";
-import { Select, Checkbox, Form, Input, Button, Row, Col } from "antd";
-import { Link } from "react-router-dom";
-import { Heading } from "../../components/Heading";
-import { JoinUserIllustration } from "../../assets/icons";
-import checkIcon from "@iconify-icons/feather/check";
-import Icon from "@iconify/react";
-import convertToRem from "../../utils/convertToRem";
-import { VerifyUser } from "./VerifyUser";
-import { useMutation } from "react-query";
+import React, { FC, useEffect } from 'react';
+import styled from 'styled-components';
+import { Select, Checkbox, Form, Input, Button, Row, Col } from 'antd';
+import { Link } from 'react-router-dom';
+import { Heading } from '../../components/Heading';
+import { JoinUserIllustration } from '../../assets/icons';
+import checkIcon from '@iconify-icons/feather/check';
+import Icon from '@iconify/react';
+import convertToRem from '../../utils/convertToRem';
+import { VerifyUser } from './VerifyUser';
+import { useMutation } from 'react-query';
 import {
   userCheckAPI,
   userJoinAPI,
   verifyUserInvitationAPI,
-} from "../../api/users";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { useState } from "react";
-import { updateToken } from "../../utils/http";
-import { ILoginActions } from "../../hooks/globalContext/globalManager";
+} from '../../api/users';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { useState } from 'react';
+import { updateToken } from '../../utils/http';
+import { ILoginActions } from '../../hooks/globalContext/globalManager';
 import {
   DivProps,
   IBaseAPIError,
   ISupportedRoutes,
   IUser,
   NOTIFICATIONTYPE,
-} from "../../modal";
-import { Capitalize } from "../../components/Typography"; 
+} from '../../modal';
+import { Capitalize } from '../../components/Typography';
 
 const { Option } = Select;
 
 let setTimeoutTime: any;
 
 const InvyceFeatures = [
-  "Easy create invoices",
-  "Mange accounts",
-  "Analyze business insights",
-  "Mange contacts",
-  "Manage inventory & sales",
-  "Create & send quotations",
-  "Import data from other accounting software",
+  'Easy create invoices',
+  'Mange accounts',
+  'Analyze business insights',
+  'Mange contacts',
+  'Manage inventory & sales',
+  'Create & send quotations',
+  'Import data from other accounting software',
 ];
 
 export const JoinUser: FC = () => {
-  const [mutateVerify, resMutateVerify] = useMutation(verifyUserInvitationAPI);
-  const [mutateUsernameAvaliable, setUsernameAvaliable] =
-    useMutation(userCheckAPI);
-  const [mutateJoinUser, resMutateJoinUser] = useMutation(userJoinAPI);
+  const {
+    mutate: mutateVerify,
+    isLoading: verifyingUser,
+    data: responseVerify,
+  } = useMutation(verifyUserInvitationAPI);
+  const {
+    mutate: mutateUsernameAvaliable,
+    data: responseUsernameAvaliable,
+    isLoading: usernameChecking,
+  } = useMutation(userCheckAPI);
+  const {
+    mutate: mutateJoinUser,
+    data: resMutateUser,
+    isLoading: joiningUser,
+  } = useMutation(userJoinAPI);
   const [verified, setVerified] = useState(false);
-  const [validatingStatus, setValidatingStatus] = useState("");
-  const verifiedUser: IUser = resMutateVerify?.data?.data?.result;
+  const [validatingStatus, setValidatingStatus] = useState('');
+  const verifiedUser: IUser = responseVerify?.data?.result;
 
   const { setUserDetails, handleLogin, notificationCallback }: any =
     useGlobalContext();
@@ -62,7 +73,7 @@ export const JoinUser: FC = () => {
   useEffect(() => {
     if (search) {
       const payload = {
-        code: search?.split("code=")[1],
+        code: search?.split('code=')[1],
       };
 
       mutateVerify(payload, {
@@ -70,10 +81,10 @@ export const JoinUser: FC = () => {
           const { result } = data?.data;
           setVerified(true);
           const formValues = {
-            username: "",
+            username: '',
             email: result?.email,
             role: result?.role?.name,
-            passowrd: "",
+            passowrd: '',
             branch: result?.branch?.name,
           };
           form?.setFieldsValue(formValues);
@@ -90,28 +101,26 @@ export const JoinUser: FC = () => {
   }, [search]);
 
   const onFinish = async (value) => {
-    const { id } = resMutateVerify?.data?.data?.result;
+    const { id } = responseVerify?.data?.result;
     await mutateJoinUser(
       { ...value, id },
       {
         onSuccess: (data) => {
-          if(process.env.NODE_ENV==="production"){
+          if (process.env.NODE_ENV === 'production') {
             handleLogin({
               type: ILoginActions.LOGIN,
-              payload: { autherization: true }
+              payload: { autherization: true },
             });
-
-          }else{
+          } else {
             handleLogin({
               type: ILoginActions.LOGIN,
               payload: data?.data,
             });
             updateToken(data?.data.access_token);
-
           }
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
-            "User Registered Successfully"
+            'User Registered Successfully'
           );
         },
         onError: (err: IBaseAPIError) => {
@@ -153,7 +162,8 @@ export const JoinUser: FC = () => {
               </div>
               <div className="responsibilities mt-20">
                 <h2 className="title">
-                  Wellcome to  <Capitalize> {verifiedUser?.organization?.name}</Capitalize>
+                  Wellcome to{' '}
+                  <Capitalize> {verifiedUser?.organization?.name}</Capitalize>
                 </h2>
                 <h4 className="sub-heading">Invyce lets you</h4>
                 <ul>
@@ -176,14 +186,14 @@ export const JoinUser: FC = () => {
             <Form.Item
               label="Name"
               name="fullName"
-              rules={[{ required: true, message: "Name is required!" }]}
+              rules={[{ required: true, message: 'Name is required!' }]}
             >
               <Input size="middle" />
             </Form.Item>
             <Form.Item
               label="User Name"
               name="username"
-              rules={[{ required: true, message: "username is required!" }, {}]}
+              rules={[{ required: true, message: 'username is required!' }, {}]}
             >
               <Input
                 onChange={onChangeUsername}
@@ -195,8 +205,8 @@ export const JoinUser: FC = () => {
               label="Email"
               name="email"
               rules={[
-                { required: true, message: "email is required!" },
-                { type: "email" },
+                { required: true, message: 'email is required!' },
+                { type: 'email' },
               ]}
             >
               <Input disabled size="middle" />
@@ -204,12 +214,12 @@ export const JoinUser: FC = () => {
             <Form.Item
               label="Country"
               name="country"
-              rules={[{ required: true, message: "country is required!" }]}
+              rules={[{ required: true, message: 'country is required!' }]}
             >
               <Select
                 size="large"
                 showSearch
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 placeholder="Select a Country"
                 optionFilterProp="children"
               >
@@ -221,36 +231,48 @@ export const JoinUser: FC = () => {
             <Form.Item
               label="Role"
               name="role"
-              rules={[{ required: true, message: "email is required!" }]}
+              rules={[{ required: true, message: 'email is required!' }]}
             >
               <Input disabled size="middle" />
             </Form.Item>
             <Form.Item
               label="Branch"
               name="branch"
-              rules={[{ required: true, message: "email is required!" }]}
+              rules={[{ required: true, message: 'email is required!' }]}
             >
               <Input disabled size="middle" />
             </Form.Item>
             <Form.Item
               label="Phone Number"
               name="phoneNumber"
-              rules={[{ required: true, message: "phone number is required!" }]}
+              rules={[{ required: true, message: 'phone number is required!' }]}
             >
               <Input size="middle" placeholder="Phone Number" />
             </Form.Item>
             <Form.Item
               label="Password"
               name="password"
-              rules={[{ required: true, message: "password is required!" }]}
+              rules={[{ required: true, message: 'password is required!' }]}
             >
               <Input.Password size="large" />
             </Form.Item>
             <Form.Item name="agreed" valuePropName="checked">
               <Checkbox>
                 <span>
-                  I have read and agree to the <Link to="https://invyce.com/terms-conditions/" target="_blank">terms, </Link>
-                  <Link to="https://invyce.com/privacy-policy/" target="_blank">Privacy, </Link> and <Link target="_blank" to="https://invyce.com/cookie-policy/">Cookie Policy</Link>
+                  I have read and agree to the{' '}
+                  <Link
+                    to="https://invyce.com/terms-conditions/"
+                    target="_blank"
+                  >
+                    terms,{' '}
+                  </Link>
+                  <Link to="https://invyce.com/privacy-policy/" target="_blank">
+                    Privacy,{' '}
+                  </Link>{' '}
+                  and{' '}
+                  <Link target="_blank" to="https://invyce.com/cookie-policy/">
+                    Cookie Policy
+                  </Link>
                 </span>
               </Checkbox>
             </Form.Item>
@@ -269,8 +291,8 @@ export const JoinUser: FC = () => {
   );
 };
 
-interface IJoinUserWrapperProps extends DivProps{
-  verified: boolean
+interface IJoinUserWrapperProps extends DivProps {
+  verified: boolean;
 }
 
 const WrapperJoinUser = styled.div<IJoinUserWrapperProps>`

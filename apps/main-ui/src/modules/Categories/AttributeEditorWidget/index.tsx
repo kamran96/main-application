@@ -97,7 +97,7 @@ export const AttributeEditorWidget: FC = () => {
           'categories-list',
           'all-categories',
         ].forEach((key) => {
-          (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
+          (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
         });
         setAttributeConfig(false);
         setAttriData([{}]);

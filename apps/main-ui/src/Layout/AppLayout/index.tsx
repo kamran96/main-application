@@ -23,7 +23,7 @@ interface IProps {
 
 export const AppLayout: FC<IProps> = ({ children }) => {
   const { rbac } = useRbac(null);
-  const [muateTheme] = useMutation(updateThemeAPI);
+  const { mutate: muateTheme } = useMutation(updateThemeAPI);
   const {
     userDetails,
     theme,

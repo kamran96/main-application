@@ -1,26 +1,30 @@
-import { Button, Col, Form, Input, message, Row } from "antd";
-import React from "react";
-import { FC } from "react";
-import styled from "styled-components";
-import InvyceLog from "../../assets/invyceLogo.png";
-import ResetIllustration from "../../assets/resetPassword.png";
-import { HeadingTemplate1 } from "../../components/HeadingTemplates";
-import convertToRem from "../../utils/convertToRem";
-import { useMutation } from "react-query";
-import { resetPasswordAPI } from "../../api";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { ISupportedRoutes, NOTIFICATIONTYPE } from "../../modal";
+import { Button, Col, Form, Input, message, Row } from 'antd';
+import React from 'react';
+import { FC } from 'react';
+import styled from 'styled-components';
+import InvyceLog from '../../assets/invyceLogo.png';
+import ResetIllustration from '../../assets/resetPassword.png';
+import { HeadingTemplate1 } from '../../components/HeadingTemplates';
+import convertToRem from '../../utils/convertToRem';
+import { useMutation } from 'react-query';
+import { resetPasswordAPI } from '../../api';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { ISupportedRoutes, NOTIFICATIONTYPE } from '../../modal';
 
 export const ResetForm: FC = () => {
-  const [mutateResetPassword, resResetRequest] = useMutation(resetPasswordAPI);
+  const {
+    mutate: mutateResetPassword,
+    isSuccess,
+    isLoading,
+  } = useMutation(resetPasswordAPI);
   const { notificationCallback } = useGlobalContext();
   const [form] = Form.useForm();
   const { routeHistory } = useGlobalContext();
-  const {history} = routeHistory;
-  const { location } =history;
+  const { history } = routeHistory;
+  const { location } = history;
 
   const onFinish = async (payload) => {
-    let code = location?.search?.split("code=")[1].split("&")[0];
+    const code = location?.search?.split('code=')[1].split('&')[0];
     await mutateResetPassword(
       { ...payload, code },
       {
@@ -29,7 +33,9 @@ export const ResetForm: FC = () => {
             NOTIFICATIONTYPE.SUCCESS,
             `Your Password is Successfully Reset`
           );
-          history?.push(`${ISupportedRoutes?.DEFAULT_LAYOUT}${ISupportedRoutes.LOGIN}`)
+          history?.push(
+            `${ISupportedRoutes?.DEFAULT_LAYOUT}${ISupportedRoutes.LOGIN}`
+          );
         },
       }
     );
@@ -39,7 +45,7 @@ export const ResetForm: FC = () => {
     <WrapperEmailForm>
       <div className="illustration">
         <div className="invyce_logo">
-          <img src={InvyceLog} alt={"invyce logo"} />
+          <img src={InvyceLog} alt={'invyce logo'} />
         </div>
         <h2 className="slogan">
           Enter New Password
@@ -76,10 +82,10 @@ export const ResetForm: FC = () => {
                   label="New Password"
                   name="password"
                   rules={[
-                    { required: true, message: "Please enter Password" },
+                    { required: true, message: 'Please enter Password' },
                     {
                       min: 6,
-                      message: "Your Password shold have minimum 6 characters",
+                      message: 'Your Password shold have minimum 6 characters',
                     },
                   ]}
                   hasFeedback
@@ -90,11 +96,11 @@ export const ResetForm: FC = () => {
                   label="Confirm Password"
                   name="confirmPassword"
                   rules={[
-                    { required: true, message: "Please re-type Password" },
+                    { required: true, message: 'Please re-type Password' },
                     {
                       validator: async (rule, value, callback) => {
-                        console.log(form.getFieldValue("password") !== value);
-                        if (value !== form.getFieldValue("password")) {
+                        console.log(form.getFieldValue('password') !== value);
+                        if (value !== form.getFieldValue('password')) {
                           throw new Error(`Password is not matched`);
                         }
                       },
@@ -104,13 +110,11 @@ export const ResetForm: FC = () => {
                 >
                   <Input.Password size="middle" />
                 </Form.Item>
-                <Form.Item
-                  hasFeedback={resResetRequest?.isSuccess ? true : false}
-                >
+                <Form.Item hasFeedback={isSuccess ? true : false}>
                   <Button
-                    loading={resResetRequest?.isLoading}
+                    loading={isLoading}
                     className="mt-10"
-                    style={{ width: "100%" }}
+                    style={{ width: '100%' }}
                     size="middle"
                     type="primary"
                     htmlType="submit"

@@ -27,7 +27,7 @@ const PricingEditorWidget: FC = () => {
     [`price-${pricingId}`, pricingId],
     getPriceByIDAPI,
     {
-      enabled: id,
+      enabled: !!id,
     }
   );
 

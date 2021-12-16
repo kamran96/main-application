@@ -284,35 +284,35 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   const userId = auth?.users?.id || null;
 
   /* LoggedInUser is Fetched */
-  const {
-    isLoading,
-    isFetched,
-    isFetching: loggedInUserCheckingAgain,
-  } = useQuery([`loggedInUser`, userId], AUTH_CHECK_API, {
-    cacheTime: Infinity,
-    enabled: isProductionEnv ? checkAutherized : !!userId,
+  const { isLoading, isFetched } = useQuery(
+    [`loggedInUser`, userId],
+    AUTH_CHECK_API,
+    {
+      cacheTime: 10000000000000,
+      enabled: isProductionEnv ? checkAutherized : !!userId,
 
-    onSuccess: (data) => {
-      if (isProductionEnv) {
-        setUserDetails(data?.data?.users);
-        setIsUserLogin(true);
-      } else {
-        const { result } = data?.data;
-        setUserDetails(result);
-        setIsUserLogin(true);
-        if (result?.theme) {
-          setTheme(result?.theme);
+      onSuccess: (data) => {
+        if (isProductionEnv) {
+          setUserDetails(data?.data?.users);
+          setIsUserLogin(true);
+        } else {
+          const { result } = data?.data;
+          setUserDetails(result);
+          setIsUserLogin(true);
+          if (result?.theme) {
+            setTheme(result?.theme);
+          }
         }
-      }
-    },
-    onError: (err: IBaseAPIError) => {
-      // CancelRequest();
-      if (err?.response?.data?.statusCode === 401) {
-        handleLogin({ type: ILoginActions.LOGOUT });
-      }
-      setAutherized(false);
-    },
-  });
+      },
+      onError: (err: IBaseAPIError) => {
+        // CancelRequest();
+        if (err?.response?.data?.statusCode === 401) {
+          handleLogin({ type: ILoginActions.LOGOUT });
+        }
+        setAutherized(false);
+      },
+    }
+  );
 
   useEffect(() => {
     toggleTheme(theme);

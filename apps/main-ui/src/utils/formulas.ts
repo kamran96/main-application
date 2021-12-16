@@ -10,8 +10,9 @@ export const getPriceWithTax = (price: number, taxPercent: number) => {
   return price + (taxPercent / 100) * price;
 };
 
-export const checkisPercentage = (value: string) => {
-  const splitedData = value && value.split('%');
+export const checkisPercentage = (val: string | number) => {
+  const value = typeof val === 'string' ? val : val.toString();
+  const splitedData = value?.split('%');
   if (splitedData.length === 2) {
     return {
       value: splitedData[0],
