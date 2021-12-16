@@ -22,6 +22,7 @@ import {
 } from '../../../../../modal/invoice';
 import convertToRem from '../../../../../utils/convertToRem';
 import { SmartFilter } from '../../../../../components/SmartFilter';
+import { ISupportedRoutes } from '../../../../../modal/routing';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import FilterSchema from './PoFilterSchema';
 import { ConfirmModal } from '../../../../../components/ConfirmModal';
@@ -30,19 +31,17 @@ import {
   IContactType,
   IContactTypes,
   NOTIFICATIONTYPE,
-  ISupportedRoutes,
 } from '../../../../../modal';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
 import { _csvExportable } from './CommonCol';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
-import moneyFormat from '../../../../../utils/moneyFormat';
 
 interface IProps {
   columns?: any[];
   activeTab?: string;
 }
-export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
+export const DueExpiredBills: FC<IProps> = ({ columns, activeTab }) => {
   /* HOOKS HERE */
   /* Mutations */
   const [mutateDeleteOrders, resDeleteOrders] =
@@ -126,7 +125,7 @@ export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
       `invoices-purchases-${INVOICETYPE.Approved}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
       [ORDER_TYPE.PURCAHSE_ORDER],
       INVOICETYPE.Approved,
-      INVOICE_TYPE_STRINGS.Paid,
+      INVOICETYPE.Date_Expired,
       page,
       page_size,
       query,
@@ -199,14 +198,6 @@ export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
 
   const cols = [...columns];
 
-  cols.splice(5, 1, {
-    title: 'Paid Amount',
-    dataIndex: 'paid_amount',
-    render: (data) => {
-      return <>{moneyFormat(Math.abs(data))}</>;
-    },
-  });
-
   const renerTopRightbar = () => {
     return (
       <div className="flex alignCenter">
@@ -216,7 +207,7 @@ export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
               ...allInvoicesConfig,
               query: encode,
             });
-            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=paid&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
+            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=due_expired&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
             history.push(route);
           }}
           onClose={() => setFilterbar(false)}
@@ -258,8 +249,7 @@ export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
               page: pagination.current,
               page_size: pagination.pageSize,
             });
-
-            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=paid&sortid=null&page=1&page_size=20&sortid=${sortid}`;
+            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=due_expired&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
             history.push(route);
           } else {
             setAllInvoicesConfig({
@@ -273,9 +263,9 @@ export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
             });
             const route = `/app${
               ISupportedRoutes.PURCHASES
-            }?tabIndex=paid&sortid=null&page=${pagination.current}&page_size=${
-              pagination.pageSize
-            }&query=${query}&sortid=${
+            }?tabIndex=due_expired&sortid=null&page=${
+              pagination.current
+            }&page_size=${pagination.pageSize}&query=${query}&sortid=${
               sorter && sorter.order === 'descend'
                 ? `-${sorter.field}`
                 : sorter.field
@@ -308,7 +298,7 @@ export const PaidPurchaseEntries: FC<IProps> = ({ columns, activeTab }) => {
   );
 };
 
-export default PaidPurchaseEntries;
+export default DueExpiredBills;
 
 /* COMPONENT STYLES HERE */
 export const ALlWrapper = styled.div`

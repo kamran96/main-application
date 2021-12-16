@@ -1,12 +1,12 @@
-import React, { FC } from "react";
-import { Heading } from "../../../components/Heading";
-import { TableCard } from "../../../components/TableCard";
-import { Breadcrumb } from "antd";
-import { Link } from "react-router-dom";
-import { ISupportedRoutes } from "../../../modal/routing";
-import { BreadCrumbArea } from "../../../components/BreadCrumbArea";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { CreditNoteEditor } from "./Editor";
+import React, { FC } from 'react';
+import { Heading } from '../../../components/Heading';
+import { TableCard } from '../../../components/TableCard';
+import { Breadcrumb } from 'antd';
+import { Link } from 'react-router-dom';
+import { ISupportedRoutes } from '../../../modal/routing';
+import { BreadCrumbArea } from '../../../components/BreadCrumbArea';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { CreditNoteEditor } from './Editor';
 
 export const CreditNoteEditorWidget: FC = () => {
   const { routeHistory } = useGlobalContext();
@@ -19,14 +19,14 @@ export const CreditNoteEditorWidget: FC = () => {
       <BreadCrumbArea>
         <Breadcrumb>
           <Breadcrumb.Item>
-            <Link to={`/app${ISupportedRoutes.CREDIT_NOTES}`}>Credit Notes</Link>
+            <Link to={`/app${ISupportedRoutes.CREDIT_NOTES}`}>
+              Credit Notes
+            </Link>
           </Breadcrumb.Item>
           <Breadcrumb.Item>Credit Note</Breadcrumb.Item>
         </Breadcrumb>
       </BreadCrumbArea>
-      <TableCard>
-        <CreditNoteEditor id={id} type="CN" />
-      </TableCard>
+      <CreditNoteEditor id={id} type="CN" />
     </>
   );
 };

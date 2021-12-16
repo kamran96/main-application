@@ -22,7 +22,7 @@ import {
 } from '../../../../../modal/invoice';
 import convertToRem from '../../../../../utils/convertToRem';
 import { SmartFilter } from '../../../../../components/SmartFilter';
-import { ISupportedRoutes } from '../../../../../modal/routing';
+import { ISupportedRoutes } from '../../../../../modal';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import FilterSchema from './PoFilterSchema';
 import { ConfirmModal } from '../../../../../components/ConfirmModal';
@@ -36,12 +36,13 @@ import { PurchaseTopbar } from './PurchaseTableTopbar';
 import { _csvExportable } from './CommonCol';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
+import moneyFormat from '../../../../../utils/moneyFormat';
 
 interface IProps {
   columns?: any[];
   activeTab?: string;
 }
-export const DueExpiredPurchases: FC<IProps> = ({ columns, activeTab }) => {
+export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
   /* HOOKS HERE */
   /* Mutations */
   const [mutateDeleteOrders, resDeleteOrders] =
@@ -100,12 +101,7 @@ export const DueExpiredPurchases: FC<IProps> = ({ columns, activeTab }) => {
     });
 
   useEffect(() => {
-    if (
-      routeHistory &&
-      routeHistory.history &&
-      routeHistory.history.location &&
-      routeHistory.history.location.search
-    ) {
+    if (routeHistory?.history?.location?.search) {
       let obj = {};
       const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
@@ -122,10 +118,10 @@ export const DueExpiredPurchases: FC<IProps> = ({ columns, activeTab }) => {
   /* ******* ORDERS ONLY TYPE (PROCESSED PURCHASE ORDERS) ********** */
   const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
     [
-      `invoices-purchases-${INVOICETYPE.Approved}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
+      `invoices-purchases-${INVOICETYPE.Payment_Awaiting}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
       [ORDER_TYPE.PURCAHSE_ORDER],
       INVOICETYPE.Approved,
-      INVOICETYPE.Date_Expired,
+      INVOICE_TYPE_STRINGS.Payment_Awaiting,
       page,
       page_size,
       query,
@@ -198,6 +194,14 @@ export const DueExpiredPurchases: FC<IProps> = ({ columns, activeTab }) => {
 
   const cols = [...columns];
 
+  cols.splice(6, 1, {
+    title: 'Due Amount',
+    dataIndex: 'due_amount',
+    render: (data, row) => {
+      return <>{moneyFormat(Math.abs(data))}</>;
+    },
+  });
+
   const renerTopRightbar = () => {
     return (
       <div className="flex alignCenter">
@@ -207,7 +211,7 @@ export const DueExpiredPurchases: FC<IProps> = ({ columns, activeTab }) => {
               ...allInvoicesConfig,
               query: encode,
             });
-            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=due_expired&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
+            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=awating_payment&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
             history.push(route);
           }}
           onClose={() => setFilterbar(false)}
@@ -249,7 +253,7 @@ export const DueExpiredPurchases: FC<IProps> = ({ columns, activeTab }) => {
               page: pagination.current,
               page_size: pagination.pageSize,
             });
-            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=due_expired&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=awating_payment&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
             history.push(route);
           } else {
             setAllInvoicesConfig({
@@ -262,8 +266,8 @@ export const DueExpiredPurchases: FC<IProps> = ({ columns, activeTab }) => {
                   : sorter.field,
             });
             const route = `/app${
-              ISupportedRoutes.PURCHASES
-            }?tabIndex=due_expired&sortid=null&page=${
+              ISupportedRoutes.INVOICES
+            }?tabIndex=awating_payment&sortid=null&page=${
               pagination.current
             }&page_size=${pagination.pageSize}&query=${query}&sortid=${
               sorter && sorter.order === 'descend'
@@ -273,14 +277,14 @@ export const DueExpiredPurchases: FC<IProps> = ({ columns, activeTab }) => {
             history.push(route);
           }
         }}
-        totalItems={pagination?.total}
+        totalItems={pagination && pagination.total}
         pagination={{
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '50', '100'],
           pageSize: page_size,
           position: ['bottomRight'],
           current: pagination?.page_no,
-          total: pagination?.total,
+          total: pagination && pagination.total,
         }}
         hasfooter={true}
         onSelectRow={onSelectedRow}
@@ -298,7 +302,7 @@ export const DueExpiredPurchases: FC<IProps> = ({ columns, activeTab }) => {
   );
 };
 
-export default DueExpiredPurchases;
+export default AwaitingBillsList;
 
 /* COMPONENT STYLES HERE */
 export const ALlWrapper = styled.div`

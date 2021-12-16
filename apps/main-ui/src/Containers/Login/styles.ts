@@ -1,14 +1,14 @@
-import styled from "styled-components";
-import convertToRem from "../../utils/convertToRem";
-import bg from "../../assets/bgLogin.png";
+import styled from 'styled-components';
+import convertToRem from '../../utils/convertToRem';
+import bg from '../../assets/bgLogin.png';
 
 export const Wrapper = styled.div`
   height: 100vh;
   display: grid;
   grid-template-columns: repeat(12, 1fr);
 
-  @media(min-width: 1366px){
-    .illustration{
+  @media (min-width: 1366px) {
+    .illustration {
       padding-left: 125px !important;
     }
   }
@@ -25,6 +25,14 @@ export const Wrapper = styled.div`
       padding-bottom: 41px;
       img {
         width: 117px;
+      }
+    }
+    .ant-modal-body {
+      height: 247px;
+      width: 328px;
+      .modal-body {
+        width: 328px;
+        height : 247px;
       }
     }
     .slogan {

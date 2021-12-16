@@ -172,7 +172,7 @@ export const SidebarUi: FC<SidebarUiProps> = ({
           <ul className="route_list">
             {routes?.nestedRoutes?.map((parent, index) => {
               return (
-                <div>
+                <div key={index}>
                   {parent?.children?.length ? (
                     <MenuPopOver route={parent} />
                   ) : (
@@ -209,6 +209,7 @@ export const SidebarUi: FC<SidebarUiProps> = ({
               {routes?.singleEntity?.map((singleEntryRoute, index) => {
                 return (
                   <li
+                    key={index}
                     className={`route_list_item flex alignCenter pointer mv-4 
                     ${
                       history?.location?.pathname === singleEntryRoute?.route

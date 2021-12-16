@@ -146,7 +146,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
           'all-items',
         ].forEach((key) => {
           queryCache.invalidateQueries((q) =>
-            q.queryKey[0].toString().startsWith(`${key}`)
+            q?.queryKey[0]?.toString()?.startsWith(`${key}`)
           );
         });
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Deleted Successfully');
@@ -155,12 +155,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
         setConfirmModal(false);
       },
       onError: (error: IServerError) => {
-        if (
-          error &&
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
+        if (error?.response?.data?.message) {
           const { message } = error.response.data;
           notificationCallback(NOTIFICATIONTYPE.ERROR, message);
         }

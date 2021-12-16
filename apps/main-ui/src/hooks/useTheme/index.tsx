@@ -1,25 +1,25 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 let timeOut: any;
 
 export const useTheme = (themeName) => {
   const [themeLoading, setThemeLoading] = useState(false);
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState('light');
 
   useEffect(() => {
-    if(themeName!==theme){
+    if (themeName !== theme) {
       setThemeLoading(true);
-    let themename = themeName;
-    clearTimeout(timeOut);
-    timeOut = setTimeout(() => {
-      setTheme(themename);
+      const themename = themeName;
       clearTimeout(timeOut);
       timeOut = setTimeout(() => {
-        setThemeLoading(false);
-      }, 700);
-    }, 500);
+        setTheme(themename);
+        clearTimeout(timeOut);
+        timeOut = setTimeout(() => {
+          setThemeLoading(false);
+        }, 700);
+      }, 500);
     }
-  }, [themeName]);
+  }, [theme, themeName]);
 
   return { themeLoading, theme };
 };

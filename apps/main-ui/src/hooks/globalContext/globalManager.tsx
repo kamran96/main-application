@@ -32,8 +32,6 @@ const stylesheets = {
 
 const isProductionEnv = process.env.NODE_ENV === 'production' || false;
 
-console.log(isProductionEnv, 'what is dot env');
-
 const AUTH_CHECK_API = isProductionEnv ? CheckAuthAPI : CheckAuthAPIDev;
 
 const createStylesheetLink = (): HTMLLinkElement => {
@@ -162,6 +160,11 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     []
   );
 
+  const [contactsImportConfig, setContactsImportConfig] =
+    useState<IModalsConfig>({
+      visibility: false,
+    });
+
   const [verifiedModal, setVerifiedModal] = useState(false);
 
   window.addEventListener('offline', (event) => {
@@ -170,7 +173,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     }
   });
   window.addEventListener('online', (event) => {
-    console.log('is online fired');
     if (isOnline !== true) {
       setIsOnline(true);
     }
@@ -239,7 +241,8 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
           });
         }
 
-        localStorage.removeItem('auth');
+        localStorage.clear();
+
         setTheme('light');
         setAuth(null);
         setIsUserLogin(false);
@@ -260,7 +263,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
       setAuth((prev) => {
         if (JSON.stringify(prev) !== JSON.stringify(decriptedData)) {
-          console.log('in effect auth');
           return decriptedData;
         } else {
           return prev;
@@ -268,7 +270,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
       });
       setUserDetails((prev) => {
         if (JSON.stringify(prev) !== JSON.stringify(user)) {
-          console.log('in effect user');
           return user;
         } else {
           return prev;
@@ -373,7 +374,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const { theme: appTheme, themeLoading } = useTheme(theme);
 
-  console.log({ loggedInUserCheckingAgain, isFetching, themeLoading, theme });
   const checkingUser = (isLoading && !isFetched) || permissionsFetching;
 
   return (
@@ -534,6 +534,10 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
           return verifiedModal;
         }, [verifiedModal]),
         setVerifiedModal,
+        contactsImportConfig,
+        setContactsImportConfig: (visibility: boolean) => {
+          setContactsImportConfig({ visibility });
+        },
       }}
     >
       <WrapperChildren>
