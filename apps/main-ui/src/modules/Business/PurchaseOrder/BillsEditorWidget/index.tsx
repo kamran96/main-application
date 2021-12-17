@@ -23,6 +23,53 @@ export const BillsEditorWidget: FC = () => {
       `/app${ISupportedRoutes.CREATE_PURCHASE_Entry}/`
     )[1];
 
+  const Requires = {
+    itemId: {
+      require: true,
+      message: 'Item is Requred to Proceed invoice',
+    },
+    description: {
+      require: false,
+      message: '',
+    },
+    quantity: {
+      require: true,
+      message: 'Item is Requred to Proceed invoice',
+    },
+    unitPrice: {
+      require: true,
+      message: 'Item is Requred to Proceed invoice',
+    },
+    purchasePrice: {
+      require: true,
+      message: 'Item is Requred to Proceed invoice',
+    },
+    itemDiscount: {
+      require: true,
+      message: 'Item is Requred to Proceed invoice',
+    },
+    tax: {
+      require: true,
+      message: 'Item is Requred to Proceed invoice',
+    },
+    total: {
+      require: true,
+      message: 'Item is Requred to Proceed invoice',
+    },
+    costOfGoodAmount: {
+      require: true,
+      message: 'Item is Requred to Proceed invoice',
+    },
+    index: {
+      require: false,
+      message: 'Item is Requred to Proceed invoice',
+    },
+    accountId: {
+      require: true,
+      message: 'Item is Requred to Proceed invoice',
+    },
+  };
+
   return (
     <WrapperBillsEditor>
       <Heading>Create Bill</Heading>
@@ -34,7 +81,7 @@ export const BillsEditorWidget: FC = () => {
           <Breadcrumb.Item>Create Bill</Breadcrumb.Item>
         </Breadcrumb>
       </BreadCrumbArea>
-      <PurchasesWidget type="POE" id={id} />
+      <PurchasesWidget requires={Requires} type="POE" id={id} />
       {/* <InvoiceForm type="PO" /> */}
     </WrapperBillsEditor>
   );

@@ -6,7 +6,6 @@ import { PaymentsForm } from './form';
 
 export const PaymentsEditorWidget: FC = () => {
   const { paymentsModalConfig, setPaymentsModalConfig } = useGlobalContext();
-  console.log('paymentsModalConfig', paymentsModalConfig);
   return (
     <CommonModal
       visible={paymentsModalConfig.visibility}
