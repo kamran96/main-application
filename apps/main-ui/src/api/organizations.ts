@@ -1,3 +1,4 @@
+import { QueryKey } from '../modal';
 import http from '../utils/http';
 
 export const addOrganizationAPI = (payload) =>
@@ -10,5 +11,7 @@ export const addBrnachAPI = (payload) => http.post(`/users/branch`, payload);
 export const deleteOrganizationAPI = (payload) =>
   http.put(`/organizations/delete`, payload);
 
-export const getOrganizationByIdAPI = (key?: any, id?: number) =>
-  http.get(`/users/organization/${id}`);
+export const getOrganizationByIdAPI = ({ queryKey }: QueryKey) => {
+  const id: number = queryKey[1];
+  return http.get(`/users/organization/${id}`);
+};

@@ -51,7 +51,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
     [`organization-${id}`, id],
     getOrganizationByIdAPI,
     {
-      enabled: id !== null,
+      enabled: !!id,
     }
   );
   const errorResponse: IBaseAPIError = error;
@@ -363,7 +363,8 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
                   htmlType="submit"
                 >
                   {' '}
-                  &nbsp;&nbsp;Create Organization&nbsp;&nbsp;
+                  &nbsp;&nbsp;{id ? 'Update' : 'Create'}{' '}
+                  Organization&nbsp;&nbsp;
                 </Button>
               </Form.Item>
             </Col>

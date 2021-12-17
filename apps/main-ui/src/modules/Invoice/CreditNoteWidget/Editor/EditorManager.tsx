@@ -229,7 +229,9 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
     ],
     getAccountsByTypeAPI,
     {
-      enabled: IOrganizationType.SAAS && contactType,
+      enabled:
+        userDetails?.organization.organizationType === IOrganizationType.SAAS &&
+        !!contactType,
     }
   );
 

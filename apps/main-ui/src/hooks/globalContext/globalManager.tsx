@@ -325,7 +325,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     isFetching,
   } = useQuery([`roles-permissions`], getAllRolesWithPermission, {
     enabled: isUserLogin,
-    cacheTime: Infinity,
+    cacheTime: 10000000000000,
     staleTime: Infinity,
   });
 
