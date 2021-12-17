@@ -12,9 +12,9 @@ import GlobalStyle from './globalStyles';
 
 export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
   /* Dynamic Imports */
-  // const UserInviteModal = lazy(
-  //   () => import('../modules/Users/UserInviteModal')
-  // );
+  const UserInviteModal = lazy(
+    () => import('../modules/Users/UserInviteModal')
+  );
   const ItemsEditorWidget = lazy(
     () => import('../modules/Items/ItemsEditorWidget')
   );
@@ -31,17 +31,17 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
   const PaymentsEditorWidget = lazy(
     () => import('../modules/Payment/PaymentsEditorWidget')
   );
+  const AddOrganizationForm = lazy(
+    () => import('../Containers/AddOrganization/AddOrganizationForm')
+  );
+  const RolesEditorWidget = lazy(
+    () => import('../modules/Rbac/RolesEditorWidget/index')
+  );
   // const BranchEditorWidget = lazy(
   //   () => import('../modules/Branch/BranchEditorWidget')
   // );
   // const AddBankWidget = lazy(
   //   () => import('../modules/Business/BankAccounts/AddBank')
-  // );
-  // const AddOrganizationForm = lazy(
-  //   () => import('../Containers/AddOrganization/AddOrganizationForm')
-  // );
-  // const RolesEditorWidget = lazy(
-  //   () => import('../modules/Rbac/RolesEditorWidget/index')
   // );
   // const PermissionsEditorWidget = lazy(
   //   () => import('../modules/Rbac/PermissionsEditorWidget/index')
@@ -110,14 +110,21 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
         <Suspense fallback={<div></div>}>
           <PaymentsEditorWidget />
         </Suspense>
-        {/* <UserInviteModal2 /> */}
-        {/* <Suspense fallback={<div></div>}>
-          <UserInviteModal />
-        </Suspense>
-        <GeneralPreferencesWidget />
-        <Suspense fallback={<></>}>
+        <Suspense fallback={<div></div>}>
           <AddOrganizationForm />
         </Suspense>
+        <Suspense fallback={<div></div>}>
+          <UserInviteModal />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <RolesEditorWidget />
+        </Suspense>
+        {/* <UserInviteModal2 /> */}
+        {/* <Suspense fallback={<div></div>}>
+         
+        </Suspense>
+        <GeneralPreferencesWidget />
+       
         
         <Suspense fallback={<></>}>
           <AddBankWidget />
@@ -134,9 +141,7 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
         <Suspense fallback={<></>}>
           <ReviewModal />
         </Suspense>
-        <Suspense fallback={<></>}>
-          <RolesEditorWidget />
-        </Suspense>
+       
         <Suspense fallback={<></>}>
           <PermissionsEditorWidget />
         </Suspense>

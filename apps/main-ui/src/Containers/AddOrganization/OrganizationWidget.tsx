@@ -1,6 +1,6 @@
 import { Button, Col, Form, Input, Row, Select } from 'antd';
 import { FC } from 'react';
-import { useQueryClient, useMutation, useQuery } from 'react-query';
+import { useQueryClient, useMutation } from 'react-query';
 import styled from 'styled-components';
 import en from 'world_countries_lists/data/en/world.json';
 import { addOrganizationAPI } from '../../api/organizations';
