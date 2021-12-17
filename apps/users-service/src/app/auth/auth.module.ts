@@ -9,6 +9,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UserToken, UserTokenSchema } from '../schemas/userToken.schema';
 import { AuthStrategy } from './auth.strategy';
+// import { Authenticate } from '@invyce/auth-middleware';
 
 @Module({
   controllers: [AuthController],
