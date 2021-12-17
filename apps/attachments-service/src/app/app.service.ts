@@ -1,11 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { getCustomRepository } from 'typeorm';
 import { InjectModel } from '@nestjs/mongoose';
 import * as multer from 'multer';
 import * as multerS3 from 'multer-s3';
 import * as aws from 'aws-sdk';
 import * as puppeteer from 'puppeteer';
-import * as fs from 'fs';
 import { Attachment } from '../schemas/attachment.schema';
 // const fs = require('fs').promises;
 // import { buildPaths } from '../buildPath';

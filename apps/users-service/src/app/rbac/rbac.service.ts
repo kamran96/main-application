@@ -146,7 +146,6 @@ export class RbacService {
   }
 
   async GetRoles(user: IBaseUser): Promise<IRole[]> {
-    console.log('okkkkkkk role');
     const role = await this.roleModel
       .find({
         organizationId: user.organizationId,
