@@ -164,7 +164,7 @@ export const PaymentsForm: FC = () => {
     ],
     getInvoiceAgainstID,
     {
-      enabled: contact_id && paymentModeSelected,
+      enabled: !!contact_id && !!paymentModeSelected,
     }
   );
 

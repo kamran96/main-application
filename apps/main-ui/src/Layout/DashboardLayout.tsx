@@ -28,9 +28,9 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
     () => import('../modules/Items/PricingEditorWidget')
   );
   const AddAccount = lazy(() => import('../modules/Accounts/AddAccount'));
-  // const PaymentsEditorWidget = lazy(
-  //   () => import('../modules/Payment/PaymentsEditorWidget')
-  // );
+  const PaymentsEditorWidget = lazy(
+    () => import('../modules/Payment/PaymentsEditorWidget')
+  );
   // const BranchEditorWidget = lazy(
   //   () => import('../modules/Branch/BranchEditorWidget')
   // );
@@ -107,6 +107,9 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
         <Suspense fallback={<div></div>}>
           <AddAccount />
         </Suspense>
+        <Suspense fallback={<div></div>}>
+          <PaymentsEditorWidget />
+        </Suspense>
         {/* <UserInviteModal2 /> */}
         {/* <Suspense fallback={<div></div>}>
           <UserInviteModal />
@@ -122,9 +125,7 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
         <Suspense fallback={<></>}>
           <BranchEditorWidget />
         </Suspense>
-        <Suspense fallback={<></>}>
-          <PaymentsEditorWidget />
-        </Suspense>
+        
         
        
         <Suspense fallback={<></>}>

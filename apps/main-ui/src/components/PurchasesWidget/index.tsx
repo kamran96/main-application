@@ -33,20 +33,10 @@ import c from './keys';
 import { PrintViewPurchaseWidget } from './PrintViewPurchaseWidget';
 import { WrapperInvoiceForm } from './styles';
 import { PurchaseManager, usePurchaseWidget } from './WidgetManager';
+import { IProps, IPurchaseManagerProps, ISUBMITTYPE } from './types';
+import { useHistory } from 'react-router-dom';
 
 const { Option } = Select;
-
-enum ISUBMITTYPE {
-  RETURN = 'RETURN',
-  APPROVE_PRINT = 'APPROVE&PRINT',
-  ONLYAPPROVE = 'ONLYAPPROVE',
-  DRAFT = 'DRAFT',
-}
-
-interface IProps {
-  type?: 'BILL' | 'SI' | 'POE' | 'PO' | 'QO';
-  id?: number;
-}
 
 interface IPaymentPayload {
   paymentMode: number;
@@ -64,9 +54,9 @@ const Editor: FC<IProps> = ({ type, id }) => {
   const queryCache = useQueryClient();
   /* ************ HOOKS *************** */
   /* Component State Hooks */
-  const { routeHistory, userDetails } = useGlobalContext();
+  const { userDetails } = useGlobalContext();
   const { organization } = userDetails;
-  const { history } = routeHistory;
+  const history = useHistory();
   const [issueDate, setIssueDate] = useState(dayjs());
   const [printModal, setPrintModal] = useState(false);
   const [taxType, setTaxType] = useState<ITaxTypes>(ITaxTypes.TAX_INCLUSIVE);
@@ -288,7 +278,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
     ClearAll();
     if (id) {
       queryCache.removeQueries(`${type}-${id}-view`);
-      let route = history.location.pathname.split('/');
+      let route: string[] | string = history.location.pathname.split('/');
       if (route.length > 3) {
         const removeIndex = route.length - 1;
         route.splice(removeIndex, 1);
@@ -837,7 +827,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
   );
 };
 
-export const PurchasesWidget: FC<IProps> = (props) => {
+export const PurchasesWidget: FC<IPurchaseManagerProps> = (props) => {
   return (
     <PurchaseManager {...props}>
       <Editor {...props} />

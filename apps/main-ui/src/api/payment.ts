@@ -1,3 +1,4 @@
+import { QueryKey } from '../modal';
 import http from '../utils/http';
 
 enum PAYMENTS {
@@ -5,10 +6,14 @@ enum PAYMENTS {
   INDEX = `payments/payment`,
 }
 
-export const getInvoiceAgainstID = (key?: any, payload?: any) =>
-  http.get(
+export const getInvoiceAgainstID = ({ queryKey }: QueryKey) => {
+  const payload = queryKey[1];
+
+  return http.get(
     `invoices/invoice/contact/${payload.id}?type=${payload.paymentMode}`
   );
+};
+
 export const paymentCreateAPI = (payload) => {
   return http.post(PAYMENTS.CREATE, payload);
 };
