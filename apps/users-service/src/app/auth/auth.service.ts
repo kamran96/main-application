@@ -414,6 +414,11 @@ export class AuthService {
     await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
   }
 
+  async SendPasswordUpdatedNotification() {
+    const baseUrl = 'http://localhost:4200';
+    const operating_system = os.type();
+  }
+
   async verifyForgotPassword(code: string): Promise<IUser> {
     const string = Buffer.from(code, 'base64').toString('ascii');
     const data = JSON.parse(string);
@@ -437,6 +442,7 @@ export class AuthService {
           roleId: verify.roleId,
         };
 
+        await this.SendPasswordUpdatedNotification();
         return updatedUser;
       }
     } catch (err) {
