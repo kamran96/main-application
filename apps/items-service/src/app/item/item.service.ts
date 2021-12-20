@@ -19,7 +19,7 @@ export class ItemService {
     itemData: IBaseUser,
     query: IPage
   ): Promise<IItemWithResponse> {
-    const { page_size, page_no, filters, purpose } = query;
+    const { page_size, page_no, query: filters, purpose } = query;
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
 
@@ -36,34 +36,77 @@ export class ItemService {
         const filterData = Buffer.from(filters, 'base64').toString();
         const data = JSON.parse(filterData);
 
+        const myCustomLabels = {
+          docs: 'result',
+          totalDocs: 'total',
+          limit: 'page_size',
+          page: 'page_no',
+          nextPage: 'next',
+          prevPage: 'prev',
+          totalPages: 'total_pages',
+          meta: 'pagination',
+        };
+
         for (const i in data) {
           if (data[i].type === 'search') {
             const val = data[i].value?.split('%')[1];
-            items = await this.itemModel.find({
-              status: 1,
-              organizationId: itemData.organizationId,
-              [i]: { $regex: val },
-            });
+            items = await this.itemModel.paginate(
+              {
+                status: 1,
+                organizationId: itemData.organizationId,
+                [i]: { $regex: val },
+              },
+              {
+                offset: pn * ps - ps,
+                populate: 'price',
+                limit: ps,
+                customLabels: myCustomLabels,
+              }
+            );
           } else if (data[i].type === 'date-between') {
             const start_date = i[1]['value'][0];
             const end_date = i[1]['value'][1];
-            items = await this.itemModel.find({
-              status: 1,
-              organizationId: itemData.organizationId,
-              [i]: { $gt: start_date, $lt: end_date },
-            });
+            items = await this.itemModel.paginate(
+              {
+                status: 1,
+                organizationId: itemData.organizationId,
+                [i]: { $gt: start_date, $lt: end_date },
+              },
+              {
+                offset: pn * ps - ps,
+                populate: 'price',
+                limit: ps,
+                customLabels: myCustomLabels,
+              }
+            );
           } else if (data[i].type === 'compare') {
-            items = await this.itemModel.find({
-              status: 1,
-              organization: itemData.organizationId,
-              [i]: { $in: i[1]['value'] },
-            });
+            items = await this.itemModel.paginate(
+              {
+                status: 1,
+                organization: itemData.organizationId,
+                [i]: { $in: i[1]['value'] },
+              },
+              {
+                offset: pn * ps - ps,
+                populate: 'price',
+                limit: ps,
+                customLabels: myCustomLabels,
+              }
+            );
           } else if (data[i].type === 'in') {
-            items = await this.itemModel.find({
-              status: 1,
-              organization: itemData.organizationId,
-              [i]: { $in: i[1]['value'] },
-            });
+            items = await this.itemModel.paginate(
+              {
+                status: 1,
+                organization: itemData.organizationId,
+                [i]: { $in: i[1]['value'] },
+              },
+              {
+                offset: pn * ps - ps,
+                populate: 'price',
+                limit: ps,
+                customLabels: myCustomLabels,
+              }
+            );
           }
         }
       } else {
@@ -89,6 +132,7 @@ export class ItemService {
         );
       }
     }
+
     return items;
   }
 
