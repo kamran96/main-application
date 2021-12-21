@@ -12,14 +12,15 @@ import {
 import { CommonModal } from '../../../components';
 import { FormLabel } from '../../../components/FormLabel';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { IRoleRequest } from '../../../modal';
+import { IRoleRequest, NOTIFICATIONTYPE } from '../../../modal';
 import convertToRem from '../../../utils/convertToRem';
 
 const { Option } = Select;
 
 export const RolesEditorWidget: FC = () => {
   const queryCache = useQueryClient();
-  const { rbacConfigModal, setRbacConfigModal } = useGlobalContext();
+  const { rbacConfigModal, setRbacConfigModal, notificationCallback } =
+    useGlobalContext();
   const { id } = rbacConfigModal;
   const { visibility } = rbacConfigModal;
   const { mutate: mutateAddRoles, isLoading: addingRoles } =
@@ -76,7 +77,7 @@ export const RolesEditorWidget: FC = () => {
     }
     await mutateAddRoles(payload, {
       onSuccess: () => {
-        queryCache.invalidateQueries(`rbac-list`);
+        (queryCache.invalidateQueries as any)((q) => q.startsWith('rbac-list'));
         onCancel();
       },
     });
@@ -84,6 +85,10 @@ export const RolesEditorWidget: FC = () => {
 
   const onCancel = () => {
     form.resetFields();
+    notificationCallback(
+      NOTIFICATIONTYPE.SUCCESS,
+      `${id ? 'Updated' : 'Created'}`
+    );
     setRbacConfigModal(false);
   };
 
@@ -131,7 +136,7 @@ export const RolesEditorWidget: FC = () => {
                 Cancel
               </Button>
               <Button loading={addingRoles} htmlType={'submit'} type="primary">
-                Create
+                {!id ? 'Create' : 'Update'}
               </Button>
             </div>
           </Form.Item>

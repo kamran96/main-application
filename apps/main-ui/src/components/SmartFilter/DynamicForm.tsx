@@ -1,16 +1,16 @@
-import React from "react";
-import { FilterType } from "../../modal";
-import { FormLabel } from "../FormLabel";
-import { Input, Radio, Select } from "antd";
-import styled from "styled-components";
-import convertToRem from "../../utils/convertToRem";
-import { DatePicker } from "../DatePicker";
-import dayjs from "dayjs";
-import { CustomDateRange } from "../DateRange";
+import React from 'react';
+import { FilterType } from '../../modal';
+import { FormLabel } from '../FormLabel';
+import { Input, Radio, Select } from 'antd';
+import styled from 'styled-components';
+import convertToRem from '../../utils/convertToRem';
+import { DatePicker } from '../DatePicker';
+import dayjs from 'dayjs';
+import { CustomDateRange } from '../DateRange';
 
 const { Option } = Select;
 
-const dateFormat = "YYYY/MM/DD";
+const dateFormat = 'YYYY/MM/DD';
 
 export default function (item, initialState, change) {
   switch (item.type) {
@@ -48,7 +48,6 @@ export default function (item, initialState, change) {
         </WrapperDyFrom>
       );
     case FilterType.DATE_BETWEEN:
-      console.log(initialState, "initial")
       return (
         <WrapperDyFrom>
           <FormLabel className="label">{item.label}</FormLabel>
@@ -56,15 +55,15 @@ export default function (item, initialState, change) {
             // value={initialState}
             onChange={(val) => {
               if (val?.length) {
-                let payload = val.map((date) => {
-                  return dayjs(date).format("YYYY-MM-DD");
+                const payload = val.map((date) => {
+                  return dayjs(date).format('YYYY-MM-DD');
                 });
                 change(payload);
               } else {
-                change("");
+                change('');
               }
             }}
-            style={{ width: "100%" }}
+            style={{ width: '100%' }}
             size="middle"
             format={dateFormat}
           />
@@ -75,16 +74,16 @@ export default function (item, initialState, change) {
         <WrapperDyFrom>
           <FormLabel className="label">{item.label}</FormLabel>
           <DatePicker
-            size={"middle"}
+            size={'middle'}
             value={initialState && dayjs(initialState)}
             onChange={(value) => {
               if (value) {
                 change(value);
               } else {
-                change("");
+                change('');
               }
             }}
-            style={{ width: "100%" }}
+            style={{ width: '100%' }}
             format={dateFormat}
           />
         </WrapperDyFrom>
@@ -98,7 +97,7 @@ export default function (item, initialState, change) {
           <FormLabel className="label">{item.label}</FormLabel>
 
           <Radio.Group
-            value={initialState ? initialState : ""}
+            value={initialState ? initialState : ''}
             onChange={(e) => change(e.target.value)}
             name="radiogroup"
           >
@@ -111,7 +110,7 @@ export default function (item, initialState, change) {
             })}
             {allValues.length && (
               <Radio value={`${allValues}`}>
-                {allValues.length < 2 ? "All" : "both"}
+                {allValues.length < 2 ? 'All' : 'both'}
               </Radio>
             )}
           </Radio.Group>
@@ -139,7 +138,7 @@ export default function (item, initialState, change) {
         </WrapperDyFrom>
       );
     default:
-      return null
+      return null;
       break;
   }
 }

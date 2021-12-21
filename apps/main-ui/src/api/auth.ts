@@ -29,8 +29,8 @@ export const resendVerificationCodeAPI = (payload: any) =>
   http?.post(`users/auth/resend-otp`, payload);
 
 export const CheckAuthAPI = (key?: any) => http.get(`users/auth/check`);
-export const CheckAuthAPIDev = ({ queryKey }: QueryKey) => {
-  const id = queryKey[1];
+export const CheckAuthAPIDev = (id?: any) => {
+  // const id = queryKey[1];
   return http?.get(`users/user/${id}`);
 };
 

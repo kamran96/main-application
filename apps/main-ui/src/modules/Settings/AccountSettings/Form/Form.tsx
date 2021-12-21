@@ -1,10 +1,11 @@
-import styled from "styled-components";
-import React, { FC, useState } from "react";
-import { Row, Col, Form, Input, Select, Button } from "antd";
-import { FormLabel } from "../../../../components/FormLabel";
-import { Heading } from "../../../../components/Heading";
-import { Color } from "../../../../modal";
-import convertToRem from "../../../../utils/convertToRem";
+import styled from 'styled-components';
+import React, { FC, useState } from 'react';
+import { Row, Col, Form, Input, Select, Button } from 'antd';
+import { FormLabel } from '../../../../components/FormLabel';
+import { Heading } from '../../../../components/Heading';
+import { Color } from '../../../../modal';
+import convertToRem from '../../../../utils/convertToRem';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 
 const { Option } = Select;
 
@@ -14,6 +15,10 @@ export const AccountsSettingsForm: FC = () => {
     password: false,
     twoStepAuth: false,
   });
+
+  const { userDetails } = useGlobalContext();
+  const { email } = userDetails;
+
   return (
     <WrapperSettingsForm>
       <Form>
@@ -30,6 +35,7 @@ export const AccountsSettingsForm: FC = () => {
                 <FormLabel>Email Address</FormLabel>
                 <Form.Item name="email">
                   <Input
+                    defaultValue={email}
                     disabled={!editable.email}
                     placeholder="something@example.com"
                     size="large"
@@ -77,7 +83,7 @@ export const AccountsSettingsForm: FC = () => {
                     size="large"
                     disabled={!editable.twoStepAuth}
                     showSearch
-                    style={{ width: "100%" }}
+                    style={{ width: '100%' }}
                     placeholder="Select a Country"
                     optionFilterProp="children"
                     onChange={(val) => console.log(val)}
@@ -111,8 +117,8 @@ export const AccountsSettingsForm: FC = () => {
                   <Select
                     size="large"
                     showSearch
-                    defaultValue={"1"}
-                    style={{ width: "100%" }}
+                    defaultValue={'1'}
+                    style={{ width: '100%' }}
                     placeholder="Select a Country"
                     optionFilterProp="children"
                     onChange={(val) => console.log(val)}

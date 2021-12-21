@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import { ReactNode } from 'react';
+import { ReactNode, useRef } from 'react';
 import { FC, useEffect, useState, useMemo } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import { useHistory } from 'react-router-dom';
@@ -22,6 +22,7 @@ import { IRolePermissions } from '../../modal/rbac';
 import { DecriptionData, EncriptData } from '../../utils/encription';
 import { useTheme } from '../useTheme';
 import { globalContext } from './globalContext';
+import { useHttp } from './useHttp';
 
 type Theme = 'light' | 'dark';
 
@@ -283,36 +284,58 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const userId = auth?.users?.id || null;
 
-  /* LoggedInUser is Fetched */
-  const { isLoading, isFetched } = useQuery(
-    [`loggedInUser`, userId],
-    AUTH_CHECK_API,
+  const {
+    isLoading,
+    response,
+    refetch: refetchUser,
+    error,
+  } = useHttp(
     {
-      cacheTime: 10000000000000,
-      enabled: isProductionEnv ? checkAutherized : !!userId,
+      queryFn: async () => {
+        CheckAuthAPIDev(userId);
+      },
 
       onSuccess: (data) => {
-        if (isProductionEnv) {
-          setUserDetails(data?.data?.users);
-          setIsUserLogin(true);
-        } else {
-          const { result } = data?.data;
-          setUserDetails(result);
-          setIsUserLogin(true);
-          if (result?.theme) {
-            setTheme(result?.theme);
-          }
-        }
+        console.log(data);
       },
-      onError: (err: IBaseAPIError) => {
-        // CancelRequest();
-        if (err?.response?.data?.statusCode === 401) {
-          handleLogin({ type: ILoginActions.LOGOUT });
-        }
-        setAutherized(false);
-      },
-    }
+    },
+
+    [!!userId]
   );
+
+  console.log(isLoading, response, error, 'what is response now');
+
+  // /* LoggedInUser is Fetched */
+  // const { isLoading, isFetched } = useQuery(
+  //   [`loggedInUser`, userId],
+  //   AUTH_CHECK_API,
+  //   {
+  //     cacheTime: 10000000000000,
+  //     enabled: isProductionEnv ? checkAutherized : !!userId,
+  //     refetchIntervalInBackground: false,
+
+  //     onSuccess: (data) => {
+  //       if (isProductionEnv) {
+  //         setUserDetails(data?.data?.users);
+  //         setIsUserLogin(true);
+  //       } else {
+  //         const { result } = data?.data;
+  //         setUserDetails(result);
+  //         setIsUserLogin(true);
+  //         if (result?.theme) {
+  //           setTheme(result?.theme);
+  //         }
+  //       }
+  //     },
+  //     onError: (err: IBaseAPIError) => {
+  //       // CancelRequest();
+  //       if (err?.response?.data?.statusCode === 401) {
+  //         handleLogin({ type: ILoginActions.LOGOUT });
+  //       }
+  //       setAutherized(false);
+  //     },
+  //   }
+  // );
 
   useEffect(() => {
     toggleTheme(theme);
@@ -327,6 +350,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     enabled: isUserLogin,
     cacheTime: 10000000000000,
     staleTime: Infinity,
+    refetchIntervalInBackground: false,
   });
 
   useEffect(() => {
@@ -377,7 +401,11 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const { theme: appTheme, themeLoading } = useTheme(theme);
 
-  const checkingUser = (isLoading && !isFetched) || permissionsFetching;
+  const checkingUser = false;
+
+  const rerender = useRef(1 + 1);
+
+  console.log(rerender, 'rerender');
 
   return (
     <globalContext.Provider
@@ -541,6 +569,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         setContactsImportConfig: (visibility: boolean) => {
           setContactsImportConfig({ visibility });
         },
+        refetchUser,
       }}
     >
       <WrapperChildren>
@@ -549,8 +578,24 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
       </div> */}
         {/* <div onClick={()=>setTheme('dark')}>dark mode</div>
       <div onClick={()=>setTheme('light')}>light mode</div> */}
-
-        {children}
+        <div>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Corrupti
+          quibusdam laudantium expedita doloribus, iusto praesentium fuga ab
+          quam alias, a officia voluptates rem consequatur explicabo facilis
+          odio at facere quo. Lorem ipsum, dolor sit amet consectetur
+          adipisicing elit. Quod, commodi beatae? Similique rerum suscipit
+          exercitationem quam eveniet nobis, totam, unde illo impedit ad optio
+          ipsum. Tempora sit sint laboriosam fugit!
+        </div>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            refetchUser();
+          }}
+        >
+          on Refetch
+        </button>
+        {/* {children} */}
       </WrapperChildren>
     </globalContext.Provider>
   );

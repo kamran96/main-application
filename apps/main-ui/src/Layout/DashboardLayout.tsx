@@ -37,31 +37,31 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
   const RolesEditorWidget = lazy(
     () => import('../modules/Rbac/RolesEditorWidget/index')
   );
-  // const BranchEditorWidget = lazy(
-  //   () => import('../modules/Branch/BranchEditorWidget')
-  // );
-  // const AddBankWidget = lazy(
-  //   () => import('../modules/Business/BankAccounts/AddBank')
-  // );
-  // const PermissionsEditorWidget = lazy(
-  //   () => import('../modules/Rbac/PermissionsEditorWidget/index')
-  // );
-  // const EnableDispatchModal = lazy(
-  //   () => import('../modules/Dispatching/DispatchingWall/EnableDispatch')
-  // );
-  // const ReviewModal = lazy(
-  //   () => import('../modules/Dispatching/DispatchingWall/ReviewModal')
-  // );
+  const BranchEditorWidget = lazy(
+    () => import('../modules/Branch/BranchEditorWidget')
+  );
+  const AddBankWidget = lazy(
+    () => import('../modules/Business/BankAccounts/AddBank')
+  );
+  const PermissionsEditorWidget = lazy(
+    () => import('../modules/Rbac/PermissionsEditorWidget/index')
+  );
+  const EnableDispatchModal = lazy(
+    () => import('../modules/Dispatching/DispatchingWall/EnableDispatch')
+  );
+  const ReviewModal = lazy(
+    () => import('../modules/Dispatching/DispatchingWall/ReviewModal')
+  );
 
-  // const VerifyAccountModal = lazy(
-  //   () => import('../components/VerificationModal')
-  // );
+  const VerifyAccountModal = lazy(
+    () => import('../components/VerificationModal')
+  );
 
-  // const Paywall = lazy(() => import('../modules/Paywall'));
+  const Paywall = lazy(() => import('../modules/Paywall'));
 
-  // const ContactsImportWidget = lazy(
-  //   () => import('../modules/Contacts/ContactsImport/ContactImportWidget')
-  // );
+  const ContactsImportWidget = lazy(
+    () => import('../modules/Contacts/ContactsImport/ContactImportWidget')
+  );
 
   const { isUserLogin, userDetails, routeHistory, theme, itemsModalConfig } =
     useGlobalContext();
@@ -120,40 +120,35 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
           <RolesEditorWidget />
         </Suspense>
         {/* <UserInviteModal2 /> */}
-        {/* <Suspense fallback={<div></div>}>
-         
-        </Suspense>
+        <Suspense fallback={<div></div>}></Suspense>
         <GeneralPreferencesWidget />
-       
-        
-        <Suspense fallback={<></>}>
+
+        <Suspense fallback={<div></div>}>
           <AddBankWidget />
         </Suspense>
-        <Suspense fallback={<></>}>
+        <Suspense fallback={<div></div>}>
           <BranchEditorWidget />
         </Suspense>
-        
-        
-       
-        <Suspense fallback={<></>}>
+
+        <Suspense fallback={<div></div>}>
           <EnableDispatchModal />
         </Suspense>
-        <Suspense fallback={<></>}>
+        <Suspense fallback={<div></div>}>
           <ReviewModal />
         </Suspense>
-       
-        <Suspense fallback={<></>}>
+
+        <Suspense fallback={<div></div>}>
           <PermissionsEditorWidget />
         </Suspense>
-        <Suspense fallback={<></>}>
+        <Suspense fallback={<div></div>}>
           <Paywall />
         </Suspense>
-        <Suspense fallback={<></>}>
+        <Suspense fallback={<div></div>}>
           <VerifyAccountModal />
         </Suspense>
-        <Suspense fallback={<></>}>
+        <Suspense fallback={<div></div>}>
           <ContactsImportWidget />
-        </Suspense> */}
+        </Suspense>
       </DashboardWrapper>
     </ThemeProvider>
   );

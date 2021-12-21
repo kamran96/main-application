@@ -1,4 +1,3 @@
-import { ORDER_TYPE } from './../modal/invoice';
 import http from '../utils/http';
 import { QueryKey } from '../modal';
 
@@ -81,10 +80,10 @@ export const invoiceDashboardDetailsAPI = (key?: any) =>
 export const draftInvoicesSuggestAPI = (key?: any) =>
   http.get('/invoice-draft');
 
-export const getInvoiceNumber = (
-  key?: any,
-  type: ORDER_TYPE = ORDER_TYPE?.SALE_INVOICE
-) => http?.get(`${INVOICES_API.INDEX}/number?type=${type}`);
+export const getInvoiceNumber = ({ queryKey }: QueryKey) => {
+  const type = queryKey[1];
+  return http?.get(`${INVOICES_API.INDEX}/number?type=${type}`);
+};
 
 export const getCreditNotes = ({ queryKey }: QueryKey) => {
   const status: string | number = queryKey[1] || 1;

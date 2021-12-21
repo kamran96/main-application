@@ -3,7 +3,7 @@ import http from '../utils/http';
 
 enum USERS {
   INDEX = 'users/user',
-  DELETE = `users/user`,
+  DELETE = `users/user/delete`,
   INVITE = `users/user/invite`,
 }
 

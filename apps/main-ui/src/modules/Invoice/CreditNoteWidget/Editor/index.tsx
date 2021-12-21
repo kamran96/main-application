@@ -6,8 +6,6 @@ import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
 import { IContactTypes, CreditNoteType } from '../../../../modal';
 import dayjs from 'dayjs';
 import { FC, useRef, useState } from 'react';
-import { createDndContext } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useQueryClient, useMutation } from 'react-query';
 
 import { CreditNoteCreateAPI } from '../../../../api';
@@ -31,12 +29,12 @@ import { IOrganizationType } from '../../../../modal/organization';
 import { addition } from '../../../../utils/helperFunctions';
 import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv, { DownloadPDF } from '../../../../utils/Print';
-import defaultItems from './defaultStates';
-import { DragableBodyRow } from './draggable';
+import defaultItems, { Requires } from './defaultStates';
 import { PurchaseManager, usePurchaseWidget } from './EditorManager';
 import { WrapperInvoiceForm } from './styles';
-
-const RNDContext = createDndContext(HTML5Backend);
+import { handleCheckValidation } from './handlers';
+import c from './key';
+import { invycePersist } from '@invyce/invyce-persist';
 
 const { Option } = Select;
 
@@ -51,16 +49,6 @@ interface IProps {
   type?: 'CN';
   id?: number;
   onSubmit?: (payload: any) => void;
-}
-
-interface IPaymentPayload {
-  paymentMode: number;
-  totalAmount: number;
-  totalDiscount: number;
-  dueDate: any;
-  paymentType?: number;
-  bankId?: number;
-  amount?: number | any;
 }
 
 let debounce: any;
@@ -86,8 +74,6 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
     invoiceItems,
     setInvoiceItems,
     deleteIds,
-    payment,
-    setPayment,
     AntForm,
     isFetching,
     handleAddRow,
@@ -123,7 +109,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
     printDiv(printItem);
   };
 
-  const onSendPDF = (contactId, message) => {
+  const onSendPDF = (contactId, invoiceId) => {
     const printItem = printRef.current;
     let email = ``;
 
@@ -137,9 +123,10 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
 
     const pdf = DownloadPDF(printItem);
     const payload = {
-      email,
+      email: 'kamran@invyce.com',
       html: `${pdf}`,
-      message,
+      id: invoiceId,
+      type: type,
     };
     handleUploadPDF(payload);
   };
@@ -147,25 +134,11 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   const onFinish = async (value) => {
-    const InvoiceItemsValidation = [];
-    organization?.organizationType !== IOrganizationType.ENTERPRISE &&
-      invoiceItems.forEach(async (i, index) => {
-        if (i.itemId === null) {
-          InvoiceItemsValidation.push(index + 1);
-        }
-      });
-    if (InvoiceItemsValidation.length > 0) {
-      notificationCallback(
-        NOTIFICATIONTYPE.ERROR,
-        `Error in [${InvoiceItemsValidation.map((i) => {
-          return `${i}`;
-        })}] Please Select any item otherwise delete empty row.`
-      );
-    } else {
-      const paymentData = { ...payment };
-      delete paymentData.totalAmount;
-      delete paymentData.totalDiscount;
+    const error = handleCheckValidation(invoiceItems, Requires, (val) => {
+      setInvoiceItems(val);
+    });
 
+    if (!error?.length) {
       const [filteredContact] = contactResult?.filter(
         (i) => i.id === value?.contactId
       );
@@ -199,60 +172,48 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
           deleted_ids: deleteIds,
         };
       }
-      try {
-        await muatateCreateInvoice(payload, {
-          onSuccess: () => {
-            notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Invoice Created');
-            if (value && value.status.print) {
-              setPrintModal(true);
-            }
-            if (payload.status !== 2) {
-              const messages = {
-                invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
-                quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.invoice.reference}`,
-              };
-              onSendPDF(
-                value.contactId,
-                type === IInvoiceType.INVOICE
-                  ? messages.invoice
-                  : messages.quotes
-              );
-            }
-            ClearAll();
-            setInvoiceDiscount(0);
-            /* this will clear invoice items, formdata and payment */
-            setInvoiceItems([{ ...defaultItems }]);
-            [
-              'invoices',
-              'transactions?page',
-              'items?page',
-              'invoice-view',
-              'ledger-contact',
-              'all-items',
-            ].forEach((key) => {
-              (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
-            });
-          },
-          onError: (error: IServerError) => {
-            if (
-              error &&
-              error.response &&
-              error.response.data &&
-              error.response.data.message
-            ) {
-              const { message } = error.response.data;
-              notificationCallback(NOTIFICATIONTYPE.ERROR, message);
-            } else {
-              notificationCallback(
-                NOTIFICATIONTYPE.ERROR,
-                IErrorMessages.NETWORK_ERROR
-              );
-            }
-          },
-        });
-      } catch (error) {
-        console.log(error, 'error');
-      }
+
+      await muatateCreateInvoice(payload, {
+        onSuccess: (data) => {
+          notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Invoice Created');
+          if (value && value.status.print) {
+            setPrintModal(true);
+          }
+          if (payload?.invoice?.status !== 2) {
+            onSendPDF(value.contactId, data?.data?.result?.id);
+          }
+          ClearAll();
+          setInvoiceDiscount(0);
+          /* this will clear invoice items, formdata and payment */
+          setInvoiceItems([{ ...defaultItems }]);
+          [
+            'invoices',
+            'transactions?page',
+            'items?page',
+            'invoice-view',
+            'ledger-contact',
+            'all-items',
+          ].forEach((key) => {
+            (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
+          });
+        },
+        onError: (error: IServerError) => {
+          if (
+            error &&
+            error.response &&
+            error.response.data &&
+            error.response.data.message
+          ) {
+            const { message } = error.response.data;
+            notificationCallback(NOTIFICATIONTYPE.ERROR, message);
+          } else {
+            notificationCallback(
+              NOTIFICATIONTYPE.ERROR,
+              IErrorMessages.NETWORK_ERROR
+            );
+          }
+        },
+      });
     }
   };
   const onCancelPrint = () => {
@@ -307,6 +268,14 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           onValuesChange={(changedField, allvalues) => {
+            const _formData =
+              invycePersist(c.ANTFORMCACHE + type, '', 'localStorage').get() ||
+              null;
+            invycePersist(
+              c.ANTFORMCACHE + type,
+              { ..._formData, ...allvalues },
+              'localStorage'
+            ).set();
             if (changedField?.isTaxIncluded) {
               setTaxType(changedField?.isTaxIncluded);
             }
@@ -379,9 +348,6 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                       rules={[{ required: true, message: 'Required !' }]}
                     >
                       <DatePicker
-                        onChange={(date) => {
-                          setPayment({ ...payment, dueDate: date });
-                        }}
                         disabledDate={(current) => {
                           return current > dayjs().endOf('day');
                         }}
@@ -555,7 +521,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                 <Form.Item name="status" className="actions_control">
                   <Button
                     onClick={() => {
-                      AntForm.resetFields();
+                      ClearAll();
                     }}
                     size={'middle'}
                     type="default"
