@@ -73,14 +73,14 @@ export const RbacList: FC = () => {
             icon={editSolid}
             size={'middle'}
           />
-          <ButtonTag
+          {/* <ButtonTag
             className="mr-10"
             disabled={!selectedRows.length}
             onClick={() => setConfirmModal(true)}
             title="Delete"
             icon={deleteIcon}
             size={'middle'}
-          />
+          /> */}
         </div>
       </div>
     );

@@ -103,7 +103,7 @@ export const PermissionList: FC = () => {
 
   const renderCustomTopbar = () => {
     return (
-      <div className="contacts_search">
+      <div className="contacts_search mv-10">
         <div className="options_actions ">
           <div className="edit flex alignCenter ">
             <ButtonTag

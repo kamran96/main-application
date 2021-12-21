@@ -30,6 +30,7 @@ export const UsersList: FC = () => {
     result: [],
     pagination: null,
   });
+  const { setUserInviteModal } = useGlobalContext();
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const { mutate: mutateDeleteUser, isLoading: deletingUser } =
@@ -118,7 +119,9 @@ export const UsersList: FC = () => {
     mutateDeleteUser(payload, {
       onSuccess: () => {
         setDeleteConfirm(false);
-        queryCache.invalidateQueries('users-list');
+        (queryCache.invalidateQueries as any)((q) =>
+          q.startsWith('users-list')
+        );
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'User Deleted');
       },
     });
@@ -140,19 +143,19 @@ export const UsersList: FC = () => {
       title: '#',
       dataIndex: 'key',
       key: 'key',
-      render: (data, row, index) => <>{index + 1}</>,
+      render: (data, row, index) => <div>{index + 1}</div>,
     },
     {
       title: 'Username',
       dataIndex: 'profile',
       key: 'profile',
-      render: (data) => <>{data?.userName || '-'}</>,
+      render: (data) => <div>{data?.userName || '-'}</div>,
     },
     {
       title: 'Full Name',
       dataIndex: 'profile',
       key: 'profile',
-      render: (data: IProfile, row, index) => <>{data?.fullName}</>,
+      render: (data: IProfile, row, index) => <div>{data?.fullName}</div>,
     },
     {
       title: 'Email',
@@ -164,7 +167,7 @@ export const UsersList: FC = () => {
       dataIndex: 'profile',
       key: 'profile',
       render: (data, row, index) => {
-        return <>{data?.phoneNumber}</>;
+        return <div>{data?.phoneNumber}</div>;
       },
     },
     {
@@ -173,7 +176,7 @@ export const UsersList: FC = () => {
       key: 'role',
       render: (data, row, index) => {
         const { role } = row;
-        return <>{role?.name}</>;
+        return <div>{role?.name}</div>;
       },
     },
     {
@@ -182,7 +185,7 @@ export const UsersList: FC = () => {
       key: 'role',
       render: (data, row, index) => {
         const { role } = row;
-        return <>{role?.name}</>;
+        return <div>{role?.name}</div>;
       },
     },
     {
@@ -191,7 +194,7 @@ export const UsersList: FC = () => {
       key: 'status',
       width: 80,
       render: (data, row, index) => (
-        <>
+        <div>
           {data ? (
             'User Active'
           ) : (
@@ -205,7 +208,7 @@ export const UsersList: FC = () => {
               Resend Email
             </Button>
           )}
-        </>
+        </div>
       ),
     },
   ];
@@ -215,30 +218,14 @@ export const UsersList: FC = () => {
       <div className="custom_topbar flex alignCenter justifySpaceBetween flexWrap pv-10">
         <div className="edit flex alignCenter justifySpaceBetween flexWrap ">
           <div className="edit flex alignCenter">
-            {true && (
-              <>
-                <ButtonTag
-                  disabled={!selectedRow.length || selectedRow.length > 1}
-                  onClick={() => {
-                    history.push(
-                      `/app${ISupportedRoutes.USERS}/${selectedRow[0]}`
-                    );
-                  }}
-                  title="Edit"
-                  icon={editSolid}
-                  size={'middle'}
-                />
-                <ButtonTag
-                  className="mr-10"
-                  disabled={!selectedRow.length}
-                  onClick={() => setDeleteConfirm(true)}
-                  title="Delete"
-                  icon={deleteIcon}
-                  size={'middle'}
-                />
-                {/* <MoreActions /> */}
-              </>
-            )}
+            <ButtonTag
+              className="mr-10"
+              disabled={!selectedRow.length}
+              onClick={() => setDeleteConfirm(true)}
+              title="Delete"
+              icon={deleteIcon}
+              size={'middle'}
+            />
           </div>
         </div>
         <div className="flex alignCenter">

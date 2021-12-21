@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { DecriptionData } from './encription';
 
-const localIP = `http://localhost/`;
+const localIP = `https://api.node.invyce.com`;
 
 let NodeBaseURL = ``;
 const cancelSource = axios.CancelToken.source();

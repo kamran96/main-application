@@ -100,6 +100,8 @@ export const AprovedCreditNotes: FC = () => {
 
   /* Local utility functions here */
   const onSelectedRow = (item) => {
+    console.log(item, 'what is item');
+
     setSelectedRow(item.selectedRowKeys);
   };
 

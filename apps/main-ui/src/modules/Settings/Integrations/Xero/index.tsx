@@ -12,8 +12,13 @@ import {
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { Seprator } from '../../../../components/Seprator';
 import { CommonModal } from '../../../../components';
-import { ISupportedRoutes } from '../../../../modal';
+import {
+  IBaseAPIError,
+  ISupportedRoutes,
+  NOTIFICATIONTYPE,
+} from '../../../../modal';
 import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
+import { useHistory } from 'react-router-dom';
 
 export const Xero: FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -33,10 +38,9 @@ export const Xero: FC = () => {
     data: verify,
     isLoading: verifyLoading,
   } = useMutation(XeroVerification);
-
-  const { routeHistory } = useGlobalContext();
-  const { history } = routeHistory;
-  const { location } = routeHistory?.history;
+  const { notificationCallback } = useGlobalContext();
+  const history = useHistory();
+  const { location } = history;
 
   useEffect(() => {
     if (location?.search && location?.search.includes('xero=verified')) {
@@ -73,6 +77,7 @@ export const Xero: FC = () => {
 
   const reset = () => {
     setModalVisible(false);
+    setImportList([]);
     setStep(1);
     history?.push(
       `/app${ISupportedRoutes.SETTINGS}${ISupportedRoutes.INTEGRATIONS}`
@@ -100,7 +105,20 @@ export const Xero: FC = () => {
       }
     });
 
-    await muateteCopyModules(payload);
+    await muateteCopyModules(payload, {
+      onSuccess: (data) => {
+        reset();
+        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Xero modules copied');
+      },
+      onError: (err: IBaseAPIError) => {
+        if (err?.response?.data?.message) {
+          const { message } = err?.response?.data;
+          notificationCallback(NOTIFICATIONTYPE.ERROR, message);
+        } else {
+          notificationCallback(NOTIFICATIONTYPE.ERROR, 'Something went wrong');
+        }
+      },
+    });
   };
 
   return (

@@ -57,7 +57,7 @@ export const PermissionsLayout: FC = () => {
     [`permission-show?type=${selectedPermission}`, selectedPermission],
     permissionsShowAPI,
     {
-      enabled: selectedPermission,
+      enabled: !!selectedPermission,
       keepPreviousData: true,
     }
   );

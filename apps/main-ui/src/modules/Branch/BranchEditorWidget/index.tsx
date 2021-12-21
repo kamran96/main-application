@@ -39,7 +39,7 @@ export const BranchEditorWidget: FC = () => {
     [`branch-${branchId}`, branchId],
     getBranchByIdAPI,
     {
-      enabled: branchId,
+      enabled: !!branchId,
     }
   );
 
