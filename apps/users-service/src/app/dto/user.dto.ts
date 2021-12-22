@@ -15,7 +15,8 @@ export class UserRegisterDto {
   fullname: string;
   phoneNumber: string;
   country: string;
-  prefix;
+  prefix: string;
+  isVerified: boolean;
 }
 
 export class InvitedUserDto {

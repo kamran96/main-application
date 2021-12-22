@@ -34,6 +34,12 @@ export enum EntryType {
   COLLECTION = 2,
 }
 
+export enum UserStatuses {
+  ACTIVE = 1,
+  DELETED = 0,
+  HOLD = 2,
+}
+
 export enum CreditNoteType {
   ACCRECCREDIT = 'ACCRECCREDIT',
   ACCPAYCREDIT = 'ACCPAYCREDIT',

@@ -14,6 +14,7 @@ export class CreditNoteDto {
   netTotal: number;
   date: string;
   type: string;
+  status: number;
   comment: string;
   invoice_items: Array<CreditNoteItemDto>;
 }
