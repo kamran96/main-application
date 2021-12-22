@@ -26,7 +26,6 @@ import {
   ICheckUser,
   IUser,
   IUserAccessControlResponse,
-  IUserChangePassword,
   IVerifyOtp,
 } from '@invyce/interfaces';
 
@@ -126,6 +125,7 @@ export class AuthService {
     user.branchId = authDto.branchId || null;
     user.roleId = authDto.roleId || null;
     user.prefix = authDto.prefix;
+    user.isVerified = authDto.isVerified;
     user.profile = updatedProfile;
     user.terms = authDto.terms;
     user.marketing = authDto.marketing;
@@ -414,9 +414,17 @@ export class AuthService {
     await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
   }
 
-  async SendPasswordUpdatedNotification() {
-    const baseUrl = 'http://localhost:4200';
-    const operating_system = os.type();
+  async SendPasswordUpdatedNotification(user) {
+    const payload = {
+      to: user.email,
+      from: 'no-reply@invyce.com',
+      TemplateAlias: 'password-update',
+      TemplateModel: {
+        user_name: user.profile.fullName,
+      },
+    };
+
+    await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
   }
 
   async verifyForgotPassword(code: string): Promise<IUser> {
@@ -428,22 +436,22 @@ export class AuthService {
     return user;
   }
 
-  async ChangePassword(userDto): Promise<IUserChangePassword> {
+  async ChangePassword(userDto): Promise<boolean> {
     try {
       const verify: IUser = await this.verifyForgotPassword(userDto.code);
 
       if (verify) {
         delete verify.password;
-        const updatedUser: IUserChangePassword = {
-          username: verify.username,
-          password: bcrypt.hashSync(userDto.password),
-          status: 1,
-          organizationId: verify.organizationId,
-          roleId: verify.roleId,
-        };
 
-        await this.SendPasswordUpdatedNotification();
-        return updatedUser;
+        await this.userModel.updateOne(
+          {
+            username: verify.username,
+          },
+          { password: await bcrypt.hashSync(userDto.password) }
+        );
+
+        await this.SendPasswordUpdatedNotification(verify);
+        return true;
       }
     } catch (err) {
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);

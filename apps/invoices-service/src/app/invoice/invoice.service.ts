@@ -1,7 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { Between, getCustomRepository, ILike, In, LessThan } from 'typeorm';
+import { Inject, Injectable } from '@nestjs/common';
+import {
+  Between,
+  getCustomRepository,
+  ILike,
+  In,
+  LessThan,
+  Not,
+} from 'typeorm';
 import axios from 'axios';
 import * as dotenv from 'dotenv';
+import * as moment from 'moment';
 import { InvoiceRepository } from '../repositories/invoice.repository';
 import { InvoiceItemRepository } from '../repositories/invoiceItem.repository';
 import { Sorting } from '@invyce/sorting';
@@ -24,11 +32,16 @@ import {
 } from '@invyce/global-constants';
 import { BillItemRepository } from '../repositories/billItem.repository';
 import { InvoiceDto, InvoiceIdsDto } from '../dto/invoice.dto';
+import { ClientProxy } from '@nestjs/microservices';
+import { SEND_FORGOT_PASSWORD } from '@invyce/send-email';
 
 dotenv.config();
 
 @Injectable()
 export class InvoiceService {
+  constructor(
+    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy
+  ) {}
   async IndexInvoice(
     req: IRequest,
     queryData: IPage
@@ -560,6 +573,37 @@ export class InvoiceService {
         creditsArrray.push(credit);
       }
 
+      const firstInvoice = await getCustomRepository(InvoiceRepository).find({
+        where: {
+          status: 1,
+          organizationId: req.user.organizationId,
+        },
+      });
+
+      if (firstInvoice.length === 1) {
+        const payload = {
+          to: req.user.email,
+          from: 'no-reply@invyce.com',
+          TemplateAlias: 'congrats-on-your-first-invoice',
+          TemplateModel: {
+            product_url: 'product_url_Value',
+            user_name: req.user.profile.fullName,
+            sender_name: 'sender_name_Value',
+            product_name: 'product_name_Value',
+            congrates_illustration_image: 'congrates_illustration_image_Value',
+            action_url: 'action_url_Value',
+            trial_extension_url: 'trial_extension_url_Value',
+            feedback_url: 'feedback_url_Value',
+            export_url: 'export_url_Value',
+            close_account_url: 'close_account_url_Value',
+            company_name: 'company_name_Value',
+            company_address: 'company_address_Value',
+          },
+        };
+
+        await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
+      }
+
       if (invoice.status === Statuses.AUTHORISED) {
         await http.post(`reports/inventory/manage`, {
           payload: itemLedgerArray,
@@ -616,6 +660,33 @@ export class InvoiceService {
       }
       return invoice;
     }
+  }
+
+  async CreateYourFirstInvoice(user) {
+    const threeDays = moment(Date.now()).subtract(3, 'days').format();
+    const today = moment(new Date()).format();
+
+    const invoices = await getCustomRepository(InvoiceRepository).find({
+      where: {
+        createdAt: Between(threeDays, today),
+        organizationId: user.organizationId,
+      },
+    });
+
+    if (invoices.length === 0) {
+      const payload = {
+        to: user.email,
+        from: 'no-reply@invyce.com',
+        TemplateAlias: 'create-your-first-invoice',
+        TemplateModel: {
+          user_name: user.username,
+        },
+      };
+
+      await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
+    }
+
+    return true;
   }
 
   async FindById(invoiceId: number, req: IRequest): Promise<IInvoice> {
@@ -906,6 +977,191 @@ export class InvoiceService {
     }
 
     return true;
+  }
+
+  /**
+   * today invoice detail REPORT
+   */
+
+  async TodayInvoiceDetails(user) {
+    const invoice = await getCustomRepository(InvoiceRepository).find({
+      where: {
+        organizationId: user.organizationId,
+        status: Not(0),
+      },
+    });
+
+    const links = invoice.map((i) => {
+      return {
+        title: i.invoiceNumber,
+        link: `http://localhost:4200/app/invoice/${i?.id}`,
+      };
+    });
+
+    const payload = {
+      to: user.email,
+      from: 'no-reply@invyce.com',
+      TemplateAlias: 'today-invoice-detail',
+      TemplateModel: {
+        product_url: 'product_url_Value',
+        user_name: user.profile.fullName,
+        action_url: 'action_url_Value',
+        product_name: 'product_name_Value',
+        name: 'name_Value',
+        operating_system: 'operating_system_Value',
+        browser_name: 'browser_name_Value',
+        support_url: 'support_url_Value',
+        company_name: 'company_name_Value',
+        company_address: 'company_address_Value',
+        links,
+      },
+    };
+
+    await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
+  }
+
+  /**
+   * pending invoices REMINDER
+   */
+
+  async PendingInvoiceToApprove(user) {
+    const invoice = await getCustomRepository(InvoiceRepository).find({
+      where: {
+        organizationId: user.organizationId,
+        status: 2,
+      },
+    });
+
+    const links = invoice.map((i) => {
+      return {
+        title: i.invoiceNumber,
+        link: `http://localhost:4200/app/invoice/${i?.id}`,
+      };
+    });
+
+    const payload = {
+      to: user.email,
+      from: 'no-reply@invyce.com',
+      TemplateAlias: 'pending-invoice-today',
+      TemplateModel: {
+        product_url: 'product_url_Value',
+        user_name: user.profile.fullName,
+        action_url: 'action_url_Value',
+        product_name: 'product_name_Value',
+        name: 'name_Value',
+        operating_system: 'operating_system_Value',
+        browser_name: 'browser_name_Value',
+        support_url: 'support_url_Value',
+        company_name: 'company_name_Value',
+        company_address: 'company_address_Value',
+        links,
+      },
+    };
+
+    await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
+  }
+
+  /**
+   * awating payment detail REMINDER
+   */
+
+  async PendingPaymentInvoices(req) {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const tokenType =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [tokenType]: value,
+      },
+    });
+
+    const invoices = await getCustomRepository(InvoiceRepository).find({
+      where: {
+        status: 1,
+        invoiceType: 'SI',
+        branchId: req.user.branchId,
+        organizationId: req.user.organizationId,
+      },
+    });
+
+    const mapInvoiceIds = invoices.map((inv) => inv.id);
+
+    const { data: balances } = await http.post(`payments/payment/invoice`, {
+      ids: mapInvoiceIds,
+      type: 'INVOICE',
+    });
+
+    const invoice_arr = [];
+    for (const i of invoices) {
+      const balance = balances.find((bal) => bal.id === i.id);
+
+      const paid_amount = balance?.invoice?.balance || 0;
+      const due_amount = balance?.invoice?.balance
+        ? i.netTotal - balance?.invoice?.balance
+        : i.netTotal;
+
+      const payment_status = () => {
+        if (paid_amount < due_amount && due_amount < i?.netTotal) {
+          return 'Partial Payment';
+        } else if (due_amount === i?.netTotal) {
+          return 'Payment Pending';
+        } else if (paid_amount === i?.netTotal) {
+          return 'Full Payment';
+        } else {
+          return null;
+        }
+      };
+      if (balance.invoice.balance === 0) {
+        invoice_arr.push({
+          ...i,
+          paid_amount,
+          due_amount: i.netTotal - balance.invoice.balance || 0,
+          payment_status: payment_status(),
+        });
+      }
+    }
+
+    const links = invoice_arr.map((i) => {
+      return {
+        title: i.invoiceNumber,
+        link: `http://localhost:4200/app/invoice/${i?.id}`,
+      };
+    });
+
+    const payload = {
+      to: req.user.email,
+      from: 'no-reply@invyce.com',
+      TemplateAlias: 'pending-payment-invoice',
+      TemplateModel: {
+        product_url: 'product_url_Value',
+        user_name: req.user.profile.fullName,
+        action_url: 'action_url_Value',
+        product_name: 'product_name_Value',
+        name: 'name_Value',
+        operating_system: 'operating_system_Value',
+        browser_name: 'browser_name_Value',
+        support_url: 'support_url_Value',
+        company_name: 'company_name_Value',
+        company_address: 'company_address_Value',
+        links,
+      },
+    };
+
+    await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
   }
 
   async InvoicesAgainstContactId(

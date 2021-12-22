@@ -4,7 +4,7 @@ const client = new postmark.ServerClient(process.env.POSTMARK_TOKEN);
 
 @Injectable()
 export class AppService {
-  constructor() {}
+  // constructor() {}
 
   getData(): { message: string } {
     return { message: 'Welcome to contacts!' };
@@ -21,6 +21,7 @@ export class AppService {
   }
 
   async SendForgotPassword(data) {
+    console.log('sending...');
     const email = await client.sendEmailWithTemplate({
       From: data.from,
       To: data.to,
@@ -41,16 +42,16 @@ export class AppService {
   }
 
   async SendPdf(data) {
-    let payload: any = {
+    const payload = {
       Name: 'build.pdf',
       ContentType: 'text/pain',
     };
+
     const email = await client.sendEmailWithTemplate({
       From: data.from,
       To: data.to,
       TemplateAlias: data.TemplateAlias,
       TemplateModel: { ...data.TemplateModel, Attachments: [payload] },
-      // Attachments: [payload],
     });
     console.log(email, 'email successfully.');
   }
