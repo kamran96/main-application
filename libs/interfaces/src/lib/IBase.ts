@@ -12,12 +12,28 @@ export interface IBaseUser {
   id: string;
   status: number;
   organizationId: string;
+  profile?: Profile;
   branchId?: string;
   roleId?: string;
   createdById: string;
   updatedById: string;
   createdAt: string;
   updatedAt: string;
+}
+
+interface Profile {
+  fullName: string;
+  phoneNumber: string;
+  prefix: string;
+  cnic: string;
+  marketingStatus: number;
+  country: string;
+  website: string;
+  location: string;
+  bio: string;
+  jobTitle: string;
+  attachmentId: string;
+  status: number;
 }
 
 export interface IBase {

@@ -95,16 +95,13 @@ export class RbacService {
       await newRole.save();
 
       await this.roleModel.updateOne(
-        { _id: roleToUpdate._id },
-        { parentId: newRole._id, level: roleDto.level + 1 }
+        { _id: roleToUpdate.id },
+        { parentId: newRole.id, level: roleDto.level + 1 }
       );
 
       if (parentRole.length > 0) {
         for (const i of parentRole) {
-          await this.roleModel.updateOne(
-            { _id: i._id },
-            { level: i.level + 1 }
-          );
+          await this.roleModel.updateOne({ _id: i.id }, { level: i.level + 1 });
         }
       }
 
@@ -158,6 +155,7 @@ export class RbacService {
   }
 
   async GetRole(roleId: string): Promise<IRole> {
+    console.log(roleId, 'roleid');
     return await this.roleModel.findById(roleId);
   }
 

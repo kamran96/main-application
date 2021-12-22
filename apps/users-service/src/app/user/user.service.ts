@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcryptjs';
+import * as Moment from 'moment';
 import axios from 'axios';
 import { AuthService } from '../auth/auth.service';
 import { User } from '../schemas/user.schema';
@@ -14,8 +15,11 @@ import {
   UserLoginDto,
   UserThemeDto,
   SendCodeDto,
+  UserIdsDto,
 } from '../dto/user.dto';
 import { Response } from 'express';
+import { UserStatuses } from '@invyce/global-constants';
+import { SEND_FORGOT_PASSWORD } from '@invyce/send-email';
 
 @Injectable()
 export class UserService {
@@ -37,7 +41,7 @@ export class UserService {
     if (purpose === 'ALL') {
       users = await this.userModel
         .find({
-          status: 1,
+          status: UserStatuses.ACTIVE,
           organizationId: user.organizationId,
           branchId: user.branchId,
         })
@@ -53,7 +57,7 @@ export class UserService {
           if (data[i].type === 'search') {
             const val = data[i].value?.split('%')[1];
             users = await this.userModel.find({
-              status: 1,
+              status: UserStatuses.ACTIVE,
               organizationId: user.organizationId,
               [i]: { $regex: val },
             });
@@ -61,19 +65,19 @@ export class UserService {
             const start_date = i[1]['value'][0];
             const end_date = i[1]['value'][1];
             users = await this.userModel.find({
-              status: 1,
+              status: UserStatuses.ACTIVE,
               organizationId: user.organizationId,
               [i]: { $gt: start_date, $lt: end_date },
             });
           } else if (data[i].type === 'compare') {
             users = await this.userModel.find({
-              status: 1,
+              status: UserStatuses.ACTIVE,
               organization: user.organizationId,
               [i]: { $in: i[1]['value'] },
             });
           } else if (data[i].type === 'in') {
             users = await this.userModel.find({
-              status: 1,
+              status: UserStatuses.ACTIVE,
               organization: user.organizationId,
               [i]: { $in: i[1]['value'] },
             });
@@ -92,7 +96,7 @@ export class UserService {
         };
 
         users = await this.userModel.paginate(
-          { status: 1, organizationId: user.organizationId },
+          { status: UserStatuses.ACTIVE, organizationId: user.organizationId },
           {
             offset: pn * ps - ps,
             limit: ps,
@@ -111,6 +115,7 @@ export class UserService {
       const user = await this.userModel
         .findOne({
           _id: userId,
+          status: UserStatuses.ACTIVE,
         })
         .populate('role')
         .populate('organization')
@@ -183,6 +188,7 @@ export class UserService {
           branchId: user.branchId,
           fullName: user.fullname,
           country: user.country,
+          isVerified: true,
           phoneNumber: user.phoneNumber,
         };
         await this.authService.AddUser(
@@ -345,5 +351,52 @@ export class UserService {
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async HoldAccount(user) {
+    const twentyDays = Moment(Date.now()).subtract(20, 'days').format();
+
+    const users = await this.userModel.find({
+      isVerified: false,
+      createdAt: { $lt: twentyDays },
+      organizationId: user.organizationId,
+    });
+
+    for (const i of users) {
+      await this.userModel.updateOne(
+        { email: i.email },
+        { status: UserStatuses.HOLD }
+      );
+
+      const payload = {
+        to: i.email,
+        from: 'no-reply@invyce.com',
+        TemplateAlias: 'account-on-hold',
+        TemplateModel: {
+          user_name: i.profile.fullName,
+        },
+      };
+
+      await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
+    }
+
+    return true;
+  }
+
+  // async TrailExpiring() {
+
+  // }
+
+  async DeleteUser(userIds: UserIdsDto): Promise<boolean> {
+    for (const i of userIds.ids) {
+      await this.userModel.updateOne(
+        {
+          _id: i,
+        },
+        { status: UserStatuses.DELETED }
+      );
+    }
+
+    return true;
   }
 }

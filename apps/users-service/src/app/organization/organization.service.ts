@@ -11,6 +11,7 @@ import { Branch } from '../schemas/branch.schema';
 import { Organization } from '../schemas/organization.schema';
 import { OrganizationUser } from '../schemas/organizationUser.schema';
 import { User } from '../schemas/user.schema';
+import { SEND_FORGOT_PASSWORD } from '@invyce/send-email';
 
 @Injectable()
 export class OrganizationService {
@@ -170,6 +171,30 @@ export class OrganizationService {
           const users = await this.authService.CheckUser({
             username: req.user.username,
           });
+
+          const payload = {
+            to: req.user.email,
+            from: 'no-reply@invyce.com',
+            TemplateAlias: 'trial-started',
+            TemplateModel: {
+              product_url: 'product_url_Value',
+              user_name: req.user.profile.fullName,
+              sender_name: 'sender_name_Value',
+              product_name: 'product_name_Value',
+              congrates_illustration_image:
+                'congrates_illustration_image_Value',
+              action_url: 'action_url_Value',
+              trial_extension_url: 'trial_extension_url_Value',
+              feedback_url: 'feedback_url_Value',
+              export_url: 'export_url_Value',
+              close_account_url: 'close_account_url_Value',
+              company_name: 'company_name_Value',
+              company_address: 'company_address_Value',
+            },
+          };
+
+          await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
+
           return await this.authService.Login(users, res);
         }
       } catch (error) {
