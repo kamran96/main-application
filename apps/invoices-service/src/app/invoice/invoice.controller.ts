@@ -77,6 +77,18 @@ export class InvoiceController {
     return await this.invoiceService.Pdf();
   }
 
+  @Get('first-invoice')
+  @UseGuards(GlobalAuthGuard)
+  async createFirstInvoice(@Req() req: IRequest) {
+    return await this.invoiceService.CreateYourFirstInvoice(req.user);
+  }
+
+  @Get('pending-invoices')
+  @UseGuards(GlobalAuthGuard)
+  async pendingInvoices(@Req() req: IRequest) {
+    return await this.invoiceService.PendingPaymentInvoices(req);
+  }
+
   @Post('ids')
   @UseGuards(GlobalAuthGuard)
   async findByInvoiceIds(
