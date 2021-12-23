@@ -1,11 +1,11 @@
-import dayjs from "dayjs";
-import React, { FC, useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import styled from "styled-components";
-import { topSuggestInvoicesAPI } from "../../../api";
-import { IThemeProps } from "../../../hooks/useTheme/themeColors";
-import { ITopSuggestedInvoices } from "../../../modal/invoice";
-import Data from "./var";
+import dayjs from 'dayjs';
+import { FC, useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
+import styled from 'styled-components';
+
+import { topSuggestInvoicesAPI } from '../../../api';
+import { IThemeProps } from '../../../hooks/useTheme/themeColors';
+import { ITopSuggestedInvoices } from '../../../modal/invoice';
 
 export const AllInvoices: FC = () => {
   const [{ result }, setTopSuggestedInvoices] = useState<ITopSuggestedInvoices>(
@@ -15,16 +15,12 @@ export const AllInvoices: FC = () => {
   );
 
   const { data: topInvoicesData, isLoading: topInvoicesFetching } = useQuery(
-    ["top-suggest-invoices"],
+    ['top-suggest-invoices'],
     topSuggestInvoicesAPI
   );
 
   useEffect(() => {
-    if (
-      topInvoicesData &&
-      topInvoicesData.data &&
-      topInvoicesData.data.result
-    ) {
+    if (topInvoicesData?.data?.result) {
       setTopSuggestedInvoices(topInvoicesData.data);
     }
   }, [topInvoicesData]);
@@ -35,14 +31,14 @@ export const AllInvoices: FC = () => {
         <thead>
           <tr>
             {[
-              "#",
-              "To",
-              "Ref",
-              "Invoice Number",
-              "Date",
-              "Due Date",
-              "Paid Amount",
-              "Status",
+              '#',
+              'To',
+              'Ref',
+              'Invoice Number',
+              'Date',
+              'Due Date',
+              'Paid Amount',
+              'Status',
             ].map((head, index) => {
               return <th key={index}>{head}</th>;
             })}
@@ -58,13 +54,13 @@ export const AllInvoices: FC = () => {
                 <td>{item.invoiceNumber}</td>
                 <td>
                   {item.issueDate
-                    ? dayjs(item.issueDate).format("DD/MM/YYYY h:mm A")
-                    : "-"}
+                    ? dayjs(item.issueDate).format('DD/MM/YYYY h:mm A')
+                    : '-'}
                 </td>
                 <td>
                   {item.dueDate
-                    ? dayjs(item.dueDate).format("DD/MM/YYYY h:mm A")
-                    : "-"}
+                    ? dayjs(item.dueDate).format('DD/MM/YYYY h:mm A')
+                    : '-'}
                 </td>
                 <td>{item.netTotal}</td>
                 <td>{item.case}</td>
@@ -84,7 +80,7 @@ const WrapperAlltInvoices = styled.div`
     width: 100%;
     thead > tr > th {
       color: ${(props: IThemeProps) =>
-        props?.theme?.theme === "dark"
+        props?.theme?.theme === 'dark'
           ? props?.theme?.colors?.$BLACK
           : props?.theme?.colors?.$Primary2};
     }

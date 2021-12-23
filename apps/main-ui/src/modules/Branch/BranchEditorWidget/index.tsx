@@ -1,23 +1,24 @@
-import { Button, Checkbox, Col, Form, Input, Row, Select } from "antd";
-import React, { FC, useEffect } from "react";
-import { queryCache, useMutation, useQuery } from "react-query";
-import styled from "styled-components";
-import { getBranchByIdAPI } from "../../../api";
-import { addBrnachAPI } from "../../../api/organizations";
-import { CommonModal } from "../../../components";
-import { FormLabel } from "../../../components/FormLabel";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { ILoginActions } from "../../../hooks/globalContext/globalManager";
-import { NOTIFICATIONTYPE } from "../../../modal";
-import { updateToken } from "../../../utils/http";
-import phoneCodes from "../../../utils/phoneCodes";
-import { BOLDTEXT } from "../../../components/Para/BoldText";
-import { Seprator } from "../../../components/Seprator";
-import TextArea from "antd/lib/input/TextArea";
+import { Button, Checkbox, Col, Form, Input, Row, Select } from 'antd';
+import React, { FC, useEffect } from 'react';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
+import styled from 'styled-components';
+import { getBranchByIdAPI } from '../../../api';
+import { addBrnachAPI } from '../../../api/organizations';
+import { CommonModal } from '../../../components';
+import { FormLabel } from '../../../components/FormLabel';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { ILoginActions } from '../../../hooks/globalContext/globalManager';
+import { NOTIFICATIONTYPE } from '../../../modal';
+import { updateToken } from '../../../utils/http';
+import phoneCodes from '../../../utils/phoneCodes';
+import { BOLDTEXT } from '../../../components/Para/BoldText';
+import { Seprator } from '../../../components/Seprator';
+import TextArea from 'antd/lib/input/TextArea';
 
 const { Option } = Select;
 
 export const BranchEditorWidget: FC = () => {
+  const queryCache = useQueryClient();
   const {
     branchModalConfig,
     setBranchModalConfig,
@@ -25,7 +26,11 @@ export const BranchEditorWidget: FC = () => {
     setUserDetails,
     handleLogin,
   } = useGlobalContext();
-  const [mutateAddBranch, resAddBranch] = useMutation(addBrnachAPI);
+  const {
+    mutate: mutateAddBranch,
+    isLoading: addingBranch,
+    data: responseAddingBranch,
+  } = useMutation(addBrnachAPI);
   const [form] = Form.useForm();
 
   const { branchId, id } = branchModalConfig;
@@ -34,96 +39,92 @@ export const BranchEditorWidget: FC = () => {
     [`branch-${branchId}`, branchId],
     getBranchByIdAPI,
     {
-      enabled: branchId,
+      enabled: !!branchId,
     }
   );
 
-  useEffect(()=>{
-    form.setFieldsValue({prefix: 92});
-  },[])
+  useEffect(() => {
+    form.setFieldsValue({ prefix: 92 });
+  }, []);
 
   useEffect(() => {
     if (data && data.data && data.data.result) {
       const { result } = data.data;
-      const {city, postalCode, description,  } = result?.address;
+      const { city, postalCode, description } = result?.address;
       form.setFieldsValue({
         ...result,
         prefix: parseInt(result?.prefix),
         city,
         postalCode,
-        address: description
+        address: description,
       });
     }
   }, [data, form]);
 
   const onFinish = async (values) => {
+    const { city, address, postalCode, country } = values;
 
-
-    const {city, address, postalCode, country} = values
-   
-    let _address = {
+    const _address = {
       city,
       postalCode,
       country,
-      description: address
-    }
+      description: address,
+    };
 
-    let restValues= {};
+    let restValues = {};
 
-    Object.keys(values).forEach((key)=>{
-      
-      if(!Object.keys(_address).includes(key)){
-        restValues = {...restValues, [key]: values[key]}
+    Object.keys(values).forEach((key) => {
+      if (!Object.keys(_address).includes(key)) {
+        restValues = { ...restValues, [key]: values[key] };
       }
-      
-    })
+    });
 
-  
-    let payload: any = { ...restValues, address: _address, organizationId: id, isNewRecord: true };
-    
+    let payload: any = {
+      ...restValues,
+      address: _address,
+      organizationId: id,
+      isNewRecord: true,
+    };
 
     if (branchId !== null) {
       payload = { ...payload, isNewRecord: false, id: branchId };
     }
-    try {
-      await mutateAddBranch(payload, {
-        onSuccess: () => {
-          notificationCallback(
-            NOTIFICATIONTYPE.SUCCESS,
-            `Branch ${branchId ? `Updated` : `Created`} Successfully`
-          );
-          form.resetFields();
-          queryCache.invalidateQueries(`all-organizations`);
-          setBranchModalConfig(false);
-        },
-      });
-    } catch (error) {}
+    await mutateAddBranch(payload, {
+      onSuccess: () => {
+        notificationCallback(
+          NOTIFICATIONTYPE.SUCCESS,
+          `Branch ${branchId ? `Updated` : `Created`} Successfully`
+        );
+        form.resetFields();
+        queryCache.invalidateQueries(`all-organizations`);
+        setBranchModalConfig(false);
+      },
+      onError: (err) => {
+        console.log(err);
+      },
+    });
   };
 
   useEffect(() => {
-    if (
-      resAddBranch.data &&
-      resAddBranch.data.data &&
-      resAddBranch.data.data.result &&
-      resAddBranch.data.data.result.access_token
-    ) {
-      const { result } = resAddBranch.data.data;
+    if (responseAddingBranch?.data?.result?.access_token) {
+      const { result } = responseAddingBranch.data;
       const { access_token, users } = result;
 
       updateToken(access_token);
       setUserDetails(users);
       handleLogin({ type: ILoginActions.LOGIN, payload: result });
     }
-  }, [resAddBranch.data, handleLogin, setUserDetails]);
+  }, [responseAddingBranch, handleLogin, setUserDetails]);
 
   const onFinishFailed = (error) => {
-    console.log(error, "error");
+    console.log(error, 'error');
   };
 
   const getFlag = (short: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const data = require(`world_countries_lists/flags/24x24/${short.toLowerCase()}.png`);
     // for dumi
-    if (typeof data === "string") {
+    if (typeof data === 'string') {
       return data;
     }
     // for CRA
@@ -137,7 +138,7 @@ export const BranchEditorWidget: FC = () => {
         showSearch
         defaultValue={92}
         filterOption={(input, option) => {
-          console.log(input, "what is input here");
+          console.log(input, 'what is input here');
           return (
             option?.id?.toLowerCase().includes(input?.toLocaleLowerCase()) ||
             option?.title?.toLowerCase().includes(input?.toLocaleLowerCase())
@@ -154,7 +155,7 @@ export const BranchEditorWidget: FC = () => {
               <img
                 className="mr-10"
                 alt="flag"
-                style={{ width: 18, height: 18, verticalAlign: "sub" }}
+                style={{ width: 18, height: 18, verticalAlign: 'sub' }}
                 src={getFlag(country.short)}
               />
               <span>+{country?.phoneCode}</span>
@@ -169,13 +170,13 @@ export const BranchEditorWidget: FC = () => {
     <CommonModal
       visible={branchModalConfig.visibility}
       onCancel={() => setBranchModalConfig(false)}
-      title={"Add Branch"}
+      title={'Add Branch'}
       footer={false}
       width={846}
     >
       <WrapperBranchEditor>
         <Form
-          layout={"vertical"}
+          layout={'vertical'}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           form={form}
@@ -188,7 +189,7 @@ export const BranchEditorWidget: FC = () => {
                 rules={[
                   {
                     required: true,
-                    message: "Name is Required !",
+                    message: 'Name is Required !',
                   },
                 ]}
               >
@@ -202,10 +203,10 @@ export const BranchEditorWidget: FC = () => {
                 rules={[
                   {
                     required: false,
-                    message: "Branchh Email is Required !",
+                    message: 'Branchh Email is Required !',
                   },
                   {
-                    type: "email",
+                    type: 'email',
                   },
                 ]}
               >
@@ -223,7 +224,7 @@ export const BranchEditorWidget: FC = () => {
                 label="Phone Number"
                 name="phoneNumber"
                 rules={[
-                  { required: false, message: "Please add your last name" },
+                  { required: false, message: 'Please add your last name' },
                   { max: 12, min: 4 },
                 ]}
               >
@@ -273,11 +274,11 @@ export const BranchEditorWidget: FC = () => {
                     className="mr-10"
                     type="default"
                   >
-                    {" "}
+                    {' '}
                     Cancel
                   </Button>
                   <Button
-                    loading={resAddBranch.isLoading}
+                    loading={addingBranch}
                     type="primary"
                     htmlType="submit"
                   >

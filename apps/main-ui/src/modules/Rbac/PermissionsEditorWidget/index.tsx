@@ -1,33 +1,28 @@
-import { Button, Form, Input } from "antd";
-import TextArea from "antd/lib/input/TextArea";
-import Modal from "antd/lib/modal/Modal";
-import React, { FC, useEffect, useState } from "react";
-import { queryCache, useMutation, useQuery } from "react-query";
-import styled from "styled-components";
-import { CreatePermissionsAPI, getPermissionModulesAPI } from "../../../api";
-import { FormLabel } from "../../../components/FormLabel";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { AutoComplete } from "antd";
-import { CommonModal } from "../../../components";
+import { AutoComplete, Button, Form, Input } from 'antd';
+import TextArea from 'antd/lib/input/TextArea';
+import { FC, useEffect, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import styled from 'styled-components';
+
+import { CreatePermissionsAPI, getPermissionModulesAPI } from '../../../api';
+import { CommonModal } from '../../../components';
+import { FormLabel } from '../../../components/FormLabel';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 
 export const PermissionsEditorWidget: FC = () => {
-  const {
-    permissionsConfigModal,
-    setPermissionConfigModal,
-  } = useGlobalContext();
+  const queryCache = useQueryClient();
+  const { permissionsConfigModal, setPermissionConfigModal } =
+    useGlobalContext();
 
   const [modules, setModules] = useState([]);
 
   const { data: modulesResponse, isLoading: modulesFetching } = useQuery(
-    ["autocomplete-modules"],
+    ['autocomplete-modules'],
     getPermissionModulesAPI
   );
 
   useEffect(() => {
-    if (
-      
-      modulesResponse?.data?.result
-    ) {
+    if (modulesResponse?.data?.result) {
       const { result } = modulesResponse.data;
       const options = result.map((item) => {
         return { value: item };
@@ -37,15 +32,14 @@ export const PermissionsEditorWidget: FC = () => {
     }
   }, [modulesResponse]);
 
-  const [mutateAddPermission, resAddPermission] = useMutation(
-    CreatePermissionsAPI
-  );
+  const { mutate: mutateAddPermission, isLoading: addingPermission } =
+    useMutation(CreatePermissionsAPI);
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
     await mutateAddPermission(values, {
       onSuccess: () => {
-        queryCache.invalidateQueries("autocomplete-modules");
+        queryCache.invalidateQueries('autocomplete-modules');
         onCancel();
       },
     });
@@ -72,7 +66,7 @@ export const PermissionsEditorWidget: FC = () => {
             rules={[
               {
                 required: true,
-                message: "Module title is required !",
+                message: 'Module title is required !',
               },
             ]}
           >
@@ -101,8 +95,8 @@ export const PermissionsEditorWidget: FC = () => {
                 Cancel
               </Button>
               <Button
-                loading={resAddPermission.isLoading}
-                htmlType={"submit"}
+                loading={addingPermission}
+                htmlType={'submit'}
                 type="primary"
               >
                 Create

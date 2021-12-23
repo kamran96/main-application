@@ -1,10 +1,10 @@
 import { Button, Col, Form, Input, Row, Select } from 'antd';
-import { getFlag } from 'apps/main-ui/src/utils/getFlags';
+import { getFlag } from '../../../../utils/getFlags';
 import { FC, useEffect, useState } from 'react';
-import { queryCache, useMutation, useQuery } from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 
-import { getUserAPI, updateProfileAPI } from '../../../../api';
+import { updateProfileAPI } from '../../../../api';
 import { FormLabel } from '../../../../components/FormLabel';
 import { Heading } from '../../../../components/Heading';
 import { Para } from '../../../../components/Para';
@@ -14,7 +14,7 @@ import { useGlobalContext } from '../../../../hooks/globalContext/globalContext'
 import { IAttachment, NOTIFICATIONTYPE } from '../../../../modal';
 import convertToRem from '../../../../utils/convertToRem';
 import phoneCodes from '../../../../utils/phoneCodes';
-import en from "../../../../../../../node_modules/world_countries_lists/data/en/world.json";
+import en from '../../../../../../../node_modules/world_countries_lists/data/en/world.json';
 
 const { Option } = Select;
 
@@ -27,44 +27,34 @@ const { TextArea } = Input;
 export const ProfileForm: FC<IProps> = ({ id }) => {
   const [form] = Form.useForm();
   const [attachmentId, setAttachmentId] = useState<number>(null);
-  const { notificationCallback } = useGlobalContext();
+  const { notificationCallback, refetchUser, userDetails } = useGlobalContext();
   const [attachmentData, setAttachmentData] = useState<IAttachment | any>(null);
 
-  const [mutateUpdateProfile, responseUpdateProfile] =
+  const { mutate: mutateUpdateProfile, isLoading: updatingProfile } =
     useMutation(updateProfileAPI);
 
   const onFinish = async (values) => {
     const payload = { ...values, attachmentId, userId: id };
-    try {
-      await mutateUpdateProfile(payload, {
-        onSuccess: () => {
-          notificationCallback(
-            NOTIFICATIONTYPE.SUCCESS,
-            'Updated Successfully'
-          );
-          queryCache.invalidateQueries(`loggedInUser`);
-        },
-      });
-    } catch (error) {
-      throw error;
-    }
+
+    await mutateUpdateProfile(payload, {
+      onSuccess: () => {
+        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Updated Successfully');
+        refetchUser();
+      },
+    });
   };
 
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
 
-  const { data } = useQuery([`loggedInUser`, id], getUserAPI, {
-    enabled: id,
-  });
-
   useEffect(() => {
-    if (data && data.data) {
-      const { profile } = data.data.result;
+    if (userDetails?.profile) {
+      const { profile } = userDetails;
       form.setFieldsValue({ ...profile, prefix: parseInt(profile?.prefix) });
       setAttachmentData(profile.attachment);
     }
-  }, [data, form]);
+  }, [userDetails, form]);
 
   const prefixSelector = (
     <Form.Item name="prefix" noStyle>
@@ -147,10 +137,7 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
               </Col>
               <Col span={12}>
                 <FormLabel>Country</FormLabel>
-                <Form.Item
-                  name="country"
-                  rules={[{ required: true }]}
-                >
+                <Form.Item name="country" rules={[{ required: true }]}>
                   <Select
                     size="middle"
                     showSearch
@@ -221,7 +208,7 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
                 <Form.Item>
                   <div className="actions-wrapper">
                     <Button
-                      loading={responseUpdateProfile.isLoading}
+                      loading={updatingProfile}
                       type="primary"
                       htmlType="submit"
                     >

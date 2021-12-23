@@ -22,7 +22,7 @@ import {
 } from '../../api';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { IAddress, IInvoiceItem, IInvoiceResult } from '../../modal';
-import { queryCache, useMutation, useQuery } from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import {
   IErrorMessages,
   IServerError,
@@ -83,6 +83,7 @@ const defaultStates = {
 };
 
 export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
+  const queryCache = useQueryClient();
   /* ******API STAKE******* */
   const APISTAKE =
     type === 'SI'
@@ -110,7 +111,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
   const { history } = routeHistory;
   /* ************ QUERIES & MUTATIONS **************  */
   const { data, isLoading } = useQuery([`invoice-view-${id}`, id], APISTAKE, {
-    enabled: id,
+    enabled: !!id,
   });
 
   const response: IInvoiceResult =
@@ -120,7 +121,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
     (response && response.contact && response.contact.addresses) || [];
   const orgInfo = userDetails.organization;
 
-  const [mutateApprove, { isLoading: approving }] =
+  const { mutate: mutateApprove, isLoading: approving } =
     useMutation(APISTAKE_APPROVED);
 
   /*Query hook for  Fetching all accounts against ID */
@@ -246,9 +247,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
           'invoice-view',
           'ledger-contact',
         ].forEach((key) => {
-          queryCache.invalidateQueries((q) =>
-            q.queryKey[0].toString().startsWith(`${key}`)
-          );
+          (queryCache.invalidateQueries as any)((q) => q?.startsWith(`${key}`));
         });
       },
       onError: (error: IServerError) => {

@@ -4,7 +4,7 @@ export const CreatePurchaseOrderAPI = (payload?: any) =>
   http.post('/purchase_order/create', payload);
 
 export const purchaseOrderList = (
-  key?: string,
+  key?: any,
   invoice_type?: number | string,
   status?: string | number,
   page?: number,

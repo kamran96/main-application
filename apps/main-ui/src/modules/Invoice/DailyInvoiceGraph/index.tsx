@@ -1,11 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, useEffect, useState } from "react";
-import styled from "styled-components";
-import * as echarts from "echarts";
-import { useWindowSize } from "../../../utils/useWindowSize";
-import { useQuery } from "react-query";
-import { invoiceFlowChartAPI } from "../../../api";
-import dayjs from "dayjs";
+import dayjs from 'dayjs';
+import * as echarts from 'echarts';
+import React, { FC, useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
+import styled from 'styled-components';
+
+import { invoiceFlowChartAPI } from '../../../api';
+import { useWindowSize } from '../../../utils/useWindowSize';
 
 export const DailySalesReportGraph: FC = () => {
   const [width, height] = useWindowSize();
@@ -14,12 +15,10 @@ export const DailySalesReportGraph: FC = () => {
     series: [],
   });
 
-  console.log(graphFlowData, "flowgraph");
+  console.log(graphFlowData, 'flowgraph');
 
-  const {
-    data: invoicesSummaryData,
-    isLoading: invoicesSummaryFetching,
-  } = useQuery([], invoiceFlowChartAPI);
+  const { data: invoicesSummaryData, isLoading: invoicesSummaryFetching } =
+    useQuery([], invoiceFlowChartAPI);
   useEffect(() => {
     renderChart();
   }, [graphFlowData, width, height]);
@@ -33,7 +32,7 @@ export const DailySalesReportGraph: FC = () => {
 
       setGraphFlowData({
         labels: result.map((item) => {
-          return dayjs(item.invoicedate).format("DD MMM");
+          return dayjs(item.invoicedate).format('DD MMM');
         }),
         series: result.map((item) => {
           return item.todaysale;
@@ -45,28 +44,28 @@ export const DailySalesReportGraph: FC = () => {
   const renderChart = () => {
     const chartDom: any = document.getElementById(`invoice_flow_chart`)!;
     if (chartDom) {
-      var myChart = echarts.init(chartDom);
-      var option;
-      option = {
+      const myChart = echarts.init(chartDom);
+
+      const option = {
         grid: {
-          top: "3%",
-          left: "0%",
-          right: "0%",
-          bottom: "0%",
+          top: '3%',
+          left: '0%',
+          right: '0%',
+          bottom: '0%',
           containLabel: true,
         },
         xAxis: {
-          type: "category",
+          type: 'category',
           data: graphFlowData.labels,
         },
         yAxis: {
-          type: "value",
+          type: 'value',
           width: 9,
         },
         series: [
           {
             data: graphFlowData.series,
-            type: "line",
+            type: 'line',
             smooth: true,
             lineStyle: {
               width: 3,
@@ -82,7 +81,7 @@ export const DailySalesReportGraph: FC = () => {
   return (
     <WrapperDailySalesReportGraph>
       <div
-        style={{ height: "200px", width: "100%" }}
+        style={{ height: '200px', width: '100%' }}
         id={`invoice_flow_chart`}
       ></div>
     </WrapperDailySalesReportGraph>

@@ -1,27 +1,21 @@
-import React, { FC, useEffect, useState } from "react";
-import styled from "styled-components";
-import Data from "./var";
-import { Link } from "react-router-dom";
-import { useQuery } from "react-query";
-import { getTopRunningItemsAPI } from "../../../../../api";
-import { ITopRunningItems } from "../../../../../modal/items";
+import React, { FC, useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
+
+import { getTopRunningItemsAPI } from '../../../../../api';
+import { ITopRunningItems } from '../../../../../modal/items';
 
 export const TopItemsOverview: FC = () => {
   const [topRunningItems, setTopRunningItems] = useState<ITopRunningItems[]>(
     []
   );
-  const {
-    data: topRunningItemsData,
-    isLoading: topRunningItemsLoading,
-  } = useQuery([`top-running-items`], getTopRunningItemsAPI);
+  const { data: topRunningItemsData, isLoading: topRunningItemsLoading } =
+    useQuery([`top-running-items`], getTopRunningItemsAPI);
 
   /* component did mount */
   useEffect(() => {
-    if (
-      topRunningItemsData &&
-      topRunningItemsData.data &&
-      topRunningItemsData.data.result
-    ) {
+    if (topRunningItemsData?.data?.result) {
       const { result } = topRunningItemsData.data;
       setTopRunningItems(result);
     }
@@ -33,12 +27,12 @@ export const TopItemsOverview: FC = () => {
         <thead>
           <tr>
             {[
-              "#",
-              "Item Name",
-              "Purchase Price",
-              "Sell price",
-              "Category",
-              "Status",
+              '#',
+              'Item Name',
+              'Purchase Price',
+              'Sell price',
+              'Category',
+              'Status',
             ].map((head, index) => {
               return <th key={index}>{head}</th>;
             })}
@@ -58,7 +52,7 @@ export const TopItemsOverview: FC = () => {
                   <td>{item.sale_price}</td>
                   <td>{item.category_name}</td>
                   <td>
-                    {item.status && item.status === 1 ? "Active" : "Deactive"}
+                    {item.status && item.status === 1 ? 'Active' : 'Deactive'}
                   </td>
                 </tr>
               );

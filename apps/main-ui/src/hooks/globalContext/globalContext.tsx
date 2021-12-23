@@ -89,6 +89,8 @@ interface IGlobalContextvalues {
   setVerifiedModal: (payload: boolean) => void;
   contactsImportConfig: IModalsConfig;
   setContactsImportConfig: (visibility: boolean) => void;
+  refetchUser: () => void;
+  refetchPermissions: () => void;
 }
 
 export const globalContext = createContext<Partial<IGlobalContextvalues>>({});

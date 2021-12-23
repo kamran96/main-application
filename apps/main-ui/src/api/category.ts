@@ -1,23 +1,23 @@
-import http from "../utils/http";
+import { QueryKey } from '../modal';
+import http from '../utils/http';
 
 enum CATEGORY_API {
-  INDEX = "items/category",
+  INDEX = 'items/category',
 }
 
-export const getCategoriesAPI = (
-  key?: string,
-  page?: number,
-  sortid?: string,
-  page_size?: number,
-  query?: string
-) => {
+export const getCategoriesAPI = ({ queryKey }: QueryKey) => {
+  const page = queryKey[1];
+  const sortid = queryKey[2];
+  const page_size = queryKey[3];
+  const query = queryKey[4];
   let url = `${CATEGORY_API.INDEX}`;
 
   url = `${url}/?page_size=${page_size}&page_no=${page}`;
 
   return http.get(url);
 };
-export const getChildCategoriesAPI = (key?: string, parentId?: number) => {
+export const getChildCategoriesAPI = ({ queryKey }: QueryKey) => {
+  const parentId: number = queryKey[1];
   let url = `${CATEGORY_API.INDEX}`;
 
   url = `${url}/?page_size=${10}&page_no=1`;
@@ -40,8 +40,12 @@ export const getAllCategories = () =>
 export const deleteCategoryAPI = (payload?: any) =>
   http.put(`${CATEGORY_API.INDEX}`, payload);
 
-export const getCategoryByIdAPI = (key?: string, id?: number) =>
-  http.get(`${CATEGORY_API.INDEX}/${id}`);
+export const getCategoryByIdAPI = ({ queryKey }: QueryKey) => {
+  const id = queryKey[1];
+  return http.get(`${CATEGORY_API.INDEX}/${id}`);
+};
 
-export const getCategoryAttributesAPI = (key?: string, id?: number) =>
-  http.get(`${CATEGORY_API.INDEX}/${id}`);
+export const getCategoryAttributesAPI = ({ queryKey }: QueryKey) => {
+  const id: number = queryKey[1];
+  return http.get(`${CATEGORY_API.INDEX}/${id}`);
+};

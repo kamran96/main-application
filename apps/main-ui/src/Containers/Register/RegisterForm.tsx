@@ -20,8 +20,7 @@ const { Option } = Select;
 export const RegisterForm: FC = () => {
   const [step, setStep] = useState(1);
 
-  const [mutateRegister, responseRegister] = useMutation(RegisterAPI);
-  const { isLoading } = responseRegister;
+  const { mutate: mutateRegister, isLoading } = useMutation(RegisterAPI);
   const { handleLogin, notificationCallback } = useGlobalContext();
 
   const [form] = Form.useForm();

@@ -1,26 +1,26 @@
-import React, { FC, useEffect, useState } from "react";
-import { ColumnsType } from "antd/lib/table";
-import { plainToClass } from "class-transformer";
-import dayjs from "dayjs";
-import { usePaginatedQuery } from "react-query";
-import styled from "styled-components";
+import React, { FC, useEffect, useState } from 'react';
+import { ColumnsType } from 'antd/lib/table';
+import { plainToClass } from 'class-transformer';
+import dayjs from 'dayjs';
+import { useQuery } from 'react-query';
+import styled from 'styled-components';
 
-import { getContactLedger } from "../../../api";
-import { Loader } from "../../../components/Loader";
-import { BoldText } from "../../../components/Para/BoldText";
-import { SmartFilter } from "../../../components/SmartFilter";
-import { CommonTable } from "../../../components/Table";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
+import { getContactLedger } from '../../../api';
+import { Loader } from '../../../components/Loader';
+import { BoldText } from '../../../components/Para/BoldText';
+import { SmartFilter } from '../../../components/SmartFilter';
+import { CommonTable } from '../../../components/Table';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import {
   IContactLedgerResp,
   IContactLedgerResponse,
   IContactTypes,
   IEntryType,
-} from "../../../modal";
-import { ISupportedRoutes } from "../../../modal/routing";
-import moneyFormat from "../../../utils/moneyFormat";
-import FilterSchema from "./ledgerFilterSchema";
-import { Link } from "react-router-dom";
+} from '../../../modal';
+import { ISupportedRoutes } from '../../../modal/routing';
+import moneyFormat from '../../../utils/moneyFormat';
+import FilterSchema from './ledgerFilterSchema';
+import { Link } from 'react-router-dom';
 
 interface IProps {
   id?: number;
@@ -28,21 +28,19 @@ interface IProps {
 }
 
 export const LedgerList: FC<IProps> = ({ id, type }) => {
-  const [
-    { pagination, result },
-    setResponse,
-  ] = useState<IContactLedgerResponse>({
-    pagination: {},
-    result: [],
-    opening_balance: null,
-  });
+  const [{ pagination, result }, setResponse] =
+    useState<IContactLedgerResponse>({
+      pagination: {},
+      result: [],
+      opening_balance: null,
+    });
 
   const [filterBar, setFilterbar] = useState<boolean>(false);
   const [ledgerConfig, setLedgerConfig] = useState({
-    query: "",
+    query: '',
     page: 1,
     page_size: 20,
-    sortid: "id",
+    sortid: 'id',
   });
 
   const { query, page, page_size, sortid } = ledgerConfig;
@@ -53,16 +51,16 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
   useEffect(() => {
     if (history?.location?.search) {
       let obj = {};
-      let queryArr = history.location.search.split("?")[1].split("&");
+      const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
-        let split = item.split("=");
+        const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
       setLedgerConfig({ ...ledgerConfig, ...obj });
     }
   }, [history]);
 
-  const { isLoading, resolvedData } = usePaginatedQuery(
+  const { isLoading, data: resolvedData } = useQuery(
     [
       `ledger-contact-${id}?type=${type}&page=${page}&pageSize=${page_size}&query=${query}`,
       id,
@@ -74,32 +72,35 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
 
     getContactLedger,
     {
-      enabled: id,
+      enabled: !!id,
+      keepPreviousData: true,
     }
   );
 
   useEffect(() => {
     if (resolvedData && resolvedData.data && resolvedData.data.result) {
-      let resolvedResult = plainToClass(IContactLedgerResp, resolvedData.data);
+      const resolvedResult = plainToClass(
+        IContactLedgerResp,
+        resolvedData.data
+      );
 
-      let contact_ledger: any =
+      const contact_ledger: any =
         (resolvedResult.result && resolvedResult.getGeneratedResult()) || [];
       setResponse({ ...resolvedResult, result: contact_ledger });
     }
   }, [resolvedData]);
 
-
   const columns: ColumnsType<any> = [
     {
-      title: "Invoice Number",
-      dataIndex: `${type === IContactTypes.CUSTOMER ? `invoice` : "purchase"}`,
-      key: "invoice",
+      title: 'Invoice Number',
+      dataIndex: `${type === IContactTypes.CUSTOMER ? `invoice` : 'purchase'}`,
+      key: 'invoice',
       render: (data, row, index) => {
         return (
           <Link
             to={`/app${
               ISupportedRoutes[
-                type === IContactTypes.CUSTOMER ? "INVOICES_VIEW" : "PURCHASES"
+                type === IContactTypes.CUSTOMER ? 'INVOICES_VIEW' : 'PURCHASES'
               ]
             }/${data?.id}`}
           >
@@ -109,56 +110,56 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
       },
     },
     {
-      title: "Date",
-      dataIndex: "date",
-      key: "date",
+      title: 'Date',
+      dataIndex: 'date',
+      key: 'date',
       render: (data, row, index) => {
         return <>{dayjs(data).format(`MMMM D, YYYY h:mm A`)}</>;
       },
     },
     {
-      title: "Comment",
-      dataIndex: "comment",
-      key: "comment",
+      title: 'Comment',
+      dataIndex: 'comment',
+      key: 'comment',
       render: (data) => {
-        return <>{data ? data : "-"}</>;
+        return <>{data ? data : '-'}</>;
       },
     },
     {
-      title: "Due Date",
-      dataIndex: "dueDate",
-      key: "dueDate",
+      title: 'Due Date',
+      dataIndex: 'dueDate',
+      key: 'dueDate',
       render: (data) => (
-        <>{data ? dayjs(data).format(`MMMM D, YYYY h:mm A`) : "-"}</>
+        <>{data ? dayjs(data).format(`MMMM D, YYYY h:mm A`) : '-'}</>
       ),
     },
     {
-      title: "Debit",
-      dataIndex: "entryType",
-      key: "entryType",
+      title: 'Debit',
+      dataIndex: 'entryType',
+      key: 'entryType',
       render: (data, row, index) => {
         const renderDebit = () => {
-          return data === IEntryType.DEBIT ? moneyFormat(row.amount) : "-";
+          return data === IEntryType.DEBIT ? moneyFormat(row.amount) : '-';
         };
 
         return <>{renderDebit()}</>;
       },
     },
     {
-      title: "Credits",
-      dataIndex: "entryType",
-      key: "entryType",
+      title: 'Credits',
+      dataIndex: 'entryType',
+      key: 'entryType',
       render: (data, row) => {
         const renderCredits = () => {
-          return data === IEntryType.CREDIT ? moneyFormat(row.amount) : "-";
+          return data === IEntryType.CREDIT ? moneyFormat(row.amount) : '-';
         };
         return <>{renderCredits()}</>;
       },
     },
     {
-      title: "Balance",
-      dataIndex: "balance",
-      key: "balance",
+      title: 'Balance',
+      dataIndex: 'balance',
+      key: 'balance',
       render: (data) => {
         return <BoldText>{moneyFormat(data)}</BoldText>;
       },
@@ -169,7 +170,7 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
     if (sorter.order === undefined) {
       history.push(
         `/app${ISupportedRoutes.CONTACTS}/${id}?type=${
-          type === 1 ? "customer" : "supplier"
+          type === 1 ? 'customer' : 'supplier'
         }&sortid=${sortid}&page=${pagination.current}&page_size=${
           pagination.pageSize
         }&query=${query}`
@@ -183,9 +184,9 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
     } else {
       history.push(
         `/app${ISupportedRoutes.CONTACTS}?type=${
-          type === 1 ? "customer" : "supplier"
+          type === 1 ? 'customer' : 'supplier'
         }&sortid=${
-          sorter && sorter.order === "descend"
+          sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field
         }&page=${pagination.current}&page_size=${
@@ -197,7 +198,7 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
         page: pagination.current,
         page_size: pagination.pageSize,
         sortid:
-          sorter && sorter.order === "descend"
+          sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field,
       });
@@ -209,7 +210,7 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
       <div className="search flex alignCenter justifyFlexEnd pv-10 ">
         <SmartFilter
           onFilter={(encode) => {
-            let route = `/app${ISupportedRoutes.CONTACTS}/${id}?sortid=${sortid}&page=1&page_size=20&query=${encode}`;
+            const route = `/app${ISupportedRoutes.CONTACTS}/${id}?sortid=${sortid}&page=1&page_size=20&query=${encode}`;
             history.push(route);
             setLedgerConfig({ ...ledgerConfig, query: encode });
           }}
@@ -245,7 +246,7 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
           totalItems={pagination?.total}
           pagination={{
             pageSize: pagination.page_size,
-            position: ["bottomRight"],
+            position: ['bottomRight'],
 
             current: pagination?.page_no,
             total: pagination?.total,

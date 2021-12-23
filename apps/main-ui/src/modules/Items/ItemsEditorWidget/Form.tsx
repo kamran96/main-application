@@ -12,7 +12,7 @@ import {
 } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import { FC, useEffect, useState } from 'react';
-import { queryCache, useMutation, useQuery } from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 
 import {
@@ -35,13 +35,14 @@ const { Option } = Select;
 
 export const ItemsForm: FC = () => {
   /* HOOKS */
-
+  const queryCache = useQueryClient();
   const [formData, setFormData] = useState({});
   const [attribute_values, setAttriValue] = useState([]);
   const [hasInventory, setHasInventory] = useState(false);
 
   /* Mutations */
-  const [mutateItems, itemsResponse] = useMutation(createUpdateItem);
+  const { mutate: mutateItems, isLoading: itemCreating } =
+    useMutation(createUpdateItem);
   /* user context API hook */
   const {
     itemsModalConfig,
@@ -95,7 +96,7 @@ export const ItemsForm: FC = () => {
 
   /*Query hook for  Fetching single contact against ID */
   const { data } = useQuery([`item-id=${id}`, id], fetchSingleItem, {
-    enabled: id && id !== null,
+    enabled: !!id,
     onSuccess: (data) => {
       if (data?.data?.result) {
         const { result } = data.data;
@@ -168,21 +169,41 @@ export const ItemsForm: FC = () => {
       if (values.itemType === ITEM_TYPE.PRODUCT) {
         payload = { ...payload, attribute_values: attribute_values };
       }
-      const response = await mutateItems(payload, {
-        onSuccess: () => {
+      await mutateItems(payload, {
+        onSuccess: (response) => {
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
             id ? 'Updated' : 'Created'
           );
           ['item-id', 'items?page', 'all-items'].forEach((key) => {
-            queryCache.invalidateQueries((q) =>
-              q.queryKey[0].toString().startsWith(key)
-            );
+            (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           });
           setItemsModalConfig(false, null);
           form.resetFields();
           setFormData({});
           setAttriValue([]);
+          if (payload.hasPricing && response) {
+            if (response.status === 201 || response.status === 204) {
+              const { status } = response;
+              const { result } = response.data;
+              if (id) {
+                const updateRes: any = { ...result };
+                delete updateRes.openingStock;
+                delete updateRes.accountId;
+                setPricingModalConfig(true, {
+                  ...updateRes,
+                  id: [updateRes.id],
+                  action: 'UPDATE',
+                });
+              } else {
+                setPricingModalConfig(true, {
+                  ...result,
+                  id: [result.id],
+                  action: status === 201 ? 'CREATE' : 'UPDATE',
+                });
+              }
+            }
+          }
         },
         onError: (error) => {
           const err: IServerError = error;
@@ -197,29 +218,6 @@ export const ItemsForm: FC = () => {
           }
         },
       });
-
-      if (payload.hasPricing && response) {
-        if (response.status === 201 || response.status === 204) {
-          const { status } = response;
-          const { result } = response.data;
-          if (id) {
-            const updateRes: any = { ...result };
-            delete updateRes.openingStock;
-            delete updateRes.accountId;
-            setPricingModalConfig(true, {
-              ...updateRes,
-              id: [updateRes.id],
-              action: 'UPDATE',
-            });
-          } else {
-            setPricingModalConfig(true, {
-              ...result,
-              id: [result.id],
-              action: status === 201 ? 'CREATE' : 'UPDATE',
-            });
-          }
-        }
-      }
     }
   };
   const onFinishFailed = (errorInfo) => {
@@ -459,11 +457,7 @@ export const ItemsForm: FC = () => {
                 >
                   Cancel
                 </Button>
-                <Button
-                  loading={itemsResponse.isLoading}
-                  type="primary"
-                  htmlType="submit"
-                >
+                <Button loading={itemCreating} type="primary" htmlType="submit">
                   {id ? 'Update' : 'Create'}
                 </Button>
               </div>

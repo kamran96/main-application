@@ -1,18 +1,17 @@
+import { QueryKey } from '../modal';
 import http from '../utils/http';
 
 enum USERS {
   INDEX = 'users/user',
-  DELETE = `users/user`,
+  DELETE = `users/user/delete`,
   INVITE = `users/user/invite`,
 }
 
-export const getUsersListAPI = (
-  key?: string,
-  page?: number,
-  sortid?: string,
-  page_size?: number,
-  query?: string
-) => {
+export const getUsersListAPI = ({ queryKey }: QueryKey) => {
+  const page: number = queryKey[1];
+  const sortid: string = queryKey[2];
+  const page_size: number = queryKey[3];
+  const query: string = queryKey[4];
   let url = `${USERS.INDEX}?page_size=${page_size}&page_no=${page}&sort=${sortid}`;
   if (query) {
     url = `${url}&query=${query}`;

@@ -34,7 +34,7 @@ export const ItemSalesGraph: FC<IProps> = ({ id }) => {
     ],
     getSalesSummaryDataAPI,
     {
-      enabled: id,
+      enabled: !!id,
       cacheTime: Infinity,
     }
   );

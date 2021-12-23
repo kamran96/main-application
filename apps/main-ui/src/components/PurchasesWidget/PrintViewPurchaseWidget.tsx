@@ -222,7 +222,7 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
                             : '-'}
                         </td>
                         <td style={{ textAlign: 'center' }}>
-                          {listItem.itemDiscount &&
+                          {typeof listItem.discount === 'string' &&
                           listItem.itemDiscount.includes('%')
                             ? `${listItem.itemDiscount}%`
                             : listItem.itemDiscount

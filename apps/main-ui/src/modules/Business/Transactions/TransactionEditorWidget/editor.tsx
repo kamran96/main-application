@@ -1,6 +1,6 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable no-throw-literal */
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { TableCard } from '../../../../components/TableCard';
 import { Heading } from '../../../../components/Heading';
 import { Button, Col, Form, Input, Row, Select, Spin } from 'antd';
@@ -9,7 +9,7 @@ import { ListItem } from './ListItem';
 import update from 'immutability-helper';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { queryCache, useMutation, useQuery } from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import { getAllAccounts, getRecentAccounts } from '../../../../api/accounts';
 import { createTransactionAPI } from '../../../../api';
 import { IAccountsResult } from '../../../../modal/accounts';
@@ -40,6 +40,7 @@ interface ITransactionItems {
 }
 
 export const TransactionWidget: FC = () => {
+  const queryCache = useQueryClient();
   const [transactionItems, setTransactionItems] = useState<
     ITransactionItems[] | any
   >([
@@ -52,8 +53,6 @@ export const TransactionWidget: FC = () => {
       error: false,
     },
   ]);
-
-  console.log(transactionItems, 'transactions items');
 
   const [form] = Form.useForm();
 
@@ -81,7 +80,7 @@ export const TransactionWidget: FC = () => {
       recentAccountsData.data.result) ||
     [];
 
-  const [mutateCreateTransaction, respCreateTransaction] =
+  const { mutate: mutateCreateTransaction, isLoading: creatingTransaction } =
     useMutation(createTransactionAPI);
 
   const moveCard = useCallback(
@@ -177,7 +176,7 @@ export const TransactionWidget: FC = () => {
             ]);
             form.resetFields();
             ['accounts', `transactions`]?.forEach((key) => {
-              queryCache?.invalidateQueries((q) =>
+              (queryCache?.invalidateQueries as any)((q) =>
                 q?.queryKey[0]?.toString().startsWith(key)
               );
             });
@@ -385,7 +384,7 @@ export const TransactionWidget: FC = () => {
                                 Save
                               </Button>
                               <Button
-                                loading={respCreateTransaction.isLoading}
+                                loading={creatingTransaction}
                                 type="primary"
                                 htmlType="submit"
                               >
@@ -508,7 +507,7 @@ export const TransactionWidget: FC = () => {
                                 Save
                               </Button>
                               <Button
-                                loading={respCreateTransaction.isLoading}
+                                loading={creatingTransaction}
                                 type="primary"
                                 htmlType="submit"
                               >

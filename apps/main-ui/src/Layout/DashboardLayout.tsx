@@ -18,23 +18,18 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
   const ItemsEditorWidget = lazy(
     () => import('../modules/Items/ItemsEditorWidget')
   );
-  const PricingEditorWidget = lazy(
-    () => import('../modules/Items/PricingEditorWidget')
-  );
   const CategoryEditorWidget = lazy(
     () => import('../modules/Categories/CategoryEditorWidget')
-  );
-  const PaymentsEditorWidget = lazy(
-    () => import('../modules/Payment/PaymentsEditorWidget')
-  );
-  const BranchEditorWidget = lazy(
-    () => import('../modules/Branch/BranchEditorWidget')
   );
   const AttributeEditorWidget = lazy(
     () => import('../modules/Categories/AttributeEditorWidget')
   );
-  const AddBankWidget = lazy(
-    () => import('../modules/Business/BankAccounts/AddBank')
+  const PricingEditorWidget = lazy(
+    () => import('../modules/Items/PricingEditorWidget')
+  );
+  const AddAccount = lazy(() => import('../modules/Accounts/AddAccount'));
+  const PaymentsEditorWidget = lazy(
+    () => import('../modules/Payment/PaymentsEditorWidget')
   );
   const AddOrganizationForm = lazy(
     () => import('../Containers/AddOrganization/AddOrganizationForm')
@@ -42,10 +37,15 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
   const RolesEditorWidget = lazy(
     () => import('../modules/Rbac/RolesEditorWidget/index')
   );
+  const BranchEditorWidget = lazy(
+    () => import('../modules/Branch/BranchEditorWidget')
+  );
+  const AddBankWidget = lazy(
+    () => import('../modules/Business/BankAccounts/AddBank')
+  );
   const PermissionsEditorWidget = lazy(
     () => import('../modules/Rbac/PermissionsEditorWidget/index')
   );
-  const AddAccount = lazy(() => import('../modules/Accounts/AddAccount'));
   const EnableDispatchModal = lazy(
     () => import('../modules/Dispatching/DispatchingWall/EnableDispatch')
   );
@@ -92,57 +92,61 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
       <DashboardWrapper>
         <GlobalStyle />
         <AppLayout>{checkLayout(renderRoutes(props.route.routes))}</AppLayout>
-        {/* <UserInviteModal2 /> */}
+        <Suspense fallback={<div></div>}>
+          <ItemsEditorWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <CategoryEditorWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <AttributeEditorWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <PricingEditorWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <AddAccount />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <PaymentsEditorWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <AddOrganizationForm />
+        </Suspense>
         <Suspense fallback={<div></div>}>
           <UserInviteModal />
         </Suspense>
-        <Suspense fallback={<></>}>
-          <ItemsEditorWidget visibility={itemsModalConfig?.visibility} />
-        </Suspense>
-        <GeneralPreferencesWidget />
-        <Suspense fallback={<></>}>
-          <AddAccount />
-        </Suspense>
-        <Suspense fallback={<></>}>
-          <AddOrganizationForm />
-        </Suspense>
-        <Suspense fallback={<></>}>
-          <PricingEditorWidget />
-        </Suspense>
-        <Suspense fallback={<></>}>
-          <AddBankWidget />
-        </Suspense>
-        <Suspense fallback={<></>}>
-          <BranchEditorWidget />
-        </Suspense>
-        <Suspense fallback={<></>}>
-          <PaymentsEditorWidget />
-        </Suspense>
-        <Suspense fallback={<></>}>
-          <CategoryEditorWidget />
-        </Suspense>
-        <Suspense fallback={<></>}>
-          <AttributeEditorWidget />
-        </Suspense>
-        <Suspense fallback={<></>}>
-          <EnableDispatchModal />
-        </Suspense>
-        <Suspense fallback={<></>}>
-          <ReviewModal />
-        </Suspense>
-        <Suspense fallback={<></>}>
+        <Suspense fallback={<div></div>}>
           <RolesEditorWidget />
         </Suspense>
-        <Suspense fallback={<></>}>
+        {/* <UserInviteModal2 /> */}
+        <Suspense fallback={<div></div>}></Suspense>
+        <GeneralPreferencesWidget />
+
+        <Suspense fallback={<div></div>}>
+          <AddBankWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <BranchEditorWidget />
+        </Suspense>
+
+        <Suspense fallback={<div></div>}>
+          <EnableDispatchModal />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <ReviewModal />
+        </Suspense>
+
+        <Suspense fallback={<div></div>}>
           <PermissionsEditorWidget />
         </Suspense>
-        <Suspense fallback={<></>}>
+        <Suspense fallback={<div></div>}>
           <Paywall />
         </Suspense>
-        <Suspense fallback={<></>}>
+        <Suspense fallback={<div></div>}>
           <VerifyAccountModal />
         </Suspense>
-        <Suspense fallback={<></>}>
+        <Suspense fallback={<div></div>}>
           <ContactsImportWidget />
         </Suspense>
       </DashboardWrapper>

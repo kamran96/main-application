@@ -8,7 +8,7 @@ import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import dayjs from 'dayjs';
 import { FC, useEffect, useRef, useState } from 'react';
-import { queryCache, useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 import { getInvoiceNumber, InvoiceCreateAPI } from '../../../../api';
 import { create_update_contact } from '../../../../api/Contact';
@@ -27,7 +27,6 @@ import {
   NOTIFICATIONTYPE,
 } from '../../../../modal';
 import { IInvoiceType, ITaxTypes } from '../../../../modal/invoice';
-import { IOrganizationType } from '../../../../modal/organization';
 import { addition } from '../../../../utils/helperFunctions';
 import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv, { DownloadPDF } from '../../../../utils/Print';
@@ -53,6 +52,7 @@ interface IProps {
 let debounce: any;
 
 const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
+  const queryCache = useQueryClient();
   /* ************ HOOKS *************** */
   /* Component State Hooks */
   const { routeHistory, userDetails } = useGlobalContext();
@@ -99,11 +99,14 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
 
   const APISTAKE = InvoiceCreateAPI;
   /* React Query useMutation hook and ASYNC method to create invoice */
-  const [muatateCreateInvoice, resMutateInvoice] = useMutation(APISTAKE);
+  const {
+    mutate: muatateCreateInvoice,
+    isLoading: invoiceCreating,
+    data: responseInvoice,
+  } = useMutation(APISTAKE);
   //  CONTACT CREATE API
-  const [mutateCreateContact, resMutateCreateContact] = useMutation(
-    create_update_contact
-  );
+  const { mutate: mutateCreateContact, isLoading: creatingContact } =
+    useMutation(create_update_contact);
   const [submitType, setSubmitType] = useState('');
   /* ********** HOOKS ENDS HERE ************** */
 
@@ -220,9 +223,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
             'ledger-contact',
             'all-items',
           ].forEach((key) => {
-            queryCache.invalidateQueries((q) =>
-              q?.queryKey[0]?.toString()?.startsWith(key)
-            );
+            (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           });
         },
         onError: (error: IServerError) => {
@@ -295,13 +296,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                 : ''
             }
             hideCalculation={type === IInvoiceType.INVOICE ? false : true}
-            data={
-              (resMutateInvoice &&
-                resMutateInvoice.data &&
-                resMutateInvoice.data.data &&
-                resMutateInvoice.data.data.result) ||
-              {}
-            }
+            data={responseInvoice?.data?.result || {}}
           />
         </PrintFormat>
       </div>
@@ -682,10 +677,9 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                   </Button>
                   <Button
                     loading={
-                      resMutateInvoice.isLoading &&
-                      submitType === ISUBMITTYPE.DRAFT
+                      invoiceCreating && submitType === ISUBMITTYPE.DRAFT
                     }
-                    disabled={resMutateInvoice.isLoading}
+                    disabled={invoiceCreating}
                     htmlType="submit"
                     size={'middle'}
                     onClick={() => {
@@ -712,9 +706,9 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                     >
                       <>
                         <Button
-                          disabled={resMutateInvoice.isLoading}
+                          disabled={invoiceCreating}
                           loading={
-                            resMutateInvoice.isLoading &&
+                            invoiceCreating &&
                             submitType === ISUBMITTYPE.APPROVE_PRINT
                           }
                           htmlType="submit"
@@ -736,9 +730,9 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                           </span>
                         </Button>
                         <Button
-                          disabled={resMutateInvoice.isLoading}
+                          disabled={invoiceCreating}
                           loading={
-                            resMutateInvoice.isLoading &&
+                            invoiceCreating &&
                             submitType === ISUBMITTYPE.ONLYAPPROVE
                           }
                           htmlType="submit"

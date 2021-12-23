@@ -1,6 +1,6 @@
 import Checkbox from 'antd/lib/checkbox/Checkbox';
 import React, { FC, useEffect, useState } from 'react';
-import { queryCache, useMutation, useQuery } from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 import {
   addRolePermissionAPI,
@@ -18,15 +18,15 @@ import { Color, ISupportedRoutes } from '../../../modal';
 import { P } from '../../../components/Para/P';
 
 export const PermissionsLayout: FC = () => {
+  const queryCache = useQueryClient();
   // const [modulesResult] = useState([]);
-  const { routeHistory } = useGlobalContext();
+  const { routeHistory, refetchPermissions } = useGlobalContext();
   const { history } = routeHistory;
 
   const [permissions, setPermissions] = useState([]);
   const [selectedPermission, setSelectedPermission] = useState(null);
   const [permissionTable, setPermissionsTable] = useState([]);
-  const [mutateAddRolePermission, setMutateRolePermission] =
-    useMutation(addRolePermissionAPI);
+  const { mutate: mutateAddRolePermission } = useMutation(addRolePermissionAPI);
 
   const { data: modulesResponse, isLoading: modulesFetching } = useQuery(
     ['permission_modules'],
@@ -57,7 +57,8 @@ export const PermissionsLayout: FC = () => {
     [`permission-show?type=${selectedPermission}`, selectedPermission],
     permissionsShowAPI,
     {
-      enabled: selectedPermission,
+      enabled: !!selectedPermission,
+      keepPreviousData: true,
     }
   );
 
@@ -77,7 +78,7 @@ export const PermissionsLayout: FC = () => {
     await mutateAddRolePermission(payload, {
       onSuccess: () => {
         queryCache.invalidateQueries(`permission-show?type=${setPermissions}`);
-        queryCache.invalidateQueries(`roles-permissions`);
+        refetchPermissions();
       },
     });
   };

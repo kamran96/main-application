@@ -6,12 +6,10 @@ import { CommonModal } from '../../../components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { ItemsForm } from './Form';
 
-interface IProps {
-  visibility: boolean;
-}
-const _itemsEditorWidget: FC<IProps> = ({ visibility }) => {
+const ItemsEditorWidget: FC = () => {
   /* user context API hook */
-  const { setItemsModalConfig } = useGlobalContext();
+  const { setItemsModalConfig, itemsModalConfig } = useGlobalContext();
+  const { visibility } = itemsModalConfig;
 
   return (
     <CommonModal
@@ -31,8 +29,8 @@ const _itemsEditorWidget: FC<IProps> = ({ visibility }) => {
   );
 };
 
-const ItemsEditorWidget = memo(_itemsEditorWidget, (prevProps, nextProps) => {
-  return true;
-});
+// const ItemsEditorWidget = memo(_itemsEditorWidget, (prevProps, nextProps) => {
+//   return true;
+// });
 
 export default ItemsEditorWidget;
