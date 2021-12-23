@@ -12,8 +12,13 @@ import { useState } from 'react';
 
 export const VerificationModal: FC = () => {
   const queryCache = useQueryClient();
-  const { userDetails, notificationCallback, setVerifiedModal, verifiedModal } =
-    useGlobalContext();
+  const {
+    userDetails,
+    notificationCallback,
+    setVerifiedModal,
+    verifiedModal,
+    refetchUser,
+  } = useGlobalContext();
   const { email } = userDetails;
   const [form] = Form.useForm();
   const { mutate: muateteVerify, isLoading: verifyingAccount } =
@@ -40,7 +45,7 @@ export const VerificationModal: FC = () => {
             NOTIFICATIONTYPE.SUCCESS,
             `Verified SuccessFully`
           );
-          queryCache?.invalidateQueries('loggedInUser');
+          refetchUser();
           closeVerifyModal();
           form.resetFields();
         },

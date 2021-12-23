@@ -20,7 +20,8 @@ import { AddOrganizationWrapper } from './styled';
 
 export const OrganizationsList: FC = () => {
   const queryCache = useQueryClient();
-  const { setOrganizationConfig, notificationCallback } = useGlobalContext();
+  const { setOrganizationConfig, notificationCallback, refetchUser } =
+    useGlobalContext();
   const [{ result }, setResponse] = useState<any>({
     result: [],
   });
@@ -72,7 +73,7 @@ export const OrganizationsList: FC = () => {
     await mutateDeleteOrganizations(payload, {
       onSuccess: () => {
         queryCache.invalidateQueries(`all-organizations`);
-        queryCache.invalidateQueries(`loggedInUser`);
+        refetchUser();
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Organization Deleted');
         setConfirmModal(false);
         setSelectedRows([]);

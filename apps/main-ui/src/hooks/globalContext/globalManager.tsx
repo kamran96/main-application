@@ -14,6 +14,7 @@ import {
 import {
   IBaseAPIError,
   IErrorMessages,
+  IErrorResponse,
   IServerError,
   NOTIFICATIONTYPE,
 } from '../../modal';
@@ -282,99 +283,74 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     }
   }, [checkIsAuthSaved]);
 
-  const userId = auth?.users?.id || null;
+  const userId = useMemo(() => {
+    return auth?.users?.id || null;
+  }, [auth?.users?.id]);
 
-  const {
-    isLoading,
-    response,
-    refetch: refetchUser,
-    error,
-  } = useHttp(
+  const { isLoading, refetch: refetchUser } = useHttp(
     {
-      queryFn: async () => {
-        CheckAuthAPIDev(userId);
+      apiOption: {
+        url: `users/user/${userId}`,
+        method: 'GET',
       },
-
+      enabled: !!userId,
       onSuccess: (data) => {
-        console.log(data);
+        if (isProductionEnv) {
+          setUserDetails(data?.users);
+          setIsUserLogin(true);
+        } else {
+          const { result } = data;
+          setUserDetails(result);
+          setIsUserLogin(true);
+          if (result?.theme) {
+            setTheme(result?.theme);
+          }
+        }
+      },
+      onError: (err: IBaseAPIError) => {
+        if (err?.response?.data?.statusCode === 401) {
+          handleLogin({ type: ILoginActions.LOGOUT });
+        }
+        setAutherized(false);
       },
     },
 
     [!!userId]
   );
 
-  console.log(isLoading, response, error, 'what is response now');
-
-  // /* LoggedInUser is Fetched */
-  // const { isLoading, isFetched } = useQuery(
-  //   [`loggedInUser`, userId],
-  //   AUTH_CHECK_API,
-  //   {
-  //     cacheTime: 10000000000000,
-  //     enabled: isProductionEnv ? checkAutherized : !!userId,
-  //     refetchIntervalInBackground: false,
-
-  //     onSuccess: (data) => {
-  //       if (isProductionEnv) {
-  //         setUserDetails(data?.data?.users);
-  //         setIsUserLogin(true);
-  //       } else {
-  //         const { result } = data?.data;
-  //         setUserDetails(result);
-  //         setIsUserLogin(true);
-  //         if (result?.theme) {
-  //           setTheme(result?.theme);
-  //         }
-  //       }
-  //     },
-  //     onError: (err: IBaseAPIError) => {
-  //       // CancelRequest();
-  //       if (err?.response?.data?.statusCode === 401) {
-  //         handleLogin({ type: ILoginActions.LOGOUT });
-  //       }
-  //       setAutherized(false);
-  //     },
-  //   }
-  // );
-
   useEffect(() => {
     toggleTheme(theme);
   }, [theme]);
 
-  const {
-    data: allRolesAndPermissionsData,
-    isLoading: permissionsFetching,
-    isFetched: permissionsFetched,
-    isFetching,
-  } = useQuery([`roles-permissions`], getAllRolesWithPermission, {
-    enabled: isUserLogin,
-    cacheTime: 10000000000000,
-    staleTime: Infinity,
-    refetchIntervalInBackground: false,
-  });
+  const { isLoading: permissionsFetching, refetch: refetchPermissions } =
+    useHttp(
+      {
+        apiOption: {
+          url: `/users/rbac/role-with-permission`,
+          method: 'GET',
+        },
+        enabled: !!isUserLogin,
+        onSuccess: ({ result }) => {
+          const { parentRole } = result;
+          const roles: IRolePermissions[] = result.roles;
+          const newResult = roles.map((item) => {
+            const roleIndex = parentRole.findIndex((i) => i === item.role);
+            const parents = [];
+            for (let index = 0; index <= roleIndex; index++) {
+              parents.push(parentRole[index]);
+            }
 
-  useEffect(() => {
-    if (allRolesAndPermissionsData?.data?.result) {
-      const { result } = allRolesAndPermissionsData.data;
-      const { parentRole } = result;
-      const roles: IRolePermissions[] =
-        allRolesAndPermissionsData.data.result.roles;
-      const newResult = roles.map((item) => {
-        const roleIndex = parentRole.findIndex((i) => i === item.role);
-        const parents = [];
-        for (let index = 0; index <= roleIndex; index++) {
-          parents.push(parentRole[index]);
-        }
-
-        return {
-          ...item,
-          action: `${item.module}/${item.title}`,
-          parents,
-        };
-      });
-      setRolePermissions(newResult);
-    }
-  }, [allRolesAndPermissionsData]);
+            return {
+              ...item,
+              action: `${item.module}/${item.title}`,
+              parents,
+            };
+          });
+          setRolePermissions(newResult);
+        },
+      },
+      [isUserLogin]
+    );
 
   const notificationCallback = (type, info: string) => {
     message.config({
@@ -401,11 +377,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const { theme: appTheme, themeLoading } = useTheme(theme);
 
-  const checkingUser = false;
-
-  const rerender = useRef(1 + 1);
-
-  console.log(rerender, 'rerender');
+  const checkingUser = isLoading || permissionsFetching;
 
   return (
     <globalContext.Provider
@@ -570,33 +542,10 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
           setContactsImportConfig({ visibility });
         },
         refetchUser,
+        refetchPermissions,
       }}
     >
-      <WrapperChildren>
-        {/* <div className="network-problem">
-        Check your internet connection 
-      </div> */}
-        {/* <div onClick={()=>setTheme('dark')}>dark mode</div>
-      <div onClick={()=>setTheme('light')}>light mode</div> */}
-        <div>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Corrupti
-          quibusdam laudantium expedita doloribus, iusto praesentium fuga ab
-          quam alias, a officia voluptates rem consequatur explicabo facilis
-          odio at facere quo. Lorem ipsum, dolor sit amet consectetur
-          adipisicing elit. Quod, commodi beatae? Similique rerum suscipit
-          exercitationem quam eveniet nobis, totam, unde illo impedit ad optio
-          ipsum. Tempora sit sint laboriosam fugit!
-        </div>
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            refetchUser();
-          }}
-        >
-          on Refetch
-        </button>
-        {/* {children} */}
-      </WrapperChildren>
+      <WrapperChildren>{children}</WrapperChildren>
     </globalContext.Provider>
   );
 };

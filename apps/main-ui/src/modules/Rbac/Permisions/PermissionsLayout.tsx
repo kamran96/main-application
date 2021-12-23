@@ -20,7 +20,7 @@ import { P } from '../../../components/Para/P';
 export const PermissionsLayout: FC = () => {
   const queryCache = useQueryClient();
   // const [modulesResult] = useState([]);
-  const { routeHistory } = useGlobalContext();
+  const { routeHistory, refetchPermissions } = useGlobalContext();
   const { history } = routeHistory;
 
   const [permissions, setPermissions] = useState([]);
@@ -78,7 +78,7 @@ export const PermissionsLayout: FC = () => {
     await mutateAddRolePermission(payload, {
       onSuccess: () => {
         queryCache.invalidateQueries(`permission-show?type=${setPermissions}`);
-        queryCache.invalidateQueries(`roles-permissions`);
+        refetchPermissions();
       },
     });
   };
