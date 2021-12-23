@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Between, getCustomRepository, ILike, In } from 'typeorm';
 import axios from 'axios';
+import * as moment from 'moment';
 import { Sorting } from '@invyce/sorting';
 import { CreditNoteRepository } from '../repositories/creditNote.repository';
 import { CreditNoteItemRepository } from '../repositories/creditNoteItem.repository';
@@ -19,9 +20,16 @@ import {
 } from '@invyce/global-constants';
 
 import { CreditNoteDto } from '../dto/credit-note.dto';
+import { InvoiceRepository } from '../repositories/invoice.repository';
+import { ClientProxy } from '@nestjs/microservices';
+import { SEND_FORGOT_PASSWORD } from '@invyce/send-email';
 
 @Injectable()
 export class CreditNoteService {
+  constructor(
+    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy
+  ) {}
+
   async IndexCreditNote(
     user: IBaseUser,
     queryData: IPage
@@ -101,7 +109,7 @@ export class CreditNoteService {
     } else {
       credit_note = await getCustomRepository(CreditNoteRepository).find({
         where: {
-          // status: status,
+          status: status,
           organizationId: user.organizationId,
           branchId: user.branchId,
         },
@@ -187,11 +195,14 @@ export class CreditNoteService {
       branchId: req.user.branchId,
       createdById: req.user.id,
       updatedById: req.user.id,
-      status: 1,
+      status: dto.status,
     });
 
+    const credit_note_item_array = [];
     for (const item of dto.invoice_items) {
-      await getCustomRepository(CreditNoteItemRepository).save({
+      const credit_note_item = await getCustomRepository(
+        CreditNoteItemRepository
+      ).save({
         itemId: item.itemId,
         creditNoteId: credit_note.id,
         description: item.description,
@@ -203,8 +214,10 @@ export class CreditNoteService {
         tax: item.tax,
         total: item.total,
         accountId: item.accountId,
-        status: 1,
+        status: credit_note.status,
       });
+
+      credit_note_item_array.push(credit_note_item);
 
       const itemDetail = items.find((i) => i.id === item.itemId);
       if (itemDetail.hasInventory) {
@@ -218,6 +231,47 @@ export class CreditNoteService {
               : 'decrease',
           action: 'create',
         });
+      }
+
+      if (dto.invoiceId) {
+        const invoice = await getCustomRepository(InvoiceRepository).findOne({
+          where: {
+            id: dto.invoiceId,
+          },
+        });
+
+        let i = 0;
+        const invoice_details = [];
+        for (const cn of credit_note_item_array) {
+          i++;
+          if (i < 5) {
+            invoice_details.push({
+              itemName: items.find((j) => cn.itemId === j.id).name,
+              quantity: cn.quantity,
+              price: cn.unitPrice,
+              itemDiscount: cn.itemDiscount,
+              tax: cn.tax,
+              total: cn.total,
+            });
+          }
+        }
+
+        const payload = {
+          to: req.user.email,
+          from: 'no-reply@invyce.com',
+          TemplateAlias: 'credit-note-applied',
+          TemplateModel: {
+            user_name: req.user.profile.fullName,
+            invoice_name: invoice.invoiceNumber,
+            issueDate: moment(credit_note.issueDate).format(''),
+            invoice_details,
+            gross_total: credit_note.grossTotal,
+            itemDisTotal: credit_note.discount,
+            net_total: credit_note.netTotal,
+          },
+        };
+
+        await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
       }
 
       if (credit_note.invoiceType === CreditNoteType.ACCRECCREDIT) {
