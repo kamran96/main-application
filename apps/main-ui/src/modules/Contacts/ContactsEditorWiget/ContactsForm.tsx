@@ -4,7 +4,7 @@ import { Form, Row, Col, Input, Button, Select, InputNumber } from 'antd';
 import { FormLabel } from './../../../components/FormLabel/index';
 import { Heading } from '../../../components/Heading';
 import { Para } from './../../../components/Para/index';
-import { useMutation, useQuery, useQueryCache } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { create_update_contact, viewSingleContact } from '../../../api/Contact';
 import {
   IContactTypes,
@@ -52,7 +52,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
   ]);
   /* Use form hook antd */
   const [form] = Form.useForm();
-  const queryCache = useQueryCache();
+  const queryCache = useQueryClient();
 
   const { data: AllAccounts } = useQuery(
     [`all-accounts`, 'ALL'],
@@ -82,15 +82,15 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
   const { history } = routeHistory;
 
   /* Mutation to create and update contact */
-  const [mutateAddContact, addContactResponse] = useMutation(
-    create_update_contact
-  );
-
-  const { isSuccess } = addContactResponse;
+  const {
+    mutate: mutateAddContact,
+    isSuccess,
+    isLoading,
+  } = useMutation(create_update_contact);
 
   /*Query hook for  Fetching single contact against ID */
   const { data } = useQuery([`contact-${id}`, id], viewSingleContact, {
-    enabled: id,
+    enabled: !!id,
     onSuccess: () => {
       /* when successfully created OR updated toast will be apear */
       /* three type of parameters are passed
@@ -138,9 +138,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
     await mutateAddContact(payload, {
       onSuccess: () => {
         [`contacts-list`, `all-contacts`, `transactions`].forEach((key) => {
-          queryCache.invalidateQueries((q) =>
-            q.queryKey[0].toString().startsWith(key)
-          );
+          (queryCache.invalidateQueries as any)((q) => q.startsWith(key));
         });
         if (id) {
           [
@@ -149,9 +147,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
             `contact-${id}`,
             `transactions`,
           ].forEach((key) => {
-            queryCache.invalidateQueries((q) =>
-              q.queryKey[0].toString().startsWith(key)
-            );
+            (queryCache.invalidateQueries as any)((q) => q.startsWith(key));
           });
         }
         /* when successfully created OR updated toast will be apear */
@@ -620,11 +616,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                 >
                   Cancel
                 </Button>
-                <Button
-                  loading={addContactResponse.isLoading}
-                  type="primary"
-                  htmlType="submit"
-                >
+                <Button loading={isLoading} type="primary" htmlType="submit">
                   {id ? 'Update' : 'Create'}
                 </Button>
               </div>

@@ -1,17 +1,17 @@
-import React, { FC } from "react";
-import { Avatar, Menu, Tooltip } from "antd";
-import styled from "styled-components";
-import { Icon } from "@iconify/react";
-import plusOutlined from "@iconify-icons/ant-design/plus-outlined";
-import { Color, NOTIFICATIONTYPE } from "../../../modal";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { IBranch, IOrganizations } from "../../../modal/organization";
-import { queryCache, useMutation } from "react-query";
-import { activeBranchAPI } from "../../../api";
-import { Rbac } from "../../Rbac";
-import { PERMISSIONS } from "../../Rbac/permissions";
-import { useRbac } from "../../Rbac/useRbac";
-import { IThemeProps } from "../../../hooks/useTheme/themeColors";
+import React, { FC } from 'react';
+import { Avatar, Menu, Tooltip } from 'antd';
+import styled from 'styled-components';
+import { Icon } from '@iconify/react';
+import plusOutlined from '@iconify-icons/ant-design/plus-outlined';
+import { Color, NOTIFICATIONTYPE } from '../../../modal';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { IBranch, IOrganizations } from '../../../modal/organization';
+import { useQueryClient, useMutation } from 'react-query';
+import { activeBranchAPI } from '../../../api';
+import { Rbac } from '../../Rbac';
+import { PERMISSIONS } from '../../Rbac/permissions';
+import { useRbac } from '../../Rbac/useRbac';
+import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 
 const { SubMenu } = Menu;
 
@@ -20,22 +20,20 @@ interface IProps {
 }
 
 export const OrganizationMenu: FC<IProps> = ({ organizationDetails }) => {
-  const {
-    setBranchModalConfig,
-    userDetails,
-    notificationCallback,
-  } = useGlobalContext();
+  const queryCache = useQueryClient();
+  const { setBranchModalConfig, userDetails, notificationCallback } =
+    useGlobalContext();
   const activeOrganization = userDetails.organizationId;
   const activeBranch = userDetails.branchId;
 
   const { rbac } = useRbac(null);
 
   /* Mutations  */
-  const [mutateActiveBranch] = useMutation(activeBranchAPI);
+  const { mutate: mutateActiveBranch } = useMutation(activeBranchAPI);
 
   const renderOrganizationIcon = (name) => {
-    let icon = "";
-    let splitArr = name.split("");
+    let icon = '';
+    const splitArr = name.split('');
     icon = `${splitArr[0]}${splitArr[1]}`;
 
     return icon;
@@ -46,33 +44,34 @@ export const OrganizationMenu: FC<IProps> = ({ organizationDetails }) => {
     organizationId: number
   ) => {
     const UserId: number = userDetails.id;
-    let payload: any = {
+    const payload: any = {
       branchId,
       organizationId,
       UserId,
     };
 
-    try {
-      await mutateActiveBranch(payload, {
-        onSuccess: () => {
-          notificationCallback(NOTIFICATIONTYPE.SUCCESS, "Branch Updated");
-          queryCache.clear();
+    await mutateActiveBranch(payload, {
+      onSuccess: () => {
+        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Branch Updated');
+        queryCache.clear();
 
-          setTimeout(() => {
-            window.location.reload();
-          }, 500);
-        },
-      });
-    } catch (error) {}
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      },
+      onError: (err) => {
+        console.log(err);
+      },
+    });
   };
 
   const isActiveClass = `${
-    organizationDetails.id === activeOrganization && "active-organization"
+    organizationDetails.id === activeOrganization && 'active-organization'
   }`;
 
   return (
     <WrapperOrganizationMenu>
-      <Menu className={isActiveClass} style={{ width: "100%" }} mode="inline">
+      <Menu className={isActiveClass} style={{ width: '100%' }} mode="inline">
         <SubMenu
           key="sub1"
           title={
@@ -204,7 +203,7 @@ const WrapperOrganizationMenu: any = styled.div`
       justify-content: center;
       &:after {
         position: absolute;
-        content: "";
+        content: '';
 
         width: 8px;
         height: 8px;

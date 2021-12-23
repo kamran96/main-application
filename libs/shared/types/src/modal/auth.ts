@@ -73,6 +73,7 @@ export interface IProfile {
   jobTitle: string;
   marketingStatus: null;
   attachment: IAttachment;
+  prefix?: string;
 }
 
 export interface IAttachment extends IBase {

@@ -1,32 +1,29 @@
-import { Card } from "antd";
-import React from "react";
-import styled from "styled-components";
-import GmailLogo from "../../../../assets/gmail.png";
-import { Loader } from "../../../../components/Loader";
-import { VerifiedIcon } from "../../../../assets/icons";
-import { useMutation } from "react-query";
-import { GmailVerificationAPI } from "../../../../api";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
-import { useEffect } from "react";
+import { Card } from 'antd';
+import React from 'react';
+import styled from 'styled-components';
+import GmailLogo from '../../../../assets/gmail.png';
+import { Loader } from '../../../../components/Loader';
+import { VerifiedIcon } from '../../../../assets/icons';
+import { useMutation } from 'react-query';
+import { GmailVerificationAPI } from '../../../../api';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { useEffect } from 'react';
 
 export const VerifyGmail = () => {
+  const { mutate: mutateVerifyGmail } = useMutation(GmailVerificationAPI);
+  const { routeHistory } = useGlobalContext();
+  const { history } = routeHistory;
+  const { search } = history?.location;
+  useEffect(() => {
+    if (search) {
+      const code = search?.split(`&scope`)[0]?.split('code=')[1];
+      const payload = {
+        code,
+      };
 
-    const [mutateVerifyGmail, resVerifyGmail] = useMutation(GmailVerificationAPI);
-    const {routeHistory} = useGlobalContext();
-    const {history} = routeHistory;
-    const {search} = history?.location;;
-    useEffect(()=>{
-        if(search){
-            let code= search?.split(`&scope`)[0]?.split('code=')[1];
-            let payload = {
-                code
-            }
-
-            mutateVerifyGmail(payload);
-        } 
-    },[search])
-
-
+      mutateVerifyGmail(payload);
+    }
+  }, [search]);
 
   return (
     <WrapperVerifyGmail>
@@ -38,19 +35,19 @@ export const VerifyGmail = () => {
           <img
             className="company_logo"
             src={GmailLogo}
-            alt={"quickbooks logo"}
+            alt={'quickbooks logo'}
           />
           <h2>Gmail</h2>
         </div>
         <div className="description">
           <p className="textCenter">
-            Verification is {false ? "in progress" : "finished"}
+            Verification is {false ? 'in progress' : 'finished'}
           </p>
         </div>
         <div className="loading_wrapper">
           <div className="verified_icon">
             {false ? <Loader /> : <VerifiedIcon />}
-            <p className="label">{false ? "Please wait" : "Verified"}</p>
+            <p className="label">{false ? 'Please wait' : 'Verified'}</p>
           </div>
         </div>
       </Card>
@@ -65,11 +62,10 @@ const WrapperVerifyGmail = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  .ant-card{
+  .ant-card {
     border-radius: 10px;
     background: #ffffff;
-    border: none
-
+    border: none;
   }
   .ant-card-body {
     min-height: 426px;

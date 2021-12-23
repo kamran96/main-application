@@ -1,3 +1,4 @@
+import { QueryKey } from '../modal';
 import http from '../utils/http';
 
 enum ACCOUNT {
@@ -10,13 +11,11 @@ enum ACCOUNT {
 export const createUpdateAccountAPI = (payload) =>
   http.post(`${ACCOUNT.CREATE_ACCOUNT}`, payload);
 
-export const getAllAccountsAPI = (
-  key?: string,
-  page?: number,
-  sortid?: string,
-  page_size?: number,
-  query?: string
-) => {
+export const getAllAccountsAPI = ({ queryKey }: QueryKey) => {
+  const page: number = queryKey[1];
+  const sortid: string = queryKey[2];
+  const page_size: number = queryKey[3];
+  const query: string = queryKey[4];
   let url = `${ACCOUNT.RAILS_LIST}?page_size=${page_size}&page_no=${page}`;
   // if (sortid) {
   //   url = `${url}&sort=${sortid}`;
@@ -29,13 +28,15 @@ export const getAllAccountsAPI = (
   return http.get(url);
 };
 
-export const getAllAccounts = (key?: string, purpose?: string) =>
+export const getAllAccounts = (key?: any, purpose?: string) =>
   http.get(`${ACCOUNT.RAILS_LIST}?purpose=${purpose}`);
 
 export const getSecondaryAccounts = () => http.get(ACCOUNT.SECONDARY_ACCOUNTS);
 
-export const getAccountByIDAPI = (key, id) =>
-  http.get(`${ACCOUNT.INDEX}/${id}`);
+export const getAccountByIDAPI = ({ queryKey }: QueryKey) => {
+  const id: number | string = queryKey[1];
+  return http.get(`${ACCOUNT.INDEX}/${id}`);
+};
 
 export const deleteAccountsAPI = (ids) => http.put(ACCOUNT.INDEX, ids);
 
@@ -45,7 +46,7 @@ export const getBankAccounts = () => http.get(`accounts/bank/account`);
 
 export const getAccountLedger = (
   key,
-  id: number,
+  id?: number,
   pageSize = 20,
   page = 1,
   query?: string
@@ -59,8 +60,10 @@ export const getAccountLedger = (
   return http.get(url);
 };
 
-export const getRecentAccounts = (key?: string) =>
+export const getRecentAccounts = (key?: any) =>
   http.get(`accounts/recent_accounts`);
 
-export const getAccountsByTypeAPI = (key?: string, type = 'invoice') =>
-  http(`accounts/account/type?type=${type}`);
+export const getAccountsByTypeAPI = ({ queryKey }: QueryKey) => {
+  const type = queryKey[1] || 'invoice';
+  return http(`accounts/account/type?type=${type}`);
+};

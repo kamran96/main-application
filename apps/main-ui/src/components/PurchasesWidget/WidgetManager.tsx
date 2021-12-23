@@ -45,15 +45,12 @@ import moneyFormat from '../../utils/moneyFormat';
 import { useWindowSize } from '../../utils/useWindowSize';
 import { Option } from '../CommonSelect';
 import { Editable, EditableSelect } from '../Editable';
-import defaultItems, {
-  defaultFormData,
-  defaultPayment,
-  Requires,
-} from './defaultStates';
+import defaultItems, { defaultFormData, defaultPayment } from './defaultStates';
 import { invycePersist } from '@invyce/invyce-persist';
 import c from './keys';
 import styled from 'styled-components';
 import usePrevious from '../../hooks/usePrevious';
+import { IPurchaseManagerProps } from './types';
 
 interface IManagerContext {
   rowsErrors: number[];
@@ -90,11 +87,8 @@ interface IManagerContext {
 export const PurchaseContext = createContext<Partial<IManagerContext>>({});
 export const usePurchaseWidget = () => useContext(PurchaseContext);
 
-interface IProps {
+interface IProps extends IPurchaseManagerProps {
   children?: ReactElement<any>;
-  type?: 'BILL' | 'SI' | 'POE' | 'PO' | 'QO';
-  id?: number;
-  onSubmit?: (payload: any) => void;
 }
 
 interface IPaymentPayload {
@@ -117,7 +111,12 @@ const DragHandle = SortableHandle(() => (
 
 let setStateTimeOut: any;
 
-export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
+export const PurchaseManager: FC<IProps> = ({
+  children,
+  type,
+  id,
+  requires,
+}) => {
   /* API STAKE */
   const APISTAKE_GETORDERS =
     type === IInvoiceType.BILL ||
@@ -224,7 +223,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     [`${type}-${id}-view`, id],
     APISTAKE_GETORDERS,
     {
-      enabled: id,
+      enabled: !!id,
       cacheTime: Infinity,
     }
   );
@@ -423,7 +422,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
       const activeItem = { ...item };
 
       Object?.keys(item)?.forEach((key, keyIndex) => {
-        if (Requires[key]?.require === true && !activeItem[key]) {
+        if (requires[key]?.require === true && !activeItem[key]) {
           if (activeItem?.errors?.length) {
             errors?.push(`In Row ${index + 1}, ${key} is required`);
             if (!activeItem?.errors?.includes(key)) {

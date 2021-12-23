@@ -1,27 +1,27 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import editSolid from "@iconify-icons/clarity/edit-solid";
-import deleteIcon from "@iconify/icons-carbon/delete";
-import { ColumnsType } from "antd/lib/table";
-import React, { FC, useEffect, useState } from "react";
-import { useMutation, usePaginatedQuery, useQueryCache } from "react-query";
-import { Link } from "react-router-dom";
-import { deleteContacts, getContacts } from "../../../api/Contact";
-import { ButtonTag } from "../../../components/ButtonTags";
-import { ConfirmModal } from "../../../components/ConfirmModal";
-import { PDFICON } from "../../../components/Icons";
-import { SmartFilter } from "../../../components/SmartFilter";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { IContactTypes, NOTIFICATIONTYPE } from "../../../modal";
-import { IPagination, IServerError } from "../../../modal/base";
-import { ISupportedRoutes } from "../../../modal/routing";
-import { CommonTable } from "./../../../components/Table";
-import FilterSchema from "./FilterSchema";
-import { ContactListWrapper, ContactMainWrapper } from "./styles";
-import printIcon from "@iconify-icons/bytesize/print";
-import { Rbac } from "../../../components/Rbac";
-import { PERMISSIONS } from "../../../components/Rbac/permissions";
-import moneyFormat from "../../../utils/moneyFormat";
-import ContactsImport from "../ContactsImport"
+import editSolid from '@iconify-icons/clarity/edit-solid';
+import deleteIcon from '@iconify/icons-carbon/delete';
+import { ColumnsType } from 'antd/lib/table';
+import { FC, useEffect, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { Link } from 'react-router-dom';
+import { deleteContacts, getContacts } from '../../../api/Contact';
+import { ButtonTag } from '../../../components/ButtonTags';
+import { ConfirmModal } from '../../../components/ConfirmModal';
+import { PDFICON } from '../../../components/Icons';
+import { SmartFilter } from '../../../components/SmartFilter';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { IContactTypes, NOTIFICATIONTYPE } from '../../../modal';
+import { IPagination, IServerError } from '../../../modal/base';
+import { ISupportedRoutes } from '../../../modal/routing';
+import { CommonTable } from './../../../components/Table';
+import FilterSchema from './FilterSchema';
+import { ContactListWrapper, ContactMainWrapper } from './styles';
+import { Rbac } from '../../../components/Rbac';
+import { PERMISSIONS } from '../../../components/Rbac/permissions';
+import moneyFormat from '../../../utils/moneyFormat';
+import ContactsImport from '../ContactsImport';
+import { useHistory } from 'react-router-dom';
 
 export const Customers: FC = () => {
   /* HOOKS */
@@ -33,38 +33,31 @@ export const Customers: FC = () => {
   const [filterBar, setFilterBar] = useState<boolean>(false);
   const [config, setConfig] = useState({
     page: 1,
-    query: "",
-    sortid: "id",
-    sortItem: "",
+    query: '',
+    sortid: 'id',
+    sortItem: '',
     page_size: 20,
   });
   const { page, query, sortid, page_size } = config;
 
-  const queryCache = useQueryCache();
+  const queryCache = useQueryClient();
 
   /*  CONTAINER STATES*/
 
   /* Mutations */
   /* this mutation is used for deleting contacts against bunch of ids */
-  const [
-    mutateDeleteContacts,
-    { isLoading: contactDeleteLoading },
-  ] = useMutation(deleteContacts);
+  const { mutate: mutateDeleteContacts, isLoading: contactDeleteLoading } =
+    useMutation(deleteContacts);
 
   const { routeHistory, notificationCallback } = useGlobalContext();
-  const { history } = routeHistory;
+  const history = useHistory();
 
   useEffect(() => {
-    if (
-      routeHistory &&
-      routeHistory.history &&
-      routeHistory.history.location &&
-      routeHistory.history.location.search
-    ) {
+    if (routeHistory?.history?.location?.search) {
       let obj = {};
-      const queryArr = history.location.search.split("?")[1].split("&");
+      const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
-        const split = item.split("=");
+        const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
 
@@ -87,7 +80,7 @@ export const Customers: FC = () => {
     } else {
       history.push(
         `/app${ISupportedRoutes.CONTACTS}?sortid=${
-          sorter && sorter.order === "descend"
+          sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field
         }&page=${pagination.current}&page_size=${
@@ -100,7 +93,7 @@ export const Customers: FC = () => {
         page: pagination.current,
         page_size: pagination.pageSize,
         sortid:
-          sorter && sorter.order === "descend"
+          sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field,
       });
@@ -110,17 +103,19 @@ export const Customers: FC = () => {
   /* usePagination hook React Query */
   /* this hook fetches contact list against page number and also sorts request data against sort id */
   /* eg. sortid = name (assending) -name (descending) */
-  const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
-    [
-      `contacts-list-customers?page_no=${page}&sort=${sortid}&page_size=${page_size}&type=${IContactTypes.CUSTOMER}&query=${query}`,
-      IContactTypes.CUSTOMER,
-      page,
-      sortid,
-      page_size,
-      query,
-    ],
-    getContacts
-  );
+  const params: any = [
+    `contacts-list-customers?page_no=${page}&sort=${sortid}&page_size=${page_size}&type=${IContactTypes.CUSTOMER}&query=${query}`,
+    IContactTypes.CUSTOMER,
+    page,
+    sortid,
+    page_size,
+    query,
+  ];
+  const {
+    isLoading,
+    data: resolvedData,
+    isFetching,
+  } = useQuery(params, getContacts);
 
   /* ComponentDidUpdate hook for updaing contactResponse state when successfully API fetches contact list data */
   useEffect(() => {
@@ -138,9 +133,9 @@ export const Customers: FC = () => {
   /* columns setup antd table */
   const columns: ColumnsType<any> = [
     {
-      title: "Contact",
-      dataIndex: "name",
-      key: "name",
+      title: 'Contact',
+      dataIndex: 'name',
+      key: 'name',
       sorter: true,
       showSorterTooltip: true,
       render: (data, row, index) => (
@@ -153,47 +148,47 @@ export const Customers: FC = () => {
       ),
     },
     {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
       sorter: true,
       showSorterTooltip: true,
     },
     {
-      title: "Company Name",
-      dataIndex: "businessName",
-      key: "businessName",
+      title: 'Company Name',
+      dataIndex: 'businessName',
+      key: 'businessName',
       sorter: true,
       showSorterTooltip: true,
     },
     {
-      title: "Contact Type",
-      dataIndex: "contactType",
-      key: "contactType",
+      title: 'Contact Type',
+      dataIndex: 'contactType',
+      key: 'contactType',
       render: (data) => (
         <>
           {data && data === IContactTypes.CUSTOMER
-            ? "Customer"
+            ? 'Customer'
             : data === IContactTypes.SUPPLIER
-            ? "Supplier"
-            : "-"}
+            ? 'Supplier'
+            : '-'}
         </>
       ),
     },
     {
-      title: "Credit Limit",
-      dataIndex: "creditLimit",
-      key: "creditLimit",
+      title: 'Credit Limit',
+      dataIndex: 'creditLimit',
+      key: 'creditLimit',
     },
     {
-      title: "Credit Block Limit",
-      dataIndex: "creditLimitBlock",
-      key: "creditLimitBlock",
+      title: 'Credit Block Limit',
+      dataIndex: 'creditLimitBlock',
+      key: 'creditLimitBlock',
     },
     {
-      title: "Balance",
-      dataIndex: "balance",
-      key: "balance",
+      title: 'Balance',
+      dataIndex: 'balance',
+      key: 'balance',
       render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
     },
   ];
@@ -206,10 +201,8 @@ export const Customers: FC = () => {
 
     await mutateDeleteContacts(payload, {
       onSuccess: () => {
-        ["contacts-list-customers", "all-contacts"].forEach((key) => {
-          queryCache.invalidateQueries((q) =>
-            q.queryKey[0].toString().startsWith(key)
-          );
+        ['contacts-list-customers', 'all-contacts'].forEach((key) => {
+          (queryCache.invalidateQueries as any)((q) => q.startsWith(key));
         });
 
         setConfirmModal(false);
@@ -245,7 +238,7 @@ export const Customers: FC = () => {
                 }}
                 title="Edit"
                 icon={editSolid}
-                size={"middle"}
+                size={'middle'}
               />
             </Rbac>
             <Rbac permission={PERMISSIONS.CONTACTS_DELETE}>
@@ -255,7 +248,7 @@ export const Customers: FC = () => {
                 onClick={() => setConfirmModal(true)}
                 title="Delete"
                 icon={deleteIcon}
-                size={"middle"}
+                size={'middle'}
               />
             </Rbac>
           </div>
@@ -267,8 +260,7 @@ export const Customers: FC = () => {
   const renderTopbarRight = () => {
     return (
       <div className="flex alignCenter">
-       
-       <ContactsImport/>
+        <ContactsImport />
         <ButtonTag
           disabled
           className="mr-10"
@@ -302,7 +294,7 @@ export const Customers: FC = () => {
       <ContactListWrapper>
         <div className="table_container">
           <CommonTable
-            printTitle={"Customers List"}
+            printTitle={'Customers List'}
             customTopbar={renderCustomTopbar()}
             topbarRightPannel={renderTopbarRight()}
             hasPrint
@@ -313,7 +305,7 @@ export const Customers: FC = () => {
             totalItems={paginationData.total}
             pagination={{
               pageSize: page_size,
-              position: ["bottomRight"],
+              position: ['bottomRight'],
               current: paginationData.page_no,
               total: paginationData.total,
             }}

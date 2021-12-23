@@ -85,7 +85,7 @@ export const TrialBalanceList: FC = () => {
             if (row.isLastIndex) {
               return null;
             } else {
-              return data;
+              return data ? data : '-';
             }
           },
         }
@@ -99,7 +99,7 @@ export const TrialBalanceList: FC = () => {
         if (row.isLastIndex) {
           return <BoldText>{moneyFormat(data.toFixed(2))}</BoldText>;
         } else {
-          return data ? data.toFixed(2) : '';
+          return data ? data.toFixed(2) : '-';
         }
       },
     },
@@ -113,15 +113,15 @@ export const TrialBalanceList: FC = () => {
         if (row.isLastIndex) {
           return <BoldText>{moneyFormat(data.toFixed(2))}</BoldText>;
         } else {
-          return data ? data.toFixed(2) : '';
+          return data ? data.toFixed(2) : '-';
         }
       },
     },
     searchedQueryItem?.date && isFetched
       ? {
           title: 'Closing balance',
-          dataIndex: 'closing_balance',
-          key: 'closing_balance',
+          dataIndex: 'balance',
+          key: 'balance',
           className: 'static-width',
           render: (data, row, index) => {
             if (row.isLastIndex) {

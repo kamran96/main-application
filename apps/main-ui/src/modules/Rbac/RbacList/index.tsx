@@ -1,22 +1,24 @@
-import { ColumnsType } from "antd/lib/table";
-import React, { FC, useEffect, useState } from "react";
-import { queryCache, useMutation, useQuery } from "react-query";
-import styled from "styled-components";
-import { deleteRolesAPI, getRbacListAPI } from "../../../api/rbac";
-import { ButtonTag } from "../../../components/ButtonTags";
-import { CommonTable } from "../../../components/Table";
-import { IRolesResponse, NOTIFICATIONTYPE } from "../../../modal";
-import editSolid from "@iconify-icons/clarity/edit-solid";
-import deleteIcon from "@iconify/icons-carbon/delete";
-import { ConfirmModal } from "../../../components/ConfirmModal";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
+import { ColumnsType } from 'antd/lib/table';
+import React, { FC, useEffect, useState } from 'react';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
+import styled from 'styled-components';
+import { deleteRolesAPI, getRbacListAPI } from '../../../api/rbac';
+import { ButtonTag } from '../../../components/ButtonTags';
+import { CommonTable } from '../../../components/Table';
+import { IRolesResponse, NOTIFICATIONTYPE } from '../../../modal';
+import editSolid from '@iconify-icons/clarity/edit-solid';
+import deleteIcon from '@iconify/icons-carbon/delete';
+import { ConfirmModal } from '../../../components/ConfirmModal';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 
 export const RbacList: FC = () => {
+  const queryCache = useQueryClient();
   const [response, setResponse] = useState<IRolesResponse>({
     result: [],
   });
   const [confirmModal, setConfirmModal] = useState(false);
-  const [mutateDeleteRole, resDeleteRole] = useMutation(deleteRolesAPI);
+  const { mutate: mutateDeleteRole, isLoading: isDeletingRole } =
+    useMutation(deleteRolesAPI);
   const { notificationCallback, setRbacConfigModal } = useGlobalContext();
 
   const [selectedRows, setSeclectedRows] = useState([]);
@@ -34,25 +36,25 @@ export const RbacList: FC = () => {
 
   const columns: ColumnsType<any> = [
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
     },
     {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
     },
     {
-      title: "Users",
-      dataIndex: "",
-      key: "",
+      title: 'Users',
+      dataIndex: '',
+      key: '',
     },
     {
-      title: "Parent",
-      dataIndex: "role",
-      key: "role",
-      render: (data) => <>{data ? data.name : "-"}</>,
+      title: 'Parent',
+      dataIndex: 'role',
+      key: 'role',
+      render: (data) => <>{data ? data.name : '-'}</>,
     },
   ];
 
@@ -69,16 +71,16 @@ export const RbacList: FC = () => {
             onClick={() => setRbacConfigModal(true, selectedRows[0])}
             title="Edit"
             icon={editSolid}
-            size={"middle"}
+            size={'middle'}
           />
-          <ButtonTag
+          {/* <ButtonTag
             className="mr-10"
             disabled={!selectedRows.length}
             onClick={() => setConfirmModal(true)}
             title="Delete"
             icon={deleteIcon}
-            size={"middle"}
-          />
+            size={'middle'}
+          /> */}
         </div>
       </div>
     );
@@ -90,10 +92,10 @@ export const RbacList: FC = () => {
     };
     await mutateDeleteRole(payload, {
       onSuccess: () => {
-        queryCache.invalidateQueries("rbac-list");
+        queryCache.invalidateQueries('rbac-list');
         notificationCallback(
           NOTIFICATIONTYPE.SUCCESS,
-          "Role Deleted Successfully"
+          'Role Deleted Successfully'
         );
         setConfirmModal(false);
       },
@@ -115,7 +117,7 @@ export const RbacList: FC = () => {
         })}
       />
       <ConfirmModal
-        loading={resDeleteRole.isLoading}
+        loading={isDeletingRole}
         visible={confirmModal}
         onCancel={() => setConfirmModal(false)}
         onConfirm={onConfirmDelete}

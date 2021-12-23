@@ -9,7 +9,7 @@ export const uploadImageAPI = (payload: any) =>
     },
   });
 
-export const getUserAPI = (key, id: number) => {
+export const getUserAPI = (key: any, id?: number) => {
   return http.get(`user/${id}`);
 };
 

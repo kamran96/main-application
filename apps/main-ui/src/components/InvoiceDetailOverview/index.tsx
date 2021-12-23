@@ -1,27 +1,27 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button } from "antd";
-import React, { FC, useEffect, useState } from "react";
-import styled from "styled-components";
-import { Color, ISupportedRoutes } from "../../modal";
-import { Card } from "../Card";
-import { Seprator } from "../Seprator";
-import { H4 } from "../Typography";
+import { Button } from 'antd';
+import React, { FC, useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { Color, ISupportedRoutes } from '../../modal';
+import { Card } from '../Card';
+import { Seprator } from '../Seprator';
+import { H4 } from '../Typography';
 
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import Icon from "@iconify/react";
-import bxPlus from "@iconify-icons/bx/bx-plus";
-import * as echarts from "echarts";
-import { useWindowSize } from "../../utils/useWindowSize";
-import { useQuery } from "react-query";
-import { InvoicePIEchartAPI } from "../../api/mainDashboard";
-import { IThemeProps } from "../../hooks/useTheme/themeColors";
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import Icon from '@iconify/react';
+import bxPlus from '@iconify-icons/bx/bx-plus';
+import * as echarts from 'echarts';
+import { useWindowSize } from '../../utils/useWindowSize';
+import { useQuery } from 'react-query';
+import { InvoicePIEchartAPI } from '../../api/mainDashboard';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
 export const InvoiceOverview: FC = () => {
   const { routeHistory, theme } = useGlobalContext();
   const { history } = routeHistory;
   const [graphData, setGraphData] = useState([]);
   const [width, height] = useWindowSize();
-  let pieWidth = width >= 1200 && width <= 1320 ? "297px" : "333px";
+  const pieWidth = width >= 1200 && width <= 1320 ? '297px' : '333px';
 
   const { data: responseData, isLoading: isFetching } = useQuery(
     [`pie-chart-maindashboard`],
@@ -33,14 +33,14 @@ export const InvoiceOverview: FC = () => {
       const { result } = responseData.data;
       setGraphData(() => {
         return [
-          { accessor: "draftinvoice", label: "Draft Invoices" },
+          { accessor: 'draftinvoice', label: 'Draft Invoices' },
           {
-            accessor: "awaiting_invoice",
-            label: "Awaiting Payments",
+            accessor: 'awaiting_invoice',
+            label: 'Awaiting Payments',
           },
           {
-            accessor: "overdue",
-            label: "Overdue",
+            accessor: 'overdue',
+            label: 'Overdue',
           },
         ].map((item, index) => {
           return { value: result[item.accessor], name: item.label };
@@ -56,59 +56,57 @@ export const InvoiceOverview: FC = () => {
     const chartDom: any = document.getElementById(`_invoice_doughnut`)!;
 
     if (chartDom) {
-      var myChart = echarts.init(chartDom);
-      var colorPalette = [" #143C69", "#1890FF", "#F5222D"];
-      var option;
-
-      option = {
+      const myChart = echarts.init(chartDom);
+      const colorPalette = [' #143C69', '#1890FF', '#F5222D'];
+      const option = {
         title: [
           {
             text: `Total Invoices \n ${responseData?.data?.result?.total}`,
 
             textStyle: {
-              fontSize: "12",
-              fontWeight: "bold",
-              color: theme === "dark" ? "#C2C2C2" : "#7B7B7B",
+              fontSize: '12',
+              fontWeight: 'bold',
+              color: theme === 'dark' ? '#C2C2C2' : '#7B7B7B',
             },
-            left: "24%",
-            top: "42%",
-            textAlign: "center",
+            left: '24%',
+            top: '42%',
+            textAlign: 'center',
           },
         ],
         tooltip: {
-          trigger: "item",
+          trigger: 'item',
         },
         legend: {
-          orient: "vertical",
-          top: "center",
-          right: "0%",
+          orient: 'vertical',
+          top: 'center',
+          right: '0%',
           itemWidth: 8,
           itemHeight: 8,
           textStyle: {
-            color: theme === "dark" ? "#C2C2C2" : "#7B7B7B",
+            color: theme === 'dark' ? '#C2C2C2' : '#7B7B7B',
           },
         },
         series: [
           {
             // name: '访问来源',
-            type: "pie",
-            radius: ["65%", "90%"],
+            type: 'pie',
+            radius: ['65%', '90%'],
             avoidLabelOverlap: false,
             // top:'center',
-            right: "50%",
+            right: '50%',
             color: colorPalette,
             // width: '100%',
             // height: '145px',
 
             label: {
               show: false,
-              position: "center",
+              position: 'center',
             },
             emphasis: {
               label: {
                 show: false,
-                fontSize: "10",
-                fontWeight: "bold",
+                fontSize: '10',
+                fontWeight: 'bold',
               },
             },
             labelLine: {
@@ -142,15 +140,15 @@ export const InvoiceOverview: FC = () => {
           >
             <span className="icon-left flex alignCenter">
               <Icon style={{ fontSize: 18 }} icon={bxPlus} />
-            </span>{" "}
+            </span>{' '}
             Create new
           </Button>
         </div>
         <Seprator />
         <div className="chartWrapper">
           <div
-            style={{ height: "146px", width: pieWidth }}
-            id={"_invoice_doughnut"}
+            style={{ height: '146px', width: pieWidth }}
+            id={'_invoice_doughnut'}
           ></div>
           {/* <ul id="data-results-chart-legends" /> */}
         </div>

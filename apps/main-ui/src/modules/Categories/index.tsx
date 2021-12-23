@@ -1,36 +1,34 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import deleteIcon from "@iconify/icons-carbon/delete";
-import editSolid from "@iconify/icons-clarity/edit-solid";
-import { Button } from "antd";
-import React, { FC, useEffect, useState } from "react";
-import { queryCache, useMutation, usePaginatedQuery } from "react-query";
-import { deleteCategoryAPI, getCategoriesAPI } from "../../api";
-import { ButtonTag } from "../../components/ButtonTags";
-import { ConfirmModal } from "../../components/ConfirmModal";
-import { Heading } from "../../components/Heading";
-import { Rbac } from "../../components/Rbac";
-import { PERMISSIONS } from "../../components/Rbac/permissions";
-import { SmartFilter } from "../../components/SmartFilter";
-import { CommonTable } from "../../components/Table";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { NOTIFICATIONTYPE } from "../../modal";
-import { ICategoriesGetResponse } from "../../modal/categories";
-import { ChildCategory } from "./ChildCategories";
-import { Columns } from "./columns";
-import { WrapperCategoriesContainer } from "./styles";
+import deleteIcon from '@iconify/icons-carbon/delete';
+import editSolid from '@iconify/icons-clarity/edit-solid';
+import { Button } from 'antd';
+import { FC, useEffect, useState } from 'react';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
+import { deleteCategoryAPI, getCategoriesAPI } from '../../api';
+import { ButtonTag } from '../../components/ButtonTags';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { Heading } from '../../components/Heading';
+import { Rbac } from '../../components/Rbac';
+import { PERMISSIONS } from '../../components/Rbac/permissions';
+import { SmartFilter } from '../../components/SmartFilter';
+import { CommonTable } from '../../components/Table';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { NOTIFICATIONTYPE } from '../../modal';
+import { ICategoriesGetResponse } from '../../modal/categories';
+import { ChildCategory } from './ChildCategories';
+import { Columns } from './columns';
+import { WrapperCategoriesContainer } from './styles';
 
 const CategoriesContainer: FC = () => {
-  const [
-    { result, pagination },
-    setCategories,
-  ] = useState<ICategoriesGetResponse>({
-    result: [],
-    pagination: {},
-  });
+  const queryCache = useQueryClient();
+  const [{ result, pagination }, setCategories] =
+    useState<ICategoriesGetResponse>({
+      result: [],
+      pagination: {},
+    });
 
-  const [mutateDeleteCategory, resDeleteCategory] = useMutation(
-    deleteCategoryAPI
-  );
+  const { mutate: mutateDeleteCategory, isLoading: isDeletingCategory } =
+    useMutation(deleteCategoryAPI);
 
   const [filterBar, setFilterBar] = useState(false);
 
@@ -41,12 +39,16 @@ const CategoriesContainer: FC = () => {
   const [categoryConfig, setCategoryConfig] = useState({
     page: 1,
     page_size: 20,
-    query: "",
-    sortid: "id",
+    query: '',
+    sortid: 'id',
   });
   const { page, page_size, query, sortid } = categoryConfig;
 
-  const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
+  const {
+    isLoading,
+    data: resolvedData,
+    isFetching,
+  } = useQuery(
     [
       `categories-list?page_no=${page}&sort=${sortid}&page_size=${page_size}&query=${query}`,
       page,
@@ -54,7 +56,10 @@ const CategoriesContainer: FC = () => {
       page_size,
       query,
     ],
-    getCategoriesAPI
+    getCategoriesAPI,
+    {
+      keepPreviousData: true,
+    }
   );
 
   useEffect(() => {
@@ -72,27 +77,28 @@ const CategoriesContainer: FC = () => {
 
   // k.newMethod();
   const handleDeleteCategory = async () => {
-    let payload = {
+    const payload = {
       ids: [...selectedRow],
       isLeaf: false,
     };
 
-    try {
-      await mutateDeleteCategory(payload, {
-        onSuccess: () => {
-          notificationCallback(
-            NOTIFICATIONTYPE.SUCCESS,
-            `Leaf Category deleted Successfully`
-          );
+    await mutateDeleteCategory(payload, {
+      onSuccess: () => {
+        notificationCallback(
+          NOTIFICATIONTYPE.SUCCESS,
+          `Leaf Category deleted Successfully`
+        );
 
-          queryCache.invalidateQueries((q) =>
-            q.queryKey[0].toString().startsWith("categories-list")
-          );
-          setConfirmModal(false);
-          setSelectedRow([]);
-        },
-      });
-    } catch (error) {}
+        (queryCache.invalidateQueries as any)((q) =>
+          q?.startsWith('categories-list')
+        );
+        setConfirmModal(false);
+        setSelectedRow([]);
+      },
+      onError: (errr) => {
+        console.log(errr);
+      },
+    });
   };
 
   const renderCustomTopbar = () => {
@@ -100,28 +106,26 @@ const CategoriesContainer: FC = () => {
       <div className=" pv-10 flex justifySpaceBetween alignCenter">
         <div className="edit">
           <div className="flex alignCenter ">
-            <>
-              <Rbac permission={PERMISSIONS.CATEGORIES_CREATE}>
-                <ButtonTag
-                  disabled={!selectedRow.length || selectedRow.length > 1}
-                  onClick={() =>
-                    setCategoryModalConfig(true, null, selectedRow[0], false)
-                  }
-                  title="Edit"
-                  icon={editSolid}
-                  size={"middle"}
-                />
-              </Rbac>
+            <Rbac permission={PERMISSIONS.CATEGORIES_CREATE}>
               <ButtonTag
-                className="mr-10"
-                disabled={!selectedRow.length}
-                onClick={() => setConfirmModal(true)}
-                title="Delete"
-                icon={deleteIcon}
-                size={"middle"}
+                disabled={!selectedRow.length || selectedRow.length > 1}
+                onClick={() =>
+                  setCategoryModalConfig(true, null, selectedRow[0], false)
+                }
+                title="Edit"
+                icon={editSolid}
+                size={'middle'}
               />
-              {/* <MoreActions /> */}
-            </>
+            </Rbac>
+            <ButtonTag
+              className="mr-10"
+              disabled={!selectedRow.length}
+              onClick={() => setConfirmModal(true)}
+              title="Delete"
+              icon={deleteIcon}
+              size={'middle'}
+            />
+            {/* <MoreActions /> */}
           </div>
         </div>
 
@@ -160,7 +164,6 @@ const CategoriesContainer: FC = () => {
         enableRowSelection
         onSelectRow={handleRowSelect}
         expandable={{
-          onExpand: (expanded, record) => {},
           expandedRowRender: (record, index) => {
             // const childCategories: ITransactionItem[] =
             //   record.transaction_items;
@@ -169,7 +172,7 @@ const CategoriesContainer: FC = () => {
         }}
       />
       <ConfirmModal
-        loading={resDeleteCategory.isLoading}
+        loading={isDeletingCategory}
         visible={confirmModal}
         onCancel={() => setConfirmModal(false)}
         onConfirm={handleDeleteCategory}

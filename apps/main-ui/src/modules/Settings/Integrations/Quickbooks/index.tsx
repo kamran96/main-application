@@ -17,10 +17,12 @@ export const QuickBooks: FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [step, setStep] = useState(1);
   const [importList, setImportList] = useState([]);
-  const [mutateIntegration, { isLoading, data }] = useMutation(
-    QuickbooksIntegrationAPI
-  );
-  const [mutateFetchModules, { data: modulesData }] =
+  const {
+    mutate: mutateIntegration,
+    data,
+    isLoading,
+  } = useMutation(QuickbooksIntegrationAPI);
+  const { mutate: mutateFetchModules, data: modulesData } =
     useMutation(QuickbooksFetchAPI);
 
   // const [muateteCopyModules, resCopyModules] = useMutation(QuickbooksIntegrationAPI);
@@ -71,12 +73,14 @@ export const QuickBooks: FC = () => {
   };
 
   const _quickbookAuthenticate = async () => {
-    const res = await mutateIntegration();
-
-    if (res?.data?.result) {
-      const { result } = res?.data;
-      window.location.replace(result);
-    }
+    const res = await mutateIntegration(null, {
+      onSuccess: (data) => {
+        if (data?.data?.result) {
+          const { result } = data?.data;
+          window.location.replace(result);
+        }
+      },
+    });
   };
 
   const _quickbookCopyModules = async () => {

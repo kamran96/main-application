@@ -1,19 +1,26 @@
-import React, { FC, useEffect, useState } from "react";
-import { Button, Col, Form, Input, Modal, Row, Select } from "antd";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
-import styled from "styled-components";
-import { FormLabel } from "../../../../components/FormLabel";
-import { useMutation, useQuery, queryCache } from "react-query";
-import { getBanks } from "../../../../api/accounts";
-import { ACCOUNT_TYPES } from "../../../../modal/accounts";
-import { createBankAPI } from "../../../../api/banks";
-import { IErrorMessages, IErrorResponse, NOTIFICATIONTYPE } from "../../../../modal";
+import React, { FC, useEffect, useState } from 'react';
+import { Button, Col, Form, Input, Modal, Row, Select } from 'antd';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import styled from 'styled-components';
+import { FormLabel } from '../../../../components/FormLabel';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { getBanks } from '../../../../api/accounts';
+import { ACCOUNT_TYPES } from '../../../../modal/accounts';
+import { createBankAPI } from '../../../../api/banks';
+import {
+  IErrorMessages,
+  IErrorResponse,
+  NOTIFICATIONTYPE,
+} from '../../../../modal';
 
 const { Option } = Select;
 
 export const AddBankWidget: FC = () => {
-  const { banksModalConfig, setBanksModalConfig, notificationCallback } = useGlobalContext();
-  const [mutateBank, resMutateBank] = useMutation(createBankAPI);
+  const queryCache = useQueryClient();
+  const { banksModalConfig, setBanksModalConfig, notificationCallback } =
+    useGlobalContext();
+  const { mutate: mutateBank, isLoading: creatingBank } =
+    useMutation(createBankAPI);
   const [banksList, setBanksList] = useState([]);
   const [form] = Form.useForm();
 
@@ -29,24 +36,23 @@ export const AddBankWidget: FC = () => {
   const onFinish = async (values) => {
     await mutateBank(values, {
       onSuccess: () => {
-        ["banks-list", "all-bank-accounts",].forEach((key) => {
-          queryCache.invalidateQueries((q) =>
-            q.queryKey[0].toString().startsWith(key)
-          );
+        ['banks-list', 'all-bank-accounts'].forEach((key) => {
+          (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
         });
-        notificationCallback(NOTIFICATIONTYPE.SUCCESS, "Bank Account Created")
+        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Bank Account Created');
         form.resetFields();
         setBanksModalConfig(false);
       },
-      onError(err:IErrorResponse){
-        if(err?.data?.message){
-          notificationCallback(NOTIFICATIONTYPE.ERROR, err?.data?.message)
-          
-        }else{
-          notificationCallback(NOTIFICATIONTYPE.ERROR, IErrorMessages.NETWORK_ERROR)
-
+      onError(err: IErrorResponse) {
+        if (err?.data?.message) {
+          notificationCallback(NOTIFICATIONTYPE.ERROR, err?.data?.message);
+        } else {
+          notificationCallback(
+            NOTIFICATIONTYPE.ERROR,
+            IErrorMessages.NETWORK_ERROR
+          );
         }
-      }
+      },
     });
   };
 
@@ -70,7 +76,7 @@ export const AddBankWidget: FC = () => {
               <FormLabel>Bank Name</FormLabel>
               <Form.Item
                 name="name"
-                rules={[{ required: true, message: "Please add Bank name" }]}
+                rules={[{ required: true, message: 'Please add Bank name' }]}
               >
                 <Input size="large" placeholder="eg. Habib Bank Ltd." />
               </Form.Item>
@@ -80,7 +86,7 @@ export const AddBankWidget: FC = () => {
               <Form.Item
                 name="accountNumber"
                 rules={[
-                  { required: true, message: "Please add Account Number" },
+                  { required: true, message: 'Please add Account Number' },
                 ]}
               >
                 <Input size="large" />
@@ -91,20 +97,26 @@ export const AddBankWidget: FC = () => {
               <Form.Item
                 name="accountType"
                 rules={[
-                  { required: true, message: "Please select Account Type" },
+                  { required: true, message: 'Please select Account Type' },
                 ]}
               >
                 <Select
                   size="large"
                   showSearch
-                  style={{ width: "100%" }}
+                  style={{ width: '100%' }}
                   placeholder="Select Item"
                   optionFilterProp="children"
                 >
-                  <Option value={ACCOUNT_TYPES?.CURRENT_ACCOUNT}>Current</Option>
+                  <Option value={ACCOUNT_TYPES?.CURRENT_ACCOUNT}>
+                    Current
+                  </Option>
                   <Option value={ACCOUNT_TYPES?.SAVING_ACCOUNT}>Saving</Option>
-                  <Option value={ACCOUNT_TYPES?.FIXED_DEPOSIT_ACCOUNT}>Fixed Deposit</Option>
-                  <Option value={ACCOUNT_TYPES?.RUNNING_FINANCE_ACCOUNT}>Running Finance</Option>
+                  <Option value={ACCOUNT_TYPES?.FIXED_DEPOSIT_ACCOUNT}>
+                    Fixed Deposit
+                  </Option>
+                  <Option value={ACCOUNT_TYPES?.RUNNING_FINANCE_ACCOUNT}>
+                    Running Finance
+                  </Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -112,12 +124,12 @@ export const AddBankWidget: FC = () => {
               <FormLabel>Bank</FormLabel>
               <Form.Item
                 name="bankId"
-                rules={[{ required: true, message: "Please select bank" }]}
+                rules={[{ required: true, message: 'Please select bank' }]}
               >
                 <Select
                   size="large"
                   showSearch
-                  style={{ width: "100%" }}
+                  style={{ width: '100%' }}
                   placeholder="Select Item"
                   optionFilterProp="children"
                 >
@@ -142,7 +154,12 @@ export const AddBankWidget: FC = () => {
                   >
                     Cancel
                   </Button>
-                  <Button loading={resMutateBank?.isLoading} size="middle" type="primary" htmlType="submit">
+                  <Button
+                    loading={creatingBank}
+                    size="middle"
+                    type="primary"
+                    htmlType="submit"
+                  >
                     Add bank
                   </Button>
                 </div>

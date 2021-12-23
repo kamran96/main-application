@@ -1,7 +1,7 @@
 import { message } from 'antd';
-import { ReactNode } from 'react';
+import { ReactNode, useRef } from 'react';
 import { FC, useEffect, useState, useMemo } from 'react';
-import { queryCache, useMutation, useQuery } from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import {
@@ -14,6 +14,7 @@ import {
 import {
   IBaseAPIError,
   IErrorMessages,
+  IErrorResponse,
   IServerError,
   NOTIFICATIONTYPE,
 } from '../../modal';
@@ -22,6 +23,7 @@ import { IRolePermissions } from '../../modal/rbac';
 import { DecriptionData, EncriptData } from '../../utils/encription';
 import { useTheme } from '../useTheme';
 import { globalContext } from './globalContext';
+import { useHttp } from './useHttp';
 
 type Theme = 'light' | 'dark';
 
@@ -70,13 +72,16 @@ interface IAction {
 }
 
 export const GlobalManager: FC<IProps> = ({ children }) => {
+  const queryCache = useQueryClient();
   /* MUTATIONS */
-  const [
-    mutateSendPDF,
-    { isLoading: sendingPDF, isSuccess: pdfUploaded, reset: resetUPloadPDF },
-  ] = useMutation(uploadPdfAPI);
+  const {
+    mutate: mutateSendPDF,
+    isLoading: sendingPDF,
+    isSuccess: pdfUploaded,
+    reset: resetUPloadPDF,
+  } = useMutation(uploadPdfAPI);
 
-  const [mutateLogout, resLogout] = useMutation(LogoutAPI);
+  const { mutate: mutateLogout, isLoading: logouting } = useMutation(LogoutAPI);
 
   const [isOnline, setIsOnline] = useState(true);
   const [checkAutherized, setAutherized] = useState(true);
@@ -278,76 +283,74 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     }
   }, [checkIsAuthSaved]);
 
-  const userId = auth?.users?.id || null;
+  const userId = useMemo(() => {
+    return auth?.users?.id || null;
+  }, [auth?.users?.id]);
 
-  /* LoggedInUser is Fetched */
-  const {
-    isLoading,
-    isFetched,
-    isFetching: loggedInUserCheckingAgain,
-  } = useQuery([`loggedInUser`, userId], AUTH_CHECK_API, {
-    cacheTime: Infinity,
-    enabled: isProductionEnv ? checkAutherized : userId,
-
-    onSuccess: (data) => {
-      if (isProductionEnv) {
-        setUserDetails(data?.data?.users);
-        setIsUserLogin(true);
-      } else {
-        const { result } = data?.data;
-        setUserDetails(result);
-        setIsUserLogin(true);
-        if (result?.theme) {
-          setTheme(result?.theme);
+  const { isLoading, refetch: refetchUser } = useHttp(
+    {
+      apiOption: {
+        url: `users/user/${userId}`,
+        method: 'GET',
+      },
+      enabled: !!userId,
+      onSuccess: (data) => {
+        if (isProductionEnv) {
+          setUserDetails(data?.users);
+          setIsUserLogin(true);
+        } else {
+          const { result } = data;
+          setUserDetails(result);
+          setIsUserLogin(true);
+          if (result?.theme) {
+            setTheme(result?.theme);
+          }
         }
-      }
+      },
+      onError: (err: IBaseAPIError) => {
+        if (err?.response?.data?.statusCode === 401) {
+          handleLogin({ type: ILoginActions.LOGOUT });
+        }
+        setAutherized(false);
+      },
     },
-    onError: (err: IBaseAPIError) => {
-      // CancelRequest();
-      if (err?.response?.data?.statusCode === 401) {
-        handleLogin({ type: ILoginActions.LOGOUT });
-      }
-      setAutherized(false);
-    },
-  });
+
+    [!!userId]
+  );
 
   useEffect(() => {
     toggleTheme(theme);
   }, [theme]);
 
-  const {
-    data: allRolesAndPermissionsData,
-    isLoading: permissionsFetching,
-    isFetched: permissionsFetched,
-    isFetching,
-  } = useQuery([`roles-permissions`], getAllRolesWithPermission, {
-    enabled: isUserLogin,
-    cacheTime: Infinity,
-    staleTime: Infinity,
-  });
+  const { isLoading: permissionsFetching, refetch: refetchPermissions } =
+    useHttp(
+      {
+        apiOption: {
+          url: `/users/rbac/role-with-permission`,
+          method: 'GET',
+        },
+        enabled: !!isUserLogin,
+        onSuccess: ({ result }) => {
+          const { parentRole } = result;
+          const roles: IRolePermissions[] = result.roles;
+          const newResult = roles.map((item) => {
+            const roleIndex = parentRole.findIndex((i) => i === item.role);
+            const parents = [];
+            for (let index = 0; index <= roleIndex; index++) {
+              parents.push(parentRole[index]);
+            }
 
-  useEffect(() => {
-    if (allRolesAndPermissionsData?.data?.result) {
-      const { result } = allRolesAndPermissionsData.data;
-      const { parentRole } = result;
-      const roles: IRolePermissions[] =
-        allRolesAndPermissionsData.data.result.roles;
-      const newResult = roles.map((item) => {
-        const roleIndex = parentRole.findIndex((i) => i === item.role);
-        const parents = [];
-        for (let index = 0; index <= roleIndex; index++) {
-          parents.push(parentRole[index]);
-        }
-
-        return {
-          ...item,
-          action: `${item.module}/${item.title}`,
-          parents,
-        };
-      });
-      setRolePermissions(newResult);
-    }
-  }, [allRolesAndPermissionsData]);
+            return {
+              ...item,
+              action: `${item.module}/${item.title}`,
+              parents,
+            };
+          });
+          setRolePermissions(newResult);
+        },
+      },
+      [isUserLogin]
+    );
 
   const notificationCallback = (type, info: string) => {
     message.config({
@@ -374,7 +377,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const { theme: appTheme, themeLoading } = useTheme(theme);
 
-  const checkingUser = (isLoading && !isFetched) || permissionsFetching;
+  const checkingUser = isLoading || permissionsFetching;
 
   return (
     <globalContext.Provider
@@ -538,17 +541,11 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         setContactsImportConfig: (visibility: boolean) => {
           setContactsImportConfig({ visibility });
         },
+        refetchUser,
+        refetchPermissions,
       }}
     >
-      <WrapperChildren>
-        {/* <div className="network-problem">
-        Check your internet connection 
-      </div> */}
-        {/* <div onClick={()=>setTheme('dark')}>dark mode</div>
-      <div onClick={()=>setTheme('light')}>light mode</div> */}
-
-        {children}
-      </WrapperChildren>
+      <WrapperChildren>{children}</WrapperChildren>
     </globalContext.Provider>
   );
 };

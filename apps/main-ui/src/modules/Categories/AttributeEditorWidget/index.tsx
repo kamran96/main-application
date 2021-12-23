@@ -1,8 +1,8 @@
 import deleteIcon from '@iconify/icons-carbon/delete';
 import Icon from '@iconify/react';
 import { Button, Col, Row, Tooltip } from 'antd';
-import React, { FC, useEffect, useState } from 'react';
-import { queryCache, useMutation, useQuery } from 'react-query';
+import { FC, useEffect, useState } from 'react';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import { addAttributesAPI, getCategoryAttributesAPI } from '../../../api';
 import { CommonModal } from '../../../components';
 import { CommonLoader } from '../../../components/FallBackLoader';
@@ -13,6 +13,7 @@ import { AttriForm } from './form';
 import { WrapperAttributeWidget } from './styles';
 
 export const AttributeEditorWidget: FC = () => {
+  const queryCache = useQueryClient();
   const [attriData, setAttriData] = useState<IVariants[]>([{}]);
   const [deletedIds, setDeletedIds] = useState([]);
   const [checkValidation, setCheckValidation] = useState(false);
@@ -25,8 +26,9 @@ export const AttributeEditorWidget: FC = () => {
 
   const { data: categoryData, isLoading: categoryAttributeFetching } = useQuery(
     [`categoryAttribute-${categoryId}`, categoryId],
-    getCategoryAttributesAPI, {
-      enabled: categoryId
+    getCategoryAttributesAPI,
+    {
+      enabled: !!categoryId,
     }
   );
 
@@ -34,7 +36,7 @@ export const AttributeEditorWidget: FC = () => {
     if (categoryData?.data?.result) {
       const { result } = categoryData.data;
       const { attributes } = result;
-      let initialData = attributes.map((item, index) => {
+      const initialData = attributes.map((item, index) => {
         const { title, valueType, values, id } = item;
         if (valueType === 'DROPDOWN') {
           return {
@@ -56,20 +58,19 @@ export const AttributeEditorWidget: FC = () => {
     }
   }, [categoryData]);
 
+  console.log(attriData, 'attributes data');
 
-  console.log(attriData, "attributes data")
-
-
-  const [mutateAttributes, resMutateAttributes] = useMutation(addAttributesAPI);
+  const { mutate: mutateAttributes, isLoading: addingAttributte } =
+    useMutation(addAttributesAPI);
 
   const handleSubmit = async () => {
-    let payload = {
+    const payload = {
       deleted_ids: [...deletedIds],
       categoryId,
       attributes: attriData.map((item: any, index: number) => {
         if (item.type === 'DROPDOWN') {
-          let values = item.value.split(',');
-          const {id} = item;
+          const values = item.value.split(',');
+          const { id } = item;
           delete item.valueType;
           return id ? { ...item, values, id } : { ...item, values };
         } else {
@@ -96,9 +97,7 @@ export const AttributeEditorWidget: FC = () => {
           'categories-list',
           'all-categories',
         ].forEach((key) => {
-          queryCache.invalidateQueries((q) =>
-            q.queryKey[0].toString().startsWith(key)
-          );
+          (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
         });
         setAttributeConfig(false);
         setAttriData([{}]);
@@ -144,9 +143,9 @@ export const AttributeEditorWidget: FC = () => {
                             <i
                               className="flex alignCenter justifyCenter"
                               onClick={() => {
-                                let allAttri = [...attriData];
+                                const allAttri = [...attriData];
                                 if (allAttri[index]?.id) {
-                                  let dIds = [...deletedIds];
+                                  const dIds = [...deletedIds];
                                   dIds.push(allAttri[index].id);
                                   setDeletedIds(dIds);
                                 }
@@ -173,7 +172,7 @@ export const AttributeEditorWidget: FC = () => {
               <div className="add-action pv-10">
                 <Button
                   onClick={() => {
-                    let allData = [...attriData];
+                    const allData = [...attriData];
                     allData.push({});
                     setAttriData(allData);
                   }}
@@ -196,7 +195,7 @@ export const AttributeEditorWidget: FC = () => {
                 cancel
               </Button>
               <Button
-                loading={resMutateAttributes.isLoading}
+                loading={addingAttributte}
                 onClick={() => {
                   setCheckValidation(true);
                   handleSubmit();

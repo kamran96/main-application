@@ -1,18 +1,18 @@
-import deleteIcon from "@iconify/icons-carbon/delete";
-import editSolid from "@iconify/icons-clarity/edit-solid";
-import { Button } from "antd";
-import { ColumnsType } from "antd/lib/table";
-import React, { FC, useState } from "react";
-import { queryCache, useMutation } from "react-query";
-import styled from "styled-components";
+import deleteIcon from '@iconify/icons-carbon/delete';
+import editSolid from '@iconify/icons-clarity/edit-solid';
+import { Button } from 'antd';
+import { ColumnsType } from 'antd/lib/table';
+import { FC, useState } from 'react';
+import { useQueryClient, useMutation } from 'react-query';
+import styled from 'styled-components';
 
-import { activeBranchAPI, branchDeleteAPI } from "../../api";
-import { ButtonTag } from "../../components/ButtonTags";
-import { ConfirmModal } from "../../components/ConfirmModal";
-import { CommonTable } from "../../components/Table";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { NOTIFICATIONTYPE } from "../../modal";
-import { IBranch } from "../../modal/organization";
+import { activeBranchAPI, branchDeleteAPI } from '../../api';
+import { ButtonTag } from '../../components/ButtonTags';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { CommonTable } from '../../components/Table';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { NOTIFICATIONTYPE } from '../../modal';
+import { IBranch } from '../../modal/organization';
 
 interface IProps {
   branches: IBranch[];
@@ -20,25 +20,23 @@ interface IProps {
 }
 
 export const BranchesContainer: FC<IProps> = ({ branches, organizationid }) => {
+  const queryCache = useQueryClient();
   const [selectedRows, setSelectedRows] = useState([]);
-  const {
-    setBranchModalConfig,
-    notificationCallback,
-    userDetails,
-  } = useGlobalContext();
+  const { setBranchModalConfig, notificationCallback, userDetails } =
+    useGlobalContext();
   const [confirmModal, setConfirmModal] = useState(false);
   /* Mutations  */
-  const [mutateActiveBranch, { isLoading: activeBranchLoading }] = useMutation(
-    activeBranchAPI
-  );
+  const { mutate: mutateActiveBranch, isLoading: activeBranchLoading } =
+    useMutation(activeBranchAPI);
 
-  const [mutateBranchDelete, resBranchDelete] = useMutation(branchDeleteAPI);
+  const { mutate: mutateBranchDelete, isLoading: deletingBranch } =
+    useMutation(branchDeleteAPI);
 
   const columns: ColumnsType<any> = [
-    { title: "Name", dataIndex: "name", key: "name", width: 200 },
-    { title: "Address", dataIndex: "address", key: "address" },
+    { title: 'Name', dataIndex: 'name', key: 'name', width: 200 },
+    { title: 'Address', dataIndex: 'address', key: 'address' },
     {
-      title: "",
+      title: '',
       width: 100,
       render: (data, row: IBranch, index) => {
         return (
@@ -47,7 +45,7 @@ export const BranchesContainer: FC<IProps> = ({ branches, organizationid }) => {
             disabled={userDetails && userDetails.branchId === row.id}
             onClick={() => handleActiveBranch(row.id, row.organizationId)}
             type="primary"
-            size={"middle"}
+            size={'middle'}
           >
             Active
           </Button>
@@ -65,22 +63,20 @@ export const BranchesContainer: FC<IProps> = ({ branches, organizationid }) => {
     organizationId: number
   ) => {
     const UserId: number = userDetails.id;
-    let payload: any = {
+    const payload: any = {
       branchId,
       organizationId,
       UserId,
     };
 
-    try {
-      await mutateActiveBranch(payload, {
-        onSuccess: () => {
-          notificationCallback(NOTIFICATIONTYPE.SUCCESS, "Branch Updated");
-          setTimeout(() => {
-            window.location.reload();
-          }, 500);
-        },
-      });
-    } catch (error) {}
+    await mutateActiveBranch(payload, {
+      onSuccess: () => {
+        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Branch Updated');
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      },
+    });
   };
 
   const renderCustomTopbar = () => {
@@ -101,7 +97,7 @@ export const BranchesContainer: FC<IProps> = ({ branches, organizationid }) => {
                   disabled={!selectedRows.length || selectedRows.length > 1}
                   title="Edit"
                   icon={editSolid}
-                  size={"middle"}
+                  size={'middle'}
                 />
               )}
               <ButtonTag
@@ -110,7 +106,7 @@ export const BranchesContainer: FC<IProps> = ({ branches, organizationid }) => {
                 onClick={() => setConfirmModal(true)}
                 title="Delete"
                 icon={deleteIcon}
-                size={"middle"}
+                size={'middle'}
               />
               {/* <MoreActions /> */}
             </div>
@@ -134,14 +130,13 @@ export const BranchesContainer: FC<IProps> = ({ branches, organizationid }) => {
     const payload = {
       ids: [...selectedRows],
     };
-    try {
-      mutateBranchDelete(payload, {
-        onSuccess: () => {
-          queryCache.invalidateQueries(`all-organizations`);
-          notificationCallback(NOTIFICATIONTYPE.SUCCESS, "Branch Deleted");
-        },
-      });
-    } catch (error) {}
+
+    await mutateBranchDelete(payload, {
+      onSuccess: () => {
+        queryCache.invalidateQueries(`all-organizations`);
+        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Branch Deleted');
+      },
+    });
   };
 
   return (
@@ -158,7 +153,7 @@ export const BranchesContainer: FC<IProps> = ({ branches, organizationid }) => {
         enableRowSelection
       />
       <ConfirmModal
-        loading={resBranchDelete.isLoading}
+        loading={deletingBranch}
         visible={confirmModal}
         onCancel={() => setConfirmModal(false)}
         onConfirm={handleDelete}

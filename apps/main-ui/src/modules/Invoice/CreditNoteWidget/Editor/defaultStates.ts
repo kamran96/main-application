@@ -1,14 +1,14 @@
-import dayjs from "dayjs";
-import { PaymentMode } from "../../../../modal";
+import dayjs from 'dayjs';
+import { PaymentMode } from '../../../../modal';
 
 export default {
   itemId: null,
-  description: "",
+  description: '',
   quantity: 1,
   unitPrice: 0,
   purchasePrice: 0,
-  itemDiscount: "0",
-  tax: "0",
+  itemDiscount: '0',
+  tax: '0',
   total: 0,
   costOfGoodAmount: 0,
   index: 0,
@@ -24,6 +24,51 @@ export const defaultPayment = {
 
 export const defaultFormData = {
   issueDate: dayjs(),
-  currency: "PKR",
+  currency: 'PKR',
   invoiceDiscount: 0,
+};
+
+export const Requires = {
+  itemId: {
+    require: true,
+    message: 'Item is Requred to Proceed invoice',
+  },
+  description: {
+    require: false,
+    message: '',
+  },
+  quantity: {
+    require: true,
+    message: 'Item is Requred to Proceed invoice',
+  },
+  unitPrice: {
+    require: true,
+    message: 'Item is Requred to Proceed invoice',
+    condition: (value) => value > 0,
+  },
+
+  itemDiscount: {
+    require: true,
+    message: 'Item is Requred to Proceed invoice',
+  },
+  tax: {
+    require: true,
+    message: 'Item is Requred to Proceed invoice',
+  },
+  total: {
+    require: true,
+    message: 'Item is Requred to Proceed invoice',
+  },
+  costOfGoodAmount: {
+    require: true,
+    message: 'Item is Requred to Proceed invoice',
+  },
+  index: {
+    require: false,
+    message: 'Item is Requred to Proceed invoice',
+  },
+  accountId: {
+    require: true,
+    message: 'Item is Requred to Proceed invoice',
+  },
 };

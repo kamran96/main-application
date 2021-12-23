@@ -1,7 +1,7 @@
 import { Button, Col, Form, Input, Row, Select } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import { FC, useEffect, useState } from 'react';
-import { queryCache, useMutation, useQuery } from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 import {
   createUpdateAccountAPI,
@@ -18,7 +18,8 @@ import { ISecondaryAccount } from './../../../modal/accounts';
 
 const { Option } = Select;
 export const AccountsForm: FC = () => {
-  const [mutateAddAccount, respAddAccount] = useMutation(
+  const queryCache = useQueryClient();
+  const { mutate: mutateAddAccount, isLoading: creatingAccount } = useMutation(
     createUpdateAccountAPI
   );
   const [secondaryAccounts, setSecondaryAccounts] = useState<
@@ -31,7 +32,7 @@ export const AccountsForm: FC = () => {
   const [form] = Form.useForm();
 
   const resAccountById = useQuery([`account-${id}`, id], getAccountByIDAPI, {
-    enabled: id,
+    enabled: !!id,
     onSuccess: () => {
       /* when successfully created OR updated toast will be apear */
       /* three type of parameters are passed
@@ -75,9 +76,7 @@ export const AccountsForm: FC = () => {
             id ? 'Updated' : 'Created'
           );
           ['accounts', `account-${id}`]?.forEach((key) => {
-            queryCache?.invalidateQueries((q) =>
-              q?.queryKey[0]?.toString().startsWith(key)
-            );
+            (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
           });
           setAccountsModalConfig({ visibility: false, id: null });
           form.resetFields();
@@ -204,7 +203,7 @@ export const AccountsForm: FC = () => {
               <Form.Item>
                 <div className="action_buttons">
                   <Button
-                    loading={respAddAccount.isLoading}
+                    loading={creatingAccount}
                     type="primary"
                     htmlType="submit"
                   >

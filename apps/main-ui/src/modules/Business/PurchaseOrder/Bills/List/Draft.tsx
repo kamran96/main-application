@@ -1,11 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { FC, useEffect, useState } from 'react';
-import {
-  queryCache,
-  useMutation,
-  usePaginatedQuery,
-  useQuery,
-} from 'react-query';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 
 import {
@@ -41,12 +36,13 @@ interface IProps {
   columns?: any[];
 }
 export const DraftBills: FC<IProps> = ({ columns }) => {
+  const queryCache = useQueryClient();
   /* HOOKS HERE */
   /* Mutations */
   /* THIS MUTATION IS RESPONSIBLE FOR APPROVED DRAFT ORDERS */
 
   /* THIS MUTATION IS RESPONSIBLE FOR DELETE ORDERS */
-  const [mutateDeleteOrders, resDeleteOrders] =
+  const { mutate: mutateDeleteOrders, isLoading: deletingPurchaseOrder } =
     useMutation(deletePurchaseDrafts);
   /* COMPONENT STATE MANAGEMENT HOOKS */
   const [selectedRow, setSelectedRow] = useState([]);
@@ -117,7 +113,11 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
   }, [routeHistory, history]);
 
   /* ********* PAGINATED QUERY FOR FETCHING DRAFT ORDERS *************** */
-  const { isLoading, resolvedData, isFetching } = usePaginatedQuery(
+  const {
+    isLoading,
+    data: resolvedData,
+    isFetching,
+  } = useQuery(
     [
       `invoices-purchases-${INVOICETYPE.DRAFT}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
       ORDER_TYPE.PURCAHSE_ORDER,
@@ -128,7 +128,10 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
       sortid,
       query,
     ],
-    getPoListAPI
+    getPoListAPI,
+    {
+      keepPreviousData: true,
+    }
   );
 
   /* ********** METHODS HERE *************** */
@@ -140,9 +143,7 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
     await mutateDeleteOrders(payload, {
       onSuccess: () => {
         ['invoices', 'invoice-view'].forEach((key) => {
-          queryCache.invalidateQueries((q) =>
-            q.queryKey[0].toString().startsWith(`${key}`)
-          );
+          (queryCache.invalidateQueries as any)((q) => q?.startsWith(`${key}`));
         });
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Deleted Successfully');
 
@@ -283,7 +284,7 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
         enableRowSelection
       />
       <ConfirmModal
-        loading={resDeleteOrders.isLoading}
+        loading={deletingPurchaseOrder}
         visible={confirmModal}
         onCancel={() => setConfirmModal(false)}
         onConfirm={handleDelete}

@@ -1,35 +1,29 @@
-import { ColumnsType } from "antd/es/table";
-import React, { FC, useEffect, useState } from "react";
-import {
-  queryCache,
-  useMutation,
-  usePaginatedQuery,
-  useQuery,
-} from "react-query";
-import styled from "styled-components";
-import editSolid from "@iconify-icons/clarity/edit-solid";
-import deleteIcon from "@iconify/icons-carbon/delete";
+import { ColumnsType } from 'antd/es/table';
+import React, { FC, useEffect, useState } from 'react';
+import { useQueryClient, useMutation, useQuery } from 'react-query';
+import styled from 'styled-components';
+import editSolid from '@iconify-icons/clarity/edit-solid';
+import deleteIcon from '@iconify/icons-carbon/delete';
 import {
   deletePermissionAPI,
   getPermissionModulesAPI,
   getPermissionsListAPI,
-} from "../../../api/rbac";
-import { ButtonTag } from "../../../components/ButtonTags";
-import { CommonTable } from "../../../components/Table";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { ISupportedRoutes } from "../../../modal";
-import { IPermissionsResponsse } from "../../../modal/rbac";
-import { ConfirmModal } from "../../../components/ConfirmModal";
+} from '../../../api/rbac';
+import { ButtonTag } from '../../../components/ButtonTags';
+import { CommonTable } from '../../../components/Table';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { ISupportedRoutes } from '../../../modal';
+import { IPermissionsResponsse } from '../../../modal/rbac';
+import { ConfirmModal } from '../../../components/ConfirmModal';
 
 export const PermissionList: FC = () => {
+  const queryCache = useQueryClient();
   const { routeHistory } = useGlobalContext();
   const { history } = routeHistory;
-  const [
-    { result, pagination },
-    setPermissionResponse,
-  ] = useState<IPermissionsResponsse>({
-    result: [],
-  });
+  const [{ result, pagination }, setPermissionResponse] =
+    useState<IPermissionsResponsse>({
+      result: [],
+    });
   const [selectedRows, setSelectedRows] = useState([]);
   const [confirmModal, setConfirmModal] = useState(false);
   const [permissionsConfig, setPermissionsConfig] = useState({
@@ -40,16 +34,15 @@ export const PermissionList: FC = () => {
 
   /* API CALLS Queries */
 
-  const [mutateDeletePermission, resDeletePermission] = useMutation(
-    deletePermissionAPI
-  );
+  const { mutate: mutateDeletePermission, isLoading: isDeletingPermission } =
+    useMutation(deletePermissionAPI);
 
-  const {
-    data: permissionsListData,
-    isLoading: modulesFetching,
-  } = usePaginatedQuery(
+  const { data: permissionsListData, isLoading: modulesFetching } = useQuery(
     [`permissions-list?page=${page}&pageSize=${pageSize}`, page, pageSize],
-    getPermissionsListAPI
+    getPermissionsListAPI,
+    {
+      keepPreviousData: true,
+    }
   );
 
   useEffect(() => {
@@ -63,19 +56,19 @@ export const PermissionList: FC = () => {
   }, [permissionsListData]);
   const columns: ColumnsType<any> = [
     {
-      title: "Name",
-      dataIndex: "title",
-      key: "title",
+      title: 'Name',
+      dataIndex: 'title',
+      key: 'title',
     },
     {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
     },
     {
-      title: "Module",
-      dataIndex: "module",
-      key: "module",
+      title: 'Module',
+      dataIndex: 'module',
+      key: 'module',
     },
   ];
 
@@ -85,8 +78,8 @@ export const PermissionList: FC = () => {
     };
     await mutateDeletePermission(payload, {
       onSuccess: () => {
-        queryCache.invalidateQueries((q) =>
-          q.queryKey[0].toString().startsWith(`permissions-list`)
+        (queryCache.invalidateQueries as any)((q) =>
+          q.startsWith(`permissions-list`)
         );
         setConfirmModal(false);
       },
@@ -110,14 +103,14 @@ export const PermissionList: FC = () => {
 
   const renderCustomTopbar = () => {
     return (
-      <div className="contacts_search">
+      <div className="contacts_search mv-10">
         <div className="options_actions ">
           <div className="edit flex alignCenter ">
             <ButtonTag
               disabled={true}
               title="Edit"
               icon={editSolid}
-              size={"middle"}
+              size={'middle'}
             />
             <ButtonTag
               className="mr-10"
@@ -125,7 +118,7 @@ export const PermissionList: FC = () => {
               onClick={() => setConfirmModal(true)}
               title="Delete"
               icon={deleteIcon}
-              size={"middle"}
+              size={'middle'}
             />
           </div>
         </div>
@@ -146,7 +139,7 @@ export const PermissionList: FC = () => {
         pagination={{
           showSizeChanger: true,
           pageSize: pagination && pagination.page_size,
-          position: ["bottomRight"],
+          position: ['bottomRight'],
           current: pagination && pagination.page_no,
           total: pagination && pagination.total,
         }}
@@ -162,7 +155,7 @@ export const PermissionList: FC = () => {
         columns={columns}
       />
       <ConfirmModal
-        loading={resDeletePermission.isLoading}
+        loading={isDeletingPermission}
         visible={confirmModal}
         onCancel={() => setConfirmModal(false)}
         onConfirm={onDelete}
