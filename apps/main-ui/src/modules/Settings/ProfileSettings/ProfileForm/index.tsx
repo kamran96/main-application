@@ -4,7 +4,7 @@ import { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 
-import { getUserAPI, updateProfileAPI } from '../../../../api';
+import { updateProfileAPI } from '../../../../api';
 import { FormLabel } from '../../../../components/FormLabel';
 import { Heading } from '../../../../components/Heading';
 import { Para } from '../../../../components/Para';
@@ -27,9 +27,8 @@ const { TextArea } = Input;
 export const ProfileForm: FC<IProps> = ({ id }) => {
   const [form] = Form.useForm();
   const [attachmentId, setAttachmentId] = useState<number>(null);
-  const { notificationCallback } = useGlobalContext();
+  const { notificationCallback, refetchUser, userDetails } = useGlobalContext();
   const [attachmentData, setAttachmentData] = useState<IAttachment | any>(null);
-  const queryCache = useQueryClient();
 
   const { mutate: mutateUpdateProfile, isLoading: updatingProfile } =
     useMutation(updateProfileAPI);
@@ -40,7 +39,7 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
     await mutateUpdateProfile(payload, {
       onSuccess: () => {
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Updated Successfully');
-        queryCache.invalidateQueries(`loggedInUser`);
+        refetchUser();
       },
     });
   };
@@ -49,17 +48,13 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
     console.log('Failed:', errorInfo);
   };
 
-  const { data } = useQuery([`loggedInUser`, id], getUserAPI, {
-    enabled: !!id,
-  });
-
   useEffect(() => {
-    if (data && data.data) {
-      const { profile } = data.data.result;
+    if (userDetails?.profile) {
+      const { profile } = userDetails;
       form.setFieldsValue({ ...profile, prefix: parseInt(profile?.prefix) });
       setAttachmentData(profile.attachment);
     }
-  }, [data, form]);
+  }, [userDetails, form]);
 
   const prefixSelector = (
     <Form.Item name="prefix" noStyle>

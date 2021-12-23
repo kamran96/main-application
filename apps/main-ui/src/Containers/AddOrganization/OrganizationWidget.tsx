@@ -22,7 +22,8 @@ const { Option } = Select;
 
 export const OrganizationWidget: FC = () => {
   const queryCache = useQueryClient();
-  const { handleLogin, routeHistory } = useGlobalContext();
+  const { handleLogin, routeHistory, refetchUser, refetchPermissions } =
+    useGlobalContext();
   const { history } = routeHistory;
   const { mutate: mutateOrganization, isLoading } =
     useMutation(addOrganizationAPI);
@@ -53,11 +54,11 @@ export const OrganizationWidget: FC = () => {
           });
           updateToken(data?.data.access_token);
         }
-        ['loggedInUser', 'all-organizations', 'roles-permissions']?.forEach(
-          (key) => {
-            (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
-          }
-        );
+        refetchUser();
+        refetchPermissions();
+        ['all-organizations']?.forEach((key) => {
+          (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
+        });
 
         history?.push(
           `${ISupportedRoutes?.DASHBOARD_LAYOUT}${ISupportedRoutes?.DASHBOARD}`

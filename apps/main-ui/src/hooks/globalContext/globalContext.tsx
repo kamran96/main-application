@@ -90,6 +90,7 @@ interface IGlobalContextvalues {
   contactsImportConfig: IModalsConfig;
   setContactsImportConfig: (visibility: boolean) => void;
   refetchUser: () => void;
+  refetchPermissions: () => void;
 }
 
 export const globalContext = createContext<Partial<IGlobalContextvalues>>({});

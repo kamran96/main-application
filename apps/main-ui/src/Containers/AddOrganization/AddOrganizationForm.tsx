@@ -44,6 +44,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
     notificationCallback,
     setUserDetails,
     handleLogin,
+    refetchUser,
   } = useGlobalContext();
   const { id, visibility } = organizationModalConfig;
 
@@ -86,11 +87,10 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
       onSuccess: () => {
         form.resetFields();
         setOrganizationConfig(false);
-        ['loggedInUser', 'all-organizations']?.forEach((key) => {
+        refetchUser();
+        ['all-organizations']?.forEach((key) => {
           (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
         });
-        queryCache.invalidateQueries(``);
-        queryCache.invalidateQueries(``);
         if (id) {
           queryCache.invalidateQueries(`organization-${id}`);
         }
