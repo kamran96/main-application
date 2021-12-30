@@ -3,7 +3,7 @@ import { DashboardWrapper } from './DashboardStyles';
 import { RouteConfigComponentProps } from 'react-router-config';
 import { AppLayout } from './AppLayout';
 import { useGlobalContext } from '../hooks/globalContext/globalContext';
-import { Redirect } from 'react-router-dom';
+import { Redirect, useHistory } from 'react-router-dom';
 import { GeneralPreferencesWidget } from '../modules/Settings/GeneralPreferances/GeneralPreferancesWidget';
 import renderRoutes from './renderRoutes';
 import { ITheme, Themes } from '../hooks/useTheme/themeColors';
@@ -66,8 +66,19 @@ export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
   const { isUserLogin, userDetails, routeHistory, theme, itemsModalConfig } =
     useGlobalContext();
 
+  const history = useHistory();
+
+  console.log('history', history);
+
   if (!isUserLogin) {
-    return <Redirect to="/page/login" />;
+    return (
+      <Redirect
+        to={{
+          pathname: '/page/login',
+          state: { ...history?.location },
+        }}
+      />
+    );
   }
 
   const checkLayout = (children) => {
