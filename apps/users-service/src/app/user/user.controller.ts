@@ -20,6 +20,7 @@ import {
   InvitedUserDetailDto,
   InvitedUserDto,
   SendCodeDto,
+  UserIdsDto,
   UserThemeDto,
 } from '../dto/user.dto';
 import { UserService } from './user.service';
@@ -183,6 +184,19 @@ export class UserController {
     }
   }
 
+  @Post('hold')
+  @UseGuards(GlobalAuthGuard)
+  async holdAccount(@Req() req: IRequest) {
+    const user = await this.userService.HoldAccount(req.user);
+
+    if (user) {
+      return {
+        message: 'User account has been hold',
+        status: true,
+      };
+    }
+  }
+
   @Put('/update-invited-user/:id')
   @UseGuards(GlobalAuthGuard)
   async updateVerifiedUser(
@@ -209,6 +223,19 @@ export class UserController {
         `Sorry! Something went wrong, ${error.message}`,
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
+    }
+  }
+
+  @Put('delete')
+  @UseGuards(GlobalAuthGuard)
+  async deleteUser(@Body() userIds: UserIdsDto) {
+    const user = await this.userService.DeleteUser(userIds);
+
+    if (user) {
+      return {
+        message: 'User deleted successfully.',
+        status: 1,
+      };
     }
   }
 }

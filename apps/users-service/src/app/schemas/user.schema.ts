@@ -20,7 +20,7 @@ export class User {
   terms: boolean;
   @Prop()
   marketing: boolean;
-  @Prop()
+  @Prop({ default: false })
   isVerified: boolean;
   @Prop(
     raw({

@@ -164,7 +164,7 @@ export class AuthController {
     }
   }
 
-  @UseGuards(GlobalAuthGuard)
+  // @UseGuards(GlobalAuthGuard)
   @Post('/change-password')
   async changePassword(
     @Body() userDto: PasswordDto
