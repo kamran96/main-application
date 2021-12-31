@@ -4,11 +4,7 @@ import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 import editSolid from '@iconify-icons/clarity/edit-solid';
 import deleteIcon from '@iconify/icons-carbon/delete';
-import {
-  deletePermissionAPI,
-  getPermissionModulesAPI,
-  getPermissionsListAPI,
-} from '../../../api/rbac';
+import { deletePermissionAPI, getPermissionsListAPI } from '../../../api/rbac';
 import { ButtonTag } from '../../../components/ButtonTags';
 import { CommonTable } from '../../../components/Table';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
