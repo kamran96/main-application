@@ -1,10 +1,20 @@
-import { Controller, Post, UseGuards } from '@nestjs/common';
+import { Controller, Logger, Post, UseGuards } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { FinancialService } from './financial.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
+import { CONTACT_CREATED } from '@invyce/send-email';
 
 @Controller('financial')
 export class FiancialController {
   constructor(private financialService: FinancialService) {}
+
+  @MessagePattern(CONTACT_CREATED)
+  async CreateContact(@Payload() data) {
+    Logger.log('Data is received.');
+    Logger.log(data);
+
+    await this.financialService.CreateContact(data);
+  }
 
   @Post('balance-sheet')
   @UseGuards(GlobalAuthGuard)

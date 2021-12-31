@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { Between, getCustomRepository, In } from 'typeorm';
 import { PaymentRepository } from '../repositories/payment.repository';
@@ -17,9 +17,15 @@ import {
   PaymentInvoiceDto,
   PaymentIdsDto,
 } from '../dto/payment.dto';
+import { ClientProxy } from '@nestjs/microservices';
+import { SEND_FORGOT_PASSWORD } from '@invyce/send-email';
 
 @Injectable()
 export class PaymentService {
+  constructor(
+    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy
+  ) {}
+
   /**
    * List All payments
    * @param data
@@ -386,6 +392,39 @@ export class PaymentService {
               remaining -= purchase_total;
             }
           }
+
+          const { data: invoiceData } = await http.post(
+            'invoices/invoice/ids',
+            {
+              ids: data.invoice_ids,
+            }
+          );
+
+          const links = invoiceData.map((i) => ({
+            title: i.invoiceNumber,
+            link: `http://localhost:4200/app/invoice/${i?.id}`,
+          }));
+
+          const emailPayload = {
+            to: req.user.email,
+            from: 'no-reply@invyce.com',
+            TemplateAlias: 'payment-has-been-made-in-invoice',
+            TemplateModel: {
+              product_url: 'product_url_Value',
+              user_name: req.user.profile.fullName,
+              action_url: 'action_url_Value',
+              product_name: 'product_name_Value',
+              name: 'name_Value',
+              operating_system: 'operating_system_Value',
+              browser_name: 'browser_name_Value',
+              support_url: 'support_url_Value',
+              company_name: 'company_name_Value',
+              company_address: 'company_address_Value',
+              links,
+            },
+          };
+
+          await this.emailService.emit(SEND_FORGOT_PASSWORD, emailPayload);
         } else {
           await getCustomRepository(PaymentRepository).save({
             date: data.date,
@@ -405,6 +444,9 @@ export class PaymentService {
           });
         }
       }
+
+      // send payment send email
+
       await http.get(`contacts/contact/balance`);
     } catch (error) {
       throw new HttpException(error.status, HttpStatus.BAD_REQUEST);
