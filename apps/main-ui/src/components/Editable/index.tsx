@@ -306,7 +306,6 @@ export const EditableSelect: FC<IEditableSelectProps> = ({
           <Select
             open={isEditable}
             onFocus={onClick}
-            onClick={onClick}
             className={className}
             loading={loading}
             size={size}

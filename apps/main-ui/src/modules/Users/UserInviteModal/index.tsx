@@ -122,7 +122,7 @@ export const UserInviteModal: FC = () => {
                             {...field}
                             label="Email"
                             name={[field.name, 'email']}
-                            fieldKey={[field.fieldKey, 'email']}
+                            fieldKey={[field.key, 'email']}
                             rules={[
                               { required: true, message: 'Email is required!' },
                               { type: 'email', message: 'Email is invalid' },
@@ -163,7 +163,7 @@ export const UserInviteModal: FC = () => {
                             {...field}
                             label="Role"
                             name={[field.name, 'roleId']}
-                            fieldKey={[field.fieldKey, 'roleId']}
+                            fieldKey={[field.key, 'roleId']}
                             rules={[
                               { required: true, message: 'Role is required!' },
                             ]}

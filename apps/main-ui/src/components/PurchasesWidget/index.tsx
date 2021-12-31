@@ -398,16 +398,11 @@ const Editor: FC<IProps> = ({ type, id }) => {
                         placeholder="Select Contact"
                         // optionFilterProp="children"
                         filterOption={(input, option) => {
+                          const valueInput = input.toLowerCase();
                           setCreateContactName(input);
+                          const child: string = option.children as any;
                           if (typeof option?.children === 'string') {
-                            return (
-                              option?.value
-                                ?.toLowerCase()
-                                .includes(input?.toLocaleLowerCase()) ||
-                              option?.children
-                                ?.toLowerCase()
-                                .includes(input?.toLocaleLowerCase())
-                            );
+                            return child.toLowerCase().includes(valueInput);
                           } else {
                             return true;
                           }

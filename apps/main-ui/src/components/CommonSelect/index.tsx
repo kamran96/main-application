@@ -1,7 +1,7 @@
-import { Select } from "antd";
-import { SizeType } from "antd/lib/config-provider/SizeContext";
-import CSS from "csstype";
-import React, { FC, ReactElement } from "react";
+import { Select } from 'antd';
+import { SizeType } from 'antd/lib/config-provider/SizeContext';
+import CSS from 'csstype';
+import React, { FC, ReactElement } from 'react';
 
 interface IProps {
   className?: string;
@@ -11,12 +11,12 @@ interface IProps {
   showSearch?: boolean;
   style?: CSS.Properties;
   placeholder?: string;
-  optionFilterProp?: string | "children";
+  optionFilterProp?: string | 'children';
   onChange?: (value: any, option: any) => void;
   children?: ReactElement<any>;
   onClick?: () => void;
   value?: any;
-  [key: string] : any
+  [key: string]: any;
 }
 
 export const Option = Select.Option;
@@ -39,7 +39,6 @@ export const CommonSelect: FC<IProps> = ({
   return (
     <Select
       onFocus={onClick}
-      onClick={onClick}
       className={className}
       loading={loading}
       size={size}
