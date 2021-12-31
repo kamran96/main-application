@@ -1,9 +1,14 @@
-export const InvoiceImportManager = ({ onLoad }) => {
+interface IProps {
+  onLoad: (payload: any) => void;
+  headers: string[];
+}
+
+export const InvoiceImportManager = ({ onLoad, headers }: IProps) => {
   const obj_csv = {
     size: 0,
     dataFile: [],
   };
-  function readImage(e) {
+  function readDocument(e) {
     const input = e.target;
     console.log(e?.target?.files[0], 'input');
     if (input.files && input.files[0]) {
@@ -31,28 +36,38 @@ export const InvoiceImportManager = ({ onLoad }) => {
   // [milk, 1, 1.5, 0.2, 1.7]
 
   function parseData(data) {
+    console.log(data, 'what is data now');
+
     const csvData = []; // array of objects
     const string = data.replace('\r', '');
     const lbreak = string.split('\n');
     const accessors = lbreak[0].split(',');
-    for (let i = 1; i < lbreak.length; i++) {
-      const obj = {};
-      lbreak[i].split(',').forEach((item, index) => {
-        console.log(accessors[index], item, 'why item');
-        obj[
-          accessors[index]
-            ?.split(' ')
-            .map((key, index) => {
-              if (index === 0) {
-                return key.toLowerCase();
-              } else {
-                return key.charAt(0).toUpperCase() + key.slice(1);
-              }
-            })
-            .join('')
-        ] = `${item.replace('\r', '')}`;
-      });
-      csvData.push(obj);
+
+    if (
+      JSON.stringify(accessors.slice().sort()) ===
+      JSON.stringify(headers.slice().sort())
+    ) {
+      for (let i = 1; i < lbreak.length; i++) {
+        const obj = {};
+        lbreak[i].split(',').forEach((item, index) => {
+          console.log(accessors[index], item, 'why item');
+          obj[
+            accessors[index]
+              ?.split(' ')
+              .map((key, index) => {
+                if (index === 0) {
+                  return key.toLowerCase();
+                } else {
+                  return key.charAt(0).toUpperCase() + key.slice(1);
+                }
+              })
+              .join('')
+          ] = `${item.replace('\r', '')}`;
+        });
+        csvData.push(obj);
+      }
+    } else {
+      alert('incorrect data');
     }
 
     console.log(csvData, 'csvData');
@@ -62,5 +77,5 @@ export const InvoiceImportManager = ({ onLoad }) => {
     onLoad(csvData);
     // console.table(csvData);
   }
-  return <input type="file" onChange={readImage} />;
+  return <input type="file" onChange={readDocument} />;
 };

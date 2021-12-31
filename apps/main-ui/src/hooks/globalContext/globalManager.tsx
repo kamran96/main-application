@@ -22,7 +22,7 @@ import { IAuth, IUser } from '../../modal/auth';
 import { IRolePermissions } from '../../modal/rbac';
 import { DecriptionData, EncriptData } from '../../utils/encription';
 import { useTheme } from '../useTheme';
-import { globalContext } from './globalContext';
+import { globalContext, IImportType } from './globalContext';
 import { useHttp } from './useHttp';
 
 type Theme = 'light' | 'dark';
@@ -168,6 +168,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   const [contactsImportConfig, setContactsImportConfig] =
     useState<IModalsConfig>({
       visibility: false,
+      type: null,
     });
 
   const [verifiedModal, setVerifiedModal] = useState(false);
@@ -538,7 +539,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         }, [verifiedModal]),
         setVerifiedModal,
         contactsImportConfig,
-        setContactsImportConfig: (visibility: boolean) => {
+        setContactsImportConfig: (visibility: boolean, type: IImportType) => {
           setContactsImportConfig({ visibility });
         },
         refetchUser,
