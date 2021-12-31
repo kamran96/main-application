@@ -244,7 +244,7 @@ export class CreditNoteService {
         const invoice_details = [];
         for (const cn of credit_note_item_array) {
           i++;
-          if (i < 5) {
+          if (i <= 5) {
             invoice_details.push({
               itemName: items.find((j) => cn.itemId === j.id).name,
               quantity: cn.quantity,
@@ -263,7 +263,7 @@ export class CreditNoteService {
           TemplateModel: {
             user_name: req.user.profile.fullName,
             invoice_name: invoice.invoiceNumber,
-            issueDate: moment(credit_note.issueDate).format(''),
+            issueDate: moment(credit_note.issueDate).format('llll'),
             invoice_details,
             gross_total: credit_note.grossTotal,
             itemDisTotal: credit_note.discount,

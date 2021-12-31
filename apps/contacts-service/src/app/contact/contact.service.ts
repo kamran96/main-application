@@ -1,6 +1,7 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as moment from 'moment';
+import { ClientProxy } from '@nestjs/microservices';
 import axios from 'axios';
 import { Contact } from '../Schemas/contact.schema';
 import { Entries, Integrations, PaymentModes } from '@invyce/global-constants';
@@ -12,10 +13,15 @@ import {
   IContactWithResponse,
 } from '@invyce/interfaces';
 import { ContactDto, ContactIds } from '../dto/contact.dto';
+import { CONTACT_CREATED } from '@invyce/send-email';
 
 @Injectable()
 export class ContactService {
-  constructor(@InjectModel(Contact.name) private contactModel) {}
+  constructor(
+    @InjectModel(Contact.name) private contactModel,
+    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy,
+    @Inject('REPORT_SERVICE') private readonly reportService: ClientProxy
+  ) {}
 
   async FindAll(
     req: IRequest,
@@ -201,7 +207,12 @@ export class ContactService {
         contact.createdById = contactData._id;
         contact.updatedById = contactData._id;
         contact.status = 1;
-        return await contact.save();
+
+        await contact.save();
+        await this.reportService.emit(CONTACT_CREATED, contact);
+        await this.emailService.emit(CONTACT_CREATED, contact);
+
+        return contact;
       } catch (error) {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
