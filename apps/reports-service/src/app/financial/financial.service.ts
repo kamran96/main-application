@@ -1,7 +1,24 @@
 import { Injectable } from '@nestjs/common';
+import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
+import { BigQuery } from '@google-cloud/bigquery';
+import { CONTACT_CREATED } from '@invyce/send-email';
+const bigquery = new BigQuery();
 
 @Injectable()
 export class FinancialService {
+  @RabbitSubscribe({
+    exchange: 'contact-created',
+    routingKey: 'adsfaasdfasdfasdf12341234',
+    queue: CONTACT_CREATED,
+  })
+  public async FetchContactData(data) {
+    console.log(`Received message: ${JSON.stringify(data)}`);
+  }
+
+  async CreateContact(data) {
+    await bigquery.dataset('invyce-testing').table('contacts').insert(data);
+  }
+
   async BalanceSheet() {
     return 'Balace sheet data will be here';
   }

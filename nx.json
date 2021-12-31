@@ -103,6 +103,9 @@
     "pixels-to-rem": {
       "tags": []
     },
+    "rabbitmq-module": {
+      "tags": []
+    },
     "reports-service": {
       "tags": []
     },

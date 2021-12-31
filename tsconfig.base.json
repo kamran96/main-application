@@ -24,6 +24,7 @@
       "@invyce/interfaces": ["libs/interfaces/src/index.ts"],
       "@invyce/invyce-persist": ["libs/invyce-persist/src/index.ts"],
       "@invyce/pixels-to-rem": ["libs/pixels-to-rem/src/index.ts"],
+      "@invyce/rabbitmq-module": ["libs/rabbitmq-module/src/index.ts"],
       "@invyce/review/invyce-theme": ["libs/review/invyce-theme/src/index.ts"],
       "@invyce/send-email": ["libs/send-email/src/index.ts"],
       "@invyce/shared/global-state-manager": [

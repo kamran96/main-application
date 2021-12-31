@@ -7,6 +7,7 @@ import {
   SEND_FORGOT_PASSWORD,
   SEND_INVITATION,
   SEND_PDF_MAIL,
+  CONTACT_CREATED,
 } from '@invyce/send-email';
 
 @Controller()
@@ -16,6 +17,12 @@ export class AppController {
   @Get()
   async GetData() {
     return await this.appService.getData();
+  }
+
+  @MessagePattern(CONTACT_CREATED)
+  async CreateContact(@Payload() data) {
+    Logger.log('Data is received.');
+    Logger.log(data, 'from emails');
   }
 
   @MessagePattern(SEND_INVITATION)

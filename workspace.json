@@ -1050,6 +1050,27 @@
         }
       }
     },
+    "rabbitmq-module": {
+      "root": "libs/rabbitmq-module",
+      "sourceRoot": "libs/rabbitmq-module/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/rabbitmq-module/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/rabbitmq-module"],
+          "options": {
+            "jestConfig": "libs/rabbitmq-module/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "reports-service": {
       "root": "apps/reports-service",
       "sourceRoot": "apps/reports-service/src",

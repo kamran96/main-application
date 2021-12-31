@@ -48,6 +48,8 @@
   "private": true,
   "dependencies": {
     "@ant-design/dark-theme": "^2.0.2",
+    "@golevelup/nestjs-rabbitmq": "^1.19.0",
+    "@google-cloud/bigquery": "^5.9.3",
     "@iconify-icons/ant-design": "^1.1.0",
     "@iconify-icons/bi": "^1.0.0",
     "@iconify-icons/bx": "^1.1.0",
