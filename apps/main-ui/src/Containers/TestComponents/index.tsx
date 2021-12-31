@@ -16,5 +16,23 @@ export const TestComponents: FC = () => {
     });
   };
 
-  return <InvoiceImportManager onLoad={handleLoad} />;
+  return (
+    <InvoiceImportManager
+      headers={[
+        '*Code',
+        '*Name',
+        '*Type',
+        '*Tax',
+        'Code',
+        'Description',
+        'Dashboard',
+        'Expense',
+        'Claims',
+        'Enable',
+        'Payments',
+        'Balance',
+      ]}
+      onLoad={handleLoad}
+    />
+  );
 };

@@ -13,6 +13,18 @@ interface IModalsConfig {
   id?: string | number;
   [key: string]: any;
 }
+
+export type IImportType =
+  | 'accounts'
+  | 'contacts'
+  | 'invoices'
+  | 'quotes'
+  | 'payments'
+  | 'creditNotes'
+  | null;
+interface IImportsModalConfig extends IModalsConfig {
+  type?: IImportType;
+}
 interface IGlobalContextvalues {
   checkAutherized: boolean;
   setAutherized: (payload: boolean) => void;
@@ -87,8 +99,8 @@ interface IGlobalContextvalues {
   setTheme: (payload: 'light' | 'dark') => void;
   verifiedModal: boolean;
   setVerifiedModal: (payload: boolean) => void;
-  contactsImportConfig: IModalsConfig;
-  setContactsImportConfig: (visibility: boolean) => void;
+  contactsImportConfig: IImportsModalConfig;
+  setContactsImportConfig: (visibility: boolean, type: IImportType) => void;
   refetchUser: () => void;
   refetchPermissions: () => void;
 }

@@ -3,11 +3,11 @@ import downloadIcon from '@iconify/icons-bi/download';
 import bxSearchAlt from '@iconify/icons-bx/bx-search-alt';
 import { Icon } from '@iconify/react';
 import { FC } from 'react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 
-import { CommonModal } from '../../../components';
-import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { CommonModal } from '../';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 
 interface Idata {
   xero: {
@@ -20,9 +20,9 @@ interface Idata {
   };
 }
 
-export const ContactImportWidget: FC = () => {
+export const ImportsWidget: FC = () => {
   const { contactsImportConfig, setContactsImportConfig } = useGlobalContext();
-  const { visibility } = contactsImportConfig;
+  const { visibility, type } = contactsImportConfig;
 
   const data: Idata = {
     xero: {
@@ -102,7 +102,7 @@ export const ContactImportWidget: FC = () => {
   );
 };
 
-export default ContactImportWidget;
+export default ImportsWidget;
 
 const WrapperModalContent = styled.div`
   height: 651px;
