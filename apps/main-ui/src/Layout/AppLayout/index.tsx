@@ -16,6 +16,7 @@ import { RoutingSchema } from '../../Schema/routingSchema';
 import { InvyceCmdPalette } from './CommandPalette';
 import { ContentArea, NewUserContentArea, WrapperApplayout } from './styles';
 import { ErrorBoundary } from '@invyce/error-boundry';
+import { Inconvinience } from '../../components/ErrorBoundries/Inconvinience';
 
 interface IProps {
   children: ReactNode;
@@ -116,7 +117,13 @@ export const AppLayout: FC<IProps> = ({ children }) => {
                 </p>
               </div>
             )}
-            <ErrorBoundary>
+            <ErrorBoundary
+              errorComponent={
+                <div className="ph-20 pv-20">
+                  <Inconvinience />
+                </div>
+              }
+            >
               <main className="content">{children}</main>
             </ErrorBoundary>
           </ContentArea>

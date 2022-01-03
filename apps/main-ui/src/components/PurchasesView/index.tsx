@@ -99,7 +99,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
     type === 'SI'
       ? 'invoiceItems'
       : type === 'credit-note'
-      ? 'credit_note_items'
+      ? 'creditNoteItems'
       : 'purchaseItems';
 
   /* *************** HOOKS HERE ************** */
@@ -665,7 +665,6 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
                       </tr>
                     );
                   })}
-
                 <tr>
                   <th>Total</th>
                   <td>{moneyFormat(response?.netTotal)}</td>
