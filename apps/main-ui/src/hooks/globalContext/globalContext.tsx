@@ -103,6 +103,7 @@ interface IGlobalContextvalues {
   setContactsImportConfig: (visibility: boolean, type: IImportType) => void;
   refetchUser: () => void;
   refetchPermissions: () => void;
+  userAuthenticated: boolean;
 }
 
 export const globalContext = createContext<Partial<IGlobalContextvalues>>({});

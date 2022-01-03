@@ -1,7 +1,8 @@
 import React from 'react';
 
 interface IProps {
-  children: React.ReactElement<any>;
+  children: React.ReactNode;
+  errorComponent: React.ReactNode;
 }
 
 interface IState {
@@ -27,7 +28,7 @@ export class ErrorBoundary extends React.Component<IProps, IState> {
   render() {
     if (this.state.hasError) {
       // You can render any custom fallback UI
-      return <div>Error Occured</div>;
+      return this?.props?.errorComponent;
     }
 
     return this.props.children;
