@@ -7,6 +7,7 @@ import {
   TransactionRepository,
   TransactionItemRepository,
   AccountRepository,
+  PrimaryAccountRepository,
 } from '../repositories';
 import {
   IBaseUser,
@@ -381,6 +382,19 @@ export class TransactionService {
     await http.post(`payments/payment/add`, {
       payments: paymentArr,
     });
+  }
+
+  async CashSummaryReport(user: IBaseUser, query) {
+    return await getCustomRepository(PrimaryAccountRepository)
+      .createQueryBuilder('pa')
+      .where({
+        status: 1,
+        organizationId: user.organizationId,
+        name: In(['asset', 'liability']),
+      })
+      .innerJoinAndSelect('pa.primaryAccount', 'acc')
+      .innerJoinAndSelect('acc.transactionItems', 'ti')
+      .getMany();
   }
 
   async reverseTransaction(transactionId: DeleteTransactionsDto, user) {

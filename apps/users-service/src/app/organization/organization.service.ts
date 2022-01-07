@@ -11,7 +11,7 @@ import { Branch } from '../schemas/branch.schema';
 import { Organization } from '../schemas/organization.schema';
 import { OrganizationUser } from '../schemas/organizationUser.schema';
 import { User } from '../schemas/user.schema';
-import { SEND_FORGOT_PASSWORD } from '@invyce/send-email';
+import { ORGANIZATION_CREATED, SEND_FORGOT_PASSWORD } from '@invyce/send-email';
 
 @Injectable()
 export class OrganizationService {
@@ -22,7 +22,8 @@ export class OrganizationService {
     @InjectModel(User.name) private userModel,
     private rbacService: RbacService,
     private authService: AuthService,
-    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy
+    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy,
+    @Inject('REPORT_SERVICE') private readonly reportService: ClientProxy
   ) {}
 
   async ListOrganizations(organizationData) {
@@ -194,6 +195,11 @@ export class OrganizationService {
           };
 
           await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
+          await this.reportService.emit(ORGANIZATION_CREATED, {
+            ...organization.toObject(),
+            userId: req.user.id,
+            branchId: branchArr.length > 0 ? branchArr[0].id : null,
+          });
 
           return await this.authService.Login(users, res);
         }

@@ -92,37 +92,6 @@ export class AccountsController {
     }
   }
 
-  @Get('ledger/:id')
-  @UseGuards(GlobalAuthGuard)
-  async AccountLedger(
-    @Req() req: IRequest,
-    @Query() query: IPage,
-    @Param() params: ParamsDto
-  ): Promise<IAccountWithResponse> {
-    try {
-      const account = await this.accountService.AccountLedger(
-        req.user,
-        query,
-        params.id
-      );
-
-      if (account) {
-        return {
-          message: 'Account ledger fetched successfull',
-          status: true,
-          pagination: account.pagination,
-          opening_balance: account.opening_balance,
-          result: account.transaction_items,
-        };
-      }
-    } catch (error) {
-      throw new HttpException(
-        `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
-
   @Post()
   @UseGuards(GlobalAuthGuard)
   async create(
@@ -155,6 +124,72 @@ export class AccountsController {
   @Post('init')
   async initAccounts(@Body() data): Promise<void> {
     return await this.accountService.initAccounts(data);
+  }
+
+  @Get('ledger/:id')
+  @UseGuards(GlobalAuthGuard)
+  async AccountLedger(
+    @Req() req: IRequest,
+    @Query() query: IPage,
+    @Param() params: ParamsDto
+  ): Promise<IAccountWithResponse> {
+    try {
+      const account = await this.accountService.AccountLedger(
+        req.user,
+        query,
+        params.id
+      );
+
+      if (account) {
+        return {
+          message: 'Account ledger fetched successfull',
+          status: true,
+          // account,
+          pagination: account.pagination,
+          opening_balance: account.opening_balance,
+          result: account.transaction_items,
+        };
+      }
+    } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Get('ledger-updated/:id')
+  @UseGuards(GlobalAuthGuard)
+  async AccountLedgerUpdated(
+    @Req() req: IRequest,
+    @Query() query: IPage,
+    @Param() params: ParamsDto
+  ): Promise<IAccountWithResponse> {
+    try {
+      const account = await this.accountService.AccountLedgerUpdated(
+        req.user,
+        query,
+        params.id
+      );
+
+      console.log(account);
+
+      if (account) {
+        return {
+          message: 'Account ledger fetched successfull',
+          status: true,
+          ...account,
+          // pagination: account.pagination,
+          // opening_balance: account.opening_balance,
+          // result: account.transaction_items,
+        };
+      }
+    } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 
   @Get('/:id')

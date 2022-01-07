@@ -13,7 +13,12 @@ import {
 } from '@nestjs/common';
 import { BillService } from './bill.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
-import { BillIdsDto, BillDto, BillParamsDto } from '../dto/bill.dto';
+import {
+  BillIdsDto,
+  BillDto,
+  BillParamsDto,
+  BillContactIdDto,
+} from '../dto/bill.dto';
 import { IRequest, IPage, IBillWithResponse, IBill } from '@invyce/interfaces';
 
 @Controller('bill')
@@ -51,6 +56,14 @@ export class BillController {
     return await this.billService.FindByBillIds(invoiceIds);
   }
 
+  @Get('contact/:id')
+  @UseGuards(GlobalAuthGuard)
+  async findByContactId(
+    @Param() contactId: BillContactIdDto
+  ): Promise<IBill[]> {
+    return await this.billService.FindBillsByContactId(contactId.id);
+  }
+
   @Post()
   @UseGuards(GlobalAuthGuard)
   async create(
@@ -67,6 +80,34 @@ export class BillController {
           result: bill,
         };
       }
+    } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @UseGuards(GlobalAuthGuard)
+  @Get('payables')
+  async agedPayables(
+    @Req() req: IRequest,
+    @Query() query
+  ): Promise<IBillWithResponse> {
+    try {
+      const invoice = await this.billService.AgedPayables(req, query);
+
+      if (invoice) {
+        return {
+          message: 'Invoice fetched successfully.',
+          status: true,
+          result: invoice,
+        };
+      }
+      throw new HttpException(
+        'Failed to create invoice',
+        HttpStatus.BAD_REQUEST
+      );
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,

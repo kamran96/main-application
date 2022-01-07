@@ -695,6 +695,11 @@ export class InvoiceService {
       relations: ['invoiceItems'],
     });
 
+    const creditNote = await getCustomRepository(CreditNoteRepository).find({
+      select: ['id', 'invoiceNumber'],
+      where: { invoiceId: invoiceId },
+    });
+
     let new_invoice;
     if (invoice?.contactId) {
       let token;
@@ -775,6 +780,10 @@ export class InvoiceService {
       if (invoiceItemArr.length > 0) {
         new_invoice = {
           ...newInvoice,
+          relation: {
+            links: creditNote,
+            type: 'CN',
+          },
           contact: contact.result,
           invoiceItems: invoiceItemArr,
         };
@@ -878,8 +887,18 @@ export class InvoiceService {
       },
     };
 
-    const data = await axios(requestObj as unknown);
-    console.log(data.data);
+    await axios(requestObj as unknown);
+  }
+
+  /**
+   *
+   */
+
+  async FindInvoicesByContactId(contactId: string): Promise<IInvoice[]> {
+    return await getCustomRepository(InvoiceRepository).find({
+      where: { contactId },
+      relations: ['invoiceItems'],
+    });
   }
 
   async deleteInvoice(
@@ -1162,6 +1181,84 @@ export class InvoiceService {
     };
 
     await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
+  }
+
+  /**
+   * Aged payable report
+   */
+
+   async AgedReceivables(req: IRequest, query) {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const tokenType =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [tokenType]: value,
+      },
+    });
+
+    const invoices = await getCustomRepository(InvoiceRepository).find({
+      where: {
+        status: 1,
+        invoiceType: 'SI',
+        branchId: req.user.branchId,
+        organizationId: req.user.organizationId,
+      },
+    });
+
+    const mapInvoiceIds = invoices.map((inv) => inv.id);
+
+    const { data: balances } = await http.post(`payments/payment/invoice`, {
+      ids: mapInvoiceIds,
+      type: 'INVOICE',
+    });
+
+    const invoice_arr = [];
+    for (const i of invoices) {
+      const balance = balances.find((bal) => bal.id === i.id);
+
+      const paid_amount = balance?.invoice?.balance || 0;
+      const due_amount = balance?.invoice?.balance
+        ? i.netTotal - balance?.invoice?.balance
+        : i.netTotal;
+
+      const payment_status = () => {
+        if (paid_amount < due_amount && due_amount < i?.netTotal) {
+          return 'Partial Payment';
+        } else if (due_amount === i?.netTotal) {
+          return 'Payment Pending';
+        } else if (paid_amount === i?.netTotal) {
+          return 'Full Payment';
+        } else {
+          return null;
+        }
+      };
+      if (balance.invoice.balance === 0) {
+        invoice_arr.push({
+          ...i,
+          paid_amount,
+          due_amount: i.netTotal - balance.invoice.balance || 0,
+          payment_status: payment_status(),
+        });
+      }
+    }
+
+
+    return invoice_arr.flat();
   }
 
   async InvoicesAgainstContactId(

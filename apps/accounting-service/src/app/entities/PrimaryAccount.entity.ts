@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Accounts } from '.';
 
 @Entity()
 export class PrimaryAccounts {
@@ -18,4 +19,7 @@ export class PrimaryAccounts {
   updatedAt: string;
   @Column()
   updatedById: string;
+
+  @OneToMany(() => Accounts, (primaryAccount) => primaryAccount.primaryAccount)
+  primaryAccount: Accounts[];
 }

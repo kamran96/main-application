@@ -83,6 +83,22 @@ export class TransactionController {
     }
   }
 
+  @Get('cash-summary')
+  @UseGuards(GlobalAuthGuard)
+  async cashSummary(@Req() req: IRequest, @Query() query) {
+    const transaction = await this.transactionService.CashSummaryReport(
+      req.user,
+      query
+    );
+
+    if (transaction) {
+      return {
+        message: 'Cash summary report fetched successfully',
+        result: transaction,
+      };
+    }
+  }
+
   @Get('/:id')
   @UseGuards(GlobalAuthGuard)
   async show(@Param() params: ParamsDto): Promise<ITransactionWithResponse> {
