@@ -38,6 +38,19 @@ import { OrganizationService } from './organization.service';
         },
       },
     ]),
+    ClientsModule.register([
+      {
+        name: 'REPORT_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://localhost:5672'],
+          queue: 'report_queue',
+          queueOptions: {
+            durable: false,
+          },
+        },
+      },
+    ]),
     RbacModule,
     AuthModule,
   ],

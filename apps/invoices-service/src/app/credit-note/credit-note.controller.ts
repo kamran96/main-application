@@ -80,15 +80,18 @@ export class CreditNoteController {
 
   @UseGuards(GlobalAuthGuard)
   @Get('/:id')
-  async show(@Param() params: CnParamsDto): Promise<ICreditNoteWithResponse> {
+  async show(
+    @Param() params: CnParamsDto,
+    @Req() req: IRequest
+  ): Promise<ICreditNoteWithResponse> {
     try {
-      const credit_note = await this.creditNoteService.FindById(params.id);
+      const credit_note = await this.creditNoteService.FindById(params.id, req);
 
       if (credit_note) {
         return {
           message: 'credit-note fetched successfully.',
           status: true,
-          result: credit_note[0],
+          result: credit_note,
         };
       }
       throw new HttpException(

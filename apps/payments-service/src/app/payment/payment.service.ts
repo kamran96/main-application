@@ -1,6 +1,14 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { Between, getCustomRepository, In } from 'typeorm';
+import {
+  Between,
+  getCustomRepository,
+  In,
+  IsNull,
+  LessThan,
+  Not,
+} from 'typeorm';
+import * as moment from 'moment';
 import { PaymentRepository } from '../repositories/payment.repository';
 import { Sorting } from '@invyce/sorting';
 import { PaymentModes, EntryType } from '@invyce/global-constants';
@@ -185,14 +193,18 @@ export class PaymentService {
 
           let remaining = data.amount;
           const bills = await getCustomRepository(PaymentRepository)
-            .query(`select p."billId", sum(p.amount) as balance, count(id) as total_payments 
-        from payments p
-        where p."billId" in (${data.invoice_ids})
-        and p.status = 1
-        and p."entryType" is not null
-        and p."organizationId" = '${req.user.organizationId}'
-        group by p."billId"
-        `);
+            .createQueryBuilder()
+            .select(
+              '"billId", COALESCE(SUM(amount), 0) as balance, COUNT(id) as total_payments'
+            )
+            .where({
+              billId: In(data.invoice_ids),
+              status: 1,
+              entryType: Not(IsNull()),
+              organizationId: req.user.organizationId,
+            })
+            .groupBy('"billId"')
+            .getRawMany();
 
           for (const i of bills) {
             const purchase_total = Math.abs(parseFloat(i.balance));
@@ -308,15 +320,29 @@ export class PaymentService {
           };
 
           let remaining = data.amount;
-          const invoices = await getCustomRepository(PaymentRepository).query(`
-          select p."invoiceId", sum(p.amount) as balance, count(p.id) as total_payments
-          from payments p
-          where p."invoiceId" in (${data.invoice_ids})
-          and p.status = 1
-          and p."entryType" is not null
-          and p."organizationId" = '${req.user.organizationId}'
-          group by p."invoiceId"
-      `);
+          //     const invoices = await getCustomRepository(PaymentRepository).query(`
+          //     select p."invoiceId", sum(p.amount) as balance, count(p.id) as total_payments
+          //     from payments p
+          //     where p."invoiceId" in (${data.invoice_ids})
+          //     and p.status = 1
+          //     and p."entryType" is not null
+          //     and p."organizationId" = '${req.user.organizationId}'
+          //     group by p."invoiceId"
+          // `);
+
+          const invoices = await getCustomRepository(PaymentRepository)
+            .createQueryBuilder()
+            .select(
+              '"invoiceId", COALESCE(SUM(amount), 0) as balance, COUNT(id) as total_payments'
+            )
+            .where({
+              invoiceId: In(data.invoice_ids),
+              status: 1,
+              entryType: Not(IsNull()),
+              organizationId: req.user.organizationId,
+            })
+            .groupBy('"invoiceId"')
+            .getRawMany();
 
           const { data: transaction } = await http.post(
             'accounts/transaction/api',
@@ -457,18 +483,22 @@ export class PaymentService {
     invoiceIds: PaymentInvoiceDto,
     user: IBaseUser
   ): Promise<IPayment[]> {
-    const id = invoiceIds.type === 'INVOICE' ? '"invoiceId"' : '"billId"';
+    const id = invoiceIds.type === 'INVOICE' ? 'invoiceId' : 'billId';
 
     const inv_arr = [];
     for (const i of invoiceIds.ids) {
-      const [invoice] = await getCustomRepository(PaymentRepository).query(`
-        select COALESCE(SUM(amount), 0) as balance from payments p
-        where p.${id} = ${i}
-        and p."entryType" = 2
-        and p."organizationId" = '${user.organizationId}'
-        and p."branchId" = '${user.branchId}'
-        and p.status = 1
-     `);
+      const [invoice] = await getCustomRepository(PaymentRepository)
+        .createQueryBuilder('pay')
+        .select('COALESCE(SUM(amount), 0)', 'balance')
+        .where({
+          [id]: i,
+          entryType: 2,
+          organizationId: user.organizationId,
+          branchId: user.branchId,
+          status: 1,
+        })
+        .getRawMany();
+
       inv_arr.push({ id: i, invoice });
     }
 
@@ -481,19 +511,101 @@ export class PaymentService {
   ): Promise<IPayment[]> {
     const payment_arr = [];
     for (const i of contactIds.ids) {
-      const [payment] = await getCustomRepository(PaymentRepository).query(`
-      SELECT COALESCE(SUM(amount), 0) as balance
-      FROM payments p
-      WHERE p."contactId" = '${i.id}'
-      and p."entryType" is not null
-      and p."organizationId" = '${user.organizationId}'
-      and p."branchId" = '${user.branchId}'
-      and p.status = 1
-    `);
+      const [payment] = await getCustomRepository(PaymentRepository)
+        .createQueryBuilder('pay')
+        .select('COALESCE(SUM(amount), 0)', 'balance')
+        .where({
+          contactId: i.id,
+          entryType: Not(IsNull()),
+          organizationId: user.organizationId,
+          branchId: user.branchId,
+          status: 1,
+        })
+        .getRawMany();
 
       payment_arr.push({ id: i.id, payment });
     }
+
     return payment_arr;
+  }
+
+  async GetPaymentAndBalance(
+    contactId: string,
+    user: IBaseUser,
+    query: IPage
+  ): Promise<unknown> {
+    const { page_no, page_size, type, start, end } = query;
+
+    const ps: number = parseInt(page_size);
+    const pn: number = parseInt(page_no);
+
+    const total = await getCustomRepository(PaymentRepository).count({
+      status: 1,
+      organizationId: user.organizationId,
+    });
+    const add_one_day = moment(new Date()).add(1, 'day').format();
+
+    const filterByDate = type
+      ? { [type]: Between(start, end) }
+      : { createdAt: LessThan(add_one_day) };
+
+    const payment = await getCustomRepository(PaymentRepository)
+      .createQueryBuilder('p')
+      .select('p.*')
+      .addSelect(
+        ' COALESCE(sum(amount) over (order by date asc), 0)',
+        'balance'
+      )
+      .where({
+        contactId,
+        entryType: Not(IsNull()),
+        organizationId: user.organizationId,
+        branchId: user.branchId,
+        status: 1,
+      })
+      .andWhere(filterByDate)
+      .orderBy('balance', 'ASC')
+      .offset(pn * ps - ps || 0)
+      .limit(ps)
+      .getRawMany();
+
+    return {
+      pagination: {
+        total,
+        total_pages: Math.ceil(total / ps),
+        page_size: parseInt(page_size) || 20,
+        page_no: parseInt(page_no),
+        page_total: payment.length,
+        // sort_column: sort_column,
+        // sort_order: sort_order,
+      },
+      result: payment,
+    };
+  }
+
+  async ContactOpeningBalance(
+    contactId: string,
+    user: IBaseUser,
+    query: IPage
+  ) {
+    return await getCustomRepository(PaymentRepository)
+      .createQueryBuilder('p')
+      .select('date(date), comment, "createdAt"')
+      .addSelect(
+        ' COALESCE(sum(amount) over (order by date asc), 0)',
+        'balance'
+      )
+      .where({
+        organizationId: user.organizationId,
+        branchId: user.branchId,
+        contactId,
+        status: In([1, 3]),
+        entryType: Not(IsNull()),
+        date: LessThan(query.start),
+      })
+      .orderBy('balance', 'ASC')
+      .limit(1)
+      .getRawMany();
   }
 
   async DeletePaymentAgainstInvoiceOrBillId(data, req) {
@@ -546,11 +658,37 @@ export class PaymentService {
     });
   }
 
+  // async AgedPayments(req: IRequest, data, query) {
+  //   let token;
+  //   if (process.env.NODE_ENV === 'development') {
+  //     const header = req.headers?.authorization?.split(' ')[1];
+  //     token = header;
+  //   } else {
+  //     if (!req || !req.cookies) return null;
+  //     token = req.cookies['access_token'];
+  //   }
+
+  //   const tokenType =
+  //     process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+  //   const value =
+  //     process.env.NODE_ENV === 'development'
+  //       ? `Bearer ${token}`
+  //       : `access_token=${token}`;
+
+  //   const http = axios.create({
+  //     baseURL: 'http://localhost',
+  //     headers: {
+  //       [tokenType]: value,
+  //     },
+  //   });
+
+  // }
+
   async AddPayment(data, user: IBaseUser): Promise<void> {
     for (const i of data.payments) {
       await getCustomRepository(PaymentRepository).save({
         amount: i?.balance,
-        dueDate: i?.createdAt,
+        dueDate: i?.dueDate,
         date: i?.date,
         reference: i.reference || 'Xero opeing balance',
         transactionId: i?.transactionId,

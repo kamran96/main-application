@@ -19,6 +19,7 @@ import {
   SEND_FORGOT_PASSWORD,
   SEND_INVITATION,
   SEND_OTP,
+  USER_CREATED,
 } from '@invyce/send-email';
 import { UserToken } from '../schemas/userToken.schema';
 import {
@@ -41,6 +42,7 @@ export class AuthService {
     @InjectModel(User.name) private userModel,
     @InjectModel(UserToken.name) private userTokenModel,
     @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy,
+    @Inject('REPORT_SERVICE') private readonly reportService: ClientProxy,
     private jwtService: JwtService
   ) {}
 
@@ -131,6 +133,8 @@ export class AuthService {
     user.marketing = authDto.marketing;
     user.status = 1;
     await user.save();
+
+    await this.reportService.emit(USER_CREATED, user);
 
     if (!email) {
       const time = Moment(new Date()).add(1, 'h').calendar();

@@ -357,13 +357,112 @@ export class CreditNoteService {
       }
     }
 
-    return await this.FindById(credit_note.id);
+    return credit_note;
   }
 
-  async FindById(creditNoteId: number): Promise<ICreditNote> {
-    return await getCustomRepository(CreditNoteRepository).findOne({
+  async FindById(creditNoteId: number, req: IRequest): Promise<ICreditNote> {
+    const creditNote = await getCustomRepository(CreditNoteRepository).findOne({
       where: { id: creditNoteId },
       relations: ['creditNoteItems'],
     });
+
+    const invoice = getCustomRepository(InvoiceRepository).findOne({
+      select: ['id', 'invoiceNumber'],
+      where: { id: creditNote.invoiceId },
+    });
+
+    let new_credit_note;
+    if (creditNote?.contactId) {
+      let token;
+      if (process.env.NODE_ENV === 'development') {
+        const header = req.headers?.authorization?.split(' ')[1];
+        token = header;
+      } else {
+        if (!req || !req.cookies) return null;
+        token = req.cookies['access_token'];
+      }
+
+      const type =
+        process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+      const value =
+        process.env.NODE_ENV === 'development'
+          ? `Bearer ${token}`
+          : `access_token=${token}`;
+
+      const contactId = creditNote?.contactId;
+      const itemIdsArray = creditNote?.creditNoteItems.map((ids) => ids.itemId);
+
+      const contactRequest = {
+        url: `http://localhost/contacts/contact/${contactId}`,
+        method: 'GET',
+        headers: {
+          [type]: value,
+        },
+      };
+
+      const http = axios.create({
+        baseURL: 'http://localhost',
+        headers: {
+          [type]: value,
+        },
+      });
+
+      const { data: payments } = await http.post(`payments/payment/invoice`, {
+        ids: [creditNoteId],
+        type: 'BILL',
+      });
+
+      const { data: contact } = await axios(contactRequest as unknown);
+      const { data: items } = await http.post(`items/item/ids`, {
+        ids: itemIdsArray,
+      });
+
+      const balance = payments.find(
+        (bal) => parseInt(bal.id) === creditNote.id
+      );
+      const paid_amount = balance?.invoice?.balance || 0;
+      const due_amount = balance?.invoice?.balance
+        ? creditNote.netTotal - balance?.invoice?.balance
+        : creditNote.netTotal;
+
+      const payment_status = () => {
+        if (paid_amount < due_amount && due_amount < creditNote?.netTotal) {
+          return 'Partial Payment';
+        } else if (due_amount === creditNote?.netTotal) {
+          return 'Payment Pending';
+        } else if (paid_amount === creditNote?.netTotal) {
+          return 'Full Payment';
+        } else {
+          return null;
+        }
+      };
+
+      const newCreditNote = {
+        ...creditNote,
+        paid_amount,
+        due_amount,
+        payment_status: payment_status(),
+      };
+
+      const creditNoteItemArr = [];
+
+      for (const i of creditNote.creditNoteItems) {
+        const item = items.find((j) => i.itemId === j.id);
+        creditNoteItemArr.push({ ...i, item });
+      }
+
+      if (creditNoteItemArr.length > 0) {
+        new_credit_note = {
+          ...newCreditNote,
+          relation: {
+            links: invoice,
+            type: 'SI',
+          },
+          contact: contact.result,
+          creditNoteItems: creditNoteItemArr,
+        };
+      }
+    }
+    return new_credit_note ? new_credit_note : creditNote;
   }
 }

@@ -7,7 +7,7 @@ import {
   TransactionRepository,
 } from '../repositories';
 import * as moment from 'moment';
-import { getCustomRepository, In, Raw } from 'typeorm';
+import { getCustomRepository, In, Not, Raw } from 'typeorm';
 import { Sorting } from '@invyce/sorting';
 import { Integrations, Entries } from '@invyce/global-constants';
 import {
@@ -19,6 +19,7 @@ import {
   ISecondaryAccount,
 } from '@invyce/interfaces';
 import { AccountDto, AccountIdsDto } from '../dto/account.dto';
+import { TransactionItems, Transactions } from '../entities';
 
 @Injectable()
 export class AccountsService {
@@ -44,117 +45,119 @@ export class AccountsService {
           where: { status: 1, organizationId: user.organizationId },
         });
       } else {
-        let sql = `
-      select 
-      a.id, a.name, a.description, a.code, sa.name as "type", pa.name as "primary", 
-      pa.id as "primaryAccountId", sa.id as "secondaryAccountId",
-      coalesce((
-        select count(ti.id) from transaction_items ti
-        where ti."accountId" = a.id
-        group by a.id
-      ), 0) as total_transactions,
+        const sql = `a.id, a.name, a.description, a.code, sa.name as "type", pa.name as "primary", 
+        pa.id as "primaryAccountId", sa.id as "secondaryAccountId",
+        coalesce((
+          select count(ti.id) from transaction_items ti
+          where ti."accountId" = a.id
+          group by a.id
+        ), 0) as total_transactions,
+        
+        coalesce((
+          select sum(ti.amount) from transaction_items ti
+          where ti."accountId" = a.id and ti."transactionType" = 20
+        ), 0) as total_credit,
+        
+        coalesce((
+          select sum(ti.amount) from transaction_items ti
+          where ti."accountId" = a.id and ti."transactionType" = 10
+        ), 0) as total_debit,
+        
+        ABS((
+          CASE
+          WHEN (pa.name = 'assets') OR ( pa.name='expense') THEN (
+            coalesce((
+              SELECT sum(ti.amount) from transaction_items AS ti
+              left join transactions as t
+              on ti."transactionId" = t.id
+              WHERE ti."accountId" = a.id AND ti."transactionType" = 10
+              and t.status = 1
+            ), 0) 
+              -
       
-      coalesce((
-        select sum(ti.amount) from transaction_items ti
-        where ti."accountId" = a.id and ti."transactionType" = 20
-      ), 0) as total_credit,
+            coalesce((
+              SELECT sum(ti.amount) from transaction_items AS ti
+              left join transactions as t
+              on ti."transactionId" = t.id
+              WHERE ti."accountId" = a.id AND ti."transactionType" = 20
+              and t.status = 1
+            ), 0 )
+          )
+          ELSE 
+             coalesce((
+              SELECT sum(ti.amount) from transaction_items AS ti
+              left join transactions as t
+              on ti."transactionId" = t.id
+              WHERE ti."accountId" = a.id AND ti."transactionType" = 20
+              and t.status = 1
+            ), 0) -
       
-      coalesce((
-        select sum(ti.amount) from transaction_items ti
-        where ti."accountId" = a.id and ti."transactionType" = 10
-      ), 0) as total_debit,
-      
-      ABS((
-        CASE
-        WHEN (pa.name = 'assets') OR ( pa.name='expense') THEN (
-          coalesce((
-            SELECT sum(ti.amount) from transaction_items AS ti
-            left join transactions as t
-            on ti."transactionId" = t.id
-            WHERE ti."accountId" = a.id AND ti."transactionType" = 10
-            and t.status = 1
-          ), 0) 
-            -
-    
-          coalesce((
-            SELECT sum(ti.amount) from transaction_items AS ti
-            left join transactions as t
-            on ti."transactionId" = t.id
-            WHERE ti."accountId" = a.id AND ti."transactionType" = 20
-            and t.status = 1
-          ), 0 )
-        )
-        ELSE 
-           coalesce((
-            SELECT sum(ti.amount) from transaction_items AS ti
-            left join transactions as t
-            on ti."transactionId" = t.id
-            WHERE ti."accountId" = a.id AND ti."transactionType" = 20
-            and t.status = 1
-          ), 0) -
-    
-          coalesce((
-            SELECT sum(ti.amount) from transaction_items AS ti
-            left join transactions as t
-            on ti."transactionId" = t.id
-            WHERE ti."accountId" = a.id AND ti."transactionType" = 10
-            and t.status = 1
-          ), 0 )
-        END
-        )) as balance
-    from accounts a
-    left join secondary_accounts sa
-    on sa.id = a."secondaryAccountId"
-    left join primary_accounts pa
-    on pa.id = sa."primaryAccountId"
-    where a."organizationId" = '${user.organizationId}'
-    `;
+            coalesce((
+              SELECT sum(ti.amount) from transaction_items AS ti
+              left join transactions as t
+              on ti."transactionId" = t.id
+              WHERE ti."accountId" = a.id AND ti."transactionType" = 10
+              and t.status = 1
+            ), 0 )
+          END
+          )) as balance
+        `;
 
         if (query) {
           const filterData = Buffer.from(query, 'base64').toString();
           const data = JSON.parse(filterData);
 
+          // const data = {
+          //   secondaryAccountId: {
+          //     type: 'in',
+          //     value: [137],
+          //   },
+          // };
+
           for (const i in data) {
             if (data[i].type === 'search') {
               const val = data[i].value.toLowerCase();
-              return await getCustomRepository(AccountRepository).query(
-                (sql += `and lower(a.${i}) like '${val}'`)
-              );
+
+              accounts = await getCustomRepository(AccountRepository)
+                .createQueryBuilder('a')
+                .where({
+                  organizationId: user.organizationId,
+                })
+                .andWhere(`LOWER(a.${i}) like :name`, { name: val })
+                .select(sql)
+                .leftJoin('a.secondaryAccount', 'sa')
+                .leftJoin('sa.primaryAccount', 'pa')
+                .offset(pn * ps - ps)
+                .limit(ps)
+                .getRawMany();
             } else if (data[i].type === 'in') {
-              return await getCustomRepository(AccountRepository).query(
-                (sql += `and a."${i}" in (${data[i].value})`)
-              );
+              accounts = await getCustomRepository(AccountRepository)
+                .createQueryBuilder('a')
+                .where({
+                  organizationId: user.organizationId,
+                  secondaryAccountId: In([data[i].value]),
+                })
+                .select(sql)
+                .leftJoin('a.secondaryAccount', 'sa')
+                .leftJoin('sa.primaryAccount', 'pa')
+                .offset(pn * ps - ps)
+                .limit(ps)
+                .getRawMany();
             }
           }
+        } else {
+          accounts = await getCustomRepository(AccountRepository)
+            .createQueryBuilder('a')
+            .where({
+              organizationId: user.organizationId,
+            })
+            .select(sql)
+            .leftJoin('a.secondaryAccount', 'sa')
+            .leftJoin('sa.primaryAccount', 'pa')
+            .offset(pn * ps - ps)
+            .limit(ps)
+            .getRawMany();
         }
-
-        const page = `
-        limit ${ps || 20}
-        offset ${pn * ps - ps || 0}
-      `;
-
-        // const secondaryAccounts = await getCustomRepository(
-        //   SecondaryAccountRepository
-        // ).find({
-        //   where: { status: 1, organizationId: user.organizationId },
-        // });
-        accounts = await getCustomRepository(AccountRepository).query(
-          (sql += `order by ${sort_column} ${sort_order}  ${page}`)
-        );
-
-        // let newAccountArr = [];
-        // for (let i of accounts) {
-        //   for (let j of secondaryAccounts) {
-        //     if (i.secondaryAccountId === j.id) {
-        //       let resp = {
-        //         ...i,
-        //         secondaryAccounts: j,
-        //       };
-
-        //       newAccountArr.push(resp);
-        //     }
-        //   }
-        // }
       }
 
       return {
@@ -313,17 +316,18 @@ export class AccountsService {
         if (data[i].type === 'date-between') {
           const start_date = data[i].value[0];
           const end_date = data[i].value[1];
-          const add_one_day = moment(end_date).add(1, 'day').calendar();
+          const add_one_day = moment(end_date).add(1, 'day').format();
 
           opening_balance = getCustomRepository(TransactionItemRepository)
             .query(`
-              SELECT (select coalesce(sum(case when transaction_items."transactionType" = 10
+              SELECT (
+                select coalesce(sum(case when transaction_items."transactionType" = 10
                 then transaction_items.amount else - transaction_items.amount end ), 0)
-                from transaction_items where transaction_items."transactionId" in (
+                  from transaction_items where transaction_items."transactionId" in (
                     select id from transactions where date < '${start_date}'
-                  )
-                and transaction_items."accountId" = accounts.id
-                and transaction_items.status = 1 ) as balance, (
+                  ) and transaction_items."accountId" = accounts.id
+                    and transaction_items.status = 1 ) as balance,
+                     (
                   SELECT "transactions"."date" FROM "transactions"
                   WHERE (date < '${start_date}')
                   AND "transactions"."status" = 1
@@ -411,6 +415,163 @@ export class AccountsService {
       },
       transaction_items: new_arr,
     };
+  }
+
+  async AccountLedgerUpdated(
+    user: IBaseUser,
+    queryData: IPage,
+    accountId: number
+  ): Promise<IAccountWithResponse> {
+    try {
+      let ledger;
+      let opening_balance;
+
+      const { page_size, page_no, sort, query } = queryData;
+      const ps: number = parseInt(page_size);
+      const pn: number = parseInt(page_no);
+
+      const { sort_column, sort_order } = await Sorting(sort);
+
+      const total = await getCustomRepository(TransactionItemRepository).count({
+        status: 1,
+        organizationId: user.organizationId,
+      });
+
+      if (!query) {
+        ledger = await getCustomRepository(TransactionItemRepository)
+          .createQueryBuilder('ti')
+          .select(
+            `ti.*, (
+              select date from transactions t
+              where t.id = ti."transactionId"
+              and t.status = 1
+            ) as date`
+          )
+          .where({
+            organizationId: user.organizationId,
+            status: 1,
+          })
+          .andWhere((qb) => {
+            const subQuery = qb
+              .subQuery()
+              .select('"transactionId"')
+              .from(TransactionItems, 'items')
+              .where(`items."accountId" = :accountId`)
+              .getQuery();
+
+            return `ti."transactionId" IN ` + subQuery;
+          })
+          .setParameter('accountId', accountId)
+          .andWhere({ accountId: Not(accountId) })
+          .innerJoin('ti.account', 'acc')
+          .addSelect(
+            'acc.name as "accountName", acc."secondaryAccountId", acc."primaryAccountId", acc.code as "accountCode"'
+          )
+          .offset(pn * ps - ps)
+          .limit(ps)
+          .getRawMany();
+      } else {
+        const filterData = Buffer.from(query, 'base64').toString();
+        const data = JSON.parse(filterData);
+
+        // const data = {
+        //   date: {
+        //     type: 'date-between',
+        //     value: ['2022-01-5', '2022-01-07'],
+        //   },
+        // };
+
+        for (const i in data) {
+          if (data[i].type === 'date-between') {
+            const start_date = data[i].value[0];
+            const end_date = data[i].value[1];
+            const add_one_day = moment(end_date).add(1, 'day').format();
+
+            opening_balance = await getCustomRepository(AccountRepository)
+              .createQueryBuilder('a')
+              .select(
+                `(coalesce(sum(case when ti."transactionType" = 10
+                then ti.amount else - ti.amount end ), 0)) as balance`
+              )
+              .innerJoin('a.transactionItems', 'ti')
+              .innerJoin('ti.transaction', 't')
+              .where({
+                id: accountId,
+                organizationId: user.organizationId,
+                status: 1,
+              })
+              .getRawOne();
+
+            opening_balance.date = start_date;
+
+            ledger = await getCustomRepository(TransactionItemRepository)
+              .createQueryBuilder('ti')
+              .select(
+                `ti.*, (
+                  select date from transactions t
+                  where t.id = ti."transactionId"
+                  and t.status = 1
+                ) as date`
+              )
+              .where({
+                organizationId: user.organizationId,
+                status: 1,
+              })
+              .andWhere((qb) => {
+                const subQuery = qb
+                  .subQuery()
+                  .select('"transactionId"')
+                  .from(TransactionItems, 'items')
+                  .where(`items."accountId" = :accountId`)
+                  .getQuery();
+
+                return `ti."transactionId" IN ` + subQuery;
+              })
+              .setParameter('accountId', accountId)
+              .andWhere({ accountId: Not(accountId) })
+              .innerJoin('ti.account', 'acc')
+              .addSelect(
+                'acc.name as "accountName", acc."secondaryAccountId", acc."primaryAccountId", acc.code as "accountCode"'
+              )
+              .andWhere((qb) => {
+                const subQuery = qb
+                  .subQuery()
+                  .select('"id"')
+                  .from(Transactions, 't')
+                  .where(`t."${i}" between :startDate AND :endDate`)
+                  .getQuery();
+
+                return `ti."transactionId" IN ` + subQuery;
+              })
+              .setParameter('startDate', start_date)
+              .setParameter('endDate', add_one_day)
+              .offset(pn * ps - ps)
+              .limit(ps)
+              .getRawMany();
+          }
+        }
+      }
+
+      return {
+        pagination: {
+          total,
+          total_pages: Math.ceil(total / ps),
+          page_size: ps || 20,
+          // page_total: null,
+          page_no: pn,
+          sort_column: sort_column,
+          sort_order: sort_order,
+        },
+        opening_balance: {
+          comment: 'Opening Balance',
+          date: opening_balance ? opening_balance.date : null,
+          amount: opening_balance ? opening_balance.balance : null,
+        },
+        result: ledger,
+      };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   async CreateOrUpdateAccount(

@@ -269,7 +269,6 @@ export class BillService {
         bills = await getCustomRepository(BillRepository).find({
           where: {
             status: status,
-            // invoiceType: invoice_type,
             organizationId: req.user.organizationId,
             dueDate: LessThan(new Date()),
             branchId: req.user.branchId,
@@ -461,6 +460,7 @@ export class BillService {
             billId: bill.id,
             balance: `-${bill.netTotal}`,
             data: bill.issueDate,
+            dueDate: bill.dueDate,
             paymentType: PaymentModes.BILLS,
             transactionId: transaction.id,
             entryType: EntryType.CREDIT,
@@ -574,6 +574,7 @@ export class BillService {
             billId: bill.id,
             balance: `-${bill.netTotal}`,
             data: bill.issueDate,
+            dueDate: bill.dueDate,
             paymentType: PaymentModes.BILLS,
             transactionId: transaction.id,
             entryType: EntryType.CREDIT,
@@ -777,9 +778,92 @@ export class BillService {
     return true;
   }
 
+  /**
+   * Aged payable report
+   */
+
+  async AgedPayables(req: IRequest, query) {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const tokenType =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [tokenType]: value,
+      },
+    });
+
+    const bills = await getCustomRepository(BillRepository).find({
+      status: 1,
+      organizationId: req.user.organizationId,
+      branchId: req.user.branchId,
+      invoiceType: 'POE',
+    });
+
+    const mapBillIds = bills.map((b) => b.id);
+
+    const { data: balances } = await http.post(`payments/payment/invoice`, {
+      ids: mapBillIds,
+      type: 'BILL',
+    });
+
+    const bill_arr = [];
+    for (const i of bills) {
+      const balance = balances.find((bal) => bal.id === i.id);
+
+      const paid_amount = balance?.invoice?.balance || 0;
+      const due_amount = balance?.invoice?.balance
+        ? i.netTotal - balance?.invoice?.balance
+        : i.netTotal;
+
+      const payment_status = () => {
+        if (paid_amount < due_amount && due_amount < i?.netTotal) {
+          return 'Partial Payment';
+        } else if (due_amount === i?.netTotal) {
+          return 'Payment Pending';
+        } else if (paid_amount === i?.netTotal) {
+          return 'Full Payment';
+        } else {
+          return null;
+        }
+      };
+
+      if (balance.invoice.balance === 0) {
+        bill_arr.push({
+          ...i,
+          paid_amount,
+          due_amount: i.netTotal - balance.invoice.balance || 0,
+          payment_status: payment_status(),
+        });
+      }
+    }
+
+    return bill_arr.flat();
+  }
+
   async FindByBillIds(billds: BillIdsDto): Promise<IBill[]> {
     return await getCustomRepository(BillRepository).find({
       where: { id: In(billds.ids) },
+    });
+  }
+
+  async FindBillsByContactId(contactId: string): Promise<IBill[]> {
+    return await getCustomRepository(BillRepository).find({
+      where: { contactId },
+      relations: ['purchaseItems'],
     });
   }
 }

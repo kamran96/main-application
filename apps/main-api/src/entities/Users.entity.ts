@@ -44,28 +44,19 @@ export class Users {
   @Column()
   updatedById: number;
 
-  @OneToOne(
-    type => Roles,
-    role => role.id,
-  )
+  @OneToOne(() => Roles, (role) => role.id)
   @JoinColumn()
   role: Roles;
 
-  @OneToOne(
-    type => Branches,
-    branch => branch.id,
-  )
+  @OneToOne(() => Branches, (branch) => branch.id)
   @JoinColumn()
   branch: Branches;
 
-  @OneToOne(
-    type => Organizations,
-    organization => organization.id,
-  )
+  @OneToOne(() => Organizations, (organization) => organization.id)
   @JoinColumn()
   organization: Organizations;
 
-  @OneToOne(type => UserProfiles)
+  @OneToOne(() => UserProfiles)
   @JoinColumn({ name: 'id', referencedColumnName: 'userId' })
   profile: UserProfiles;
 }
