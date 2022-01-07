@@ -97,6 +97,28 @@ export class InvoiceController {
     return await this.invoiceService.FindByInvoiceIds(invoiceIds);
   }
 
+  @Get('contact/:id')
+  @UseGuards(GlobalAuthGuard)
+  async findInvoiceByContactId(
+    @Param() invoiceIds: ParamsDto
+  ): Promise<IInvoice[]> {
+    return await this.invoiceService.FindInvoicesByContactId(invoiceIds.id);
+  }
+
+  @Get('receivables')
+  @UseGuards(GlobalAuthGuard)
+  async agedReceivables(@Req() req: IRequest, @Query() query) {
+    const invoices = await this.invoiceService.AgedReceivables(req, query);
+
+    if (invoices) {
+      return {
+        message: 'Successfull',
+        status: true,
+        result: invoices,
+      };
+    }
+  }
+
   @UseGuards(GlobalAuthGuard)
   @Post()
   async create(
@@ -140,10 +162,6 @@ export class InvoiceController {
           result: invoice,
         };
       }
-      throw new HttpException(
-        'Failed to create invoice',
-        HttpStatus.BAD_REQUEST
-      );
     } catch (error) {
       console.log(error);
       throw new HttpException(

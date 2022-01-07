@@ -34,6 +34,8 @@ export class Bills {
   @Column()
   indirectTax: number;
   @Column()
+  paymentStatus: number;
+  @Column()
   isTaxIncluded: number;
   @Column()
   branchId: string;

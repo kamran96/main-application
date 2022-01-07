@@ -34,7 +34,6 @@ export class AppService {
       // ],
     };
 
-    console.log(payload, 'payload');
     await bigquery.dataset('reports').table('test').insert(payload);
   }
 }

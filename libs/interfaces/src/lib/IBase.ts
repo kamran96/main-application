@@ -67,8 +67,10 @@ export class IPage {
   filters?: string;
   purpose?: string;
   query?: string;
-  type?: string;
+  type?: string | number;
   sort?: string;
   paymentType?: number;
   parentId?: string;
+  start?: string;
+  end?: string;
 }

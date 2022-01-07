@@ -1,6 +1,6 @@
 import { Controller, Get, Logger } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { CONTACT_CREATED } from '@invyce/send-email';
+import { CONTACT_CREATED, USER_CREATED } from '@invyce/send-email';
 
 import { AppService } from './app.service';
 

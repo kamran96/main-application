@@ -43,3 +43,7 @@ export class BillIdsDto {
 export class BillParamsDto {
   id: number;
 }
+
+export class BillContactIdDto {
+  id: string;
+}

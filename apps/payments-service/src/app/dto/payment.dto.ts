@@ -34,3 +34,7 @@ export class DeletePaymentDto {
 export class PaymentIdsDto {
   ids: Array<number>;
 }
+
+export class PaymentIdDto {
+  id: string;
+}

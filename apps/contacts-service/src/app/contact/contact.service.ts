@@ -274,6 +274,167 @@ export class ContactService {
     }
   }
 
+  async Ledger(contactId: string, req: IRequest, query: IPage) {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const tokenType =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [tokenType]: value,
+      },
+    });
+
+    const { page_no, page_size, query: filters, type } = query;
+    const contact = await this.contactModel.findById(contactId);
+
+    if (type == PaymentModes.BILLS) {
+      const { data: bills } = await http.get(
+        `invoices/bill/contact/${contactId}`
+      );
+
+      if (filters) {
+        const filterData = Buffer.from(filters, 'base64').toString();
+        const data = JSON.parse(filterData);
+
+        // const data = {
+        //   createdAt: {
+        //     type: 'date-between',
+        //     value: ['2022-01-04', '2022-01-06'],
+        //   },
+        // };
+
+        for (const i in data) {
+          if (data[i].type === 'date-between') {
+            const start_date = moment(data[i].value[0]).format('YYYYMMDD');
+            const end_date = data[i].value[1];
+            const add_one_day = moment(end_date)
+              .add(1, 'day')
+              .format('YYYYMMDD');
+
+            const { data: payments } = await http.get(
+              `payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}&type=${i}&start=${start_date}&end=${add_one_day}`
+            );
+
+            const { data: openingBalance } = await http.get(
+              `payments/payment/opening-balance/${contactId}?start=${start_date}`
+            );
+
+            const newLedgerArray = [];
+            for (const i of payments.result) {
+              const bill = bills.find((b) => b.id === i.billId);
+
+              newLedgerArray.push({
+                ...i,
+                bill,
+              });
+            }
+            return {
+              pagination: payments.pagination,
+              openingBalance: openingBalance[0],
+              result: newLedgerArray,
+              contact,
+            };
+          }
+        }
+      } else {
+        const { data: payments } = await http.get(
+          `payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}`
+        );
+
+        const newLedgerArray = [];
+        for (const i of payments.result) {
+          const bill = bills.find((b) => b.id === i.billId);
+
+          newLedgerArray.push({
+            ...i,
+            bill,
+          });
+        }
+        return {
+          pagination: payments.pagination,
+          result: newLedgerArray,
+          contact,
+        };
+      }
+    } else if (type == PaymentModes.INVOICES) {
+      const { data: invoices } = await http.get(
+        `invoices/invoice/contact/${contactId}`
+      );
+
+      if (filters) {
+        const filterData = Buffer.from(filters, 'base64').toString();
+        const data = JSON.parse(filterData);
+
+        for (const i in data) {
+          if (data[i].type === 'date-between') {
+            const start_date = moment(data[i].value[0]).format('YYYYMMDD');
+            const end_date = data[i].value[1];
+            const add_one_day = moment(end_date)
+              .add(1, 'day')
+              .format('YYYYMMDD');
+
+            const { data: payments } = await http.get(
+              `payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}&type=${i}&start=${start_date}&end=${add_one_day}`
+            );
+
+            const { data: openingBalance } = await http.get(
+              `payments/payment/opening-balance/${contactId}?start=${start_date}`
+            );
+
+            const newLedgerArray = [];
+            for (const i of payments.result) {
+              const invoice = invoices.find((b) => b.id === i.invoiceId);
+
+              newLedgerArray.push({
+                ...i,
+                invoice,
+              });
+            }
+            return {
+              pagination: payments.pagination,
+              openingBalance: openingBalance[0],
+              result: newLedgerArray,
+              contact,
+            };
+          }
+        }
+      } else {
+        const { data: payments } = await http.get(
+          `payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}`
+        );
+
+        const newLedgerArray = [];
+        for (const i of payments.result) {
+          const invoice = invoices.find((b) => b.id === i.invoiceId);
+
+          newLedgerArray.push({
+            ...i,
+            invoice,
+          });
+        }
+        return {
+          pagination: payments.pagination,
+          result: newLedgerArray,
+          contact,
+        };
+      }
+    }
+  }
+
   async FindById(id: string): Promise<IContact> {
     return await this.contactModel.findById(id);
   }
