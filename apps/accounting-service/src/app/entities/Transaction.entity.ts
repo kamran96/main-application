@@ -31,6 +31,7 @@ export class Transactions {
   updatedAt: string;
   @Column()
   updatedById: string;
+
   @OneToMany(
     () => TransactionItems,
     (transactionItems) => transactionItems.transaction

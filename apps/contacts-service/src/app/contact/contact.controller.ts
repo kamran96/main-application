@@ -76,6 +76,31 @@ export class ContactController {
     }
   }
 
+  @Get('ledger/:id')
+  @UseGuards(GlobalAuthGuard)
+  async ledger(
+    @Param() params: ParamsDto,
+    @Req() req: IRequest,
+    @Query() page: IPage
+  ) {
+    try {
+      const contact = await this.contactService.Ledger(params.id, req, page);
+
+      if (contact) {
+        return {
+          message: 'Successfull',
+          status: true,
+          ...contact,
+        };
+      }
+    } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   @Get('/:id')
   @UseGuards(GlobalAuthGuard)
   async show(@Param() params: ParamsDto): Promise<IContactWithResponse> {

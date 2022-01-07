@@ -43,6 +43,19 @@ import { AuthStrategy } from './auth.strategy';
         },
       },
     ]),
+    ClientsModule.register([
+      {
+        name: 'REPORT_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://localhost:5672'],
+          queue: 'report_queue',
+          queueOptions: {
+            durable: false,
+          },
+        },
+      },
+    ]),
   ],
   providers: [AuthService, AuthStrategy],
   exports: [AuthService, AuthStrategy],

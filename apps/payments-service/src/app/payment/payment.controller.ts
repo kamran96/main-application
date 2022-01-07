@@ -9,6 +9,7 @@ import {
   Get,
   Query,
   Put,
+  Param,
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
@@ -22,6 +23,7 @@ import {
   DeletePaymentDto,
   PaymentContactDto,
   PaymentDto,
+  PaymentIdDto,
   PaymentIdsDto,
   PaymentInvoiceDto,
 } from '../dto/payment.dto';
@@ -69,6 +71,34 @@ export class PaymentController {
     return await this.paymentService.GetPaymentAgainstContactId(
       contactIds,
       req.user
+    );
+  }
+
+  @Get('/opening-balance/:id')
+  @UseGuards(GlobalAuthGuard)
+  async getPaymentOpeningBalance(
+    @Param() contactIds: PaymentIdDto,
+    @Req() req: IRequest,
+    @Query() query
+  ): Promise<unknown> {
+    return await this.paymentService.ContactOpeningBalance(
+      contactIds.id,
+      req.user,
+      query
+    );
+  }
+
+  @Get('/contact/:id')
+  @UseGuards(GlobalAuthGuard)
+  async getPaymentWithBalance(
+    @Param() contactIds: PaymentIdDto,
+    @Req() req: IRequest,
+    @Query() query
+  ): Promise<unknown> {
+    return await this.paymentService.GetPaymentAndBalance(
+      contactIds.id,
+      req.user,
+      query
     );
   }
 

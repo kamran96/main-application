@@ -4,9 +4,11 @@ import {
   Column,
   JoinColumn,
   ManyToOne,
+  OneToOne,
 } from 'typeorm';
 import { PrimaryAccounts } from './PrimaryAccount.entity';
 import { SecondaryAccounts } from './SecondaryAccount.entity';
+import { TransactionItems } from './TransactionItem.entity';
 
 @Entity()
 export class Accounts {
@@ -49,7 +51,14 @@ export class Accounts {
   @JoinColumn({ name: 'secondaryAccountId', referencedColumnName: 'id' })
   secondaryAccount: SecondaryAccounts;
 
-  @ManyToOne(() => PrimaryAccounts)
-  @JoinColumn({ name: 'secondaryAccountId', referencedColumnName: 'id' })
+  // @ManyToOne(() => PrimaryAccounts)
+  // @JoinColumn({ name: 'id', referencedColumnName: 'id' })
+  // primaryAccount: PrimaryAccounts;
+
+  @ManyToOne(() => PrimaryAccounts, (primaryAccount) => primaryAccount.id)
   primaryAccount: PrimaryAccounts;
+
+  @OneToOne(() => TransactionItems)
+  @JoinColumn({ name: 'id' })
+  transactionItems: TransactionItems;
 }

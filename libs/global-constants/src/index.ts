@@ -10,6 +10,12 @@ export enum PaymentModes {
   BILLS = 2,
 }
 
+export enum PaymentStatuses {
+  PAID = 1,
+  PENDING = 2,
+  DUE_EXPIRED = 3,
+}
+
 export enum XeroTypes {
   BILL = 'ACCPAY',
   INVOICE = 'ACCREC',
