@@ -17,5 +17,12 @@ export const TestComponents: FC = () => {
     });
   };
 
-  return <Inconvinience />;
+  return (
+    <InvoiceImportManager
+      headers={`Item Name,Category,Code,Purchase Price,Sale Price,Item Type,Stock,Status`.split(
+        ','
+      )}
+      onLoad={handleLoad}
+    />
+  );
 };

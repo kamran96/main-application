@@ -90,6 +90,9 @@
       "tags": [],
       "implicitDependencies": ["main-ui"]
     },
+    "micro-frontend": {
+      "tags": []
+    },
     "mobile-app": {
       "tags": []
     },

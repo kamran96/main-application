@@ -846,6 +846,28 @@
         }
       }
     },
+    "micro-frontend": {
+      "root": "libs/micro-frontend",
+      "sourceRoot": "libs/micro-frontend/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["libs/micro-frontend/**/*.{ts,tsx,js,jsx}"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/micro-frontend"],
+          "options": {
+            "jestConfig": "libs/micro-frontend/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "mobile-app": {
       "root": "apps/mobile-app",
       "sourceRoot": "apps/mobile-app/src",
