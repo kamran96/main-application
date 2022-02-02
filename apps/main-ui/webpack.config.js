@@ -4,7 +4,7 @@ const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin');
 const { ModuleFederationPlugin } = require('webpack').container;
 function getCustomWebpackConfig(webpackConfig) {
   const config = getWebpackConfig(webpackConfig);
-
+  console.log(config);
   // config?.resolve?.plugins.push(new AntdDayjsWebpackPlugin());
 
   config.plugins.push(new AntdDayjsWebpackPlugin());
