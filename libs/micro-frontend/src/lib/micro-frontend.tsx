@@ -5,18 +5,18 @@ interface Props {
   host: string;
 }
 
-const MicroFrontend = ({ name, host }: Props) => {
+export const MicroFrontend = ({ name, host }: Props) => {
   useEffect(() => {
     const scriptId = `micro-frontend-script-${name}`;
 
     const renderMicroFrontend = () => {
       // history?
+      debugger;
       (window as any)[`render${name}`](`${name}-container`);
     };
 
     if (document.getElementById(scriptId)) {
-      renderMicroFrontend();
-      return;
+      return renderMicroFrontend();
     }
 
     const renderRemoteJS = async () => {
