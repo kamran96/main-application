@@ -1,20 +1,20 @@
 import { message } from 'antd';
 import { ReactNode, useRef } from 'react';
-import { FC, useEffect, useState, useMemo } from 'react';
-import { useQueryClient, useMutation, useQuery } from 'react-query';
+import { FC, useEffect, useMemo, useState } from 'react';
+import { useMutation, useQueryClient } from 'react-query';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
+
 import {
   CheckAuthAPI,
   CheckAuthAPIDev,
-  getAllRolesWithPermission,
   LogoutAPI,
   uploadPdfAPI,
 } from '../../api';
+import { NoInternet } from '../../components/ErrorBoundries/NoInternet';
 import {
   IBaseAPIError,
   IErrorMessages,
-  IErrorResponse,
   IServerError,
   NOTIFICATIONTYPE,
 } from '../../modal';
@@ -288,7 +288,11 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     return auth?.users?.id || null;
   }, [auth?.users?.id]);
 
-  const { isLoading, refetch: refetchUser } = useHttp(
+  const {
+    isLoading,
+    refetch: refetchUser,
+    isFetched: userAuthenticated,
+  } = useHttp(
     {
       apiOption: {
         url: `users/user/${userId}`,
@@ -383,6 +387,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   return (
     <globalContext.Provider
       value={{
+        userAuthenticated,
         checkAutherized: useMemo(() => {
           return checkAutherized;
         }, [checkAutherized]),
@@ -546,7 +551,9 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         refetchPermissions,
       }}
     >
-      <WrapperChildren>{children}</WrapperChildren>
+      <WrapperChildren>
+        {!isOnline ? <NoInternet /> : <>{children}</>}
+      </WrapperChildren>
     </globalContext.Provider>
   );
 };

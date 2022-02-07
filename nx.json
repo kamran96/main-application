@@ -37,6 +37,13 @@
     "auth-middleware": {
       "tags": []
     },
+    "bank-reconcilation": {
+      "tags": []
+    },
+    "bank-reconcilation-e2e": {
+      "tags": [],
+      "implicitDependencies": ["bank-reconcilation"]
+    },
     "contacts-service": {
       "tags": []
     },
@@ -90,6 +97,9 @@
       "tags": [],
       "implicitDependencies": ["main-ui"]
     },
+    "micro-frontend": {
+      "tags": []
+    },
     "mobile-app": {
       "tags": []
     },
@@ -110,6 +120,9 @@
       "tags": []
     },
     "send-email": {},
+    "shared-components": {
+      "tags": []
+    },
     "shared-invyce-theme": {
       "tags": []
     },

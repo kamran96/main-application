@@ -78,4 +78,5 @@ export enum ISupportedRoutes {
   FORGOT_PASSWORD = `/forgot-password`,
   LOGIN = `/login`,
   SIGNUP = `/signup`,
+  BANK_RECONSILATION = '/bank-reconcilation',
 }
