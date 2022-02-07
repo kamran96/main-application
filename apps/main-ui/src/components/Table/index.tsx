@@ -1,14 +1,13 @@
-
-import printIcon from "@iconify-icons/bytesize/print";
+import printIcon from '@iconify-icons/bytesize/print';
 import downloadIcon from '@iconify/icons-bi/download';
 import {
   ExportTableButton,
   IExportFieldButtonProps,
   // Table,
-} from "ant-table-extensions";
-import { Table, Skeleton } from "antd";
-import { ColumnsType } from "antd/es/table";
-import { TableProps } from "antd/lib/table";
+} from 'ant-table-extensions';
+import { Table, Skeleton } from 'antd';
+import { ColumnsType } from 'antd/es/table';
+import { TableProps } from 'antd/lib/table';
 import React, {
   FC,
   ReactElement,
@@ -16,16 +15,16 @@ import React, {
   useMemo,
   useRef,
   useState,
-} from "react";
+} from 'react';
 
-import printDiv, { ConvertDivToPDFAndDownload } from "../../utils/Print";
-import { ButtonTag } from "../ButtonTags";
-import { PrintFormat } from "../PrintFormat";
-import { PrintHeaderFormat, TableDivisions } from "../PrintHeader";
-import { Addressbar, TopbarLogoWithDetails } from "../PrintHeader/Formats";
-import { PDFICON } from "../Icons";
-import { WrapperTable, DefaultWrapper } from "./styles";
-import { useWindowSize } from "../../utils/useWindowSize";
+import printDiv, { ConvertDivToPDFAndDownload } from '../../utils/Print';
+import { ButtonTag } from '../ButtonTags';
+import { PrintFormat } from '../PrintFormat';
+import { PrintHeaderFormat, TableDivisions } from '../PrintHeader';
+import { Addressbar, TopbarLogoWithDetails } from '../PrintHeader/Formats';
+import { PDFICON } from '../Icons';
+import { WrapperTable, DefaultWrapper } from './styles';
+import { useWindowSize } from '../../utils/useWindowSize';
 
 interface IProps extends TableProps<any> {
   data?: any[];
@@ -41,14 +40,14 @@ interface IProps extends TableProps<any> {
   defaultTopbar?: boolean;
   columns?: ColumnsType<any> | any;
   hasPrint?: boolean;
-  hasImport?:boolean;
+  hasImport?: boolean;
   topbarRightPannel?: ReactElement<any>;
   printTitle?: string;
   printColumns?: ColumnsType<any>;
   exportable?: boolean;
   exportableProps?: IExportFieldButtonProps;
   pdfExportable?: boolean;
-  tableType?: "primary" | `default`;
+  tableType?: 'primary' | `default`;
   themeScroll?: boolean;
   loading?: boolean;
 }
@@ -57,7 +56,7 @@ const defaultProps: IProps = {
   hasfooter: true,
   hasTabs: false,
   enableRowSelection: false,
-  tableType: "primary",
+  tableType: 'primary',
 };
 
 export const CommonTable: FC<IProps> = ({
@@ -83,82 +82,76 @@ export const CommonTable: FC<IProps> = ({
   themeScroll,
   loading,
   hasImport,
-  tableType = "primary",
+  tableType = 'primary',
   ...rest
 } = defaultProps) => {
-
-
   /* *****************COMPONENT STATES ************** */
   const [scrollConfig, setScrollConfig] = useState<any>({
-    y: "100vh",
+    y: '100vh',
   });
 
-  const [{tableColumns, tableData}, setLoadingConfig] = useState({
+  const [{ tableColumns, tableData }, setLoadingConfig] = useState({
     tableData: [],
-    tableColumns: []
-  })
-
-
+    tableColumns: [],
+  });
 
   /* *****************COMPONENT STATES ENDS HERE************** */
 
   /* **************UTILITY CONSTANTS ************ */
-  const _newData: any[] = data ? data : rest?.dataSource as any[];
-  console.log(_newData, "new data")
-
-  
+  const _newData: any[] = data ? data : (rest?.dataSource as any[]);
+  console.log(_newData, 'new data');
 
   const _exportableProps: IExportFieldButtonProps = exportableProps
-  ? {
-      dataSource: _newData,
-      columns: columns,
-      ...exportableProps,
-    }
-  : {
-      dataSource: _newData,
-      columns: columns,
-    };
+    ? {
+        dataSource: _newData,
+        columns: columns,
+        ...exportableProps,
+      }
+    : {
+        dataSource: _newData,
+        columns: columns,
+      };
 
-const printScrollconfig = { ...rest, scroll: {} };
-
+  const printScrollconfig = { ...rest, scroll: {} };
 
   const [width] = useWindowSize();
-  
+
   const printRef = useRef();
-  
+
   /* **************UTILITY CONSTANTS ENDS HERE ************ */
 
   /* *************COMPONENT LIFECYCLE HOOKS ************** */
 
-  useEffect(()=>{
-    if(loading){
-     
-     setLoadingConfig(()=>{
-       const cols= columns?.map((col)=>{
-         return {...col, render: ()=> <Skeleton title={false} paragraph={{rows:1}} active/>}
-       })
- 
-       return {tableColumns: cols, tableData: [{},{},{}]}
-     })
-     
-   }
- 
-   else if(!loading && _newData){
-     setLoadingConfig({tableColumns: columns, tableData: _newData})
-   }
-   },[loading, _newData, columns])
+  useEffect(() => {
+    if (loading) {
+      setLoadingConfig(() => {
+        const cols = columns?.map((col) => {
+          return {
+            ...col,
+            render: () => (
+              <Skeleton title={false} paragraph={{ rows: 1 }} active />
+            ),
+          };
+        });
 
-   useEffect(() => {
+        return { tableColumns: cols, tableData: [{}, {}, {}] };
+      });
+    } else if (!loading && _newData) {
+      setLoadingConfig({ tableColumns: columns, tableData: _newData });
+    }
+  }, [loading, _newData, columns]);
+
+  useEffect(() => {
     if (!rest.scroll && width < 1300 && themeScroll) {
       setScrollConfig({ ...scrollConfig, x: true });
     } else {
-      setScrollConfig({ y: "100vh" });
+      setScrollConfig({ y: '100vh' });
     }
   }, [width, themeScroll, rest.scroll]);
   /* *************COMPONENT LIFECYCLE HOOKS ENDS HERE ************** */
 
   /* ***********************COMPONENT UTILITY FUNCTIONS *************** */
-  
+
   const onPrint = () => {
     const printItem = printRef.current;
 
@@ -171,9 +164,9 @@ const printScrollconfig = { ...rest, scroll: {} };
     ConvertDivToPDFAndDownload(printItem);
   };
   /* ***********************COMPONENT UTILITY FUNCTIONS ENDS HERE*************** */
-  
+
   /* **************** JSX RETURNING FUNCTIONS **************** */
-  
+
   const renderTable = () => {
     return (
       <>
@@ -188,7 +181,7 @@ const printScrollconfig = { ...rest, scroll: {} };
                   </ExportTableButton>
                 </div>
               )}
-                {/* {hasImport && (
+              {/* {hasImport && (
                   <ButtonTag
                   className="mr-10"
                     onClick={onPrint}
@@ -199,7 +192,7 @@ const printScrollconfig = { ...rest, scroll: {} };
                 )} */}
               {hasPrint && (
                 <ButtonTag
-                className="mr-10"
+                  className="mr-10"
                   onClick={onPrint}
                   title="Print"
                   size="middle"
@@ -208,46 +201,49 @@ const printScrollconfig = { ...rest, scroll: {} };
               )}
               {pdfExportable && (
                 <ButtonTag
-                onClick={onPDF}
-                className="mr-10"
-                ghost
-                title="Download PDF"
+                  onClick={onPDF}
+                  className="mr-10"
+                  ghost
+                  title="Download PDF"
                   size="middle"
                   customizeIcon={<PDFICON className="flex alignCenter mr-10" />}
                 />
-                )}
+              )}
               {topbarRightPannel}
             </div>
           </div>
         )}
         {enableRowSelection ? (
           <Table
-          // scroll={rest.scroll ? rest.scroll : themeScroll ? scrollConfig : {}}
-          rowSelection={{
-            type: "checkbox",
-            ...rest.rowSelection,
-            onChange: (selectedRowKeys, selectedRows) => {
-              onSelectRow({ selectedRows, selectedRowKeys });
-            },
-          }}
+            // scroll={rest.scroll ? rest.scroll : themeScroll ? scrollConfig : {}}
+            rowSelection={{
+              type: 'checkbox',
+              ...rest.rowSelection,
+              onChange: (selectedRowKeys, selectedRows) => {
+                onSelectRow({ selectedRows, selectedRowKeys });
+              },
+            }}
             pagination={pagination}
             columns={tableColumns}
             dataSource={tableData}
             loading={false}
+            rowKey={(record: any) => record?.id}
             {...rest}
-            />
-            ) : (
+          />
+        ) : (
           <Table
             // scroll={rest.scroll ? rest.scroll : themeScroll ? scrollConfig : {}}
+            // title={'hello world'}
             pagination={pagination}
             columns={tableColumns}
             dataSource={tableData}
             loading={false}
+            rowKey={(record: any) => record?.id}
             // exportable
             // loading
             {...rest}
           />
-          )}
+        )}
 
         {hasfooter && (
           <div className="ant-table ant-table-default footer-border">
@@ -257,9 +253,9 @@ const printScrollconfig = { ...rest, scroll: {} };
                   <td>
                     {renderFooter ? (
                       <>{renderFooter}</>
-                      ) : (
-                        <p className="total_count">{totalItems} Total Items</p>
-                        )}
+                    ) : (
+                      <p className="total_count">{totalItems} Total Items</p>
+                    )}
                   </td>
                 </tr>
               </thead>
@@ -270,11 +266,11 @@ const printScrollconfig = { ...rest, scroll: {} };
     );
   };
   /* **************** JSX RETURNING FUNCTIONS ENDS HERE **************** */
-  
+
   /* JSX */
   return (
     <>
-      <div className={"_visibleOnPrint"} ref={printRef}>
+      <div className={'_visibleOnPrint'} ref={printRef}>
         <PrintFormat>
           <>
             <div className="mb-30">
@@ -291,9 +287,8 @@ const printScrollconfig = { ...rest, scroll: {} };
                 />
               </PrintHeaderFormat>
             </div>
-            <div className={"antd-table-print"}>
+            <div className={'antd-table-print'}>
               <Table
-              
                 pagination={pagination}
                 columns={printColumns ? printColumns : columns}
                 dataSource={[..._newData]}
@@ -310,7 +305,7 @@ const printScrollconfig = { ...rest, scroll: {} };
         classname={`_disable_print`}
         pagination={pagination ? true : false}
       >
-        {tableType === "default" ? (
+        {tableType === 'default' ? (
           <DefaultWrapper>{renderTable()}</DefaultWrapper>
         ) : (
           renderTable()

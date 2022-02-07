@@ -218,7 +218,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
       const invoiceDiscount = discount - itemsDiscount;
       setInvoiceDiscount(invoiceDiscount);
       delete result?.invoiceNumber;
-
+      setContactType(result?.contact?.contactType);
       AntForm.setFieldsValue({
         ...result,
         dueDate: dayjs(result.dueDate),
@@ -892,6 +892,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
 
   const { loading: contactEffectLoading } = useEffectLoading(contactType);
 
+  console.log(accountsList, 'accountslist');
   return (
     <PurchaseContext.Provider
       value={{

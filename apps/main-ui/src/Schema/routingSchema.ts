@@ -28,6 +28,12 @@ export const RoutingSchema: IRoutingSchema = {
       icon: viewDashboardOutline,
     },
     {
+      tag: 'Banking',
+      route: `/app${ISupportedRoutes?.BANK_RECONSILATION}`,
+      children: [],
+      icon: viewDashboardOutline,
+    },
+    {
       tag: 'Business',
       icon: coinsIcon,
       children: [
