@@ -28,6 +28,7 @@
       "@invyce/rabbitmq-module": ["libs/rabbitmq-module/src/index.ts"],
       "@invyce/review/invyce-theme": ["libs/review/invyce-theme/src/index.ts"],
       "@invyce/send-email": ["libs/send-email/src/index.ts"],
+      "@invyce/shared/components": ["libs/shared/components/src/index.ts"],
       "@invyce/shared/global-state-manager": [
         "libs/shared/global-state-manager/src/index.ts"
       ],
