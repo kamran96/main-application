@@ -10,7 +10,7 @@ import { ITheme, Themes } from '../hooks/useTheme/themeColors';
 import { ThemeProvider } from 'styled-components';
 import GlobalStyle from './globalStyles';
 
-export const DashboardLayout: FC = (props: RouteConfigComponentProps) => {
+export const DashboardLayout: any = (props: RouteConfigComponentProps) => {
   /* Dynamic Imports */
   const UserInviteModal = lazy(
     () => import('../modules/Users/UserInviteModal')
