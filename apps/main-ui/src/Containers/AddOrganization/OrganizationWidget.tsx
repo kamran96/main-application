@@ -1,5 +1,5 @@
 import { Button, Col, Form, Input, Row, Select } from 'antd';
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { useQueryClient, useMutation } from 'react-query';
 import styled from 'styled-components';
 import en from 'world_countries_lists/data/en/world.json';
@@ -38,6 +38,12 @@ export const OrganizationWidget: FC = () => {
     // for CRA
     return data.default;
   };
+
+  useEffect(() => {
+    form.setFieldsValue({
+      prefix: '92',
+    });
+  }, []);
 
   const onFinish = async (values) => {
     await mutateOrganization(values, {
@@ -83,7 +89,7 @@ export const OrganizationWidget: FC = () => {
         {phoneCodes?.map((country) => {
           return (
             <Option
-              value={country?.phoneCode}
+              value={`${country?.phoneCode}`}
               title={`${country?.phoneCode}`}
               id={country?.short}
             >

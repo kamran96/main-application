@@ -110,6 +110,9 @@
     "payments-service": {
       "tags": []
     },
+    "pdf-table": {
+      "tags": []
+    },
     "pixels-to-rem": {
       "tags": []
     },

@@ -1155,6 +1155,28 @@
         }
       }
     },
+    "pdf-table": {
+      "root": "libs/pdf-table",
+      "sourceRoot": "libs/pdf-table/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["libs/pdf-table/**/*.{ts,tsx,js,jsx}"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/pdf-table"],
+          "options": {
+            "jestConfig": "libs/pdf-table/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "pixels-to-rem": {
       "root": "libs/pixels-to-rem",
       "sourceRoot": "libs/pixels-to-rem/src",
