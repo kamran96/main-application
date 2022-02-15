@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Accounts } from '.';
+import { Accounts, SecondaryAccounts } from '.';
 
 @Entity()
 export class PrimaryAccounts {
@@ -21,5 +21,11 @@ export class PrimaryAccounts {
   updatedById: string;
 
   @OneToMany(() => Accounts, (primaryAccount) => primaryAccount.primaryAccount)
-  primaryAccount: Accounts[];
+  accounts: Accounts[];
+
+  @OneToMany(
+    () => SecondaryAccounts,
+    (primaryAccount) => primaryAccount.primaryAccount
+  )
+  secondaryAccounts: SecondaryAccounts[];
 }

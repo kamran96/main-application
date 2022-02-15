@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
-import { IRequest, IOrganizationResponse } from '@invyce/interfaces';
+import { IRequest, IOrganizationResponse, IBaseUser } from '@invyce/interfaces';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 import { OrganizationDto, OrganizationParams } from '../dto/organization.dto';
 import { OrganizationService } from './organization.service';
@@ -23,10 +23,10 @@ export class OrganizationController {
 
   @Get()
   @UseGuards(GlobalAuthGuard)
-  async index(@Req() req: IRequest): Promise<IOrganizationResponse> {
+  async index(@Req() req: IBaseUser): Promise<IOrganizationResponse> {
     try {
       const organization = await this.organizationService.ListOrganizations(
-        req.user
+        req
       );
 
       if (organization) {

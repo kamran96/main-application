@@ -120,4 +120,10 @@ export class AppService {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
+
+  async attachmentByIds(attachmentIds) {
+    return await this.attachmentModel.find({
+      _id: { $in: attachmentIds.ids },
+    });
+  }
 }
