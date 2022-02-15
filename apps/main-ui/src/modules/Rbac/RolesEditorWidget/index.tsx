@@ -31,7 +31,7 @@ export const RolesEditorWidget: FC = () => {
     [`role=${id}`, id],
     getRoleByIDAPI,
     {
-      enabled: !!id,
+      enabled: !!id && !!visibility,
     }
   );
 

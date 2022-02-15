@@ -18,7 +18,10 @@ export const PermissionsEditorWidget: FC = () => {
 
   const { data: modulesResponse, isLoading: modulesFetching } = useQuery(
     ['autocomplete-modules'],
-    getPermissionModulesAPI
+    getPermissionModulesAPI,
+    {
+      enabled: permissionsConfigModal.visibility,
+    }
   );
 
   useEffect(() => {

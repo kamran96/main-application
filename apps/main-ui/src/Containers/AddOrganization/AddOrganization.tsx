@@ -139,18 +139,18 @@ export const OrganizationsList: FC = () => {
         hasfooter={true}
         enableRowSelection
         onSelectRow={onSelectedRow}
-        expandable={{
-          expandedRowRender: (record, index) => {
-            // const childCategories: ITransactionItem[] =
-            //   record.transaction_items;
-            return (
-              <BranchesContainer
-                organizationid={record.id}
-                branches={record.branches}
-              />
-            );
-          },
-        }}
+        // expandable={{
+        //   expandedRowRender: (record, index) => {
+        //     // const childCategories: ITransactionItem[] =
+        //     //   record.transaction_items;
+        //     return (
+        //       <BranchesContainer
+        //         organizationid={record.id}
+        //         branches={record.branches}
+        //       />
+        //     );
+        //   },
+        // }}
       />
       <ConfirmModal
         loading={deletingOrganization}

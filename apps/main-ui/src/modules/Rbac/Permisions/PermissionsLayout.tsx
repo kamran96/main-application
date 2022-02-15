@@ -1,7 +1,8 @@
 import Checkbox from 'antd/lib/checkbox/Checkbox';
 import React, { FC, useEffect, useState } from 'react';
-import { useQueryClient, useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import styled from 'styled-components';
+
 import {
   addRolePermissionAPI,
   getPermissionModulesAPI,
@@ -10,12 +11,12 @@ import {
 } from '../../../api/rbac';
 import { CommonLoader } from '../../../components/FallBackLoader';
 import { BoldText } from '../../../components/Para/BoldText';
+import { P } from '../../../components/Para/P';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
 import { useRbac } from '../../../components/Rbac/useRbac';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
-import { Color, ISupportedRoutes } from '../../../modal';
-import { P } from '../../../components/Para/P';
+import { ISupportedRoutes } from '../../../modal';
 
 export const PermissionsLayout: FC = () => {
   const queryCache = useQueryClient();

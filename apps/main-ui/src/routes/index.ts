@@ -63,6 +63,7 @@ import { OrganizationWidget } from '../Containers/AddOrganization/OrganizationWi
 import { ManageInventoryForm } from '../modules/Items/InventoryManagementForm';
 import { Organizations } from '../Containers/AddOrganization';
 import { ForgotPassowrdContainer } from '../Containers/ForgetPassword';
+import { BankReconcilation } from '../modules/BankReconcilation';
 
 export const routes = (root = '/app'): RouteConfig[] => [
   {
@@ -94,6 +95,11 @@ export const routes = (root = '/app'): RouteConfig[] => [
         path: root,
         component: DashboardLayout,
         routes: [
+          {
+            path: `${root}${ISupportedRoutes.BANK_RECONSILATION}`,
+            component: BankReconcilation,
+            exact: true,
+          },
           {
             path: `${root}${ISupportedRoutes.PERMISSION_DENIED}`,
             component: PermissionDenied,
@@ -480,6 +486,11 @@ export const routes = (root = '/app'): RouteConfig[] => [
           {
             path: `/page/join-user`,
             component: JoinUser,
+            exact: true,
+          },
+          {
+            path: `/page/rec`,
+            component: TestComponents,
             exact: true,
           },
           {

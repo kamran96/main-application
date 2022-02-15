@@ -99,7 +99,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
     type === 'SI'
       ? 'invoiceItems'
       : type === 'credit-note'
-      ? 'credit_note_items'
+      ? 'creditNoteItems'
       : 'purchaseItems';
 
   /* *************** HOOKS HERE ************** */
@@ -636,7 +636,35 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
                   <th>Tax Rate</th>
                   <td>{response && moneyFormat(TotalTax)}</td>
                 </tr>
+                {response?.relation?.links?.length &&
+                  response?.relation?.links?.map((item, key) => {
+                    const generateLink = () => {
+                      let link = ``;
+                      switch (response?.relation?.type) {
+                        case 'CN':
+                          link = `/app${ISupportedRoutes.CREDIT_NOTES}/${item.id}`;
+                          break;
+                        case 'SI':
+                          link = `/app${ISupportedRoutes.INVOICES_VIEW}/${item.id}`;
+                          break;
+                        case 'PO':
+                          link = `/app${ISupportedRoutes.PURCHASES}/${item.id}`;
+                          break;
 
+                        default:
+                          return ``;
+                      }
+                      return link;
+                    };
+                    return (
+                      <tr>
+                        <th>
+                          <Link to={generateLink()}>{item?.invoiceNumber}</Link>
+                        </th>
+                        <td>{70}</td>
+                      </tr>
+                    );
+                  })}
                 <tr>
                   <th>Total</th>
                   <td>{moneyFormat(response?.netTotal)}</td>
@@ -650,11 +678,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
                 <h5 className="label">
                   <BOLDTEXT>Notes</BOLDTEXT>
                 </h5>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Mauris aliquam pulvinar dolor urna enim vitae vel. Ultrices
-                  eget ut.
-                </p>
+                <p>{response?.comment}</p>
               </div>
             </Col>
           )}

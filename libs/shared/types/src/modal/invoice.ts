@@ -48,6 +48,10 @@ export interface IInvoiceResult extends IBase {
   payment_status?: string;
   due_amount?: string;
   [key: string]: any;
+  relation?: {
+    type: 'SI' | 'PO' | 'QO' | 'CN';
+    links: { id: number; invoiceNumber: string }[];
+  };
 }
 
 export interface IAddress {
