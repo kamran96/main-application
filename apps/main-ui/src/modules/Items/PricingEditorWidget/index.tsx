@@ -123,7 +123,7 @@ const PricingEditorWidget: FC = () => {
                   optionFilterProp="children"
                 >
                   <Option value={1}>General</Option>
-                  <Option value={2}>Reverse Pricing</Option>
+                  {/* <Option value={2}>Reverse Pricing</Option> */}
                 </Select>
               </Form.Item>
             </Col>

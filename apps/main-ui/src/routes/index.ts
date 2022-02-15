@@ -490,7 +490,7 @@ export const routes = (root = '/app'): RouteConfig[] => [
           },
           {
             path: `/page/rec`,
-            component: BankReconcilation,
+            component: TestComponents,
             exact: true,
           },
           {

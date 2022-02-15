@@ -22,6 +22,7 @@ import { IProfile, NOTIFICATIONTYPE } from '../../../modal';
 import { ISupportedRoutes } from '../../../modal/routing';
 import { CommonTable } from './../../../components/Table';
 import UserFilterSchema from './UsersFilterSchema';
+import { useHistory } from 'react-router-dom';
 
 export const UsersList: FC = () => {
   const queryCache = useQueryClient();
@@ -30,7 +31,6 @@ export const UsersList: FC = () => {
     result: [],
     pagination: null,
   });
-  const { setUserInviteModal } = useGlobalContext();
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const { mutate: mutateDeleteUser, isLoading: deletingUser } =
@@ -69,16 +69,10 @@ export const UsersList: FC = () => {
     }
   );
 
-  const { routeHistory } = useGlobalContext();
-  const { history } = routeHistory;
+  const history = useHistory();
 
   useEffect(() => {
-    if (
-      routeHistory &&
-      routeHistory.history &&
-      routeHistory.history.location &&
-      routeHistory.history.location.search
-    ) {
+    if (history?.location?.search) {
       let obj = {};
       const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
@@ -88,7 +82,7 @@ export const UsersList: FC = () => {
 
       setUsersConfig({ ...usersConfig, ...obj });
     }
-  }, [routeHistory, history]);
+  }, [history]);
 
   const onSelectedRow = (item) => {
     setSelectedRow(item.selectedRowKeys);
@@ -147,9 +141,8 @@ export const UsersList: FC = () => {
     },
     {
       title: 'Username',
-      dataIndex: 'profile',
-      key: 'profile',
-      render: (data) => <div>{data?.userName || '-'}</div>,
+      dataIndex: 'username',
+      key: 'username',
     },
     {
       title: 'Full Name',
@@ -192,7 +185,7 @@ export const UsersList: FC = () => {
       title: 'Actions',
       dataIndex: 'username',
       key: 'status',
-      width: 80,
+      width: 120,
       render: (data, row, index) => (
         <div>
           {data ? (

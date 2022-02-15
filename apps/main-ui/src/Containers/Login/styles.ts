@@ -16,7 +16,6 @@ export const Wrapper = styled.div`
     grid-column: 6 span;
     padding: 44px 60px;
     background: #0071ff;
-    height: 100vh;
     width: 100%;
     background-image: url(${bg});
     background-repeat: no-repeat;
@@ -32,7 +31,7 @@ export const Wrapper = styled.div`
       width: 328px;
       .modal-body {
         width: 328px;
-        height : 247px;
+        height: 247px;
       }
     }
     .slogan {

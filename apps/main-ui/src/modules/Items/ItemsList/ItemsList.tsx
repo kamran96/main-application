@@ -107,13 +107,13 @@ export const ItemsList: FC = () => {
     if (resolvedCategories && resolvedCategories.length) {
       const filteringSchema = {
         ...filterSchema,
-        categoryId: {
-          ...filterSchema.categoryId,
-          value: resolvedCategories.map((item: ICategory, index: number) => {
-            const { title } = item;
-            return { ...item, name: title };
-          }),
-        },
+        // categoryId: {
+        //   ...filterSchema.categoryId,
+        //   value: resolvedCategories.map((item: ICategory, index: number) => {
+        //     const { title } = item;
+        //     return { ...item, name: title };
+        //   }),
+        // },
       };
       setItemsFilteringSchema(filteringSchema);
     }
@@ -363,10 +363,10 @@ export const ItemsList: FC = () => {
               />
             </Rbac>
             {/* <Rbac permission={PERMISSIONS.ITEMS_DELETE}> */}
-            <DuplicateModal
+            {/* <DuplicateModal
               itemsData={copyItemsList()}
               disabled={!selectedRow.length}
-            />
+            /> */}
             {/* </Rbac> */}
           </div>
         </div>
