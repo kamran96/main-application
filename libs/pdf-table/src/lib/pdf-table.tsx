@@ -1,47 +1,7 @@
 import { ITableProps } from './types';
-import { View, StyleSheet, Text } from '@react-pdf/renderer';
+import { View, StyleSheet, Text, Font } from '@react-pdf/renderer';
 
 /* eslint-disable-next-line */
-
-const styles = StyleSheet.create({
-  tableContainer: {},
-  tableHeadersGroup: {
-    flexDirection: 'row',
-    borderBottomColor: '#a7a7a7',
-    backgroundColor: '#16367a',
-    borderBottomWidth: 1,
-    alignItems: 'center',
-    textAlign: 'center',
-    fontStyle: 'bold',
-    flexGrow: 1,
-  },
-  th: {
-    fontSize: '9px',
-    fontWeight: 400,
-    textTransform: 'capitalize',
-    color: '#e6e6e6',
-    textAlign: 'left',
-    padding: '7px 7px',
-  },
-  tableBody: {},
-  tableBodyRow: {
-    flexDirection: 'row',
-    borderBottomColor: '#cccccc',
-    borderBottomWidth: 1,
-    alignItems: 'center',
-    textAlign: 'center',
-    fontStyle: 'bold',
-    flexGrow: 1,
-  },
-  td: {
-    fontSize: '9px',
-    fontWeight: 400,
-    textTransform: 'capitalize',
-    padding: '7px 7px',
-    textAlign: 'left',
-    color: '#363636',
-  },
-});
 
 export function PdfTable({ data, columns }: ITableProps) {
   return (
@@ -60,7 +20,9 @@ export function PdfTable({ data, columns }: ITableProps) {
               {columns?.map((ci, cind) => {
                 return (
                   <Text style={{ ...styles.td, width: 200 }}>
-                    {dataItem[ci.dataIndex]}
+                    {ci.render
+                      ? ci.render(dataItem[ci.dataIndex], dataItem, dataIndex)
+                      : dataItem[ci?.dataIndex]}
                   </Text>
                 );
               })}
@@ -71,5 +33,45 @@ export function PdfTable({ data, columns }: ITableProps) {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  tableContainer: {},
+  tableHeadersGroup: {
+    flexDirection: 'row',
+    borderBottomColor: '#a7a7a7',
+    backgroundColor: '#16367a',
+    borderBottomWidth: 1,
+    alignItems: 'center',
+    textAlign: 'center',
+    fontStyle: 'bold',
+    flexGrow: 1,
+  },
+  th: {
+    fontSize: '10px',
+    fontWeight: 400,
+    textTransform: 'capitalize',
+    color: '#e6e6e6',
+    textAlign: 'left',
+    padding: '7px 7px',
+  },
+  tableBody: {},
+  tableBodyRow: {
+    flexDirection: 'row',
+    borderBottomColor: '#cccccc',
+    borderBottomWidth: '0.7px',
+    alignItems: 'center',
+    textAlign: 'center',
+    fontStyle: 'bold',
+    flexGrow: 1,
+  },
+  td: {
+    fontSize: '9px',
+    fontWeight: 400,
+    textTransform: 'capitalize',
+    padding: '7px 7px',
+    textAlign: 'left',
+    color: '#363636',
+  },
+});
 
 export default PdfTable;

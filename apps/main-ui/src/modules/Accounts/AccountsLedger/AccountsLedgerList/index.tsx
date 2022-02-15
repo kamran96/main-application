@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { ColumnsType } from 'antd/es/table';
 import { plainToClass } from 'class-transformer';
@@ -60,9 +61,9 @@ export const AccountsLedgerList: FC<IProps> = ({ id, accountName }) => {
   useEffect(() => {
     if (history?.location?.search) {
       let obj = {};
-      let queryArr = history.location.search.split('?')[1].split('&');
+      const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
-        let split = item.split('=');
+        const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
 
@@ -72,7 +73,10 @@ export const AccountsLedgerList: FC<IProps> = ({ id, accountName }) => {
 
   useEffect(() => {
     if (data && data.data && data.data.result) {
-      let newResult = plainToClass(IAccountLedgerResult, data.data).getResult();
+      const newResult = plainToClass(
+        IAccountLedgerResult,
+        data.data
+      ).getResult();
 
       setResponse({ ...data.data, result: newResult });
     }
@@ -85,6 +89,7 @@ export const AccountsLedgerList: FC<IProps> = ({ id, accountName }) => {
       key: 'date',
       render: (data, row, index) => {
         return (
+          // eslint-disable-next-line react/jsx-no-useless-fragment
           <>
             {!row.lastIndex ? (
               dayjs(data).format(`MMMM D, YYYY`)
@@ -163,7 +168,7 @@ export const AccountsLedgerList: FC<IProps> = ({ id, accountName }) => {
       <div className="search flex alignCenter justifyFlexEnd pv-10 ">
         <SmartFilter
           onFilter={(encode) => {
-            let route = `/app${
+            const route = `/app${
               ISupportedRoutes.ACCOUNTS
             }/${id}?&page=${1}&page_size=${
               pagination.page_size

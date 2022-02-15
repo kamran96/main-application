@@ -47,6 +47,8 @@ import { PrintFormat } from '../PrintFormat';
 import { PrintViewPurchaseWidget } from '../PurchasesWidget/PrintViewPurchaseWidget';
 import { totalDiscountInInvoice } from '../../utils/formulas';
 import { getBanks } from '../../api/accounts';
+import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
+import { InvoicePDF } from '../PDFs';
 interface IProps {
   type?: 'SI' | 'PO' | 'credit-note';
   id?: number;
@@ -413,6 +415,9 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
 
   return (
     <WrapperNewPurchaseView>
+      {/* <PDFViewer width={'100%'} height={'100%'}>
+        <InvoicePDF type={type} data={response} />
+      </PDFViewer> */}
       <div className="pv-10">
         <Row gutter={24}>
           <Col span={12}>
@@ -428,6 +433,16 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
           </Col>
           <Col span={12}>
             <div className="textRight">
+              {response?.contact ? (
+                <PDFDownloadLink
+                  document={<InvoicePDF data={response} type={type} />}
+                  fileName={response?.invoiceNumber || 'invoice'}
+                >
+                  Download as PDF
+                </PDFDownloadLink>
+              ) : (
+                ''
+              )}
               <Dropdown overlay={menu}>
                 <Button type="primary">
                   {type === 'SI'
