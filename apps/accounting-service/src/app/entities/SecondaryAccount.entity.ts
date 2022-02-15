@@ -2,10 +2,10 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  JoinColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
-import { PrimaryAccounts } from '.';
+import { Accounts, PrimaryAccounts } from '.';
 
 @Entity()
 export class SecondaryAccounts {
@@ -30,7 +30,13 @@ export class SecondaryAccounts {
   @Column()
   updatedById: string;
 
-  @ManyToOne(() => PrimaryAccounts)
-  @JoinColumn({ name: 'primaryAccountId', referencedColumnName: 'id' })
+  // @ManyToOne(() => PrimaryAccounts)
+  // @JoinColumn({ name: 'primaryAccountId', referencedColumnName: 'id' })
+  // primaryAccount: PrimaryAccounts;
+
+  @ManyToOne(() => PrimaryAccounts, (primaryAccount) => primaryAccount.id)
   primaryAccount: PrimaryAccounts;
+
+  @OneToMany(() => Accounts, (account) => account.secondaryAccount)
+  accounts: Accounts[];
 }

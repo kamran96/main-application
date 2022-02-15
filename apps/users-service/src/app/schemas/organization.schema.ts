@@ -32,6 +32,8 @@ export class Organization {
   )
   address: IAddress;
   @Prop()
+  attachmentId: string;
+  @Prop()
   status: number;
   @Prop()
   createdById: string;

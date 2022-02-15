@@ -110,6 +110,46 @@ export class UserService {
     return users;
   }
 
+  async check(data) {
+    if (data?.username) {
+      const username = await this.userModel.findOne({
+        username: data.username,
+      });
+
+      if (username) {
+        return {
+          message:
+            'Username has already being taken. Please try again with an alternate username.',
+          available: false,
+        };
+      } else if (!username) {
+        return {
+          message: 'Username is available',
+          available: true,
+        };
+      }
+    }
+
+    if (data?.email) {
+      const email = await this.userModel.findOne({
+        email: data.email,
+      });
+
+      if (email) {
+        return {
+          message:
+            'Email has already being taken. Please try again with an alternate email.',
+          available: false,
+        };
+      } else if (!email) {
+        return {
+          message: 'Email is available',
+          available: true,
+        };
+      }
+    }
+  }
+
   async FindUserById(userId: string, req: IRequest): Promise<IUser> {
     try {
       const user = await this.userModel

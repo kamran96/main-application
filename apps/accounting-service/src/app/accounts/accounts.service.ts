@@ -19,10 +19,11 @@ import {
   ISecondaryAccount,
 } from '@invyce/interfaces';
 import { AccountDto, AccountIdsDto } from '../dto/account.dto';
-import { TransactionItems, Transactions } from '../entities';
+import { PrimaryAccounts, TransactionItems, Transactions } from '../entities';
 
 @Injectable()
 export class AccountsService {
+  // account name filter not working
   async ListAccounts(
     user: IBaseUser,
     queryData: IPage
@@ -43,88 +44,66 @@ export class AccountsService {
       if (purpose === 'ALL') {
         accounts = await getCustomRepository(AccountRepository).find({
           where: { status: 1, organizationId: user.organizationId },
+          relations: ['secondaryAccount', 'secondaryAccount.primaryAccount'],
         });
+
+        return {
+          result: accounts,
+        };
       } else {
-        const sql = `a.id, a.name, a.description, a.code, sa.name as "type", pa.name as "primary", 
-        pa.id as "primaryAccountId", sa.id as "secondaryAccountId",
-        coalesce((
-          select count(ti.id) from transaction_items ti
-          where ti."accountId" = a.id
-          group by a.id
-        ), 0) as total_transactions,
-        
-        coalesce((
-          select sum(ti.amount) from transaction_items ti
-          where ti."accountId" = a.id and ti."transactionType" = 20
-        ), 0) as total_credit,
-        
-        coalesce((
-          select sum(ti.amount) from transaction_items ti
-          where ti."accountId" = a.id and ti."transactionType" = 10
-        ), 0) as total_debit,
-        
-        ABS((
-          CASE
-          WHEN (pa.name = 'assets') OR ( pa.name='expense') THEN (
-            coalesce((
-              SELECT sum(ti.amount) from transaction_items AS ti
-              left join transactions as t
-              on ti."transactionId" = t.id
-              WHERE ti."accountId" = a.id AND ti."transactionType" = 10
-              and t.status = 1
-            ), 0) 
-              -
-      
-            coalesce((
-              SELECT sum(ti.amount) from transaction_items AS ti
-              left join transactions as t
-              on ti."transactionId" = t.id
-              WHERE ti."accountId" = a.id AND ti."transactionType" = 20
-              and t.status = 1
-            ), 0 )
-          )
-          ELSE 
-             coalesce((
-              SELECT sum(ti.amount) from transaction_items AS ti
-              left join transactions as t
-              on ti."transactionId" = t.id
-              WHERE ti."accountId" = a.id AND ti."transactionType" = 20
-              and t.status = 1
-            ), 0) -
-      
-            coalesce((
-              SELECT sum(ti.amount) from transaction_items AS ti
-              left join transactions as t
-              on ti."transactionId" = t.id
-              WHERE ti."accountId" = a.id AND ti."transactionType" = 10
-              and t.status = 1
-            ), 0 )
-          END
-          )) as balance
-        `;
+        const total_debits = await getCustomRepository(
+          TransactionItemRepository
+        )
+          .createQueryBuilder('ti')
+          .select('coalesce(sum(ti.amount), 0)')
+          .leftJoin('ti.transaction', 't')
+          .where('ti."accountId" = a.id')
+          .andWhere('ti."transactionType" = 10')
+          .andWhere('t.status = 1')
+          .andWhere('ti.status = 1')
+          // .andWhere('t.date between :start and :end')
+          .getQuery();
+
+        const total_credits = await getCustomRepository(
+          TransactionItemRepository
+        )
+          .createQueryBuilder('ti')
+          .select('coalesce(sum(ti.amount), 0)')
+          .leftJoin('ti.transaction', 't')
+          .where('ti."accountId" = a.id')
+          .andWhere('ti."transactionType" = 20')
+          .andWhere('t.status = 1')
+          .andWhere('ti.status = 1')
+          // .andWhere('t.date between :start and :end')
+          .getQuery();
+
+        const balances = `case when pa.name='asset' OR pa.name='expense'
+        then ( (${total_debits})-(${total_credits}))
+        else (( ${total_credits})-(${total_debits})) end`;
 
         if (query) {
-          const filterData = Buffer.from(query, 'base64').toString();
-          const data = JSON.parse(filterData);
+          // const filterData = Buffer.from(query, 'base64').toString();
+          // const data = JSON.parse(filterData);
 
-          // const data = {
-          //   secondaryAccountId: {
-          //     type: 'in',
-          //     value: [137],
-          //   },
-          // };
+          const data = {
+            name: {
+              type: 'search',
+              value: '%cash%',
+            },
+          };
 
           for (const i in data) {
             if (data[i].type === 'search') {
               const val = data[i].value.toLowerCase();
-
               accounts = await getCustomRepository(AccountRepository)
                 .createQueryBuilder('a')
+                .select(
+                  `a.*, (${total_debits}) as total_debits, (${total_credits}) as total_credits, (abs(${balances})) as balance `
+                )
                 .where({
                   organizationId: user.organizationId,
                 })
-                .andWhere(`LOWER(a.${i}) like :name`, { name: val })
-                .select(sql)
+                .andWhere('a.name like :name', { name: val })
                 .leftJoin('a.secondaryAccount', 'sa')
                 .leftJoin('sa.primaryAccount', 'pa')
                 .offset(pn * ps - ps)
@@ -133,11 +112,13 @@ export class AccountsService {
             } else if (data[i].type === 'in') {
               accounts = await getCustomRepository(AccountRepository)
                 .createQueryBuilder('a')
+                .select(
+                  `a.*, (${total_debits}) as total_debits, (${total_credits}) as total_credits, (abs(${balances})) as balance `
+                )
                 .where({
                   organizationId: user.organizationId,
                   secondaryAccountId: In([data[i].value]),
                 })
-                .select(sql)
                 .leftJoin('a.secondaryAccount', 'sa')
                 .leftJoin('sa.primaryAccount', 'pa')
                 .offset(pn * ps - ps)
@@ -148,10 +129,12 @@ export class AccountsService {
         } else {
           accounts = await getCustomRepository(AccountRepository)
             .createQueryBuilder('a')
+            .select(
+              `a.*, (${total_debits}) as total_debits, (${total_credits}) as total_credits, (abs(${balances})) as balance `
+            )
             .where({
               organizationId: user.organizationId,
             })
-            .select(sql)
             .leftJoin('a.secondaryAccount', 'sa')
             .leftJoin('sa.primaryAccount', 'pa')
             .offset(pn * ps - ps)
@@ -224,6 +207,164 @@ export class AccountsService {
       },
       relations: ['primaryAccount'],
     });
+  }
+
+  async GetBalances(user, query) {
+    // sql = 'select id from accounts where primary_account_id in (Select id from primary where name=assests or name=expenses';
+
+    // const data = {
+    //   accountIds: [482, 485, 500],
+    //   dates: ['2022-01-01', '2022-01-07'],
+    //   primaryAccounts: [],
+    // };
+    const data = {
+      accountIds: [],
+      dates: ['2022-01-01', '2022-01-07'],
+      primaryAccounts: ['asset'],
+    };
+
+    let account;
+
+    const total_debits = await getCustomRepository(TransactionItemRepository)
+      .createQueryBuilder('ti')
+      .select('coalesce(sum(ti.amount), 0)')
+      .leftJoin('ti.transaction', 't')
+      .where('ti."accountId" = a.id')
+      .andWhere('ti."transactionType" = 10')
+      .andWhere('t.status = 1')
+      .andWhere('ti.status = 1')
+      .andWhere('t.date < :start')
+      .getQuery();
+
+    const total_credits = await getCustomRepository(TransactionItemRepository)
+      .createQueryBuilder('ti')
+      .select('coalesce(sum(ti.amount), 0)')
+      .leftJoin('ti.transaction', 't')
+      .where('ti."accountId" = a.id')
+      .andWhere('ti."transactionType" = 20')
+      .andWhere('t.status = 1')
+      .andWhere('ti.status = 1')
+      .andWhere('t.date < :start')
+      .getQuery();
+
+    const balances = `case when pa.name='asset' OR pa.name='expense'
+      then ( (${total_debits})-(${total_credits}))
+      else (( ${total_credits})-(${total_debits})) end`;
+
+    let accounts_array = [];
+    for (const i of data.dates) {
+      if (data?.accountIds.length > 0) {
+        account = await getCustomRepository(AccountRepository)
+          .createQueryBuilder('a')
+          .select(
+            `a.*, pa.name as "primaryName", sa.name as "secondaryName", 
+              (${total_debits}) as total_debits,
+              (${total_credits}) as total_credits,
+              (abs(${balances})) as balance `
+          )
+          .where({
+            organizationId: user.organizationId,
+            id: In(data.accountIds),
+          })
+          .leftJoin('a.secondaryAccount', 'sa')
+          .leftJoin('sa.primaryAccount', 'pa')
+          .setParameter('start', i)
+          .getRawMany();
+
+        account = account.map((obj) => {
+          obj.date = i;
+          return obj;
+        });
+
+        accounts_array.push(account);
+        accounts_array = accounts_array.flat();
+      } else if (data?.primaryAccounts.length > 0) {
+        account = await getCustomRepository(AccountRepository)
+          .createQueryBuilder('a')
+          .select(
+            `a.*, pa.name as "primaryName", sa.name as "secondaryName", 
+              (${total_debits}) as total_debits,
+              (${total_credits}) as total_credits,
+              (abs(${balances})) as balance `
+          )
+          .where({
+            organizationId: user.organizationId,
+          })
+          .andWhere((qb) => {
+            const subQuery = qb
+              .subQuery()
+              .select('id')
+              .from(PrimaryAccounts, 'p')
+              .where('p.name = :name')
+              .getQuery();
+            return `a."primaryAccountId" IN ` + subQuery;
+          })
+          .leftJoin('a.secondaryAccount', 'sa')
+          .leftJoin('sa.primaryAccount', 'pa')
+          .setParameter('name', 'asset')
+          .setParameter('start', i)
+          .getRawMany();
+
+        account = account.map((obj) => {
+          obj.date = i;
+          return obj;
+        });
+
+        accounts_array.push(account);
+        accounts_array = accounts_array.flat();
+      }
+    }
+
+    const newAccountArray = [];
+    if (data.accountIds.length > 0) {
+      for (const i of data.accountIds) {
+        const filter = accounts_array.filter((j) => j.id === i);
+
+        const balances = filter.map((f) => ({
+          balance: f.balance,
+          total_debits: f.total_debits,
+          total_credits: f.total_credits,
+          date: f.date,
+        }));
+
+        const [account] = filter;
+        const { name } = account;
+
+        delete account.date;
+        delete account.balance;
+        delete account.total_debits;
+        delete account.total_credits;
+
+        newAccountArray.push({
+          [name]: { ...account, balances },
+        });
+      }
+    } else if (data.primaryAccounts.length > 0) {
+      for (const i of data.primaryAccounts) {
+        const filter = accounts_array.filter((j) => j.primaryName === i);
+
+        const balances = filter.map((f) => ({
+          balance: f.balance,
+          total_debits: f.total_debits,
+          total_credits: f.total_credits,
+          date: f.date,
+        }));
+
+        const [account] = filter;
+        const { name } = account;
+
+        delete account.date;
+        delete account.balance;
+        delete account.total_debits;
+        delete account.total_credits;
+
+        newAccountArray.push({
+          [name]: { ...account, balances },
+        });
+      }
+    }
+
+    return newAccountArray;
   }
 
   async initAccounts(data: IRequest): Promise<void> {
