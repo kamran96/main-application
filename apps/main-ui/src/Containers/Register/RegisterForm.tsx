@@ -1,31 +1,41 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { Button, Checkbox, Col, Form, Input, Row, Select } from 'antd';
-import { FC, useState } from 'react';
+import { FC, useEffect } from 'react';
 import { useMutation } from 'react-query';
 import { Link } from 'react-router-dom';
+
 import styled from 'styled-components';
 import en from '../../../../../node_modules/world_countries_lists/data/en/world.json';
 import { RegisterAPI } from '../../api/auth';
+import { userCheckAPI } from '../../api/users';
 import { Heading } from '../../components/Heading';
 import { BOLDTEXT } from '../../components/Para/BoldText';
 import { Seprator } from '../../components/Seprator';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { ILoginActions } from '../../hooks/globalContext/globalManager';
-import { DivProps, IBaseAPIError, NOTIFICATIONTYPE } from '../../modal';
+import { IBaseAPIError, NOTIFICATIONTYPE } from '../../modal';
 import { updateToken } from '../../utils/http';
 import phoneCodes from '../../utils/phoneCodes';
 
 const { Option } = Select;
 
-export const RegisterForm: FC = () => {
-  const [step, setStep] = useState(1);
+let timeOutTime: any;
 
+export const RegisterForm: FC = () => {
+  const { mutate: mutateUsernameAvaliable, data: usernameAvaliable } =
+    useMutation(userCheckAPI);
   const { mutate: mutateRegister, isLoading } = useMutation(RegisterAPI);
   const { handleLogin, notificationCallback } = useGlobalContext();
+
+  useEffect(() => {
+    form.setFieldsValue({ prefix: 92 });
+  }, []);
 
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
+    console.log(values);
+    return false;
     try {
       await mutateRegister(values, {
         onSuccess: (data) => {
@@ -60,6 +70,43 @@ export const RegisterForm: FC = () => {
       console.log(error);
     }
   };
+
+  const checkUsernameAvaliable = (payload, callback) => {
+    const request = payload;
+    clearTimeout(timeOutTime);
+    timeOutTime = setTimeout(async () => {
+      await mutateUsernameAvaliable(
+        { ...request },
+        {
+          onSuccess: (data) => {
+            if (!data?.data?.available) {
+              callback(data?.data?.message);
+            } else {
+              callback();
+            }
+          },
+        }
+      );
+    }, 400);
+  };
+  // const checkEmailAvaliable = (payload, callback) => {
+  //   const request = payload;
+  //   clearTimeout(timeOutTime);
+  //   timeOutTime = setTimeout(async () => {
+  //     await mutateUsernameAvaliable(
+  //       { ...request },
+  //       {
+  //         onSuccess: (data) => {
+  //           if (!data?.data?.available) {
+  //             callback(data?.data?.message);
+  //           } else {
+  //             callback();
+  //           }
+  //         },
+  //       }
+  //     );
+  //   }, 400);
+  // };
 
   const getFlag = (short: string) => {
     const data = require(`world_countries_lists/flags/24x24/${short.toLowerCase()}.png`);
@@ -109,356 +156,272 @@ export const RegisterForm: FC = () => {
   );
 
   return (
-    <RegisterFormWrapper step={step}>
+    <RegisterFormWrapper>
       <div className="form_body">
-        <div className="form_wrapper">
-          <Row gutter={24}>
-            <Col
-              xxl={{ span: 19, offset: 5, pull: 4 }}
-              xl={{ span: 24 }}
-              md={{ span: 24 }}
-              sm={{ span: 24 }}
-              xs={{ span: 24 }}
-            >
-              <div className="personal_info">
-                <div className="form_title">
-                  <Heading className="mb-20" type="table">
-                    Register Your Account!
-                  </Heading>
-                  <p className="form_description">
-                    Let’s get all set up so you can verify your personal account
-                    and begin <br /> setting up your profile.{' '}
-                  </p>
-                  <Seprator />
-                </div>
-                <Form
-                  autoComplete="off"
-                  onFinish={onFinish}
-                  onFinishFailed={onFinishFailed}
-                  layout="vertical"
-                >
-                  <Row gutter={24}>
-                    <Col span={12}>
-                      <Form.Item
-                        name="fullName"
-                        label="Name"
-                        rules={[
-                          {
-                            required: true,
-                            message: 'Please add your first name',
-                          },
-                        ]}
-                      >
-                        <Input
-                          placeholder={'eg John'}
-                          size="middle"
-                          autoComplete="off"
-                        />
-                      </Form.Item>
-                    </Col>
+        <Row gutter={24}>
+          <Col
+            xxl={{ span: 19, offset: 5, pull: 4 }}
+            xl={{ span: 24 }}
+            md={{ span: 24 }}
+            sm={{ span: 24 }}
+            xs={{ span: 24 }}
+          >
+            <div className="personal_info">
+              <div className="form_title">
+                <Heading className="mb-20" type="table">
+                  Register Your Account!
+                </Heading>
+                <p className="form_description">
+                  Let’s get all set up so you can verify your personal account
+                  and begin <br /> setting up your profile.{' '}
+                </p>
+                <Seprator />
+              </div>
+              <Form
+                autoComplete="off"
+                onFinish={onFinish}
+                onFinishFailed={onFinishFailed}
+                layout="vertical"
+                form={form}
+              >
+                <Row gutter={24}>
+                  <Col span={12}>
+                    <Form.Item
+                      name="fullName"
+                      label="Full Name"
+                      rules={[
+                        {
+                          required: true,
+                          message: 'Please add your first name',
+                        },
+                      ]}
+                    >
+                      <Input
+                        placeholder={'eg John'}
+                        size="middle"
+                        autoComplete="off"
+                      />
+                    </Form.Item>
+                  </Col>
 
-                    <Col span={12}>
-                      <Form.Item
-                        name="username"
-                        label="Username"
-                        rules={[
-                          { required: true, message: 'please add username' },
-                        ]}
-                      >
-                        <Input
-                          placeholder="e.g John"
-                          size="middle"
-                          autoComplete="off"
-                        />
-                      </Form.Item>
-                    </Col>
-
-                    <Col span={12}>
-                      <Form.Item
-                        name="email"
-                        label="Email"
-                        rules={[
-                          { required: true, message: 'Please add your email' },
-                        ]}
-                      >
-                        <Input
-                          placeholder="e.g someone@example.com"
-                          size="middle"
-                          autoComplete="off"
-                        />
-                      </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                      <Form.Item
-                        name="country"
-                        rules={[{ required: true }]}
-                        label="Country"
-                      >
-                        <Select
-                          size="middle"
-                          showSearch
-                          style={{ width: '100%' }}
-                          placeholder="Select a Country"
-                          filterOption={(input, option) => {
-                            return option?.title
-                              ?.toLowerCase()
-                              .includes(input?.toLocaleLowerCase());
-                          }}
-                        >
-                          {en?.map((country) => {
-                            return (
-                              <Option title={country?.name} value={country?.id}>
-                                <img
-                                  className="mr-10"
-                                  alt="flag"
-                                  style={{
-                                    width: 18,
-                                    height: 18,
-                                    verticalAlign: 'sub',
-                                  }}
-                                  src={getFlag(country.alpha2)}
-                                />
-                                <span>{country?.name}</span>
-                              </Option>
+                  <Col span={12}>
+                    <Form.Item
+                      name="username"
+                      label="Username"
+                      rules={[
+                        { required: true, message: 'Username required' },
+                        {
+                          validator: (rule, value, callback) => {
+                            checkUsernameAvaliable(
+                              { username: value },
+                              callback
                             );
-                          })}
-                        </Select>
-                      </Form.Item>
-                    </Col>
-
-                    <Col span={12}>
-                      <Form.Item
-                        label="Cell Number"
-                        name="phoneNumber"
-                        rules={[
-                          {
-                            required: false,
-                            message: 'Please add your last name',
                           },
-                          { max: 12, min: 4 },
-                        ]}
-                      >
-                        <Input
-                          autoComplete="off"
-                          addonBefore={prefixSelector}
-                          type="text"
-                          placeholder="3188889898"
-                          size="middle"
-                        />
-                      </Form.Item>
-                    </Col>
+                        },
+                      ]}
+                      hasFeedback
+                    >
+                      <Input
+                        placeholder="e.g John"
+                        size="middle"
+                        autoComplete="off"
+                      />
+                    </Form.Item>
+                  </Col>
 
-                    <Col span={12}>
-                      <Form.Item
-                        name="password"
-                        label="Password"
-                        rules={[
-                          { required: true, message: 'Please add a password' },
-                          {
-                            min: 6,
-                            message:
-                              'Your Password shold have minimum 6 characters',
-                          },
-                        ]}
-                        hasFeedback
-                      >
-                        <Input.Password size="middle" />
-                      </Form.Item>
-                    </Col>
+                  <Col span={12}>
+                    <Form.Item
+                      name="email"
+                      label="Email"
+                      validateFirst="parallel"
+                      rules={[
+                        {
+                          type: 'email',
+                        },
+                        {
+                          required: true,
+                          message: 'Please add your email',
+                        },
 
-                    <Col span={24}>
-                      <Form.Item
-                        className="m-reset"
-                        name="agreed"
-                        valuePropName="checked"
+                        // {
+                        //   validator: (rule, value, callback) => {
+                        //     checkUsernameAvaliable({ email: value }, callback);
+                        //   },
+                        // },
+                      ]}
+                      hasFeedback
+                    >
+                      <Input
+                        placeholder="e.g someone@example.com"
+                        size="middle"
+                        autoComplete="off"
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item
+                      name="country"
+                      rules={[{ required: true }]}
+                      label="Country"
+                    >
+                      <Select
+                        size="middle"
+                        showSearch
+                        style={{ width: '100%' }}
+                        placeholder="Select a Country"
+                        filterOption={(input, option) => {
+                          return option?.title
+                            ?.toLowerCase()
+                            .includes(input?.toLocaleLowerCase());
+                        }}
                       >
-                        <Checkbox>
-                          <span>
-                            I have read and agree to the{' '}
-                            <Link
-                              target="_blank"
-                              to="https://invyce.com/terms-conditions/"
-                            >
-                              terms,{' '}
-                            </Link>
-                            <Link
-                              target="_blank"
-                              to="https://invyce.com/privacy-policy/"
-                            >
-                              Privacy,{' '}
-                            </Link>{' '}
-                            and{' '}
-                            <Link
-                              target="_blank"
-                              to="https://invyce.com/cookie-policy/"
-                            >
-                              Cookie Policy{' '}
-                            </Link>
-                          </span>
-                        </Checkbox>
-                      </Form.Item>
-                      <Form.Item name="update-details" valuePropName="checked">
+                        {en?.map((country) => {
+                          return (
+                            <Option title={country?.name} value={country?.id}>
+                              <img
+                                className="mr-10"
+                                alt="flag"
+                                style={{
+                                  width: 18,
+                                  height: 18,
+                                  verticalAlign: 'sub',
+                                }}
+                                src={getFlag(country.alpha2)}
+                              />
+                              <span>{country?.name}</span>
+                            </Option>
+                          );
+                        })}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+
+                  <Col span={12}>
+                    <Form.Item
+                      label="Cell Number"
+                      name="phoneNumber"
+                      rules={[
+                        {
+                          required: false,
+                          message: 'Please add your last name',
+                        },
+                        { max: 12, min: 4 },
+                      ]}
+                    >
+                      <Input
+                        autoComplete="off"
+                        addonBefore={prefixSelector}
+                        type="text"
+                        placeholder="3188889898"
+                        size="middle"
+                      />
+                    </Form.Item>
+                  </Col>
+
+                  <Col span={12}>
+                    <Form.Item
+                      name="password"
+                      label="Password"
+                      rules={[
+                        { required: true, message: 'Please add a password' },
+                        {
+                          min: 6,
+                          message:
+                            'Your Password shold have minimum 6 characters',
+                        },
+                      ]}
+                      hasFeedback
+                    >
+                      <Input.Password size="middle" />
+                    </Form.Item>
+                  </Col>
+
+                  <Col span={24}>
+                    <Form.Item
+                      className="m-reset"
+                      name="agreed"
+                      valuePropName="checked"
+                    >
+                      <Checkbox>
+                        <span>
+                          I have read and agree to the{' '}
+                          <a
+                            target="_blank"
+                            href="https://invyce.com/terms-conditions/"
+                            rel="noreferrer"
+                          >
+                            terms,{' '}
+                          </a>
+                          <a
+                            target="_blank"
+                            href="https://invyce.com/privacy-policy/"
+                            rel="noreferrer"
+                          >
+                            Privacy,{' '}
+                          </a>{' '}
+                          and{' '}
+                          <a
+                            target="_blank"
+                            href="https://invyce.com/cookie-policy/"
+                            rel="noreferrer"
+                          >
+                            Cookie Policy{' '}
+                          </a>
+                        </span>
+                      </Checkbox>
+                    </Form.Item>
+                    {/* <Form.Item name="update-details" valuePropName="checked">
                         <Checkbox>
                           Send me all the Marketing and Update details
                         </Checkbox>
-                      </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                      <Form.Item>
-                        <div className="actions-wrapper">
-                          <Button
-                            style={{ width: '100%' }}
-                            loading={isLoading}
-                            type="primary"
-                            htmlType="submit"
-                          >
-                            Create Account
-                          </Button>
-                        </div>
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                </Form>
-              </div>
-            </Col>
-          </Row>
-
-          {/* <div className="verification">
-            <Row gutter={24}>
-              <Col span={14}>
-                <div className="form_title">
-                  <Heading className="mb-20" type="table">
-                    Complete Your Profile!
-                  </Heading>
-                  <p className="form_description">
-                    For the purpose of software regulation, your details
-                    <br /> are required
-                  </p>
-                  <Seprator />
-                </div>
-                <Form onFinish={onVerification}>
-                  <h5>
-                    <BOLDTEXT>Please verify account</BOLDTEXT>
-                  </h5>
-                  <p>
-                    Please enter the verification code we sent
-                    <br />
-                    to your email
-                  </p>
-                  <Form.Item
-                    name="code"
-                    rules={[{ required: true, message: "Code is required!" }]}
-                    hasFeedback
-                  >
-                    <Input size="middle" />
-                  </Form.Item>
-                  <Form.Item>
-                    <Button type="link" ghost>
-                      Resend again?
-                    </Button>
-                  </Form.Item>
-                  <Form.Item>
-                    <Button type="primary" htmlType={"submit"}>
-                      Save & Continue
-                    </Button>
-                  </Form.Item>
-                </Form>
-              </Col>
-            </Row>
-          </div>
-         */}
-        </div>
-        <div className="already_account pb-10 textCenter">
-          Already have an account?{' '}
-          <Link to={`/page/login`}>
-            <BOLDTEXT>Login</BOLDTEXT>
-          </Link>
-        </div>
+                      </Form.Item> */}
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item>
+                      <div className="actions-wrapper mt-20">
+                        <Button
+                          style={{ width: '100%' }}
+                          loading={isLoading}
+                          type="primary"
+                          htmlType="submit"
+                        >
+                          Create Account
+                        </Button>
+                      </div>
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Form>
+            </div>
+          </Col>
+        </Row>
+      </div>
+      <div className="already_accout textCenter">
+        Already have an account?{' '}
+        <Link to={`/page/login`}>
+          <BOLDTEXT>Login</BOLDTEXT>
+        </Link>
       </div>
     </RegisterFormWrapper>
   );
 };
 
-interface IRegisterFormWrapperProps extends DivProps {
-  step: number;
-}
+const RegisterFormWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 50px;
+  align-item: center;
+  height: 100vh;
 
-const RegisterFormWrapper = styled.div<IRegisterFormWrapperProps>`
-  .form_header {
-    padding: 30px 20px 0 20px;
-    top: 0;
-    position: sticky;
-    background-color: #ffffff;
-
-    .step_info .values {
-      font-style: normal;
-      font-weight: normal;
-      font-size: 14px;
-      line-height: 16px;
-      display: flex;
-      align-items: center;
-      text-align: right;
-
-      color: #bdbdbd;
-    }
-  }
-  .form_body {
-    padding: 135px 70px 0 70px;
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-flex-direction: column;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    -webkit-box-pack: justify;
-    -webkit-justify-content: space-between;
-    -ms-flex-pack: justify;
+  @media(max-height:589px){
     justify-content: space-between;
-    height: calc(100vh - 75px);
-
-    .form_wrapper {
-      position: relative;
-    }
-
-    .personal_info {
-      position: absolute;
-      width: 100%;
-      top: 0;
-      transition: ${(props: IRegisterFormWrapperProps) =>
-          props?.step === 1 ? '0.5s' : '0.9s'}
-        all ease-in-out;
-      opacity: ${(props: IRegisterFormWrapperProps) =>
-        props?.step === 1 ? '1' : '0'};
-    }
-    .verification {
-      position: absolute;
-      width: 100%;
-      top: 0;
-      transition: ${(props: IRegisterFormWrapperProps) =>
-          props?.step === 2 ? '0.9s' : '0.5s'}
-        all ease-in-out;
-      opacity: ${(props: IRegisterFormWrapperProps) =>
-        props?.step === 2 ? '1' : '0'};
-      z-index: ${(props: IRegisterFormWrapperProps) =>
-        props?.step === 2 ? '1' : '-1'};
-    }
-
-    .form_title {
-      padding-bottom: 70px;
-    }
-
-    .form_description {
-      font-style: normal;
-      font-weight: normal;
-      font-size: 16px;
-      line-height: 20px;
-      /* or 125% */
-
-      display: flex;
-      align-items: center;
-
-      color: #2d4155;
-    }
+    height: auto: !important;
+    padding-top: 40px;
   }
+
+  .ant-form-item-explain, .ant-form-item-extra{
+    color: red !important;
+  }
+ 
 `;

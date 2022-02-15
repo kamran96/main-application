@@ -224,14 +224,12 @@ export const ItemsForm: FC = () => {
     console.log(errorInfo);
   };
 
-  const resAllAccounts = useQuery([`all-accounts`, `ALL`], getAllAccounts, {
+  const {data: resAllAccounts} = useQuery([`all-accounts`, `ALL`], getAllAccounts, {
     enabled: itemsModalConfig.visibility,
   });
   const allLiabilitiesAcc: IAccountsResult[] =
-    (resAllAccounts.data &&
-      resAllAccounts.data.data &&
-      resAllAccounts.data.data.result &&
-      resAllAccounts.data.data.result.filter(
+    (
+      resAllAccounts?.data.result.filter(
         (item: IAccountsResult) =>
           item?.secondary_account?.primary_account?.name === 'liability'
       )) ||
@@ -371,17 +369,7 @@ export const ItemsForm: FC = () => {
               <Input size="middle" type="text" />
             </Form.Item>
           </Col>
-          <Col span={12}>
-            <FormLabel>Minimum Stock limit</FormLabel>
-            <Form.Item
-              name="minimumStock"
-              rules={[
-                { required: true, message: 'Minimum stock limit required!' },
-              ]}
-            >
-              <InputNumber size="middle" type="text" />
-            </Form.Item>
-          </Col>
+
           <Col span={24}>
             <div className="pb-10">
               <Form.Item name="hasInventory" valuePropName="checked">
@@ -427,6 +415,20 @@ export const ItemsForm: FC = () => {
                         }
                       )}
                   </Select>
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <FormLabel>Minimum Stock limit</FormLabel>
+                <Form.Item
+                  name="minimumStock"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Minimum stock limit required!',
+                    },
+                  ]}
+                >
+                  <InputNumber size="middle" type="text" />
                 </Form.Item>
               </Col>
             </>

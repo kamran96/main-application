@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 import Icon from '@iconify/react';
 import { ITheme, IThemeProps } from '@invyce/shared/invyce-theme';
 
-export const SettingLayout: FC = (props: RouteConfigComponentProps) => {
+export const SettingLayout: any = (props: RouteConfigComponentProps) => {
   return (
     <WrapperSettingLayout>
       <Heading type="container">Setting</Heading>

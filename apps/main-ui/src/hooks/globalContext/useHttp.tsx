@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { setLogger } from 'react-query';
+import { IBaseAPIError } from '../../modal';
 import http from '../../utils/http';
 
 interface IAPIOptions {
@@ -14,6 +14,15 @@ interface IParams<T = any> {
   status?: boolean;
   enabled?: boolean;
   retryLimit?: number;
+}
+
+interface IReturn<T = any> {
+  response: T;
+  isLoading: boolean;
+  refetch: () => void;
+  error: IBaseAPIError;
+  refetching: boolean;
+  isFetched: boolean;
 }
 
 export const useHttp = (
@@ -71,5 +80,12 @@ export const useHttp = (
     handleRequest('refetch');
   };
 
-  return { response, isLoading, refetch: onRefetch, error, refetching };
+  return {
+    response,
+    isLoading,
+    refetch: onRefetch,
+    error,
+    refetching,
+    isFetched: response?.data !== null ? true : false,
+  } as IReturn;
 };

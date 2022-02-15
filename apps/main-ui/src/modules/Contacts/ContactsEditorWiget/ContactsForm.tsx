@@ -64,7 +64,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
       AllAccounts.data &&
       AllAccounts.data.result &&
       AllAccounts.data.result.filter(
-        (acc) => acc?.secondary_account?.primary_account?.name === 'assets'
+        (acc) => acc?.secondaryAccount?.primaryAccount?.name === 'asset'
       )) ||
     [];
   const creditedAccounts: IAccountsResult[] =
@@ -73,8 +73,8 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
       AllAccounts.data.result &&
       AllAccounts.data.result.filter(
         (acc) =>
-          acc?.secondary_account?.primary_account?.name === 'liability' ||
-          acc?.secondary_account?.primary_account?.name === 'equity'
+          acc?.secondaryAccount?.primaryAccount?.name === 'liability' ||
+          acc?.secondaryAccount?.primaryAccount?.name === 'equity'
       )) ||
     [];
 
@@ -466,7 +466,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               </Form.Item>
             </Col>
           )}
-          <EnterpriseWrapper enable={[IOrganizationType.ENTERPRISE]}>
+          <EnterpriseWrapper enable={[IOrganizationType.SAAS]}>
             <Col span={12}>
               <FormLabel isRequired={false}>Debit Account</FormLabel>
               <Form.Item
@@ -493,7 +493,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               </Form.Item>
             </Col>
           </EnterpriseWrapper>
-          <EnterpriseWrapper enable={[IOrganizationType.ENTERPRISE]}>
+          <EnterpriseWrapper enable={[IOrganizationType.SAAS]}>
             <Col span={12}>
               <FormLabel isRequired={false}>Credit Account</FormLabel>
               <Form.Item

@@ -31,7 +31,8 @@ export const getALLBranches = () => http.get(`/users/branch`);
 export const verifyUserInvitationAPI = (payload) =>
   http?.post(`users/user/verify-invited-user`, payload);
 
-export const userCheckAPI = (payload) => http?.post(`/users/check`, payload);
+export const userCheckAPI = (payload) =>
+  http?.post(`/users/user/check`, payload);
 
 export const userJoinAPI = (payload) =>
   http?.put(`${USERS.INDEX}/update-invited-user/${payload?.id}`, payload);
