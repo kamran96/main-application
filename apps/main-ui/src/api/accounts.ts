@@ -28,8 +28,10 @@ export const getAllAccountsAPI = ({ queryKey }: QueryKey) => {
   return http.get(url);
 };
 
-export const getAllAccounts = (key?: any, purpose?: string) =>
-  http.get(`${ACCOUNT.RAILS_LIST}?purpose=${purpose}`);
+export const getAllAccounts = ({ queryKey }: QueryKey) => {
+  const purpose = queryKey[1] || 'ALL';
+  return http.get(`${ACCOUNT.RAILS_LIST}?purpose=${purpose}`);
+};
 
 export const getSecondaryAccounts = () => http.get(ACCOUNT.SECONDARY_ACCOUNTS);
 
