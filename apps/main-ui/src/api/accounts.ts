@@ -46,13 +46,11 @@ export const getBanks = () => http.get(`accounts/bank`);
 
 export const getBankAccounts = () => http.get(`accounts/bank/account`);
 
-export const getAccountLedger = (
-  key,
-  id?: number,
-  pageSize = 20,
-  page = 1,
-  query?: string
-) => {
+export const getAccountLedger = ({ queryKey }: QueryKey) => {
+  const id: number = queryKey[1];
+  const pageSize = queryKey[2] || 20;
+  const page = queryKey[3] || 1;
+  const query: string = queryKey[4];
   let url = `${ACCOUNT.INDEX}/ledger/${id}?page_size=${pageSize}&page_no=${page}`;
 
   if (query) {
