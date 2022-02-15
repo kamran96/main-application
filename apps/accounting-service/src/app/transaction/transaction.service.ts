@@ -392,7 +392,7 @@ export class TransactionService {
         organizationId: user.organizationId,
         name: In(['asset', 'liability']),
       })
-      .innerJoinAndSelect('pa.primaryAccount', 'acc')
+      .innerJoinAndSelect('pa.accounts', 'acc')
       .innerJoinAndSelect('acc.transactionItems', 'ti')
       .getMany();
   }

@@ -11,7 +11,11 @@ import { Branch } from '../schemas/branch.schema';
 import { Organization } from '../schemas/organization.schema';
 import { OrganizationUser } from '../schemas/organizationUser.schema';
 import { User } from '../schemas/user.schema';
-import { ORGANIZATION_CREATED, SEND_FORGOT_PASSWORD } from '@invyce/send-email';
+import {
+  ORGANIZATION_CREATED,
+  SEND_FORGOT_PASSWORD,
+  TRAIL_STARTED,
+} from '@invyce/send-email';
 
 @Injectable()
 export class OrganizationService {
@@ -26,9 +30,32 @@ export class OrganizationService {
     @Inject('REPORT_SERVICE') private readonly reportService: ClientProxy
   ) {}
 
-  async ListOrganizations(organizationData) {
+  async ListOrganizations(req) {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const type =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [type]: value,
+      },
+    });
+
     const org = await this.organizationUserModel.find({
-      userId: { $in: organizationData.id },
+      userId: { $in: req.user.id },
     });
 
     const orgIds = org.map((ids) => ids.organizationId);
@@ -39,7 +66,24 @@ export class OrganizationService {
       })
       .populate('branches');
 
-    return organization;
+    const mapAttachmentIds = organization.map((i) => i.attachmentId);
+
+    const { data: attachments } = await http.post(
+      `attachments/attachment/ids`,
+      {
+        ids: mapAttachmentIds,
+      }
+    );
+
+    const new_organization = [];
+    for (const i of organization) {
+      new_organization.push({
+        ...i.toObject(),
+        attachment: await attachments.find((c) => i.attachmentId === c.id),
+      });
+    }
+
+    return new_organization;
   }
 
   async CreateOrUpdateOrganization(
@@ -91,8 +135,14 @@ export class OrganizationService {
             updatedOrganization
           );
 
-          return await this.organizationModel.findOne({
+          const updatedOrg = await this.organizationModel.findOne({
             _id: organizationDto.id,
+          });
+
+          return res.status(201).send({
+            message: 'Organization updated successfully',
+            status: true,
+            result: updatedOrg,
           });
         }
         throw new HttpException('Invalid Params', HttpStatus.BAD_REQUEST);
@@ -173,28 +223,10 @@ export class OrganizationService {
             username: req.user.username,
           });
 
-          const payload = {
+          await this.emailService.emit(TRAIL_STARTED, {
             to: req.user.email,
-            from: 'no-reply@invyce.com',
-            TemplateAlias: 'trial-started',
-            TemplateModel: {
-              product_url: 'product_url_Value',
-              user_name: req.user.profile.fullName,
-              sender_name: 'sender_name_Value',
-              product_name: 'product_name_Value',
-              congrates_illustration_image:
-                'congrates_illustration_image_Value',
-              action_url: 'action_url_Value',
-              trial_extension_url: 'trial_extension_url_Value',
-              feedback_url: 'feedback_url_Value',
-              export_url: 'export_url_Value',
-              close_account_url: 'close_account_url_Value',
-              company_name: 'company_name_Value',
-              company_address: 'company_address_Value',
-            },
-          };
-
-          await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
+            user_name: req.user.profile.fullName,
+          });
           await this.reportService.emit(ORGANIZATION_CREATED, {
             ...organization.toObject(),
             userId: req.user.id,

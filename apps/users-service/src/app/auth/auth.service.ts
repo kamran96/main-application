@@ -16,6 +16,7 @@ import * as ip from 'ip';
 import { Response } from 'express';
 import { User } from '../schemas/user.schema';
 import {
+  PASSWORD_UPDATED,
   SEND_FORGOT_PASSWORD,
   SEND_INVITATION,
   SEND_OTP,
@@ -320,30 +321,10 @@ export class AuthService {
   }
 
   async sendVerificationOtp(user, otp): Promise<void> {
-    const payload = {
-      to: user.email,
-      from: 'no-reply@invyce.com',
-      TemplateAlias: 'send-opt',
-      TemplateModel: {
-        product_url: 'https://invyce.com',
-        product_name: 'invyce',
-        name: user.username,
-        action_url: otp,
-        trial_length: 'trial_length_Value',
-        trial_start_date: 'trial_start_date_Value',
-        trial_end_date: 'trial_end_date_Value',
-        support_email: 'support_email_Value',
-        live_chat_url: 'live_chat_url_Value',
-        sender_name: 'sender_name_Value',
-        help_url: 'help_url_Value',
-        company_name: 'company_name_Value',
-        company_address: 'company_address_Value',
-        login_url: 'login_url_Value',
-        username: user.username,
-      },
-    };
-
-    await this.emailService.emit(SEND_OTP, payload);
+    await this.emailService.emit(SEND_OTP, {
+      user_name: user.username,
+      otp_link: otp,
+    });
   }
 
   async sendVerificationCode(user: UserLoginDto, code: string): Promise<void> {
@@ -402,17 +383,10 @@ export class AuthService {
       to: user.email,
       from: 'no-reply@invyce.com',
       TemplateAlias: 'password-reset',
-      TemplateModel: {
-        product_url: '',
-        product_name: 'invyce',
-        name: user.profile.fullName,
-        action_url: a,
-        operating_system,
-        // browser_name: browser.name,
-        support_url: 'support@invyce.com',
-        company_name: 'invyce',
-        company_address: 'ZS plaza jutial giltit, Pakistan',
-      },
+      user_name: user.profile.fullName,
+      user_email: user.email,
+      link: a,
+      operating_system,
     };
 
     await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
@@ -421,14 +395,10 @@ export class AuthService {
   async SendPasswordUpdatedNotification(user) {
     const payload = {
       to: user.email,
-      from: 'no-reply@invyce.com',
-      TemplateAlias: 'password-update',
-      TemplateModel: {
-        user_name: user.profile.fullName,
-      },
+      user_name: user.profile.fullName,
     };
 
-    await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
+    await this.emailService.emit(PASSWORD_UPDATED, payload);
   }
 
   async verifyForgotPassword(code: string): Promise<IUser> {

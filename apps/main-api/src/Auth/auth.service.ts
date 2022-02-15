@@ -5,7 +5,6 @@ import * as queryString from 'query-string';
 import * as redis from 'redis';
 import * as Moment from 'moment';
 import { JwtService } from '@nestjs/jwt';
-const { promisify } = require('util');
 import {
   ProfileRepository,
   UserCodeRepository,
@@ -32,7 +31,7 @@ export class AuthService {
 
   async CheckUser(authDto) {
     try {
-      let user_arr = [];
+      const user_arr = [];
       const userRepository = getCustomRepository(UserRepository);
       const user = await userRepository
         .createQueryBuilder('users')
@@ -82,10 +81,10 @@ export class AuthService {
 
       const time = Moment(new Date()).add(1, 'h').calendar();
 
-      let generateOtp: any = generateRandomNDigits(4);
+      const generateOtp: any = generateRandomNDigits(4);
       parseInt(generateOtp);
 
-      let values = {
+      const values = {
         userId: user.id,
         email: authDto.email,
       };
@@ -150,7 +149,7 @@ export class AuthService {
 
   async VerifyOtp(body) {
     try {
-      let response = {
+      const response = {
         status: false,
       };
 
@@ -204,12 +203,12 @@ export class AuthService {
       },
     });
 
-    let values = {
+    const values = {
       userId: user.id,
       email: user.email,
     };
 
-    let generateOtp: any = generateRandomNDigits(4);
+    const generateOtp: any = generateRandomNDigits(4);
     parseInt(generateOtp);
 
     // await client.set(`${generateOtp}`, JSON.stringify(values));
@@ -230,7 +229,7 @@ export class AuthService {
 
   async sendVerificationEmail(
     usr: any = null,
-    resend: boolean = false,
+    resend = false,
     otp = false,
     generateOtp = null
   ) {

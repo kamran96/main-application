@@ -11,7 +11,7 @@ export class OrganizationDto {
   isNewRecord: boolean;
   email: string;
   website: string;
-  attachmentId: number;
+  attachmentId: string;
   organizationType: string;
   permanentAddress: string;
   residentialAddress: string;

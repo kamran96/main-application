@@ -8,6 +8,9 @@ import {
   SEND_INVITATION,
   SEND_PDF_MAIL,
   CONTACT_CREATED,
+  TRAIL_STARTED,
+  PASSWORD_UPDATED,
+  SUSPEND_ACCOUNT,
 } from '@invyce/send-email';
 
 @Controller()
@@ -33,12 +36,36 @@ export class AppController {
     await this.appService.SendInvitation(data);
   }
 
+  @MessagePattern(TRAIL_STARTED)
+  async trailStarted(@Payload() data: any) {
+    Logger.log('Data is received.');
+    Logger.log(data);
+
+    await this.appService.TrailStarted(data);
+  }
+
   @MessagePattern(SEND_FORGOT_PASSWORD)
   async sendForgotPassword(@Payload() data: any) {
     Logger.log('Data is received.');
     Logger.log(data);
 
     await this.appService.SendForgotPassword(data);
+  }
+
+  @MessagePattern(PASSWORD_UPDATED)
+  async passwordUpdated(@Payload() data: any) {
+    Logger.log('Data is received.');
+    Logger.log(data);
+
+    await this.appService.PasswordUpdated(data);
+  }
+
+  @MessagePattern(SUSPEND_ACCOUNT)
+  async suspendAccount(@Payload() data: any) {
+    Logger.log('Data is received.');
+    Logger.log(data);
+
+    await this.appService.SuspendAccount(data);
   }
 
   @MessagePattern(SEND_OTP)
