@@ -51,10 +51,6 @@ export class Accounts {
   @JoinColumn({ name: 'secondaryAccountId', referencedColumnName: 'id' })
   secondaryAccount: SecondaryAccounts;
 
-  // @ManyToOne(() => PrimaryAccounts)
-  // @JoinColumn({ name: 'id', referencedColumnName: 'id' })
-  // primaryAccount: PrimaryAccounts;
-
   @ManyToOne(() => PrimaryAccounts, (primaryAccount) => primaryAccount.id)
   primaryAccount: PrimaryAccounts;
 

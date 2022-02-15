@@ -31,6 +31,12 @@ export class AppController {
   }
 
   @UseGuards(GlobalAuthGuard)
+  @Post('ids')
+  async ListAttachmentByIds(@Body() body) {
+    return await this.appService.attachmentByIds(body);
+  }
+
+  @UseGuards(GlobalAuthGuard)
   @Post('create-pdf')
   async init(@Body() body, @Req() req: Request): Promise<any> {
     try {

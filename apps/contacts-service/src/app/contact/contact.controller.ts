@@ -49,6 +49,23 @@ export class ContactController {
     return await this.contactService.SyncContactBalances(req);
   }
 
+  @Get('outstanding-balance')
+  @UseGuards(GlobalAuthGuard)
+  async highestOutstandingBalance(@Req() req: IRequest, @Query() query) {
+    const contact = await this.contactService.HighestOutstandingBalanceReport(
+      req.user,
+      query
+    );
+    if (contact) {
+      return {
+        message: 'Successfull',
+        status: true,
+        result: !contact?.pagination ? contact : contact.result,
+        pagination: contact.pagination,
+      };
+    }
+  }
+
   @Post()
   @UseGuards(GlobalAuthGuard)
   async create(

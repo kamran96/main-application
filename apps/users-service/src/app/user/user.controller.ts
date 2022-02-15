@@ -117,6 +117,24 @@ export class UserController {
     }
   }
 
+  @Post('/check')
+  async checkUsernameOrEmail(@Body() body): Promise<IUserWithResponse> {
+    try {
+      const user = await this.userService.check(body);
+
+      if (user) {
+        return {
+          ...user,
+        };
+      }
+    } catch (error) {
+      throw new HttpException(
+        `Sorry! Something went wrong, ${error.message}`,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   @Post('/verify-invited-user')
   async verifyInvitedUser(
     @Body() body: SendCodeDto

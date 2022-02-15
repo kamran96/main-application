@@ -43,8 +43,7 @@ export class AccountsController {
         return {
           message: 'Account Fetched successfull',
           status: true,
-          pagination: account.pagination,
-          result: !account.pagination ? account : account.result,
+          ...account,
         };
       }
     } catch (error) {
@@ -89,6 +88,19 @@ export class AccountsController {
         `Sorry! Something went wrong, ${error.message}`,
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
+    }
+  }
+
+  @Get('balances')
+  @UseGuards(GlobalAuthGuard)
+  async GetBalances(@Req() req: IRequest, @Query() query: IPage) {
+    const accounts = await this.accountService.GetBalances(req.user, query);
+
+    if (accounts) {
+      return {
+        message: 'successfull',
+        result: accounts,
+      };
     }
   }
 

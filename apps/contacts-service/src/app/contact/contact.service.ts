@@ -435,6 +435,17 @@ export class ContactService {
     }
   }
 
+  async HighestOutstandingBalanceReport(user: IBaseUser, query) {
+    return await this.contactModel.find(
+      {
+        contactType: query.type,
+        organizationId: user.organizationId,
+      },
+      '',
+      { sort: { balance: -1 } }
+    );
+  }
+
   async FindById(id: string): Promise<IContact> {
     return await this.contactModel.findById(id);
   }
