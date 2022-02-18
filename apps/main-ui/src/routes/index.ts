@@ -64,6 +64,7 @@ import { ManageInventoryForm } from '../modules/Items/InventoryManagementForm';
 import { Organizations } from '../Containers/AddOrganization';
 import { ForgotPassowrdContainer } from '../Containers/ForgetPassword';
 import { BankReconcilation } from '../modules/BankReconcilation';
+import { TransactionsWidget } from '../modules/Business/Transactions/TransactionEditorWidgetV2';
 
 export const routes = (root = '/app'): RouteConfig[] => [
   {
@@ -353,7 +354,7 @@ export const routes = (root = '/app'): RouteConfig[] => [
           },
           {
             path: `${root}${ISupportedRoutes.CREATE_TRANSACTION}`,
-            component: JournalEditor,
+            component: TransactionsWidget,
             exact: true,
             restricted: true,
             permission: PERMISSIONS.TRANSACTIONS_CREATE,
@@ -420,14 +421,17 @@ export const routes = (root = '/app'): RouteConfig[] => [
             restricted: true,
             permission: PERMISSIONS.PAYMENTS_INDEX,
           },
+
+          // UN COMMENT TO ENABLE CATEGORIES FEATURES
+
           /* Categories Route */
-          {
-            path: `${root}${ISupportedRoutes.Categories}`,
-            component: CategoriesRoot,
-            exact: true,
-            restricted: true,
-            permission: PERMISSIONS.CATEGORIES_INDEX,
-          },
+          // {
+          //   path: `${root}${ISupportedRoutes.Categories}`,
+          //   component: CategoriesRoot,
+          //   exact: true,
+          //   restricted: true,
+          //   permission: PERMISSIONS.CATEGORIES_INDEX,
+          // },
           {
             path: `${root}${ISupportedRoutes.Organizations}`,
             component: Organizations,

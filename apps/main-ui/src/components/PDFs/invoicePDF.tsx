@@ -1,10 +1,42 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import { IInvoiceResult, IInvoiceItem } from '@invyce/shared/types';
-import { PDFPage, PdfTable, PDFHeader } from '@invyce/pdf-table';
-import { Document, StyleSheet, View, Text } from '@react-pdf/renderer';
+import {
+  Document,
+  StyleSheet,
+  View,
+  Text,
+  Page,
+  Font,
+} from '@react-pdf/renderer';
 import { FC } from 'react';
 import dayjs from 'dayjs';
 import moneyFormat from '../../utils/moneyFormat';
 import { totalDiscountInInvoice } from '../../utils/formulas';
+import thin from '../../assets/fonts/RobotoSlab-Thin.ttf';
+import black from '../../assets/fonts/RobotoSlab-Black.ttf';
+import bold from '../../assets/fonts/RobotoSlab-Bold.ttf';
+import extraBold from '../../assets/fonts/RobotoSlab-ExtraBold.ttf';
+import extraLight from '../../assets/fonts/RobotoSlab-ExtraLight.ttf';
+import light from '../../assets/fonts/RobotoSlab-Light.ttf';
+import medium from '../../assets/fonts/RobotoSlab-medium.ttf';
+import regular from '../../assets/fonts/RobotoSlab-Regular.ttf';
+import semiBold from '../../assets/fonts/RobotoSlab-SemiBold.ttf';
+import { PDFHeader, PdfTable } from '@invyce/pdf-table';
+
+Font.register({
+  family: 'Roboto Slab',
+  fonts: [
+    { src: thin },
+    { src: black },
+    { src: bold },
+    { src: extraBold },
+    { src: extraLight },
+    { src: light },
+    { src: medium },
+    { src: regular, fontWeight: 400 },
+    { src: semiBold },
+  ],
+});
 
 const styles = StyleSheet.create({
   dispatchedInfoWrapper: {
@@ -12,16 +44,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: '23px 30px',
+    fontFamily: 'Roboto Slab',
   },
   dispatchLabel: {
     color: '#6F6F84',
     fontSize: 10,
     lineHeight: '1.5px',
+    fontWeight: 'medium',
   },
   dispatchData: {
     color: '#222234',
     fontSize: 11,
     lineHeight: '2px',
+    fontWeight: 'bold',
   },
   calculationAndNotesWrapper: {
     display: 'flex',
@@ -47,11 +82,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '90%',
+    fontFamily: 'Roboto Slab',
   },
   calculationLabel: {
     fontSize: '11px',
     color: '#6F6F84',
     lineHeight: '1.6px',
+    fontWeight: 'demibold',
   },
   calculationData: {
     fontSize: '13px',
@@ -135,7 +172,7 @@ export const InvoicePDF: FC<IProps> = ({ data, type }) => {
 
   return (
     <Document>
-      <PDFPage size={'A4'}>
+      <Page size={'A4'}>
         <PDFHeader />
         <View style={styles.dispatchedInfoWrapper}>
           <View>
@@ -225,7 +262,7 @@ export const InvoicePDF: FC<IProps> = ({ data, type }) => {
             </View>
           </View>
         </View>
-      </PDFPage>
+      </Page>
     </Document>
   );
 };

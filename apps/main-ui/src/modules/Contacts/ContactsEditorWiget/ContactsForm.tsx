@@ -441,85 +441,96 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               </Para>
             </div>
           </Col>
-          <Col span={24}>
-            <div className="pb-10">
-              <Checkbox
-                checked={showOpeningBlance}
-                onChange={(e) => setShowOpeningBalance(e.target.checked)}
-              >
-                Enable Opening Balance
-              </Checkbox>
-            </div>
-          </Col>
-          {!id && showOpeningBlance && (
-            <Col span={12}>
-              <FormLabel isRequired={false}>Opening Balance</FormLabel>
-              <Form.Item
-                name="openingBalance"
-                rules={[{ required: false, message: 'Opening Balance' }]}
-              >
-                <Input
-                  style={{ width: '100%' }}
-                  placeholder={''}
-                  size="large"
-                />
-              </Form.Item>
-            </Col>
+          {!id && (
+            <>
+              <Col span={24}>
+                <div className="pb-10">
+                  <Checkbox
+                    checked={showOpeningBlance}
+                    onChange={(e) => setShowOpeningBalance(e.target.checked)}
+                  >
+                    Enable Opening Balance
+                  </Checkbox>
+                </div>
+              </Col>
+              {showOpeningBlance && (
+                <>
+                  <Col span={12}>
+                    <FormLabel isRequired={false}>Opening Balance</FormLabel>
+                    <Form.Item
+                      name="openingBalance"
+                      rules={[{ required: false, message: 'Opening Balance' }]}
+                    >
+                      <Input
+                        style={{ width: '100%' }}
+                        placeholder={''}
+                        size="large"
+                      />
+                    </Form.Item>
+                  </Col>
+                  <EnterpriseWrapper enable={[IOrganizationType.SAAS]}>
+                    <Col span={12}>
+                      <FormLabel isRequired={false}>Debit Account</FormLabel>
+                      <Form.Item
+                        name="debitAccount"
+                        rules={[{ required: false, message: 'Debit Account' }]}
+                      >
+                        <Select
+                          disabled={!hasOpeningBalance}
+                          size="large"
+                          showSearch
+                          style={{ width: '100%' }}
+                          placeholder="Select Item"
+                          optionFilterProp="children"
+                        >
+                          {debitedAccounts.length &&
+                            debitedAccounts.map(
+                              (acc: IAccountsResult, index) => {
+                                return (
+                                  <Option key={index} value={acc.id}>
+                                    {acc.name}
+                                  </Option>
+                                );
+                              }
+                            )}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                  </EnterpriseWrapper>
+                  <EnterpriseWrapper enable={[IOrganizationType.SAAS]}>
+                    <Col span={12}>
+                      <FormLabel isRequired={false}>Credit Account</FormLabel>
+                      <Form.Item
+                        name="creditAccount"
+                        rules={[{ required: false, message: 'Credit Account' }]}
+                      >
+                        <Select
+                          disabled={!hasOpeningBalance}
+                          size="large"
+                          showSearch
+                          style={{ width: '100%' }}
+                          placeholder="Select Item"
+                          optionFilterProp="children"
+                        >
+                          {creditedAccounts.length &&
+                            creditedAccounts.map(
+                              (acc: IAccountsResult, index) => {
+                                return (
+                                  <Option key={index} value={acc.id}>
+                                    {acc.name}
+                                  </Option>
+                                );
+                              }
+                            )}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                  </EnterpriseWrapper>
+                </>
+              )}
+            </>
           )}
-          <EnterpriseWrapper enable={[IOrganizationType.SAAS]}>
-            <Col span={12}>
-              <FormLabel isRequired={false}>Debit Account</FormLabel>
-              <Form.Item
-                name="debitAccount"
-                rules={[{ required: false, message: 'Debit Account' }]}
-              >
-                <Select
-                  disabled={!hasOpeningBalance}
-                  size="large"
-                  showSearch
-                  style={{ width: '100%' }}
-                  placeholder="Select Item"
-                  optionFilterProp="children"
-                >
-                  {debitedAccounts.length &&
-                    debitedAccounts.map((acc: IAccountsResult, index) => {
-                      return (
-                        <Option key={index} value={acc.id}>
-                          {acc.name}
-                        </Option>
-                      );
-                    })}
-                </Select>
-              </Form.Item>
-            </Col>
-          </EnterpriseWrapper>
-          <EnterpriseWrapper enable={[IOrganizationType.SAAS]}>
-            <Col span={12}>
-              <FormLabel isRequired={false}>Credit Account</FormLabel>
-              <Form.Item
-                name="creditAccount"
-                rules={[{ required: false, message: 'Credit Account' }]}
-              >
-                <Select
-                  disabled={!hasOpeningBalance}
-                  size="large"
-                  showSearch
-                  style={{ width: '100%' }}
-                  placeholder="Select Item"
-                  optionFilterProp="children"
-                >
-                  {creditedAccounts.length &&
-                    creditedAccounts.map((acc: IAccountsResult, index) => {
-                      return (
-                        <Option key={index} value={acc.id}>
-                          {acc.name}
-                        </Option>
-                      );
-                    })}
-                </Select>
-              </Form.Item>
-            </Col>
-          </EnterpriseWrapper>
+
           <Col span={12}>
             <FormLabel isRequired={true}>Credit Limit Amount</FormLabel>
             <Form.Item

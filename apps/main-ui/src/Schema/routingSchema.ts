@@ -27,12 +27,12 @@ export const RoutingSchema: IRoutingSchema = {
       children: [],
       icon: viewDashboardOutline,
     },
-    {
-      tag: 'Banking',
-      route: `/app${ISupportedRoutes?.BANK_RECONSILATION}`,
-      children: [],
-      icon: viewDashboardOutline,
-    },
+    // {
+    //   tag: 'Banking',
+    //   route: `/app${ISupportedRoutes?.BANK_RECONSILATION}`,
+    //   children: [],
+    //   icon: viewDashboardOutline,
+    // },
     {
       tag: 'Business',
       icon: coinsIcon,
@@ -143,13 +143,16 @@ export const RoutingSchema: IRoutingSchema = {
       icon: shoppingCart,
       permission: PERMISSIONS.ITEMS_INDEX,
     },
-    {
-      tag: 'Categories',
-      route: `${root}${ISupportedRoutes.Categories}`,
-      children: [],
-      icon: layersIcon,
-      permission: PERMISSIONS.CATEGORIES_INDEX,
-    },
+
+    //**** Un Comment to enable Categories in sidebar */
+
+    // {
+    //   tag: 'Categories',
+    //   route: `${root}${ISupportedRoutes.Categories}`,
+    //   children: [],
+    //   icon: layersIcon,
+    //   permission: PERMISSIONS.CATEGORIES_INDEX,
+    // },
     {
       tag: 'Dispatching',
       route: `${root}${ISupportedRoutes.DISPATCHING}`,

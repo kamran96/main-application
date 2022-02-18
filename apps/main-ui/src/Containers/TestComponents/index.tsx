@@ -5,7 +5,6 @@ import { CsvImportAPi } from '../../api';
 // import { Inconvinience } from '../../components/ErrorBoundries/Inconvinience';
 // import { InvoiceImportManager } from '../../modules/Invoice/InvoiceImportManager';
 import { Document, PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
-import { PdfTable, PDFPage } from '@invyce/pdf-table';
 import { InvoicePDF } from '../../components/PDFs';
 
 const columns = [
