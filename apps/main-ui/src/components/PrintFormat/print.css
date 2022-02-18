@@ -1,5 +1,5 @@
 /* Custom GLOBAL Styles on PRINT */
-@import url("https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;600&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;600&display=swap');
 ._visibleOnPrint {
   display: none;
 }
@@ -9,12 +9,12 @@
   } */
 
   * {
-    font-family: "Roboto Slab", serif !important;
+    font-family: 'Roboto Slab', serif !important;
   }
 
-  .print_format_wrapper{
+  .print_format_wrapper {
     background: white !important;
-    height: 100vh !important; 
+    height: 100vh !important;
   }
   ._disable_print {
     display: none !important;
@@ -525,5 +525,16 @@
   .cash_flow_table table tbody tr:last-child td:last-child p {
     padding-top: 10px;
     border-top: 1px solid #e1e1e1;
+  }
+
+  .printTitle {
+    padding: 20px 34px;
+    padding-bottom: 0px;
+  }
+  .printTitle h3 {
+    color: #143c69;
+    font-size: 20px;
+    margin: 0;
+    font-weight: 800;
   }
 }

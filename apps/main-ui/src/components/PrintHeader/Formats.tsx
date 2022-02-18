@@ -52,7 +52,7 @@ export const Addressbar = () => {
       </tr>
       <tr>
         <td>
-          <p>{city}</p>
+          <p style={{ textTransform: 'capitalize' }}>{city}</p>
         </td>
       </tr>
       <tr>
@@ -74,6 +74,14 @@ export const BlockDesignLogo = () => {
     >
       <img className="header_company_logo" src={_logo} alt={'company_logo'} />
       <h2 className="company_name">{organizationName}</h2>
+    </div>
+  );
+};
+
+export const PrintTitle = ({ title }) => {
+  return (
+    <div className="printTitle">
+      <h3>{title}</h3>
     </div>
   );
 };

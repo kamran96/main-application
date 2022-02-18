@@ -19,6 +19,7 @@ const styles = StyleSheet.create({
   },
   titleArea: {
     paddingLeft: '10px',
+    fontWeight: 'heavy',
   },
   title: {
     color: '#143C69',

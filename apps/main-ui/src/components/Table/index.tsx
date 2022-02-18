@@ -21,7 +21,11 @@ import printDiv, { ConvertDivToPDFAndDownload } from '../../utils/Print';
 import { ButtonTag } from '../ButtonTags';
 import { PrintFormat } from '../PrintFormat';
 import { PrintHeaderFormat, TableDivisions } from '../PrintHeader';
-import { Addressbar, TopbarLogoWithDetails } from '../PrintHeader/Formats';
+import {
+  Addressbar,
+  PrintTitle,
+  TopbarLogoWithDetails,
+} from '../PrintHeader/Formats';
 import { PDFICON } from '../Icons';
 import { WrapperTable, DefaultWrapper } from './styles';
 import { useWindowSize } from '../../utils/useWindowSize';
@@ -286,6 +290,7 @@ export const CommonTable: FC<IProps> = ({
                   ]}
                 />
               </PrintHeaderFormat>
+              <PrintTitle title={printTitle} />
             </div>
             <div className={'antd-table-print'}>
               <Table

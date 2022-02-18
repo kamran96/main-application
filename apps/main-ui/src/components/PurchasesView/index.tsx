@@ -414,6 +414,12 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
   const addresses = response?.contact?.addresses || [];
 
   return (
+    <PDFViewer width={'100%'} height={'900px'}>
+      <InvoicePDF type={type} data={response} />
+    </PDFViewer>
+  );
+
+  return (
     <WrapperNewPurchaseView>
       {/* <PDFViewer width={'100%'} height={'100%'}>
         <InvoicePDF type={type} data={response} />

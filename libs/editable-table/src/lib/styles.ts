@@ -30,6 +30,8 @@ export const EditableTableWrapper = styled.div<IWrapperProps>`
 
     .ant-table-thead > tr > th {
       padding: 9px 16px;
+      background: ${(props: IThemeProps) =>
+        props?.theme?.theme === 'dark' ? props?.theme?.colors?.bgTh : ''};
     }
     .ant-table-thead {
       tr {

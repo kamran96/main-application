@@ -41,6 +41,8 @@ export const WrapperTable = styled.div`
   }
   .ant-table-thead > tr > th {
     padding: 9px 16px;
+    background: ${(props: IThemeProps) =>
+      props?.theme?.theme === 'dark' ? props?.theme?.colors?.bgTh : ''};
   }
   .ant-table-thead {
     tr {
@@ -185,5 +187,7 @@ export const DefaultWrapper = styled.div`
     padding: 13px 16px;
     color: ${(props: IThemeProps) =>
       props?.theme?.theme === 'dark' ? '#ffff' : 'unset'};
+    background: ${(props: IThemeProps) =>
+      props?.theme?.theme === 'dark' ? props?.theme?.colors?.bgTh : ''};
   }
 `;

@@ -1,5 +1,7 @@
+
 import { ITableProps } from './types';
 import { View, StyleSheet, Text, Font } from '@react-pdf/renderer';
+import f1 from './fonts/RobotoSlab-Bold.ttf';
 
 /* eslint-disable-next-line */
 
