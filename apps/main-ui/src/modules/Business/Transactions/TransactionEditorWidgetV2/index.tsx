@@ -11,11 +11,166 @@ import { ISupportedRoutes } from '../../../../modal/routing';
 import { Link } from 'react-router-dom';
 import { Heading } from '../../../../components/Heading';
 import TextArea from 'antd/lib/input/TextArea';
+import { BoldText } from '../../../../components/Para/BoldText';
+import moneyFormat from '../../../../utils/moneyFormat';
+import { createTransactionAPI } from '../../../../api';
+import { useMutation, useQueryClient } from 'react-query';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { NOTIFICATIONTYPE } from '@invyce/shared/types';
+import { ITransactionsList } from './types';
 const Editor = () => {
   // ****** HOOKS IMPLEMENTATION ******
-  const { columns, transactionsList, setTransactionsList, addRow } =
-    useTransaction();
+  const {
+    columns,
+    transactionsList,
+    setTransactionsList,
+    addRow,
+    loading,
+    resetTransactions,
+  } = useTransaction();
   const [form] = Form.useForm();
+  const { notificationCallback } = useGlobalContext();
+
+  const { mutate: mutateCreateTransaction, isLoading: creatingTransaction } =
+    useMutation(createTransactionAPI);
+
+  const queryCache = useQueryClient();
+
+  const totalDebits = (transactionsList.length &&
+    transactionsList.reduce((a, b) => {
+      return { debit: a.debit + b.debit } as any;
+    })) || { debit: 0 };
+  const totalCredits = (transactionsList.length &&
+    transactionsList.reduce((a, b) => {
+      return { credit: a.credit + b.credit } as any;
+    })) || { credit: 0 };
+
+  const validateRows = (rows: ITransactionsList[]) => {
+    const validate = rows.map((row, index) => {
+      if (!row.debit && !row.credit && !row.account) {
+        return {
+          errorIndex: index,
+          errors: {
+            debitError: 'Debit or Credit is required',
+            creditError: 'Debit or Credit is required',
+            accountError: 'Account is required',
+          },
+        };
+      }
+      if (!row.debit && !row.credit) {
+        return {
+          errorIndex: index,
+          errors: {
+            debitError: 'Debit or Credit is required',
+            creditError: 'Debit or Credit is required',
+          },
+        };
+      }
+      if (!row.account) {
+        return {
+          errorIndex: index,
+          errors: {
+            accountError: 'Account is required',
+          },
+        };
+      }
+      return {};
+    });
+
+    return validate.filter((row, index) => Object.keys(row).length > 0);
+  };
+
+  const onFinish = async (values) => {
+    const errors = validateRows(transactionsList);
+
+    if (errors.length > 0) {
+      errors.forEach((err) => {
+        const mutateIndex = err.errorIndex;
+        const allRows = [...transactionsList];
+        allRows.splice(mutateIndex, 1, {
+          ...allRows[mutateIndex],
+          ...err.errors,
+        });
+        setTransactionsList(allRows);
+      });
+    } else {
+      const credits = [];
+      const debits = [];
+
+      transactionsList.forEach((tranc, index) => {
+        if (tranc && tranc.debit > 0) {
+          debits.push({
+            amount: tranc.debit,
+            accountId: tranc.account,
+            description: tranc.description,
+          });
+        } else if (tranc && tranc.credit > 0) {
+          credits.push({
+            amount: tranc.credit,
+            accountId: tranc.account,
+            description: tranc.description,
+          });
+        }
+      });
+
+      const totalDebits = (debits?.length &&
+        debits.reduce((a, b) => {
+          return { amount: a.amount + b.amount };
+        })) || { amount: 0 };
+      const totalCredits = (credits?.length &&
+        credits.reduce((a, b) => {
+          return { amount: a.amount + b.amount };
+        })) || { amount: 0 };
+
+      const { amount } = debits.reduce((a, b) => {
+        return { amount: a.amount + b.amount };
+      });
+
+      const payload = {
+        ...values,
+        entries: {
+          credits,
+          debits,
+        },
+        amount,
+      };
+
+      try {
+        if (totalDebits.amount === totalCredits.amount && true) {
+          await mutateCreateTransaction(payload, {
+            onSuccess: () => {
+              resetTransactions();
+              form.resetFields();
+              ['accounts', `transactions`]?.forEach((key) => {
+                (queryCache?.invalidateQueries as any)((q) =>
+                  q?.queryKey[0]?.toString().startsWith(key)
+                );
+              });
+
+              notificationCallback(
+                NOTIFICATIONTYPE.SUCCESS,
+                'Transaction Created'
+              );
+            },
+          });
+        } else
+          throw {
+            status: 501,
+            message:
+              "The Transaction Amount Are Not Seem's Equal Please Take A Look Again",
+          };
+      } catch (error) {
+        if (error.status && error.status === 501) {
+          notificationCallback(NOTIFICATIONTYPE.ERROR, error.message);
+        }
+
+        console.log(error, 'error');
+      }
+    }
+  };
+  const onFinishFailed = (error) => {
+    console.log(error, 'check error');
+  };
 
   // JSX RENDER
   return (
@@ -36,7 +191,7 @@ const Editor = () => {
       </div>
       <Card>
         <Wrapper>
-          <Form layout="vertical" form={form}>
+          <Form onFinish={onFinish} layout="vertical" form={form}>
             <Row gutter={24}>
               <Col span={5}>
                 <Form.Item
@@ -65,23 +220,46 @@ const Editor = () => {
             </Row>
             <div className="table-wrapper mb-20">
               <EditableTable
-                loading={false}
+                loading={loading}
                 dragable={(data) => setTransactionsList(data)}
                 columns={columns}
                 data={transactionsList}
                 scrollable={{ offsetY: 400, offsetX: 0 }}
               />
+              <table className="table-footer" style={{ width: '100%' }}>
+                <colgroup>
+                  {columns.map((col, index) => {
+                    const { width } = col;
+                    return <col key={index} style={{ width }} />;
+                  })}
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <td colSpan={2}></td>
+                    <td colSpan={2}>
+                      <BoldText>Total</BoldText>
+                    </td>
+                    <td>
+                      <BoldText>{moneyFormat(totalDebits?.debit)}</BoldText>
+                    </td>
+                    <td>
+                      <BoldText>{moneyFormat(totalCredits?.credit)}</BoldText>
+                    </td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
               <div className="add_item mt-10">
                 <Button
                   className="flex alignCenter"
                   onClick={addRow}
-                  type="primary"
+                  type="link"
                   ghost
                 >
                   <span className="flex alignCenter mr-10">
                     <Icon icon={bxPlus} />
                   </span>
-                  Add line item
+                  Add Transaction Row
                 </Button>
               </div>
             </div>
@@ -101,7 +279,9 @@ const Editor = () => {
                   <Button className="mr-10" type="default">
                     Save
                   </Button>
-                  <Button type="primary">Approve</Button>
+                  <Button htmlType="submit" type="primary">
+                    Approve
+                  </Button>
                 </Form.Item>
               </Col>
             </Row>
