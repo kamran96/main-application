@@ -11,6 +11,7 @@ export interface ITranactionContext {
   setTransactionsList: (payload: ITransactionsList[]) => void;
   addRow: () => void;
   loading: boolean;
+  resetTransactions: () => void;
 }
 export interface ITransactionsList {
   account: number | string;
