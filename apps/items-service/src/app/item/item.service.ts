@@ -203,6 +203,8 @@ export class ItemService {
           item.itemType = itemDto.itemType;
           item.isActive = itemDto.isActive;
           item.stock = itemDto.stock;
+          item.openingStock = itemDto.openingStock;
+          item.minimumStock = itemDto.minimumStock;
           item.organizationId = itemData.organizationId;
           item.createdById = itemData._id;
           item.updatedById = itemData._id;

@@ -34,6 +34,8 @@ export class Contact {
   @Prop()
   openingBalance: number;
   @Prop()
+  transactionId: number;
+  @Prop()
   balance: number;
   @Prop()
   importedFrom: string;

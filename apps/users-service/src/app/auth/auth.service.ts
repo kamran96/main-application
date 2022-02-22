@@ -115,8 +115,17 @@ export class AuthService {
   ): Promise<IUser> {
     const updatedProfile = {
       fullName: authDto.fullName,
+      email: authDto.email,
       country: authDto.country,
       phoneNumber: authDto.phoneNumber,
+      prefix: '',
+      cnic: '',
+      marketingStatus: null,
+      website: '',
+      location: '',
+      bio: '',
+      jobTitle: '',
+      attachmentId: '',
     };
 
     const user = new this.userModel();
@@ -235,9 +244,16 @@ export class AuthService {
           HttpStatus.BAD_REQUEST
         );
       }
+
       if (bcrypt.compareSync(authDto.password, user.password)) {
-        const user: IUser[] = await this.Login(users, res);
-        return user;
+        if (authDto?.rememberMe) {
+          await this.userModel.updateOne(
+            { _id: user.id },
+            { rememberMe: authDto.rememberMe }
+          );
+        }
+
+        return await this.Login(users, res);
       }
       throw new HttpException('Incorrect Password', HttpStatus.BAD_REQUEST);
     } else {

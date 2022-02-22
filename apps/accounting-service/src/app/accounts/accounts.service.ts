@@ -7,7 +7,7 @@ import {
   TransactionRepository,
 } from '../repositories';
 import * as moment from 'moment';
-import { getCustomRepository, In, Not, Raw } from 'typeorm';
+import { getCustomRepository, In, Like, Not, Raw } from 'typeorm';
 import { Sorting } from '@invyce/sorting';
 import { Integrations, Entries } from '@invyce/global-constants';
 import {
@@ -61,7 +61,6 @@ export class AccountsService {
           .andWhere('ti."transactionType" = 10')
           .andWhere('t.status = 1')
           .andWhere('ti.status = 1')
-          // .andWhere('t.date between :start and :end')
           .getQuery();
 
         const total_credits = await getCustomRepository(
@@ -74,7 +73,6 @@ export class AccountsService {
           .andWhere('ti."transactionType" = 20')
           .andWhere('t.status = 1')
           .andWhere('ti.status = 1')
-          // .andWhere('t.date between :start and :end')
           .getQuery();
 
         const balances = `case when pa.name='asset' OR pa.name='expense'
@@ -88,13 +86,13 @@ export class AccountsService {
           const data = {
             name: {
               type: 'search',
-              value: '%cash%',
+              value: '"%Cash In%"',
             },
           };
-
           for (const i in data) {
             if (data[i].type === 'search') {
               const val = data[i].value.toLowerCase();
+              console.log(val, 'val');
               accounts = await getCustomRepository(AccountRepository)
                 .createQueryBuilder('a')
                 .select(
@@ -102,13 +100,16 @@ export class AccountsService {
                 )
                 .where({
                   organizationId: user.organizationId,
+                  [i]: Like('%Cash%'),
                 })
-                .andWhere('a.name like :name', { name: val })
+                // .andWhere(`lower(a.${i}) like :${i}`, { i: val })
                 .leftJoin('a.secondaryAccount', 'sa')
                 .leftJoin('sa.primaryAccount', 'pa')
                 .offset(pn * ps - ps)
                 .limit(ps)
                 .getRawMany();
+
+              console.log(accounts, 'rresu');
             } else if (data[i].type === 'in') {
               accounts = await getCustomRepository(AccountRepository)
                 .createQueryBuilder('a')
