@@ -8,6 +8,8 @@ export class ItemDto {
   itemType: number;
   isActive: boolean;
   stock: number;
+  openingStock: number;
+  minimumStock: number;
   isNewRecord: boolean;
   hasInventory: boolean;
   hasCategory: boolean;

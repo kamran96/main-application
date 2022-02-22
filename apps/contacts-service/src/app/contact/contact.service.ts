@@ -159,8 +159,31 @@ export class ContactService {
 
   async CreateContact(
     contactDto: ContactDto,
-    contactData: IBaseUser
+    req: IRequest
   ): Promise<IContact> {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const tokenType =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [tokenType]: value,
+      },
+    });
+
     if (contactDto && contactDto.isNewRecord === false) {
       const contact = await this.FindById(contactDto.id);
 
@@ -190,7 +213,7 @@ export class ContactService {
           status: 1 || contact.status,
           createdById: contact.createdById,
           organizationId: contact.organizationId,
-          updatedById: contactData._id,
+          updatedById: req.user.id,
         };
 
         await this.contactModel.updateOne(
@@ -201,11 +224,48 @@ export class ContactService {
       return await this.FindById(contactDto.id);
     } else {
       try {
+        const debitArray = [];
+        const creditArray = [];
+        if (
+          contactDto?.openingBalance &&
+          parseFloat(contactDto?.openingBalance) > 0
+        ) {
+          const debits = {
+            amount: contactDto.openingBalance,
+            account_id: contactDto.debitAccount,
+          };
+
+          const credits = {
+            amount: contactDto.openingBalance,
+            account_id: contactDto.creditAccount,
+          };
+
+          debitArray.push(debits);
+          creditArray.push(credits);
+        }
+
+        const payload = {
+          dr: debitArray,
+          cr: creditArray,
+          type: 'contact opening balance',
+          reference: `${contactDto.name} opening balance`,
+          amount: contactDto.openingBalance,
+          status: 1,
+        };
+
+        const { data: transaction } = await http.post(
+          'accounts/transaction/api',
+          {
+            transactions: payload,
+          }
+        );
+
         const contact = new this.contactModel(contactDto);
-        contact.organizationId = contactData.organizationId;
-        contact.branchId = contactData.branchId;
-        contact.createdById = contactData._id;
-        contact.updatedById = contactData._id;
+        contact.organizationId = req.user.organizationId;
+        contact.transactionId = transaction ? transaction.id : null;
+        contact.branchId = req.user.branchId;
+        contact.createdById = req.user._id;
+        contact.updatedById = req.user._id;
         contact.status = 1;
 
         await contact.save();
