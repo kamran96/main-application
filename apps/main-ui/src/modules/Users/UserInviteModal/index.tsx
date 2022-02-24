@@ -38,20 +38,25 @@ export const UserInviteModal: FC = () => {
   const { mutate: mutateInviteUser, isLoading: invitingUser } =
     useMutation(inviteUserAPI);
 
-  const { data, isLoading: branchesLoading } = useQuery(
-    [`all-branches`],
-    getALLBranches
-  );
+  // const { data, isLoading: branchesLoading } = useQuery(
+  //   [`all-branches`],
+  //   getALLBranches,
+  //   {
+  //     enabled: !!userInviteModal,
+  //   }
+  // );
 
   const { data: rolesListData, isLoading: rolesListLoading } = useQuery(
     [`rbac-list`],
-    getRbacListAPI
+    getRbacListAPI,
+    {
+      enabled: !!userInviteModal,
+    }
   );
 
   const rolesResult =
     (rolesListData && rolesListData.data && rolesListData.data.result) || [];
 
-  const allBranches = (data && data.data && data.data.result) || [];
   const [form] = Form.useForm();
 
   const onCancel = () => {

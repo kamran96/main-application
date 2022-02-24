@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { ColumnsType } from 'antd/es/table';
+import { ITableColumns } from '../../../../components/PDFs/PDFTable';
 import { plainToClass } from 'class-transformer';
 import dayjs from 'dayjs';
 import React, { FC, useEffect, useState } from 'react';
@@ -19,6 +20,7 @@ import {
 } from '../../../../modal/accountLedger';
 import moneyFormat from '../../../../utils/moneyFormat';
 import FilterSchema from './AccountLedgerFilterSchema';
+import { Text } from '@react-pdf/renderer';
 
 interface IProps {
   id?: number;
@@ -211,7 +213,10 @@ export const AccountsLedgerList: FC<IProps> = ({ id, accountName }) => {
         </div>
       ) : (
         <CommonTable
-          printTitle={`${accountName} Ledger`}
+          pdfExportable={{
+            columns: pdfCols,
+          }}
+          printTitle={`Ledger Report: ${accountName}`}
           size="middle"
           hasPrint
           onChange={handleTableChange}
@@ -242,3 +247,76 @@ const WrapperAccountLedger = styled.div`
     min-height: 70vh;
   }
 `;
+
+const pdfCols: ITableColumns[] = [
+  {
+    title: 'Date',
+    dataIndex: 'date',
+    key: 'date',
+    render: (data, row, index) => {
+      return (
+        // eslint-disable-next-line react/jsx-no-useless-fragment
+        !row.lastIndex ? (
+          dayjs(data).format(`MMMM D, YYYY`)
+        ) : (
+          <Text style={{ fontWeight: 600 }}>Total</Text>
+        )
+      );
+    },
+  },
+  {
+    title: 'Particular',
+    dataIndex: 'account',
+    key: 'account',
+    render: (data, row, index) => {
+      return data ? data.name : '-';
+    },
+  },
+  {
+    title: 'Narration',
+    dataIndex: 'owner',
+    key: 'owner',
+    render: (data, row, index) => {
+      return data ? data.narration : '-';
+    },
+  },
+  {
+    title: 'Debit',
+    dataIndex: 'transactionType',
+    key: 'transactionType',
+    render: (data, row, index) => {
+      return !row.lastIndex ? (
+        (data && data === TransactionsType.CREDIT && row.amount) || '-'
+      ) : (
+        <Text style={{ fontWeight: 'black' }}>
+          {moneyFormat(row.totalDebits)}
+        </Text>
+      );
+    },
+  },
+  {
+    title: 'Credit',
+    dataIndex: 'transactionType',
+    key: 'transaction_type',
+    render: (data, row, index) => {
+      return !row.lastIndex ? (
+        (data && data === TransactionsType.DEBIT && row.amount) || '-'
+      ) : (
+        <Text style={{ fontWeight: 'black' }}>
+          {moneyFormat(row.totalCredits)}
+        </Text>
+      );
+    },
+  },
+  {
+    title: 'Balance',
+    dataIndex: 'balance',
+    key: 'balance',
+    render: (data, row, index) =>
+      !row.lastIndex ? (
+        data
+      ) : (
+        <Text style={{ fontWeight: 'black' }}>{moneyFormat(data)}</Text>
+      ),
+  },
+];

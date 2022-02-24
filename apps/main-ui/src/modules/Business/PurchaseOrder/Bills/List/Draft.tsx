@@ -28,7 +28,7 @@ import {
 } from '../../../../../modal';
 import FilterSchema from './PoFilterSchema';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
-import { _csvExportable } from './CommonCol';
+import { PDFColsBills, _csvExportable } from './CommonCol';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
 
@@ -211,6 +211,7 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
   return (
     <ALlWrapper>
       <CommonTable
+        pdfExportable={{ columns: PDFColsBills }}
         exportable
         exportableProps={{
           fields: _csvExportable,
@@ -218,7 +219,7 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
         className={'border-top-none'}
         topbarRightPannel={renerTopRightbar()}
         hasPrint
-        printTitle={'Draft Purchase Orders List'}
+        printTitle={'Draft Bills'}
         customTopbar={
           <PurchaseTopbar
             disabled={!selectedRow.length}

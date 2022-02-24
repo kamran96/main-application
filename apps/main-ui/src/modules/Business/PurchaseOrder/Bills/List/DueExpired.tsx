@@ -28,7 +28,7 @@ import {
   NOTIFICATIONTYPE,
 } from '../../../../../modal';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
-import { _csvExportable } from './CommonCol';
+import { PDFColsBills, _csvExportable } from './CommonCol';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
 
@@ -226,11 +226,12 @@ export const DueExpiredBills: FC<IProps> = ({ columns, activeTab }) => {
     <ALlWrapper>
       <CommonTable
         exportable
+        pdfExportable={{ columns: PDFColsBills }}
         exportableProps={{
           fields: _csvExportable,
           fileName: 'approved-purchases',
         }}
-        printTitle={'Approved Purchase Orders List'}
+        printTitle={'Overdue Bills'}
         className={'border-top-none'}
         hasPrint
         topbarRightPannel={renerTopRightbar()}

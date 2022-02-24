@@ -27,6 +27,8 @@ export const ContactLedger = () => {
     setId(location.pathname.split('/app/contacts/')[1]);
   }, [location]);
 
+  console.log(id, 'islkdjfaois');
+
   const { data } = useQuery([`all-contacts`, 'ALL'], getAllContacts);
   const result: IContactType[] = (data && data.data && data.data.result) || [];
 
@@ -58,7 +60,7 @@ export const ContactLedger = () => {
               : ''}
           </Heading>
         </div>
-        <LedgerList type={type} id={parseInt(id)} />
+        <LedgerList type={type} id={id} />
       </TableCard>
     </WrapperContactLedger>
   );

@@ -22,7 +22,7 @@ import {
 } from '../../../modal/invoice';
 import { ISupportedRoutes } from '../../../modal/routing';
 import moneyFormat from '../../../utils/moneyFormat';
-import { _exportableCols } from './commonCol';
+import { PdfCols, _exportableCols } from './commonCol';
 import InvoicesFilterSchema from './InvoicesFilterSchema';
 
 interface IProps {
@@ -168,13 +168,6 @@ export const PaidtInvoiceList: FC<IProps> = ({ columns }) => {
   const renderTobarRight = () => {
     return (
       <div className="flex alignCenter">
-        <Button
-          className="mr-10 flex alignCenter _print_button"
-          disabled={true}
-          type="ghost"
-        >
-          <PDFICON className="flex alignCenter mr-10" /> Download as PDF
-        </Button>
         <SmartFilter
           onFilter={(encode) => {
             setAllInvoicesConfig({ ...allInvoicesConfig, query: encode });
@@ -192,6 +185,7 @@ export const PaidtInvoiceList: FC<IProps> = ({ columns }) => {
   return (
     <>
       <CommonTable
+        pdfExportable={{ columns: PdfCols }}
         exportable
         exportableProps={{ fields: _exportableCols, fileName: 'paid-invoices' }}
         className="border-top-none"

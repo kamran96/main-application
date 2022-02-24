@@ -1,11 +1,26 @@
-import { ITableProps } from './types';
 import { View, StyleSheet, Text, Font } from '@react-pdf/renderer';
+import { ReactNode } from 'react';
+import { PDFFontWrapper } from './PDFFontWrapper';
 // import f1 from './fonts/RobotoSlab-Bold.ttf';
+
+export interface ITableColumns {
+  title: string;
+  dataIndex: string;
+  key?: string;
+  render?: (data: any, row: any, index: number) => ReactNode;
+  width?: number;
+}
+
+export interface ITableProps {
+  columns: ITableColumns[];
+  data?: unknown[];
+}
 
 /* eslint-disable-next-line */
 
-export function PdfTable({ data, columns }: ITableProps) {
+export function PDFTable({ data, columns }: ITableProps) {
   return (
+    // <PDFFontWrapper>
     <View style={styles.tableContainer}>
       <View style={styles.tableHeadersGroup}>
         {columns.map((column, index) => {
@@ -44,6 +59,7 @@ export function PdfTable({ data, columns }: ITableProps) {
         })}
       </View>
     </View>
+    // </PDFFontWrapper>
   );
 }
 
@@ -52,20 +68,19 @@ const styles = StyleSheet.create({
   tableHeadersGroup: {
     flexDirection: 'row',
     borderBottomColor: '#a7a7a7',
-    backgroundColor: '#16367a',
+    backgroundColor: '#fafafa',
     borderBottomWidth: 1,
     alignItems: 'center',
     textAlign: 'center',
-    fontStyle: 'bold',
     flexGrow: 1,
   },
   th: {
     fontSize: '10px',
-    fontWeight: 400,
     textTransform: 'capitalize',
-    color: '#e6e6e6',
+    color: 'rgba(0,0,0,.85)',
     textAlign: 'left',
     padding: '7px 7px',
+    fontWeight: 'bold',
   },
   tableBody: {},
   tableBodyRow: {
@@ -74,17 +89,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: '0.7px',
     alignItems: 'center',
     textAlign: 'center',
-    fontStyle: 'bold',
+    fontWeight: 'demibold',
     flexGrow: 1,
   },
   td: {
     fontSize: '9px',
-    fontWeight: 400,
+    fontWeight: 500,
     textTransform: 'capitalize',
     padding: '7px 7px',
     textAlign: 'left',
-    color: '#363636',
+    color: '#4b4b4b',
   },
 });
 
-export default PdfTable;
+export default PDFTable;

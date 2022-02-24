@@ -1,17 +1,17 @@
-import { Breadcrumb } from "antd";
-import React from "react";
-import styled from "styled-components";
-import { TableCard } from "../../../components/TableCard";
-import { Link } from "react-router-dom";
-import { PurchasesView } from "../../../components/PurchasesView";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { BreadCrumbArea } from "../../../components/BreadCrumbArea";
-import { ISupportedRoutes } from "../../../modal";
+import { Breadcrumb } from 'antd';
+import React from 'react';
+import styled from 'styled-components';
+import { TableCard } from '../../../components/TableCard';
+import { Link } from 'react-router-dom';
+import { PurchasesView } from '../../../components/PurchasesView';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { BreadCrumbArea } from '../../../components/BreadCrumbArea';
+import { ISupportedRoutes } from '../../../modal';
 
 export const InvoiceView = () => {
   const { routeHistory } = useGlobalContext();
   const { pathname } = routeHistory.location;
-  let invId = pathname.split("app/invoice/")[1];
+  const invId = pathname.split('app/invoice/')[1];
 
   return (
     <WrapperInvoiceView>

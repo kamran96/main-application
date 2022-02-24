@@ -23,7 +23,7 @@ import {
   ORDER_TYPE,
 } from '../../../modal/invoice';
 import { ISupportedRoutes } from '../../../modal/routing';
-import { _exportableCols } from './commonCol';
+import { PdfCols, _exportableCols } from './commonCol';
 import InvoicesFilterSchema from './InvoicesFilterSchema';
 
 interface IProps {
@@ -173,13 +173,6 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
   const renderTobarRight = () => {
     return (
       <div className="flex alignCenter">
-        <Button
-          className="mr-10 flex alignCenter _print_button"
-          disabled={true}
-          type="ghost"
-        >
-          <PDFICON className="flex alignCenter mr-10" /> Download as PDF
-        </Button>
         <SmartFilter
           onFilter={(encode) => {
             const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=draft&sortid=${sortid}&page=1&page_size=20&query=${encode}`;
@@ -199,6 +192,7 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
   return (
     <>
       <CommonTable
+        pdfExportable={{ columns: PdfCols }}
         className="border-top-none"
         exportable
         exportableProps={{
