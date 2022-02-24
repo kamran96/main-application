@@ -1,4 +1,4 @@
-import { IBase, IBaseRequest } from "./base";
+import { IBase, IBaseRequest } from './base';
 
 export enum ACCOUNT_TYPES {
   SAVING_ACCOUNT = 1,
@@ -14,12 +14,12 @@ export enum BANK_ACCOUNTTYPES {
   FIXED = 2,
 }
 export enum ACCOUNT_TYPES_NAMES {
-  SAVING_ACCOUNT = "Saving Account",
-  CURRENT_ACCOUNT = "Current Account",
-  BASIC_BANKING_ACCOUNT = "Basic Banking Account",
-  FORIGN_CURR_ACCOUNT = "Foreign Currency Account",
-  FIXED_DEPOSIT_ACCOUNT = "Fixed Deposit Account",
-  RUNNING_FINANCE_ACCOUNT = "Running Finance Account",
+  SAVING_ACCOUNT = 'Saving Account',
+  CURRENT_ACCOUNT = 'Current Account',
+  BASIC_BANKING_ACCOUNT = 'Basic Banking Account',
+  FORIGN_CURR_ACCOUNT = 'Foreign Currency Account',
+  FIXED_DEPOSIT_ACCOUNT = 'Fixed Deposit Account',
+  RUNNING_FINANCE_ACCOUNT = 'Running Finance Account',
 }
 
 export interface IAccounts extends IBaseRequest {
@@ -37,7 +37,7 @@ export interface IAccountsResult extends IBase {
   code?: string;
   branchId?: null;
   secondaryAccountId?: number;
-  secondary_account?: ISecondaryAccount;
+  secondaryAccount?: ISecondaryAccount;
   balance?: number;
   opening_balance?: number;
   total_credits?: number;
@@ -52,7 +52,7 @@ export interface ISecondaryAccount extends IBase {
   name: string;
   primaryAccountId: number;
   organizationId: number;
-  primary_account: IPrimaryAccount;
+  primaryAccount: IPrimaryAccount;
 }
 
 export interface IPrimaryAccount extends IBase {

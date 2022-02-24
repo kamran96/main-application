@@ -15,7 +15,7 @@ import editSolid from '@iconify-icons/clarity/edit-solid';
 import { SmartFilter } from '../../../components/SmartFilter';
 import { PDFICON } from '../../../components/Icons';
 import FilteringSchema from './FilteringSchema';
-import columns from './commonCols';
+import columns, { pdfCols } from './commonCols';
 
 export const DraftCreditNotes: FC = () => {
   /* HOOKS HERE */
@@ -123,14 +123,6 @@ export const DraftCreditNotes: FC = () => {
   const renderTopbarRight = () => {
     return (
       <div className="flex alignCenter">
-        <ButtonTag
-          disabled
-          className="mr-10"
-          ghost
-          title="Download PDF"
-          size="middle"
-          customizeIcon={<PDFICON className="flex alignCenter mr-10" />}
-        />
         <SmartFilter
           onFilter={(encode) => {
             const route = `/app${ISupportedRoutes?.CREDIT_NOTES}?tabIndex=draft&page=1&page_size=20&query=${encode}`;
@@ -149,6 +141,7 @@ export const DraftCreditNotes: FC = () => {
   return (
     <CreditNoteWrapper>
       <CommonTable
+        pdfExportable={{ columns: pdfCols }}
         loading={isLoading}
         columns={columns}
         data={result}

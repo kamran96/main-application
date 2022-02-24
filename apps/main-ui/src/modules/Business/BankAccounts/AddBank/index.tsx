@@ -24,7 +24,9 @@ export const AddBankWidget: FC = () => {
   const [banksList, setBanksList] = useState([]);
   const [form] = Form.useForm();
 
-  const { data } = useQuery([`all-banks`], getBanks);
+  const { data } = useQuery([`all-banks`], getBanks, {
+    enabled: !!banksModalConfig?.visibility,
+  });
 
   useEffect(() => {
     if (data && data.data && data.data.result) {

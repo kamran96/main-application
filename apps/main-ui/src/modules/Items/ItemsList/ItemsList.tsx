@@ -29,7 +29,7 @@ import { useWindowSize } from '../../../utils/useWindowSize';
 import { CommonTable } from './../../../components/Table';
 import { DuplicateModal } from './DuplicateModal';
 import filterSchema from './filterSchema';
-import { PrintColumns } from './PrintColumns';
+import { PrintColumns, PDFColumns } from './PrintColumns';
 import { ItemsListWrapper } from './styles';
 import packageIcon from '@iconify-icons/feather/package';
 
@@ -410,7 +410,9 @@ export const ItemsList: FC = () => {
           className="customized-table"
           rowKey={(record) => record.id}
           key={'table1'}
-          pdfExportable
+          pdfExportable={{
+            columns: PDFColumns,
+          }}
           exportable
           printColumns={printCols}
           printTitle={'Items List'}

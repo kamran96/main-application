@@ -21,6 +21,7 @@ import printIcon from '@iconify-icons/bytesize/print';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
 import moneyFormat from '../../../utils/moneyFormat';
+import { pdfCols } from './pdfCols';
 
 export const Suppliers: FC = () => {
   /* HOOKS */
@@ -270,14 +271,6 @@ export const Suppliers: FC = () => {
   const renderTopbarRight = () => {
     return (
       <div className="flex alignCenter">
-        <ButtonTag
-          disabled
-          className="mr-10"
-          ghost
-          title="Download PDF"
-          size="middle"
-          customizeIcon={<PDFICON className="flex alignCenter mr-10" />}
-        />
         <SmartFilter
           onFilter={(encode) => {
             const route = `/app/contacts?tabIndex=suppliers&sortid=${sortid}&page=1&page_size=20&query=${encode}`;
@@ -298,6 +291,9 @@ export const Suppliers: FC = () => {
       <ContactListWrapper>
         <div className="table_container">
           <CommonTable
+            pdfExportable={{
+              columns: pdfCols,
+            }}
             customTopbar={renderCustomTopbar()}
             topbarRightPannel={renderTopbarRight()}
             hasPrint

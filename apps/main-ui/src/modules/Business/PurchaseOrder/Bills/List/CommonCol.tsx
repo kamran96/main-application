@@ -87,6 +87,70 @@ export const PurchaseOrderColumns: ColumnsType<any> = [
   },
 ];
 
+export const PDFColsBills: ColumnsType<any> = [
+  {
+    title: 'Order No#',
+    dataIndex: 'invoiceNumber',
+    key: 'invoiceNumber',
+  },
+
+  {
+    title: 'Ref',
+    dataIndex: 'reference',
+    key: 'reference',
+  },
+  {
+    title: 'Comment',
+    dataIndex: 'comment',
+    key: 'comment',
+    render: (data) => (data ? data : '-'),
+  },
+  {
+    title: 'Supplier',
+    dataIndex: 'contact',
+    key: 'contact',
+    render: (data, row, index) => (data ? data.name : '-'),
+  },
+
+  {
+    title: 'Date Raised',
+    dataIndex: 'issueDate',
+    key: 'issueDate',
+    render: (data, row, index) => dayjs(data).format(`	MMMM D, YYYY`),
+  },
+  {
+    title: 'Delivery Date',
+    dataIndex: 'dueDate',
+    key: 'dueDate',
+    render: (data, row, index) =>
+      (data && dayjs(data).format(`MMMM D, YYYY`)) || `-`,
+  },
+  {
+    title: 'Paid Amount',
+    dataIndex: 'paid_amount',
+    key: 'paid_amount',
+    render: (data) => {
+      return data ? moneyFormat(Math.abs(data)) : '-';
+    },
+  },
+
+  {
+    title: 'Total',
+    dataIndex: 'netTotal',
+    key: 'netTotal',
+    render: (data) => (data ? moneyFormat(data) : '-'),
+  },
+  {
+    title: 'Status',
+    dataIndex: '',
+    key: '',
+    render: (data, row, index) => {
+      const rowData = plainToClass(InvoiceResultClass, row);
+      return row && rowData.getStatus();
+    },
+  },
+];
+
 export const _csvExportable: ITableExportFields = {
   invoiceNumber: 'Order Number',
   reference: 'Reference',

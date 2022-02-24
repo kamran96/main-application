@@ -21,6 +21,7 @@ import {
 } from '../../../../modal';
 import { IInvoiceResponse, ORDER_TYPE } from '../../../../modal/invoice';
 import { ISupportedRoutes } from '../../../../modal/routing';
+import { PDFQuotesCols } from './commonCol';
 import QuotesFilters from './QuotesFilters';
 
 interface IProps {
@@ -171,6 +172,7 @@ export const ALLQuotesList: FC<IProps> = ({ columns }) => {
   return (
     <>
       <CommonTable
+        pdfExportable={{ columns: PDFQuotesCols }}
         className="border-top-none"
         data={result}
         customTopbar={

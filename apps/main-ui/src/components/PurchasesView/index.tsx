@@ -385,11 +385,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
       permission: PERMISSIONS?.INVOICES_CREATE,
       key: IInvoiceActions.CREDIT_NOTE,
     },
-    {
-      title: 'Download as PDF',
-      permission: null,
-      key: IInvoiceActions.DOWNLOAD_PDF,
-    },
+
     {
       title: 'Email',
       permission: null,
@@ -413,11 +409,11 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
 
   const addresses = response?.contact?.addresses || [];
 
-  return (
-    <PDFViewer width={'100%'} height={'900px'}>
-      <InvoicePDF type={type} data={response} />
-    </PDFViewer>
-  );
+  // return (
+  //   <PDFViewer width={'100%'} height={'900px'}>
+  //     <InvoicePDF type={type} data={response} />
+  //   </PDFViewer>
+  // );
 
   return (
     <WrapperNewPurchaseView>

@@ -224,16 +224,18 @@ export const ItemsForm: FC = () => {
     console.log(errorInfo);
   };
 
-  const {data: resAllAccounts} = useQuery([`all-accounts`, `ALL`], getAllAccounts, {
-    enabled: itemsModalConfig.visibility,
-  });
+  const { data: resAllAccounts } = useQuery(
+    [`all-accounts`, `ALL`],
+    getAllAccounts,
+    {
+      enabled: itemsModalConfig.visibility,
+    }
+  );
   const allLiabilitiesAcc: IAccountsResult[] =
-    (
-      resAllAccounts?.data.result.filter(
-        (item: IAccountsResult) =>
-          item?.secondary_account?.primary_account?.name === 'liability'
-      )) ||
-    [];
+    resAllAccounts?.data.result.filter(
+      (item: IAccountsResult) =>
+        item?.secondaryAccount?.primaryAccount?.name === 'liability'
+    ) || [];
 
   useEffect(() => {
     return () => {

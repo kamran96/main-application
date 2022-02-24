@@ -5,7 +5,7 @@ import { useMutation } from 'react-query';
 import { Link } from 'react-router-dom';
 
 import styled from 'styled-components';
-import en from '../../../../../node_modules/world_countries_lists/data/en/world.json';
+import en from 'world_countries_lists/data/en/world.json';
 import { RegisterAPI } from '../../api/auth';
 import { userCheckAPI } from '../../api/users';
 import { Heading } from '../../components/Heading';
@@ -34,8 +34,6 @@ export const RegisterForm: FC = () => {
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
-    console.log(values);
-    return false;
     try {
       await mutateRegister(values, {
         onSuccess: (data) => {

@@ -1,13 +1,13 @@
-import { Button } from "antd";
-import React, { FC, ReactElement } from "react";
-import styled from "styled-components";
-import { Color } from "../../../../../modal";
-import deleteIcon from "@iconify/icons-carbon/delete";
-import Icon from "@iconify/react";
-import baselineAlternateEmail from "@iconify-icons/ic/baseline-alternate-email";
-import editSolid from "@iconify/icons-clarity/edit-solid";
-import { PDFICON } from "../../../../../components/Icons";
-import printIcon from "@iconify-icons/bytesize/print";
+import { Button } from 'antd';
+import React, { FC, ReactElement } from 'react';
+import styled from 'styled-components';
+import { Color } from '../../../../../modal';
+import deleteIcon from '@iconify/icons-carbon/delete';
+import Icon from '@iconify/react';
+import baselineAlternateEmail from '@iconify-icons/ic/baseline-alternate-email';
+import editSolid from '@iconify/icons-clarity/edit-solid';
+import { PDFICON } from '../../../../../components/Icons';
+import printIcon from '@iconify-icons/bytesize/print';
 
 interface IProps {
   disabled?: boolean;
@@ -40,7 +40,7 @@ export const PurchaseTopbar: FC<IProps> = ({
           <Button
             onClick={onApprove}
             disabled={disabled}
-            className={`${!disabled ? "_customized_button" : ""}`}
+            className={`${!disabled ? '_customized_button' : ''}`}
           >
             Approve
           </Button>
@@ -50,7 +50,7 @@ export const PurchaseTopbar: FC<IProps> = ({
             disabled={disabled}
             onClick={onEdit}
             className={` flex alignCenter ${
-              !disabled ? "_customized_button" : ""
+              !disabled ? '_customized_button' : ''
             }`}
           >
             <i className="flex alignCenter _icon_button">
@@ -64,7 +64,7 @@ export const PurchaseTopbar: FC<IProps> = ({
             disabled={disabled}
             onClick={onDelete}
             className={` flex alignCenter  ${
-              !disabled ? "_customized_button" : ""
+              !disabled ? '_customized_button' : ''
             }`}
           >
             <i className="flex alignCenter _icon_button">
@@ -77,7 +77,7 @@ export const PurchaseTopbar: FC<IProps> = ({
           disabled={disabled}
           onClick={onEmail}
           className={`flex alignCenter ${
-            !disabled ? "_customized_button" : ""
+            !disabled ? '_customized_button' : ''
           }`}
         >
           <i className="flex alignCenter _icon_button">
@@ -86,15 +86,7 @@ export const PurchaseTopbar: FC<IProps> = ({
           Email
         </Button>
       </div>
-      <div className={"_print flex alignCenter"}>
-        <Button
-          className="mr-10 flex alignCenter _print_button"
-          disabled={disabled}
-          type="ghost"
-        >
-          <PDFICON className="flex alignCenter mr-10" /> Download as PDF
-        </Button>
-
+      <div className={'_print flex alignCenter'}>
         <div className="filter_space">{renderSmartFilter}</div>
       </div>
     </WrapperPurchaseTopbar>

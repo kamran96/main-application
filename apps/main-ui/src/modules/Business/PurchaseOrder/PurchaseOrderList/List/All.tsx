@@ -24,7 +24,7 @@ import {
 } from '../../../../../modal';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
 import { purchaseOrderList } from '../../../../../api/purchaseOrder';
-import { _csvColumns } from './CommonCol';
+import { pdfColsPO, _csvColumns } from './CommonCol';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
 
@@ -218,12 +218,13 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
   return (
     <ALlWrapper>
       <CommonTable
+        pdfExportable={{ columns: pdfColsPO }}
         exportable
         exportableProps={{
           fields: _csvColumns,
           fileName: 'approved-purchase-orders',
         }}
-        printTitle={'Approved Purchase Orders List'}
+        printTitle={'Approved Purchase Orders'}
         className={'border-top-none'}
         hasPrint
         topbarRightPannel={renerTopRightbar()}

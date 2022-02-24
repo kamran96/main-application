@@ -31,12 +31,16 @@ export interface IOrganization extends IBase {
   name?: string;
   niche?: string;
   financialEnding?: string;
+  email?: string;
   status?: number;
   organizationType?: IOrganizationType;
-
+  phoneNumber?: string;
   branches?: IBranch[];
   currency?: ICurrency;
   address?: IAddress;
+  website?: string;
+  attachment?: IAttachment;
+  attachmentId?: string;
 }
 
 export interface IBranch extends IBase {

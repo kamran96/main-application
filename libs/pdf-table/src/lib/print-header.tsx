@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, Image } from '@react-pdf/renderer';
+// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 import TestImage from '../../../../apps/main-ui/src/assets/xero.png';
 
 const styles = StyleSheet.create({

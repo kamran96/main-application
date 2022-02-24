@@ -81,7 +81,7 @@ export const draftInvoicesSuggestAPI = (key?: any) =>
   http.get('/invoice-draft');
 
 export const getInvoiceNumber = ({ queryKey }: QueryKey) => {
-  const type = queryKey[1];
+  const type = queryKey[1] || 'SI';
   return http?.get(`${INVOICES_API.INDEX}/number?type=${type}`);
 };
 
