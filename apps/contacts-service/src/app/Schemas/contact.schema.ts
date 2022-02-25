@@ -39,6 +39,8 @@ export class Contact {
   balance: number;
   @Prop()
   importedFrom: string;
+  @Prop({ default: false })
+  hasOpeningBalance: boolean;
   @Prop()
   importedContactId: string;
   @Prop()

@@ -64,4 +64,8 @@ export class Invoices {
 
   @OneToMany(() => InvoiceItems, (invoiceItem) => invoiceItem.invoice)
   invoiceItems: InvoiceItems[];
+
+  @OneToOne(() => CreditNotes)
+  @JoinColumn({ name: 'id', referencedColumnName: 'invoiceId' })
+  creditNote: CreditNotes;
 }

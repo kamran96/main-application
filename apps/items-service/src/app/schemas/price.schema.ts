@@ -26,6 +26,8 @@ export class Price {
   tax: string;
   @Prop()
   discount: string;
+  @Prop()
+  transactionId: number;
   @Prop({ type: mongoose.Schema.Types.ObjectId, schema: 'Item' })
   itemId: Item;
   @Prop()

@@ -13,6 +13,7 @@ export class ItemDto {
   isNewRecord: boolean;
   hasInventory: boolean;
   hasCategory: boolean;
+  targetAccount: number;
   attribute_values: Array<AttributeValuesDto>;
 }
 

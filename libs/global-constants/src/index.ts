@@ -36,8 +36,11 @@ export enum Entries {
 }
 
 export enum EntryType {
+  FULLPAYMENT = 3,
   CREDIT = 1,
   COLLECTION = 2,
+  CREDITNOTE = 4,
+  DEBITNOTE = 5,
 }
 
 export enum UserStatuses {

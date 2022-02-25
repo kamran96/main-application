@@ -22,7 +22,7 @@ export class CreditNoteItems {
   @Column()
   quantity: number;
   @Column()
-  itemDiscount: number;
+  itemDiscount: string;
   @Column()
   unitPrice: number;
   @Column()
