@@ -164,7 +164,7 @@ export const _csvExportable: ITableExportFields = {
   contact: {
     header: 'Supplier',
     formatter: (data) => {
-      return data.name;
+      return data?.name;
     },
   },
   issueDate: {
@@ -179,14 +179,9 @@ export const _csvExportable: ITableExportFields = {
       return data ? dayjs(data).format(`MM/DD/YYYY h:mm A`) : '-';
     },
   },
-  purchase_items: {
-    header: 'Items Count',
-    formatter: (data) => {
-      return data.length;
-    },
-  },
+
   netTotal: {
     header: 'Total',
-    formatter: (data) => (data ? moneyFormat(data) : ''),
+    formatter: (data) => (data ? data : ''),
   },
 };

@@ -46,12 +46,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   const { notificationCallback } = useGlobalContext();
 
   useEffect(() => {
-    if (
-      routeHistory &&
-      routeHistory.history &&
-      routeHistory.history.location &&
-      routeHistory.history.location.search
-    ) {
+    if (routeHistory?.history?.location?.search) {
       let obj = {};
       const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
@@ -78,12 +73,8 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   const allContacts = useQuery([`all-contacts`, 'ALL'], getAllContacts);
 
   useEffect(() => {
-    if (
-      allContacts.data &&
-      allContacts.data.data &&
-      allContacts.data.data.result
-    ) {
-      const { result } = allContacts.data.data;
+    if (allContacts?.data?.data?.result) {
+      const { result } = allContacts?.data?.data;
       const schema = invoiceFiltersSchema;
       schema.contactId.value = result.filter(
         (item) => item.contactType === IContactTypes.CUSTOMER
@@ -131,6 +122,8 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
       setAllInvoicesRes({ ...resolvedData.data, result: newResult });
     }
   }, [resolvedData]);
+
+  console.log(result, 'list');
 
   /* Function select rows and to set selectedRow state */
 

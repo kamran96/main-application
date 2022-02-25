@@ -303,9 +303,9 @@
     /* border: 1px solid #dedede !important; */
     font-size: 12px !important;
     padding: 10px 0 10px 10px !important;
-    color: #ffffff !important;
+    color: #f7fbff !important;
     text-transform: uppercase;
-    background-color: #143c69;
+    background-color: #838383;
   }
   #purchase_order_print_view .table_list tbody tr td {
     font-size: 14px !important;
@@ -391,9 +391,9 @@
   .antd-table-print thead tr th {
     font-size: 12px !important;
     padding: 10px 0 10px 10px !important;
-    color: #ffffff !important;
+    color: #f7fbff !important;
     text-transform: uppercase;
-    background-color: #143c69;
+    background-color: #838383;
   }
   .antd-table-print tbody tr td {
     font-size: 14px !important;
@@ -436,9 +436,9 @@
   .balancesheet-table thead tr th.main-title-head {
     font-size: 12px !important;
     padding: 10px 0 10px 10px !important;
-    color: #ffffff !important;
+    color: #f7fbff !important;
     text-transform: uppercase;
-    background-color: #143c69;
+    background-color: #838383;
     border: 1px solid #e8e8e8 !important;
   }
 
@@ -508,8 +508,8 @@
   .cash_flow_table table thead tr th {
     text-transform: capitalize;
     padding: 11px;
-    background: #143c69;
-    color: white;
+    background: #838383;
+    color: #f7fbff;
   }
   .cash_flow_table table tbody tr td {
     padding: 15px 10px;

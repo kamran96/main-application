@@ -3,6 +3,7 @@ import React from 'react';
 import dayJs from 'dayjs';
 import { Link } from 'react-router-dom';
 import { ISupportedRoutes } from '../../../modal';
+import { ITableExportFields } from 'ant-table-extensions';
 
 export const columns: ColumnsType<any> = [
   {
@@ -56,6 +57,30 @@ export const columns: ColumnsType<any> = [
     render: (data) => (data === 1 ? 'Aproved' : 'Draft'),
   },
 ];
+
+export const csvColumns: ITableExportFields = {
+  invoiceNumber: 'Invoice Numbber',
+  reference: 'Reference',
+  contact: {
+    header: 'Contact',
+    formatter: (data) => {
+      return data?.name;
+    },
+  },
+  issueDate: {
+    header: 'Issue Date',
+    formatter: (data) => {
+      return data ? dayJs(data).format('MMMM D, YYYY h:mm A') : '-';
+    },
+  },
+  netTotal: 'Amount',
+  status: {
+    header: 'Status',
+    formatter: (data) => {
+      return data === 1 ? 'Aproved' : 'Draft';
+    },
+  },
+};
 
 export const pdfCols: ColumnsType<any> = [
   {

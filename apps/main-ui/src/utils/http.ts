@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { DecriptionData } from './encription';
 
-const localIP = `http://192.168.1.114`;
+const localIP = `http://192.168.1.27`;
 
 let NodeBaseURL = ``;
 const cancelSource = axios.CancelToken.source();

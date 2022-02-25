@@ -139,7 +139,9 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
       key: 'entryType',
       render: (data, row, index) => {
         const renderDebit = () => {
-          return data === IEntryType.DEBIT ? moneyFormat(row.amount) : '-';
+          return data === IEntryType.DEBIT || data === IEntryType?.DEBIT_NOTE
+            ? moneyFormat(row.amount)
+            : '-';
         };
 
         return <>{renderDebit()}</>;
@@ -151,7 +153,9 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
       key: 'entryType',
       render: (data, row) => {
         const renderCredits = () => {
-          return data === IEntryType.CREDIT ? moneyFormat(row.amount) : '-';
+          return data === IEntryType.CREDIT || data === IEntryType?.CREDIT_NOTE
+            ? moneyFormat(row.amount)
+            : '-';
         };
         return <>{renderCredits()}</>;
       },

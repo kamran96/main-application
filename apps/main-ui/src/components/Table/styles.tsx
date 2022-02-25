@@ -128,6 +128,15 @@ export const WrapperTable = styled.div`
       }
     }
   }
+  ._exportable_button.disabled {
+    button {
+      background: ${(props: IThemeProps) =>
+        props?.theme?.colors?.buttonTagBg} !important;
+      color: ${(props: IThemeProps) => props?.theme?.colors?.buttonTagColor};
+      border: none;
+      outline: none;
+    }
+  }
 
   ::-webkit-scrollbar {
     width: 10px !important;

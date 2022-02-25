@@ -126,10 +126,13 @@ export const CommonTable: FC<IProps> = ({
 
   /* **************UTILITY CONSTANTS ************ */
   const _newData: any[] = data ? data : (rest?.dataSource as any[]);
-  const _exportableProps: IExportFieldButtonProps = exportableProps
+
+  const _exportableProps: IExportFieldButtonProps = exportableProps?.fields
     ? {
         dataSource: _newData,
         columns: columns,
+        disabled: !_newData.length,
+        showColumnPicker: true,
         ...exportableProps,
       }
     : {
@@ -200,7 +203,11 @@ export const CommonTable: FC<IProps> = ({
             <div className="flex-1 mr-10">{customTopbar}</div>
             <div className="flex alignCenter">
               {exportable && (
-                <div className="mr-10 flex alignCenter _exportable_button">
+                <div
+                  className={`mr-10 flex alignCenter _exportable_button ${
+                    _exportableProps?.disabled ? 'disabled ' : ''
+                  }`}
+                >
                   <ExportTableButton {..._exportableProps}>
                     Export to CSV
                   </ExportTableButton>
