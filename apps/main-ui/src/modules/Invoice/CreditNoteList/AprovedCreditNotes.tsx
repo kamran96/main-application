@@ -15,7 +15,7 @@ import editSolid from '@iconify-icons/clarity/edit-solid';
 import { SmartFilter } from '../../../components/SmartFilter';
 import { PDFICON } from '../../../components/Icons';
 import FilteringSchema from './FilteringSchema';
-import columns, { pdfCols } from './commonCols';
+import columns, { pdfCols, csvColumns } from './commonCols';
 
 export const AprovedCreditNotes: FC = () => {
   /* HOOKS HERE */
@@ -151,6 +151,10 @@ export const AprovedCreditNotes: FC = () => {
         customTopbar={renderCustomTableTobar()}
         topbarRightPannel={renderTopbarRight()}
         exportable
+        exportableProps={{
+          fileName: 'approved-credit-notes',
+          fields: csvColumns,
+        }}
         printTitle={'Credit Notes'}
         onChange={(pagination, filters, sorter: any, extra) => {
           setCreditNoteConfig({

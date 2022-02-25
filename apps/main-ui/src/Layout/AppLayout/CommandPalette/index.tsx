@@ -347,14 +347,14 @@ export const InvyceCmdPalette = () => {
             <Icon icon={arrowDown} />
           </i>
         </div>
-        <h4>To navigate</h4>
+        <h5>To navigate</h5>
         <div className="flex alignCenter">
           <div className="label mr-10">Enter</div>
-          <h4>To select</h4>
+          <h5>To select</h5>
         </div>
         <div className="flex alignCenter">
           <div className="label mr-10">Esc</div>
-          <h4>To dismiss</h4>
+          <h5>To dismiss</h5>
         </div>
       </Wrapperheader>
     );
@@ -449,7 +449,7 @@ const Wrapperheader = styled.div`
   justify-content: space-between;
 
   h3,
-  h4 {
+  h5 {
     margin: 0;
     color: ${(props: IThemeProps) => props?.theme?.colors?.sidebarDefaultText};
   }
@@ -465,7 +465,7 @@ const Wrapperheader = styled.div`
     font-size: 10px;
   }
   .icon {
-    padding: 6px 9px;
+    padding: 6px 7px;
   }
 `;
 

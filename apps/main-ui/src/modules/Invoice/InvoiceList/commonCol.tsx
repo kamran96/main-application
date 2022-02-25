@@ -28,7 +28,7 @@ export const InvoiceColumns: ColumnsType<any> = [
     dataIndex: 'contact',
     key: 'contact',
     render: (contact, row, index) => {
-      return <>{contact ? contact.name : '-'}</>;
+      return contact ? contact.name : '-';
     },
   },
 
@@ -37,7 +37,7 @@ export const InvoiceColumns: ColumnsType<any> = [
     dataIndex: 'issueDate',
     key: 'issueDate',
     render: (data, row, index) => {
-      return <>{data ? dayjs(data).format(`MMMM D, YYYY h:mm A`) : '-'}</>;
+      return data ? dayjs(data).format(`MMMM D, YYYY h:mm A`) : '-';
     },
   },
   {
@@ -45,7 +45,7 @@ export const InvoiceColumns: ColumnsType<any> = [
     dataIndex: 'dueDate',
     key: 'dueDate',
     render: (data, row, index) => {
-      return <>{data ? dayjs(data).format(`MMMM D, YYYY h:mm A`) : '-'}</>;
+      return data ? dayjs(data).format(`MMMM D, YYYY h:mm A`) : '-';
     },
   },
   {
@@ -53,25 +53,23 @@ export const InvoiceColumns: ColumnsType<any> = [
     dataIndex: 'paid_amount',
     key: 'paid_amount',
     render: (data) => {
-      return <>{data ? moneyFormat(Math.abs(data)) : '-'}</>;
+      return data ? moneyFormat(Math.abs(data)) : '-';
     },
   },
   {
     title: 'Due',
-    dataIndex: 'due',
+    dataIndex: 'due_amount',
     key: '',
-    render: (data, row: InvoiceResultClass, index) => {
-      const rowData = plainToClass(InvoiceResultClass, row);
-      return <>{row ? moneyFormat(rowData.getRemaningAmount()) : '-'}</>;
+    render: (data) => {
+      return data ? moneyFormat(Math.abs(data)) : '-';
     },
   },
   {
     title: 'Items',
     dataIndex: 'invoiceItems',
     key: 'invoiceItems',
-    render: (data: any[]) => (
-      <>{data.length === 1 ? `${data.length} Item` : `${data.length} Items`}</>
-    ),
+    render: (data: any[]) =>
+      data.length === 1 ? `${data.length} Item` : `${data.length} Items`,
   },
   {
     title: 'Status',
@@ -79,7 +77,7 @@ export const InvoiceColumns: ColumnsType<any> = [
     key: '',
     render: (data, row, index) => {
       const rowData = plainToClass(InvoiceResultClass, row);
-      return <>{row && rowData.getStatus()}</>;
+      return row && rowData.getStatus();
     },
   },
 ];
@@ -107,15 +105,14 @@ export const _exportableCols: ITableExportFields = {
   },
   paid_amount: {
     header: 'Paid Amount',
-    formatter: (data, record) => {
-      return data ? moneyFormat(Math.abs(data)) : '-';
+    formatter: (data: number) => {
+      return data ? Math.abs(data).toString() : '-';
     },
   },
-  due: {
+  due_amount: {
     header: 'Due',
     formatter: (data, record) => {
-      const rowData = plainToClass(InvoiceResultClass, record);
-      return record ? moneyFormat(rowData.getRemaningAmount()) : '-';
+      return data ? Math.abs(data).toString() : '-';
     },
   },
   status: {
@@ -172,12 +169,8 @@ export const PdfCols: ColumnsType<any> = [
   },
   {
     title: 'Due',
-    dataIndex: 'due',
+    dataIndex: 'due_amount',
     key: '',
-    render: (data, row: InvoiceResultClass, index) => {
-      const rowData = plainToClass(InvoiceResultClass, row);
-      return row ? moneyFormat(rowData.getRemaningAmount()) : '-';
-    },
   },
 
   {

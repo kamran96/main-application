@@ -211,7 +211,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
       },
       {
-        title: 'Amount',
+        title: 'Balance',
         dataIndex: 'balance',
         key: 'balance',
         render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,

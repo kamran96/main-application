@@ -30,7 +30,7 @@ export const settingRoutingScheam: ISettingRoutesSchema[] = [
     icon: bxEditAlt,
   },
   {
-    tag: 'Organisation Details',
+    tag: 'Organisations',
     route: `${root}${ISupportedRoutes?.Organizations}`,
     icon: organizationLine,
   },

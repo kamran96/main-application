@@ -441,7 +441,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               </Para>
             </div>
           </Col>
-          {!id && (
+          {!data?.data?.result?.hasOpeningBalance && (
             <>
               <Col span={24}>
                 <div className="pb-10">
