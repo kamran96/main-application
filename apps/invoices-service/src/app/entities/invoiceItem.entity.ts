@@ -18,7 +18,7 @@ export class InvoiceItems {
   @Column()
   description: string;
   @Column()
-  quantity: string;
+  quantity: number;
   @Column()
   itemDiscount: string;
   @Column()

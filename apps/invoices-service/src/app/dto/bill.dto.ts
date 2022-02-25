@@ -25,10 +25,10 @@ class BillItemsDto {
   id: number;
   itemId: string;
   description: string;
-  quantity: string;
+  quantity: number;
   itemDiscount: string;
   purchasePrice: number;
-  unitPrice: string;
+  unitPrice: number;
   tax: string;
   total: number;
   accountId: number;

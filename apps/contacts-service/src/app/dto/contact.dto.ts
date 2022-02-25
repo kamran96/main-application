@@ -42,6 +42,7 @@ export class AddressDto {
 
 export class ContactIds {
   ids: Array<number>;
+  type: number;
 }
 
 export class ParamsDto {

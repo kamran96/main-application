@@ -52,7 +52,7 @@ export class CreditNoteController {
   async create(
     @Body() creditNoteDto: CreditNoteDto,
     @Req() req: IRequest
-  ): Promise<ICreditNoteWithResponse> {
+  ): Promise<unknown> {
     try {
       const credit_note = await this.creditNoteService.CreateCreditNote(
         creditNoteDto,

@@ -24,7 +24,7 @@ class CreditNoteItemDto {
   itemId: string;
   description: string;
   quantity: number;
-  itemDiscount: number;
+  itemDiscount: string;
   unitPrice: number;
   tax: string;
   total: number;

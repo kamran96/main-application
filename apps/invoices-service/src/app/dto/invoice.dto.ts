@@ -25,9 +25,9 @@ export class InvoiceItemsDto {
   id: number;
   itemId: string;
   description: string;
-  quantity: string;
+  quantity: number;
   itemDiscount: string;
-  unitPrice: string;
+  unitPrice: number;
   tax: string;
   accountId: number;
   total: number;

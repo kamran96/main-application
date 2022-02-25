@@ -49,6 +49,29 @@ export class InvoiceService {
     const { page_no, page_size, invoice_type, type, status, sort, query } =
       queryData;
 
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const tokenType =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [tokenType]: value,
+      },
+    });
+
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
     let invoices;
@@ -124,29 +147,6 @@ export class InvoiceService {
         };
       }
     } else {
-      let token;
-      if (process.env.NODE_ENV === 'development') {
-        const header = req.headers?.authorization?.split(' ')[1];
-        token = header;
-      } else {
-        if (!req || !req.cookies) return null;
-        token = req.cookies['access_token'];
-      }
-
-      const tokenType =
-        process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-      const value =
-        process.env.NODE_ENV === 'development'
-          ? `Bearer ${token}`
-          : `access_token=${token}`;
-
-      const http = axios.create({
-        baseURL: 'http://localhost',
-        headers: {
-          [tokenType]: value,
-        },
-      });
-
       if (type === 'ALL') {
         invoices = await getCustomRepository(InvoiceRepository).find({
           where: {
@@ -173,10 +173,13 @@ export class InvoiceService {
         for (const i of invoices) {
           const balance = balances.find((bal) => bal.id === i.id);
 
-          const paid_amount = balance?.invoice?.balance || 0;
-          const due_amount = balance?.invoice?.balance
-            ? i.netTotal - balance?.invoice?.balance
-            : i.netTotal;
+          const due_amount =
+            balance.invoice.credit_notes !== 0
+              ? balance.invoice.credits -
+                balance.invoice.credit_notes -
+                balance.invoice.payment
+              : balance.invoice.balance;
+          const paid_amount = balance.invoice.payment;
 
           const payment_status = () => {
             if (paid_amount < due_amount && due_amount < i?.netTotal) {
@@ -192,8 +195,8 @@ export class InvoiceService {
 
           invoice_arr.push({
             ...i,
-            paid_amount,
-            due_amount: i.netTotal - balance.invoice.balance || 0,
+            paid_amount: paid_amount || 0,
+            due_amount: due_amount || 0,
             payment_status: payment_status(),
           });
         }
@@ -223,10 +226,13 @@ export class InvoiceService {
         for (const i of invoices) {
           const balance = balances.find((bal) => bal.id === i.id);
 
-          const paid_amount = balance?.invoice?.balance || 0;
-          const due_amount = balance?.invoice?.balance
-            ? i.netTotal - balance?.invoice?.balance
-            : i.netTotal;
+          const due_amount =
+            balance.invoice.credit_notes !== 0
+              ? balance.invoice.credits -
+                balance.invoice.credit_notes -
+                balance.invoice.payment
+              : balance.invoice.balance;
+          const paid_amount = balance.invoice.payment;
 
           const payment_status = () => {
             if (paid_amount < due_amount && due_amount < i?.netTotal) {
@@ -239,11 +245,12 @@ export class InvoiceService {
               return null;
             }
           };
-          if (balance.invoice.balance === 0) {
+          console.log(balance);
+          if (balance.invoice.balance !== 0) {
             invoice_arr.push({
               ...i,
-              paid_amount,
-              due_amount: i.netTotal - balance.invoice.balance || 0,
+              paid_amount: paid_amount || 0,
+              due_amount: due_amount || 0,
               payment_status: payment_status(),
             });
           }
@@ -274,10 +281,13 @@ export class InvoiceService {
         for (const i of invoices) {
           const balance = balances.find((bal) => bal.id === i.id);
 
-          const paid_amount = balance?.invoice?.balance || 0;
-          const due_amount = balance?.invoice?.balance
-            ? i.netTotal - balance?.invoice?.balance
-            : i.netTotal;
+          const due_amount =
+            balance.invoice.credit_notes !== 0
+              ? balance.invoice.credits -
+                balance.invoice.credit_notes -
+                balance.invoice.payment
+              : balance.invoice.balance;
+          const paid_amount = balance.invoice.payment;
 
           const payment_status = () => {
             if (paid_amount < due_amount && due_amount < i?.netTotal) {
@@ -290,11 +300,11 @@ export class InvoiceService {
               return null;
             }
           };
-          if (balance.invoice.balance !== 0) {
+          if (paid_amount) {
             invoice_arr.push({
               ...i,
-              paid_amount,
-              due_amount: i.netTotal - balance.invoice.balance || 0,
+              paid_amount: paid_amount || 0,
+              due_amount: due_amount || 0,
               payment_status: payment_status(),
             });
           }
@@ -324,8 +334,30 @@ export class InvoiceService {
       }
     }
 
+    const new_invoices = [];
+    const mapContactIds = invoice_arr.map((inv) => inv.contactId);
+
+    const newContactIds = mapContactIds
+      .sort()
+      .filter(function (item, pos, ary) {
+        return !pos || item != ary[pos - 1];
+      });
+
+    const { data: contacts } = await http.post(`contacts/contact/ids`, {
+      ids: newContactIds,
+      type: 1,
+    });
+
+    for (const i of invoice_arr) {
+      const contact = contacts.find((c) => c.id === i.contactId);
+      new_invoices.push({
+        ...i,
+        contact,
+      });
+    }
+
     return {
-      result: invoice_arr,
+      result: new_invoices,
       pagination: {
         total,
         total_pages: Math.ceil(total / ps),
@@ -423,7 +455,7 @@ export class InvoiceService {
           description: item.description,
           quantity: item.quantity,
           itemDiscount: item.itemDiscount,
-          unitPrice: parseInt(item.unitPrice),
+          unitPrice: item.unitPrice,
           costOfGoodAmount: item.costOfGoodAmount,
           sequence: item.sequence,
           tax: item.tax,
@@ -545,7 +577,7 @@ export class InvoiceService {
           description: item.description,
           quantity: item.quantity,
           itemDiscount: item.itemDiscount,
-          unitPrice: parseInt(item.unitPrice),
+          unitPrice: item.unitPrice,
           costOfGoodAmount: item.costOfGoodAmount,
           sequence: item.sequence,
           tax: item.tax,
@@ -695,10 +727,11 @@ export class InvoiceService {
       relations: ['invoiceItems'],
     });
 
-    const creditNote = await getCustomRepository(CreditNoteRepository).find({
-      select: ['id', 'invoiceNumber'],
-      where: { invoiceId: invoiceId },
-    });
+    const creditNote = await getCustomRepository(CreditNoteRepository)
+      .createQueryBuilder()
+      .where('"invoiceId" = :id', { id: invoiceId })
+      .select('id, "invoiceNumber", "netTotal" as balance')
+      .getRawMany();
 
     let new_invoice;
     if (invoice?.contactId) {
@@ -747,10 +780,14 @@ export class InvoiceService {
       });
 
       const balance = payments.find((bal) => parseInt(bal.id) === invoice.id);
-      const paid_amount = balance?.invoice?.balance || 0;
-      const due_amount = balance?.invoice?.balance
-        ? invoice.netTotal - balance?.invoice?.balance
-        : invoice.netTotal;
+
+      const due_amount =
+        balance.invoice.credit_notes !== 0
+          ? balance.invoice.credits -
+            balance.invoice.credit_notes -
+            balance.invoice.payment
+          : balance.invoice.balance;
+      const paid_amount = balance.invoice.payment;
 
       const payment_status = () => {
         if (paid_amount < due_amount && due_amount < invoice?.netTotal) {
@@ -897,7 +934,7 @@ export class InvoiceService {
   async FindInvoicesByContactId(contactId: string): Promise<IInvoice[]> {
     return await getCustomRepository(InvoiceRepository).find({
       where: { contactId },
-      relations: ['invoiceItems'],
+      relations: ['invoiceItems', 'creditNote'],
     });
   }
 
@@ -1187,7 +1224,7 @@ export class InvoiceService {
    * Aged payable report
    */
 
-   async AgedReceivables(req: IRequest, query) {
+  async AgedReceivables(req: IRequest, query) {
     let token;
     if (process.env.NODE_ENV === 'development') {
       const header = req.headers?.authorization?.split(' ')[1];
@@ -1257,7 +1294,6 @@ export class InvoiceService {
       }
     }
 
-
     return invoice_arr.flat();
   }
 
@@ -1306,13 +1342,14 @@ export class InvoiceService {
           ids: invoiceIds,
           type: 'INVOICE',
         });
+
         for (const inv of invoices) {
           const balance = payments.find((pay) => pay.id === inv.id);
-          const newBalance = balance.invoice.balance.toString().split('-')[1];
-          if (inv.netTotal != newBalance) {
+
+          if (balance.invoice.balance !== 0) {
             inv_arr.push({
               ...inv,
-              balance: inv.netTotal - newBalance || inv.netTotal,
+              balance: balance.invoice.balance,
             });
           }
         }
@@ -1390,6 +1427,7 @@ export class InvoiceService {
 
     const { data: contacts } = await http.post(`contacts/contact/ids`, {
       ids: mapContactIds,
+      type: 2,
     });
 
     const newPaymentPayload = [];
