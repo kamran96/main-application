@@ -27,13 +27,14 @@ import {
   EntryType,
   Integrations,
   PaymentModes,
+  PdfType,
   Statuses,
   XeroTypes,
 } from '@invyce/global-constants';
 import { BillItemRepository } from '../repositories/billItem.repository';
 import { InvoiceDto, InvoiceIdsDto } from '../dto/invoice.dto';
 import { ClientProxy } from '@nestjs/microservices';
-import { SEND_FORGOT_PASSWORD } from '@invyce/send-email';
+import { BILL_CREATED, SEND_FORGOT_PASSWORD } from '@invyce/send-email';
 
 dotenv.config();
 
@@ -245,7 +246,7 @@ export class InvoiceService {
               return null;
             }
           };
-          console.log(balance);
+
           if (balance.invoice.balance !== 0) {
             invoice_arr.push({
               ...i,
@@ -407,6 +408,24 @@ export class InvoiceService {
 
     const creditsArrray = [];
     const itemLedgerArray = [];
+    const invoice_details = [];
+
+    for (const item of dto.invoice_items) {
+      invoice_details.push({
+        itemName: await items.find((i) => i.id === item.itemId).name,
+        quantity: item.quantity,
+        price: item.purchasePrice,
+        itemDiscount: item.itemDiscount,
+        tax: item.tax,
+        total: item.total,
+      });
+    }
+
+    const { data: contact } = await http.post(`contacts/contact/ids`, {
+      ids: [dto.contactId],
+      type: 1,
+    });
+
     if (dto?.isNewRecord === false) {
       // we need to update invoice
       const invoice: IInvoice = await getCustomRepository(
@@ -540,6 +559,32 @@ export class InvoiceService {
           },
         ];
 
+        const { data: attachment } = await http.post(
+          `attachments/attachment/generate-pdf`,
+          {
+            data: {
+              ...dto,
+              invoice,
+              contact: contact[0],
+              items,
+              type: PdfType.INVOICE,
+            },
+          }
+        );
+
+        await this.emailService.emit(BILL_CREATED, {
+          to: contact[0]?.email,
+          user_name: contact[0]?.name,
+          invoice_number: invoice.invoiceNumber,
+          issueDate: invoice.issueDate,
+          gross_total: invoice.grossTotal,
+          itemDisTotal: invoice.discount,
+          net_total: invoice.netTotal,
+          invoice_details,
+          download_link: attachment?.path,
+          attachment_name: attachment?.name,
+        });
+
         await http.post(`payments/payment/add`, {
           payments: paymentArr,
         });
@@ -605,37 +650,6 @@ export class InvoiceService {
         creditsArrray.push(credit);
       }
 
-      const firstInvoice = await getCustomRepository(InvoiceRepository).find({
-        where: {
-          status: 1,
-          organizationId: req.user.organizationId,
-        },
-      });
-
-      if (firstInvoice.length === 1) {
-        const payload = {
-          to: req.user.email,
-          from: 'no-reply@invyce.com',
-          TemplateAlias: 'congrats-on-your-first-invoice',
-          TemplateModel: {
-            product_url: 'product_url_Value',
-            user_name: req.user.profile.fullName,
-            sender_name: 'sender_name_Value',
-            product_name: 'product_name_Value',
-            congrates_illustration_image: 'congrates_illustration_image_Value',
-            action_url: 'action_url_Value',
-            trial_extension_url: 'trial_extension_url_Value',
-            feedback_url: 'feedback_url_Value',
-            export_url: 'export_url_Value',
-            close_account_url: 'close_account_url_Value',
-            company_name: 'company_name_Value',
-            company_address: 'company_address_Value',
-          },
-        };
-
-        await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
-      }
-
       if (invoice.status === Statuses.AUTHORISED) {
         await http.post(`reports/inventory/manage`, {
           payload: itemLedgerArray,
@@ -684,6 +698,32 @@ export class InvoiceService {
             entryType: EntryType.CREDIT,
           },
         ];
+
+        const { data: attachment } = await http.post(
+          `attachments/attachment/generate-pdf`,
+          {
+            data: {
+              ...dto,
+              invoice,
+              contact: contact[0],
+              items,
+              type: PdfType.INVOICE,
+            },
+          }
+        );
+
+        await this.emailService.emit(BILL_CREATED, {
+          to: contact[0]?.email,
+          user_name: contact[0]?.name,
+          invoice_number: invoice.invoiceNumber,
+          issueDate: invoice.issueDate,
+          gross_total: invoice.grossTotal,
+          itemDisTotal: invoice.discount,
+          net_total: invoice.netTotal,
+          invoice_details,
+          download_link: attachment?.path,
+          attachment_name: attachment?.name,
+        });
 
         await http.post(`payments/payment/add`, {
           payments: paymentArr,
@@ -782,12 +822,12 @@ export class InvoiceService {
       const balance = payments.find((bal) => parseInt(bal.id) === invoice.id);
 
       const due_amount =
-        balance.invoice.credit_notes !== 0
-          ? balance.invoice.credits -
-            balance.invoice.credit_notes -
-            balance.invoice.payment
-          : balance.invoice.balance;
-      const paid_amount = balance.invoice.payment;
+        balance?.invoice?.credit_notes !== 0
+          ? balance?.invoice?.credits -
+            balance?.invoice?.credit_notes -
+            balance?.invoice?.payment
+          : balance?.invoice?.balance;
+      const paid_amount = balance?.invoice?.payment;
 
       const payment_status = () => {
         if (paid_amount < due_amount && due_amount < invoice?.netTotal) {
@@ -1325,6 +1365,7 @@ export class InvoiceService {
       },
     });
 
+    const inv_arr = [];
     if (type == PaymentModes.INVOICES) {
       const invoices = await getCustomRepository(InvoiceRepository).find({
         where: {
@@ -1336,7 +1377,6 @@ export class InvoiceService {
       });
 
       const invoiceIds = invoices?.map((i) => i.id);
-      const inv_arr = [];
       if (invoices.length > 0) {
         const { data: payments } = await http.post(`payments/payment/invoice`, {
           ids: invoiceIds,
@@ -1366,7 +1406,6 @@ export class InvoiceService {
         },
       });
 
-      const inv_arr = [];
       if (bills.length > 0) {
         const invoiceIds = bills?.map((i) => i.id);
 
@@ -1377,11 +1416,10 @@ export class InvoiceService {
 
         for (const inv of bills) {
           const balance = payments.find((pay) => pay.id === inv.id);
-          const newBalance = balance.invoice.balance;
-          if (inv.netTotal != newBalance) {
+          if (balance.invoice.billbalance !== 0) {
             inv_arr.push({
               ...inv,
-              balance: inv.netTotal - newBalance || inv.netTotal,
+              balance: balance.invoice.billbalance,
             });
           }
         }

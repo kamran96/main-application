@@ -22,7 +22,9 @@ export class InvoiceItems {
   @Column()
   itemDiscount: string;
   @Column()
-  unitPrice: number;
+  unitPrice: string;
+  @Column()
+  purchasePrice: string;
   @Column()
   accountId: number;
   @Column()

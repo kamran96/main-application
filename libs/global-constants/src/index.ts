@@ -53,3 +53,10 @@ export enum CreditNoteType {
   ACCRECCREDIT = 'ACCRECCREDIT',
   ACCPAYCREDIT = 'ACCPAYCREDIT',
 }
+
+export enum PdfType {
+  INVOICE = 'invoice',
+  CREDIT_NOTE = 'credit-note',
+  DEBIT_NOTE = 'debit-note',
+  BILL = 'bill',
+}
