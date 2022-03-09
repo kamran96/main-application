@@ -77,11 +77,13 @@ export class OrganizationController {
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
   async view(
-    @Param() params: OrganizationParams
+    @Param() params: OrganizationParams,
+    @Req() req: IRequest
   ): Promise<IOrganizationResponse> {
     try {
       const organization = await this.organizationService.ViewOrganization(
-        params.id
+        params.id,
+        req
       );
 
       if (organization) {

@@ -117,6 +117,18 @@ export class UserController {
     }
   }
 
+  @Post('change-email')
+  @UseGuards(GlobalAuthGuard)
+  async changeEmail(@Req() req: IRequest, @Body() body) {
+    const user = await this.userService.ChangeEmail(req.user, body.email);
+
+    if (user) {
+      return {
+        result: user,
+      };
+    }
+  }
+
   @Post('/check')
   async checkUsernameOrEmail(@Body() body): Promise<IUserWithResponse> {
     try {

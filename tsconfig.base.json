@@ -17,6 +17,7 @@
     "baseUrl": ".",
     "paths": {
       "@invyce/auth-middleware": ["libs/auth-middleware/src/index.ts"],
+      "@invyce/common": ["libs/common/src/index.ts"],
       "@invyce/editable-table": ["libs/editable-table/src/index.ts"],
       "@invyce/error-boundry": ["libs/error-boundry/src/index.ts"],
       "@invyce/global-auth-guard": ["libs/global-auth-guard/src/index.ts"],

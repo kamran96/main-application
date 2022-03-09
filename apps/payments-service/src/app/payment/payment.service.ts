@@ -485,7 +485,7 @@ export class PaymentService {
               select coalesce(sum(t.amount),0) from payments t where t."entryType" = 1 and t.${id} = p.${id}
             ) as credits,
             (
-              select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" = 4 and t.${id} = p.${id}
+              select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" in (4, 5) and t.${id} = p.${id}
             ) as credit_notes,
             (
               select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" = 2 and t.${id} = p.${id}
@@ -494,11 +494,21 @@ export class PaymentService {
               (
                 select coalesce(sum(t.amount),0) from payments t where t."entryType" = 1 and t.${id} = p.${id}
               ) - (
-                select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" = 4 and t.${id} = p.${id}
+                select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" in (4, 5) and t.${id} = p.${id}
               ) - (
                 select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" = 2 and t.${id} = p.${id}
               )
-            ) as balance
+            ) as balance,
+            (
+              (
+                select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" = 1 and t.${id} = p.${id}
+              ) - (
+                select coalesce(sum(t.amount),0) from payments t where t."entryType" in (4, 5) and t.${id} = p.${id}
+              ) - (
+                select coalesce(sum(t.amount),0) from payments t where t."entryType" = 2 and t.${id} = p.${id}
+              )
+            ) as billbalance
+
           from payments p
           where p.${id} = $1
           and p."branchId" = $2

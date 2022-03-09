@@ -24,7 +24,9 @@ export class CreditNoteItems {
   @Column()
   itemDiscount: string;
   @Column()
-  unitPrice: number;
+  unitPrice: string;
+  @Column()
+  purchasePrice: string;
   @Column()
   costOfGoodAmount: number;
   @Column()

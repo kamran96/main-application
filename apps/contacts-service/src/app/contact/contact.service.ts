@@ -336,20 +336,37 @@ export class ContactService {
       ids: mapContactIds,
     });
 
+    const getBalances = (balance, i) => {
+      if (i.type === PaymentModes.BILLS) {
+        if (i.openingBalance) {
+          return Math.abs(balance.payment.balance) + i.openingBalance;
+        } else {
+          return Math.abs(balance.payment.balance);
+        }
+      } else {
+        if (i.openingBalance) {
+          return Math.abs(balance.payment.balance) + i.openingBalance;
+        } else {
+          return Math.abs(balance.payment.balance);
+        }
+      }
+    };
+
     for (const i of contacts) {
       const balance = payments.find((pay) => pay.id == i._id);
       if (i.balance !== balance.payment.balance) {
         await this.contactModel.updateOne(
           { _id: i.id },
           {
-            balance:
-              i.contactType === PaymentModes.BILLS
-                ? i.openingBalance
-                  ? Math.abs(balance.payment.balance) + i.openingBalance
-                  : Math.abs(balance.payment.balance)
-                : i.openingBalance
-                ? balance.payment.balance + i.openingBalance
-                : balance.payment.balance,
+            balance: getBalances(balance, i),
+            // balance:
+            //   i.contactType === PaymentModes.BILLS
+            //     ? i.openingBalance
+            //       ? Math.abs(balance.payment.balance) + i.openingBalance
+            //       : Math.abs(balance.payment.balance)
+            //     : i.openingBalance
+            //     ? balance.payment.balance + i.openingBalance
+            //     : balance.payment.balance,
           }
         );
       }

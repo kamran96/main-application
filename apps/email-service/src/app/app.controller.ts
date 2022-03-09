@@ -11,6 +11,11 @@ import {
   TRAIL_STARTED,
   PASSWORD_UPDATED,
   SUSPEND_ACCOUNT,
+  ORGANIZATION_CREATED,
+  CHANGE_EMAIL_OTP,
+  EMAIL_CHANGED,
+  BILL_CREATED,
+  INVOICE_CREATED,
 } from '@invyce/send-email';
 
 @Controller()
@@ -37,11 +42,11 @@ export class AppController {
   }
 
   @MessagePattern(TRAIL_STARTED)
-  async trailStarted(@Payload() data: any) {
+  async trialStarted(@Payload() data: any) {
     Logger.log('Data is received.');
     Logger.log(data);
 
-    await this.appService.TrailStarted(data);
+    await this.appService.TrialStarted(data);
   }
 
   @MessagePattern(SEND_FORGOT_PASSWORD)
@@ -60,12 +65,36 @@ export class AppController {
     await this.appService.PasswordUpdated(data);
   }
 
+  @MessagePattern(CHANGE_EMAIL_OTP)
+  async changeEmailOtp(@Payload() data: any) {
+    Logger.log('Data is received.');
+    Logger.log(data);
+
+    await this.appService.ChangeEmailOtp(data);
+  }
+
+  @MessagePattern(EMAIL_CHANGED)
+  async emailChanged(@Payload() data: any) {
+    Logger.log('Data is received.');
+    Logger.log(data);
+
+    await this.appService.EmailChanged(data);
+  }
+
   @MessagePattern(SUSPEND_ACCOUNT)
   async suspendAccount(@Payload() data: any) {
     Logger.log('Data is received.');
     Logger.log(data);
 
     await this.appService.SuspendAccount(data);
+  }
+
+  @MessagePattern(ORGANIZATION_CREATED)
+  async organizationCreated(@Payload() data: any) {
+    Logger.log('Data is received.');
+    Logger.log(data);
+
+    await this.appService.OrganizationCreated(data);
   }
 
   @MessagePattern(SEND_OTP)
@@ -82,5 +111,21 @@ export class AppController {
     Logger.log(data);
 
     await this.appService.SendPdf(data);
+  }
+
+  @MessagePattern(BILL_CREATED)
+  async billCreated(@Payload() data: any) {
+    Logger.log('Data is received.');
+    Logger.log(data);
+
+    await this.appService.BillCreated(data);
+  }
+
+  @MessagePattern(INVOICE_CREATED)
+  async invoiceCreated(@Payload() data: any) {
+    Logger.log('Data is received.');
+    Logger.log(data);
+
+    await this.appService.InvoiceCreated(data);
   }
 }

@@ -3,13 +3,21 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as multer from 'multer';
 import * as multerS3 from 'multer-s3';
 import * as aws from 'aws-sdk';
+import * as moment from 'moment';
+import axios from 'axios';
+import * as PdfPrinter from 'pdfmake/src/printer';
+import * as fs from 'fs';
+import * as path from 'path';
 import * as puppeteer from 'puppeteer';
 import { Attachment } from '../schemas/attachment.schema';
-// const fs = require('fs').promises;
-// import { buildPaths } from '../buildPath';
+import { IRequest } from '@invyce/interfaces';
+import {
+  getCountryById,
+  moneyFormatJs,
+  totalDiscountInInvoice,
+} from '@invyce/common';
 
-// import { AttachmentRepository, BranchRepository } from '../repositories';
-// import { EmailService } from '../Common/services/email.service';
+const promises = fs.promises;
 
 const spacesEndpoint: any = new aws.Endpoint('sgp1.digitaloceanspaces.com');
 const s3 = new aws.S3({
@@ -17,6 +25,7 @@ const s3 = new aws.S3({
   accessKeyId: '7HZDHJARFO3DENGQY6XP',
   secretAccessKey: 'lOoHek25WXG2V4x1iDINSzPkPMPG+oC3lCLOARWUt5o',
 });
+
 @Injectable()
 export class AppService {
   constructor(@InjectModel(Attachment.name) private attachmentModel) {}
@@ -87,33 +96,6 @@ export class AppService {
 
       await browser.close();
 
-      // fs.writeFileSync(buildPaths.buildPathPdf, pdf);
-
-      // const [branch] = await getCustomRepository(BranchRepository).find({
-      //   where: {
-      //     id: req.user.branchId,
-      //   },
-      // });
-
-      // await this.email
-      //   .compose(
-      //     body.email,
-      //     body.subject,
-      //     body.message,
-      //     'no-reply@invyce.com',
-      //     '',
-      //     [
-      //       {
-      //         filename: 'build.pdf',
-      //         path: 'build.pdf',
-      //         contentType: 'application/pdf',
-      //       },
-      //     ],
-      //     body.cc,
-      //     body.bcc
-      //   )
-      //   .send();
-
       console.log('Ending: Generating PDF Process');
       return pdf;
     } catch (error) {
@@ -125,5 +107,455 @@ export class AppService {
     return await this.attachmentModel.find({
       _id: { $in: attachmentIds.ids },
     });
+  }
+
+  async uploadPdf(location, pdf, req) {
+    try {
+      const data = await fs.createReadStream(location);
+
+      const params = {
+        Bucket: 'invyce',
+        Key: pdf,
+        Body: data,
+        ACL: 'public-read',
+      };
+
+      const upload = await s3.upload(params).promise();
+
+      const attachment = new this.attachmentModel({
+        name: pdf,
+        path: upload.Location,
+        createdById: req.user.id,
+        updatedById: req.user.id,
+        status: 1,
+      });
+
+      await attachment.save();
+
+      setTimeout(() => {
+        promises.unlink(pdf).then(() => {
+          console.log('File deleted successfully');
+        });
+      }, 10000);
+
+      return attachment;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async pdfData(data) {
+    try {
+      const newArr = [];
+      const heading = [
+        ['#', 'item', 'quantity', 'unit price', 'discount', 'tax', 'total'].map(
+          (i) => i.toUpperCase()
+        ),
+      ];
+
+      data.invoice_items.forEach((tr, index) => {
+        const item = data.items.find((i) => i.id === tr.itemId);
+
+        heading.push([
+          index + 1,
+          item.name,
+          tr.quantity,
+          tr.unitPrice,
+          tr.itemDiscount,
+          tr.tax,
+          tr.total,
+        ]);
+        newArr.push({
+          sno: index + 1,
+          item: item.name,
+          quantity: tr.quantity,
+          unitPrice: tr.unitPrice,
+          discount: tr.itemDiscount,
+          saleTax: tr.tax,
+          total: tr.total,
+        });
+      });
+
+      const pdfArr = [...heading, ...newArr];
+
+      return pdfArr;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async GeneratePdf(body, req: IRequest) {
+    try {
+      let token;
+      if (process.env.NODE_ENV === 'development') {
+        const header = req.headers?.authorization?.split(' ')[1];
+        token = header;
+      } else {
+        if (!req || !req.cookies) return null;
+        token = req.cookies['access_token'];
+      }
+
+      const tokenType =
+        process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+      const value =
+        process.env.NODE_ENV === 'development'
+          ? `Bearer ${token}`
+          : `access_token=${token}`;
+
+      const http = axios.create({
+        baseURL: 'http://localhost',
+        headers: {
+          [tokenType]: value,
+        },
+      });
+
+      const { data } = body;
+
+      const {
+        data: { result },
+      } = await http.get(`users/organization/${req.user.organizationId}`);
+
+      const contents = await this.pdfData(data);
+
+      const tableStylesConfig = {
+        th: {
+          borderColor: ['#d3d3d3', '#d3d3d3', '#d3d3d3'],
+          border: [0.1, true, true, false],
+          bold: true,
+          fontSize: 8,
+          fillColor: '#efefef',
+          margin: [3, 3],
+        },
+        td: {
+          borderColor: ['#d3d3d3', '#d3d3d3', '#d3d3d3', '#d3d3d3'],
+          border: [true, true, true, true],
+        },
+      };
+
+      const [header] = contents;
+      contents.splice(0, 1);
+      const newRows = [
+        header.map((item) => ({
+          text: item,
+          bold: true,
+          ...tableStylesConfig.th,
+        })),
+        ...contents.map((c) => {
+          return Array.prototype.map.call(c, function (i) {
+            return {
+              text: i,
+              ...tableStylesConfig.td,
+            };
+          });
+        }),
+      ];
+
+      const getBase64 = (url) => {
+        return axios
+          .get(url, {
+            responseType: 'arraybuffer',
+          })
+          .then((response) =>
+            Buffer.from(response.data, 'binary').toString('base64')
+          );
+      };
+
+      const resp = await getBase64(result.attachment.path);
+
+      const rows = newRows.filter((item) => item.length !== 0);
+
+      const defaultCurrency = {
+        name: 'United States dollar',
+        code: 'USD',
+        symbol: '$',
+        id: null,
+      };
+
+      const calculatedDiscount = data?.invoice?.discount || 0;
+      // const itemsDiscount = data && totalDiscountInInvoice(response[])
+
+      const calculations = [
+        [
+          { text: 'Subtotal', bold: true, fontSize: 10 },
+          {
+            text: moneyFormatJs(data?.invoice?.grossTotal, defaultCurrency),
+            fontSize: 10,
+            alignment: 'right',
+          },
+        ],
+        [
+          { text: 'Items Discount', bold: true, fontSize: 10 },
+          {
+            text: moneyFormatJs(data?.invoice?.discount),
+            fontSize: 10,
+            alignment: 'right',
+          },
+        ],
+        [
+          { text: 'Invoice Discount', bold: true, fontSize: 10 },
+          {
+            text: moneyFormatJs(data?.invoice?.discount, defaultCurrency),
+            fontSize: 10,
+            alignment: 'right',
+          },
+        ],
+        [
+          { text: 'Tax Rates ', bold: true, fontSize: 10 },
+          {
+            text: moneyFormatJs(data?.invoice?.tax, defaultCurrency),
+            fontSize: 10,
+            alignment: 'right',
+          },
+        ],
+        [
+          {
+            canvas: [
+              {
+                type: 'rect',
+                x: 0,
+                y: 0,
+                w: 148,
+                h: 0,
+                lineWidth: 1,
+                lineColor: 'black',
+              },
+            ],
+          },
+          {},
+        ],
+        [
+          { text: 'Total', bold: true, fontSize: 12.4, margin: [0, 3] },
+          {
+            text: data?.invoice?.netTotal,
+            fontSize: 12.4,
+            alignment: 'right',
+            margin: [0, 3],
+            bold: true,
+          },
+        ],
+      ];
+
+      const docDefinition = {
+        pageMargins: [0, 0, 0, 20],
+        footer: function (currentPage, pageCount) {
+          return {
+            columns: [
+              {
+                text: `Reported generated on: ${data?.invoice?.createdAt}`,
+                fontSize: 9,
+                margin: [5, 0],
+              },
+              {
+                text: `${currentPage.toString()} / ${pageCount}`,
+                fontSize: 9,
+                alignment: 'center',
+              },
+              {
+                text: `Report generated by: ${req?.user?.profile?.fullName}`,
+                alignment: 'right',
+                fontSize: 9,
+                margin: [5, 0],
+              },
+            ],
+          };
+        },
+        content: [
+          {
+            style: 'section',
+            table: {
+              widths: ['50%', '50%'],
+
+              body: [
+                [
+                  {
+                    margin: [20, 30],
+                    fillColor: '#F7FBFF',
+                    columns: [
+                      {
+                        image: `data:image/png;base64,${resp}`,
+                        width: 50,
+                        margin: [0, 10, 0, 0],
+                      },
+                      {
+                        margin: [10, 0],
+                        stack: [
+                          { text: result?.name, style: 'c_name' },
+                          { text: result?.phoneNumber, style: 'address_style' },
+                          { text: result?.email, style: 'address_style' },
+                          { text: result?.website, style: 'address_style' },
+                        ],
+                      },
+                    ],
+                  },
+                  {
+                    margin: [20, 30],
+                    fillColor: '#F7FBFF',
+                    columns: [
+                      {},
+                      {
+                        alignment: 'right',
+                        stack: [
+                          {
+                            text: result?.address?.city,
+                            style: 'address_style',
+                          },
+                          {
+                            text: result?.address?.postalCode,
+                            style: 'address_style',
+                          },
+                          {
+                            text: getCountryById(
+                              parseInt(result?.address?.country)
+                            )?.name,
+                            style: 'address_style',
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          },
+          {
+            //   text: "Example",
+            fontSize: 15,
+            margin: [15, 15],
+            //   color: "#143c69",
+            //   bold: true,
+            columns: [
+              {
+                stack: [
+                  { text: 'To', style: 'label' },
+                  { text: data?.contact?.name, style: 'data' },
+                  { text: 'Address', style: 'label' },
+                  {
+                    text: `${data?.contact?.addresses[0]?.country}, ${data?.contact?.addresses[0]?.city}, ${data?.contact?.addresses[0]?.postalCode}`,
+                    style: 'data',
+                  },
+                ],
+              },
+              {
+                stack: [
+                  { text: 'Invoice Number', style: 'label' },
+                  { text: data?.invoice?.invoiceNumber, style: 'data' },
+                  { text: 'Reference', style: 'label' },
+                  { text: data?.invoice?.reference, style: 'data' },
+                  { text: 'Invoice Date', style: 'label' },
+                  {
+                    text: moment(data?.invoice?.issueDate).format('MM/DD/YYYY'),
+                    style: 'data',
+                  },
+                ],
+              },
+              {
+                stack: [
+                  {
+                    text: 'Invoice of (USD)',
+                    alignment: 'right',
+                    style: 'label',
+                  },
+                  {
+                    text: data?.invoice?.netTotal,
+                    color: '#143c69',
+                    bold: true,
+                    fontSize: 20,
+                    alignment: 'right',
+                  },
+                  { text: 'Due Date', alignment: 'right', style: 'label' },
+                  {
+                    text: moment(data?.invoice?.dueDate).format('MM/DD/YYYY'),
+                    alignment: 'right',
+                    style: 'data',
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            margin: [15, 0],
+
+            //   layout: 'lightHorizontalLines', // optional
+            table: {
+              widths: ['5%', '*', '14%', '14%', '14%', '14%', '14%'],
+
+              //  widths: ['10%', '*' , '100%'],
+              // headers are automatically repeated if the table spans over multiple pages
+              // you can declare how many rows should be treated as headers
+
+              body: rows,
+            },
+          },
+
+          {
+            columns: [
+              {},
+              {
+                // alignment: 'right',
+                width: '29%',
+                margin: [15, 15],
+                layout: 'noBorders',
+
+                table: {
+                  widths: ['60%', '*'],
+                  body: calculations,
+                },
+              },
+            ],
+          },
+        ],
+
+        styles: {
+          label: {
+            fontSize: 10,
+            color: '#6f6f84',
+            margin: [0, 5, 0, 0],
+          },
+          data: {
+            fontSize: 10.5,
+            bold: true,
+            color: '#272727',
+            margin: [0, 2.4, 0, 0],
+          },
+          c_name: {
+            fontSize: 24,
+            color: '#143c69',
+            bold: true,
+          },
+          address_style: {
+            fontSize: 12,
+            margin: [0, 2],
+            color: '#6f6f84',
+          },
+        },
+        defaultStyle: {
+          font: 'RobotoSlab',
+        },
+      };
+
+      const fonts = {
+        RobotoSlab: {
+          normal: path.resolve(
+            './apps/attachments-service/src/assets/fonts/RobotoSlab-Regular.ttf'
+          ),
+          bold: path.resolve(
+            './apps/attachments-service/src/assets/fonts/RobotoSlab-Bold.ttf'
+          ),
+        },
+      };
+
+      const printer = new PdfPrinter(fonts);
+      const doc = printer.createPdfKitDocument(docDefinition);
+
+      const pdf = `${data?.type}-${Date.now()}.pdf`;
+      doc.pipe(await fs.createWriteStream(pdf));
+
+      doc.end();
+
+      return pdf;
+    } catch (err) {
+      throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+    }
   }
 }
