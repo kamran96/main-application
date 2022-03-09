@@ -36,8 +36,11 @@ export enum Entries {
 }
 
 export enum EntryType {
+  FULLPAYMENT = 3,
   CREDIT = 1,
   COLLECTION = 2,
+  CREDITNOTE = 4,
+  DEBITNOTE = 5,
 }
 
 export enum UserStatuses {
@@ -49,4 +52,11 @@ export enum UserStatuses {
 export enum CreditNoteType {
   ACCRECCREDIT = 'ACCRECCREDIT',
   ACCPAYCREDIT = 'ACCPAYCREDIT',
+}
+
+export enum PdfType {
+  INVOICE = 'invoice',
+  CREDIT_NOTE = 'credit-note',
+  DEBIT_NOTE = 'debit-note',
+  BILL = 'bill',
 }

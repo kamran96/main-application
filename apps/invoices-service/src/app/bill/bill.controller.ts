@@ -56,7 +56,7 @@ export class BillController {
     return await this.billService.FindByBillIds(invoiceIds);
   }
 
-  @Get('contact/:id')
+  @Get('contacts/:id')
   @UseGuards(GlobalAuthGuard)
   async findByContactId(
     @Param() contactId: BillContactIdDto

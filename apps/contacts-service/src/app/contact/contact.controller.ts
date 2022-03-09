@@ -73,10 +73,7 @@ export class ContactController {
     @Req() req: IRequest
   ): Promise<IContactWithResponse> {
     try {
-      const contact = await this.contactService.CreateContact(
-        contactDto,
-        req.user
-      );
+      const contact = await this.contactService.CreateContact(contactDto, req);
 
       if (contact) {
         return {

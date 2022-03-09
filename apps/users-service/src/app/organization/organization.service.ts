@@ -3,6 +3,8 @@ import { ClientProxy } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import axios from 'axios';
 import { Response } from 'express';
+import * as moment from 'moment';
+import { currencies } from 'currencies.json';
 import { IRequest, IAddress, IOrganization } from '@invyce/interfaces';
 import { AuthService } from '../auth/auth.service';
 import { OrganizationDto } from '../dto/organization.dto';
@@ -11,11 +13,8 @@ import { Branch } from '../schemas/branch.schema';
 import { Organization } from '../schemas/organization.schema';
 import { OrganizationUser } from '../schemas/organizationUser.schema';
 import { User } from '../schemas/user.schema';
-import {
-  ORGANIZATION_CREATED,
-  SEND_FORGOT_PASSWORD,
-  TRAIL_STARTED,
-} from '@invyce/send-email';
+import { ORGANIZATION_CREATED, TRAIL_STARTED } from '@invyce/send-email';
+import { Currrency } from '../schemas/currency.schema';
 
 @Injectable()
 export class OrganizationService {
@@ -24,6 +23,7 @@ export class OrganizationService {
     @InjectModel(OrganizationUser.name) private organizationUserModel,
     @InjectModel(Branch.name) private branchModel,
     @InjectModel(User.name) private userModel,
+    @InjectModel(Currrency.name) private currencyModel,
     private rbacService: RbacService,
     private authService: AuthService,
     @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy,
@@ -84,6 +84,13 @@ export class OrganizationService {
     }
 
     return new_organization;
+  }
+
+  async InsertCurrency() {
+    for (const i of currencies) {
+      const currency = new this.currencyModel(i);
+      await currency.save();
+    }
   }
 
   async CreateOrUpdateOrganization(
@@ -180,6 +187,11 @@ export class OrganizationService {
         organizationUser.status = 1;
         await organizationUser.save();
 
+        const currency = await this.currencyModel.find();
+        if (currency.length === 0) {
+          await this.InsertCurrency();
+        }
+
         const branchArr = [];
         if (
           req?.user?.organizationId === null &&
@@ -208,6 +220,12 @@ export class OrganizationService {
         const [adminRole] = roles.filter((r) => r.name === 'admin');
 
         if (req?.user?.organizationId !== null) {
+          await this.emailService.emit(ORGANIZATION_CREATED, {
+            org_name: organization.name,
+            user_name: req.user.profile.fullName,
+            to: req.user.email,
+          });
+
           return organization;
         } else {
           await this.userModel.updateOne(
@@ -223,15 +241,18 @@ export class OrganizationService {
             username: req.user.username,
           });
 
+          const nextSevenDay = moment().add(7, 'days').format('YYYY-MM-DD');
+
           await this.emailService.emit(TRAIL_STARTED, {
             to: req.user.email,
             user_name: req.user.profile.fullName,
+            next_7_days: nextSevenDay,
           });
-          await this.reportService.emit(ORGANIZATION_CREATED, {
-            ...organization.toObject(),
-            userId: req.user.id,
-            branchId: branchArr.length > 0 ? branchArr[0].id : null,
-          });
+          // await this.reportService.emit(ORGANIZATION_CREATED, {
+          //   ...organization.toObject(),
+          //   userId: req.user.id,
+          //   branchId: branchArr.length > 0 ? branchArr[0].id : null,
+          // });
 
           return await this.authService.Login(users, res);
         }
@@ -241,13 +262,53 @@ export class OrganizationService {
     }
   }
 
-  async ViewOrganization(organizationId: string): Promise<IOrganization> {
+  async ViewOrganization(
+    organizationId: string,
+    req: IRequest
+  ): Promise<IOrganization> {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const type =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [type]: value,
+      },
+    });
+
     const organization = await this.organizationModel
       .findOne({
         _id: organizationId,
       })
       .populate('branches');
 
-    return organization;
+    const orgArray = [];
+    if (organization.attachmentId !== undefined) {
+      const { data: attachment } = await http.post(
+        `attachments/attachment/ids`,
+        {
+          ids: [organization.attachmentId],
+        }
+      );
+      orgArray.push({
+        ...organization.toObject(),
+        attachment: attachment.length === 1 ? attachment[0] : attachment,
+      });
+    }
+
+    return orgArray.length > 0 ? orgArray[0] : organization;
   }
 }

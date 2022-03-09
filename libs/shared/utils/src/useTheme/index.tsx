@@ -9,7 +9,7 @@ export const useTheme = (themeName: 'light' | 'dark') => {
   useEffect(() => {
     if (themeName !== theme) {
       setThemeLoading(true);
-      let themename = themeName;
+      const themename = themeName;
       clearTimeout(timeOut);
       timeOut = setTimeout(() => {
         setTheme(themename);

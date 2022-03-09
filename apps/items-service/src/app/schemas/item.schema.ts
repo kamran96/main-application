@@ -26,9 +26,13 @@ export class Item {
   @Prop()
   importedItemId: string;
   @Prop()
+  accountId: number;
+  @Prop()
   importedFrom: string;
   @Prop()
   hasCategory: boolean;
+  @Prop({ default: false })
+  hasStock: boolean;
   @Prop()
   hasInventory: boolean;
   @Prop({ type: mongoose.Schema.Types.ObjectId, schema: 'Category' })

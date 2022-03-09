@@ -30,6 +30,7 @@ export class UserLoginDto {
   username: string;
   password: string;
   email: string;
+  rememberMe: boolean;
 }
 
 export class ForgetPasswordDto {
