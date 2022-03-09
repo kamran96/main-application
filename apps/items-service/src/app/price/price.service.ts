@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import axios from 'axios';
 import { IPrice } from '@invyce/interfaces';
 import { Item } from '../schemas/item.schema';
 import { Price } from '../schemas/price.schema';
@@ -16,13 +17,45 @@ export class PriceService {
     return await this.priceModel.findOne({ itemId: priceId });
   }
 
-  async CreatePrice(priceDto: PriceDto): Promise<IPrice | IPrice[]> {
+  async CreatePrice(priceDto: PriceDto, req): Promise<IPrice | IPrice[]> {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const tokenType =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [tokenType]: value,
+      },
+    });
+
+    // fetch inventory account by its code
+    const { data: accounts } = await http.post(`accounts/account/codes`, {
+      codes: ['15005'],
+    });
+
+    const debitArray = [];
+    const creditArray = [];
     if (priceDto.isNewRecord === false) {
       try {
         for (const i of priceDto.item_ids) {
           const price = await this.FindById(i);
+          const item = await this.itemModel.findById(i);
           if (price) {
             // update price
+
             await this.priceModel.updateOne(
               { itemId: i },
               {
@@ -41,14 +74,56 @@ export class PriceService {
           } else {
             // Create Price
 
-            delete priceDto.item_ids;
-            const item = await this.itemModel.findById(i);
+            let worth = 0;
+            if (priceDto?.openingStock > 0) {
+              worth = priceDto.openingStock * priceDto.purchasePrice;
+              const debits = {
+                amount: worth,
+                account_id: await accounts[0].id,
+              };
 
-            const price = new this.priceModel(priceDto);
-            price.itemId = i;
-            price.initialPurchasePrice =
+              const credits = {
+                amount: worth,
+                account_id: item.accountId,
+              };
+
+              debitArray.push(debits);
+              creditArray.push(credits);
+            }
+
+            const payload = {
+              dr: debitArray,
+              cr: creditArray,
+              type: 'item opening stock balance',
+              reference: `${item.name} opening stock balance`,
+              amount: worth,
+              status: 1,
+            };
+
+            let transaction;
+            if (worth > 0) {
+              const { data } = await http.post('accounts/transaction/api', {
+                transactions: payload,
+              });
+              transaction = data;
+            }
+
+            delete priceDto.item_ids;
+
+            const newPrice = new this.priceModel(priceDto);
+            newPrice.itemId = i;
+            newPrice.initialPurchasePrice =
               item.priceType === 1 ? priceDto.purchasePrice : null;
-            await price.save();
+            newPrice.transactionId = transaction ? transaction.id : null;
+
+            await newPrice.save();
+
+            await this.itemModel.updateOne(
+              { _id: i },
+              {
+                hasStock: true,
+              }
+            );
           }
         }
       } catch (error) {
@@ -60,16 +135,61 @@ export class PriceService {
         delete priceDto.item_ids;
 
         const priceArr = [];
+
         for (const i of itemIds) {
-          const item = await this.FindById(i);
-          const price = new this.priceModel(priceDto);
+          const item = await this.itemModel.findById(i);
+          const price = await this.FindById(i);
 
-          price.itemId = i;
-          price.initialPurchasePrice =
-            item?.priceType === 1 ? priceDto.purchasePrice : null;
-          await price.save();
+          let worth = 0;
+          if (priceDto?.openingStock > 0) {
+            worth = priceDto.openingStock * priceDto.purchasePrice;
+            const debits = {
+              amount: worth,
+              account_id: await accounts[0].id,
+            };
 
-          priceArr.push(price);
+            const credits = {
+              amount: worth,
+              account_id: item.accountId,
+            };
+
+            debitArray.push(debits);
+            creditArray.push(credits);
+          }
+
+          const payload = {
+            dr: debitArray,
+            cr: creditArray,
+            type: 'item opening stock balance',
+            reference: `${item.name} opening stock balance`,
+            amount: worth,
+            status: 1,
+          };
+
+          let transaction;
+          if (worth > 0) {
+            const { data } = await http.post('accounts/transaction/api', {
+              transactions: payload,
+            });
+            transaction = data;
+          }
+
+          const newPrice = new this.priceModel(priceDto);
+
+          newPrice.itemId = i;
+          newPrice.initialPurchasePrice =
+            price?.priceType === 1 ? priceDto.purchasePrice : null;
+          newPrice.transactionId = transaction ? transaction.id : null;
+          await newPrice.save();
+
+          await this.itemModel.updateOne(
+            { _id: i },
+            {
+              hasStock: true,
+            }
+          );
+
+          priceArr.push(newPrice);
         }
 
         return priceArr;

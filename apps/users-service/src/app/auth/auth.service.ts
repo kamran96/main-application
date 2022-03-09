@@ -16,6 +16,7 @@ import * as ip from 'ip';
 import { Response } from 'express';
 import { User } from '../schemas/user.schema';
 import {
+  CHANGE_EMAIL_OTP,
   PASSWORD_UPDATED,
   SEND_FORGOT_PASSWORD,
   SEND_INVITATION,
@@ -115,8 +116,17 @@ export class AuthService {
   ): Promise<IUser> {
     const updatedProfile = {
       fullName: authDto.fullName,
+      email: authDto.email,
       country: authDto.country,
       phoneNumber: authDto.phoneNumber,
+      prefix: '',
+      cnic: '',
+      marketingStatus: null,
+      website: '',
+      location: '',
+      bio: '',
+      jobTitle: '',
+      attachmentId: '',
     };
 
     const user = new this.userModel();
@@ -235,9 +245,16 @@ export class AuthService {
           HttpStatus.BAD_REQUEST
         );
       }
+
       if (bcrypt.compareSync(authDto.password, user.password)) {
-        const user: IUser[] = await this.Login(users, res);
-        return user;
+        if (authDto?.rememberMe) {
+          await this.userModel.updateOne(
+            { _id: user.id },
+            { rememberMe: authDto.rememberMe }
+          );
+        }
+
+        return await this.Login(users, res);
       }
       throw new HttpException('Incorrect Password', HttpStatus.BAD_REQUEST);
     } else {
@@ -320,8 +337,30 @@ export class AuthService {
     await this.sendVerificationEmail(body, generateOtp);
   }
 
+  async ChangeEmailOtp(body: SendOtp): Promise<void> {
+    const time = Moment(new Date()).add(1, 'h').calendar();
+
+    const user = await this.userModel.findOne({ email: body.email });
+
+    const generateOtp: number = generateRandomNDigits(4);
+    parseInt(generateOtp as unknown as string);
+
+    const user_token = new this.userTokenModel();
+    user_token.code = generateOtp;
+    user_token.expiresAt = time.toString();
+    user_token.userId = user._id;
+    await user_token.save();
+
+    await this.emailService.emit(CHANGE_EMAIL_OTP, {
+      to: user.email,
+      user_name: user.profile.fullName,
+      otp_link: generateOtp,
+    });
+  }
+
   async sendVerificationOtp(user, otp): Promise<void> {
     await this.emailService.emit(SEND_OTP, {
+      to: user.email,
       user_name: user.username,
       otp_link: otp,
     });

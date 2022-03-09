@@ -4,7 +4,12 @@ import * as moment from 'moment';
 import { ClientProxy } from '@nestjs/microservices';
 import axios from 'axios';
 import { Contact } from '../Schemas/contact.schema';
-import { Entries, Integrations, PaymentModes } from '@invyce/global-constants';
+import {
+  Entries,
+  EntryType,
+  Integrations,
+  PaymentModes,
+} from '@invyce/global-constants';
 import {
   IPage,
   IRequest,
@@ -159,8 +164,31 @@ export class ContactService {
 
   async CreateContact(
     contactDto: ContactDto,
-    contactData: IBaseUser
+    req: IRequest
   ): Promise<IContact> {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const tokenType =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [tokenType]: value,
+      },
+    });
+
     if (contactDto && contactDto.isNewRecord === false) {
       const contact = await this.FindById(contactDto.id);
 
@@ -190,7 +218,7 @@ export class ContactService {
           status: 1 || contact.status,
           createdById: contact.createdById,
           organizationId: contact.organizationId,
-          updatedById: contactData._id,
+          updatedById: req.user.id,
         };
 
         await this.contactModel.updateOne(
@@ -201,14 +229,64 @@ export class ContactService {
       return await this.FindById(contactDto.id);
     } else {
       try {
-        const contact = new this.contactModel(contactDto);
-        contact.organizationId = contactData.organizationId;
-        contact.branchId = contactData.branchId;
-        contact.createdById = contactData._id;
-        contact.updatedById = contactData._id;
-        contact.status = 1;
+        const debitArray = [];
+        const creditArray = [];
+        if (
+          contactDto?.openingBalance &&
+          parseFloat(contactDto?.openingBalance) > 0
+        ) {
+          const debits = {
+            amount: contactDto.openingBalance,
+            account_id: contactDto.debitAccount,
+          };
 
+          const credits = {
+            amount: contactDto.openingBalance,
+            account_id: contactDto.creditAccount,
+          };
+
+          debitArray.push(debits);
+          creditArray.push(credits);
+        }
+
+        const payload = {
+          dr: debitArray,
+          cr: creditArray,
+          type: 'contact opening balance',
+          reference: `${contactDto.name} opening balance`,
+          amount: contactDto.openingBalance,
+          status: 1,
+        };
+
+        let transaction;
+        if (
+          contactDto.openingBalance &&
+          parseFloat(contactDto.openingBalance) > 0
+        ) {
+          const { data } = await http.post('accounts/transaction/api', {
+            transactions: payload,
+          });
+          transaction = data;
+        }
+
+        const contact = new this.contactModel(contactDto);
+        contact.organizationId = req.user.organizationId;
+        contact.transactionId = transaction ? transaction.id : null;
+        contact.branchId = req.user.branchId;
+        contact.createdById = req.user._id;
+        contact.updatedById = req.user._id;
+        contact.status = 1;
         await contact.save();
+
+        if (contact.openingBalance > 0) {
+          await this.contactModel.updateOne(
+            { _id: contact._id },
+            {
+              hasOpeningBalance: true,
+              balance: contact.openingBalance,
+            }
+          );
+        }
         await this.reportService.emit(CONTACT_CREATED, contact);
         await this.emailService.emit(CONTACT_CREATED, contact);
 
@@ -258,16 +336,37 @@ export class ContactService {
       ids: mapContactIds,
     });
 
+    const getBalances = (balance, i) => {
+      if (i.type === PaymentModes.BILLS) {
+        if (i.openingBalance) {
+          return Math.abs(balance.payment.balance) + i.openingBalance;
+        } else {
+          return Math.abs(balance.payment.balance);
+        }
+      } else {
+        if (i.openingBalance) {
+          return Math.abs(balance.payment.balance) + i.openingBalance;
+        } else {
+          return Math.abs(balance.payment.balance);
+        }
+      }
+    };
+
     for (const i of contacts) {
       const balance = payments.find((pay) => pay.id == i._id);
       if (i.balance !== balance.payment.balance) {
         await this.contactModel.updateOne(
           { _id: i.id },
           {
-            balance:
-              i.contactType === PaymentModes.BILLS
-                ? Math.abs(balance.payment.balance)
-                : balance.payment.balance,
+            balance: getBalances(balance, i),
+            // balance:
+            //   i.contactType === PaymentModes.BILLS
+            //     ? i.openingBalance
+            //       ? Math.abs(balance.payment.balance) + i.openingBalance
+            //       : Math.abs(balance.payment.balance)
+            //     : i.openingBalance
+            //     ? balance.payment.balance + i.openingBalance
+            //     : balance.payment.balance,
           }
         );
       }
@@ -303,7 +402,7 @@ export class ContactService {
 
     if (type == PaymentModes.BILLS) {
       const { data: bills } = await http.get(
-        `invoices/bill/contact/${contactId}`
+        `invoices/bill/contacts/${contactId}`
       );
 
       if (filters) {
@@ -372,8 +471,10 @@ export class ContactService {
       }
     } else if (type == PaymentModes.INVOICES) {
       const { data: invoices } = await http.get(
-        `invoices/invoice/contact/${contactId}`
+        `invoices/invoice/contacts/${contactId}`
       );
+
+      const contact = await this.contactModel.findById(contactId);
 
       if (filters) {
         const filterData = Buffer.from(filters, 'base64').toString();
@@ -401,12 +502,26 @@ export class ContactService {
 
               newLedgerArray.push({
                 ...i,
-                invoice,
+                invoice: {
+                  ...invoice,
+                  invoiceNumber: invoice.creditNote
+                    ? invoice.creditNote.invoiceNumber
+                    : invoice.invoiceNumber,
+                },
               });
             }
+
             return {
               pagination: payments.pagination,
-              openingBalance: openingBalance[0],
+              openingBalance:
+                openingBalance.length > 0
+                  ? openingBalance[0]
+                  : {
+                      comment: 'Initial opening balance',
+                      amount: contact.openingBalance,
+                      date: contact.createdAt,
+                      entryType: 1,
+                    },
               result: newLedgerArray,
               contact,
             };
@@ -423,10 +538,24 @@ export class ContactService {
 
           newLedgerArray.push({
             ...i,
-            invoice,
+            invoice: {
+              ...invoice,
+              invoiceNumber:
+                i.entryType === EntryType.CREDITNOTE && invoice.creditNote
+                  ? invoice.creditNote.invoiceNumber
+                  : invoice.invoiceNumber,
+              id: invoice.creditNote ? invoice.creditNote.id : invoice.id,
+            },
           });
         }
         return {
+          initial_balance: {
+            comment: 'Initial opening balance',
+            amount: contact.openingBalance,
+            date: contact.createdAt,
+            createdAt: contact.createdAt,
+            entryType: 1,
+          },
           pagination: payments.pagination,
           result: newLedgerArray,
           contact,
@@ -462,9 +591,15 @@ export class ContactService {
   }
 
   async ContactByIds(data: ContactIds): Promise<IContact[]> {
-    return await this.contactModel.find({
-      importedContactId: { $in: data.ids },
-    });
+    if (data.type === 1) {
+      return await this.contactModel.find({
+        _id: { $in: data.ids },
+      });
+    } else {
+      return await this.contactModel.find({
+        importedContactId: { $in: data.ids },
+      });
+    }
   }
 
   async SyncContacts(data, req: IRequest): Promise<void> {

@@ -7,7 +7,7 @@ import {
   TransactionRepository,
 } from '../repositories';
 import * as moment from 'moment';
-import { getCustomRepository, In, Not, Raw } from 'typeorm';
+import { getCustomRepository, ILike, In, Not, Raw } from 'typeorm';
 import { Sorting } from '@invyce/sorting';
 import { Integrations, Entries } from '@invyce/global-constants';
 import {
@@ -43,7 +43,10 @@ export class AccountsService {
       let accounts;
       if (purpose === 'ALL') {
         accounts = await getCustomRepository(AccountRepository).find({
-          where: { status: 1, organizationId: user.organizationId },
+          where: {
+            organizationId: user.organizationId,
+            status: 1,
+          },
           relations: ['secondaryAccount', 'secondaryAccount.primaryAccount'],
         });
 
@@ -61,7 +64,6 @@ export class AccountsService {
           .andWhere('ti."transactionType" = 10')
           .andWhere('t.status = 1')
           .andWhere('ti.status = 1')
-          // .andWhere('t.date between :start and :end')
           .getQuery();
 
         const total_credits = await getCustomRepository(
@@ -74,7 +76,6 @@ export class AccountsService {
           .andWhere('ti."transactionType" = 20')
           .andWhere('t.status = 1')
           .andWhere('ti.status = 1')
-          // .andWhere('t.date between :start and :end')
           .getQuery();
 
         const balances = `case when pa.name='asset' OR pa.name='expense'
@@ -82,28 +83,30 @@ export class AccountsService {
         else (( ${total_credits})-(${total_debits})) end`;
 
         if (query) {
-          // const filterData = Buffer.from(query, 'base64').toString();
-          // const data = JSON.parse(filterData);
-
-          const data = {
-            name: {
-              type: 'search',
-              value: '%cash%',
-            },
-          };
-
+          const filterData = Buffer.from(query, 'base64').toString();
+          const data = JSON.parse(filterData);
+          console.log(data, 'filters');
+          // const data = {
+          //   name: {
+          //     type: 'search',
+          //     value: '"%Cash In%"',
+          //   },
+          // };
           for (const i in data) {
             if (data[i].type === 'search') {
               const val = data[i].value.toLowerCase();
+              console.log(i, val);
               accounts = await getCustomRepository(AccountRepository)
                 .createQueryBuilder('a')
                 .select(
-                  `a.*, (${total_debits}) as total_debits, (${total_credits}) as total_credits, (abs(${balances})) as balance `
+                  `a.*,  sa.name as "secondaryName", pa.name as "primaryName", 
+                  (${total_debits}) as total_debits, (${total_credits}) as total_credits, (abs(${balances})) as balance `
                 )
                 .where({
                   organizationId: user.organizationId,
+                  [i]: ILike(val),
                 })
-                .andWhere('a.name like :name', { name: val })
+                // .andWhere(`lower(a.${i}) like :${i}`, { i: val })
                 .leftJoin('a.secondaryAccount', 'sa')
                 .leftJoin('sa.primaryAccount', 'pa')
                 .offset(pn * ps - ps)
@@ -113,7 +116,8 @@ export class AccountsService {
               accounts = await getCustomRepository(AccountRepository)
                 .createQueryBuilder('a')
                 .select(
-                  `a.*, (${total_debits}) as total_debits, (${total_credits}) as total_credits, (abs(${balances})) as balance `
+                  `a.*, sa.name as "secondaryName", pa.name as "primaryName", 
+                  (${total_debits}) as total_debits, (${total_credits}) as total_credits, (abs(${balances})) as balance `
                 )
                 .where({
                   organizationId: user.organizationId,
@@ -130,13 +134,15 @@ export class AccountsService {
           accounts = await getCustomRepository(AccountRepository)
             .createQueryBuilder('a')
             .select(
-              `a.*, (${total_debits}) as total_debits, (${total_credits}) as total_credits, (abs(${balances})) as balance `
+              `a.*, sa.name as "secondaryName", pa.name as "primaryName",
+              (${total_debits}) as total_debits, (${total_credits}) as total_credits, (abs(${balances})) as balance `
             )
             .where({
               organizationId: user.organizationId,
             })
             .leftJoin('a.secondaryAccount', 'sa')
             .leftJoin('sa.primaryAccount', 'pa')
+            .groupBy('a.id, pa.name, pa.id, sa.id ')
             .offset(pn * ps - ps)
             .limit(ps)
             .getRawMany();

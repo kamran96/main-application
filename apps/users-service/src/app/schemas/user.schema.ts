@@ -22,9 +22,12 @@ export class User {
   marketing: boolean;
   @Prop({ default: false })
   isVerified: boolean;
+  @Prop({ default: false })
+  rememberMe: boolean;
   @Prop(
     raw({
       fullName: String,
+      email: String,
       phoneNumber: String,
       prefix: String,
       cnic: String,

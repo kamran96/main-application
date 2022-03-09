@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from '../auth/auth.module';
 import { RbacModule } from '../rbac/rbac.module';
 import { Branch, BranchSchema } from '../schemas/branch.schema';
+import { CurrencySchema, Currrency } from '../schemas/currency.schema';
 import {
   Organization,
   OrganizationSchema,
@@ -23,6 +24,7 @@ import { OrganizationService } from './organization.service';
       { name: OrganizationUser.name, schema: OrganizationUserSchema },
       { name: Branch.name, schema: BranchSchema },
       { name: User.name, schema: UserSchema },
+      { name: Currrency.name, schema: CurrencySchema },
     ]),
     ClientsModule.register([
       {
