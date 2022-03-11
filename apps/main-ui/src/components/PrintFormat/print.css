@@ -354,6 +354,7 @@
     color: #6f6f84;
     font-weight: 600;
     letter-spacing: 0.9px;
+    text-align: left !important;
   }
   #purchase_order_print_view .total .total_table tr td {
     font-size: 14px !important;

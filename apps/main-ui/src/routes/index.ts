@@ -28,7 +28,6 @@ import { BankAccounts } from '../modules/Business/BankAccounts';
 import { TraialBalance } from '../modules/Business/TrialBalance';
 import { BalanceSheet } from '../modules/Accounts/BalanceSheet';
 import { ContactLedger } from '../modules/Contacts/ContactLedger';
-import { JournalEditor } from '../modules/Business/Transactions/TransactionEditorWidget';
 import { PaymentContainer } from '../modules/Payment';
 import { BillsEditorWidget } from '../modules/Business/PurchaseOrder/BillsEditorWidget';
 import CategoriesRoot from '../modules/Categories';
@@ -53,6 +52,7 @@ import { VerificationLayout } from '../Layout/VerificationLayout';
 import { VerifyQuickBooks } from '../modules/Settings/Integrations/Quickbooks/VerifyQuickbooks';
 import { VerifyXero } from '../modules/Settings/Integrations/Xero/VerifyXero';
 import { CreditNoteEditorWidget } from '../modules/Invoice/CreditNoteWidget';
+import { DebitNoteEditorWidget } from '../modules/Invoice/DebitNoteEditorWidget';
 import { Import } from '../components/Import';
 import { JoinUser } from '../Containers/JoinUser';
 import { VerifyUser } from '../Containers/JoinUser/VerifyUser';
@@ -251,6 +251,19 @@ export const routes = (root = '/app'): RouteConfig[] => [
           {
             path: `${root}${ISupportedRoutes.ADD_CREDIT_NOTE}`,
             component: CreditNoteEditorWidget,
+            restricted: true,
+            permission: PERMISSIONS.INVOICES_CREATE,
+            exact: true,
+          },
+          {
+            path: `${root}${ISupportedRoutes.ADD_DEBIT_NOTE}/:id`,
+            component: DebitNoteEditorWidget,
+            restricted: true,
+            permission: PERMISSIONS.INVOICES_CREATE,
+          },
+          {
+            path: `${root}${ISupportedRoutes.ADD_DEBIT_NOTE}`,
+            component: DebitNoteEditorWidget,
             restricted: true,
             permission: PERMISSIONS.INVOICES_CREATE,
             exact: true,

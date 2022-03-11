@@ -62,6 +62,14 @@ export const PurchaseOrderColumns: ColumnsType<any> = [
     },
   },
   {
+    title: 'Due Amount',
+    dataIndex: 'due_amount',
+    key: 'due_amount',
+    render: (data) => {
+      return <>{data ? moneyFormat(Math.abs(data)) : '-'}</>;
+    },
+  },
+  {
     title: 'Items',
     dataIndex: 'purchaseItems',
     key: 'purchaseItems',
@@ -133,6 +141,14 @@ export const PDFColsBills: ColumnsType<any> = [
       return data ? moneyFormat(Math.abs(data)) : '-';
     },
   },
+  {
+    title: 'Due Amount',
+    dataIndex: 'due_amount',
+    key: 'due_amount',
+    render: (data) => {
+      return data ? moneyFormat(Math.abs(data)) : '-';
+    },
+  },
 
   {
     title: 'Total',
@@ -179,6 +195,8 @@ export const _csvExportable: ITableExportFields = {
       return data ? dayjs(data).format(`MM/DD/YYYY h:mm A`) : '-';
     },
   },
+  paid_amount: 'Paid Amount',
+  due_amount: 'Due Amount',
 
   netTotal: {
     header: 'Total',

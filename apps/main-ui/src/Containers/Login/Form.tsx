@@ -103,7 +103,6 @@ export const LoginForm: FC = () => {
           form={form}
           autoComplete="off"
           className="mt-20"
-          initialValues={{ remember: true }}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
         >

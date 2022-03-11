@@ -34,6 +34,7 @@ export const AccountsLedgerList: FC<IProps> = ({ id, accountName }) => {
       pagination: {},
     }
   );
+
   const [ledgerConfig, setLedgerConfig] = useState({
     query: '',
     page_size: 20,
@@ -112,8 +113,8 @@ export const AccountsLedgerList: FC<IProps> = ({ id, accountName }) => {
     },
     {
       title: 'Narration',
-      dataIndex: 'owner',
-      key: 'owner',
+      dataIndex: 'transaction',
+      key: 'transaction',
       render: (data, row, index) => {
         return <>{data ? data.narration : '-'}</>;
       },

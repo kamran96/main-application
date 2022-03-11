@@ -128,6 +128,25 @@ export const PurchaseManager: FC<IProps> = ({
   const [rowsErrors, setRowsErrors] = useState([]);
   const [width] = useWindowSize();
 
+  const { notificationCallback, setItemsModalConfig, userDetails } =
+    useGlobalContext();
+
+  const { organization } = userDetails;
+
+  // Accounts Fetched By Types
+
+  const { data: accountsData, isLoading: accountsLoading } = useQuery(
+    [`accounts-${type}`, type === IInvoiceType.INVOICE ? 'invoice' : 'bill'],
+    getAccountsByTypeAPI,
+    {
+      enabled: organization?.organizationType === IOrganizationType?.SAAS,
+    }
+  );
+
+  const accountsList: IAccountsResult[] = accountsData?.data?.result || [];
+
+  const [defaultAccount] = accountsList.filter((i) => i.code === '15005');
+
   /* ************ HOOKS *************** */
 
   /* Component State Hooks */
@@ -213,11 +232,6 @@ export const PurchaseManager: FC<IProps> = ({
   useEffect(() => {
     AntForm.setFieldsValue(defaultFormData);
   }, [AntForm]);
-
-  const { notificationCallback, setItemsModalConfig, userDetails } =
-    useGlobalContext();
-
-  const { organization } = userDetails;
 
   const { data: invoicesData, isLoading: invoiceLoading } = useQuery(
     [`${type}-${id}-view`, id],
@@ -316,18 +330,6 @@ export const PurchaseManager: FC<IProps> = ({
         }
       })) ||
     [];
-
-  // Accounts Fetched By Types
-
-  const { data: accountsData, isLoading: accountsLoading } = useQuery(
-    [`accounts-${type}`, type === IInvoiceType.INVOICE ? 'invoice' : 'bill'],
-    getAccountsByTypeAPI,
-    {
-      enabled: organization?.organizationType === IOrganizationType?.SAAS,
-    }
-  );
-
-  const accountsList: IAccountsResult[] = accountsData?.data?.result || [];
 
   const getSubTotal = useCallback(() => {
     let subTotal = 0;
@@ -572,6 +574,9 @@ export const PurchaseManager: FC<IProps> = ({
                     total,
                     costOfGoodAmount,
                     description,
+                    accountId: record?.accountId
+                      ? record?.accountId
+                      : defaultAccount?.id,
                   };
                   if (type === IInvoiceType.PURCHASE_ENTRY) {
                     allItems[index] = {
@@ -830,7 +835,7 @@ export const PurchaseManager: FC<IProps> = ({
                   const indexed =
                     allItems[index].errors?.indexOf('itemDiscount');
                   if (indexed !== -1) {
-                    allItems[index].errors.splice(indexed, 1);
+                    allItems[index]?.errors?.splice(indexed, 1);
                   }
                   allItems[index] = {
                     ...allItems[index],

@@ -204,5 +204,10 @@ export const RoutingSchema: IRoutingSchema = {
       tag: 'Credit Note',
       icon: billIcon,
     },
+    {
+      route: `${root}${ISupportedRoutes.ADD_DEBIT_NOTE}`,
+      tag: 'Debit Note',
+      icon: billIcon,
+    },
   ],
 };

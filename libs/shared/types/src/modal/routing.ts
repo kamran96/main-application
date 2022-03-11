@@ -71,6 +71,7 @@ export enum ISupportedRoutes {
   CALLBACK = '/callback',
   SETTINGS = '/settings',
   ADD_CREDIT_NOTE = `/add-credit-note`,
+  ADD_DEBIT_NOTE = `/add-debit-note`,
   CREDIT_NOTES = '/credit-notes',
   VERIFY_USER = ' /user',
   TAX = '/tax',

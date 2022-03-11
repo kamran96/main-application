@@ -19,6 +19,9 @@ export enum IEntryType {
   DEBIT_NOTE = 5,
 }
 
+export interface IContactResut extends IBaseResponse {
+  result: IContactType[];
+}
 export interface IContactType extends IBase {
   id: number;
   businessName: string;

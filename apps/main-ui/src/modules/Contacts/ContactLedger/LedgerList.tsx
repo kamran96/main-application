@@ -28,6 +28,8 @@ interface IProps {
 }
 
 export const LedgerList: FC<IProps> = ({ id, type }) => {
+  const accessor = type === IContactTypes.SUPPLIER ? 'bill' : 'invoice';
+
   const [{ pagination, result }, setResponse] =
     useState<IContactLedgerResponse>({
       pagination: {},
@@ -93,7 +95,7 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
   const columns: ColumnsType<any> = [
     {
       title: 'Invoice Number',
-      dataIndex: `${type === IContactTypes.CUSTOMER ? `invoice` : 'purchase'}`,
+      dataIndex: `${type === IContactTypes.CUSTOMER ? `invoice` : 'bill'}`,
       key: 'invoice',
       render: (data, row, index) => {
         return (
@@ -111,10 +113,10 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
     },
     {
       title: 'Date',
-      dataIndex: 'date',
+      dataIndex: `${type === IContactTypes.CUSTOMER ? `invoice` : 'bill'}`,
       key: 'date',
       render: (data, row, index) => {
-        return <>{dayjs(data).format(`MMMM D, YYYY h:mm A`)}</>;
+        return <>{dayjs(data?.issueDate).format(`MMMM D, YYYY h:mm A`)}</>;
       },
     },
     {

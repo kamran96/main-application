@@ -349,17 +349,19 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                         }}
                       >
                         <Option
+                          key={'new-contact'}
                           style={{
                             textAlign: 'left',
                           }}
                           value={'contact-create'}
                         >
                           <Button
+                            className="new-contact-btn"
                             onClick={(e) => {
                               e.stopPropagation();
                               onCreateContact();
                             }}
-                            type="default"
+                            type="text"
                             size="middle"
                           >
                             Create Contact

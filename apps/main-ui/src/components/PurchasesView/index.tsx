@@ -31,14 +31,13 @@ import {
   PaymentMode,
 } from '../../modal';
 import dayjs from 'dayjs';
-import { getAllUsers } from '../../api/users';
 import { useRef } from 'react';
 import { PERMISSIONS } from '../Rbac/permissions';
 import printDiv, {
   ConvertDivToPDFAndDownload,
   DownloadPDF,
 } from '../../utils/Print';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import CommonModal from '../Modal';
 import { EmailModal } from './Email';
 import { Payment } from '../Payment';
@@ -46,9 +45,9 @@ import { IThemeProps } from '../../hooks/useTheme/themeColors';
 import { PrintFormat } from '../PrintFormat';
 import { PrintViewPurchaseWidget } from '../PurchasesWidget/PrintViewPurchaseWidget';
 import { totalDiscountInInvoice } from '../../utils/formulas';
-import { getBanks } from '../../api/accounts';
-import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import { InvoicePDF } from '../PDFs';
+import DummyLogo from '../../assets/quickbook.png';
 interface IProps {
   type?: 'SI' | 'PO' | 'credit-note';
   id?: number;
@@ -108,9 +107,11 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
 
   /* **************UTILITY HOOKS**************** */
   const { rbac } = useRbac(null);
-  const { userDetails, notificationCallback, handleUploadPDF, routeHistory } =
+  const { userDetails, notificationCallback, handleUploadPDF } =
     useGlobalContext();
-  const { history } = routeHistory;
+
+  const history = useHistory();
+
   /* ************ QUERIES & MUTATIONS **************  */
   const { data, isLoading } = useQuery([`invoice-view-${id}`, id], APISTAKE, {
     enabled: !!id,
@@ -195,7 +196,9 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
         break;
 
       case IInvoiceActions?.CREDIT_NOTE:
-        history?.push(`/app${ISupportedRoutes?.ADD_CREDIT_NOTE}/${id}`);
+        history?.push(`/app${ISupportedRoutes?.ADD_CREDIT_NOTE}/${id}`, {
+          type,
+        });
         break;
       case IInvoiceActions?.PRINT:
         onPrint();
@@ -397,29 +400,80 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
       key: IInvoiceActions.CHANGE_DUE_DATE,
     },
   ];
+  const { organization } = userDetails;
+  const {
+    address: organizationAddress,
+    name: organizationName,
+    email: organizationEmail,
+    phoneNumber: organizationContact,
+    website,
+  } = organization;
+  const { city, country, postalCode } = organizationAddress;
+
+  const headerprops = {
+    organizationName,
+    city,
+    country,
+    title: '',
+    organizationContact,
+    organizationEmail,
+    address: '',
+    code: postalCode,
+    logo: DummyLogo,
+    website,
+  };
+
   const menu = (
     <Menu onClick={handleMenuClick}>
-      {_options?.map((option, index) => {
-        return rbac.can(option?.permission) || option?.permission === null ? (
-          <Menu.Item key={option?.key}>{option?.title}</Menu.Item>
-        ) : null;
-      })}
+      <>
+        {_options?.map((option, index) => {
+          return rbac.can(option?.permission) || option?.permission === null ? (
+            <Menu.Item key={option?.key}>{option?.title}</Menu.Item>
+          ) : null;
+        })}
+        {response?.contact ? (
+          <li
+            className="ant-dropdown-menu-item ant-dropdown-menu-item-only-child"
+            role="menuitem"
+            data-menu-id="rc-menu-uuid-46302-3-change_due_date"
+          >
+            <span className="ant-dropdown-menu-title-content">
+              <PDFDownloadLink
+                document={
+                  <InvoicePDF
+                    header={headerprops}
+                    data={response}
+                    type={type}
+                    reportGeneratedUser={userDetails?.profile?.fullName}
+                  />
+                }
+                fileName={response?.invoiceNumber || 'invoice'}
+              >
+                Download as PDF
+              </PDFDownloadLink>
+            </span>
+          </li>
+        ) : (
+          ''
+        )}
+      </>
     </Menu>
   );
 
   const addresses = response?.contact?.addresses || [];
 
-  // return (
-  //   <PDFViewer width={'100%'} height={'900px'}>
-  //     <InvoicePDF type={type} data={response} />
-  //   </PDFViewer>
-  // );
+  const getTotal = () => {
+    const { netTotal, relation } = response;
+    const { balance } = (relation?.links?.length &&
+      relation?.links?.reduce((a, b) => {
+        return { balance: a.balance + b.balance };
+      })) || { balance: 0 };
+
+    return netTotal - balance;
+  };
 
   return (
     <WrapperNewPurchaseView>
-      {/* <PDFViewer width={'100%'} height={'100%'}>
-        <InvoicePDF type={type} data={response} />
-      </PDFViewer> */}
       <div className="pv-10">
         <Row gutter={24}>
           <Col span={12}>
@@ -435,16 +489,6 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
           </Col>
           <Col span={12}>
             <div className="textRight">
-              {response?.contact ? (
-                <PDFDownloadLink
-                  document={<InvoicePDF data={response} type={type} />}
-                  fileName={response?.invoiceNumber || 'invoice'}
-                >
-                  Download as PDF
-                </PDFDownloadLink>
-              ) : (
-                ''
-              )}
               <Dropdown overlay={menu}>
                 <Button type="primary">
                   {type === 'SI'
@@ -653,7 +697,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
                   <th>Tax Rate</th>
                   <td>{response && moneyFormat(TotalTax)}</td>
                 </tr>
-                {response?.relation?.links?.length &&
+                {response?.relation?.links?.length > 0 &&
                   response?.relation?.links?.map((item, key) => {
                     const generateLink = () => {
                       let link = ``;
@@ -678,13 +722,13 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
                         <th>
                           <Link to={generateLink()}>{item?.invoiceNumber}</Link>
                         </th>
-                        <td>{70}</td>
+                        <td>{moneyFormat(item?.balance)}</td>
                       </tr>
                     );
                   })}
                 <tr>
                   <th>Total</th>
-                  <td>{moneyFormat(response?.netTotal)}</td>
+                  <td>{moneyFormat(getTotal())}</td>
                 </tr>
               </table>
             </div>

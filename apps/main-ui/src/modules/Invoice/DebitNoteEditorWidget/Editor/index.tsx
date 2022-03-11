@@ -77,6 +77,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
     isFetching,
     handleAddRow,
     ClearAll,
+
     accountsList,
   } = usePurchaseWidget();
 
@@ -85,7 +86,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
       ? columns.filter((item) => item.dataIndex !== 'tax')
       : columns;
 
-  const idType = 'billId';
+  const idType = 'invoiceId';
 
   const printRef = useRef();
 
@@ -144,10 +145,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
       let payload: any = {
         ...value,
         status: value.status.status,
-        invoiceType:
-          filteredContact?.contactType === IContactTypes?.CUSTOMER
-            ? CreditNoteType.CREDITNOTE
-            : CreditNoteType.DEBITNOTE,
+        invoiceType: CreditNoteType.CREDITNOTE,
         discount: invoiceDiscount,
         netTotal: NetTotal,
         grossTotal: GrossTotal,
@@ -595,7 +593,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
   );
 };
 
-export const CreditNoteEditor: FC<IProps> = (props) => {
+export const DebitNoteEditor: FC<IProps> = (props) => {
   return (
     <PurchaseManager {...props}>
       <Editor {...props} />

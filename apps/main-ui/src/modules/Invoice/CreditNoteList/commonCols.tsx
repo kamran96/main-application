@@ -44,8 +44,8 @@ export const columns: ColumnsType<any> = [
 
   {
     title: 'Items',
-    dataIndex: 'credit_note_items',
-    key: 'credit_note_items',
+    dataIndex: 'creditNoteItems',
+    key: 'creditNoteItems',
     render: (data) => (
       <>{data?.length > 1 ? `${data?.length} items` : `${data?.length} item`}</>
     ),

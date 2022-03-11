@@ -90,10 +90,10 @@ export class IAccountLedgerResult extends IBaseRequestResponse {
 
     if (resolvedData.length) {
       const allDebits = resolvedData.filter(
-        (i, ind) => i.transactionType === TransactionsType.DEBIT
+        (i, ind) => i.transactionType === TransactionsType.CREDIT
       );
       const allCredits = resolvedData.filter(
-        (i, ind) => i.transactionType === TransactionsType.CREDIT
+        (i, ind) => i.transactionType === TransactionsType.DEBIT
       );
 
       resolvedData.push({

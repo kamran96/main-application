@@ -197,13 +197,13 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
 
   const cols = [...columns];
 
-  cols.splice(6, 1, {
-    title: 'Due Amount',
-    dataIndex: 'due_amount',
-    render: (data, row) => {
-      return <>{moneyFormat(Math.abs(data))}</>;
-    },
-  });
+  // cols.splice(6, 1, {
+  //   title: 'Due Amount',
+  //   dataIndex: 'due_amount',
+  //   render: (data, row) => {
+  //     return <>{moneyFormat(Math.abs(data))}</>;
+  //   },
+  // });
 
   const renerTopRightbar = () => {
     return (
