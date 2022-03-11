@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 body {
   margin: 0;
-  font-family: "Poppins", sans-serif !important;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 h1,
@@ -62,7 +62,7 @@ h6 {
   margin-top: 0.5rem !important;
 }
 .mb-0 {
-  margin-bottom: 0 ;
+  margin-bottom: 0;
 }
 .mb-10 {
   margin-bottom: 1.25rem;
@@ -163,7 +163,7 @@ h6 {
   align-items: flex-end !important;
 }
 
-.flex_d_column{
+.flex_d_column {
   flex-direction: column;
 }
 
@@ -253,7 +253,7 @@ h6 {
   font-weight: 600;
 }
 
-.capitalize{
+.capitalize {
   text-transform: capitalize;
 }
 
@@ -272,11 +272,10 @@ h6 {
   /* border-radius: 5px !important; */
 }
 input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
-input:-webkit-autofill:active
-{
- -webkit-box-shadow: 0 0 0 30px transparent inset !important;
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px transparent inset !important;
 }
 
 .ant-modal-body {
@@ -394,3 +393,8 @@ input:-webkit-autofill:active
   height: auto;
 }
 
+/* .new-contact-btn {
+  width: '100%';
+  text-align: 'left';
+  padding: 0 !important;
+} */

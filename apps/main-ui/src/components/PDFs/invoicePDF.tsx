@@ -21,7 +21,10 @@ import light from '../../assets/fonts/RobotoSlab-Light.ttf';
 import medium from '../../assets/fonts/RobotoSlab-medium.ttf';
 import regular from '../../assets/fonts/RobotoSlab-Regular.ttf';
 import semiBold from '../../assets/fonts/RobotoSlab-SemiBold.ttf';
-import { PDFHeader, PdfTable } from '@invyce/pdf-table';
+import PdfTable from './PDFTable';
+import { PdfDocument } from './PdfDocument';
+import { PDFHeader } from './pdf-header';
+import { PDFFontWrapper } from './PDFFontWrapper';
 
 Font.register({
   family: 'Roboto Slab',
@@ -100,9 +103,27 @@ const styles = StyleSheet.create({
 interface IProps {
   data: IInvoiceResult;
   type: 'SI' | 'PO' | 'credit-note';
+  header: {
+    title?: string;
+    organizationName?: string;
+    organizationEmail?: string;
+    organizationContact?: string;
+    website?: string;
+    address?: string;
+    city?: string;
+    code?: string | number;
+    country?: string;
+    logo?: string;
+  };
+  reportGeneratedUser: string;
 }
 
-export const InvoicePDF: FC<IProps> = ({ data, type }) => {
+export const InvoicePDF: FC<IProps> = ({
+  data,
+  type,
+  header,
+  reportGeneratedUser,
+}) => {
   const columns = [
     {
       title: 'DESCRIPTION',
@@ -171,16 +192,18 @@ export const InvoicePDF: FC<IProps> = ({ data, type }) => {
     0;
 
   return (
-    <Document>
-      <Page size={'A4'}>
-        <PDFHeader />
+    <PdfDocument generatedUser={reportGeneratedUser}>
+      <PDFFontWrapper>
+        <PDFHeader {...header} />
         <View style={styles.dispatchedInfoWrapper}>
           <View>
             <View>
               <Text style={styles.dispatchLabel}>Billed to,</Text>
-              <Text style={styles.dispatchData}>{data?.contact?.name}</Text>
+              <Text style={styles.dispatchData}>
+                {data?.contact?.name || ''}
+              </Text>
             </View>
-            {data?.contact?.addresses?.length && (
+            {data?.contact?.addresses?.length > 0 ? (
               <View>
                 <Text style={styles.dispatchLabel}>Address</Text>
                 <Text style={styles.dispatchData}>
@@ -189,7 +212,7 @@ export const InvoicePDF: FC<IProps> = ({ data, type }) => {
                   {data?.contact?.addresses[0]?.postalCode}
                 </Text>
               </View>
-            )}
+            ) : null}
           </View>
           <View>
             <View>
@@ -220,32 +243,32 @@ export const InvoicePDF: FC<IProps> = ({ data, type }) => {
         <PdfTable columns={columns} data={data[accessor]} />
         <View style={styles.calculationAndNotesWrapper}>
           <View style={styles.notesSection}>
-            {data?.comment && (
+            {data?.comment ? (
               <>
                 <Text style={styles.dispatchLabel}>Notes</Text>
                 <Text style={styles.note}>
                   {data.comment ? data?.comment : ''}
                 </Text>
               </>
-            )}
+            ) : null}
           </View>
           <View style={styles.calculation}>
             <View style={styles.calculationItem}>
               <Text style={styles.calculationLabel}>Sub Total</Text>
               <Text style={styles.calculationData}>
-                {moneyFormat(data?.grossTotal)}
+                {moneyFormat(data?.grossTotal || 0)}
               </Text>
             </View>
             <View style={styles.calculationItem}>
               <Text style={styles.calculationLabel}>Items Discount</Text>
               <Text style={styles.calculationData}>
-                {moneyFormat(itemsDiscount)}
+                {moneyFormat(itemsDiscount || 0)}
               </Text>
             </View>
             <View style={styles.calculationItem}>
               <Text style={styles.calculationLabel}>Invoice Discount</Text>
               <Text style={styles.calculationData}>
-                {moneyFormat(invoiceDiscount)}
+                {moneyFormat(invoiceDiscount || 0)}
               </Text>
             </View>
             <View
@@ -257,12 +280,12 @@ export const InvoicePDF: FC<IProps> = ({ data, type }) => {
             >
               <Text style={styles.calculationLabel}>Total</Text>
               <Text style={styles.calculationData}>
-                {moneyFormat(data?.netTotal)}
+                {moneyFormat(data?.netTotal || 0)}
               </Text>
             </View>
           </View>
         </View>
-      </Page>
-    </Document>
+      </PDFFontWrapper>
+    </PdfDocument>
   );
 };

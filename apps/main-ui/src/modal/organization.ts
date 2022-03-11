@@ -1,4 +1,4 @@
-import { IBase, IBaseRequest } from "./base";
+import { IBase, IBaseRequest } from './base';
 
 export interface IOrganizationResult extends IBaseRequest {
   result: IOrganizations[];
@@ -19,6 +19,7 @@ export interface ICurrency {
   name: string;
   code: string;
   symbol: string;
+  symbolNative?: string;
 }
 
 export interface IBranch extends IBase {
@@ -27,7 +28,7 @@ export interface IBranch extends IBase {
 }
 
 export enum IOrganizationType {
-  ENTERPRISE = "EN", // For International Enterprise businesses
-  SAAS = "SAAS", // FOR ALL TYPE OF INTERNATIONAL BUSINESSES
-  LOCAL_ENTERPRISES = "LOC_EN" // FOR LOCAL BUSINESSES
+  ENTERPRISE = 'EN', // For International Enterprise businesses
+  SAAS = 'SAAS', // FOR ALL TYPE OF INTERNATIONAL BUSINESSES
+  LOCAL_ENTERPRISES = 'LOC_EN', // FOR LOCAL BUSINESSES
 }

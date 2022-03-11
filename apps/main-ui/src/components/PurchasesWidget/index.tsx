@@ -153,8 +153,6 @@ const Editor: FC<IProps> = ({ type, id }) => {
   const onFinish = async (value) => {
     const errors = handleCheckValidation();
 
-    console.log(errors);
-
     if (!errors?.length) {
       const paymentData = { ...payment };
       delete paymentData.totalAmount;
@@ -169,7 +167,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
             ? parseInt(invoiceDiscount)
             : invoiceDiscount,
           TotalDiscount
-        ),
+        ).toString(),
         netTotal: NetTotal,
         grossTotal: GrossTotal,
         total: '',
@@ -179,23 +177,6 @@ const Editor: FC<IProps> = ({ type, id }) => {
           return { ...item, sequence: index };
         }),
       };
-      // let payments = {
-      //   ...paymentData,
-      //   amount:
-      //     payment.paymentMode === PaymentMode.CREDIT
-      //       ? 0
-      //       : payment.paymentMode === PaymentMode.CASH
-      //       ? NetTotal
-      //       : parseFloat(payment.amount),
-      // };
-
-      // if (type !== IInvoiceType.QUOTE && payload.invoice.status !== 2) {
-      //   if (payments.paymentMode === PaymentMode.CASH) {
-      //     delete payments.dueDate;
-      //   }
-
-      //   payload.payment = payments;
-      // }
 
       delete payload?.invoiceDiscount;
       delete payload?.total;
@@ -414,17 +395,19 @@ const Editor: FC<IProps> = ({ type, id }) => {
                         // }}
                       >
                         <Option
+                          key={'new-contact'}
                           style={{
                             textAlign: 'left',
                           }}
                           value={'contact-create'}
                         >
                           <Button
+                            className="new-contact-btn"
                             onClick={(e) => {
                               e.stopPropagation();
                               onCreateContact();
                             }}
-                            type="default"
+                            type="text"
                             size="middle"
                           >
                             Create Contact
@@ -736,27 +719,6 @@ const Editor: FC<IProps> = ({ type, id }) => {
                       }
                     >
                       <>
-                        <Button
-                          disabled={creatingInvoiceLoading}
-                          loading={
-                            creatingInvoiceLoading &&
-                            submitType === ISUBMITTYPE.RETURN
-                          }
-                          htmlType="submit"
-                          size={'middle'}
-                          onClick={() => {
-                            setSubmitType(ISUBMITTYPE.RETURN);
-                            AntForm.setFieldsValue({
-                              status: {
-                                status: IInvoiceStatus.returned,
-                                print: false,
-                              },
-                            });
-                          }}
-                        >
-                          Return
-                        </Button>
-
                         <Button
                           disabled={creatingInvoiceLoading}
                           loading={

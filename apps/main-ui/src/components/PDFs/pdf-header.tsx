@@ -108,11 +108,11 @@ export const PDFHeader: FC<IPropsHeader> = ({
           <Text style={styles.adderssAndInfo}>{country}</Text>
         </View>
       </View>
-      {title && (
+      {title ? (
         <View style={styles.pdfTitleWrapper}>
           <Text style={styles.pdfTitle}>{title}</Text>
         </View>
-      )}
+      ) : null}
     </View>
   );
 };

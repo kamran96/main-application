@@ -50,7 +50,7 @@ export interface IInvoiceResult extends IBase {
   [key: string]: any;
   relation?: {
     type: 'SI' | 'PO' | 'QO' | 'CN';
-    links: { id: number; invoiceNumber: string }[];
+    links: { id?: number; invoiceNumber?: string; balance?: number }[];
   };
 }
 

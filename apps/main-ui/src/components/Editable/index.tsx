@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState, ReactElement, ReactNode } from 'react';
+import React, { FC, useEffect, useState, ReactNode } from 'react';
 import { Input, InputNumber, Tooltip } from 'antd';
 import { SizeType } from 'antd/lib/config-provider/SizeContext';
 import { ClickOutSide } from './../../utils/clickoutside';
@@ -172,6 +172,9 @@ export const WrapperEditable = styled.div<WrapperProps>`
   input:focus {
     border-color: #ffffff14 !important;
   }
+  .ant-input {
+    padding: 8px 3px !important;
+  }
 
   .input-para {
     width: 100%;
@@ -194,7 +197,7 @@ export const WrapperEditable = styled.div<WrapperProps>`
   .rendered-text {
     height: 100%;
     color: #626262;
-    padding: 8px 11px;
+    padding: 8px 3px;
     display: block;
     border: 1px solid
       ${(props: WrapperProps) => (props?.error ? '#ff940f' : 'transparent')};
@@ -255,7 +258,7 @@ interface IEditableSelectProps {
   placeholder?: string;
   optionFilterProp?: string | 'children';
   onChange?: (payload: any) => void;
-  children?: ReactElement<any>;
+  children?: ReactNode;
   onClick?: () => void;
   value?: any;
   error?: boolean;
@@ -362,10 +365,13 @@ export const EditableSelect: FC<IEditableSelectProps> = ({
 
 const WrapperEditableSelect = styled.div<any>`
   overflow: hidden;
+  .ant-input {
+    padding: 8px 3px !important;
+  }
   .rendered-text {
     font-size: 14px;
     color: #626262;
-    padding: 8px 11px;
+    padding: 8px 3px;
     display: block;
     border: 1px solid ${({ error }): any => (error ? '#ff940f' : 'transparent')};
     transition: 0.3s all ease-in-out;

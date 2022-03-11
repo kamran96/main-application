@@ -83,6 +83,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
       ? 'purchaseItems'
       : 'invoiceItems';
 
+  console.log(key);
   const APISTAKE_GETORDERS =
     relation?.type === ORDER_TYPE?.PURCAHSE_ORDER
       ? getPurchasesById
@@ -92,7 +93,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   const [width] = useWindowSize();
 
   /* ************ HOOKS *************** */
-  const { setItemsModalConfig, userDetails } = useGlobalContext();
+  const { notificationCallback, setItemsModalConfig, userDetails } =
+    useGlobalContext();
 
   const { organization } = userDetails;
 
@@ -103,10 +105,10 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   const [deleteIds, setDeleteIds] = useState([]);
   const [paymentReset, setPaymentReset] = useState(false);
 
-  const priceKey = 'purchasePrice';
+  const priceKey = 'unitPrice';
 
   const { data: accountsData, isLoading: accountsLoading } = useQuery(
-    [`accounts-${type}-contactType=${IContactTypes.SUPPLIER}`, 'bill'],
+    [`accounts-${type}-contactType=${IContactTypes.CUSTOMER}`, 'invoice'],
     getAccountsByTypeAPI,
     {
       enabled:
@@ -116,7 +118,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
 
   const accountsList: IAccountsResult[] = accountsData?.data?.result || [];
 
-  const defaultAccountCode = '15005';
+  const defaultAccountCode = '50001';
 
   const [defaultAccount] = accountsList.filter(
     (i) => i.code === defaultAccountCode
@@ -268,7 +270,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
 
   const contactResult: IContactType[] =
     data?.data?.result?.filter(
-      (contact: IContactType) => contact?.contactType === IContactTypes.SUPPLIER
+      (contact: IContactType) => contact?.contactType === IContactTypes.CUSTOMER
     ) || [];
 
   // Accounts Fetched By Types
@@ -276,7 +278,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   const getSubTotal = useCallback(() => {
     let subTotal = 0;
     invoiceItems.forEach((item) => {
-      subTotal = subTotal + item.purchasePrice * item.quantity;
+      subTotal = subTotal + item.unitPrice * item.quantity;
     });
     return subTotal;
   }, [invoiceItems, type]);
@@ -288,8 +290,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   const GrossTotal = useMemo(() => {
     return getSubTotal() + TotalTax;
   }, [getSubTotal(), TotalTax]);
-
-  console.log();
 
   /* Gets Total Discount on items */
   const TotalDiscount = useMemo(() => {
@@ -308,7 +308,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
 
   const NetTotal = useMemo(() => {
     return GrandTotal.total - invoiceDiscount;
-  }, [GrandTotal]);
+  }, [GrandTotal, invoiceDiscount]);
 
   /*Query hook for  Fetching all items against ID */
   const { data: itemsData, isLoading: itemsLoading } = useQuery(
@@ -417,6 +417,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
                   );
                   const allItems = [...prev];
 
+                  const unitPrice = selectedItem.price.salePrice;
                   const purchasePrice =
                     allItems[index].purchasePrice ||
                     selectedItem?.price?.purchasePrice ||
@@ -426,34 +427,14 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
                   const costOfGoodAmount =
                     purchasePrice * allItems[index].quantity;
 
-                  // if (type === 'CN' && selectedItem.stock < record.quantity) {
-                  //   const allErrors = [...rowsErrors];
-                  //   allErrors[index] = { hasError: true };
-                  //   setRowsErrors(allErrors);
-                  //   notificationCallback(
-                  //     NOTIFICATIONTYPE.WARNING,
-                  //     `You are out of stock! Only ${selectedItem.stock} items left in your stock`
-                  //   );
-                  // } else {
-                  //   const allErrors = [...rowsErrors];
-                  //   allErrors[index] = { hasError: false };
-                  //   setRowsErrors(allErrors);
-                  // }
                   const description = `${selectedItem?.category?.title || ''}/`;
 
-                  const tAccessors = {
-                    purchasePrice,
-                  };
-                  const total = calculateInvoice(
-                    purchasePrice,
-                    tax,
-                    itemDiscount
-                  );
+                  const total = calculateInvoice(unitPrice, tax, itemDiscount);
 
                   allItems[index] = {
                     ...allItems[index],
                     itemId: val.value,
-                    purchasePrice,
+                    unitPrice,
                     tax,
                     itemDiscount,
                     total,
@@ -616,9 +597,9 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
       },
     },
     {
-      title: 'Purchase Price',
-      dataIndex: 'purchasePrice',
-      key: 'purchasePrice',
+      title: 'Unit Price',
+      dataIndex: 'unitPrice',
+      key: 'unitPrice',
       width: width > 1500 ? 150 : '',
 
       render: (value, record, index) => {
@@ -633,20 +614,20 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
 
                   const row = {
                     ...allItems[index],
-                    [priceKey]: value,
+                    unitPrice: value,
                     itemDiscount: record?.itemDiscount,
                     tax: record?.tax,
                   };
                   const total =
                     calculateInvoice(
-                      row[priceKey],
+                      row.unitPrice,
                       row?.tax,
                       row?.itemDiscount
                     ) * parseInt(row?.quantity);
 
                   allItems[index] = {
                     ...row,
-                    purchasePrice: value,
+                    value,
                     total,
                     errors: RemovedErrors(allItems[index].errors, 'unitPrice'),
                   };
@@ -673,7 +654,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
                 error={
                   row?.errors?.length && row?.errors?.includes('accountId')
                 }
-                className={`border-less-select contacttype-${IContactTypes.SUPPLIER}`}
+                className={`border-less-select contacttype-${IContactTypes.CUSTOMER}`}
                 value={{
                   value: value !== null ? value : '',
                   label:
@@ -855,6 +836,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
         ClearAll,
         handleAddRow,
         isFetching: itemsLoading || invoiceLoading || accountsLoading,
+
         accountsList,
       }}
     >

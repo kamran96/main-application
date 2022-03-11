@@ -4,7 +4,12 @@ import { useMutation } from 'react-query';
 import { CsvImportAPi } from '../../api';
 // import { Inconvinience } from '../../components/ErrorBoundries/Inconvinience';
 // import { InvoiceImportManager } from '../../modules/Invoice/InvoiceImportManager';
-import { Document, PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
+import {
+  Document,
+  PDFViewer,
+  PDFDownloadLink,
+  renderToString,
+} from '@react-pdf/renderer';
 import { InvoicePDF } from '../../components/PDFs';
 
 const columns = [
@@ -83,12 +88,12 @@ export const TestComponents: FC = () => {
   return (
     // <div>test</div>
     <div>
-      <PDFDownloadLink
+      {/* <PDFDownloadLink
         document={<InvoicePDF data={null} type={null} />}
         fileName="generated.pdf"
       >
         Generate PDF
-      </PDFDownloadLink>
+      </PDFDownloadLink> */}
       {/* <PDFViewer width={'100%'} height={900}>
         <InvoicePDF />
       </PDFViewer> */}

@@ -248,30 +248,30 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
             className="flex aliginCenter justifySpaceBetween"
           >
             <div className="comment area ">
-              <BoldText style={{ color: '#656584' }} className="pv-10">
-                Note:
-              </BoldText>
-              <div
-                style={{
-                  padding: '4px 0',
-                  marginRight: '40px',
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: 14,
-                    paddingRight: 0,
-                    color: '#222234',
-                    lineHeight: '17px',
-                  }}
-                >
-                  {/* {data.comment} */}
-                  Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quis
-                  nobis, consequatur facilis facere architecto suscipit
-                  recusandae, quisquam accusantium ipsa tempore, modi enim
-                  aspernatur? Sit neque ullam ratione corrupti, sed aperiam.
-                </p>
-              </div>
+              {data?.comment && (
+                <>
+                  <BoldText style={{ color: '#656584' }} className="pv-10">
+                    Note:
+                  </BoldText>
+                  <div
+                    style={{
+                      padding: '4px 0',
+                      marginRight: '40px',
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: 14,
+                        paddingRight: 0,
+                        color: '#222234',
+                        lineHeight: '17px',
+                      }}
+                    >
+                      {data?.comment}
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
             {!hideCalculation ? (
               <div className="total">
@@ -311,7 +311,7 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
             )}
           </div>
           <div style={{ padding: '20px 0' }}>
-            <div className="terms">
+            {/* <div className="terms">
               <BoldText style={{ color: '#656584' }} className="pv-10">
                 Terms & Conditions
               </BoldText>
@@ -330,13 +330,13 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
                   }}
                 >
                   {/* {data.comment} */}
-                  Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quis
+            {/* Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quis
                   nobis, consequatur facilis facere architecto suscipit
                   recusandae, quisquam accusantium ipsa tempore, modi enim
-                  aspernatur? Sit neque ullam ratione corrupti, sed aperiam.
-                </p>
-              </div>
-            </div>
+                  aspernatur? Sit neque ullam ratione corrupti, sed aperiam. */}
+            {/* </p> */}
+            {/* </div> */}
+            {/* </div>  */}
           </div>
         </div>
       </div>

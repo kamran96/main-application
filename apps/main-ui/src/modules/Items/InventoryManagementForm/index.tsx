@@ -1,7 +1,7 @@
 import Icon from '@iconify/react';
 import { Button, Col, Row, Select } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import { getAllItems, StockUpdateAPI } from '../../../api';
 import CommonSelect from '../../../components/CommonSelect';
@@ -15,7 +15,6 @@ import bxPlus from '@iconify-icons/bx/bx-plus';
 import convertToRem from '../../../utils/convertToRem';
 import { Color, NOTIFICATIONTYPE } from '../../../modal';
 import deleteIcon from '@iconify/icons-carbon/delete';
-import { P } from '../../../components/Typography';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { getAllAccounts } from '../../../api/accounts';
 import { IAccountsResult } from '../../../modal';
@@ -106,13 +105,14 @@ export const ManageInventoryForm: FC = () => {
             showSearch
             value={{
               value: data !== null ? data : '',
+
               label:
                 data !== null
                   ? itemsList
-                    ? `${getItemWithItemId(data)?.code} / ${
-                        getItemWithItemId(data).name
+                    ? `${getItemWithItemId(data)?.name}/${
+                        getItemWithItemId(data)?.code
                       }`
-                    : ''
+                    : 'sadfjsadf'
                   : 'Select Item',
             }}
             size="middle"
@@ -125,36 +125,34 @@ export const ManageInventoryForm: FC = () => {
             placeholder="Select Item"
             optionFilterProp="children"
             onChange={(val) => {
+              console.log(val, 'what is val');
               const [filtered] = itemsList?.filter(
                 (item) => item?.id === val?.value
               );
 
               setInventoryList((prev) => {
-                return [
-                  ...prev,
-                  prev?.splice(index, 1, {
-                    ...prev[index],
-                    itemId: val?.value,
-                    description: filtered?.description,
-                    stock: filtered?.stock,
-                    code: filtered?.code,
-                    error: false,
-                    purchasePrice: filtered?.price?.purchasePrice,
-                  }),
-                ];
+                const _list = [...prev];
+                _list?.splice(index, 1, {
+                  ..._list[index],
+                  itemId: val?.value,
+                  description: filtered?.description,
+                  stock: filtered?.stock,
+                  code: filtered?.code,
+                  error: false,
+                  purchasePrice: filtered?.price?.purchasePrice,
+                });
+                return _list;
               });
             }}
           >
-            <>
-              {inventoryList[index]?.active &&
-                itemsList?.map((item, index) => {
-                  return (
-                    <Option value={item?.id}>
-                      {item?.code} / {item?.name}
-                    </Option>
-                  );
-                })}
-            </>
+            {inventoryList[index]?.active &&
+              itemsList?.map((item, index) => {
+                return (
+                  <Option value={item?.id}>
+                    {item?.code} / {item?.name}
+                  </Option>
+                );
+              })}
           </CommonSelect>
         );
       },
@@ -203,25 +201,22 @@ export const ManageInventoryForm: FC = () => {
             size="middle"
             onChange={(value) => {
               setInventoryList((prev) => {
-                return [
-                  ...prev,
-                  prev?.splice(index, 1, {
-                    ...prev[index],
-                    debit: value,
-                  }),
-                ];
+                const list = [...prev];
+                list?.splice(index, 1, {
+                  ...list[index],
+                  debit: value,
+                });
+                return list;
               });
             }}
           >
-            <>
-              {accountsList?.map((acc: IAccountsResult, index) => {
-                return (
-                  <Option key={index} value={acc?.id}>
-                    {acc?.name}
-                  </Option>
-                );
-              })}
-            </>
+            {accountsList?.map((acc: IAccountsResult, index) => {
+              return (
+                <Option key={index} value={acc?.id}>
+                  {acc?.name}
+                </Option>
+              );
+            })}
           </EditableSelect>
         );
       },
@@ -239,25 +234,22 @@ export const ManageInventoryForm: FC = () => {
             size="middle"
             onChange={(value) => {
               setInventoryList((prev) => {
-                return [
-                  ...prev,
-                  prev?.splice(index, 1, {
-                    ...prev[index],
-                    credit: value,
-                  }),
-                ];
+                const list = [...prev];
+                list.splice(index, 1, {
+                  ...list[index],
+                  credit: value,
+                });
+                return list;
               });
             }}
           >
-            <>
-              {accountsList?.map((acc: IAccountsResult, index) => {
-                return (
-                  <Option key={index} value={acc?.id}>
-                    {acc?.name}
-                  </Option>
-                );
-              })}
-            </>
+            {accountsList?.map((acc: IAccountsResult, index) => {
+              return (
+                <Option key={index} value={acc?.id}>
+                  {acc?.name}
+                </Option>
+              );
+            })}
           </EditableSelect>
         );
       },

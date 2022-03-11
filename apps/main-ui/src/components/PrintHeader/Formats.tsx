@@ -1,7 +1,5 @@
-import React from 'react';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { IUser } from '../../modal';
-import { getCountryById } from '@invyce/shared/utils';
 
 export const TopbarLogoWithDetails = () => {
   const { userDetails } = useGlobalContext();
@@ -47,7 +45,7 @@ export const Addressbar = () => {
     <table className="address_bar_table">
       <tr>
         <td>
-          <p>{getCountryById(parseInt(country))?.name}</p>
+          <p>{country}</p>
         </td>
       </tr>
       <tr>

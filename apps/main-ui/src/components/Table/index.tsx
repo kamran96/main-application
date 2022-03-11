@@ -1,5 +1,4 @@
 import printIcon from '@iconify-icons/bytesize/print';
-import downloadIcon from '@iconify/icons-bi/download';
 import {
   ExportTableButton,
   IExportFieldButtonProps,
@@ -27,14 +26,10 @@ import {
   PrintTitle,
   TopbarLogoWithDetails,
 } from '../PrintHeader/Formats';
-import { PDFICON } from '../Icons';
 import { WrapperTable, DefaultWrapper } from './styles';
 import { useWindowSize } from '../../utils/useWindowSize';
-import { PreviewPDF } from './exportPDF';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import DummyLogo from '../../assets/quickbook.png';
-import { getCountryById } from '../../utils/getCountryById';
-// import { ITableColumns } from '@invyce/pdf-table';
 
 interface IPDFExportable {
   columns?: any[];
@@ -237,7 +232,7 @@ export const CommonTable: FC<IProps> = ({
                     Header={{
                       organizationName,
                       city,
-                      country: country ? getCountryById(country)?.name : '',
+                      country,
                       title: printTitle,
                       organizationContact,
                       organizationEmail,
@@ -366,27 +361,6 @@ export const CommonTable: FC<IProps> = ({
           renderTable()
         )}
       </WrapperTable>
-      {/* <PreviewPDF
-        Header={{
-          organizationName,
-          city,
-          country: country ? getCountryById(country)?.name : '',
-          title: printTitle,
-          organizationContact,
-          organizationEmail,
-          address: '',
-          code: postalCode,
-          logo: DummyLogo,
-          website,
-        }}
-        generatedBy={userDetails?.profile?.fullName}
-        data={tableData}
-        columns={
-          typeof pdfExportable === 'boolean'
-            ? printColumns
-            : pdfExportable?.columns || []
-        }
-      /> */}
     </>
   );
 };
