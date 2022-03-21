@@ -16,11 +16,11 @@ export class BillItems {
   @Column()
   billId: number;
   @Column()
+  accountId: number;
+  @Column()
   description: string;
   @Column()
   quantity: number;
-  @Column()
-  itemDiscount: string;
   @Column()
   purchasePrice: number;
   @Column()

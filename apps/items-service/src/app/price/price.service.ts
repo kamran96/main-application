@@ -94,8 +94,8 @@ export class PriceService {
             const payload = {
               dr: debitArray,
               cr: creditArray,
-              type: 'item opening stock balance',
-              reference: `${item.name} opening stock balance`,
+              type: 'item opening stock',
+              reference: `${item.name} opening stock`,
               amount: worth,
               status: 1,
             };

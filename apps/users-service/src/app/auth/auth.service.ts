@@ -13,10 +13,13 @@ import * as Moment from 'moment';
 import * as queryString from 'query-string';
 import * as os from 'os';
 import * as ip from 'ip';
+import * as speakeasy from 'speakeasy';
+import * as qrcode from 'qrcode';
 import { Response } from 'express';
 import { User } from '../schemas/user.schema';
 import {
   CHANGE_EMAIL_OTP,
+  CHANGE_PASSWORD_OTP,
   PASSWORD_UPDATED,
   SEND_FORGOT_PASSWORD,
   SEND_INVITATION,
@@ -30,6 +33,7 @@ import {
   IUser,
   IUserAccessControlResponse,
   IVerifyOtp,
+  IBaseUser,
 } from '@invyce/interfaces';
 
 import { SendOtp, UserLoginDto, UserRegisterDto } from '../dto/user.dto';
@@ -37,6 +41,10 @@ import { SendOtp, UserLoginDto, UserRegisterDto } from '../dto/user.dto';
 const generateRandomNDigits = (n) => {
   return Math.floor(Math.random() * (9 * Math.pow(10, n))) + Math.pow(10, n);
 };
+
+const secret = speakeasy.generateSecret({
+  name: 'invyce',
+});
 
 @Injectable()
 export class AuthService {
@@ -111,7 +119,7 @@ export class AuthService {
 
   async AddUser(
     authDto: UserRegisterDto,
-    organizationId = null as string,
+    userData = null as IBaseUser,
     email = '' as string
   ): Promise<IUser> {
     const updatedProfile = {
@@ -134,7 +142,7 @@ export class AuthService {
     user.email = authDto.email;
     user.password =
       authDto.password !== '' ? bcrypt.hashSync(authDto.password) : null;
-    user.organizationId = organizationId || null;
+    user.organizationId = userData?.organizationId || null;
     user.branchId = authDto.branchId || null;
     user.roleId = authDto.roleId || null;
     user.prefix = authDto.prefix;
@@ -158,9 +166,9 @@ export class AuthService {
       user_token.expiresAt = time.toString();
       user_token.userId = user._id;
       await user_token.save();
-      await this.sendVerificationEmail(user, generateOtp);
+      await this.sendVerificationEmail(user, generateOtp, userData);
     } else {
-      await this.sendVerificationEmail(user);
+      await this.sendVerificationEmail(user, null, userData);
     }
 
     return user;
@@ -264,7 +272,8 @@ export class AuthService {
 
   async sendVerificationEmail(
     usr = null as SendOtp,
-    generateOtp = null as number
+    generateOtp = null as number,
+    userData = null as IBaseUser
   ): Promise<boolean> {
     const user = await this.userModel.findOne({ email: usr.email });
 
@@ -278,7 +287,7 @@ export class AuthService {
     if (generateOtp) {
       this.sendVerificationOtp(user, generateOtp);
     } else {
-      this.sendVerificationCode(user, base64);
+      this.sendVerificationCode(user, base64, userData);
     }
 
     return true;
@@ -334,13 +343,13 @@ export class AuthService {
     user_token.userId = user._id;
     await user_token.save();
 
-    await this.sendVerificationEmail(body, generateOtp);
+    await this.sendVerificationEmail(body, generateOtp, null);
   }
 
-  async ChangeEmailOtp(body: SendOtp): Promise<void> {
-    const time = Moment(new Date()).add(1, 'h').calendar();
+  async ChangeEmailOtp(body, usr) {
+    const time = Moment(new Date()).add(1, 'h');
 
-    const user = await this.userModel.findOne({ email: body.email });
+    const user = await this.userModel.findOne({ email: usr.email });
 
     const generateOtp: number = generateRandomNDigits(4);
     parseInt(generateOtp as unknown as string);
@@ -351,11 +360,27 @@ export class AuthService {
     user_token.userId = user._id;
     await user_token.save();
 
-    await this.emailService.emit(CHANGE_EMAIL_OTP, {
-      to: user.email,
-      user_name: user.profile.fullName,
-      otp_link: generateOtp,
-    });
+    if (body.type === 'email') {
+      await this.emailService.emit(CHANGE_EMAIL_OTP, {
+        to: user.email,
+        user_name: user.profile.fullName,
+        otp_link: generateOtp,
+      });
+    } else if (body.type === 'password') {
+      await this.emailService.emit(CHANGE_PASSWORD_OTP, {
+        to: user.email,
+        user_name: user.profile.fullName,
+        otp_link: generateOtp,
+      });
+    }
+
+    const type = body.type;
+    return {
+      message: 'Email send',
+      result: {
+        [type]: time,
+      },
+    };
   }
 
   async sendVerificationOtp(user, otp): Promise<void> {
@@ -366,7 +391,11 @@ export class AuthService {
     });
   }
 
-  async sendVerificationCode(user: UserLoginDto, code: string): Promise<void> {
+  async sendVerificationCode(
+    user: IUser,
+    code: string,
+    userData: IBaseUser
+  ): Promise<void> {
     const baseUrl = 'http://localhost:4200';
     const _code = { code };
     const a = `${baseUrl}/page/join-user?${queryString.stringify(_code)}`;
@@ -375,21 +404,9 @@ export class AuthService {
 
     const payload = {
       to: user.email,
-      from: 'no-reply@invyce.com',
-      TemplateAlias: 'user-invitation',
-      TemplateModel: {
-        product_url: 'https://invyce.com',
-        product_name: 'invyce',
-        name: 'test',
-        invite_sender_name: 'zeeshan',
-        invite_sender_organization_name: 'test org',
-        action_url: a,
-        support_email: 'support@invyce.com',
-        live_chat_url: 'live_chat_url_Value',
-        help_url: 'help_url_Value',
-        company_name: 'invyce',
-        company_address: 'gilgit',
-      },
+      user_name: user?.profile?.fullName,
+      name: userData.profile.fullName,
+      action_url: a,
     };
 
     await this.emailService.emit(SEND_INVITATION, payload);
@@ -435,6 +452,7 @@ export class AuthService {
     const payload = {
       to: user.email,
       user_name: user.profile.fullName,
+      link: `${process.env.FRONTEND_HOST}/page/login`,
     };
 
     await this.emailService.emit(PASSWORD_UPDATED, payload);
@@ -469,5 +487,20 @@ export class AuthService {
     } catch (err) {
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async GenerateGoogleAuthenticatorToken() {
+    return await qrcode.toDataURL(secret.otpauth_url);
+  }
+
+  async VerifyGoogleAuthenticatorToken(data) {
+    const { code } = data;
+    const verified = await speakeasy.totp.verify({
+      secret: secret.base32,
+      encoding: 'base32',
+      token: code,
+    });
+
+    return verified;
   }
 }

@@ -172,6 +172,12 @@ export class InvoiceController {
   }
 
   @UseGuards(GlobalAuthGuard)
+  @Put('due-date/:id')
+  async changeDueDate(@Param() params, @Body() invoiceDto) {
+    return await this.invoiceService.ChangeDueDate(params.id, invoiceDto);
+  }
+
+  @UseGuards(GlobalAuthGuard)
   @Get('/:id')
   async show(
     @Param() params,

@@ -186,8 +186,15 @@ export class UserService {
           status: UserStatuses.ACTIVE,
         })
         .populate('role')
-        .populate('organization')
-        .populate('branch');
+        .populate('branch')
+        .populate({
+          path: 'organization',
+          model: 'Organization',
+          populate: {
+            path: 'currency',
+            model: 'Currency',
+          },
+        });
 
       let new_obj;
       if (user?.profile?.attachmentId) {
@@ -259,11 +266,7 @@ export class UserService {
           isVerified: true,
           phoneNumber: user.phoneNumber,
         };
-        await this.authService.AddUser(
-          insertedUser,
-          userData.organizationId,
-          'email'
-        );
+        await this.authService.AddUser(insertedUser, userData, 'email');
       }
     }
   }
@@ -274,7 +277,7 @@ export class UserService {
       organizationId: user.organizationId,
     });
 
-    await this.authService.sendVerificationEmail(dbUser);
+    await this.authService.sendVerificationEmail(dbUser, null, user);
   }
 
   async VerifyInvitedUser(body: SendCodeDto): Promise<IUser> {

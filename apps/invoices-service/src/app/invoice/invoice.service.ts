@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
   Between,
   getCustomRepository,
@@ -26,6 +26,7 @@ import {
 import {
   EntryType,
   Integrations,
+  InvTypes,
   PaymentModes,
   PdfType,
   Statuses,
@@ -34,7 +35,11 @@ import {
 import { BillItemRepository } from '../repositories/billItem.repository';
 import { InvoiceDto, InvoiceIdsDto } from '../dto/invoice.dto';
 import { ClientProxy } from '@nestjs/microservices';
-import { BILL_CREATED, SEND_FORGOT_PASSWORD } from '@invyce/send-email';
+import {
+  INVOICE_CREATED,
+  INVOICE_UPDATED,
+  SEND_FORGOT_PASSWORD,
+} from '@invyce/send-email';
 
 dotenv.config();
 
@@ -408,23 +413,7 @@ export class InvoiceService {
 
     const creditsArrray = [];
     const itemLedgerArray = [];
-    const invoice_details = [];
-
-    for (const item of dto.invoice_items) {
-      invoice_details.push({
-        itemName: await items.find((i) => i.id === item.itemId).name,
-        quantity: item.quantity,
-        price: item.purchasePrice,
-        itemDiscount: item.itemDiscount,
-        tax: item.tax,
-        total: item.total,
-      });
-    }
-
-    const { data: contact } = await http.post(`contacts/contact/ids`, {
-      ids: [dto.contactId],
-      type: 1,
-    });
+    const invoiceItems = [];
 
     if (dto?.isNewRecord === false) {
       // we need to update invoice
@@ -438,159 +427,145 @@ export class InvoiceService {
         },
       });
 
-      await getCustomRepository(InvoiceRepository).update(
-        { id: dto.id },
-        {
-          contactId: dto.contactId || invoice.contactId,
-          reference: dto.reference || invoice.reference,
-          issueDate: dto.issueDate || invoice.issueDate,
-          dueDate: dto.dueDate || invoice.dueDate,
-          invoiceNumber: dto.invoiceNumber || invoice.invoiceNumber,
-          discount: dto.discount || invoice.discount,
-          grossTotal: dto.grossTotal || invoice.grossTotal,
-          netTotal: dto.netTotal || invoice.netTotal,
-          date: dto.issueDate || invoice.date,
-          invoiceType: dto.invoiceType || invoice.invoiceType,
-          directTax: dto.directTax || invoice.directTax,
-          indirectTax: dto.indirectTax || invoice.indirectTax,
-          isTaxIncluded: dto.isTaxIncluded || invoice.isTaxIncluded,
-          comment: dto.comment || invoice.comment,
-          organizationId: invoice.organizationId,
-          branchId: invoice.branchId,
-          createdById: invoice.createdById,
-          updatedById: req.user.id,
-          status: dto.status || invoice.status,
-        }
-      );
+      if (invoice) {
+        await getCustomRepository(InvoiceRepository).update(
+          { id: dto.id },
+          {
+            contactId: dto.contactId || invoice.contactId,
+            reference: dto.reference || invoice.reference,
+            issueDate: dto.issueDate || invoice.issueDate,
+            dueDate: dto.dueDate || invoice.dueDate,
+            invoiceNumber: dto.invoiceNumber || invoice.invoiceNumber,
+            discount: dto.discount || invoice.discount,
+            grossTotal: dto.grossTotal || invoice.grossTotal,
+            netTotal: dto.netTotal || invoice.netTotal,
+            date: dto.issueDate || invoice.date,
+            invoiceType: dto.invoiceType || invoice.invoiceType,
+            directTax: dto.directTax || invoice.directTax,
+            indirectTax: dto.indirectTax || invoice.indirectTax,
+            isTaxIncluded: dto.isTaxIncluded || invoice.isTaxIncluded,
+            comment: dto.comment || invoice.comment,
+            organizationId: invoice.organizationId,
+            branchId: invoice.branchId,
+            createdById: invoice.createdById,
+            updatedById: req.user.id,
+            status: dto.status || invoice.status,
+          }
+        );
 
-      await getCustomRepository(InvoiceItemRepository).delete({
-        invoiceId: dto.id,
-      });
-
-      for (const item of dto.invoice_items) {
-        await getCustomRepository(InvoiceItemRepository).save({
-          itemId: item.itemId,
+        await getCustomRepository(InvoiceItemRepository).delete({
           invoiceId: dto.id,
-          description: item.description,
-          quantity: item.quantity,
-          itemDiscount: item.itemDiscount,
-          unitPrice: item.unitPrice,
-          costOfGoodAmount: item.costOfGoodAmount,
-          sequence: item.sequence,
-          tax: item.tax,
-          total: item.total,
-          status: 1,
         });
 
-        const itemDetail = items.find((i) => i.id === item.itemId);
-        if (itemDetail.hasInventory) {
-          itemLedgerArray.push({
+        for (const item of dto.invoice_items) {
+          const iItems = await getCustomRepository(InvoiceItemRepository).save({
             itemId: item.itemId,
-            value: item.quantity,
-            targetId: invoice.id,
-            type: 'decrease',
-            action: 'create',
+            invoiceId: dto.id,
+            description: item.description,
+            quantity: item.quantity,
+            itemDiscount: item.itemDiscount,
+            unitPrice: item.unitPrice,
+            costOfGoodAmount: item.costOfGoodAmount,
+            sequence: item.sequence,
+            tax: item.tax,
+            total: item.total,
+            status: 1,
           });
-        }
 
-        const credit = {
-          amount: Number(item.quantity) * Number(item.unitPrice),
-          account_id: item.accountId,
-        };
+          const itemDetail = items.find((i) => i.id === item.itemId);
+          if (itemDetail?.hasInventory === true) {
+            itemLedgerArray.push({
+              itemId: item.itemId,
+              value: item.quantity,
+              targetId: invoice.id,
+              type: 'decrease',
+              action: 'create',
+            });
+          }
 
-        creditsArrray.push(credit);
-      }
-
-      const updatedInvoice: IInvoice = await getCustomRepository(
-        InvoiceRepository
-      ).findOne({
-        where: {
-          id: dto.id,
-          organizationId: req.user.organizationId,
-        },
-      });
-
-      if (updatedInvoice.status === Statuses.AUTHORISED) {
-        await http.post(`reports/inventory/manage`, {
-          payload: itemLedgerArray,
-        });
-
-        const debitsArray = [];
-        const debit = {
-          account_id: await accounts.find((i) => i.code === '15004').id,
-          amount: dto.netTotal,
-        };
-        if (dto?.discount > 0) {
-          const debitDiscount = {
-            amount: dto.discount,
-            account_id: await accounts.find((i) => i.code === '20002').id,
+          const credit = {
+            amount: Number(item.quantity) * Number(item.unitPrice),
+            account_id: item.accountId,
           };
 
-          debitsArray.push(debit, debitDiscount);
-        } else {
-          debitsArray.push(debit);
+          creditsArrray.push(credit);
+          invoiceItems.push(iItems);
         }
 
-        const payload = {
-          dr: debitsArray,
-          cr: creditsArrray,
-          type: 'invoice',
-          reference: dto.reference,
-          amount: dto.grossTotal,
-          status: updatedInvoice.status,
-        };
-
-        const { data: transaction } = await http.post(
-          'accounts/transaction/api',
-          {
-            transactions: payload,
-          }
-        );
-
-        const paymentArr = [
-          {
-            ...updatedInvoice,
-            invoiceId: invoice.id,
-            balance: invoice.netTotal,
-            data: invoice.issueDate,
-            paymentType: PaymentModes.INVOICES,
-            transactionId: transaction.id,
-            entryType: EntryType.CREDIT,
+        const updatedInvoice: IInvoice = await getCustomRepository(
+          InvoiceRepository
+        ).findOne({
+          where: {
+            id: dto.id,
+            organizationId: req.user.organizationId,
           },
-        ];
+        });
 
-        const { data: attachment } = await http.post(
-          `attachments/attachment/generate-pdf`,
-          {
-            data: {
-              ...dto,
-              invoice,
-              contact: contact[0],
-              items,
-              type: PdfType.INVOICE,
-            },
+        if (updatedInvoice.status === Statuses.AUTHORISED) {
+          await http.post(`reports/inventory/manage`, {
+            payload: itemLedgerArray,
+          });
+
+          const debitsArray = [];
+          const debit = {
+            account_id: await accounts.find((i) => i.code === '15004').id,
+            amount: dto.netTotal,
+          };
+          if (dto?.discount > 0) {
+            const debitDiscount = {
+              amount: dto.discount,
+              account_id: await accounts.find((i) => i.code === '20002').id,
+            };
+
+            debitsArray.push(debit, debitDiscount);
+          } else {
+            debitsArray.push(debit);
           }
-        );
 
-        await this.emailService.emit(BILL_CREATED, {
-          to: contact[0]?.email,
-          user_name: contact[0]?.name,
-          invoice_number: invoice.invoiceNumber,
-          issueDate: invoice.issueDate,
-          gross_total: invoice.grossTotal,
-          itemDisTotal: invoice.discount,
-          net_total: invoice.netTotal,
-          invoice_details,
-          download_link: attachment?.path,
-          attachment_name: attachment?.name,
-        });
+          const payload = {
+            dr: debitsArray,
+            cr: creditsArrray,
+            type: 'invoice',
+            reference: dto.reference,
+            amount: dto.grossTotal,
+            status: updatedInvoice.status,
+          };
 
-        await http.post(`payments/payment/add`, {
-          payments: paymentArr,
-        });
-        await http.get(`contacts/contact/balance`);
+          const { data: transaction } = await http.post(
+            'accounts/transaction/api',
+            {
+              transactions: payload,
+            }
+          );
+
+          const paymentArr = [
+            {
+              ...updatedInvoice,
+              invoiceId: invoice.id,
+              balance: invoice.netTotal,
+              data: invoice.issueDate,
+              paymentType: PaymentModes.INVOICES,
+              transactionId: transaction.id,
+              entryType: EntryType.CREDIT,
+            },
+          ];
+
+          const invoiceLink = `${process.env.FRONTEND_HOST}/invoices/${invoice.id}`;
+
+          await this.emailService.emit(INVOICE_UPDATED, {
+            to: req?.user?.email,
+            user_name: req?.user?.profile?.fullName,
+            invoice_number: invoice?.invoiceNumber,
+            name: invoiceLink,
+          });
+
+          await http.post(`payments/payment/add`, {
+            payments: paymentArr,
+          });
+          await http.get(`contacts/contact/balance`);
+        }
+        return updatedInvoice;
       }
-      return invoice;
     } else {
       // we need to create invoice
       const invoice = await getCustomRepository(InvoiceRepository).save({
@@ -616,7 +591,7 @@ export class InvoiceService {
       });
 
       for (const item of dto.invoice_items) {
-        await getCustomRepository(InvoiceItemRepository).save({
+        const iItem = await getCustomRepository(InvoiceItemRepository).save({
           itemId: item.itemId,
           invoiceId: invoice.id,
           description: item.description,
@@ -632,7 +607,7 @@ export class InvoiceService {
         });
 
         const itemDetail = items.find((i) => i.id === item.itemId);
-        if (itemDetail.hasInventory) {
+        if (itemDetail?.hasInventory === true) {
           itemLedgerArray.push({
             itemId: item.itemId,
             value: item.quantity,
@@ -648,6 +623,7 @@ export class InvoiceService {
         };
 
         creditsArrray.push(credit);
+        invoiceItems.push(iItem);
       }
 
       if (invoice.status === Statuses.AUTHORISED) {
@@ -691,6 +667,7 @@ export class InvoiceService {
           {
             ...invoice,
             invoiceId: invoice.id,
+            contactId: dto.contactId,
             balance: invoice.netTotal,
             data: invoice.issueDate,
             paymentType: PaymentModes.INVOICES,
@@ -699,12 +676,37 @@ export class InvoiceService {
           },
         ];
 
+        await http.post(`payments/payment/add`, {
+          payments: paymentArr,
+        });
+
+        const invoice_details = [];
+        let i = 0;
+        for (const item of dto.invoice_items) {
+          i++;
+          if (i < 6) {
+            invoice_details.push({
+              itemName: await items.find((i) => i.id === item.itemId).name,
+              quantity: item.quantity,
+              price: item.purchasePrice,
+              itemDiscount: item.itemDiscount,
+              tax: item.tax,
+              total: item.total,
+            });
+          }
+        }
+
+        const { data: contact } = await http.post(`contacts/contact/ids`, {
+          ids: [dto.contactId],
+          type: 1,
+        });
+
         const { data: attachment } = await http.post(
           `attachments/attachment/generate-pdf`,
           {
             data: {
               ...dto,
-              invoice,
+              invoice: { ...invoice, invoice_items: invoiceItems },
               contact: contact[0],
               items,
               type: PdfType.INVOICE,
@@ -712,7 +714,9 @@ export class InvoiceService {
           }
         );
 
-        await this.emailService.emit(BILL_CREATED, {
+        console.log(attachment, 'atta');
+
+        await this.emailService.emit(INVOICE_CREATED, {
           to: contact[0]?.email,
           user_name: contact[0]?.name,
           invoice_number: invoice.invoiceNumber,
@@ -725,13 +729,82 @@ export class InvoiceService {
           attachment_name: attachment?.name,
         });
 
-        await http.post(`payments/payment/add`, {
-          payments: paymentArr,
-        });
         await http.get(`contacts/contact/balance`);
       }
       return invoice;
     }
+  }
+
+  async ChangeDueDate(invoiceId, data) {
+    const { type, date } = data;
+
+    const isNumeric = (invoiceId) =>
+      /^-?[0-9]+(?:\.[0-9]+)?$/.test(invoiceId + '');
+
+    if (isNumeric(invoiceId) && type === InvTypes.INVOICE) {
+      const invoice = await getCustomRepository(InvoiceRepository).findOne({
+        id: invoiceId,
+      });
+
+      if (invoice) {
+        await getCustomRepository(InvoiceRepository).update(
+          {
+            id: invoiceId,
+          },
+          {
+            dueDate: date,
+          }
+        );
+
+        return {
+          message: 'Invoice updated successfully.',
+          status: true,
+        };
+      }
+    } else if (isNumeric(invoiceId) && type === InvTypes.BILL) {
+      const bill = await getCustomRepository(BillRepository).findOne({
+        id: invoiceId,
+      });
+
+      if (bill) {
+        await getCustomRepository(BillRepository).update(
+          {
+            id: invoiceId,
+          },
+          {
+            dueDate: date,
+          }
+        );
+
+        return {
+          message: 'Invoice updated successfully.',
+          status: true,
+        };
+      }
+    } else if (isNumeric(invoiceId) && type === InvTypes.CREDIT_NOTE) {
+      const creditnote = await getCustomRepository(
+        CreditNoteRepository
+      ).findOne({ id: invoiceId });
+
+      if (creditnote) {
+        await getCustomRepository(CreditNoteRepository).update(
+          {
+            id: invoiceId,
+          },
+          {
+            dueDate: date,
+          }
+        );
+        return {
+          message: 'Invoice updated successfully.',
+          status: true,
+        };
+      }
+    }
+    throw new HttpException(
+      'Invalid input, please check again',
+      HttpStatus.BAD_REQUEST
+    );
   }
 
   async CreateYourFirstInvoice(user) {
@@ -871,7 +944,7 @@ export class InvoiceService {
 
   async GetInvoiceNumber(type: string, user: IBaseUser): Promise<string> {
     let invoiceNo = '';
-    if (type === 'SI') {
+    if (type === InvTypes.INVOICE) {
       const [invoice] = await getCustomRepository(InvoiceRepository).find({
         where: {
           organizationId: user.organizationId,
@@ -893,7 +966,7 @@ export class InvoiceService {
       } else {
         invoiceNo = `INV-${new Date().getFullYear()}-1`;
       }
-    } else if (type === 'BILL') {
+    } else if (type === InvTypes.BILL) {
       const [bill] = await getCustomRepository(BillRepository).find({
         where: {
           organizationId: user.organizationId,
@@ -915,7 +988,7 @@ export class InvoiceService {
       } else {
         invoiceNo = `BILL-${new Date().getFullYear()}-1`;
       }
-    } else if (type === 'CN') {
+    } else if (type === InvTypes.CREDIT_NOTE) {
       const [credit_note] = await getCustomRepository(
         CreditNoteRepository
       ).find({
@@ -1048,7 +1121,7 @@ export class InvoiceService {
 
         if (invoice.status === Statuses.AUTHORISED) {
           const itemDetail = newItemArray.find((i) => i.id === j.itemId);
-          if (itemDetail.hasInventory) {
+          if (itemDetail?.hasInventory === true) {
             itemLedgerArray.push({
               itemId: j.itemId,
               value: j.quantity,

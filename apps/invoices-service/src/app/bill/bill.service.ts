@@ -13,7 +13,7 @@ import {
   Statuses,
 } from '@invyce/global-constants';
 import { ClientProxy } from '@nestjs/microservices';
-import { BILL_CREATED } from '@invyce/send-email';
+import { BILL_CREATED, BILL_UPDATED } from '@invyce/send-email';
 import { CreditNoteRepository } from '../repositories/creditNote.repository';
 
 @Injectable()
@@ -24,6 +24,29 @@ export class BillService {
 
   async IndexBill(req: IRequest, queryData: IPage): Promise<IBillWithResponse> {
     const { page_no, page_size, status, type, sort, query } = queryData;
+
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const tokenType =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [tokenType]: value,
+      },
+    });
 
     let bills;
     const ps: number = parseInt(page_size);
@@ -98,29 +121,6 @@ export class BillService {
         };
       }
     } else {
-      let token;
-      if (process.env.NODE_ENV === 'development') {
-        const header = req.headers?.authorization?.split(' ')[1];
-        token = header;
-      } else {
-        if (!req || !req.cookies) return null;
-        token = req.cookies['access_token'];
-      }
-
-      const tokenType =
-        process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-      const value =
-        process.env.NODE_ENV === 'development'
-          ? `Bearer ${token}`
-          : `access_token=${token}`;
-
-      const http = axios.create({
-        baseURL: 'http://localhost',
-        headers: {
-          [tokenType]: value,
-        },
-      });
-
       if (type === 'ALL') {
         bills = await getCustomRepository(BillRepository).find({
           where: {
@@ -159,6 +159,8 @@ export class BillService {
               return 'Payment Pending';
             } else if (paid_amount === i?.netTotal) {
               return 'Full Payment';
+            } else if (paid_amount === 0 && due_amount === 0) {
+              return 'Cleared';
             } else {
               return null;
             }
@@ -295,8 +297,30 @@ export class BillService {
       }
     }
 
+    const new_bills = [];
+    const mapContactIds = bill_arr.map((inv) => inv.contactId);
+
+    const newContactIds = mapContactIds
+      .sort()
+      .filter(function (item, pos, ary) {
+        return !pos || item != ary[pos - 1];
+      });
+
+    const { data: contacts } = await http.post(`contacts/contact/ids`, {
+      ids: newContactIds,
+      type: 1,
+    });
+
+    for (const i of bill_arr) {
+      const contact = contacts.find((c) => c.id === i.contactId);
+      new_bills.push({
+        ...i,
+        contact,
+      });
+    }
+
     return {
-      result: bill_arr,
+      result: new_bills,
       pagination: {
         total,
         total_pages: Math.ceil(total / ps),
@@ -345,22 +369,21 @@ export class BillService {
     const itemLedgerArray = [];
     const debitsArrray = [];
     const invoice_details = [];
-
-    const { data: contact } = await http.post(`contacts/contact/ids`, {
-      ids: [dto.contactId],
-      type: 1,
-    });
-
-    for (const item of dto.invoice_items) {
-      invoice_details.push({
-        itemName: await items.find((i) => i.id === item.itemId).name,
-        quantity: item.quantity,
-        price: item.purchasePrice,
-        itemDiscount: item.itemDiscount,
-        tax: item.tax,
-        total: item.total,
-      });
-    }
+    const billItems = [];
+    // let i = 0;
+    // for (const item of dto.invoice_items) {
+    //   i++;
+    //   if (i < 6) {
+    //     invoice_details.push({
+    //       itemName: await items.find((i) => i.id === item.itemId).name,
+    //       quantity: item.quantity,
+    //       price: item.purchasePrice,
+    //       itemDiscount: item.itemDiscount,
+    //       tax: item.tax,
+    //       total: item.total,
+    //     });
+    //   }
+    // }
 
     if (dto?.isNewRecord === false) {
       const bill: IBill = await getCustomRepository(BillRepository).findOne({
@@ -378,7 +401,7 @@ export class BillService {
           issueDate: dto.issueDate || bill.issueDate,
           dueDate: dto.dueDate || bill.dueDate,
           invoiceNumber: dto.invoiceNumber || bill.invoiceNumber,
-          discount: dto.discount || bill.discount,
+          adjustment: dto.adjustment || bill.adjustment,
           grossTotal: dto.grossTotal || bill.grossTotal,
           netTotal: dto.netTotal || bill.netTotal,
           date: dto.date || bill.date,
@@ -400,12 +423,12 @@ export class BillService {
       });
 
       for (const item of dto.invoice_items) {
-        await getCustomRepository(BillItemRepository).save({
+        const bItem = await getCustomRepository(BillItemRepository).save({
           itemId: item.itemId,
           billId: dto.id,
+          accountId: item.accountId,
           description: item.description,
           quantity: item.quantity,
-          itemDiscount: item.itemDiscount,
           purchasePrice: item.purchasePrice,
           costOfGoodAmount: item.costOfGoodAmount,
           sequence: item.sequence,
@@ -415,7 +438,7 @@ export class BillService {
         });
 
         const itemDetail = items.find((i) => i.id === item.itemId);
-        if (itemDetail.hasInventory) {
+        if (itemDetail?.hasInventory === true) {
           itemLedgerArray.push({
             itemId: item.itemId,
             value: item.quantity,
@@ -431,6 +454,7 @@ export class BillService {
         };
 
         debitsArrray.push(debit);
+        billItems.push(bItem);
       }
 
       const updatedBill: IBill = await getCustomRepository(
@@ -447,20 +471,12 @@ export class BillService {
           payload: itemLedgerArray,
         });
 
-        const creditsArray = [];
-        const credit = {
-          account_id: await accounts.find((i) => i.code === '40001').id,
-          amount: dto.netTotal,
-        };
-        if (dto?.discount > 0) {
-          const creditDiscount = {
-            amount: dto.discount,
-            account_id: await accounts.find((i) => i.code === '55002').id,
-          };
-          creditsArray.push(credit, creditDiscount);
-        } else {
-          creditsArray.push(credit);
-        }
+        const creditsArray = [
+          {
+            account_id: await accounts.find((i) => i.code === '40001').id,
+            amount: dto.netTotal,
+          },
+        ];
 
         const payload = {
           dr: debitsArrray,
@@ -491,30 +507,14 @@ export class BillService {
           },
         ];
 
-        const { data: attachment } = await http.post(
-          `attachments/attachment/generate-pdf`,
-          {
-            data: {
-              ...dto,
-              invoice: bill,
-              contact: contact[0],
-              items,
-              type: PdfType.BILL,
-            },
-          }
-        );
+        const billLink = `${process.env.FRONTEND_HOST}/bills/view/${updatedBill.id}`;
 
-        await this.emailService.emit(BILL_CREATED, {
-          to: contact[0]?.email,
-          user_name: contact[0]?.name,
+        await this.emailService.emit(BILL_UPDATED, {
+          to: req.user.email,
+          user_name: req.user.profile.fullName,
           invoice_number: bill.invoiceNumber,
-          issueDate: bill.issueDate,
-          gross_total: bill.grossTotal,
-          itemDisTotal: bill.discount,
-          net_total: bill.netTotal,
-          invoice_details,
-          download_link: attachment?.path,
-          attachment_name: attachment?.name,
+          invoice_name: bill.reference,
+          link: billLink,
         });
 
         await http.post(`payments/payment/add`, {
@@ -531,7 +531,7 @@ export class BillService {
         issueDate: dto.issueDate,
         dueDate: dto.dueDate,
         invoiceNumber: dto.invoiceNumber,
-        discount: dto.discount,
+        adjustment: dto.adjustment,
         grossTotal: dto.grossTotal,
         netTotal: dto.netTotal,
         date: dto.date,
@@ -549,12 +549,12 @@ export class BillService {
       });
 
       for (const item of dto.invoice_items) {
-        await getCustomRepository(BillItemRepository).save({
+        const bItem = await getCustomRepository(BillItemRepository).save({
           itemId: item.itemId,
           billId: bill.id,
+          accountId: item.accountId,
           description: item.description,
           quantity: item.quantity,
-          itemDiscount: item.itemDiscount,
           purchasePrice: item.purchasePrice,
           costOfGoodAmount: item.costOfGoodAmount,
           sequence: item.sequence,
@@ -564,7 +564,7 @@ export class BillService {
         });
 
         const itemDetail = items.find((i) => i.id === item.itemId);
-        if (itemDetail.hasInventory) {
+        if (itemDetail?.hasInventory === true) {
           itemLedgerArray.push({
             itemId: item.itemId,
             value: item.quantity,
@@ -580,6 +580,7 @@ export class BillService {
         };
 
         debitsArrray.push(debit);
+        billItems.push(bItem);
       }
 
       if (bill.status === Statuses.AUTHORISED) {
@@ -587,20 +588,12 @@ export class BillService {
           payload: itemLedgerArray,
         });
 
-        const creditsArray = [];
-        const credit = {
-          account_id: await accounts.find((i) => i.code === '40001').id,
-          amount: dto.netTotal,
-        };
-        if (dto?.discount > 0) {
-          const creditDiscount = {
-            amount: dto.discount,
-            account_id: await accounts.find((i) => i.code === '55002').id,
-          };
-          creditsArray.push(credit, creditDiscount);
-        } else {
-          creditsArray.push(credit);
-        }
+        const creditsArray = [
+          {
+            account_id: await accounts.find((i) => i.code === '40001').id,
+            amount: dto.netTotal,
+          },
+        ];
 
         const payload = {
           dr: debitsArrray,
@@ -631,31 +624,31 @@ export class BillService {
           },
         ];
 
-        const { data: attachment } = await http.post(
-          `attachments/attachment/generate-pdf`,
-          {
-            data: {
-              ...dto,
-              invoice: bill,
-              contact: contact[0],
-              items,
-              type: PdfType.BILL,
-            },
-          }
-        );
+        // const { data: attachment } = await http.post(
+        //   `attachments/attachment/generate-pdf`,
+        //   {
+        //     data: {
+        //       ...dto,
+        //       invoice: { ...bill, invoice_items: billItems },
+        //       contact: contact[0],
+        //       items,
+        //       type: PdfType.BILL,
+        //     },
+        //   }
+        // );
 
-        await this.emailService.emit(BILL_CREATED, {
-          to: contact[0]?.email,
-          user_name: contact[0]?.name,
-          invoice_number: bill.invoiceNumber,
-          issueDate: bill.issueDate,
-          gross_total: bill.grossTotal,
-          itemDisTotal: bill.discount,
-          net_total: bill.netTotal,
-          invoice_details,
-          download_link: attachment?.path,
-          attachment_name: attachment?.name,
-        });
+        // await this.emailService.emit(BILL_CREATED, {
+        //   to: contact[0]?.email,
+        //   user_name: contact[0]?.name,
+        //   invoice_number: bill.invoiceNumber,
+        //   issueDate: bill.issueDate,
+        //   gross_total: bill.grossTotal,
+        //   itemDisTotal: bill.discount,
+        //   net_total: bill.netTotal,
+        //   invoice_details,
+        //   download_link: attachment?.path,
+        //   attachment_name: attachment?.name,
+        // });
 
         await http.post(`payments/payment/add`, {
           payments: paymentArr,
@@ -675,6 +668,9 @@ export class BillService {
     const creditNote = await getCustomRepository(CreditNoteRepository)
       .createQueryBuilder()
       .where('"billId" = :id', { id: billId })
+      .andWhere({
+        status: 1,
+      })
       .select('id, "invoiceNumber", "netTotal" as balance')
       .getRawMany();
 
@@ -836,7 +832,7 @@ export class BillService {
 
         if (bill.status === Statuses.AUTHORISED) {
           const itemDetail = newItemArray.find((i) => i.id === j.itemId);
-          if (itemDetail.hasInventory) {
+          if (itemDetail?.hasInventory === true) {
             itemLedgerArray.push({
               itemId: j.itemId,
               value: j.quantity,

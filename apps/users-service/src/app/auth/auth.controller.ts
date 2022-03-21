@@ -190,6 +190,12 @@ export class AuthController {
   }
 
   @UseGuards(GlobalAuthGuard)
+  @Post('/request-change')
+  async changeEmailOtp(@Body() data, @Req() req: IRequest) {
+    return await this.authService.ChangeEmailOtp(data, req.user);
+  }
+
+  @UseGuards(GlobalAuthGuard)
   @Post('verify-otp')
   async verifyOtp(@Body() body: SendOtp): Promise<IUserWithResponse> {
     try {
@@ -211,5 +217,17 @@ export class AuthController {
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  @UseGuards(GlobalAuthGuard)
+  @Post('/authenticator')
+  async GoogleAuthenticator() {
+    return await this.authService.GenerateGoogleAuthenticatorToken();
+  }
+
+  @UseGuards(GlobalAuthGuard)
+  @Post('/authenticator')
+  async verifyGoogleAuthenticatorToken(@Body() body) {
+    return await this.authService.VerifyGoogleAuthenticatorToken(body);
   }
 }

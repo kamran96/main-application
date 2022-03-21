@@ -28,14 +28,14 @@ export class Contact {
   @Prop()
   creditLimitBlock: number;
   @Prop()
-  salesDiscount: number;
-  @Prop()
+  salesDiscount: string;
+  @Prop({ default: [] })
   addresses: string[];
   @Prop()
   openingBalance: number;
   @Prop()
   transactionId: number;
-  @Prop()
+  @Prop({ default: 0 })
   balance: number;
   @Prop()
   importedFrom: string;

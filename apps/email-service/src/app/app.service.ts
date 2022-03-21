@@ -13,11 +13,17 @@ export class AppService {
   }
 
   async SendInvitation(data) {
+    const TemplateModel = {
+      user_name: data.user_name,
+      name: data.name,
+      action_url: data.action_url,
+    };
+
     const email = await client.sendEmailWithTemplate({
-      From: data.from,
+      From: 'no-reply@invyce.com',
       To: data.to,
-      TemplateAlias: data.TemplateAlias,
-      TemplateModel: data.TemplateModel,
+      TemplateAlias: 'user-is-invited',
+      TemplateModel: TemplateModel,
     });
     console.log(email, 'email successfully.');
   }
@@ -99,6 +105,7 @@ export class AppService {
 
     const TemplateModel = {
       user_name: data.user_name,
+      link: data.link,
     };
 
     const email = await client.sendEmailWithTemplate({
@@ -140,6 +147,21 @@ export class AppService {
     console.log(email, 'email successfully.');
   }
 
+  async ChangePasswordOtp(data) {
+    const TemplateModel = {
+      user_name: data.user_name,
+      otp_link: data.otp_link,
+    };
+
+    const email = await client.sendEmailWithTemplate({
+      From: 'no-reply@invyce.com',
+      To: data.to,
+      TemplateAlias: 'otp-password-change',
+      TemplateModel: TemplateModel,
+    });
+    console.log(email, 'email successfully.');
+  }
+
   async EmailChanged(data) {
     const TemplateModel = {
       user_name: data.user_name,
@@ -151,6 +173,46 @@ export class AppService {
       To: data.to,
       TemplateAlias: 'email-changed-confirmation',
       TemplateModel: TemplateModel,
+    });
+    console.log(email, 'email successfully.');
+  }
+
+  async TrailExpiringIn5Days(data) {
+    const email = await client.sendEmailWithTemplate({
+      From: data.from,
+      To: data.to,
+      TemplateAlias: data.TemplateAlias,
+      TemplateModel: data.TemplateModel,
+    });
+    console.log(email, 'email successfully.');
+  }
+
+  async TrailExpiringIn2Days(data) {
+    const email = await client.sendEmailWithTemplate({
+      From: data.from,
+      To: data.to,
+      TemplateAlias: data.TemplateAlias,
+      TemplateModel: data.TemplateModel,
+    });
+    console.log(email, 'email successfully.');
+  }
+
+  async TrailExpiringIn24Hours(data) {
+    const email = await client.sendEmailWithTemplate({
+      From: data.from,
+      To: data.to,
+      TemplateAlias: data.TemplateAlias,
+      TemplateModel: data.TemplateModel,
+    });
+    console.log(email, 'email successfully.');
+  }
+
+  async DidNotSendInvoiceInLast7Days(data) {
+    const email = await client.sendEmailWithTemplate({
+      From: data.from,
+      To: data.to,
+      TemplateAlias: data.TemplateAlias,
+      TemplateModel: data.TemplateModel,
     });
     console.log(email, 'email successfully.');
   }
@@ -216,18 +278,55 @@ export class AppService {
     }, 5000);
   }
 
-  async InvoiceCreated(data) {
-    const payload = {
-      Name: 'inv.pdf',
-      Content: data.download_link,
-      ContentType: 'text/pain',
+  async BillUpdated(data) {
+    const TemplateModel = {
+      ...data,
     };
 
     const email = await client.sendEmailWithTemplate({
       From: 'no-reply@invyce.com',
       To: data.to,
-      TemplateAlias: 'invoice-created',
-      TemplateModel: { ...data.TemplateModel, Attachments: [payload] },
+      TemplateAlias: 'bill-updated',
+      TemplateModel: TemplateModel,
+    });
+    console.log(email, 'email successfully.');
+  }
+
+  async InvoiceCreated(data) {
+    console.log('sending email...');
+
+    const dist = path.resolve(data.attachment_name);
+    const content = fs.readFileSync(dist);
+
+    const TemplateModel = { ...data };
+    const payload = {
+      Name: data.attachment_name,
+      ContentType: 'text/pain',
+      Content: Buffer.from(content).toString('base64'),
+      ContentID: data.attachment_name,
+    };
+
+    setTimeout(async () => {
+      const email = await client.sendEmailWithTemplate({
+        From: 'no-reply@invyce.com',
+        To: data.to,
+        TemplateAlias: 'invoice-has-been-created',
+        TemplateModel: TemplateModel,
+        Attachments: [payload],
+      });
+      console.log(email, 'email successfully.');
+    }, 5000);
+  }
+
+  async InvoiceUpdated(data) {
+    console.log('sending email...');
+    const TemplateModel = { ...data };
+
+    const email = await client.sendEmailWithTemplate({
+      From: 'no-reply@invyce.com',
+      To: data.to,
+      TemplateAlias: 'invoice-has-been-updated',
+      TemplateModel: TemplateModel,
     });
     console.log(email, 'email successfully.');
   }
