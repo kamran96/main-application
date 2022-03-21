@@ -206,6 +206,7 @@ export class ContactService {
           skypeName: contactDto.skypeName || contact.skypeName,
           webLink: contactDto.webLink || contact.webLink,
           creditLimit: contactDto.creditLimit || contact.creditLimit,
+          // creditDiscount: contactDto.creditDiscount || contact.creditDiscount,
           creditLimitBlock:
             contactDto.creditLimitBlock || contact.creditLimitBlock,
           salesDiscount: contactDto.salesDiscount || contact.salesDiscount,
@@ -579,14 +580,47 @@ export class ContactService {
     return await this.contactModel.findById(id);
   }
 
-  async Remove(deletedIds: ContactIds): Promise<void> {
+  async Remove(deletedIds: ContactIds, req: IRequest): Promise<void> {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const tokenType =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [tokenType]: value,
+      },
+    });
+
     for (const i of deletedIds.ids) {
-      await this.contactModel.updateOne(
-        { _id: i },
-        {
-          status: 0,
+      const contact = await this.contactModel.findById(i);
+
+      if (contact) {
+        await this.contactModel.updateOne(
+          { _id: i },
+          {
+            status: 0,
+          }
+        );
+
+        if (contact?.transactionId) {
+          await http.post(`accounts/transaction/delete`, {
+            ids: [contact.transactionId],
+          });
         }
-      );
+      }
     }
   }
 

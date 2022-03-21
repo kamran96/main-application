@@ -16,6 +16,13 @@ import {
   EMAIL_CHANGED,
   BILL_CREATED,
   INVOICE_CREATED,
+  TRAIL_EXPIRING_IN_5_DAYS,
+  TRAIL_EXPIRING_IN_2_DAYS,
+  TRAIL_EXPIRING_IN_24_HOURS,
+  INVOICE_UPDATED,
+  DID_NOT_SEND_INVOICE_IN_LAST_7_DAYS,
+  BILL_UPDATED,
+  CHANGE_PASSWORD_OTP,
 } from '@invyce/send-email';
 
 @Controller()
@@ -73,6 +80,14 @@ export class AppController {
     await this.appService.ChangeEmailOtp(data);
   }
 
+  @MessagePattern(CHANGE_PASSWORD_OTP)
+  async changePasswordOtp(@Payload() data: any) {
+    Logger.log('Data is received.');
+    Logger.log(data);
+
+    await this.appService.ChangePasswordOtp(data);
+  }
+
   @MessagePattern(EMAIL_CHANGED)
   async emailChanged(@Payload() data: any) {
     Logger.log('Data is received.');
@@ -121,11 +136,59 @@ export class AppController {
     await this.appService.BillCreated(data);
   }
 
+  @MessagePattern(BILL_UPDATED)
+  async billUpdated(@Payload() data: any) {
+    Logger.log('Data is received.');
+    Logger.log(data);
+
+    await this.appService.BillUpdated(data);
+  }
+
   @MessagePattern(INVOICE_CREATED)
   async invoiceCreated(@Payload() data: any) {
     Logger.log('Data is received.');
     Logger.log(data);
 
     await this.appService.InvoiceCreated(data);
+  }
+
+  @MessagePattern(INVOICE_UPDATED)
+  async invoiceUpdated(@Payload() data: any) {
+    Logger.log('Data is received.');
+    Logger.log(data);
+
+    await this.appService.InvoiceUpdated(data);
+  }
+
+  @MessagePattern(TRAIL_EXPIRING_IN_5_DAYS)
+  async trailExpiringIn5Days(@Payload() data: any) {
+    Logger.log('Data is received.');
+    Logger.log(data);
+
+    await this.appService.TrailExpiringIn5Days(data);
+  }
+
+  @MessagePattern(TRAIL_EXPIRING_IN_2_DAYS)
+  async TrailExpiringIn2Days(@Payload() data: any) {
+    Logger.log('Data is received.');
+    Logger.log(data);
+
+    await this.appService.TrailExpiringIn2Days(data);
+  }
+
+  @MessagePattern(TRAIL_EXPIRING_IN_24_HOURS)
+  async trailExpiringIn24Hours(@Payload() data: any) {
+    Logger.log('Data is received.');
+    Logger.log(data);
+
+    await this.appService.TrailExpiringIn24Hours(data);
+  }
+
+  @MessagePattern(DID_NOT_SEND_INVOICE_IN_LAST_7_DAYS)
+  async didNotSendInvoiceInLast7Days(@Payload() data: any) {
+    Logger.log('Data is received.');
+    Logger.log(data);
+
+    await this.appService.DidNotSendInvoiceInLast7Days(data);
   }
 }

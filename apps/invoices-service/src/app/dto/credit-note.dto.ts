@@ -15,6 +15,7 @@ export class CreditNoteDto {
   date: string;
   type: string;
   status: number;
+  isNewRecord: boolean;
   comment: string;
   invoice_items: Array<CreditNoteItemDto>;
 }

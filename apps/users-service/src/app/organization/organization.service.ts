@@ -14,7 +14,7 @@ import { Organization } from '../schemas/organization.schema';
 import { OrganizationUser } from '../schemas/organizationUser.schema';
 import { User } from '../schemas/user.schema';
 import { ORGANIZATION_CREATED, TRAIL_STARTED } from '@invyce/send-email';
-import { Currrency } from '../schemas/currency.schema';
+import { Currency } from '../schemas/currency.schema';
 
 @Injectable()
 export class OrganizationService {
@@ -23,7 +23,7 @@ export class OrganizationService {
     @InjectModel(OrganizationUser.name) private organizationUserModel,
     @InjectModel(Branch.name) private branchModel,
     @InjectModel(User.name) private userModel,
-    @InjectModel(Currrency.name) private currencyModel,
+    @InjectModel(Currency.name) private currencyModel,
     private rbacService: RbacService,
     private authService: AuthService,
     @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy,
@@ -64,8 +64,8 @@ export class OrganizationService {
         _id: { $in: orgIds },
         status: 1,
       })
+      .populate('currency')
       .populate('branches');
-
     const mapAttachmentIds = organization.map((i) => i.attachmentId);
 
     const { data: attachments } = await http.post(
@@ -132,6 +132,7 @@ export class OrganizationService {
             residentialAddress:
               organizationDto.residentialAddress ||
               organization.residentialAddress,
+            currencyId: organizationDto.currencyId || organization.currencyId,
             financialEnding:
               organizationDto.financialEnding || organization.financialEnding,
             status: 1 || organization.status,
@@ -293,7 +294,8 @@ export class OrganizationService {
       .findOne({
         _id: organizationId,
       })
-      .populate('branches');
+      .populate('branches')
+      .populate('currency');
 
     const orgArray = [];
     if (organization.attachmentId !== undefined) {

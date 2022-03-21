@@ -131,8 +131,11 @@ export class ContactController {
 
   @Put()
   @UseGuards(GlobalAuthGuard)
-  async delete(@Body() deletedIds: ContactIds): Promise<IContactWithResponse> {
-    const contact = await this.contactService.Remove(deletedIds);
+  async delete(
+    @Body() deletedIds: ContactIds,
+    @Req() req: IRequest
+  ): Promise<IContactWithResponse> {
+    const contact = await this.contactService.Remove(deletedIds, req);
 
     if (contact !== undefined) {
       return {

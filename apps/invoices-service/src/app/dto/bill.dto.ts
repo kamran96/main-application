@@ -5,7 +5,7 @@ export class BillDto {
   issueDate: string;
   dueDate: string;
   invoiceNumber: string;
-  discount: number;
+  adjustment: number;
   grossTotal: number;
   currency: number;
   netTotal: number;
@@ -26,7 +26,6 @@ class BillItemsDto {
   itemId: string;
   description: string;
   quantity: number;
-  itemDiscount: string;
   purchasePrice: number;
   unitPrice: number;
   tax: string;

@@ -12,8 +12,8 @@ import * as puppeteer from 'puppeteer';
 import { Attachment } from '../schemas/attachment.schema';
 import { IRequest } from '@invyce/interfaces';
 import {
-  getCountryById,
   moneyFormatJs,
+  Capitalize,
   totalDiscountInInvoice,
 } from '@invyce/common';
 
@@ -144,7 +144,7 @@ export class AppService {
     }
   }
 
-  async pdfData(data) {
+  async pdfData(data, currency) {
     try {
       const newArr = [];
       const heading = [
@@ -169,10 +169,10 @@ export class AppService {
           sno: index + 1,
           item: item.name,
           quantity: tr.quantity,
-          unitPrice: tr.unitPrice,
+          unitPrice: moneyFormatJs(tr.unitPrice, currency),
           discount: tr.itemDiscount,
           saleTax: tr.tax,
-          total: tr.total,
+          total: moneyFormatJs(tr.total, currency),
         });
       });
 
@@ -215,7 +215,9 @@ export class AppService {
         data: { result },
       } = await http.get(`users/organization/${req.user.organizationId}`);
 
-      const contents = await this.pdfData(data);
+      const defaultCurrency = result.currency;
+
+      const contents = await this.pdfData(data, defaultCurrency);
 
       const tableStylesConfig = {
         th: {
@@ -264,15 +266,25 @@ export class AppService {
 
       const rows = newRows.filter((item) => item.length !== 0);
 
-      const defaultCurrency = {
-        name: 'United States dollar',
-        code: 'USD',
-        symbol: '$',
-        id: null,
-      };
-
       const calculatedDiscount = data?.invoice?.discount || 0;
-      // const itemsDiscount = data && totalDiscountInInvoice(response[])
+      const itemsDiscount =
+        (data &&
+          totalDiscountInInvoice(
+            data?.invoice.invoice_items,
+            'itemDiscount',
+            data?.invoice?.invoiceType
+          )) ||
+        0;
+
+      const invoiceDiscount = calculatedDiscount - itemsDiscount;
+      const totalTax =
+        (data &&
+          totalDiscountInInvoice(
+            data?.invoice.invoice_items,
+            'tax',
+            data?.invoice?.invoiceType
+          )) ||
+        0;
 
       const calculations = [
         [
@@ -286,7 +298,7 @@ export class AppService {
         [
           { text: 'Items Discount', bold: true, fontSize: 10 },
           {
-            text: moneyFormatJs(data?.invoice?.discount),
+            text: moneyFormatJs(itemsDiscount),
             fontSize: 10,
             alignment: 'right',
           },
@@ -294,7 +306,7 @@ export class AppService {
         [
           { text: 'Invoice Discount', bold: true, fontSize: 10 },
           {
-            text: moneyFormatJs(data?.invoice?.discount, defaultCurrency),
+            text: moneyFormatJs(invoiceDiscount, defaultCurrency),
             fontSize: 10,
             alignment: 'right',
           },
@@ -302,7 +314,7 @@ export class AppService {
         [
           { text: 'Tax Rates ', bold: true, fontSize: 10 },
           {
-            text: moneyFormatJs(data?.invoice?.tax, defaultCurrency),
+            text: moneyFormatJs(totalTax, defaultCurrency),
             fontSize: 10,
             alignment: 'right',
           },
@@ -326,7 +338,7 @@ export class AppService {
         [
           { text: 'Total', bold: true, fontSize: 12.4, margin: [0, 3] },
           {
-            text: data?.invoice?.netTotal,
+            text: moneyFormatJs(data?.invoice?.netTotal, defaultCurrency),
             fontSize: 12.4,
             alignment: 'right',
             margin: [0, 3],
@@ -335,13 +347,25 @@ export class AppService {
         ],
       ];
 
+      const {
+        country: contactCountry,
+        city: contactCity,
+        postalCode: contactPostalCode,
+      } = data?.contact?.addresses[0] || {
+        country: '',
+        city: '',
+        postalCode: '',
+      };
+
       const docDefinition = {
         pageMargins: [0, 0, 0, 20],
         footer: function (currentPage, pageCount) {
           return {
             columns: [
               {
-                text: `Reported generated on: ${data?.invoice?.createdAt}`,
+                text: `Reported generated on: ${moment(new Date()).format(
+                  'dddd'
+                )}`,
                 fontSize: 9,
                 margin: [5, 0],
               },
@@ -379,7 +403,7 @@ export class AppService {
                       {
                         margin: [10, 0],
                         stack: [
-                          { text: result?.name, style: 'c_name' },
+                          { text: Capitalize(result?.name), style: 'c_name' },
                           { text: result?.phoneNumber, style: 'address_style' },
                           { text: result?.email, style: 'address_style' },
                           { text: result?.website, style: 'address_style' },
@@ -396,7 +420,7 @@ export class AppService {
                         alignment: 'right',
                         stack: [
                           {
-                            text: result?.address?.city,
+                            text: Capitalize(result?.address?.city),
                             style: 'address_style',
                           },
                           {
@@ -404,9 +428,7 @@ export class AppService {
                             style: 'address_style',
                           },
                           {
-                            text: getCountryById(
-                              parseInt(result?.address?.country)
-                            )?.name,
+                            text: Capitalize(result?.address?.country),
                             style: 'address_style',
                           },
                         ],
@@ -428,10 +450,12 @@ export class AppService {
               {
                 stack: [
                   { text: 'To', style: 'label' },
-                  { text: data?.contact?.name, style: 'data' },
+                  { text: Capitalize(data?.contact?.name), style: 'data' },
                   { text: 'Address', style: 'label' },
                   {
-                    text: `${data?.contact?.addresses[0]?.country}, ${data?.contact?.addresses[0]?.city}, ${data?.contact?.addresses[0]?.postalCode}`,
+                    text: `${Capitalize(contactCountry)}, ${Capitalize(
+                      contactCity
+                    )}, ${contactPostalCode}`,
                     style: 'data',
                   },
                 ],
@@ -452,12 +476,15 @@ export class AppService {
               {
                 stack: [
                   {
-                    text: 'Invoice of (USD)',
+                    text: `Invoice of ${defaultCurrency.code}`,
                     alignment: 'right',
                     style: 'label',
                   },
                   {
-                    text: data?.invoice?.netTotal,
+                    text: moneyFormatJs(
+                      data?.invoice?.netTotal,
+                      defaultCurrency
+                    ),
                     color: '#143c69',
                     bold: true,
                     fontSize: 20,
@@ -493,7 +520,7 @@ export class AppService {
               {},
               {
                 // alignment: 'right',
-                width: '29%',
+                width: '40%',
                 margin: [15, 15],
                 layout: 'noBorders',
 

@@ -14,6 +14,7 @@ export class billItems1630669523250 implements MigrationInterface {
           { name: 'id', type: 'serial', isPrimary: true },
           { name: 'billId', type: 'int', isNullable: false },
           { name: 'itemId', type: 'varchar', isNullable: true },
+          { name: 'accountId', type: 'int', isNullable: true },
           { name: 'description', type: 'varchar', isNullable: true },
           { name: 'quantity', type: 'float', isNullable: true },
           { name: 'itemDiscount', type: 'float', isNullable: true },
