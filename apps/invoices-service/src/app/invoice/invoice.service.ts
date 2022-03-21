@@ -27,13 +27,14 @@ import {
   EntryType,
   Integrations,
   PaymentModes,
+  PdfType,
   Statuses,
   XeroTypes,
 } from '@invyce/global-constants';
 import { BillItemRepository } from '../repositories/billItem.repository';
 import { InvoiceDto, InvoiceIdsDto } from '../dto/invoice.dto';
 import { ClientProxy } from '@nestjs/microservices';
-import { SEND_FORGOT_PASSWORD } from '@invyce/send-email';
+import { BILL_CREATED, SEND_FORGOT_PASSWORD } from '@invyce/send-email';
 
 dotenv.config();
 
@@ -48,6 +49,29 @@ export class InvoiceService {
   ): Promise<IInvoiceWithResponse> {
     const { page_no, page_size, invoice_type, type, status, sort, query } =
       queryData;
+
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const tokenType =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [tokenType]: value,
+      },
+    });
 
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
@@ -124,29 +148,6 @@ export class InvoiceService {
         };
       }
     } else {
-      let token;
-      if (process.env.NODE_ENV === 'development') {
-        const header = req.headers?.authorization?.split(' ')[1];
-        token = header;
-      } else {
-        if (!req || !req.cookies) return null;
-        token = req.cookies['access_token'];
-      }
-
-      const tokenType =
-        process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-      const value =
-        process.env.NODE_ENV === 'development'
-          ? `Bearer ${token}`
-          : `access_token=${token}`;
-
-      const http = axios.create({
-        baseURL: 'http://localhost',
-        headers: {
-          [tokenType]: value,
-        },
-      });
-
       if (type === 'ALL') {
         invoices = await getCustomRepository(InvoiceRepository).find({
           where: {
@@ -173,10 +174,13 @@ export class InvoiceService {
         for (const i of invoices) {
           const balance = balances.find((bal) => bal.id === i.id);
 
-          const paid_amount = balance?.invoice?.balance || 0;
-          const due_amount = balance?.invoice?.balance
-            ? i.netTotal - balance?.invoice?.balance
-            : i.netTotal;
+          const due_amount =
+            balance.invoice.credit_notes !== 0
+              ? balance.invoice.credits -
+                balance.invoice.credit_notes -
+                balance.invoice.payment
+              : balance.invoice.balance;
+          const paid_amount = balance.invoice.payment;
 
           const payment_status = () => {
             if (paid_amount < due_amount && due_amount < i?.netTotal) {
@@ -192,8 +196,8 @@ export class InvoiceService {
 
           invoice_arr.push({
             ...i,
-            paid_amount,
-            due_amount: i.netTotal - balance.invoice.balance || 0,
+            paid_amount: paid_amount || 0,
+            due_amount: due_amount || 0,
             payment_status: payment_status(),
           });
         }
@@ -223,10 +227,13 @@ export class InvoiceService {
         for (const i of invoices) {
           const balance = balances.find((bal) => bal.id === i.id);
 
-          const paid_amount = balance?.invoice?.balance || 0;
-          const due_amount = balance?.invoice?.balance
-            ? i.netTotal - balance?.invoice?.balance
-            : i.netTotal;
+          const due_amount =
+            balance.invoice.credit_notes !== 0
+              ? balance.invoice.credits -
+                balance.invoice.credit_notes -
+                balance.invoice.payment
+              : balance.invoice.balance;
+          const paid_amount = balance.invoice.payment;
 
           const payment_status = () => {
             if (paid_amount < due_amount && due_amount < i?.netTotal) {
@@ -239,11 +246,12 @@ export class InvoiceService {
               return null;
             }
           };
-          if (balance.invoice.balance === 0) {
+
+          if (balance.invoice.balance !== 0) {
             invoice_arr.push({
               ...i,
-              paid_amount,
-              due_amount: i.netTotal - balance.invoice.balance || 0,
+              paid_amount: paid_amount || 0,
+              due_amount: due_amount || 0,
               payment_status: payment_status(),
             });
           }
@@ -274,10 +282,13 @@ export class InvoiceService {
         for (const i of invoices) {
           const balance = balances.find((bal) => bal.id === i.id);
 
-          const paid_amount = balance?.invoice?.balance || 0;
-          const due_amount = balance?.invoice?.balance
-            ? i.netTotal - balance?.invoice?.balance
-            : i.netTotal;
+          const due_amount =
+            balance.invoice.credit_notes !== 0
+              ? balance.invoice.credits -
+                balance.invoice.credit_notes -
+                balance.invoice.payment
+              : balance.invoice.balance;
+          const paid_amount = balance.invoice.payment;
 
           const payment_status = () => {
             if (paid_amount < due_amount && due_amount < i?.netTotal) {
@@ -290,11 +301,11 @@ export class InvoiceService {
               return null;
             }
           };
-          if (balance.invoice.balance !== 0) {
+          if (paid_amount) {
             invoice_arr.push({
               ...i,
-              paid_amount,
-              due_amount: i.netTotal - balance.invoice.balance || 0,
+              paid_amount: paid_amount || 0,
+              due_amount: due_amount || 0,
               payment_status: payment_status(),
             });
           }
@@ -324,8 +335,30 @@ export class InvoiceService {
       }
     }
 
+    const new_invoices = [];
+    const mapContactIds = invoice_arr.map((inv) => inv.contactId);
+
+    const newContactIds = mapContactIds
+      .sort()
+      .filter(function (item, pos, ary) {
+        return !pos || item != ary[pos - 1];
+      });
+
+    const { data: contacts } = await http.post(`contacts/contact/ids`, {
+      ids: newContactIds,
+      type: 1,
+    });
+
+    for (const i of invoice_arr) {
+      const contact = contacts.find((c) => c.id === i.contactId);
+      new_invoices.push({
+        ...i,
+        contact,
+      });
+    }
+
     return {
-      result: invoice_arr,
+      result: new_invoices,
       pagination: {
         total,
         total_pages: Math.ceil(total / ps),
@@ -375,6 +408,24 @@ export class InvoiceService {
 
     const creditsArrray = [];
     const itemLedgerArray = [];
+    const invoice_details = [];
+
+    for (const item of dto.invoice_items) {
+      invoice_details.push({
+        itemName: await items.find((i) => i.id === item.itemId).name,
+        quantity: item.quantity,
+        price: item.purchasePrice,
+        itemDiscount: item.itemDiscount,
+        tax: item.tax,
+        total: item.total,
+      });
+    }
+
+    const { data: contact } = await http.post(`contacts/contact/ids`, {
+      ids: [dto.contactId],
+      type: 1,
+    });
+
     if (dto?.isNewRecord === false) {
       // we need to update invoice
       const invoice: IInvoice = await getCustomRepository(
@@ -423,7 +474,7 @@ export class InvoiceService {
           description: item.description,
           quantity: item.quantity,
           itemDiscount: item.itemDiscount,
-          unitPrice: parseInt(item.unitPrice),
+          unitPrice: item.unitPrice,
           costOfGoodAmount: item.costOfGoodAmount,
           sequence: item.sequence,
           tax: item.tax,
@@ -508,6 +559,32 @@ export class InvoiceService {
           },
         ];
 
+        const { data: attachment } = await http.post(
+          `attachments/attachment/generate-pdf`,
+          {
+            data: {
+              ...dto,
+              invoice,
+              contact: contact[0],
+              items,
+              type: PdfType.INVOICE,
+            },
+          }
+        );
+
+        await this.emailService.emit(BILL_CREATED, {
+          to: contact[0]?.email,
+          user_name: contact[0]?.name,
+          invoice_number: invoice.invoiceNumber,
+          issueDate: invoice.issueDate,
+          gross_total: invoice.grossTotal,
+          itemDisTotal: invoice.discount,
+          net_total: invoice.netTotal,
+          invoice_details,
+          download_link: attachment?.path,
+          attachment_name: attachment?.name,
+        });
+
         await http.post(`payments/payment/add`, {
           payments: paymentArr,
         });
@@ -545,7 +622,7 @@ export class InvoiceService {
           description: item.description,
           quantity: item.quantity,
           itemDiscount: item.itemDiscount,
-          unitPrice: parseInt(item.unitPrice),
+          unitPrice: item.unitPrice,
           costOfGoodAmount: item.costOfGoodAmount,
           sequence: item.sequence,
           tax: item.tax,
@@ -571,37 +648,6 @@ export class InvoiceService {
         };
 
         creditsArrray.push(credit);
-      }
-
-      const firstInvoice = await getCustomRepository(InvoiceRepository).find({
-        where: {
-          status: 1,
-          organizationId: req.user.organizationId,
-        },
-      });
-
-      if (firstInvoice.length === 1) {
-        const payload = {
-          to: req.user.email,
-          from: 'no-reply@invyce.com',
-          TemplateAlias: 'congrats-on-your-first-invoice',
-          TemplateModel: {
-            product_url: 'product_url_Value',
-            user_name: req.user.profile.fullName,
-            sender_name: 'sender_name_Value',
-            product_name: 'product_name_Value',
-            congrates_illustration_image: 'congrates_illustration_image_Value',
-            action_url: 'action_url_Value',
-            trial_extension_url: 'trial_extension_url_Value',
-            feedback_url: 'feedback_url_Value',
-            export_url: 'export_url_Value',
-            close_account_url: 'close_account_url_Value',
-            company_name: 'company_name_Value',
-            company_address: 'company_address_Value',
-          },
-        };
-
-        await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
       }
 
       if (invoice.status === Statuses.AUTHORISED) {
@@ -653,6 +699,32 @@ export class InvoiceService {
           },
         ];
 
+        const { data: attachment } = await http.post(
+          `attachments/attachment/generate-pdf`,
+          {
+            data: {
+              ...dto,
+              invoice,
+              contact: contact[0],
+              items,
+              type: PdfType.INVOICE,
+            },
+          }
+        );
+
+        await this.emailService.emit(BILL_CREATED, {
+          to: contact[0]?.email,
+          user_name: contact[0]?.name,
+          invoice_number: invoice.invoiceNumber,
+          issueDate: invoice.issueDate,
+          gross_total: invoice.grossTotal,
+          itemDisTotal: invoice.discount,
+          net_total: invoice.netTotal,
+          invoice_details,
+          download_link: attachment?.path,
+          attachment_name: attachment?.name,
+        });
+
         await http.post(`payments/payment/add`, {
           payments: paymentArr,
         });
@@ -695,10 +767,11 @@ export class InvoiceService {
       relations: ['invoiceItems'],
     });
 
-    const creditNote = await getCustomRepository(CreditNoteRepository).find({
-      select: ['id', 'invoiceNumber'],
-      where: { invoiceId: invoiceId },
-    });
+    const creditNote = await getCustomRepository(CreditNoteRepository)
+      .createQueryBuilder()
+      .where('"invoiceId" = :id', { id: invoiceId })
+      .select('id, "invoiceNumber", "netTotal" as balance')
+      .getRawMany();
 
     let new_invoice;
     if (invoice?.contactId) {
@@ -747,10 +820,14 @@ export class InvoiceService {
       });
 
       const balance = payments.find((bal) => parseInt(bal.id) === invoice.id);
-      const paid_amount = balance?.invoice?.balance || 0;
-      const due_amount = balance?.invoice?.balance
-        ? invoice.netTotal - balance?.invoice?.balance
-        : invoice.netTotal;
+
+      const due_amount =
+        balance?.invoice?.credit_notes !== 0
+          ? balance?.invoice?.credits -
+            balance?.invoice?.credit_notes -
+            balance?.invoice?.payment
+          : balance?.invoice?.balance;
+      const paid_amount = balance?.invoice?.payment;
 
       const payment_status = () => {
         if (paid_amount < due_amount && due_amount < invoice?.netTotal) {
@@ -897,7 +974,7 @@ export class InvoiceService {
   async FindInvoicesByContactId(contactId: string): Promise<IInvoice[]> {
     return await getCustomRepository(InvoiceRepository).find({
       where: { contactId },
-      relations: ['invoiceItems'],
+      relations: ['invoiceItems', 'creditNote'],
     });
   }
 
@@ -1187,7 +1264,7 @@ export class InvoiceService {
    * Aged payable report
    */
 
-   async AgedReceivables(req: IRequest, query) {
+  async AgedReceivables(req: IRequest, query) {
     let token;
     if (process.env.NODE_ENV === 'development') {
       const header = req.headers?.authorization?.split(' ')[1];
@@ -1257,7 +1334,6 @@ export class InvoiceService {
       }
     }
 
-
     return invoice_arr.flat();
   }
 
@@ -1289,6 +1365,7 @@ export class InvoiceService {
       },
     });
 
+    const inv_arr = [];
     if (type == PaymentModes.INVOICES) {
       const invoices = await getCustomRepository(InvoiceRepository).find({
         where: {
@@ -1300,19 +1377,19 @@ export class InvoiceService {
       });
 
       const invoiceIds = invoices?.map((i) => i.id);
-      const inv_arr = [];
       if (invoices.length > 0) {
         const { data: payments } = await http.post(`payments/payment/invoice`, {
           ids: invoiceIds,
           type: 'INVOICE',
         });
+
         for (const inv of invoices) {
           const balance = payments.find((pay) => pay.id === inv.id);
-          const newBalance = balance.invoice.balance.toString().split('-')[1];
-          if (inv.netTotal != newBalance) {
+
+          if (balance.invoice.balance !== 0) {
             inv_arr.push({
               ...inv,
-              balance: inv.netTotal - newBalance || inv.netTotal,
+              balance: balance.invoice.balance,
             });
           }
         }
@@ -1329,7 +1406,6 @@ export class InvoiceService {
         },
       });
 
-      const inv_arr = [];
       if (bills.length > 0) {
         const invoiceIds = bills?.map((i) => i.id);
 
@@ -1340,11 +1416,10 @@ export class InvoiceService {
 
         for (const inv of bills) {
           const balance = payments.find((pay) => pay.id === inv.id);
-          const newBalance = balance.invoice.balance;
-          if (inv.netTotal != newBalance) {
+          if (balance.invoice.billbalance !== 0) {
             inv_arr.push({
               ...inv,
-              balance: inv.netTotal - newBalance || inv.netTotal,
+              balance: balance.invoice.billbalance,
             });
           }
         }
@@ -1390,6 +1465,7 @@ export class InvoiceService {
 
     const { data: contacts } = await http.post(`contacts/contact/ids`, {
       ids: mapContactIds,
+      type: 2,
     });
 
     const newPaymentPayload = [];

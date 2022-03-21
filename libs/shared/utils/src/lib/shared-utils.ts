@@ -1,5 +1,5 @@
-import CryptoJS from 'crypto-js';
-import en from '../../../../../node_modules/world_countries_lists/data/en/world.json';
+import * as CryptoJS from 'crypto-js';
+import * as en from 'world_countries_lists/data/en/world.json';
 
 export const EncriptData = (data: any | string) => {
   const encription = CryptoJS.AES.encrypt(

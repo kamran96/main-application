@@ -10,9 +10,12 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-
+import * as fs from 'fs';
+import * as path from 'path';
+import { Response } from 'express';
 import { AppService } from './app.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
+import { IRequest } from '@invyce/interfaces';
 
 @Controller('attachment')
 export class AppController {
@@ -40,7 +43,7 @@ export class AppController {
   @Post('create-pdf')
   async init(@Body() body, @Req() req: Request): Promise<any> {
     try {
-      const pdf = await this.appService.createPdf(body, req);
+      await this.appService.createPdf(body, req);
 
       console.log('Succesfully created a PDF table');
 
@@ -51,5 +54,15 @@ export class AppController {
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  @UseGuards(GlobalAuthGuard)
+  @Post('generate-pdf')
+  async generatePdf(@Body() body, @Req() req: IRequest): Promise<any> {
+    const pdf = await this.appService.GeneratePdf(body, req);
+
+    const dist = path.resolve(pdf);
+
+    return await this.appService.uploadPdf(dist, pdf, req);
   }
 }

@@ -97,7 +97,7 @@ export class InvoiceController {
     return await this.invoiceService.FindByInvoiceIds(invoiceIds);
   }
 
-  @Get('contact/:id')
+  @Get('contacts/:id')
   @UseGuards(GlobalAuthGuard)
   async findInvoiceByContactId(
     @Param() invoiceIds: ParamsDto

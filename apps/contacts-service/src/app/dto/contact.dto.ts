@@ -15,7 +15,9 @@ export class ContactDto {
   creditLimit: number;
   creditLimitBlock: number;
   salesDiscount: number;
-  openingBalance: number;
+  openingBalance: string;
+  debitAccount: number;
+  creditAccount: number;
   importedFrom: string;
   paymentDaysLimit: string;
   accountNumber: string;
@@ -40,6 +42,7 @@ export class AddressDto {
 
 export class ContactIds {
   ids: Array<number>;
+  type: number;
 }
 
 export class ParamsDto {

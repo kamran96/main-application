@@ -19,7 +19,7 @@ import {
 } from '../dto/user.dto';
 import { Response } from 'express';
 import { UserStatuses } from '@invyce/global-constants';
-import { SEND_FORGOT_PASSWORD } from '@invyce/send-email';
+import { EMAIL_CHANGED, SEND_FORGOT_PASSWORD } from '@invyce/send-email';
 
 @Injectable()
 export class UserService {
@@ -148,6 +148,34 @@ export class UserService {
         };
       }
     }
+  }
+
+  async ChangeEmail(loginUser: IBaseUser, email: string) {
+    const userEmail = await this.userModel.findOne({
+      email,
+    });
+
+    if (userEmail) {
+      throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST);
+    }
+
+    await this.userModel.update(
+      { _id: loginUser.id },
+      {
+        email,
+      }
+    );
+
+    await this.emailService.emit(EMAIL_CHANGED, {
+      to: loginUser.email,
+      user_name: loginUser.profile.fullName,
+      user_new_email: email,
+    });
+
+    return {
+      message: 'Email successfully changed',
+      status: true,
+    };
   }
 
   async FindUserById(userId: string, req: IRequest): Promise<IUser> {
