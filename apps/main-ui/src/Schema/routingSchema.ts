@@ -52,6 +52,11 @@ export const RoutingSchema: IRoutingSchema = {
           permission: PERMISSIONS.INVOICES_INDEX,
         },
         {
+          route: `${root}${ISupportedRoutes.DEBIT_NOTES}`,
+          tag: 'Debit Notes',
+          permission: PERMISSIONS.INVOICES_INDEX,
+        },
+        {
           route: '/app/quotes',
           tag: 'Quotes',
           permission: PERMISSIONS.QUOTATIONS_INDEX,

@@ -1,3 +1,4 @@
+import { IContact } from '@invyce/interfaces';
 import {
   IBase,
   IBaseRequest,
@@ -60,6 +61,8 @@ export class Contact {
 export interface IContactLedgerResponse extends IBaseRequest {
   result: IContactLedger[];
   opening_balance?: IContactOpeningBalance;
+  contact?: IContact;
+  [key: string]: any;
 }
 export interface IInitialBalance {
   amount: number;
@@ -71,7 +74,7 @@ export class IContactLedgerResp extends IBaseRequestResponse {
   result: IContactLedger[];
   opening_balance?: IContactOpeningBalance;
   initial_balance?: IInitialBalance;
-  contact: IContactType;
+  contact: IContactType | undefined;
 
   getMergedResult() {
     if (this.opening_balance?.amount) {
@@ -167,7 +170,6 @@ export class IContactLedgerResp extends IBaseRequestResponse {
       }
     });
 
-    console.log({ generatedResult, res: this.result }, 'generated result');
     return generatedResult;
   }
 }

@@ -2,16 +2,20 @@ import React, { FC } from 'react';
 import { Heading } from '../../../components/Heading';
 import { TableCard } from '../../../components/TableCard';
 import { Breadcrumb } from 'antd';
-import { Link } from 'react-router-dom';
-import { ISupportedRoutes } from '../../../modal/routing';
+import { Link, useHistory } from 'react-router-dom';
 import { BreadCrumbArea } from '../../../components/BreadCrumbArea';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { DebitNoteEditor } from './Editor';
+import { ISupportedRoutes } from '@invyce/shared/types';
 
 export const DebitNoteEditorWidget: FC = () => {
-  const { routeHistory } = useGlobalContext();
-  const { location } = routeHistory;
-  const id = location?.pathname?.split(`/app/add-credit-note/`)[1] || null;
+  const history = useHistory();
+  const { location } = history;
+  const id =
+    location?.pathname?.split(`app${ISupportedRoutes.ADD_DEBIT_NOTE}/`)[1] ||
+    null;
+
+  console.log(id, location);
 
   return (
     <>

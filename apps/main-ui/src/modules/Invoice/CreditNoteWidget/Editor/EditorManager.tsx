@@ -4,7 +4,6 @@ import addLine from '@iconify/icons-ri/add-line';
 import Icon from '@iconify/react';
 import { Button, Card, Form } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import { useEffectLoading } from '../../../../hooks/useEffectLoading';
 import dayjs from 'dayjs';
 import {
   createContext,
@@ -21,11 +20,11 @@ import { SortableHandle } from 'react-sortable-hoc';
 import scrollIntoView from 'scroll-into-view';
 
 import {
+  creditNoteViewAPI,
   getAllContacts,
   getAllItems,
   getInvoiceByIDAPI,
   getInvoiceNumber,
-  getPurchasesById,
 } from '../../../../api';
 import { getAccountsByTypeAPI } from '../../../../api/accounts';
 import { Option } from '../../../../components/CommonSelect';
@@ -35,7 +34,7 @@ import { useShortcut } from '../../../../hooks/useShortcut';
 import { Color, IContactType, IContactTypes } from '../../../../modal';
 import { IAccountsResult } from '../../../../modal/accounts';
 import { ORDER_TYPE } from '../../../../modal/invoice';
-import { IItemsResult } from '../../../../modal/items';
+import { IItemsResult } from '@invyce/shared/types';
 import { IOrganizationType } from '../../../../modal/organization';
 import convertToRem from '../../../../utils/convertToRem';
 import {
@@ -51,6 +50,7 @@ import { invycePersist } from '@invyce/invyce-persist';
 import c from './key';
 import usePrevious from '../../../../hooks/usePrevious';
 import { useHistory } from 'react-router-dom';
+import { ISupportedRoutes, IInvoiceType } from '../../../../modal';
 
 export const PurchaseContext: any = createContext({});
 export const usePurchaseWidget: any = () => useContext(PurchaseContext);
@@ -75,18 +75,9 @@ let setStateTimeOut: any;
 export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   /* API STAKE */
   const history = useHistory();
-  const relation: { type: string } = (history.location?.state as {
+  const relation: { type: string } = history.location?.state as {
     type: string;
-  }) || { type: ORDER_TYPE?.SALE_INVOICE };
-  const key =
-    relation?.type === ORDER_TYPE?.PURCAHSE_ORDER
-      ? 'purchaseItems'
-      : 'invoiceItems';
-
-  const APISTAKE_GETORDERS =
-    relation?.type === ORDER_TYPE?.PURCAHSE_ORDER
-      ? getPurchasesById
-      : getInvoiceByIDAPI;
+  };
 
   const [rowsErrors, setRowsErrors] = useState([]);
   const [width] = useWindowSize();
@@ -103,10 +94,10 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   const [deleteIds, setDeleteIds] = useState([]);
   const [paymentReset, setPaymentReset] = useState(false);
 
-  const priceKey = 'purchasePrice';
+  const priceKey = 'unitPrice';
 
   const { data: accountsData, isLoading: accountsLoading } = useQuery(
-    [`accounts-${type}-contactType=${IContactTypes.SUPPLIER}`, 'bill'],
+    [`accounts-${type}-contactType=${IContactTypes.CUSTOMER}`, 'invoice'],
     getAccountsByTypeAPI,
     {
       enabled:
@@ -116,7 +107,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
 
   const accountsList: IAccountsResult[] = accountsData?.data?.result || [];
 
-  const defaultAccountCode = '15005';
+  const defaultAccountCode = '15001';
 
   const [defaultAccount] = accountsList.filter(
     (i) => i.code === defaultAccountCode
@@ -195,9 +186,21 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
     AntForm.setFieldsValue(defaultFormData);
   }, [AntForm]);
 
+  const APICATEGORYSTAKE =
+    relation?.type === IInvoiceType.PURCHASE_ENTRY ||
+    relation?.type === IInvoiceType.PURCHASE_ORDER
+      ? getInvoiceByIDAPI
+      : creditNoteViewAPI;
+
+  const key =
+    relation?.type === IInvoiceType.PURCHASE_ENTRY ||
+    relation?.type === IInvoiceType.PURCHASE_ORDER
+      ? 'purchaseItems'
+      : 'creditNoteItems';
+
   const { data: invoicesData, isLoading: invoiceLoading } = useQuery(
     [`${type}-${id}-view`, id],
-    APISTAKE_GETORDERS,
+    APICATEGORYSTAKE,
     {
       enabled: !!id && !!relation?.type,
       cacheTime: Infinity,
@@ -206,7 +209,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
 
   const { data: invoiceNumberData, refetch: refetchInvoiceNumber } = useQuery(
     [null, ORDER_TYPE?.CREDIT_NOTE],
-    getInvoiceNumber
+    getInvoiceNumber,
+    { enabled: !id || id === null || relation?.type === IInvoiceType?.INVOICE }
   );
 
   useEffect(() => {
@@ -222,7 +226,9 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
       const { result } = invoicesData.data;
 
       setInvoiceDiscount(invoiceDiscount);
-      delete result?.invoiceNumber;
+      if (id && relation?.type) {
+        delete result?.invoiceNumber;
+      }
       AntForm.setFieldsValue({
         ...result,
         dueDate: dayjs(result.dueDate),
@@ -268,7 +274,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
 
   const contactResult: IContactType[] =
     data?.data?.result?.filter(
-      (contact: IContactType) => contact?.contactType === IContactTypes.SUPPLIER
+      (contact: IContactType) => contact?.contactType === IContactTypes.CUSTOMER
     ) || [];
 
   // Accounts Fetched By Types
@@ -276,7 +282,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   const getSubTotal = useCallback(() => {
     let subTotal = 0;
     invoiceItems.forEach((item) => {
-      subTotal = subTotal + item.purchasePrice * item.quantity;
+      subTotal = subTotal + item.unitPrice * item.quantity;
     });
     return subTotal;
   }, [invoiceItems, type]);
@@ -288,8 +294,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   const GrossTotal = useMemo(() => {
     return getSubTotal() + TotalTax;
   }, [getSubTotal(), TotalTax]);
-
-  console.log();
 
   /* Gets Total Discount on items */
   const TotalDiscount = useMemo(() => {
@@ -421,7 +425,11 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
                     allItems[index].purchasePrice ||
                     selectedItem?.price?.purchasePrice ||
                     0;
-                  const itemDiscount = selectedItem?.price?.discount || '0';
+                  const unitPrice =
+                    allItems[index].unitPrice ||
+                    selectedItem?.price?.salePrice ||
+                    0;
+
                   const tax = selectedItem?.price?.tax || '0';
                   const costOfGoodAmount =
                     purchasePrice * allItems[index].quantity;
@@ -441,21 +449,14 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
                   // }
                   const description = `${selectedItem?.category?.title || ''}/`;
 
-                  const tAccessors = {
-                    purchasePrice,
-                  };
-                  const total = calculateInvoice(
-                    purchasePrice,
-                    tax,
-                    itemDiscount
-                  );
+                  const total = calculateInvoice(unitPrice, tax, '0');
 
                   allItems[index] = {
                     ...allItems[index],
                     itemId: val.value,
                     purchasePrice,
+                    unitPrice,
                     tax,
-                    itemDiscount,
                     total,
                     costOfGoodAmount,
                     description,
@@ -616,9 +617,9 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
       },
     },
     {
-      title: 'Purchase Price',
-      dataIndex: 'purchasePrice',
-      key: 'purchasePrice',
+      title: 'Unit Price',
+      dataIndex: 'unitPrice',
+      key: 'unitPrice',
       width: width > 1500 ? 150 : '',
 
       render: (value, record, index) => {
@@ -786,14 +787,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
     });
   };
 
-  /* Scroll to last added item */
-
-  //   const handleScroll = () => {
-  //     let ele: HTMLElement = document.querySelector(".ant-table-tbody");
-
-  //     ele.lastElementChild.scrollIntoView();
-  //   };
-
   const handleAddRow = () => {
     const items = [...invoiceItems];
     items.push({ ...defaultItems, index: items.length });
@@ -821,6 +814,11 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
       AntForm.setFieldsValue(defaultFormData);
       refetchInvoiceNumber();
     }, 300);
+
+    history?.push(
+      `${ISupportedRoutes?.DASHBOARD_LAYOUT}${ISupportedRoutes?.ADD_CREDIT_NOTE}`,
+      null
+    );
   };
 
   useShortcut('i', handleAddRow);
@@ -856,6 +854,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
         handleAddRow,
         isFetching: itemsLoading || invoiceLoading || accountsLoading,
         accountsList,
+        relation,
       }}
     >
       <Wrapper>

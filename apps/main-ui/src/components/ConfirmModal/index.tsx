@@ -1,26 +1,32 @@
-import infoCircleOutlined from "@iconify-icons/ant-design/info-circle-outline";
-import warningOutlined from "@iconify-icons/ant-design/warning-outlined";
-import deleteIcon from "@iconify/icons-carbon/delete";
-import Icon from "@iconify/react";
-import { Button, Modal } from "antd";
-import React, { FC } from "react";
-import styled from "styled-components";
+import infoCircleOutlined from '@iconify-icons/ant-design/info-circle-outline';
+import warningOutlined from '@iconify-icons/ant-design/warning-outlined';
+import deleteIcon from '@iconify/icons-carbon/delete';
+import mentionIcon from '@iconify/icons-fe/mention';
+import Icon from '@iconify/react';
+import { Button, Modal } from 'antd';
+import React, { FC, ReactNode } from 'react';
+import styled from 'styled-components';
 
-import { Color } from "../../modal";
+import { Color } from '../../modal';
 
 interface IProps {
   visible: boolean;
   onConfirm?: () => void;
   onCancel?: () => void;
   loading?: boolean;
-  type?: "delete" | "warning" | "info";
+  type?: 'delete' | 'warning' | 'info' | 'mention';
   text?: string;
+  children?: ReactNode;
+  confirmText?: string;
+  showButtons?: boolean;
 }
 
 const defaultProps: IProps = {
   visible: false,
-  type: "delete",
-  text: "Are you sure want to delete ?",
+  type: 'delete',
+  text: 'Are you sure want to delete ?',
+  confirmText: 'Confirm',
+  showButtons: true,
 };
 
 export const ConfirmModal: FC<IProps> = ({
@@ -30,25 +36,32 @@ export const ConfirmModal: FC<IProps> = ({
   loading,
   type,
   text,
+  children,
+  confirmText,
+  showButtons = true,
 } = defaultProps) => {
   const iconClass =
-    type === "delete"
-      ? "delete-icon"
-      : type === "info"
-      ? "info-icon"
-      : type === "warning"
-      ? "warning-icon"
-      : "delete-icon";
+    type === 'delete'
+      ? 'delete-icon'
+      : type === 'info'
+      ? 'info-icon'
+      : type === 'warning'
+      ? 'warning-icon'
+      : type === 'mention'
+      ? 'mention-icon'
+      : 'delete-icon';
   const icon =
-    type === "delete"
+    type === 'delete'
       ? deleteIcon
-      : type === "info"
+      : type === 'info'
       ? infoCircleOutlined
-      : type === "warning"
+      : type === 'warning'
       ? warningOutlined
+      : type === 'mention'
+      ? mentionIcon
       : deleteIcon;
 
-  const isDangerbutton = type === "delete" ? { danger: true } : null;
+  const isDangerbutton = type === 'delete' ? { danger: true } : null;
   return (
     <WrapperConfirmModal
       width={400}
@@ -64,27 +77,29 @@ export const ConfirmModal: FC<IProps> = ({
           </i>
         </div>
         <div className="text_area textCenter">
-          <h3> {text}</h3>
+          {children ? children : <h3> {text}</h3>}
         </div>
-        <div className="actions">
-          <Button
-            onClick={onCancel}
-            className="mr-10"
-            type="default"
-            size="middle"
-          >
-            Cancel
-          </Button>
-          <Button
-            loading={loading}
-            onClick={onConfirm}
-            {...isDangerbutton}
-            type="primary"
-            size="middle"
-          >
-            Confirm
-          </Button>
-        </div>
+        {showButtons && (
+          <div className="actions">
+            <Button
+              onClick={onCancel}
+              className="mr-10"
+              type="default"
+              size="middle"
+            >
+              Cancel
+            </Button>
+            <Button
+              loading={loading}
+              onClick={onConfirm}
+              {...isDangerbutton}
+              type="primary"
+              size="middle"
+            >
+              {confirmText ? confirmText : 'Confirm'}
+            </Button>
+          </div>
+        )}
       </div>
     </WrapperConfirmModal>
   );
@@ -115,6 +130,9 @@ const WrapperConfirmModal = styled(Modal)`
 
     .delete-icon {
       color: #ff0000;
+    }
+    .mention-icon {
+      color: ${Color.$PRIMARY};
     }
     .info-icon {
       color: ${Color.$PRIMARY};

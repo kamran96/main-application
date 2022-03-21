@@ -3,7 +3,7 @@ import printIcon from '@iconify-icons/bytesize/print';
 import Icon from '@iconify/react';
 import { EditableTable } from '@invyce/editable-table';
 import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
-import { IContactTypes, CreditNoteType } from '../../../../modal';
+import { IContactTypes } from '../../../../modal';
 import dayjs from 'dayjs';
 import { FC, useRef, useState } from 'react';
 import { useQueryClient, useMutation } from 'react-query';
@@ -24,9 +24,7 @@ import {
   ISupportedRoutes,
   NOTIFICATIONTYPE,
 } from '../../../../modal';
-import { IInvoiceType, ITaxTypes } from '../../../../modal/invoice';
-import { IOrganizationType } from '../../../../modal/organization';
-import { addition } from '../../../../utils/helperFunctions';
+import { IInvoiceType, ITaxTypes } from '@invyce/shared/types';
 import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv, { DownloadPDF } from '../../../../utils/Print';
 import defaultItems, { Requires } from './defaultStates';
@@ -47,7 +45,7 @@ enum ISUBMITTYPE {
 
 interface IProps {
   type?: 'CN';
-  id?: number;
+  id?: number | string;
   onSubmit?: (payload: any) => void;
 }
 
@@ -57,7 +55,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
   /* ************ HOOKS *************** */
   /* Component State Hooks */
   const { routeHistory, userDetails } = useGlobalContext();
-  const { organization } = userDetails;
+
   const { history } = routeHistory;
   const [printModal, setPrintModal] = useState(false);
   const [taxType, setTaxType] = useState<ITaxTypes>(ITaxTypes.TAX_INCLUSIVE);
@@ -66,7 +64,6 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
     columns,
     contactResult,
     GrossTotal,
-    TotalDiscount,
     NetTotal,
     invoiceDiscount,
     setInvoiceDiscount,
@@ -77,16 +74,13 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
     isFetching,
     handleAddRow,
     ClearAll,
-
-    accountsList,
+    relation,
   } = usePurchaseWidget();
 
   const __columns =
     taxType === ITaxTypes.NO_TAX
       ? columns.filter((item) => item.dataIndex !== 'tax')
       : columns;
-
-  const idType = 'invoiceId';
 
   const printRef = useRef();
 
@@ -139,19 +133,16 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
     });
 
     if (!error?.length) {
-      const [filteredContact] = contactResult?.filter(
-        (i) => i.id === value?.contactId
-      );
       let payload: any = {
         ...value,
+
         status: value.status.status,
-        invoiceType: CreditNoteType.CREDITNOTE,
+        invoiceType: IInvoiceType.DEBITNOTE,
         discount: invoiceDiscount,
         netTotal: NetTotal,
         grossTotal: GrossTotal,
         total: '',
         isNewRecord: true,
-
         invoice_items: invoiceItems.map((item, index) => {
           return { ...item, sequence: index };
         }),
@@ -159,15 +150,17 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
 
       delete payload.invoiceDiscount;
       delete payload.total;
-      if (id) {
+      if (id && !relation?.type) {
         payload = {
           ...payload,
 
           ...payload.invoice,
-          [idType]: id,
+          id,
           isNewRecord: false,
           deleted_ids: deleteIds,
         };
+      } else if (id && relation?.type) {
+        payload.billId = id;
       }
 
       await muatateCreateInvoice(payload, {
@@ -176,9 +169,9 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
           if (value && value.status.print) {
             setPrintModal(true);
           }
-          if (payload?.invoice?.status !== 2) {
-            onSendPDF(value.contactId, data?.data?.result?.id);
-          }
+          // if (payload?.invoice?.status !== 2) {
+          //   onSendPDF(value.contactId, data?.data?.result?.id);
+          // }
           ClearAll();
           setInvoiceDiscount(0);
           /* this will clear invoice items, formdata and payment */
@@ -238,8 +231,6 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
     due_date: 'Due Date',
     orderNo: 'Invoice #',
   };
-
-  const _match = JSON.stringify(accountsList);
 
   /* JSX  */
   return (

@@ -41,16 +41,12 @@ export const Requires = {
     require: true,
     message: 'Item is Requred to Proceed invoice',
   },
-  unitPrice: {
+  purchasePrice: {
     require: true,
     message: 'Item is Requred to Proceed invoice',
     condition: (value) => value > 0,
   },
 
-  itemDiscount: {
-    require: true,
-    message: 'Item is Requred to Proceed invoice',
-  },
   tax: {
     require: true,
     message: 'Item is Requred to Proceed invoice',

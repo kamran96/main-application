@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import { getAllContacts, getCreditNotes } from '../../../api';
 import { CommonTable } from '../../../components/Table';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { IContactTypes, ISupportedRoutes } from '../../../modal';
+import { IInvoiceType, IContactTypes, ISupportedRoutes } from '../../../modal';
 import { IInvoiceResponse } from '../../../modal/invoice';
 import { ButtonTag } from '../../../components/ButtonTags';
 import editSolid from '@iconify-icons/clarity/edit-solid';
@@ -49,6 +49,7 @@ export const AprovedCreditNotes: FC = () => {
       1, // this specifies APPROVED CREDIT NOTES
       page,
       pageSize,
+      IInvoiceType.CREDITNOTE,
       query,
     ],
     getCreditNotes,

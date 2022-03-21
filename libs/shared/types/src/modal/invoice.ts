@@ -7,12 +7,12 @@ export interface IInvoiceResponse extends IBaseRequest {
 }
 
 export enum IInvoiceType {
-  BILL = 'BILL',
   INVOICE = 'SI',
   PURCHASE_ENTRY = 'POE',
   PURCHASE_ORDER = 'PO',
   QUOTE = 'QO',
-  CREDIT_NOTE = 'credit-note',
+  CREDITNOTE = 'ACCRECCREDIT',
+  DEBITNOTE = 'ACCPAYCREDIT',
 }
 
 export interface IInvoiceResult extends IBase {
@@ -31,9 +31,16 @@ export interface IInvoiceResult extends IBase {
   branch: IBranch;
   status: number;
   organizationId: number;
-  invoiceType: any;
+  invoiceType:
+    | IInvoiceType.CREDITNOTE
+    | IInvoiceType.DEBITNOTE
+    | IInvoiceType.QUOTE
+    | IInvoiceType.INVOICE
+    | IInvoiceType.PURCHASE_ENTRY
+    | any;
   invoiceNumber: string;
   invoiceStatus: number;
+
   isTaxIncluded: number;
   currency: string;
   invoice_items: IInvoiceItem[];
@@ -242,7 +249,7 @@ export enum IInvoiceTypes {
   BILL = 'BILL',
 }
 
-export enum CreditNoteType {
-  CREDITNOTE = 'ACCRECCREDIT',
-  DEBITNOTE = 'ACCPAYCREDIT',
-}
+// export enum CreditNoteType {
+//   CREDITNOTE = 'ACCRECCREDIT',
+//   DEBITNOTE = 'ACCPAYCREDIT',
+// }

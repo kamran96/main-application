@@ -3,7 +3,7 @@ import printIcon from '@iconify-icons/bytesize/print';
 import Icon from '@iconify/react';
 import { EditableTable } from '@invyce/editable-table';
 import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
-import { IContactTypes, CreditNoteType } from '../../../../modal';
+import { IInvoiceType, ITaxTypes } from '@invyce/shared/types';
 import dayjs from 'dayjs';
 import { FC, useRef, useState } from 'react';
 import { useQueryClient, useMutation } from 'react-query';
@@ -24,9 +24,6 @@ import {
   ISupportedRoutes,
   NOTIFICATIONTYPE,
 } from '../../../../modal';
-import { IInvoiceType, ITaxTypes } from '../../../../modal/invoice';
-import { IOrganizationType } from '../../../../modal/organization';
-import { addition } from '../../../../utils/helperFunctions';
 import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv, { DownloadPDF } from '../../../../utils/Print';
 import defaultItems, { Requires } from './defaultStates';
@@ -57,7 +54,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
   /* ************ HOOKS *************** */
   /* Component State Hooks */
   const { routeHistory, userDetails } = useGlobalContext();
-  const { organization } = userDetails;
+
   const { history } = routeHistory;
   const [printModal, setPrintModal] = useState(false);
   const [taxType, setTaxType] = useState<ITaxTypes>(ITaxTypes.TAX_INCLUSIVE);
@@ -66,7 +63,6 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
     columns,
     contactResult,
     GrossTotal,
-    TotalDiscount,
     NetTotal,
     invoiceDiscount,
     setInvoiceDiscount,
@@ -78,14 +74,13 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
     handleAddRow,
     ClearAll,
     accountsList,
+    relation,
   } = usePurchaseWidget();
 
   const __columns =
     taxType === ITaxTypes.NO_TAX
       ? columns.filter((item) => item.dataIndex !== 'tax')
       : columns;
-
-  const idType = 'billId';
 
   const printRef = useRef();
 
@@ -144,14 +139,12 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
       let payload: any = {
         ...value,
         status: value.status.status,
-        invoiceType:
-          filteredContact?.contactType === IContactTypes?.CUSTOMER
-            ? CreditNoteType.CREDITNOTE
-            : CreditNoteType.DEBITNOTE,
+        invoiceType: IInvoiceType.CREDITNOTE,
         discount: invoiceDiscount,
         netTotal: NetTotal,
         grossTotal: GrossTotal,
         total: '',
+        invoiceId: id,
         isNewRecord: true,
 
         invoice_items: invoiceItems.map((item, index) => {
@@ -161,15 +154,19 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
 
       delete payload.invoiceDiscount;
       delete payload.total;
-      if (id) {
+      if (id && !relation?.type) {
         payload = {
           ...payload,
 
           ...payload.invoice,
-          [idType]: id,
+          id,
           isNewRecord: false,
           deleted_ids: deleteIds,
         };
+
+        delete payload.invoiceId;
+      } else if (id && relation?.type) {
+        payload.invoiceId = id;
       }
 
       await muatateCreateInvoice(payload, {

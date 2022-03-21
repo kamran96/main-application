@@ -13,7 +13,7 @@ import {
 } from '../../../modal';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { AddressForm } from './addressForm';
-import { getAllAccounts } from '../../../api/accounts';
+import { getAllAccounts, getBankAccounts } from '../../../api/accounts';
 import { IAccountsResult } from '../../../modal/accounts';
 import { EnterpriseWrapper } from '../../../components/EnterpriseWrapper';
 import { IOrganizationType } from '../../../modal/organization';
@@ -74,7 +74,8 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
       AllAccounts.data.result.filter(
         (acc) =>
           acc?.secondaryAccount?.primaryAccount?.name === 'liability' ||
-          acc?.secondaryAccount?.primaryAccount?.name === 'equity'
+          acc?.secondaryAccount?.primaryAccount?.name === 'equity' ||
+          acc?.secondaryAccount?.primaryAccount?.name === 'revenue'
       )) ||
     [];
 
@@ -112,7 +113,12 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
       form.setFieldsValue({
         ...result,
       });
-      if (addresses.length) {
+      if (addresses?.length === 1) {
+        setAddress((prev) => {
+          prev.splice(0, 1, { ...addresses[0] });
+          return prev;
+        });
+      } else if (addresses.length) {
         setAddress(addresses);
       }
     }
@@ -122,11 +128,14 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
 
   /* Async function to create and update a contact */
   const onFinish = async (values) => {
+    console.log(values, 'valuse');
+
     let payload = {
       ...values,
       isNewRecord: true,
       addresses: address,
     };
+
     if (id) {
       payload = {
         ...payload,
@@ -165,9 +174,34 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
     });
   };
 
+  const { data: allBanks } = useQuery([`bank-accounts`], getBankAccounts);
+
+  const banksList = allBanks?.data?.result || [];
+
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
+
+  const banksAddOn = (
+    <Form.Item name="bankId">
+      <Select
+        loading={isLoading}
+        // size="large"
+        showSearch
+        // style={{ width: '100%' }}
+        placeholder="Select Bank"
+        optionFilterProp="children"
+      >
+        {banksList.map((bank, index) => {
+          return (
+            <Option key={index} value={bank.accountId}>
+              {bank.name}
+            </Option>
+          );
+        })}
+      </Select>
+    </Form.Item>
+  );
 
   return (
     <WrapperContactsForm>
@@ -454,164 +488,210 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                 </div>
               </Col>
               {showOpeningBlance && (
-                <>
-                  <Col span={12}>
-                    <FormLabel isRequired={false}>Opening Balance</FormLabel>
-                    <Form.Item
-                      name="openingBalance"
-                      rules={[{ required: false, message: 'Opening Balance' }]}
-                    >
-                      <Input
-                        style={{ width: '100%' }}
-                        placeholder={''}
-                        size="large"
-                      />
-                    </Form.Item>
-                  </Col>
-                  <EnterpriseWrapper enable={[IOrganizationType.SAAS]}>
+                <Col span={12}>
+                  <Row gutter={24}>
                     <Col span={12}>
-                      <FormLabel isRequired={false}>Debit Account</FormLabel>
+                      <FormLabel isRequired={false}>Opening Balance</FormLabel>
                       <Form.Item
-                        name="debitAccount"
-                        rules={[{ required: false, message: 'Debit Account' }]}
+                        name="openingBalance"
+                        rules={[
+                          { required: false, message: 'Opening Balance' },
+                        ]}
                       >
-                        <Select
-                          disabled={!hasOpeningBalance}
-                          size="large"
-                          showSearch
+                        <Input
                           style={{ width: '100%' }}
-                          placeholder="Select Item"
-                          optionFilterProp="children"
-                        >
-                          {debitedAccounts.length &&
-                            debitedAccounts.map(
-                              (acc: IAccountsResult, index) => {
-                                return (
-                                  <Option key={index} value={acc.id}>
-                                    {acc.name}
-                                  </Option>
-                                );
-                              }
-                            )}
-                        </Select>
+                          placeholder={''}
+                          size="large"
+                        />
                       </Form.Item>
                     </Col>
-                  </EnterpriseWrapper>
-                  <EnterpriseWrapper enable={[IOrganizationType.SAAS]}>
-                    <Col span={12}>
-                      <FormLabel isRequired={false}>Credit Account</FormLabel>
-                      <Form.Item
-                        name="creditAccount"
-                        rules={[{ required: false, message: 'Credit Account' }]}
-                      >
-                        <Select
-                          disabled={!hasOpeningBalance}
-                          size="large"
-                          showSearch
-                          style={{ width: '100%' }}
-                          placeholder="Select Item"
-                          optionFilterProp="children"
+                    <EnterpriseWrapper enable={[IOrganizationType.SAAS]}>
+                      <Col span={12}>
+                        <FormLabel isRequired={false}>Debit Account</FormLabel>
+                        <Form.Item
+                          name="debitAccount"
+                          rules={[
+                            { required: false, message: 'Debit Account' },
+                          ]}
                         >
-                          {creditedAccounts.length &&
-                            creditedAccounts.map(
-                              (acc: IAccountsResult, index) => {
-                                return (
-                                  <Option key={index} value={acc.id}>
-                                    {acc.name}
-                                  </Option>
-                                );
-                              }
-                            )}
-                        </Select>
-                      </Form.Item>
-                    </Col>
-                  </EnterpriseWrapper>
-                </>
+                          <Select
+                            disabled={!hasOpeningBalance}
+                            size="large"
+                            showSearch
+                            style={{ width: '100%' }}
+                            placeholder="Select Item"
+                            optionFilterProp="children"
+                          >
+                            {debitedAccounts.length &&
+                              debitedAccounts.map(
+                                (acc: IAccountsResult, index) => {
+                                  return (
+                                    <Option key={index} value={acc.id}>
+                                      {acc.name}
+                                    </Option>
+                                  );
+                                }
+                              )}
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                    </EnterpriseWrapper>
+                    <EnterpriseWrapper enable={[IOrganizationType.SAAS]}>
+                      <Col span={12}>
+                        <FormLabel isRequired={false}>Credit Account</FormLabel>
+                        <Form.Item
+                          name="creditAccount"
+                          rules={[
+                            { required: false, message: 'Credit Account' },
+                          ]}
+                        >
+                          <Select
+                            disabled={!hasOpeningBalance}
+                            size="large"
+                            showSearch
+                            style={{ width: '100%' }}
+                            placeholder="Select Item"
+                            optionFilterProp="children"
+                          >
+                            {creditedAccounts.length &&
+                              creditedAccounts.map(
+                                (acc: IAccountsResult, index) => {
+                                  return (
+                                    <Option key={index} value={acc.id}>
+                                      {acc.name}
+                                    </Option>
+                                  );
+                                }
+                              )}
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                    </EnterpriseWrapper>
+                  </Row>
+                </Col>
               )}
             </>
           )}
 
           <Col span={12}>
-            <FormLabel isRequired={true}>Credit Limit Amount</FormLabel>
-            <Form.Item
-              name="creditLimit"
-              rules={[{ required: true, message: 'Please add Credit Limit' }]}
-            >
-              <InputNumber
-                type="number"
-                style={{ width: '100%' }}
-                placeholder={''}
-                size="large"
-              />
-            </Form.Item>
+            <Row gutter={24}>
+              <Col span={12}>
+                <FormLabel isRequired={true}>Credit Limit Amount</FormLabel>
+                <Form.Item
+                  name="creditLimit"
+                  rules={[
+                    { required: true, message: 'Please add Credit Limit' },
+                  ]}
+                >
+                  <InputNumber
+                    type="number"
+                    style={{ width: '100%' }}
+                    placeholder={''}
+                    size="large"
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <FormLabel isRequired={true}>Credit Limit Block </FormLabel>
+                <Form.Item
+                  name="creditLimitBlock"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please credit block limit',
+                      type: 'number',
+                    },
+                  ]}
+                >
+                  <InputNumber
+                    type="number"
+                    style={{ width: '100%' }}
+                    placeholder={'add credit limit block'}
+                    size="large"
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <FormLabel isRequired={true}>Credit Discount % </FormLabel>
+                <Form.Item
+                  name="salesDiscount"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'If no any discount please type 0',
+                    },
+                  ]}
+                >
+                  <InputNumber
+                    style={{ width: '100%' }}
+                    type="number"
+                    placeholder={'Sales discount in percentage or amount'}
+                    size="large"
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <FormLabel isRequired={true}>Payment Days Limit</FormLabel>
+                <Form.Item
+                  name="paymentDaysLimit"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please provide payment days limit',
+                    },
+                  ]}
+                >
+                  <Input
+                    style={{ width: '100%' }}
+                    placeholder={'Please add payment days limit'}
+                    size="large"
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
           </Col>
           <Col span={12}>
-            <FormLabel isRequired={true}>Credit Limit Block </FormLabel>
-            <Form.Item
-              name="creditLimitBlock"
-              rules={[
-                {
-                  required: true,
-                  message: 'Please credit block limit',
-                  type: 'number',
-                },
-              ]}
-            >
-              <InputNumber
-                type="number"
-                style={{ width: '100%' }}
-                placeholder={'add credit limit block'}
-                size="large"
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <FormLabel isRequired={true}>Credit Discount % </FormLabel>
-            <Form.Item
-              name="salesDiscount"
-              rules={[
-                { required: true, message: 'If no any discount please type 0' },
-              ]}
-            >
-              <InputNumber
-                style={{ width: '100%' }}
-                type="number"
-                placeholder={'Sales discount in percentage or amount'}
-                size="large"
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <FormLabel isRequired={true}>Payment Days Limit</FormLabel>
-            <Form.Item
-              name="paymentDaysLimit"
-              rules={[
-                {
-                  required: true,
-                  message: 'Please provide payment days limit',
-                },
-              ]}
-            >
-              <Input
-                style={{ width: '100%' }}
-                placeholder={'Please add payment days limit'}
-                size="large"
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <FormLabel isRequired={true}>Account Number</FormLabel>
-            <Form.Item
-              name="accountNumber"
-              rules={[
-                {
-                  required: false,
-                  message: 'Please provide Account Number',
-                },
-              ]}
-            >
-              <Input style={{ width: '100%' }} placeholder={''} size="large" />
-            </Form.Item>
+            <Row gutter={24}>
+              <Col span={24}>
+                <FormLabel isRequired={true}>Account Number</FormLabel>
+                <Form.Item
+                  name="accountNumber"
+                  rules={[
+                    {
+                      required: false,
+                      message: 'Please provide Account Number',
+                    },
+                  ]}
+                >
+                  <InputNumber
+                    style={{ width: '100%' }}
+                    placeholder={''}
+                    size="large"
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={24}>
+                <FormLabel isRequired={true}>Select Bank</FormLabel>
+                <Form.Item name="bankId">
+                  <Select
+                    loading={isLoading}
+                    size="large"
+                    showSearch
+                    style={{ width: '100%' }}
+                    placeholder="Select Bank"
+                    optionFilterProp="children"
+                  >
+                    {banksList.map((bank, index) => {
+                      return (
+                        <Option key={index} value={bank.accountId}>
+                          {bank.name}
+                        </Option>
+                      );
+                    })}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
           </Col>
         </Row>
         <Row gutter={24}>

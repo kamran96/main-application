@@ -73,6 +73,7 @@ export enum ISupportedRoutes {
   ADD_CREDIT_NOTE = `/add-credit-note`,
   ADD_DEBIT_NOTE = `/add-debit-note`,
   CREDIT_NOTES = '/credit-notes',
+  DEBIT_NOTES = '/debit-notes',
   VERIFY_USER = ' /user',
   TAX = '/tax',
   INVENTORY_MANAGEMENT = '/inventory-management',

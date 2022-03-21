@@ -27,7 +27,6 @@ import { ISupportedRoutes } from '../../../modal/routing';
 import moneyFormat from '../../../utils/moneyFormat';
 import { useWindowSize } from '../../../utils/useWindowSize';
 import { CommonTable } from './../../../components/Table';
-import { DuplicateModal } from './DuplicateModal';
 import filterSchema from './filterSchema';
 import { PrintColumns, PDFColumns } from './PrintColumns';
 import { ItemsListWrapper } from './styles';
@@ -107,13 +106,6 @@ export const ItemsList: FC = () => {
     if (resolvedCategories && resolvedCategories.length) {
       const filteringSchema = {
         ...filterSchema,
-        // categoryId: {
-        //   ...filterSchema.categoryId,
-        //   value: resolvedCategories.map((item: ICategory, index: number) => {
-        //     const { title } = item;
-        //     return { ...item, name: title };
-        //   }),
-        // },
       };
       setItemsFilteringSchema(filteringSchema);
     }
@@ -210,12 +202,12 @@ export const ItemsList: FC = () => {
         <Link to={`/app${ISupportedRoutes.ITEMS}/${row.id}`}>{data}</Link>
       ),
     },
-    {
-      title: 'Category',
-      dataIndex: 'categoryName',
-      key: 'categoryName',
-      render: (data, row, index) => data,
-    },
+    // {
+    //   title: 'Category',
+    //   dataIndex: 'categoryName',
+    //   key: 'categoryName',
+    //   render: (data, row, index) => data,
+    // },
     {
       title: 'Code',
       dataIndex: 'code',
@@ -306,22 +298,6 @@ export const ItemsList: FC = () => {
     );
   };
 
-  const copyItemsList = () => {
-    const copyItems = [];
-
-    selectedRow.map((id) => {
-      const [filter] = result.filter((item) => item.id === id);
-
-      if (filter) {
-        delete filter.category;
-
-        copyItems.push({ ...filter });
-      }
-    });
-
-    return copyItems;
-  };
-
   const renderCustomTopbar = () => {
     return (
       <div className="custom_topbar">
@@ -406,7 +382,6 @@ export const ItemsList: FC = () => {
           </div>
         </div>
         <CommonTable
-          // scroll={scrollConfig}
           className="customized-table"
           rowKey={(record) => record.id}
           key={'table1'}
