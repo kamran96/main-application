@@ -65,6 +65,8 @@ import { Organizations } from '../Containers/AddOrganization';
 import { ForgotPassowrdContainer } from '../Containers/ForgetPassword';
 import { BankReconcilation } from '../modules/BankReconcilation';
 import { TransactionsWidget } from '../modules/Business/Transactions/TransactionEditorWidgetV2';
+import { DebitNotesList } from '../modules/Invoice/DebitNotesList';
+import { DebitNotesView } from '../modules/Invoice/DebitNotesList/View';
 
 export const routes = (root = '/app'): RouteConfig[] => [
   {
@@ -275,8 +277,21 @@ export const routes = (root = '/app'): RouteConfig[] => [
             permission: PERMISSIONS.INVOICES_SHOW,
           },
           {
+            path: `${root}${ISupportedRoutes.DEBIT_NOTES}/:id`,
+            component: DebitNotesView,
+            restricted: true,
+            permission: PERMISSIONS.INVOICES_SHOW,
+          },
+          {
             path: `${root}${ISupportedRoutes.CREDIT_NOTES}`,
             component: CreditNoteList,
+            exact: true,
+            restricted: true,
+            permission: PERMISSIONS.INVOICES_CREATE,
+          },
+          {
+            path: `${root}${ISupportedRoutes.DEBIT_NOTES}`,
+            component: DebitNotesList,
             exact: true,
             restricted: true,
             permission: PERMISSIONS.INVOICES_CREATE,

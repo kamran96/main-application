@@ -34,11 +34,12 @@ export class PersistManager {
         sessionStorage.setItem(_key, jsonData);
         break;
       case IStorageType.COOKIE:
+        console.log(key, data, 'daaat');
         // eslint-disable-next-line no-case-declarations
         const _expiresAt: string | null = this?.expiresAt || expiresAt;
         document.cookie = _expiresAt
-          ? `${key}=${_data} expires=${_expiresAt}`
-          : `${key}=${_data}`;
+          ? `${_key}=${_data}; expires=${_expiresAt}`
+          : `${_key}=${_data}`;
         break;
 
       default:

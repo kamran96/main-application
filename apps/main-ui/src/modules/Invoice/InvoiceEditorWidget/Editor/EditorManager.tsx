@@ -133,6 +133,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     paymentType: null,
   });
 
+  const [bypassCreditLimit, setBypassCreditLimit] = useState(false);
+
   /* Antd antd form */
   /* And Form Hook */
   const [AntForm] = Form.useForm();
@@ -411,6 +413,9 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
     return errors;
   };
+  const a = AntForm.getFieldsValue();
+
+  console.log(a, 'al');
 
   const columns: ColumnsType<any> = useMemo(() => {
     return [
@@ -966,6 +971,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     AntForm.setFieldsValue({
       ...defaultFormData,
     });
+    setBypassCreditLimit(false);
     setDeleteIds([]);
     resetPersist();
     setPaymentReset(true);
@@ -1026,6 +1032,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         isFetching: itemsLoading || invoiceLoading || accountsLoading,
         handleCheckValidation,
         getCachedInvoice,
+        bypassCreditLimit,
+        setBypassCreditLimit,
       }}
     >
       <LayoutWrapper>

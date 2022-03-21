@@ -11,6 +11,7 @@ import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { useQuery } from 'react-query';
 import { getAllContacts } from '../../../api';
 import { IContactType } from '../../../modal';
+import { Capitalize } from '../../../components/Typography';
 
 export const ContactLedger = () => {
   const { routeHistory } = useGlobalContext();
@@ -55,9 +56,11 @@ export const ContactLedger = () => {
       <TableCard>
         <div>
           <Heading type="table">
-            {result.length > 0
-              ? ` ${getContactById(id) && getContactById(id).name}   Ledger`
-              : ''}
+            <Capitalize>
+              {result.length > 0
+                ? ` ${getContactById(id) && getContactById(id).name}   Ledger`
+                : ''}
+            </Capitalize>
           </Heading>
         </div>
         <LedgerList type={type} id={id} />

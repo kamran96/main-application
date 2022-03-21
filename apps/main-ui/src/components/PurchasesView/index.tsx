@@ -21,7 +21,12 @@ import {
   pushDraftToPurchaseAPI,
 } from '../../api';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
-import { IAddress, IInvoiceItem, IInvoiceResult } from '../../modal';
+import {
+  IAddress,
+  IInvoiceItem,
+  IInvoiceResult,
+  IInvoiceType,
+} from '@invyce/shared/types';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import {
   IErrorMessages,
@@ -120,10 +125,6 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
   const response: IInvoiceResult =
     (data && data.data && data.data.result) || {};
 
-  const address: IAddress[] =
-    (response && response.contact && response.contact.addresses) || [];
-  const orgInfo = userDetails.organization;
-
   const { mutate: mutateApprove, isLoading: approving } =
     useMutation(APISTAKE_APPROVED);
 
@@ -139,6 +140,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
   const [tableData, setTableData] = useState<IInvoiceItem[]>([]);
   const [paymentModal, setPaymentModal] = useState(false);
   const [payment, setPayment] = useState<IPaymentPayload>({ ...defaultStates });
+
   /* LOCAL STATES ENDS HERE */
 
   /* ***** COMPONENT LIFE CYCLES */
@@ -177,13 +179,20 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
     ConvertDivToPDFAndDownload(PrintItem);
   };
   function handleMenuClick(e) {
+    const creditNoteRoute =
+      response?.invoiceType === 'POE'
+        ? ISupportedRoutes?.ADD_DEBIT_NOTE
+        : ISupportedRoutes?.ADD_CREDIT_NOTE;
     switch (e?.key) {
       case IInvoiceActions?.APPROVE:
         setPaymentModal(true);
         break;
       case IInvoiceActions?.PROCEED:
         history.push(
-          `/app${ISupportedRoutes.CREATE_PURCHASE_Entry}/${response.id}`
+          `/app${ISupportedRoutes.CREATE_PURCHASE_Entry}/${response.id}`,
+          {
+            type: response?.invoiceType,
+          }
         );
         break;
       case IInvoiceActions?.DOWNLOAD_PDF:
@@ -196,7 +205,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
         break;
 
       case IInvoiceActions?.CREDIT_NOTE:
-        history?.push(`/app${ISupportedRoutes?.ADD_CREDIT_NOTE}/${id}`, {
+        history?.push(`/app${creditNoteRoute}/${id}`, {
           type,
         });
         break;
@@ -320,6 +329,12 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
       : netTotal - Math.abs(paid_amount);
   };
 
+  const priceAccessor =
+    response?.invoiceType === IInvoiceType.DEBITNOTE ||
+    response?.invoiceType === IInvoiceType?.PURCHASE_ENTRY
+      ? 'purchasePrice'
+      : 'unitPrice';
+
   /* *********************CALCULATIONS ENDS HERE**************** */
   const columns: ColumnsType = [
     {
@@ -342,14 +357,19 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
     },
     {
       title: 'RATE',
-      dataIndex: type === 'PO' ? `purchasePrice` : `unitPrice`,
+      dataIndex: priceAccessor,
       key: type === 'PO' ? `purchasePrice` : `unitPrice`,
+      render: (data) => moneyFormat(data),
     },
-    {
-      title: 'DISCOUNT',
-      dataIndex: 'itemDiscount',
-      key: 'itemDiscount',
-    },
+    response?.invoiceType !== IInvoiceType?.CREDITNOTE &&
+    response?.invoiceType !== IInvoiceType?.DEBITNOTE
+      ? {
+          title: 'DISCOUNT',
+          dataIndex: 'itemDiscount',
+          key: 'itemDiscount',
+          render: (data) => moneyFormat(data),
+        }
+      : {},
     {
       title: 'TAX',
       dataIndex: 'tax',
@@ -359,6 +379,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
       title: 'TOTAL',
       dataIndex: 'total',
       key: 'total',
+      render: (data) => moneyFormat(data),
     },
   ];
 
@@ -383,7 +404,9 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
       permission: null,
       key: IInvoiceActions.PRINT,
     },
-    {
+
+    (response.invoiceType === IInvoiceType?.PURCHASE_ENTRY ||
+      response.invoiceType === IInvoiceType?.INVOICE) && {
       title: 'Add Credit note',
       permission: PERMISSIONS?.INVOICES_CREATE,
       key: IInvoiceActions.CREDIT_NOTE,
@@ -659,24 +682,26 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
         <Seprator />
         <Row gutter={24}>
           <Col span={8} offset={8} pull={8}>
-            <div className="payment_details_card mt-35">
-              <div className="flex alignStart pv-2 ">
-                <BoldText className="bold_text">Status</BoldText>
-                <P className="plain_text">{response?.payment_status}</P>
+            {response?.status !== 2 && (
+              <div className="payment_details_card mt-35">
+                <div className="flex alignStart pv-2 ">
+                  <BoldText className="bold_text">Status</BoldText>
+                  <P className="plain_text">{response?.payment_status}</P>
+                </div>
+                <div className="flex alignStart pv-2 ">
+                  <BoldText className="bold_text">Paid Amount</BoldText>
+                  <P className="plain_text">
+                    {moneyFormat(response?.paid_amount)}
+                  </P>
+                </div>
+                <div className="flex alignStart pv-2 ">
+                  <BoldText className="bold_text">Remaining Amount</BoldText>
+                  <P className="plain_text">
+                    {moneyFormat(response?.due_amount)}
+                  </P>
+                </div>
               </div>
-              <div className="flex alignStart pv-2 ">
-                <BoldText className="bold_text">Paid Amount</BoldText>
-                <P className="plain_text">
-                  {moneyFormat(response?.paid_amount)}
-                </P>
-              </div>
-              <div className="flex alignStart pv-2 ">
-                <BoldText className="bold_text">Remaining Amount</BoldText>
-                <P className="plain_text">
-                  {moneyFormat(response?.due_amount)}
-                </P>
-              </div>
-            </div>
+            )}
           </Col>
           <Col span={8}>
             <div className="calculation textRight">

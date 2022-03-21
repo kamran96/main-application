@@ -30,11 +30,12 @@ interface IProps {
 export const LedgerList: FC<IProps> = ({ id, type }) => {
   const accessor = type === IContactTypes.SUPPLIER ? 'bill' : 'invoice';
 
-  const [{ pagination, result }, setResponse] =
+  const [{ pagination, result, contact }, setResponse] =
     useState<IContactLedgerResponse>({
       pagination: {},
       result: [],
       opening_balance: null,
+      contact: null,
     });
 
   const [filterBar, setFilterbar] = useState<boolean>(false);
@@ -86,9 +87,15 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
         resolvedData.data
       );
 
+      console.log(resolvedResult, 'resolved result');
+
       const contact_ledger: any =
         (resolvedResult.result && resolvedResult.getGeneratedResult()) || [];
-      setResponse({ ...resolvedResult, result: contact_ledger });
+      setResponse({
+        ...resolvedResult,
+        result: contact_ledger,
+        contact: resolvedData?.data?.contact,
+      });
     }
   }, [resolvedData]);
 
@@ -242,6 +249,7 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
         </div>
       ) : (
         <CommonTable
+          printTitle={`${contact?.name.toLocaleUpperCase()} Ledger`}
           size="middle"
           customTopbar={<></>}
           hasPrint

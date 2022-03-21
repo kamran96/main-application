@@ -1,5 +1,6 @@
 import { ITableExportFields } from 'ant-table-extensions';
 import { ColumnsType } from 'antd/es/table';
+import { Capitalize } from '../../../../../components/Typography';
 import { plainToClass } from 'class-transformer';
 import dayjs from 'dayjs';
 import React from 'react';
@@ -25,16 +26,16 @@ export const PurchaseOrderColumns: ColumnsType<any> = [
     key: 'reference',
   },
   {
-    title: 'Comment',
-    dataIndex: 'comment',
-    key: 'comment',
-    render: (data) => <>{data ? data : '-'}</>,
-  },
-  {
     title: 'Supplier',
     dataIndex: 'contact',
     key: 'contact',
-    render: (data, row, index) => <>{data ? data.name : '-'}</>,
+    render: (data, row, index) => (
+      <Link
+        to={`${ISupportedRoutes.DASHBOARD_LAYOUT}${ISupportedRoutes?.CONTACTS}/${data?.id}?type=supplier`}
+      >
+        <Capitalize>{data ? data.name : '-'}</Capitalize>
+      </Link>
+    ),
   },
 
   {
@@ -58,7 +59,7 @@ export const PurchaseOrderColumns: ColumnsType<any> = [
     dataIndex: 'paid_amount',
     key: 'paid_amount',
     render: (data) => {
-      return <>{data ? moneyFormat(Math.abs(data)) : '-'}</>;
+      return <>{data ? moneyFormat(Math.abs(data)) : moneyFormat(0)}</>;
     },
   },
   {
@@ -66,7 +67,7 @@ export const PurchaseOrderColumns: ColumnsType<any> = [
     dataIndex: 'due_amount',
     key: 'due_amount',
     render: (data) => {
-      return <>{data ? moneyFormat(Math.abs(data)) : '-'}</>;
+      return <>{data ? moneyFormat(Math.abs(data)) : moneyFormat(0)}</>;
     },
   },
   {
@@ -108,12 +109,6 @@ export const PDFColsBills: ColumnsType<any> = [
     key: 'reference',
   },
   {
-    title: 'Comment',
-    dataIndex: 'comment',
-    key: 'comment',
-    render: (data) => (data ? data : '-'),
-  },
-  {
     title: 'Supplier',
     dataIndex: 'contact',
     key: 'contact',
@@ -138,7 +133,7 @@ export const PDFColsBills: ColumnsType<any> = [
     dataIndex: 'paid_amount',
     key: 'paid_amount',
     render: (data) => {
-      return data ? moneyFormat(Math.abs(data)) : '-';
+      return data ? moneyFormat(Math.abs(data)) : moneyFormat(0);
     },
   },
   {
@@ -146,7 +141,7 @@ export const PDFColsBills: ColumnsType<any> = [
     dataIndex: 'due_amount',
     key: 'due_amount',
     render: (data) => {
-      return data ? moneyFormat(Math.abs(data)) : '-';
+      return data ? moneyFormat(Math.abs(data)) : moneyFormat(0);
     },
   },
 
@@ -154,7 +149,7 @@ export const PDFColsBills: ColumnsType<any> = [
     title: 'Total',
     dataIndex: 'netTotal',
     key: 'netTotal',
-    render: (data) => (data ? moneyFormat(data) : '-'),
+    render: (data) => (data ? moneyFormat(data) : moneyFormat(0)),
   },
   {
     title: 'Status',
@@ -176,7 +171,7 @@ export const _csvExportable: ITableExportFields = {
       return data === true ? 'Returned' : '';
     },
   },
-  comment: 'Comment',
+
   contact: {
     header: 'Supplier',
     formatter: (data) => {

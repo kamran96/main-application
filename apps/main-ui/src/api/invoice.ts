@@ -89,8 +89,9 @@ export const getCreditNotes = ({ queryKey }: QueryKey) => {
   const status: string | number = queryKey[1] || 1;
   const page = queryKey[2] || 1;
   const pageSize = queryKey[3] || 10;
-  const query: string = queryKey[4] || '';
-  let url = `${INVOICES_API.CREDIT_NOTE}?page_size=${pageSize}&page_no=${page}&status=${status}`;
+  const invoiceType = queryKey[4] || '';
+  const query: string = queryKey[5] || '';
+  let url = `${INVOICES_API.CREDIT_NOTE}?page_size=${pageSize}&page_no=${page}&status=${status}&invoice_type=${invoiceType}`;
   if (query) {
     url = `${url}&query=${query}`;
   }

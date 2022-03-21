@@ -272,13 +272,13 @@ export const ItemsForm: FC = () => {
               </Select>
             </Form.Item>
           </Col>
-          <Col span={24}>
+          {/* <Col span={24}>
             <div className="pb-10">
               <Form.Item name="hasCategory" valuePropName="checked">
                 <Checkbox>Has Categories</Checkbox>
               </Form.Item>
             </div>
-          </Col>
+          </Col> */}
           {form.getFieldValue('hasCategory') && (
             <Col span={24}>
               <Row gutter={24}>
