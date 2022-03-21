@@ -135,10 +135,7 @@ export class CreditNoteService {
     };
   }
 
-  async CreateCreditNote(
-    dto: CreditNoteDto,
-    req: IRequest
-  ): Promise<ICreditNote> {
+  async CreateCreditNote(dto: CreditNoteDto, req: IRequest): Promise<unknown> {
     let token;
     if (process.env.NODE_ENV === 'development') {
       const header = req.headers?.authorization?.split(' ')[1];
@@ -233,47 +230,6 @@ export class CreditNoteService {
         });
       }
 
-      if (dto.invoiceId) {
-        const invoice = await getCustomRepository(InvoiceRepository).findOne({
-          where: {
-            id: dto.invoiceId,
-          },
-        });
-
-        let i = 0;
-        const invoice_details = [];
-        for (const cn of credit_note_item_array) {
-          i++;
-          if (i <= 5) {
-            invoice_details.push({
-              itemName: items.find((j) => cn.itemId === j.id).name,
-              quantity: cn.quantity,
-              price: cn.unitPrice,
-              itemDiscount: cn.itemDiscount,
-              tax: cn.tax,
-              total: cn.total,
-            });
-          }
-        }
-
-        const payload = {
-          to: req.user.email,
-          from: 'no-reply@invyce.com',
-          TemplateAlias: 'credit-note-applied',
-          TemplateModel: {
-            user_name: req.user.profile.fullName,
-            invoice_name: invoice.invoiceNumber,
-            issueDate: moment(credit_note.issueDate).format('llll'),
-            invoice_details,
-            gross_total: credit_note.grossTotal,
-            itemDisTotal: credit_note.discount,
-            net_total: credit_note.netTotal,
-          },
-        };
-
-        await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
-      }
-
       if (credit_note.invoiceType === CreditNoteType.ACCRECCREDIT) {
         const debit = {
           amount: Number(item.quantity) * Number(item.unitPrice),
@@ -289,72 +245,122 @@ export class CreditNoteService {
 
         creditsArray.push(credit);
       }
+    }
 
-      if (credit_note.status === Statuses.AUTHORISED) {
-        await http.post(`reports/inventory/manage`, {
-          payload: itemLedgerArray,
-        });
+    if (dto.invoiceId) {
+      const invoice = await getCustomRepository(InvoiceRepository).findOne({
+        where: {
+          id: dto.invoiceId,
+        },
+      });
 
-        if (credit_note.invoiceType === CreditNoteType.ACCRECCREDIT) {
-          const credit = {
-            account_id: await accounts.find((i) => i.code === '15004').id,
-            amount: dto.netTotal,
-          };
-
-          creditsArray.push(credit);
-        } else if (credit_note.invoiceType === CreditNoteType.ACCPAYCREDIT) {
-          const debit = {
-            account_id: await accounts.find((i) => i.code === '40001').id,
-            amount: dto.netTotal,
-          };
-
-          debitsArray.push(debit);
+      let i = 0;
+      const invoice_details = [];
+      for (const cn of credit_note_item_array) {
+        i++;
+        if (i <= 5) {
+          invoice_details.push({
+            itemName: items.find((j) => cn.itemId === j.id).name,
+            quantity: cn.quantity,
+            price: cn.unitPrice,
+            itemDiscount: cn.itemDiscount,
+            tax: cn.tax,
+            total: cn.total,
+          });
         }
+      }
 
-        const payload = {
-          dr: debitsArray,
-          cr: creditsArray,
-          type:
-            credit_note.invoiceType === CreditNoteType.ACCRECCREDIT
-              ? 'invoice'
-              : 'bill',
-          referense: dto.reference,
-          amount: dto.grossTotal,
-          status: credit_note.status,
+      const payload = {
+        to: req.user.email,
+        from: 'no-reply@invyce.com',
+        TemplateAlias: 'credit-note-applied',
+        TemplateModel: {
+          user_name: req.user.profile.fullName,
+          invoice_name: invoice.invoiceNumber,
+          issueDate: moment(credit_note.issueDate).format('llll'),
+          invoice_details,
+          gross_total: credit_note.grossTotal,
+          itemDisTotal: credit_note.discount,
+          net_total: credit_note.netTotal,
+        },
+      };
+
+      await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
+    }
+
+    if (credit_note.status === Statuses.AUTHORISED) {
+      await http.post(`reports/inventory/manage`, {
+        payload: itemLedgerArray,
+      });
+
+      if (credit_note.invoiceType === CreditNoteType.ACCRECCREDIT) {
+        const credit = {
+          account_id: await accounts.find((i) => i.code === '15004').id,
+          amount: dto.netTotal,
         };
 
-        const { data: transaction } = await http.post(
-          'accounts/transaction/api',
-          {
-            transactions: payload,
-          }
-        );
+        creditsArray.push(credit);
+      } else if (credit_note.invoiceType === CreditNoteType.ACCPAYCREDIT) {
+        const debit = {
+          account_id: await accounts.find((i) => i.code === '40001').id,
+          amount: dto.netTotal,
+        };
 
-        const id =
-          credit_note.invoiceType === CreditNoteType.ACCRECCREDIT
-            ? 'invoiceId'
-            : 'billId';
-
-        const paymentArr = [
-          {
-            ...credit_note,
-            [id]: credit_note.id,
-            balance: credit_note.netTotal,
-            data: credit_note.issueDate,
-            paymentType:
-              credit_note.invoiceType === CreditNoteType.ACCRECCREDIT
-                ? PaymentModes.INVOICES
-                : PaymentModes.BILLS,
-            transactionId: transaction.id,
-            entryType: EntryType.CREDIT,
-          },
-        ];
-
-        await http.post(`payments/payment/add`, {
-          payments: paymentArr,
-        });
-        await http.get(`contacts/contact/balance`);
+        debitsArray.push(debit);
       }
+
+      const payload = {
+        dr: debitsArray,
+        cr: creditsArray,
+        type:
+          credit_note.invoiceType === CreditNoteType.ACCRECCREDIT
+            ? 'invoice'
+            : 'bill',
+        referense: dto.reference,
+        amount: dto.grossTotal,
+        status: credit_note.status,
+      };
+
+      const { data: transaction } = await http.post(
+        'accounts/transaction/api',
+        {
+          transactions: payload,
+        }
+      );
+
+      const id =
+        credit_note.invoiceType === CreditNoteType.ACCRECCREDIT
+          ? 'invoiceId'
+          : 'billId';
+
+      const paymentArr = [
+        {
+          ...credit_note,
+          [id]:
+            credit_note.invoiceType === CreditNoteType.ACCRECCREDIT
+              ? credit_note.invoiceId
+              : credit_note.billId,
+          balance:
+            credit_note.invoiceType === CreditNoteType.ACCRECCREDIT
+              ? `-${credit_note}`
+              : credit_note.netTotal,
+          data: credit_note.issueDate,
+          paymentType:
+            credit_note.invoiceType === CreditNoteType.ACCRECCREDIT
+              ? PaymentModes.INVOICES
+              : PaymentModes.BILLS,
+          transactionId: transaction.id,
+          entryType:
+            credit_note.invoiceType === CreditNoteType.ACCRECCREDIT
+              ? EntryType.CREDITNOTE
+              : EntryType.DEBITNOTE,
+        },
+      ];
+
+      await http.post(`payments/payment/add`, {
+        payments: paymentArr,
+      });
+      await http.get(`contacts/contact/balance`);
     }
 
     return credit_note;

@@ -44,6 +44,12 @@
       "tags": [],
       "implicitDependencies": ["bank-reconcilation"]
     },
+    "common": {
+      "tags": []
+    },
+    "common-money-format": {
+      "tags": []
+    },
     "contacts-service": {
       "tags": []
     },

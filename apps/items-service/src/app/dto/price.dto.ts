@@ -12,5 +12,6 @@ export class PriceDto {
   handlingCost: number;
   unitsInCorton: number;
   priceUnit: number;
+  accountId: string;
   item_ids: Array<string>;
 }

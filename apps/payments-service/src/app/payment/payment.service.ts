@@ -320,15 +320,6 @@ export class PaymentService {
           };
 
           let remaining = data.amount;
-          //     const invoices = await getCustomRepository(PaymentRepository).query(`
-          //     select p."invoiceId", sum(p.amount) as balance, count(p.id) as total_payments
-          //     from payments p
-          //     where p."invoiceId" in (${data.invoice_ids})
-          //     and p.status = 1
-          //     and p."entryType" is not null
-          //     and p."organizationId" = '${req.user.organizationId}'
-          //     group by p."invoiceId"
-          // `);
 
           const invoices = await getCustomRepository(PaymentRepository)
             .createQueryBuilder()
@@ -483,21 +474,50 @@ export class PaymentService {
     invoiceIds: PaymentInvoiceDto,
     user: IBaseUser
   ): Promise<IPayment[]> {
-    const id = invoiceIds.type === 'INVOICE' ? 'invoiceId' : 'billId';
+    const id = invoiceIds.type === 'INVOICE' ? '"invoiceId"' : '"billId"';
 
     const inv_arr = [];
     for (const i of invoiceIds.ids) {
-      const [invoice] = await getCustomRepository(PaymentRepository)
-        .createQueryBuilder('pay')
-        .select('COALESCE(SUM(amount), 0)', 'balance')
-        .where({
-          [id]: i,
-          entryType: 2,
-          organizationId: user.organizationId,
-          branchId: user.branchId,
-          status: 1,
-        })
-        .getRawMany();
+      const sql = `
+        select
+          p.id,
+            (
+              select coalesce(sum(t.amount),0) from payments t where t."entryType" = 1 and t.${id} = p.${id}
+            ) as credits,
+            (
+              select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" in (4, 5) and t.${id} = p.${id}
+            ) as credit_notes,
+            (
+              select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" = 2 and t.${id} = p.${id}
+            ) as payment,
+            (
+              (
+                select coalesce(sum(t.amount),0) from payments t where t."entryType" = 1 and t.${id} = p.${id}
+              ) - (
+                select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" in (4, 5) and t.${id} = p.${id}
+              ) - (
+                select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" = 2 and t.${id} = p.${id}
+              )
+            ) as balance,
+            (
+              (
+                select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" = 1 and t.${id} = p.${id}
+              ) - (
+                select coalesce(sum(t.amount),0) from payments t where t."entryType" in (4, 5) and t.${id} = p.${id}
+              ) - (
+                select coalesce(sum(t.amount),0) from payments t where t."entryType" = 2 and t.${id} = p.${id}
+              )
+            ) as billbalance
+
+          from payments p
+          where p.${id} = $1
+          and p."branchId" = $2
+      `;
+
+      const [invoice] = await getCustomRepository(PaymentRepository).query(
+        sql,
+        [i, user.branchId]
+      );
 
       inv_arr.push({ id: i, invoice });
     }
@@ -551,11 +571,8 @@ export class PaymentService {
 
     const payment = await getCustomRepository(PaymentRepository)
       .createQueryBuilder('p')
-      .select('p.*')
-      .addSelect(
-        ' COALESCE(sum(amount) over (order by date asc), 0)',
-        'balance'
-      )
+      .select('p.*, abs(p.amount) as amount')
+      .addSelect('COALESCE(sum(amount) over (order by date asc), 0)', 'balance')
       .where({
         contactId,
         entryType: Not(IsNull()),

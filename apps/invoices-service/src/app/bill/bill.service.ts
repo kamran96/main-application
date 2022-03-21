@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Between, getCustomRepository, ILike, In, LessThan } from 'typeorm';
 import axios from 'axios';
 import { BillRepository } from '../repositories/bill.repository';
@@ -6,10 +6,22 @@ import { BillItemRepository } from '../repositories/billItem.repository';
 import { Sorting } from '@invyce/sorting';
 import { IPage, IBillWithResponse, IRequest, IBill } from '@invyce/interfaces';
 import { BillDto, BillIdsDto } from '../dto/bill.dto';
-import { EntryType, PaymentModes, Statuses } from '@invyce/global-constants';
+import {
+  EntryType,
+  PaymentModes,
+  PdfType,
+  Statuses,
+} from '@invyce/global-constants';
+import { ClientProxy } from '@nestjs/microservices';
+import { BILL_CREATED } from '@invyce/send-email';
+import { CreditNoteRepository } from '../repositories/creditNote.repository';
 
 @Injectable()
 export class BillService {
+  constructor(
+    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy
+  ) {}
+
   async IndexBill(req: IRequest, queryData: IPage): Promise<IBillWithResponse> {
     const { page_no, page_size, status, type, sort, query } = queryData;
 
@@ -137,10 +149,8 @@ export class BillService {
         for (const i of bills) {
           const balance = balances.find((bal) => bal.id === i.id);
 
-          const paid_amount = balance?.invoice?.balance || 0;
-          const due_amount = balance?.invoice?.balance
-            ? i.netTotal - balance?.invoice?.balance
-            : i.netTotal;
+          const due_amount = balance?.invoice?.billbalance;
+          const paid_amount = balance?.invoice?.payment;
 
           const payment_status = () => {
             if (paid_amount < due_amount && due_amount < i?.netTotal) {
@@ -156,8 +166,8 @@ export class BillService {
 
           bill_arr.push({
             ...i,
-            paid_amount,
-            due_amount: i?.netTotal - balance?.invoice?.balance || 0,
+            paid_amount: paid_amount || 0,
+            due_amount: due_amount || 0,
             payment_status: payment_status(),
           });
         }
@@ -187,10 +197,8 @@ export class BillService {
         for (const i of bills) {
           const balance = balances.find((bal) => bal.id === i.id);
 
-          const paid_amount = balance?.invoice?.balance || 0;
-          const due_amount = balance?.invoice?.balance
-            ? i.netTotal - balance?.invoice?.balance
-            : i.netTotal;
+          const due_amount = balance?.invoice?.billbalance;
+          const paid_amount = balance?.invoice?.payment;
 
           const payment_status = () => {
             if (paid_amount < due_amount && due_amount < i?.netTotal) {
@@ -204,11 +212,11 @@ export class BillService {
             }
           };
 
-          if (balance.invoice.balance === 0) {
+          if (balance?.invoice?.balance !== 0) {
             bill_arr.push({
               ...i,
-              paid_amount,
-              due_amount: i.netTotal - balance.invoice.balance || 0,
+              paid_amount: paid_amount || 0,
+              due_amount: due_amount || 0,
               payment_status: payment_status(),
             });
           }
@@ -239,10 +247,8 @@ export class BillService {
         for (const i of bills) {
           const balance = balances.find((bal) => bal.id === i.id);
 
-          const paid_amount = balance?.invoice?.balance || 0;
-          const due_amount = balance?.invoice?.balance
-            ? i.netTotal - balance?.invoice?.balance
-            : i.netTotal;
+          const due_amount = balance?.invoice?.billbalance;
+          const paid_amount = balance?.invoice?.payment;
 
           const payment_status = () => {
             if (paid_amount < due_amount && due_amount < i?.netTotal) {
@@ -256,11 +262,11 @@ export class BillService {
             }
           };
 
-          if (balance.invoice.balance !== 0) {
+          if (paid_amount) {
             bill_arr.push({
               ...i,
-              paid_amount,
-              due_amount: i.netTotal - balance.invoice.balance || 0,
+              paid_amount: paid_amount || 0,
+              due_amount: due_amount || 0,
               payment_status: payment_status(),
             });
           }
@@ -338,6 +344,24 @@ export class BillService {
 
     const itemLedgerArray = [];
     const debitsArrray = [];
+    const invoice_details = [];
+
+    const { data: contact } = await http.post(`contacts/contact/ids`, {
+      ids: [dto.contactId],
+      type: 1,
+    });
+
+    for (const item of dto.invoice_items) {
+      invoice_details.push({
+        itemName: await items.find((i) => i.id === item.itemId).name,
+        quantity: item.quantity,
+        price: item.purchasePrice,
+        itemDiscount: item.itemDiscount,
+        tax: item.tax,
+        total: item.total,
+      });
+    }
+
     if (dto?.isNewRecord === false) {
       const bill: IBill = await getCustomRepository(BillRepository).findOne({
         where: {
@@ -467,6 +491,32 @@ export class BillService {
           },
         ];
 
+        const { data: attachment } = await http.post(
+          `attachments/attachment/generate-pdf`,
+          {
+            data: {
+              ...dto,
+              invoice: bill,
+              contact: contact[0],
+              items,
+              type: PdfType.BILL,
+            },
+          }
+        );
+
+        await this.emailService.emit(BILL_CREATED, {
+          to: contact[0]?.email,
+          user_name: contact[0]?.name,
+          invoice_number: bill.invoiceNumber,
+          issueDate: bill.issueDate,
+          gross_total: bill.grossTotal,
+          itemDisTotal: bill.discount,
+          net_total: bill.netTotal,
+          invoice_details,
+          download_link: attachment?.path,
+          attachment_name: attachment?.name,
+        });
+
         await http.post(`payments/payment/add`, {
           payments: paymentArr,
         });
@@ -581,6 +631,32 @@ export class BillService {
           },
         ];
 
+        const { data: attachment } = await http.post(
+          `attachments/attachment/generate-pdf`,
+          {
+            data: {
+              ...dto,
+              invoice: bill,
+              contact: contact[0],
+              items,
+              type: PdfType.BILL,
+            },
+          }
+        );
+
+        await this.emailService.emit(BILL_CREATED, {
+          to: contact[0]?.email,
+          user_name: contact[0]?.name,
+          invoice_number: bill.invoiceNumber,
+          issueDate: bill.issueDate,
+          gross_total: bill.grossTotal,
+          itemDisTotal: bill.discount,
+          net_total: bill.netTotal,
+          invoice_details,
+          download_link: attachment?.path,
+          attachment_name: attachment?.name,
+        });
+
         await http.post(`payments/payment/add`, {
           payments: paymentArr,
         });
@@ -595,6 +671,12 @@ export class BillService {
       where: { id: billId },
       relations: ['purchaseItems'],
     });
+
+    const creditNote = await getCustomRepository(CreditNoteRepository)
+      .createQueryBuilder()
+      .where('"billId" = :id', { id: billId })
+      .select('id, "invoiceNumber", "netTotal" as balance')
+      .getRawMany();
 
     let new_bill;
     if (bill?.contactId) {
@@ -643,10 +725,9 @@ export class BillService {
       });
 
       const balance = payments.find((bal) => parseInt(bal.id) === bill.id);
-      const paid_amount = balance?.invoice?.balance || 0;
-      const due_amount = balance?.invoice?.balance
-        ? bill.netTotal - balance?.invoice?.balance
-        : bill.netTotal;
+
+      const paid_amount = balance?.invoice?.payment || 0;
+      const due_amount = balance?.invoice?.billbalance || 0;
 
       const payment_status = () => {
         if (paid_amount < due_amount && due_amount < bill?.netTotal) {
@@ -680,6 +761,10 @@ export class BillService {
       if (billItemArr.length > 0) {
         new_bill = {
           ...newBill,
+          relation: {
+            links: creditNote,
+            type: 'CN',
+          },
           contact: contact.result,
           purchaseItems: billItemArr,
         };

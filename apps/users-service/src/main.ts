@@ -6,6 +6,8 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import * as cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import * as csurf from 'csurf';
 
 import { AppModule } from './app/app.module';
 
@@ -20,8 +22,10 @@ async function bootstrap() {
 
   app.enableCors(options);
   app.use(cookieParser());
+  app.use(helmet());
 
-  console.log(process.env['NODE' + '_ENV']);
+  // app.use(csurf());
+
   if (process.env['NODE' + '_ENV'] === 'production') {
     app.setGlobalPrefix('/users');
   }

@@ -6,7 +6,9 @@ import {
   HttpStatus,
   Param,
   Post,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { IPriceWithResponse } from '@invyce/interfaces';
 import { ParamsDto } from '../dto/item.dto';
 import { PriceDto } from '../dto/price.dto';
@@ -37,9 +39,12 @@ export class PriceController {
   }
 
   @Post()
-  async create(@Body() priceDto: PriceDto): Promise<IPriceWithResponse> {
+  async create(
+    @Body() priceDto: PriceDto,
+    @Req() req: Request
+  ): Promise<IPriceWithResponse> {
     try {
-      const price = await this.priceService.CreatePrice(priceDto);
+      const price = await this.priceService.CreatePrice(priceDto, req);
 
       if (price) {
         return {

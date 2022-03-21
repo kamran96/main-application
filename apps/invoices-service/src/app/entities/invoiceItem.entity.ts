@@ -18,11 +18,13 @@ export class InvoiceItems {
   @Column()
   description: string;
   @Column()
-  quantity: string;
+  quantity: number;
   @Column()
   itemDiscount: string;
   @Column()
-  unitPrice: number;
+  unitPrice: string;
+  @Column()
+  purchasePrice: string;
   @Column()
   accountId: number;
   @Column()
