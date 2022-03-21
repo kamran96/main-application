@@ -68,8 +68,6 @@ export const DashboardLayout: any = (props: RouteConfigComponentProps) => {
 
   const history = useHistory();
 
-  console.log('history', history);
-
   if (!isUserLogin) {
     return (
       <Redirect

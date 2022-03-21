@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { EditableListItem } from './editable-list-item';
 import { EditableTableWrapper } from './styles';
 import { Skeleton } from 'antd';
@@ -14,7 +14,7 @@ export interface EditableColumnsType {
   id?: string;
   ref?: any;
   width?: number;
-  render?: (data: any, row: unknown, index: number) => JSX.Element;
+  render?: (data: any, row: unknown, index: number) => JSX.Element | ReactNode;
 }
 
 export interface Scrollable {
@@ -141,11 +141,13 @@ export function EditableTable({
     setDragEnd(false);
   };
 
+  console.log(columns, 'collumns');
+
   return (
     <EditableTableWrapper scrollable={scrollable ? scrollable : null}>
       <table>
         <colgroup>
-          {columns.map((col, index) => {
+          {columns?.map((col, index) => {
             const style = { width: col?.width ? `${col.width}px` : '' };
             return <col key={index} style={style} />;
           })}
@@ -162,7 +164,7 @@ export function EditableTable({
           </tr>
         </thead>
         <tbody className="ant-table-tbody">
-          {tableData.map((item, index) => {
+          {tableData?.map((item, index) => {
             return (
               <EditableListItem
                 onMouseOver={() => setSelectedIndex(index)}

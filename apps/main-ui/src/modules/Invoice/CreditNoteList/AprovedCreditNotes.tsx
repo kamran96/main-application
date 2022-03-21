@@ -8,14 +8,14 @@ import styled from 'styled-components';
 import { getAllContacts, getCreditNotes } from '../../../api';
 import { CommonTable } from '../../../components/Table';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { IContactTypes, ISupportedRoutes } from '../../../modal';
+import { IInvoiceType, IContactTypes, ISupportedRoutes } from '../../../modal';
 import { IInvoiceResponse } from '../../../modal/invoice';
 import { ButtonTag } from '../../../components/ButtonTags';
 import editSolid from '@iconify-icons/clarity/edit-solid';
 import { SmartFilter } from '../../../components/SmartFilter';
 import { PDFICON } from '../../../components/Icons';
 import FilteringSchema from './FilteringSchema';
-import columns from './commonCols';
+import columns, { pdfCols, csvColumns } from './commonCols';
 
 export const AprovedCreditNotes: FC = () => {
   /* HOOKS HERE */
@@ -49,6 +49,7 @@ export const AprovedCreditNotes: FC = () => {
       1, // this specifies APPROVED CREDIT NOTES
       page,
       pageSize,
+      IInvoiceType.CREDITNOTE,
       query,
     ],
     getCreditNotes,
@@ -125,14 +126,6 @@ export const AprovedCreditNotes: FC = () => {
   const renderTopbarRight = () => {
     return (
       <div className="flex alignCenter">
-        <ButtonTag
-          disabled
-          className="mr-10"
-          ghost
-          title="Download PDF"
-          size="middle"
-          customizeIcon={<PDFICON className="flex alignCenter mr-10" />}
-        />
         <SmartFilter
           onFilter={(encode) => {
             const route = `/app${ISupportedRoutes?.CREDIT_NOTES}?tabIndex=aproved&page=1&page_size=20&query=${encode}`;
@@ -151,6 +144,7 @@ export const AprovedCreditNotes: FC = () => {
   return (
     <CreditNoteWrapper>
       <CommonTable
+        pdfExportable={{ columns: pdfCols }}
         loading={isLoading}
         columns={columns}
         data={result}
@@ -158,6 +152,10 @@ export const AprovedCreditNotes: FC = () => {
         customTopbar={renderCustomTableTobar()}
         topbarRightPannel={renderTopbarRight()}
         exportable
+        exportableProps={{
+          fileName: 'approved-credit-notes',
+          fields: csvColumns,
+        }}
         printTitle={'Credit Notes'}
         onChange={(pagination, filters, sorter: any, extra) => {
           setCreditNoteConfig({

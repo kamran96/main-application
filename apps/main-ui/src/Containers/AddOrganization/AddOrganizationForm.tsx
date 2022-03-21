@@ -278,7 +278,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
                 >
                   {en?.map((country) => {
                     return (
-                      <Option title={country?.name} value={`${country?.id}`}>
+                      <Option title={country?.name} value={`${country?.name}`}>
                         <img
                           className="mr-10"
                           alt="flag"

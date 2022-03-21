@@ -103,7 +103,6 @@ export const LoginForm: FC = () => {
           form={form}
           autoComplete="off"
           className="mt-20"
-          initialValues={{ remember: true }}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
         >
@@ -135,9 +134,9 @@ export const LoginForm: FC = () => {
                 <Input.Password size="large" autoComplete="off" />
               </Form.Item>
               <div className="actions-wrapper mv-10">
-                <Form.Item name="remember_me" valuePropName="checked">
+                {/* <Form.Item name="remember_me" valuePropName="checked">
                   <Checkbox>Remember Me</Checkbox>
-                </Form.Item>
+                </Form.Item> */}
                 <Button
                   type="link"
                   htmlType="button"
@@ -210,6 +209,9 @@ export const LoginFormWrapper = styled.div`
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+    button {
+      padding: 0;
+    }
   }
 
   .join_link {

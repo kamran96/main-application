@@ -1,5 +1,4 @@
 import printIcon from '@iconify-icons/bytesize/print';
-import downloadIcon from '@iconify/icons-bi/download';
 import {
   ExportTableButton,
   IExportFieldButtonProps,
@@ -8,11 +7,12 @@ import {
 import { Table, Skeleton } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { TableProps } from 'antd/lib/table';
-import React, {
+import {
   FC,
   ReactElement,
   useEffect,
-  useMemo,
+  Suspense,
+  lazy,
   useRef,
   useState,
 } from 'react';
@@ -21,11 +21,19 @@ import printDiv, { ConvertDivToPDFAndDownload } from '../../utils/Print';
 import { ButtonTag } from '../ButtonTags';
 import { PrintFormat } from '../PrintFormat';
 import { PrintHeaderFormat, TableDivisions } from '../PrintHeader';
-import { Addressbar, TopbarLogoWithDetails } from '../PrintHeader/Formats';
-import { PDFICON } from '../Icons';
+import {
+  Addressbar,
+  PrintTitle,
+  TopbarLogoWithDetails,
+} from '../PrintHeader/Formats';
 import { WrapperTable, DefaultWrapper } from './styles';
 import { useWindowSize } from '../../utils/useWindowSize';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import DummyLogo from '../../assets/quickbook.png';
 
+interface IPDFExportable {
+  columns?: any[];
+}
 interface IProps extends TableProps<any> {
   data?: any[];
   customTopbar?: React.ReactElement<any>;
@@ -46,7 +54,7 @@ interface IProps extends TableProps<any> {
   printColumns?: ColumnsType<any>;
   exportable?: boolean;
   exportableProps?: IExportFieldButtonProps;
-  pdfExportable?: boolean;
+  pdfExportable?: IPDFExportable | boolean;
   tableType?: 'primary' | `default`;
   themeScroll?: boolean;
   loading?: boolean;
@@ -85,6 +93,20 @@ export const CommonTable: FC<IProps> = ({
   tableType = 'primary',
   ...rest
 } = defaultProps) => {
+  // DYNAMIC IMPORTS
+
+  const TablePDF = lazy(() => import('./exportPDF'));
+  const { userDetails } = useGlobalContext();
+  const { organization } = userDetails;
+  const {
+    address: organizationAddress,
+    name: organizationName,
+    email: organizationEmail,
+    phoneNumber: organizationContact,
+    website,
+  } = organization;
+  const { city, country, postalCode } = organizationAddress;
+
   /* *****************COMPONENT STATES ************** */
   const [scrollConfig, setScrollConfig] = useState<any>({
     y: '100vh',
@@ -99,12 +121,13 @@ export const CommonTable: FC<IProps> = ({
 
   /* **************UTILITY CONSTANTS ************ */
   const _newData: any[] = data ? data : (rest?.dataSource as any[]);
-  console.log(_newData, 'new data');
 
-  const _exportableProps: IExportFieldButtonProps = exportableProps
+  const _exportableProps: IExportFieldButtonProps = exportableProps?.fields
     ? {
         dataSource: _newData,
         columns: columns,
+        disabled: !_newData.length,
+        showColumnPicker: true,
         ...exportableProps,
       }
     : {
@@ -175,7 +198,11 @@ export const CommonTable: FC<IProps> = ({
             <div className="flex-1 mr-10">{customTopbar}</div>
             <div className="flex alignCenter">
               {exportable && (
-                <div className="mr-10 flex alignCenter _exportable_button">
+                <div
+                  className={`mr-10 flex alignCenter _exportable_button ${
+                    _exportableProps?.disabled ? 'disabled ' : ''
+                  }`}
+                >
                   <ExportTableButton {..._exportableProps}>
                     Export to CSV
                   </ExportTableButton>
@@ -199,15 +226,37 @@ export const CommonTable: FC<IProps> = ({
                   icon={printIcon}
                 />
               )}
-              {pdfExportable && (
-                <ButtonTag
-                  onClick={onPDF}
-                  className="mr-10"
-                  ghost
-                  title="Download PDF"
-                  size="middle"
-                  customizeIcon={<PDFICON className="flex alignCenter mr-10" />}
-                />
+              {!!pdfExportable && tableData?.length > 0 && (
+                <Suspense fallback={null}>
+                  <TablePDF
+                    Header={{
+                      organizationName,
+                      city,
+                      country,
+                      title: printTitle,
+                      organizationContact,
+                      organizationEmail,
+                      address: '',
+                      code: postalCode,
+                      logo: DummyLogo,
+                      website,
+                    }}
+                    data={tableData}
+                    columns={
+                      typeof pdfExportable === 'boolean'
+                        ? printColumns
+                        : pdfExportable.columns
+                    }
+                  />
+                </Suspense>
+                // <ButtonTag
+                //   onClick={onPDF}
+                //   className="mr-10"
+                //   ghost
+                //   title="Download PDF"
+                //   size="middle"
+                //   customizeIcon={<PDFICON className="flex alignCenter mr-10" />}
+                // />
               )}
               {topbarRightPannel}
             </div>
@@ -286,6 +335,7 @@ export const CommonTable: FC<IProps> = ({
                   ]}
                 />
               </PrintHeaderFormat>
+              <PrintTitle title={printTitle} />
             </div>
             <div className={'antd-table-print'}>
               <Table

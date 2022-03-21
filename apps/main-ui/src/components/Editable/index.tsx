@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState, ReactElement } from 'react';
+import React, { FC, useEffect, useState, ReactNode } from 'react';
 import { Input, InputNumber, Tooltip } from 'antd';
 import { SizeType } from 'antd/lib/config-provider/SizeContext';
 import { ClickOutSide } from './../../utils/clickoutside';
@@ -113,7 +113,7 @@ export const Editable: FC<IProps> = ({
             />
           ) : (
             <div
-              className="rendered-text"
+              className={`rendered-text ${disabled ? 'disabled' : ''}`}
               onClick={() => setIsEditable(true)}
               title={inputVal ? inputVal : placeholder ? placeholder : ''}
             >
@@ -172,6 +172,9 @@ export const WrapperEditable = styled.div<WrapperProps>`
   input:focus {
     border-color: #ffffff14 !important;
   }
+  .ant-input {
+    padding: 8px 3px !important;
+  }
 
   .input-para {
     width: 100%;
@@ -194,7 +197,7 @@ export const WrapperEditable = styled.div<WrapperProps>`
   .rendered-text {
     height: 100%;
     color: #626262;
-    padding: 8px 11px;
+    padding: 8px 3px;
     display: block;
     border: 1px solid
       ${(props: WrapperProps) => (props?.error ? '#ff940f' : 'transparent')};
@@ -231,6 +234,9 @@ export const WrapperEditable = styled.div<WrapperProps>`
       } */
     }
   }
+  .rendered-text.disabled {
+    background: #d9d9d9 !important;
+  }
 
   &:hover {
     .tooltip {
@@ -252,10 +258,15 @@ interface IEditableSelectProps {
   placeholder?: string;
   optionFilterProp?: string | 'children';
   onChange?: (payload: any) => void;
-  children?: ReactElement<any>;
+  children?: ReactNode;
   onClick?: () => void;
   value?: any;
   error?: boolean;
+  options?: {
+    key: number | string;
+    value: number | string;
+    customizedRender?: ReactNode;
+  }[];
 }
 
 export const Option = Select.Option;
@@ -274,6 +285,7 @@ export const EditableSelect: FC<IEditableSelectProps> = ({
   onClick,
   value,
   error,
+  options,
 }) => {
   const [isEditable, setIsEditable] = useState(false);
   const [selectValue, setSelectValue] = useState(value);
@@ -324,7 +336,17 @@ export const EditableSelect: FC<IEditableSelectProps> = ({
             value={labelInValue ? selectValue : selectValue?.value}
             autoFocus
           >
-            {children}
+            {options
+              ? options?.map((optionItem, optionIndex) => {
+                  return (
+                    <Option key={optionItem.key} value={optionItem.value}>
+                      {optionItem?.customizedRender
+                        ? optionItem?.customizedRender
+                        : optionItem.value}
+                    </Option>
+                  );
+                })
+              : children}
           </Select>
         ) : (
           <div
@@ -343,10 +365,13 @@ export const EditableSelect: FC<IEditableSelectProps> = ({
 
 const WrapperEditableSelect = styled.div<any>`
   overflow: hidden;
+  .ant-input {
+    padding: 8px 3px !important;
+  }
   .rendered-text {
     font-size: 14px;
     color: #626262;
-    padding: 8px 11px;
+    padding: 8px 3px;
     display: block;
     border: 1px solid ${({ error }): any => (error ? '#ff940f' : 'transparent')};
     transition: 0.3s all ease-in-out;

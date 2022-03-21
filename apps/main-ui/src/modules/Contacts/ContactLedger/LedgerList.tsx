@@ -28,11 +28,14 @@ interface IProps {
 }
 
 export const LedgerList: FC<IProps> = ({ id, type }) => {
-  const [{ pagination, result }, setResponse] =
+  const accessor = type === IContactTypes.SUPPLIER ? 'bill' : 'invoice';
+
+  const [{ pagination, result, contact }, setResponse] =
     useState<IContactLedgerResponse>({
       pagination: {},
       result: [],
       opening_balance: null,
+      contact: null,
     });
 
   const [filterBar, setFilterbar] = useState<boolean>(false);
@@ -84,16 +87,22 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
         resolvedData.data
       );
 
+      console.log(resolvedResult, 'resolved result');
+
       const contact_ledger: any =
         (resolvedResult.result && resolvedResult.getGeneratedResult()) || [];
-      setResponse({ ...resolvedResult, result: contact_ledger });
+      setResponse({
+        ...resolvedResult,
+        result: contact_ledger,
+        contact: resolvedData?.data?.contact,
+      });
     }
   }, [resolvedData]);
 
   const columns: ColumnsType<any> = [
     {
       title: 'Invoice Number',
-      dataIndex: `${type === IContactTypes.CUSTOMER ? `invoice` : 'purchase'}`,
+      dataIndex: `${type === IContactTypes.CUSTOMER ? `invoice` : 'bill'}`,
       key: 'invoice',
       render: (data, row, index) => {
         return (
@@ -111,10 +120,10 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
     },
     {
       title: 'Date',
-      dataIndex: 'date',
+      dataIndex: `${type === IContactTypes.CUSTOMER ? `invoice` : 'bill'}`,
       key: 'date',
       render: (data, row, index) => {
-        return <>{dayjs(data).format(`MMMM D, YYYY h:mm A`)}</>;
+        return <>{dayjs(data?.issueDate).format(`MMMM D, YYYY h:mm A`)}</>;
       },
     },
     {
@@ -139,7 +148,9 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
       key: 'entryType',
       render: (data, row, index) => {
         const renderDebit = () => {
-          return data === IEntryType.DEBIT ? moneyFormat(row.amount) : '-';
+          return data === IEntryType.DEBIT || data === IEntryType?.DEBIT_NOTE
+            ? moneyFormat(row.amount)
+            : '-';
         };
 
         return <>{renderDebit()}</>;
@@ -151,7 +162,9 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
       key: 'entryType',
       render: (data, row) => {
         const renderCredits = () => {
-          return data === IEntryType.CREDIT ? moneyFormat(row.amount) : '-';
+          return data === IEntryType.CREDIT || data === IEntryType?.CREDIT_NOTE
+            ? moneyFormat(row.amount)
+            : '-';
         };
         return <>{renderCredits()}</>;
       },
@@ -236,6 +249,7 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
         </div>
       ) : (
         <CommonTable
+          printTitle={`${contact?.name.toLocaleUpperCase()} Ledger`}
           size="middle"
           customTopbar={<></>}
           hasPrint

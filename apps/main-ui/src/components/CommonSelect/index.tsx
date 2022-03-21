@@ -1,7 +1,7 @@
 import { Select } from 'antd';
 import { SizeType } from 'antd/lib/config-provider/SizeContext';
 import CSS from 'csstype';
-import React, { FC, ReactElement } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 interface IProps {
   className?: string;
@@ -13,7 +13,7 @@ interface IProps {
   placeholder?: string;
   optionFilterProp?: string | 'children';
   onChange?: (value: any, option: any) => void;
-  children?: ReactElement<any>;
+  children?: ReactNode;
   onClick?: () => void;
   value?: any;
   [key: string]: any;

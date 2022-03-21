@@ -1,5 +1,5 @@
-import { IThemeProps } from "./../../../hooks/useTheme/themeColors";
-import { createGlobalStyle } from "styled-components";
+import { IThemeProps } from './../../../hooks/useTheme/themeColors';
+import { createGlobalStyle } from 'styled-components';
 
 const CommandPlatteGlobalStyles = createGlobalStyle`
 .react-command-palette{
@@ -95,13 +95,13 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
   overflow-y: auto;
   overflow-x: hidden;
   border-top: 1px solid ${(props: IThemeProps) =>
-    props?.theme?.theme === "dark"
+    props?.theme?.theme === 'dark'
       ? props?.theme?.colors?.seprator
-      : "#cbcccd"};
+      : '#cbcccd'};
   border-bottom: 1px solid ${(props: IThemeProps) =>
-    props?.theme?.theme === "dark"
+    props?.theme?.theme === 'dark'
       ? props?.theme?.colors?.seprator
-      : "#cbcccd"};
+      : '#cbcccd'};
   max-height: 315px;
   margin-top: 10px;
 }
@@ -115,17 +115,17 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
 
 .invyce-suggestion {
   color: ${(props: IThemeProps) =>
-    props?.theme?.theme === "dark"
+    props?.theme?.theme === 'dark'
       ? props?.theme?.colors?.sidebarDefaultText
-      : "#3d3d3d"};
+      : '#3d3d3d'};
   border-left: 1px solid ${(props: IThemeProps) =>
-    props?.theme?.theme === "dark"
+    props?.theme?.theme === 'dark'
       ? props?.theme?.colors?.seprator
-      : "#cbcccd"};
+      : '#cbcccd'};
   border-right: 1px solid ${(props: IThemeProps) =>
-    props?.theme?.theme === "dark"
+    props?.theme?.theme === 'dark'
       ? props?.theme?.colors?.seprator
-      : "#cbcccd"};
+      : '#cbcccd'};
   border-top: 0px none;
   background-color: ${(props: IThemeProps) => props?.theme?.colors?.cmdbg};
   cursor: pointer;

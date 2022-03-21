@@ -1,11 +1,12 @@
+import { IContact } from '@invyce/interfaces';
 import {
   IBase,
   IBaseRequest,
   IBaseRequestResponse,
   IBaseResponse,
-} from "./base";
-import { IAddress } from "./invoice";
-import { PaymentMode } from "./payment";
+} from './base';
+import { IAddress } from './invoice';
+import { PaymentMode } from './payment';
 
 export enum IContactTypes {
   CUSTOMER = 1,
@@ -15,8 +16,13 @@ export enum IContactTypes {
 export enum IEntryType {
   CREDIT = 2,
   DEBIT = 1,
+  CREDIT_NOTE = 4,
+  DEBIT_NOTE = 5,
 }
 
+export interface IContactResut extends IBaseResponse {
+  result: IContactType[];
+}
 export interface IContactType extends IBase {
   id: number;
   businessName: string;
@@ -55,6 +61,8 @@ export class Contact {
 export interface IContactLedgerResponse extends IBaseRequest {
   result: IContactLedger[];
   opening_balance?: IContactOpeningBalance;
+  contact?: IContact;
+  [key: string]: any;
 }
 export interface IInitialBalance {
   amount: number;
@@ -66,11 +74,11 @@ export class IContactLedgerResp extends IBaseRequestResponse {
   result: IContactLedger[];
   opening_balance?: IContactOpeningBalance;
   initial_balance?: IInitialBalance;
-  contact: IContactType;
+  contact: IContactType | undefined;
 
   getMergedResult() {
     if (this.opening_balance?.amount) {
-      let generatedResult: IContactLedger[] | any[] = this.result;
+      const generatedResult: IContactLedger[] | any[] = this.result;
       generatedResult.splice(0, 0, {
         ...this.opening_balance,
       });
@@ -86,7 +94,7 @@ export class IContactLedgerResp extends IBaseRequestResponse {
           })
         : generatedResult;
     } else if (this.initial_balance && this.initial_balance.amount) {
-      let generatedResult: IContactLedger | any[] = this.result;
+      const generatedResult: IContactLedger | any[] = this.result;
       generatedResult.splice(0, 0, {
         ...this.initial_balance,
       });
@@ -117,52 +125,51 @@ export class IContactLedgerResp extends IBaseRequestResponse {
   }
 
   getGeneratedResult() {
-    let generatedResult = [];
+    const generatedResult: any = [];
     this.getMergedResult().forEach((item: IContactLedger, index) => {
       if (index === 0) {
-        const balance = ()=>{
-          if(this.contact?.contactType===IContactTypes.SUPPLIER){
-            if(item.entryType===IEntryType.DEBIT){
-              return -item.amount
-            }else{
-              return item.amount
+        const balance = () => {
+          if (this.contact?.contactType === IContactTypes.SUPPLIER) {
+            if (item.entryType === IEntryType.DEBIT) {
+              return -item.amount;
+            } else {
+              return item.amount;
             }
-          }else{
-            if(item.entryType===IEntryType.DEBIT){
-              return item.amount
-            }else{
-              return -item.amount
+          } else {
+            if (item.entryType === IEntryType.DEBIT) {
+              return item.amount;
+            } else {
+              return -item.amount;
             }
           }
-        }
+        };
         generatedResult.push({
           ...item,
           balance: balance(),
         });
       } else {
-        const balance = ()=>{
-          if(this.contact?.contactType===IContactTypes.SUPPLIER){
-            if(item.entryType===IEntryType.DEBIT){
-              return  generatedResult[index - 1].balance - item.amount
-            }else{
-              return  generatedResult[index - 1].balance + item.amount
+        const balance = () => {
+          if (this.contact?.contactType === IContactTypes.SUPPLIER) {
+            if (item.entryType === IEntryType.DEBIT) {
+              return generatedResult[index - 1].balance - item.amount;
+            } else {
+              return generatedResult[index - 1].balance + item.amount;
             }
-          }else{
-            if(item.entryType===IEntryType.DEBIT){
-              return  generatedResult[index - 1].balance + item.amount
-            }else{
-              return generatedResult[index - 1].balance - item.amount
+          } else {
+            if (item.entryType === IEntryType.DEBIT) {
+              return generatedResult[index - 1].balance + item.amount;
+            } else {
+              return generatedResult[index - 1].balance - item.amount;
             }
           }
-        }
+        };
         generatedResult?.push({
           ...item,
-          balance: balance()
+          balance: balance(),
         });
       }
     });
 
-    console.log({ generatedResult, res: this.result }, "generated result");
     return generatedResult;
   }
 }

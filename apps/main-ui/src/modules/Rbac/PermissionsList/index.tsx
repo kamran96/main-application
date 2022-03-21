@@ -125,6 +125,7 @@ export const PermissionList: FC = () => {
   return (
     <WrapperPermissionsList>
       <CommonTable
+        printTitle="Permissions List"
         onSelectRow={onRowSelections}
         loading={modulesFetching}
         customTopbar={renderCustomTopbar()}

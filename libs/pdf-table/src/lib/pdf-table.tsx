@@ -1,7 +1,51 @@
 import { ITableProps } from './types';
-import { View, StyleSheet, Text } from '@react-pdf/renderer';
+import { View, StyleSheet, Text, Font } from '@react-pdf/renderer';
+// import f1 from './fonts/RobotoSlab-Bold.ttf';
 
 /* eslint-disable-next-line */
+
+export function PdfTable({ data, columns }: ITableProps) {
+  return (
+    <View style={styles.tableContainer}>
+      <View style={styles.tableHeadersGroup}>
+        {columns.map((column, index) => {
+          return (
+            <Text
+              style={{
+                ...styles.th,
+                width: column.width ? column.width : '100%',
+              }}
+            >
+              {column.title}
+            </Text>
+          );
+        })}
+      </View>
+      <View style={styles.tableBody}>
+        {data?.map((dataItem: any, dataIndex: number) => {
+          return (
+            <View style={styles.tableBodyRow}>
+              {columns?.map((ci, cind) => {
+                return (
+                  <Text
+                    style={{
+                      ...styles.td,
+                      width: ci.width ? ci.width : '100%',
+                    }}
+                  >
+                    {ci.render
+                      ? ci.render(dataItem[ci.dataIndex], dataItem, dataIndex)
+                      : dataItem[ci?.dataIndex]}
+                  </Text>
+                );
+              })}
+            </View>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   tableContainer: {},
@@ -16,7 +60,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   th: {
-    fontSize: '9px',
+    fontSize: '10px',
     fontWeight: 400,
     textTransform: 'capitalize',
     color: '#e6e6e6',
@@ -27,7 +71,7 @@ const styles = StyleSheet.create({
   tableBodyRow: {
     flexDirection: 'row',
     borderBottomColor: '#cccccc',
-    borderBottomWidth: 1,
+    borderBottomWidth: '0.7px',
     alignItems: 'center',
     textAlign: 'center',
     fontStyle: 'bold',
@@ -42,34 +86,5 @@ const styles = StyleSheet.create({
     color: '#363636',
   },
 });
-
-export function PdfTable({ data, columns }: ITableProps) {
-  return (
-    <View style={styles.tableContainer}>
-      <View style={styles.tableHeadersGroup}>
-        {columns.map((column, index) => {
-          return (
-            <Text style={{ ...styles.th, width: 200 }}>{column.title}</Text>
-          );
-        })}
-      </View>
-      <View style={styles.tableBody}>
-        {data?.map((dataItem: any, dataIndex: number) => {
-          return (
-            <View style={styles.tableBodyRow}>
-              {columns?.map((ci, cind) => {
-                return (
-                  <Text style={{ ...styles.td, width: 200 }}>
-                    {dataItem[ci.dataIndex]}
-                  </Text>
-                );
-              })}
-            </View>
-          );
-        })}
-      </View>
-    </View>
-  );
-}
 
 export default PdfTable;

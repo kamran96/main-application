@@ -4,9 +4,7 @@ import addLine from '@iconify/icons-ri/add-line';
 import Icon from '@iconify/react';
 import { Button, Card, Form } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import { useEffectLoading } from '../../../../hooks/useEffectLoading';
 import dayjs from 'dayjs';
-import update from 'immutability-helper';
 import {
   createContext,
   FC,
@@ -22,25 +20,21 @@ import { SortableHandle } from 'react-sortable-hoc';
 import scrollIntoView from 'scroll-into-view';
 
 import {
+  creditNoteViewAPI,
   getAllContacts,
   getAllItems,
   getInvoiceByIDAPI,
   getInvoiceNumber,
 } from '../../../../api';
 import { getAccountsByTypeAPI } from '../../../../api/accounts';
-import CommonSelect, { Option } from '../../../../components/CommonSelect';
+import { Option } from '../../../../components/CommonSelect';
 import { Editable, EditableSelect } from '../../../../components/Editable';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { useShortcut } from '../../../../hooks/useShortcut';
-import {
-  Color,
-  IContactType,
-  IContactTypes,
-  PaymentMode,
-} from '../../../../modal';
+import { Color, IContactType, IContactTypes } from '../../../../modal';
 import { IAccountsResult } from '../../../../modal/accounts';
 import { ORDER_TYPE } from '../../../../modal/invoice';
-import { IItemsResult } from '../../../../modal/items';
+import { IItemsResult } from '@invyce/shared/types';
 import { IOrganizationType } from '../../../../modal/organization';
 import convertToRem from '../../../../utils/convertToRem';
 import {
@@ -49,12 +43,14 @@ import {
 } from '../../../../utils/formulas';
 import moneyFormat from '../../../../utils/moneyFormat';
 import { useWindowSize } from '../../../../utils/useWindowSize';
-import defaultItems, { defaultFormData, defaultPayment } from './defaultStates';
+import defaultItems, { defaultFormData } from './defaultStates';
 import { RemovedErrors } from './handlers';
 import styled from 'styled-components';
 import { invycePersist } from '@invyce/invyce-persist';
 import c from './key';
 import usePrevious from '../../../../hooks/usePrevious';
+import { useHistory } from 'react-router-dom';
+import { ISupportedRoutes, IInvoiceType } from '../../../../modal';
 
 export const PurchaseContext: any = createContext({});
 export const usePurchaseWidget: any = () => useContext(PurchaseContext);
@@ -64,16 +60,6 @@ interface IProps {
   type?: 'CN';
   id?: number;
   onSubmit?: (payload: any) => void;
-}
-
-interface IPaymentPayload {
-  paymentMode: number;
-  totalAmount: number;
-  totalDiscount: number;
-  dueDate: any;
-  paymentType?: number;
-  bankId?: number;
-  amount?: number | any;
 }
 
 const DragHandle = SortableHandle(() => (
@@ -88,12 +74,18 @@ let setStateTimeOut: any;
 
 export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   /* API STAKE */
-  const APISTAKE_GETORDERS = getInvoiceByIDAPI;
+  const history = useHistory();
+  const relation: { type: string } = history.location?.state as {
+    type: string;
+  };
 
   const [rowsErrors, setRowsErrors] = useState([]);
   const [width] = useWindowSize();
 
   /* ************ HOOKS *************** */
+  const { setItemsModalConfig, userDetails } = useGlobalContext();
+
+  const { organization } = userDetails;
 
   /* Component State Hooks */
   const [invoiceDiscount, setInvoiceDiscount] = useState(0);
@@ -102,7 +94,24 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   const [deleteIds, setDeleteIds] = useState([]);
   const [paymentReset, setPaymentReset] = useState(false);
 
-  const [contactType, setContactType] = useState(null);
+  const priceKey = 'unitPrice';
+
+  const { data: accountsData, isLoading: accountsLoading } = useQuery(
+    [`accounts-${type}-contactType=${IContactTypes.CUSTOMER}`, 'invoice'],
+    getAccountsByTypeAPI,
+    {
+      enabled:
+        userDetails?.organization.organizationType === IOrganizationType.SAAS,
+    }
+  );
+
+  const accountsList: IAccountsResult[] = accountsData?.data?.result || [];
+
+  const defaultAccountCode = '15001';
+
+  const [defaultAccount] = accountsList.filter(
+    (i) => i.code === defaultAccountCode
+  );
 
   const cachedInvoiceData = invycePersist(
     c.CACHEKEY + type,
@@ -177,23 +186,31 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
     AntForm.setFieldsValue(defaultFormData);
   }, [AntForm]);
 
-  const { notificationCallback, setItemsModalConfig, userDetails } =
-    useGlobalContext();
+  const APICATEGORYSTAKE =
+    relation?.type === IInvoiceType.PURCHASE_ENTRY ||
+    relation?.type === IInvoiceType.PURCHASE_ORDER
+      ? getInvoiceByIDAPI
+      : creditNoteViewAPI;
 
-  const { organization } = userDetails;
+  const key =
+    relation?.type === IInvoiceType.PURCHASE_ENTRY ||
+    relation?.type === IInvoiceType.PURCHASE_ORDER
+      ? 'purchaseItems'
+      : 'creditNoteItems';
 
   const { data: invoicesData, isLoading: invoiceLoading } = useQuery(
     [`${type}-${id}-view`, id],
-    APISTAKE_GETORDERS,
+    APICATEGORYSTAKE,
     {
-      enabled: !!id,
+      enabled: !!id && !!relation?.type,
       cacheTime: Infinity,
     }
   );
 
   const { data: invoiceNumberData, refetch: refetchInvoiceNumber } = useQuery(
     [null, ORDER_TYPE?.CREDIT_NOTE],
-    getInvoiceNumber
+    getInvoiceNumber,
+    { enabled: !id || id === null || relation?.type === IInvoiceType?.INVOICE }
   );
 
   useEffect(() => {
@@ -207,27 +224,19 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   useEffect(() => {
     if (invoicesData && invoicesData.data && invoicesData.data.result) {
       const { result } = invoicesData.data;
-      // const { payment } = result;
-      const { discount } = result;
 
-      const key = 'invoiceItems';
-      const itemsDiscount =
-        (result && totalDiscountInInvoice(result[key], 'itemDiscount', type)) ||
-        0;
-
-      const invoiceDiscount = discount - itemsDiscount;
       setInvoiceDiscount(invoiceDiscount);
-      delete result?.invoiceNumber;
-      setContactType(result?.contact?.contactType);
+      if (id && relation?.type) {
+        delete result?.invoiceNumber;
+      }
       AntForm.setFieldsValue({
         ...result,
         dueDate: dayjs(result.dueDate),
         issueDate: dayjs(result.issueDate),
-        invoiceDiscount,
       });
 
       const invoice_items = [];
-      result[key].forEach((item, index) => {
+      result[key]?.forEach((item, index) => {
         const purchasePrice = item.purchasePrice ? item.purchasePrice : 0;
         const unitPrice = item.unitPrice ? item.unitPrice : 0;
         const tax = item.tax ? item.tax : 0;
@@ -263,28 +272,12 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
     }
   );
 
-  const contactResult: IContactType[] = data?.data?.result || [];
+  const contactResult: IContactType[] =
+    data?.data?.result?.filter(
+      (contact: IContactType) => contact?.contactType === IContactTypes.CUSTOMER
+    ) || [];
 
   // Accounts Fetched By Types
-
-  const {
-    data: accountsData,
-    isLoading: accountsLoading,
-    isPreviousData,
-  } = useQuery(
-    [
-      `accounts-${type}-contactType=${contactType}`,
-      contactType === IContactTypes?.CUSTOMER ? 'invoice' : 'bill' || 'invoice',
-    ],
-    getAccountsByTypeAPI,
-    {
-      enabled:
-        userDetails?.organization.organizationType === IOrganizationType.SAAS &&
-        !!contactType,
-    }
-  );
-
-  const accountsList: IAccountsResult[] = accountsData?.data?.result || [];
 
   const getSubTotal = useCallback(() => {
     let subTotal = 0;
@@ -318,8 +311,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   }, [invoiceDiscount]);
 
   const NetTotal = useMemo(() => {
-    return GrandTotal.total - IDiscount;
-  }, [GrandTotal, IDiscount]);
+    return GrandTotal.total - invoiceDiscount;
+  }, [GrandTotal]);
 
   /*Query hook for  Fetching all items against ID */
   const { data: itemsData, isLoading: itemsLoading } = useQuery(
@@ -392,7 +385,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
       key: 'itemId',
       width: width > 1500 ? 220 : 190,
       align: 'left',
-
       className: `select-column`,
 
       render: (value, record, index) => {
@@ -428,26 +420,17 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
                     (item) => item.id === val.value
                   );
                   const allItems = [...prev];
-                  const unitPrice =
-                    (selectedItem &&
-                      selectedItem.price &&
-                      selectedItem.price.salePrice) ||
-                    0;
+
                   const purchasePrice =
-                    (selectedItem &&
-                      selectedItem.price &&
-                      selectedItem.price.purchasePrice) ||
+                    allItems[index].purchasePrice ||
+                    selectedItem?.price?.purchasePrice ||
                     0;
-                  const itemDiscount =
-                    (selectedItem &&
-                      selectedItem.price &&
-                      selectedItem.price.discount) ||
-                    '0';
-                  const tax =
-                    (selectedItem &&
-                      selectedItem.price &&
-                      selectedItem.price.tax) ||
-                    '0';
+                  const unitPrice =
+                    allItems[index].unitPrice ||
+                    selectedItem?.price?.salePrice ||
+                    0;
+
+                  const tax = selectedItem?.price?.tax || '0';
                   const costOfGoodAmount =
                     purchasePrice * allItems[index].quantity;
 
@@ -464,20 +447,22 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
                   //   allErrors[index] = { hasError: false };
                   //   setRowsErrors(allErrors);
                   // }
-
                   const description = `${selectedItem?.category?.title || ''}/`;
 
-                  const total = calculateInvoice(unitPrice, tax, itemDiscount);
+                  const total = calculateInvoice(unitPrice, tax, '0');
 
                   allItems[index] = {
                     ...allItems[index],
                     itemId: val.value,
-                    unitPrice: unitPrice.toFixed(2),
+                    purchasePrice,
+                    unitPrice,
                     tax,
-                    itemDiscount,
                     total,
                     costOfGoodAmount,
                     description,
+                    accountId: allItems[index].accountId
+                      ? allItems[index].accountId
+                      : defaultAccount?.id,
                     errors: RemovedErrors(allItems[index].errors, [
                       'itemId',
                       'unitPrice',
@@ -592,19 +577,13 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
               setStateTimeOut = setTimeout(() => {
                 if (value) {
                   setInvoiceItems((prev) => {
-                    const [selectedItem] = items.filter(
-                      (item) => item.id === record.itemId
-                    );
                     let quantity = value;
                     if (quantity === null || quantity === undefined) {
                       quantity = 0;
                     }
                     const allItems = [...prev];
-                    const unitPrice = record.unitPrice;
-                    const itemDiscount = record.itemDiscount;
 
                     const costOfGoodAmount = record.purchasePrice * quantity;
-                    const tax = record.tax;
 
                     const indexed = allItems[index].errors?.indexOf('quantity');
                     if (indexed !== -1 && allItems[index]?.errors?.length) {
@@ -612,7 +591,11 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
                     }
 
                     const total =
-                      calculateInvoice(unitPrice, tax, itemDiscount) * quantity;
+                      calculateInvoice(
+                        record[priceKey],
+                        record?.tax,
+                        record?.itemDiscount || '0'
+                      ) * quantity;
                     allItems[index] = {
                       ...allItems[index],
                       quantity,
@@ -642,24 +625,29 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
       render: (value, record, index) => {
         return (
           <Editable
-            error={
-              record?.errors?.length && record?.errors?.includes('unitPrice')
-            }
+            error={record?.errors?.length && record?.errors?.includes(key)}
             onChange={(value) => {
               clearTimeout(setStateTimeOut);
               setStateTimeOut = setTimeout(() => {
                 setInvoiceItems((prev) => {
                   const allItems = [...prev];
-                  const unitPrice = value;
-                  const itemDiscount = record.itemDiscount;
-                  const tax = record.tax;
+
+                  const row = {
+                    ...allItems[index],
+                    [priceKey]: value,
+                    itemDiscount: record?.itemDiscount,
+                    tax: record?.tax,
+                  };
                   const total =
-                    calculateInvoice(unitPrice, tax, itemDiscount) *
-                    parseInt(record.quantity);
+                    calculateInvoice(
+                      row[priceKey],
+                      row?.tax,
+                      row?.itemDiscount
+                    ) * parseInt(row?.quantity);
 
                   allItems[index] = {
-                    ...allItems[index],
-                    unitPrice,
+                    ...row,
+                    purchasePrice: value,
                     total,
                     errors: RemovedErrors(allItems[index].errors, 'unitPrice'),
                   };
@@ -670,56 +658,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
             }}
             type="number"
             value={value}
-            size={'middle'}
-          />
-        );
-      },
-    },
-    {
-      title: 'Disc %',
-      dataIndex: 'itemDiscount',
-      key: 'itemDiscount',
-      width: width > 1500 ? 150 : '',
-
-      render: (value, record, index) => {
-        return (
-          <Editable
-            error={
-              record?.errors?.length && record?.errors?.includes('itemDiscount')
-            }
-            disabled={!record.itemId}
-            type="text"
-            value={value}
-            onChange={(e) => {
-              const { value } = e.target;
-              clearTimeout(setStateTimeOut);
-              setStateTimeOut = setTimeout(() => {
-                setInvoiceItems((prev) => {
-                  const allItems = [...prev];
-                  let itemDiscount = value.replace(/\b0+/g, '');
-
-                  if (itemDiscount === '') {
-                    itemDiscount = '0';
-                  }
-                  const unitPrice = record.unitPrice;
-                  const tax = record.tax;
-                  const total =
-                    calculateInvoice(unitPrice, tax, itemDiscount) *
-                    parseInt(record.quantity);
-
-                  allItems[index] = {
-                    ...allItems[index],
-                    itemDiscount,
-                    total,
-                    errors: RemovedErrors(
-                      allItems[index].errors,
-                      'itemDiscount'
-                    ),
-                  };
-                  return allItems;
-                });
-              }, 400);
-            }}
             size={'middle'}
           />
         );
@@ -736,7 +674,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
                 error={
                   row?.errors?.length && row?.errors?.includes('accountId')
                 }
-                className={`border-less-select contacttype-${contactType}`}
+                className={`border-less-select contacttype-${IContactTypes.SUPPLIER}`}
                 value={{
                   value: value !== null ? value : '',
                   label:
@@ -849,14 +787,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
     });
   };
 
-  /* Scroll to last added item */
-
-  //   const handleScroll = () => {
-  //     let ele: HTMLElement = document.querySelector(".ant-table-tbody");
-
-  //     ele.lastElementChild.scrollIntoView();
-  //   };
-
   const handleAddRow = () => {
     const items = [...invoiceItems];
     items.push({ ...defaultItems, index: items.length });
@@ -884,15 +814,17 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
       AntForm.setFieldsValue(defaultFormData);
       refetchInvoiceNumber();
     }, 300);
+
+    history?.push(
+      `${ISupportedRoutes?.DASHBOARD_LAYOUT}${ISupportedRoutes?.ADD_CREDIT_NOTE}`,
+      null
+    );
   };
 
   useShortcut('i', handleAddRow);
   useShortcut('b', removeRowFromLastIndex);
   useShortcut('/', ClearAll);
 
-  const { loading: contactEffectLoading } = useEffectLoading(contactType);
-
-  console.log(accountsList, 'accountslist');
   return (
     <PurchaseContext.Provider
       value={{
@@ -920,14 +852,9 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
         setPaymentReset,
         ClearAll,
         handleAddRow,
-        isFetching:
-          itemsLoading ||
-          invoiceLoading ||
-          accountsLoading ||
-          contactEffectLoading,
-        contactType,
-        setContactType,
+        isFetching: itemsLoading || invoiceLoading || accountsLoading,
         accountsList,
+        relation,
       }}
     >
       <Wrapper>

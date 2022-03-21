@@ -24,7 +24,7 @@ import {
   ORDER_TYPE,
 } from '../../../../../modal/invoice';
 import { ISupportedRoutes } from '../../../../../modal/routing';
-import { _csvColumns } from './CommonCol';
+import { pdfColsPO, _csvColumns } from './CommonCol';
 import FilterSchema from './PoFilterSchema';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
 
@@ -212,6 +212,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   return (
     <ALlWrapper>
       <CommonTable
+        pdfExportable={{ columns: pdfColsPO }}
         exportable
         exportableProps={{
           fields: _csvColumns,
@@ -220,7 +221,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
         className={'border-top-none'}
         topbarRightPannel={renerTopRightbar()}
         hasPrint
-        printTitle={'Draft Purchase Orders List'}
+        printTitle={'Draft Purchase Orders '}
         customTopbar={
           <PurchaseTopbar
             disabled={!selectedRow.length}

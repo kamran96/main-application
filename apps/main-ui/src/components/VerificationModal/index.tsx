@@ -1,17 +1,16 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import styled, { keyframes } from 'styled-components';
 import CommonModal from '../Modal';
 import ReactInputVerificationCode from 'react-input-verification-code';
 import { Button, Form } from 'antd';
 import convertToRem from '../../utils/convertToRem';
-import { useQueryClient, useMutation, useQuery } from 'react-query';
+import { useMutation } from 'react-query';
 import { resendVerificationCodeAPI, verifyAccountAPI } from '../../api';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { IErrorMessages, IServerError, NOTIFICATIONTYPE } from '../../modal';
 import { useState } from 'react';
 
 export const VerificationModal: FC = () => {
-  const queryCache = useQueryClient();
   const {
     userDetails,
     notificationCallback,

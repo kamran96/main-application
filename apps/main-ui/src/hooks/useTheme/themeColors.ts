@@ -144,7 +144,7 @@ export const Themes: IThemes = {
     sidebarDefaultText: ` #CED3DA;`,
     tableRowHover: '#fafafa',
     td: `#08131D`,
-    bgTh: `#0B1822`,
+    bgTh: `#060e15`,
     textTd: `rgba(255, 255, 255, 0.6)`,
     seprator: `#1e1e1e`,
     modalOverlay: `rgb(128 128 128 / 45%)`,

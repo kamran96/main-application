@@ -23,10 +23,9 @@ import moneyFormat from '../../../utils/moneyFormat';
 import { useWindowSize } from '../../../utils/useWindowSize';
 import { CommonTable } from './../../../components/Table';
 import AccountsFilterringSchema from './AccountsFilteringSchema';
-import { _csvColumnsAccount } from './exportableCols';
+import { pdfColsAccounts, _csvColumnsAccount } from './exportableCols';
 import { AccountsWrapper, ListWrapper } from './styles';
 import { IErrorResponse } from '@invyce/shared/types';
-import { PdfTable } from '@invyce/pdf-table';
 
 interface IProps {
   columns: ColumnsType;
@@ -189,8 +188,8 @@ export const AccountsList: FC<IProps> = ({ data }) => {
       },
       {
         title: 'Type',
-        dataIndex: 'type',
-        key: 'type',
+        dataIndex: 'secondaryName',
+        key: 'secondaryName',
       },
       {
         width: 100,
@@ -212,7 +211,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
       },
       {
-        title: 'Amount',
+        title: 'Balance',
         dataIndex: 'balance',
         key: 'balance',
         render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
@@ -263,14 +262,6 @@ export const AccountsList: FC<IProps> = ({ data }) => {
   const topbarRightPannel = () => {
     return (
       <div className="flex alignCenter">
-        <ButtonTag
-          disabled
-          className="mr-10"
-          ghost
-          title="Download PDF"
-          size="middle"
-          customizeIcon={<PDFICON className="flex alignCenter mr-10" />}
-        />
         <SmartFilter
           onFilter={(encode) => {
             setAccountConfig({ ...accountsConfig, query: encode });
@@ -324,6 +315,9 @@ export const AccountsList: FC<IProps> = ({ data }) => {
     <AccountsWrapper ref={ref}>
       <ListWrapper>
         <CommonTable
+          pdfExportable={{
+            columns: pdfColsAccounts,
+          }}
           themeScroll
           printTitle={'Chart of Accounts List'}
           exportable

@@ -26,7 +26,7 @@ import {
   ORDER_TYPE,
 } from '../../../../../modal';
 import convertToRem from '../../../../../utils/convertToRem';
-import { _csvExportable } from './CommonCol';
+import { PDFColsBills, _csvExportable } from './CommonCol';
 import FilterSchema from './PoFilterSchema';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
 
@@ -223,12 +223,13 @@ export const ALLBillsList: FC<IProps> = ({ columns, activeTab }) => {
   return (
     <ALlWrapper>
       <CommonTable
+        pdfExportable={{ columns: PDFColsBills }}
         exportable
         exportableProps={{
           fields: _csvExportable,
           fileName: 'approved-purchases',
         }}
-        printTitle={'Approved Purchase Orders List'}
+        printTitle={'Approved Bills '}
         className={'border-top-none'}
         hasPrint
         topbarRightPannel={renerTopRightbar()}

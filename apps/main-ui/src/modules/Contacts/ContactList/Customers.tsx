@@ -22,6 +22,7 @@ import { PERMISSIONS } from '../../../components/Rbac/permissions';
 import moneyFormat from '../../../utils/moneyFormat';
 import ContactsImport from '../ContactsImport';
 import { useHistory } from 'react-router-dom';
+import { pdfCols } from './pdfCols';
 
 export const Customers: FC = () => {
   /* HOOKS */
@@ -261,14 +262,7 @@ export const Customers: FC = () => {
     return (
       <div className="flex alignCenter">
         <ContactsImport />
-        <ButtonTag
-          disabled
-          className="mr-10"
-          ghost
-          title="Download PDF"
-          size="middle"
-          customizeIcon={<PDFICON className="flex alignCenter mr-10" />}
-        />
+
         <SmartFilter
           onFilter={(encode) => {
             const route = `/app/contacts?tabIndex=customers&sortid=${sortid}&page=1&page_size=20&query=${encode}`;
@@ -294,6 +288,7 @@ export const Customers: FC = () => {
       <ContactListWrapper>
         <div className="table_container">
           <CommonTable
+            pdfExportable={{ columns: pdfCols }}
             printTitle={'Customers List'}
             customTopbar={renderCustomTopbar()}
             topbarRightPannel={renderTopbarRight()}

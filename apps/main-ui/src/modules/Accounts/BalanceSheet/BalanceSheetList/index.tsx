@@ -82,62 +82,6 @@ export const BalanceSheetList: FC = () => {
   useEffect(() => {
     if (data && data.data && data.data.result) {
       const { result } = data.data;
-
-      // let newResult: IBalanceSheetData[] | any[] = [
-      //   "Fixed Assets",
-      //   "Current Assets",
-      //   "Fixed Liability",
-      //   `Current Liability`,
-      //   "Equity",
-      // ]
-      //   .map((item, index) => {
-      //     const filtered: IAccountsResult[] = result.filter(
-      //       (fItem: IAccountsResult) => fItem.secondary_account.name === item
-      //     );
-
-      //     let { balance } = filtered.length
-      //       ? filtered.reduce((a, b) => {
-      //           return { balance: a.balance + b.balance };
-      //         })
-      //       : { balance: 0 };
-      //     if (filtered?.length) {
-      //       return {
-      //         name: item,
-      //         balance,
-      //         type: ["Fixed Assets", "Current Assets"].includes(item)
-      //           ? ITransactionType.DEBIT
-      //           : ITransactionType.CREDIT,
-      //         accounts: filtered,
-      //       };
-      //     } else {
-      //       return null;
-      //     }
-      //   })
-      //   .filter((item) => item !== null);
-
-      // let debit = newResult.filter(
-      //   (item) => item.type === ITransactionType.DEBIT
-      // );
-      // let credits = newResult.filter(
-      //   (item) => item.type === ITransactionType.CREDIT
-      // );
-
-      // const { balance: totalDebits } = (debit?.length &&
-      //   debit.reduce((a, b) => {
-      //     return {
-      //       balance: a?.balance ? a.balance : 0 + b?.balance ? b.balance : 0,
-      //     };
-      //   })) || { balance: 0 };
-
-      // const { balance: totalCredits } = (credits?.length &&
-      //   credits.reduce((a, b) => {
-      //     return {
-      //       balance: a?.balance ? a.balance : 0 + b?.balance ? b.balance : 0,
-      //     };
-      //   })) || { balance: 0 };
-
-      // setTotals({ totalDebits, totalCredits });
-
       setBalanceSheet(result);
     }
   }, [data]);

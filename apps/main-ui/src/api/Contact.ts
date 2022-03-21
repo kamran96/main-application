@@ -45,7 +45,7 @@ export const getContactLedger = ({ queryKey }: QueryKey) => {
   const query: string = queryKey[3];
   const page_size: number = queryKey[4];
   const page_no: number = queryKey[5];
-  let url = `/contacts/ledger/${id}?type=${type}&page_size=${page_size}&page_no=${page_no}`;
+  let url = `/contacts/contact/ledger/${id}?type=${type}&page_size=${page_size}&page_no=${page_no}`;
   if (query) {
     url = `${url}&query=${query}`;
   }

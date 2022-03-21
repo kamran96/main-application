@@ -27,12 +27,12 @@ export const RoutingSchema: IRoutingSchema = {
       children: [],
       icon: viewDashboardOutline,
     },
-    {
-      tag: 'Banking',
-      route: `/app${ISupportedRoutes?.BANK_RECONSILATION}`,
-      children: [],
-      icon: viewDashboardOutline,
-    },
+    // {
+    //   tag: 'Banking',
+    //   route: `/app${ISupportedRoutes?.BANK_RECONSILATION}`,
+    //   children: [],
+    //   icon: viewDashboardOutline,
+    // },
     {
       tag: 'Business',
       icon: coinsIcon,
@@ -49,6 +49,11 @@ export const RoutingSchema: IRoutingSchema = {
         {
           route: `${root}${ISupportedRoutes.CREDIT_NOTES}`,
           tag: 'Credit Notes',
+          permission: PERMISSIONS.INVOICES_INDEX,
+        },
+        {
+          route: `${root}${ISupportedRoutes.DEBIT_NOTES}`,
+          tag: 'Debit Notes',
           permission: PERMISSIONS.INVOICES_INDEX,
         },
         {
@@ -143,13 +148,16 @@ export const RoutingSchema: IRoutingSchema = {
       icon: shoppingCart,
       permission: PERMISSIONS.ITEMS_INDEX,
     },
-    {
-      tag: 'Categories',
-      route: `${root}${ISupportedRoutes.Categories}`,
-      children: [],
-      icon: layersIcon,
-      permission: PERMISSIONS.CATEGORIES_INDEX,
-    },
+
+    //**** Un Comment to enable Categories in sidebar */
+
+    // {
+    //   tag: 'Categories',
+    //   route: `${root}${ISupportedRoutes.Categories}`,
+    //   children: [],
+    //   icon: layersIcon,
+    //   permission: PERMISSIONS.CATEGORIES_INDEX,
+    // },
     {
       tag: 'Dispatching',
       route: `${root}${ISupportedRoutes.DISPATCHING}`,
@@ -199,6 +207,11 @@ export const RoutingSchema: IRoutingSchema = {
     {
       route: `${root}${ISupportedRoutes.ADD_CREDIT_NOTE}`,
       tag: 'Credit Note',
+      icon: billIcon,
+    },
+    {
+      route: `${root}${ISupportedRoutes.ADD_DEBIT_NOTE}`,
+      tag: 'Debit Note',
       icon: billIcon,
     },
   ],

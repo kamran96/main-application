@@ -8,7 +8,7 @@ import { ReactNode } from 'react';
 import { FC } from 'react';
 import { useMutation } from 'react-query';
 import { updateThemeAPI } from '../../api';
-import { InyvceDarkTextIcon } from '../../assets/icons';
+import { InyvceDarkTextIcon, InyvceLightTextIcon } from '../../assets/icons';
 import { useRbac } from '../../components/Rbac/useRbac';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { ILoginActions } from '../../hooks/globalContext/globalManager';
@@ -86,7 +86,13 @@ export const AppLayout: FC<IProps> = ({ children }) => {
         <section className="layout">
           {/* <Sidebar/> */}
           <SidebarUi
-            appLogo={<InyvceDarkTextIcon />}
+            appLogo={
+              theme === 'dark' ? (
+                <InyvceLightTextIcon />
+              ) : (
+                <InyvceDarkTextIcon />
+              )
+            }
             activeUserInfo={{
               userEmail: userDetails?.profile?.email,
               username: userDetails?.username,

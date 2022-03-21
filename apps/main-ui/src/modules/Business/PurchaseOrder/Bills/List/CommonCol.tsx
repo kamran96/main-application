@@ -1,5 +1,6 @@
 import { ITableExportFields } from 'ant-table-extensions';
 import { ColumnsType } from 'antd/es/table';
+import { Capitalize } from '../../../../../components/Typography';
 import { plainToClass } from 'class-transformer';
 import dayjs from 'dayjs';
 import React from 'react';
@@ -25,16 +26,16 @@ export const PurchaseOrderColumns: ColumnsType<any> = [
     key: 'reference',
   },
   {
-    title: 'Comment',
-    dataIndex: 'comment',
-    key: 'comment',
-    render: (data) => <>{data ? data : '-'}</>,
-  },
-  {
     title: 'Supplier',
     dataIndex: 'contact',
     key: 'contact',
-    render: (data, row, index) => <>{data ? data.name : '-'}</>,
+    render: (data, row, index) => (
+      <Link
+        to={`${ISupportedRoutes.DASHBOARD_LAYOUT}${ISupportedRoutes?.CONTACTS}/${data?.id}?type=supplier`}
+      >
+        <Capitalize>{data ? data.name : '-'}</Capitalize>
+      </Link>
+    ),
   },
 
   {
@@ -58,7 +59,15 @@ export const PurchaseOrderColumns: ColumnsType<any> = [
     dataIndex: 'paid_amount',
     key: 'paid_amount',
     render: (data) => {
-      return <>{data ? moneyFormat(Math.abs(data)) : '-'}</>;
+      return <>{data ? moneyFormat(Math.abs(data)) : moneyFormat(0)}</>;
+    },
+  },
+  {
+    title: 'Due Amount',
+    dataIndex: 'due_amount',
+    key: 'due_amount',
+    render: (data) => {
+      return <>{data ? moneyFormat(Math.abs(data)) : moneyFormat(0)}</>;
     },
   },
   {
@@ -87,6 +96,72 @@ export const PurchaseOrderColumns: ColumnsType<any> = [
   },
 ];
 
+export const PDFColsBills: ColumnsType<any> = [
+  {
+    title: 'Order No#',
+    dataIndex: 'invoiceNumber',
+    key: 'invoiceNumber',
+  },
+
+  {
+    title: 'Ref',
+    dataIndex: 'reference',
+    key: 'reference',
+  },
+  {
+    title: 'Supplier',
+    dataIndex: 'contact',
+    key: 'contact',
+    render: (data, row, index) => (data ? data.name : '-'),
+  },
+
+  {
+    title: 'Date Raised',
+    dataIndex: 'issueDate',
+    key: 'issueDate',
+    render: (data, row, index) => dayjs(data).format(`	MMMM D, YYYY`),
+  },
+  {
+    title: 'Delivery Date',
+    dataIndex: 'dueDate',
+    key: 'dueDate',
+    render: (data, row, index) =>
+      (data && dayjs(data).format(`MMMM D, YYYY`)) || `-`,
+  },
+  {
+    title: 'Paid Amount',
+    dataIndex: 'paid_amount',
+    key: 'paid_amount',
+    render: (data) => {
+      return data ? moneyFormat(Math.abs(data)) : moneyFormat(0);
+    },
+  },
+  {
+    title: 'Due Amount',
+    dataIndex: 'due_amount',
+    key: 'due_amount',
+    render: (data) => {
+      return data ? moneyFormat(Math.abs(data)) : moneyFormat(0);
+    },
+  },
+
+  {
+    title: 'Total',
+    dataIndex: 'netTotal',
+    key: 'netTotal',
+    render: (data) => (data ? moneyFormat(data) : moneyFormat(0)),
+  },
+  {
+    title: 'Status',
+    dataIndex: '',
+    key: '',
+    render: (data, row, index) => {
+      const rowData = plainToClass(InvoiceResultClass, row);
+      return row && rowData.getStatus();
+    },
+  },
+];
+
 export const _csvExportable: ITableExportFields = {
   invoiceNumber: 'Order Number',
   reference: 'Reference',
@@ -96,11 +171,11 @@ export const _csvExportable: ITableExportFields = {
       return data === true ? 'Returned' : '';
     },
   },
-  comment: 'Comment',
+
   contact: {
     header: 'Supplier',
     formatter: (data) => {
-      return data.name;
+      return data?.name;
     },
   },
   issueDate: {
@@ -115,14 +190,11 @@ export const _csvExportable: ITableExportFields = {
       return data ? dayjs(data).format(`MM/DD/YYYY h:mm A`) : '-';
     },
   },
-  purchase_items: {
-    header: 'Items Count',
-    formatter: (data) => {
-      return data.length;
-    },
-  },
+  paid_amount: 'Paid Amount',
+  due_amount: 'Due Amount',
+
   netTotal: {
     header: 'Total',
-    formatter: (data) => (data ? moneyFormat(data) : ''),
+    formatter: (data) => (data ? data : ''),
   },
 };

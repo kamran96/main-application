@@ -284,6 +284,7 @@ export const PopupGlobalStyles = createGlobalStyle`
 
 .open_popover{
   z-index: 1111 !important;
+  width: 199px !important;
 }
 
 `;

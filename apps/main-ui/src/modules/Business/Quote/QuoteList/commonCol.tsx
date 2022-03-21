@@ -47,3 +47,41 @@ export const QuoteColumns: ColumnsType<any> = [
     key: 'netTotal',
   },
 ];
+
+export const PDFQuotesCols: ColumnsType<any> = [
+  {
+    title: 'Invoice Number',
+    dataIndex: 'invoiceNumber',
+    key: 'invoiceNumber',
+  },
+  {
+    title: 'Ref',
+    dataIndex: 'reference',
+    key: 'reference',
+  },
+  {
+    title: 'Customer',
+    dataIndex: 'contact',
+    key: 'contact',
+    render: (data) => (data && data.name) || '-',
+  },
+
+  {
+    title: 'Date',
+    dataIndex: 'issueDate',
+    key: 'issueDate',
+    render: (data, row, index) => dayjs(data).format(`MMMM D, YYYY h:mm A`),
+  },
+  // {
+  //   title: 'Items',
+  //   dataIndex: 'invoiceItems',
+  //   key: 'invoiceItems',
+  //   render: (data: any[]) =>
+  //     data.length === 1 ? `${data?.length} Item` : `${data?.length} Items`,
+  // },
+  {
+    title: 'Amount',
+    dataIndex: 'netTotal',
+    key: 'netTotal',
+  },
+];

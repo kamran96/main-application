@@ -23,7 +23,7 @@ import {
   ORDER_TYPE,
 } from '../../../modal/invoice';
 import { ISupportedRoutes } from '../../../modal/routing';
-import { _exportableCols } from './commonCol';
+import { PdfCols, _exportableCols } from './commonCol';
 import InvoicesFilterSchema from './InvoicesFilterSchema';
 
 interface IProps {
@@ -46,12 +46,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   const { notificationCallback } = useGlobalContext();
 
   useEffect(() => {
-    if (
-      routeHistory &&
-      routeHistory.history &&
-      routeHistory.history.location &&
-      routeHistory.history.location.search
-    ) {
+    if (routeHistory?.history?.location?.search) {
       let obj = {};
       const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
@@ -78,12 +73,8 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   const allContacts = useQuery([`all-contacts`, 'ALL'], getAllContacts);
 
   useEffect(() => {
-    if (
-      allContacts.data &&
-      allContacts.data.data &&
-      allContacts.data.data.result
-    ) {
-      const { result } = allContacts.data.data;
+    if (allContacts?.data?.data?.result) {
+      const { result } = allContacts?.data?.data;
       const schema = invoiceFiltersSchema;
       schema.contactId.value = result.filter(
         (item) => item.contactType === IContactTypes.CUSTOMER
@@ -132,6 +123,8 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
     }
   }, [resolvedData]);
 
+  console.log(result, 'list');
+
   /* Function select rows and to set selectedRow state */
 
   const handleDelete = async () => {
@@ -179,13 +172,6 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   const renderTobarRight = () => {
     return (
       <div className="flex alignCenter">
-        <Button
-          className="mr-10 flex alignCenter _print_button"
-          disabled={true}
-          type="ghost"
-        >
-          <PDFICON className="flex alignCenter mr-10" /> Download as PDF
-        </Button>
         <SmartFilter
           onFilter={(encode) => {
             setAllInvoicesConfig({ ...allInvoicesConfig, query: encode });
@@ -204,6 +190,9 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
     <>
       <CommonTable
         // themeScroll
+        pdfExportable={{
+          columns: PdfCols,
+        }}
         className="border-top-none"
         topbarRightPannel={renderTobarRight()}
         hasPrint

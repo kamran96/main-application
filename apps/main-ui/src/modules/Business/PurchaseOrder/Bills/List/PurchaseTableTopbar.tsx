@@ -87,14 +87,6 @@ export const PurchaseTopbar: FC<IProps> = ({
         </Button>
       </div>
       <div className={'_print flex alignCenter'}>
-        <Button
-          className="mr-10 flex alignCenter _print_button"
-          disabled={disabled}
-          type="ghost"
-        >
-          <PDFICON className="flex alignCenter mr-10" /> Download as PDF
-        </Button>
-
         <div className="filter_space">{renderSmartFilter}</div>
       </div>
     </WrapperPurchaseTopbar>

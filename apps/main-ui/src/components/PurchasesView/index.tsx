@@ -21,7 +21,12 @@ import {
   pushDraftToPurchaseAPI,
 } from '../../api';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
-import { IAddress, IInvoiceItem, IInvoiceResult } from '../../modal';
+import {
+  IAddress,
+  IInvoiceItem,
+  IInvoiceResult,
+  IInvoiceType,
+} from '@invyce/shared/types';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import {
   IErrorMessages,
@@ -31,14 +36,13 @@ import {
   PaymentMode,
 } from '../../modal';
 import dayjs from 'dayjs';
-import { getAllUsers } from '../../api/users';
 import { useRef } from 'react';
 import { PERMISSIONS } from '../Rbac/permissions';
 import printDiv, {
   ConvertDivToPDFAndDownload,
   DownloadPDF,
 } from '../../utils/Print';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import CommonModal from '../Modal';
 import { EmailModal } from './Email';
 import { Payment } from '../Payment';
@@ -46,7 +50,9 @@ import { IThemeProps } from '../../hooks/useTheme/themeColors';
 import { PrintFormat } from '../PrintFormat';
 import { PrintViewPurchaseWidget } from '../PurchasesWidget/PrintViewPurchaseWidget';
 import { totalDiscountInInvoice } from '../../utils/formulas';
-import { getBanks } from '../../api/accounts';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import { InvoicePDF } from '../PDFs';
+import DummyLogo from '../../assets/quickbook.png';
 interface IProps {
   type?: 'SI' | 'PO' | 'credit-note';
   id?: number;
@@ -106,9 +112,11 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
 
   /* **************UTILITY HOOKS**************** */
   const { rbac } = useRbac(null);
-  const { userDetails, notificationCallback, handleUploadPDF, routeHistory } =
+  const { userDetails, notificationCallback, handleUploadPDF } =
     useGlobalContext();
-  const { history } = routeHistory;
+
+  const history = useHistory();
+
   /* ************ QUERIES & MUTATIONS **************  */
   const { data, isLoading } = useQuery([`invoice-view-${id}`, id], APISTAKE, {
     enabled: !!id,
@@ -116,10 +124,6 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
 
   const response: IInvoiceResult =
     (data && data.data && data.data.result) || {};
-
-  const address: IAddress[] =
-    (response && response.contact && response.contact.addresses) || [];
-  const orgInfo = userDetails.organization;
 
   const { mutate: mutateApprove, isLoading: approving } =
     useMutation(APISTAKE_APPROVED);
@@ -136,6 +140,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
   const [tableData, setTableData] = useState<IInvoiceItem[]>([]);
   const [paymentModal, setPaymentModal] = useState(false);
   const [payment, setPayment] = useState<IPaymentPayload>({ ...defaultStates });
+
   /* LOCAL STATES ENDS HERE */
 
   /* ***** COMPONENT LIFE CYCLES */
@@ -174,13 +179,20 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
     ConvertDivToPDFAndDownload(PrintItem);
   };
   function handleMenuClick(e) {
+    const creditNoteRoute =
+      response?.invoiceType === 'POE'
+        ? ISupportedRoutes?.ADD_DEBIT_NOTE
+        : ISupportedRoutes?.ADD_CREDIT_NOTE;
     switch (e?.key) {
       case IInvoiceActions?.APPROVE:
         setPaymentModal(true);
         break;
       case IInvoiceActions?.PROCEED:
         history.push(
-          `/app${ISupportedRoutes.CREATE_PURCHASE_Entry}/${response.id}`
+          `/app${ISupportedRoutes.CREATE_PURCHASE_Entry}/${response.id}`,
+          {
+            type: response?.invoiceType,
+          }
         );
         break;
       case IInvoiceActions?.DOWNLOAD_PDF:
@@ -193,7 +205,9 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
         break;
 
       case IInvoiceActions?.CREDIT_NOTE:
-        history?.push(`/app${ISupportedRoutes?.ADD_CREDIT_NOTE}/${id}`);
+        history?.push(`/app${creditNoteRoute}/${id}`, {
+          type,
+        });
         break;
       case IInvoiceActions?.PRINT:
         onPrint();
@@ -315,6 +329,12 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
       : netTotal - Math.abs(paid_amount);
   };
 
+  const priceAccessor =
+    response?.invoiceType === IInvoiceType.DEBITNOTE ||
+    response?.invoiceType === IInvoiceType?.PURCHASE_ENTRY
+      ? 'purchasePrice'
+      : 'unitPrice';
+
   /* *********************CALCULATIONS ENDS HERE**************** */
   const columns: ColumnsType = [
     {
@@ -337,14 +357,19 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
     },
     {
       title: 'RATE',
-      dataIndex: type === 'PO' ? `purchasePrice` : `unitPrice`,
+      dataIndex: priceAccessor,
       key: type === 'PO' ? `purchasePrice` : `unitPrice`,
+      render: (data) => moneyFormat(data),
     },
-    {
-      title: 'DISCOUNT',
-      dataIndex: 'itemDiscount',
-      key: 'itemDiscount',
-    },
+    response?.invoiceType !== IInvoiceType?.CREDITNOTE &&
+    response?.invoiceType !== IInvoiceType?.DEBITNOTE
+      ? {
+          title: 'DISCOUNT',
+          dataIndex: 'itemDiscount',
+          key: 'itemDiscount',
+          render: (data) => moneyFormat(data),
+        }
+      : {},
     {
       title: 'TAX',
       dataIndex: 'tax',
@@ -354,6 +379,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
       title: 'TOTAL',
       dataIndex: 'total',
       key: 'total',
+      render: (data) => moneyFormat(data),
     },
   ];
 
@@ -378,16 +404,14 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
       permission: null,
       key: IInvoiceActions.PRINT,
     },
-    {
+
+    (response.invoiceType === IInvoiceType?.PURCHASE_ENTRY ||
+      response.invoiceType === IInvoiceType?.INVOICE) && {
       title: 'Add Credit note',
       permission: PERMISSIONS?.INVOICES_CREATE,
       key: IInvoiceActions.CREDIT_NOTE,
     },
-    {
-      title: 'Download as PDF',
-      permission: null,
-      key: IInvoiceActions.DOWNLOAD_PDF,
-    },
+
     {
       title: 'Email',
       permission: null,
@@ -399,17 +423,77 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
       key: IInvoiceActions.CHANGE_DUE_DATE,
     },
   ];
+  const { organization } = userDetails;
+  const {
+    address: organizationAddress,
+    name: organizationName,
+    email: organizationEmail,
+    phoneNumber: organizationContact,
+    website,
+  } = organization;
+  const { city, country, postalCode } = organizationAddress;
+
+  const headerprops = {
+    organizationName,
+    city,
+    country,
+    title: '',
+    organizationContact,
+    organizationEmail,
+    address: '',
+    code: postalCode,
+    logo: DummyLogo,
+    website,
+  };
+
   const menu = (
     <Menu onClick={handleMenuClick}>
-      {_options?.map((option, index) => {
-        return rbac.can(option?.permission) || option?.permission === null ? (
-          <Menu.Item key={option?.key}>{option?.title}</Menu.Item>
-        ) : null;
-      })}
+      <>
+        {_options?.map((option, index) => {
+          return rbac.can(option?.permission) || option?.permission === null ? (
+            <Menu.Item key={option?.key}>{option?.title}</Menu.Item>
+          ) : null;
+        })}
+        {response?.contact ? (
+          <li
+            className="ant-dropdown-menu-item ant-dropdown-menu-item-only-child"
+            role="menuitem"
+            data-menu-id="rc-menu-uuid-46302-3-change_due_date"
+          >
+            <span className="ant-dropdown-menu-title-content">
+              <PDFDownloadLink
+                document={
+                  <InvoicePDF
+                    header={headerprops}
+                    data={response}
+                    type={type}
+                    reportGeneratedUser={userDetails?.profile?.fullName}
+                  />
+                }
+                fileName={response?.invoiceNumber || 'invoice'}
+              >
+                Download as PDF
+              </PDFDownloadLink>
+            </span>
+          </li>
+        ) : (
+          ''
+        )}
+      </>
     </Menu>
   );
 
   const addresses = response?.contact?.addresses || [];
+
+  const getTotal = () => {
+    const { netTotal, relation } = response;
+    const { balance } = (relation?.links?.length &&
+      relation?.links?.reduce((a, b) => {
+        return { balance: a.balance + b.balance };
+      })) || { balance: 0 };
+
+    return netTotal - balance;
+  };
 
   return (
     <WrapperNewPurchaseView>
@@ -598,24 +682,26 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
         <Seprator />
         <Row gutter={24}>
           <Col span={8} offset={8} pull={8}>
-            <div className="payment_details_card mt-35">
-              <div className="flex alignStart pv-2 ">
-                <BoldText className="bold_text">Status</BoldText>
-                <P className="plain_text">{response?.payment_status}</P>
+            {response?.status !== 2 && (
+              <div className="payment_details_card mt-35">
+                <div className="flex alignStart pv-2 ">
+                  <BoldText className="bold_text">Status</BoldText>
+                  <P className="plain_text">{response?.payment_status}</P>
+                </div>
+                <div className="flex alignStart pv-2 ">
+                  <BoldText className="bold_text">Paid Amount</BoldText>
+                  <P className="plain_text">
+                    {moneyFormat(response?.paid_amount)}
+                  </P>
+                </div>
+                <div className="flex alignStart pv-2 ">
+                  <BoldText className="bold_text">Remaining Amount</BoldText>
+                  <P className="plain_text">
+                    {moneyFormat(response?.due_amount)}
+                  </P>
+                </div>
               </div>
-              <div className="flex alignStart pv-2 ">
-                <BoldText className="bold_text">Paid Amount</BoldText>
-                <P className="plain_text">
-                  {moneyFormat(response?.paid_amount)}
-                </P>
-              </div>
-              <div className="flex alignStart pv-2 ">
-                <BoldText className="bold_text">Remaining Amount</BoldText>
-                <P className="plain_text">
-                  {moneyFormat(response?.due_amount)}
-                </P>
-              </div>
-            </div>
+            )}
           </Col>
           <Col span={8}>
             <div className="calculation textRight">
@@ -636,7 +722,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
                   <th>Tax Rate</th>
                   <td>{response && moneyFormat(TotalTax)}</td>
                 </tr>
-                {response?.relation?.links?.length &&
+                {response?.relation?.links?.length > 0 &&
                   response?.relation?.links?.map((item, key) => {
                     const generateLink = () => {
                       let link = ``;
@@ -661,13 +747,13 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
                         <th>
                           <Link to={generateLink()}>{item?.invoiceNumber}</Link>
                         </th>
-                        <td>{70}</td>
+                        <td>{moneyFormat(item?.balance)}</td>
                       </tr>
                     );
                   })}
                 <tr>
                   <th>Total</th>
-                  <td>{moneyFormat(response?.netTotal)}</td>
+                  <td>{moneyFormat(getTotal())}</td>
                 </tr>
               </table>
             </div>
