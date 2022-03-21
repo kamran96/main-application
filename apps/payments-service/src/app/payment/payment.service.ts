@@ -151,7 +151,7 @@ export class PaymentService {
         },
       });
 
-      const accountCodesArray = ['15001', '15004', '40003'];
+      const accountCodesArray = ['15001', '15004', '40001'];
       const { data: accounts } = await http.post(`accounts/account/codes`, {
         codes: accountCodesArray,
       });
@@ -161,7 +161,7 @@ export class PaymentService {
         const debits = [
           {
             amount: data.amount,
-            account_id: accounts.find((i) => i.code === '40003').id,
+            account_id: accounts.find((i) => i.code === '40001').id,
           },
         ];
         const credits = [
@@ -482,36 +482,46 @@ export class PaymentService {
         select
           p.id,
             (
-              select coalesce(sum(t.amount),0) from payments t where t."entryType" = 1 and t.${id} = p.${id}
+              select coalesce(sum(t.amount),0) from payments t where t."entryType" = 1 
+              and t.${id} = p.${id} and t.status = 1
             ) as credits,
             (
-              select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" in (4, 5) and t.${id} = p.${id}
+              select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" in (4, 5) 
+              and t.${id} = p.${id} and t.status = 1
             ) as credit_notes,
             (
-              select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" = 2 and t.${id} = p.${id}
+              select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" = 2 
+              and t.${id} = p.${id} and t.status = 1
             ) as payment,
             (
               (
-                select coalesce(sum(t.amount),0) from payments t where t."entryType" = 1 and t.${id} = p.${id}
+                select coalesce(sum(t.amount),0) from payments t where t."entryType" = 1 
+                and t.${id} = p.${id} and t.status = 1
               ) - (
-                select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" in (4, 5) and t.${id} = p.${id}
+                select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" in (4, 5) 
+                and t.${id} = p.${id} and t.status = 1
               ) - (
-                select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" = 2 and t.${id} = p.${id}
+                select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" = 2 
+                and t.${id} = p.${id} and t.status = 1
               )
             ) as balance,
             (
               (
-                select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" = 1 and t.${id} = p.${id}
+                select coalesce(abs(sum(t.amount)),0) from payments t where t."entryType" = 1 
+                and t.${id} = p.${id} and t.status = 1
               ) - (
-                select coalesce(sum(t.amount),0) from payments t where t."entryType" in (4, 5) and t.${id} = p.${id}
+                select coalesce(sum(t.amount),0) from payments t where t."entryType" in (4, 5) 
+                and t.${id} = p.${id} and t.status = 1
               ) - (
-                select coalesce(sum(t.amount),0) from payments t where t."entryType" = 2 and t.${id} = p.${id}
+                select coalesce(sum(t.amount),0) from payments t where t."entryType" = 2 
+                and t.${id} = p.${id} and t.status = 1
               )
             ) as billbalance
 
           from payments p
           where p.${id} = $1
           and p."branchId" = $2
+          and p.status = 1
       `;
 
       const [invoice] = await getCustomRepository(PaymentRepository).query(
@@ -651,11 +661,21 @@ export class PaymentService {
 
     const id = data.type === PaymentModes.INVOICES ? 'invoiceId' : 'billId';
 
-    const payments = await getCustomRepository(PaymentRepository).find({
-      where: {
-        [id]: In(data.ids),
-      },
-    });
+    let payments;
+    if (data?.entryType) {
+      payments = await getCustomRepository(PaymentRepository).find({
+        where: {
+          [id]: In(data.ids),
+          entryType: data.entryType,
+        },
+      });
+    } else {
+      payments = await getCustomRepository(PaymentRepository).find({
+        where: {
+          [id]: In(data.ids),
+        },
+      });
+    }
 
     const mapTransactionIds = payments.map((p) => p.transactionId);
     for (const i of payments) {

@@ -1,9 +1,16 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import axios from 'axios';
 import { AttributeValue } from '../schemas/attributeValue.schema';
 import { Item } from '../schemas/item.schema';
 import { Integrations } from '@invyce/global-constants';
-import { IBaseUser, IItem, IItemWithResponse, IPage } from '@invyce/interfaces';
+import {
+  IBaseUser,
+  IItem,
+  IItemWithResponse,
+  IPage,
+  IRequest,
+} from '@invyce/interfaces';
 import { Price } from '../schemas/price.schema';
 import { ItemCodesDto, ItemDto, ItemIdsDto } from '../dto/item.dto';
 
@@ -146,6 +153,7 @@ export class ItemService {
           organizationId: itemData.organizationId,
           branchId: itemData.branchId,
         });
+        console.log(find_item, 'item');
       }
 
       if (find_item?.length > 0) {
@@ -170,6 +178,7 @@ export class ItemService {
               hasCategory: itemDto.hasCategory || item.hasCategory,
               stock: itemDto.stock || item.stock,
               organizationId: item.organizationId,
+              branchId: item.branchId,
               createdById: item.name,
               updatedById: itemData._id,
             };
@@ -207,6 +216,7 @@ export class ItemService {
           item.openingStock = itemDto.openingStock;
           item.minimumStock = itemDto.minimumStock;
           item.organizationId = itemData.organizationId;
+          item.branchId = itemData.branchId;
           item.stock = itemDto?.openingStock
             ? itemDto.openingStock
             : item.stock;
@@ -249,9 +259,46 @@ export class ItemService {
     });
   }
 
-  async DeleteItem(data: ItemIdsDto): Promise<void> {
+  async DeleteItem(data: ItemIdsDto, req: IRequest): Promise<void> {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const tokenType =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = await axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [tokenType]: value,
+      },
+    });
+
     for (const i of data.ids) {
-      await this.itemModel.updateOne({ _id: i }, { status: 0 });
+      const item = await this.itemModel.findById(i);
+      if (item) {
+        await this.itemModel.updateOne(
+          { _id: i },
+          {
+            status: 0,
+          }
+        );
+      }
+
+      if (item?.transactionId) {
+        await http.post(`accounts/transaction/delete`, {
+          ids: [item.transactionId],
+        });
+      }
     }
   }
 

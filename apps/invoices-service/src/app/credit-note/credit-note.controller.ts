@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -26,10 +27,7 @@ export class CreditNoteController {
     @Query() query: IPage
   ): Promise<ICreditNoteWithResponse> {
     try {
-      const invoice = await this.creditNoteService.IndexCreditNote(
-        req.user,
-        query
-      );
+      const invoice = await this.creditNoteService.IndexCreditNote(req, query);
 
       if (invoice) {
         return {
@@ -104,5 +102,11 @@ export class CreditNoteController {
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  @UseGuards(GlobalAuthGuard)
+  @Put('/delete')
+  async delete(@Body() data, @Req() req: IRequest): Promise<unknown> {
+    return await this.creditNoteService.DeleteCreditNote(data, req);
   }
 }

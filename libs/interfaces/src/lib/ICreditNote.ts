@@ -24,8 +24,8 @@ export interface ICreditNoteItem {
   itemId: string;
   description: string;
   quantity: number;
-  itemDiscount: number;
-  unitPrice: number;
+  itemDiscount: string;
+  unitPrice: string;
   tax: string;
   sequence: number;
   costOfGoodAmount: number;
