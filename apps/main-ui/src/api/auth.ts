@@ -35,3 +35,6 @@ export const CheckAuthAPIDev = ({ queryKey }: QueryKey) => {
 };
 
 export const LogoutAPI = (key?: any) => http.post(`users/auth/logout`);
+
+export const ChangeAccountPreferencesAPI = (payload?: { type: string }) =>
+  http?.post(`users/auth/request-change`, payload);

@@ -21,6 +21,7 @@ export interface IContact extends IBase {
   importedContactId: string;
   addresses: Array<IAddress>;
   isNewRecord: boolean;
+  balance: number;
 }
 
 export interface IContactWithResponse {

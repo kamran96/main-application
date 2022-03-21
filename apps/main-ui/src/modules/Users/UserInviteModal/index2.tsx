@@ -25,12 +25,18 @@ const UserInviteModal2: FC = () => {
 
   const { data, isLoading: branchesLoading } = useQuery(
     [`all-branches`],
-    getALLBranches
+    getALLBranches,
+    {
+      enabled: !!userInviteModal,
+    }
   );
 
   const { data: rolesListData, isLoading: rolesListLoading } = useQuery(
     [`rbac-list`],
-    getRbacListAPI
+    getRbacListAPI,
+    {
+      enabled: !!userInviteModal,
+    }
   );
 
   const rolesResult =

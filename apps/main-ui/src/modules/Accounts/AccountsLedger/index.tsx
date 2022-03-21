@@ -1,15 +1,15 @@
-import { Breadcrumb } from "antd";
-import React, { FC, useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import { getAllAccounts } from "../../../api/accounts";
-import { BreadCrumbArea } from "../../../components/BreadCrumbArea";
-import { Heading } from "../../../components/Heading";
-import { TableCard } from "../../../components/TableCard";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { ISupportedRoutes } from "../../../modal";
-import { IAccountsResult } from "../../../modal/accounts";
-import { AccountsLedgerList } from "./AccountsLedgerList";
-import { Link } from "react-router-dom";
+import { Breadcrumb } from 'antd';
+import React, { FC, useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
+import { getAllAccounts } from '../../../api/accounts';
+import { BreadCrumbArea } from '../../../components/BreadCrumbArea';
+import { Heading } from '../../../components/Heading';
+import { TableCard } from '../../../components/TableCard';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { ISupportedRoutes } from '../../../modal';
+import { IAccountsResult } from '../../../modal/accounts';
+import { AccountsLedgerList } from './AccountsLedgerList';
+import { Link } from 'react-router-dom';
 
 export const AccountsLedger: FC = () => {
   const [id, setId] = useState<number>(null);
@@ -18,21 +18,21 @@ export const AccountsLedger: FC = () => {
   useEffect(() => {
     if (routeHistory && routeHistory.location) {
       const { pathname } = routeHistory.location;
-      let i = pathname.split("/app/accounts/")[1];
+      const i = pathname.split('/app/accounts/')[1];
       setId(parseInt(i));
     }
   }, [routeHistory]);
 
-  const { data } = useQuery([`all-accounts`, "ALL"], getAllAccounts);
+  const { data } = useQuery([`all-accounts`, 'ALL'], getAllAccounts);
   const result: IAccountsResult[] =
     (data && data.data && data.data.result) || [];
 
-  const getAccountById = (id:Number|string) => {
+  const getAccountById = (id: number | string) => {
     if (result) {
       const [filtered] = result.filter((item) => item.id === id);
       return filtered;
-    }else{
-      return null
+    } else {
+      return null;
     }
   };
 
@@ -48,12 +48,12 @@ export const AccountsLedger: FC = () => {
       </BreadCrumbArea>
       <div className="pv-10">
         <Heading type="table">
-          {result?.length > 0 ? getAccountById(id)?.name : ""}
+          {result?.length > 0 ? getAccountById(id)?.name : ''}
         </Heading>
       </div>
       <AccountsLedgerList
         id={id}
-        accountName={result?.length > 0 ? getAccountById(id)?.name : ""}
+        accountName={result?.length > 0 ? getAccountById(id)?.name : ''}
       />
     </>
   );

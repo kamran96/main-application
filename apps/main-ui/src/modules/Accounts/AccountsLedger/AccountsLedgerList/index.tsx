@@ -1,5 +1,7 @@
+/* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { ColumnsType } from 'antd/es/table';
+import { ITableColumns } from '../../../../components/PDFs/PDFTable';
 import { plainToClass } from 'class-transformer';
 import dayjs from 'dayjs';
 import React, { FC, useEffect, useState } from 'react';
@@ -18,6 +20,7 @@ import {
 } from '../../../../modal/accountLedger';
 import moneyFormat from '../../../../utils/moneyFormat';
 import FilterSchema from './AccountLedgerFilterSchema';
+import { Text } from '@react-pdf/renderer';
 
 interface IProps {
   id?: number;
@@ -31,6 +34,7 @@ export const AccountsLedgerList: FC<IProps> = ({ id, accountName }) => {
       pagination: {},
     }
   );
+
   const [ledgerConfig, setLedgerConfig] = useState({
     query: '',
     page_size: 20,
@@ -60,9 +64,9 @@ export const AccountsLedgerList: FC<IProps> = ({ id, accountName }) => {
   useEffect(() => {
     if (history?.location?.search) {
       let obj = {};
-      let queryArr = history.location.search.split('?')[1].split('&');
+      const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
-        let split = item.split('=');
+        const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
 
@@ -72,7 +76,10 @@ export const AccountsLedgerList: FC<IProps> = ({ id, accountName }) => {
 
   useEffect(() => {
     if (data && data.data && data.data.result) {
-      let newResult = plainToClass(IAccountLedgerResult, data.data).getResult();
+      const newResult = plainToClass(
+        IAccountLedgerResult,
+        data.data
+      ).getResult();
 
       setResponse({ ...data.data, result: newResult });
     }
@@ -85,6 +92,7 @@ export const AccountsLedgerList: FC<IProps> = ({ id, accountName }) => {
       key: 'date',
       render: (data, row, index) => {
         return (
+          // eslint-disable-next-line react/jsx-no-useless-fragment
           <>
             {!row.lastIndex ? (
               dayjs(data).format(`MMMM D, YYYY`)
@@ -105,8 +113,8 @@ export const AccountsLedgerList: FC<IProps> = ({ id, accountName }) => {
     },
     {
       title: 'Narration',
-      dataIndex: 'owner',
-      key: 'owner',
+      dataIndex: 'transaction',
+      key: 'transaction',
       render: (data, row, index) => {
         return <>{data ? data.narration : '-'}</>;
       },
@@ -163,7 +171,7 @@ export const AccountsLedgerList: FC<IProps> = ({ id, accountName }) => {
       <div className="search flex alignCenter justifyFlexEnd pv-10 ">
         <SmartFilter
           onFilter={(encode) => {
-            let route = `/app${
+            const route = `/app${
               ISupportedRoutes.ACCOUNTS
             }/${id}?&page=${1}&page_size=${
               pagination.page_size
@@ -206,7 +214,10 @@ export const AccountsLedgerList: FC<IProps> = ({ id, accountName }) => {
         </div>
       ) : (
         <CommonTable
-          printTitle={`${accountName} Ledger`}
+          pdfExportable={{
+            columns: pdfCols,
+          }}
+          printTitle={`Ledger Report: ${accountName}`}
           size="middle"
           hasPrint
           onChange={handleTableChange}
@@ -237,3 +248,76 @@ const WrapperAccountLedger = styled.div`
     min-height: 70vh;
   }
 `;
+
+const pdfCols: ITableColumns[] = [
+  {
+    title: 'Date',
+    dataIndex: 'date',
+    key: 'date',
+    render: (data, row, index) => {
+      return (
+        // eslint-disable-next-line react/jsx-no-useless-fragment
+        !row.lastIndex ? (
+          dayjs(data).format(`MMMM D, YYYY`)
+        ) : (
+          <Text style={{ fontWeight: 600 }}>Total</Text>
+        )
+      );
+    },
+  },
+  {
+    title: 'Particular',
+    dataIndex: 'account',
+    key: 'account',
+    render: (data, row, index) => {
+      return data ? data.name : '-';
+    },
+  },
+  {
+    title: 'Narration',
+    dataIndex: 'owner',
+    key: 'owner',
+    render: (data, row, index) => {
+      return data ? data.narration : '-';
+    },
+  },
+  {
+    title: 'Debit',
+    dataIndex: 'transactionType',
+    key: 'transactionType',
+    render: (data, row, index) => {
+      return !row.lastIndex ? (
+        (data && data === TransactionsType.CREDIT && row.amount) || '-'
+      ) : (
+        <Text style={{ fontWeight: 'black' }}>
+          {moneyFormat(row.totalDebits)}
+        </Text>
+      );
+    },
+  },
+  {
+    title: 'Credit',
+    dataIndex: 'transactionType',
+    key: 'transaction_type',
+    render: (data, row, index) => {
+      return !row.lastIndex ? (
+        (data && data === TransactionsType.DEBIT && row.amount) || '-'
+      ) : (
+        <Text style={{ fontWeight: 'black' }}>
+          {moneyFormat(row.totalCredits)}
+        </Text>
+      );
+    },
+  },
+  {
+    title: 'Balance',
+    dataIndex: 'balance',
+    key: 'balance',
+    render: (data, row, index) =>
+      !row.lastIndex ? (
+        data
+      ) : (
+        <Text style={{ fontWeight: 'black' }}>{moneyFormat(data)}</Text>
+      ),
+  },
+];

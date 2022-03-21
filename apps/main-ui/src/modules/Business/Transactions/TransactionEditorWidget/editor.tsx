@@ -73,7 +73,6 @@ export const TransactionWidget: FC = () => {
   const accounts: IAccountsResult[] =
     (accountsData && accountsData.data && accountsData.data.result) || [];
 
-  console.log(accounts);
   const recentAccounts: IAccountsResult[] =
     (recentAccountsData &&
       recentAccountsData.data &&

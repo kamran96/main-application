@@ -99,6 +99,7 @@ export const SidebarUi: FC<SidebarUiProps> = ({
   onLogOut,
   onThemeButtonClick,
   userOnline,
+  appLogo,
 }) => {
   const history = useHistory();
 
@@ -115,9 +116,7 @@ export const SidebarUi: FC<SidebarUiProps> = ({
   return (
     <SidebarWrapper toggle={sidebarOpen}>
       <div className="logo_area flex alignCenter">
-        <span>
-          {sidebarOpen ? <InyvceDarkTextIcon /> : <AppLogoWithoutText />}{' '}
-        </span>
+        <span>{sidebarOpen ? appLogo : <AppLogoWithoutText />} </span>
         <span
           onClick={() => {
             setSidebarOpen(!sidebarOpen);

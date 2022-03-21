@@ -2,6 +2,7 @@ import bxPlus from '@iconify-icons/bx/bx-plus';
 import printIcon from '@iconify-icons/bytesize/print';
 import Icon from '@iconify/react';
 import { EditableTable } from '@invyce/editable-table';
+import { IContact } from '@invyce/interfaces';
 import { invycePersist } from '@invyce/invyce-persist';
 import { IContactTypes } from '@invyce/shared/types';
 import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
@@ -55,16 +56,19 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   const queryCache = useQueryClient();
   /* ************ HOOKS *************** */
   /* Component State Hooks */
-  const { routeHistory, userDetails } = useGlobalContext();
-  const { organization } = userDetails;
+  const { routeHistory } = useGlobalContext();
   const { history } = routeHistory;
-  const [issueDate, setIssueDate] = useState(dayjs());
   const [printModal, setPrintModal] = useState(false);
+  const [creditLimitModal, setCreditLimitModal] = useState({
+    visibility: false,
+    contact: '',
+  });
   const [taxType, setTaxType] = useState<ITaxTypes>(ITaxTypes.TAX_INCLUSIVE);
   const [createContactName, setCreateContactName] = useState('');
+  const [emailModal, setEmailModal] = useState(false);
+  const [contactEmail, setContactEmail] = useState(null);
 
   const {
-    rowsErrors,
     columns,
     contactResult,
     GrossTotal,
@@ -76,14 +80,14 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     setInvoiceItems,
     deleteIds,
     payment,
-    setPayment,
+    setIssueDate,
     AntForm,
     isFetching,
-    paymentReset,
     handleAddRow,
     ClearAll,
     handleCheckValidation,
-    getCachedInvoice,
+    bypassCreditLimit,
+    setBypassCreditLimit,
   } = usePurchaseWidget();
 
   const __columns =
@@ -164,6 +168,9 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   const onFinish = async (value) => {
+    const email =
+      contactEmail || getContactById(value?.contactId)?.email || null;
+
     const errors = handleCheckValidation(invoiceItems);
 
     if (!errors.length) {
@@ -173,6 +180,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
 
       let payload: any = {
         ...value,
+        email,
         status: value.status.status,
         invoiceType: type ? type : IInvoiceType.INVOICE,
         discount: addition(invoiceDiscount, TotalDiscount),
@@ -281,6 +289,11 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     orderNo: type === IInvoiceType.INVOICE ? 'Invoice #' : 'Order No',
   };
 
+  const getContactById = (id) => {
+    const [filteredContact] = contactResult.filter((cont) => cont.id === id);
+    return filteredContact;
+  };
+
   /* JSX  */
   return (
     <WrapperInvoiceForm>
@@ -303,7 +316,25 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
       <div className=" _disable_print">
         <Form
           form={AntForm}
-          onFinish={onFinish}
+          onFinish={(values) => {
+            const contact: IContact = getContactById(values?.contactId);
+            if (
+              contact?.balance >= contact?.creditLimitBlock ||
+              NetTotal > contact?.creditLimitBlock
+            ) {
+              notificationCallback(
+                NOTIFICATIONTYPE.WARNING,
+                'Contact has reached credit block limit, Invoice cannot be created'
+              );
+            } else if (
+              contact?.balance >= contact.creditLimit ||
+              (NetTotal > contact?.creditLimit && !bypassCreditLimit)
+            ) {
+              setCreditLimitModal({ visibility: true, contact: contact?.name });
+            } else {
+              onFinish(values);
+            }
+          }}
           onFinishFailed={onFinishFailed}
           onValuesChange={(changedField, allvalues) => {
             const _formData =
@@ -336,6 +367,9 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                         showSearch
                         style={{ width: '100%' }}
                         placeholder="Select Contact"
+                        onChange={(value) => {
+                          console.log(value);
+                        }}
                         // optionFilterProp="children"
                         filterOption={(input, option) => {
                           const valueInput = input.toLowerCase();
@@ -349,17 +383,19 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                         }}
                       >
                         <Option
+                          key={'new-contact'}
                           style={{
                             textAlign: 'left',
                           }}
                           value={'contact-create'}
                         >
                           <Button
+                            className="new-contact-btn"
                             onClick={(e) => {
                               e.stopPropagation();
                               onCreateContact();
                             }}
-                            type="default"
+                            type="text"
                             size="middle"
                           >
                             Create Contact
@@ -494,23 +530,6 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
             </Row>
           </div>
           <Form>
-            {/* <button onClick={handleAddRow}>click {invoiceItems?.length}</button>
-            {invoiceItems?.map((item, index) => {
-              return (
-                <div className="flex">
-                  {columns?.map((col) => {
-                    console.log(col, "what is col");
-                    return (
-                      <div>
-                        {col?.render
-                          ? col?.render(item[col?.dataIndex], item, index)
-                          : item[col?.dataIndex]}
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })} */}
             <div className="table_area">
               <EditableTable
                 loading={isFetching}
@@ -519,36 +538,6 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                 data={invoiceItems}
                 scrollable={{ offsetY: 400, offsetX: 0 }}
               />
-              {/* <DndProvider manager={manager.current.dragDropManager}>
-              <CommonTable
-                rowClassName={(record, index) =>
-                  ` ${
-                    rowsErrors[index] && rowsErrors[index].hasError
-                      ? "row_warning"
-                      : ""
-                  } 
-                  
-                  ${index === invoiceItems?.length - 1 ? `scroll-row` : ""}
-                  `
-                }
-                loading={isFetching}
-                dataSource={invoiceItems}
-                columns={__columns}
-                pagination={false}
-                scroll={{ y: 240 }}
-                // scroll={{ y: 350, x: 0 }}
-                components={components}
-                onRow={(record: any, index: any) => {
-                  let row: any = {
-                    index,
-                    moveRow,
-                  };
-                  return {
-                    ...row,
-                  };
-                }}
-              />
-            </DndProvider> */}
             </div>
           </Form>
           <div className="add_item">
@@ -725,7 +714,12 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                             invoiceCreating &&
                             submitType === ISUBMITTYPE.ONLYAPPROVE
                           }
-                          htmlType="submit"
+                          htmlType={
+                            getContactById(AntForm.getFieldValue('contactId'))
+                              ?.email
+                              ? 'submit'
+                              : 'button'
+                          }
                           size={'middle'}
                           type="primary"
                           onClick={() => {
@@ -736,6 +730,15 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                                 print: false,
                               },
                             });
+
+                            const email = getContactById(
+                              AntForm.getFieldValue('contactId')
+                            )?.email;
+                            if (!email) {
+                              setEmailModal(true);
+                            } else {
+                              AntForm.setFieldsValue({ email });
+                            }
                           }}
                         >
                           Approve
@@ -755,6 +758,48 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
         onConfirm={onPrint}
         type="info"
         text="Do you want to print?"
+      />
+      <ConfirmModal
+        visible={emailModal}
+        onCancel={() => {
+          AntForm.submit();
+          setEmailModal(false);
+        }}
+        onConfirm={() => {
+          AntForm.submit();
+          setEmailModal(false);
+        }}
+        type="mention"
+        confirmText="Send"
+        children={
+          <Form.Item label="Please Provide email" labelCol={{ span: 24 }}>
+            <Input
+              onChange={(e) => {
+                const value = e.target.value;
+                setContactEmail(value);
+              }}
+              placeholder="example@something.com"
+              style={{ width: '100%' }}
+              type="email"
+              size="middle"
+            />
+          </Form.Item>
+        }
+      />
+      <ConfirmModal
+        visible={creditLimitModal?.visibility}
+        onCancel={() => {
+          setCreditLimitModal({ visibility: false, contact: '' });
+        }}
+        onConfirm={() => {
+          setBypassCreditLimit(true);
+          setTimeout(() => {
+            AntForm.submit();
+            setCreditLimitModal({ visibility: false, contact: '' });
+          }, 300);
+        }}
+        type="warning"
+        text={`${creditLimitModal?.contact} reached credit limit do you want to proceed further?`}
       />
     </WrapperInvoiceForm>
   );

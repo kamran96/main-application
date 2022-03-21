@@ -1,7 +1,5 @@
-import React from 'react';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { IUser } from '../../modal';
-import { getCountryById } from '@invyce/shared/utils';
 
 export const TopbarLogoWithDetails = () => {
   const { userDetails } = useGlobalContext();
@@ -47,12 +45,12 @@ export const Addressbar = () => {
     <table className="address_bar_table">
       <tr>
         <td>
-          <p>{getCountryById(parseInt(country))?.name}</p>
+          <p>{country}</p>
         </td>
       </tr>
       <tr>
         <td>
-          <p>{city}</p>
+          <p style={{ textTransform: 'capitalize' }}>{city}</p>
         </td>
       </tr>
       <tr>
@@ -74,6 +72,14 @@ export const BlockDesignLogo = () => {
     >
       <img className="header_company_logo" src={_logo} alt={'company_logo'} />
       <h2 className="company_name">{organizationName}</h2>
+    </div>
+  );
+};
+
+export const PrintTitle = ({ title }) => {
+  return (
+    <div className="printTitle">
+      <h3>{title}</h3>
     </div>
   );
 };

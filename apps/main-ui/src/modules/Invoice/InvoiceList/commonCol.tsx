@@ -1,132 +1,185 @@
-import { ITableExportFields } from "ant-table-extensions";
-import { ColumnsType } from "antd/es/table";
-import { plainToClass } from "class-transformer";
-import dayjs from "dayjs";
-import React from "react";
-import { Link } from "react-router-dom";
+import { ITableExportFields } from 'ant-table-extensions';
+import { ColumnsType } from 'antd/es/table';
+import { plainToClass } from 'class-transformer';
+import dayjs from 'dayjs';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-import { InvoiceResultClass } from "../../../modal/invoice";
-import { ISupportedRoutes } from "../../../modal/routing";
-import moneyFormat from "../../../utils/moneyFormat";
+import { InvoiceResultClass } from '../../../modal/invoice';
+import { ISupportedRoutes } from '../../../modal/routing';
+import moneyFormat from '../../../utils/moneyFormat';
 
 export const InvoiceColumns: ColumnsType<any> = [
   {
-    title: "Number",
-    dataIndex: "invoiceNumber",
-    key: "invoiceNumber",
+    title: 'Number',
+    dataIndex: 'invoiceNumber',
+    key: 'invoiceNumber',
     render: (data, row, index) => (
-      <>
-        <Link to={`/app${ISupportedRoutes.INVOICES_VIEW}/${row.id}`}>
-          {data}
-        </Link>
-      </>
+      <Link to={`/app${ISupportedRoutes.INVOICES_VIEW}/${row.id}`}>{data}</Link>
     ),
   },
   {
-    title: "Ref",
-    dataIndex: "reference",
-    key: "reference",
+    title: 'Ref',
+    dataIndex: 'reference',
+    key: 'reference',
   },
   {
-    title: "To",
-    dataIndex: "contact",
-    key: "contact",
+    title: 'To',
+    dataIndex: 'contact',
+    key: 'contact',
     render: (contact, row, index) => {
-      return <>{contact ? contact.name : "-"}</>;
+      return contact ? contact.name : '-';
     },
   },
 
   {
-    title: "Date",
-    dataIndex: "issueDate",
-    key: "issueDate",
+    title: 'Date',
+    dataIndex: 'issueDate',
+    key: 'issueDate',
     render: (data, row, index) => {
-      return <>{data ? dayjs(data).format(`MMMM D, YYYY h:mm A`) : "-"}</>;
+      return data ? dayjs(data).format(`MMMM D, YYYY h:mm A`) : '-';
     },
   },
   {
-    title: "Due Date",
-    dataIndex: "dueDate",
-    key: "dueDate",
+    title: 'Due Date',
+    dataIndex: 'dueDate',
+    key: 'dueDate',
     render: (data, row, index) => {
-      return <>{data ? dayjs(data).format(`MMMM D, YYYY h:mm A`) : "-"}</>;
+      return data ? dayjs(data).format(`MMMM D, YYYY h:mm A`) : '-';
     },
   },
   {
-    title: "Paid Amount",
-    dataIndex: "paid_amount",
-    key: "paid_amount",
+    title: 'Paid Amount',
+    dataIndex: 'paid_amount',
+    key: 'paid_amount',
     render: (data) => {
-      return <>{data ? moneyFormat(Math.abs(data)) : "-"}</>;
+      return data ? moneyFormat(Math.abs(data)) : '-';
     },
   },
   {
-    title: "Due",
-    dataIndex: "due",
-    key: "",
-    render: (data, row: InvoiceResultClass, index) => {
-      let rowData = plainToClass(InvoiceResultClass, row);
-      return <>{row ? moneyFormat(rowData.getRemaningAmount()) : "-"}</>;
+    title: 'Due',
+    dataIndex: 'due_amount',
+    key: '',
+    render: (data) => {
+      return data ? moneyFormat(Math.abs(data)) : '-';
     },
   },
   {
-    title: "Items",
-    dataIndex: "invoiceItems",
-    key: "invoiceItems",
-    render: (data: any[]) => (
-      <>{data.length === 1 ? `${data.length} Item` : `${data.length} Items`}</>
-    ),
+    title: 'Items',
+    dataIndex: 'invoiceItems',
+    key: 'invoiceItems',
+    render: (data: any[]) =>
+      data.length === 1 ? `${data.length} Item` : `${data.length} Items`,
   },
   {
-    title: "Status",
-    dataIndex: "",
-    key: "",
+    title: 'Status',
+    dataIndex: '',
+    key: '',
     render: (data, row, index) => {
-      let rowData = plainToClass(InvoiceResultClass, row);
-      return <>{row && rowData.getStatus()}</>;
+      const rowData = plainToClass(InvoiceResultClass, row);
+      return row && rowData.getStatus();
     },
   },
 ];
 
 export const _exportableCols: ITableExportFields = {
-  invoiceNumber: "Invoice Number",
-  reference: "Reference",
+  invoiceNumber: 'Invoice Number',
+  reference: 'Reference',
   contact: {
-    header: "To",
+    header: 'To',
     formatter: (_data) => {
       return _data.name;
     },
   },
   issueDate: {
-    header: "Date",
+    header: 'Date',
     formatter: (data) => {
-      return data ? dayjs(data).format(`MMMM D, YYYY h:mm A`) : "-";
+      return data ? dayjs(data).format(`MMMM D, YYYY h:mm A`) : '-';
     },
   },
   dueDate: {
-    header: "Due Date",
+    header: 'Due Date',
     formatter: (data) => {
-      return data ? dayjs(data).format(`MMMM D, YYYY h:mm A`) : "-";
+      return data ? dayjs(data).format(`MMMM D, YYYY h:mm A`) : '-';
     },
   },
   paid_amount: {
-    header: "Paid Amount",
-    formatter: (data, record) => {
-      return data ? moneyFormat(Math.abs(data)) : "-";
+    header: 'Paid Amount',
+    formatter: (data: number) => {
+      return data ? Math.abs(data).toString() : '-';
     },
   },
-  due: {
-    header: "Due",
+  due_amount: {
+    header: 'Due',
     formatter: (data, record) => {
-      let rowData = plainToClass(InvoiceResultClass, record);
-      return record ? moneyFormat(rowData.getRemaningAmount()) : "-";
+      return data ? Math.abs(data).toString() : '-';
     },
   },
   status: {
-    header: "Status",
+    header: 'Status',
     formatter: (data, record) => {
-      let rowData = plainToClass(InvoiceResultClass, record);
+      const rowData = plainToClass(InvoiceResultClass, record);
       return record && rowData.getStatus();
     },
   },
 };
+
+export const PdfCols: ColumnsType<any> = [
+  {
+    title: 'Number',
+    dataIndex: 'invoiceNumber',
+    key: 'invoiceNumber',
+  },
+  {
+    title: 'Ref',
+    dataIndex: 'reference',
+    key: 'reference',
+  },
+  {
+    title: 'To',
+    dataIndex: 'contact',
+    key: 'contact',
+    render: (contact, row, index) => {
+      return contact ? contact.name : '-';
+    },
+  },
+
+  {
+    title: 'Date',
+    dataIndex: 'issueDate',
+    key: 'issueDate',
+    render: (data, row, index) =>
+      data ? dayjs(data).format(`MMMM D, YYYY h:mm A`) : '-',
+  },
+  {
+    title: 'Due Date',
+    dataIndex: 'dueDate',
+    key: 'dueDate',
+    render: (data, row, index) => {
+      return data ? dayjs(data).format(`MMMM D, YYYY h:mm A`) : '-';
+    },
+  },
+  {
+    title: 'Paid Amount',
+    dataIndex: 'paid_amount',
+    key: 'paid_amount',
+    render: (data) => {
+      return data ? moneyFormat(Math.abs(data)) : '-';
+    },
+  },
+  {
+    title: 'Due',
+    dataIndex: 'due_amount',
+    key: '',
+  },
+
+  {
+    title: 'Status',
+    dataIndex: '',
+    key: '',
+    render: (data, row, index) => {
+      const rowData = plainToClass(InvoiceResultClass, row);
+      return row && rowData.getStatus();
+    },
+  },
+];

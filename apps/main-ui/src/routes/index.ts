@@ -28,7 +28,6 @@ import { BankAccounts } from '../modules/Business/BankAccounts';
 import { TraialBalance } from '../modules/Business/TrialBalance';
 import { BalanceSheet } from '../modules/Accounts/BalanceSheet';
 import { ContactLedger } from '../modules/Contacts/ContactLedger';
-import { JournalEditor } from '../modules/Business/Transactions/TransactionEditorWidget';
 import { PaymentContainer } from '../modules/Payment';
 import { BillsEditorWidget } from '../modules/Business/PurchaseOrder/BillsEditorWidget';
 import CategoriesRoot from '../modules/Categories';
@@ -53,6 +52,7 @@ import { VerificationLayout } from '../Layout/VerificationLayout';
 import { VerifyQuickBooks } from '../modules/Settings/Integrations/Quickbooks/VerifyQuickbooks';
 import { VerifyXero } from '../modules/Settings/Integrations/Xero/VerifyXero';
 import { CreditNoteEditorWidget } from '../modules/Invoice/CreditNoteWidget';
+import { DebitNoteEditorWidget } from '../modules/Invoice/DebitNoteEditorWidget';
 import { Import } from '../components/Import';
 import { JoinUser } from '../Containers/JoinUser';
 import { VerifyUser } from '../Containers/JoinUser/VerifyUser';
@@ -64,6 +64,9 @@ import { ManageInventoryForm } from '../modules/Items/InventoryManagementForm';
 import { Organizations } from '../Containers/AddOrganization';
 import { ForgotPassowrdContainer } from '../Containers/ForgetPassword';
 import { BankReconcilation } from '../modules/BankReconcilation';
+import { TransactionsWidget } from '../modules/Business/Transactions/TransactionEditorWidgetV2';
+import { DebitNotesList } from '../modules/Invoice/DebitNotesList';
+import { DebitNotesView } from '../modules/Invoice/DebitNotesList/View';
 
 export const routes = (root = '/app'): RouteConfig[] => [
   {
@@ -255,14 +258,40 @@ export const routes = (root = '/app'): RouteConfig[] => [
             exact: true,
           },
           {
+            path: `${root}${ISupportedRoutes.ADD_DEBIT_NOTE}/:id`,
+            component: DebitNoteEditorWidget,
+            restricted: true,
+            permission: PERMISSIONS.INVOICES_CREATE,
+          },
+          {
+            path: `${root}${ISupportedRoutes.ADD_DEBIT_NOTE}`,
+            component: DebitNoteEditorWidget,
+            restricted: true,
+            permission: PERMISSIONS.INVOICES_CREATE,
+            exact: true,
+          },
+          {
             path: `${root}${ISupportedRoutes.CREDIT_NOTES}/:id`,
             component: CreditNoteView,
             restricted: true,
             permission: PERMISSIONS.INVOICES_SHOW,
           },
           {
+            path: `${root}${ISupportedRoutes.DEBIT_NOTES}/:id`,
+            component: DebitNotesView,
+            restricted: true,
+            permission: PERMISSIONS.INVOICES_SHOW,
+          },
+          {
             path: `${root}${ISupportedRoutes.CREDIT_NOTES}`,
             component: CreditNoteList,
+            exact: true,
+            restricted: true,
+            permission: PERMISSIONS.INVOICES_CREATE,
+          },
+          {
+            path: `${root}${ISupportedRoutes.DEBIT_NOTES}`,
+            component: DebitNotesList,
             exact: true,
             restricted: true,
             permission: PERMISSIONS.INVOICES_CREATE,
@@ -353,7 +382,7 @@ export const routes = (root = '/app'): RouteConfig[] => [
           },
           {
             path: `${root}${ISupportedRoutes.CREATE_TRANSACTION}`,
-            component: JournalEditor,
+            component: TransactionsWidget,
             exact: true,
             restricted: true,
             permission: PERMISSIONS.TRANSACTIONS_CREATE,
@@ -420,14 +449,17 @@ export const routes = (root = '/app'): RouteConfig[] => [
             restricted: true,
             permission: PERMISSIONS.PAYMENTS_INDEX,
           },
+
+          // UN COMMENT TO ENABLE CATEGORIES FEATURES
+
           /* Categories Route */
-          {
-            path: `${root}${ISupportedRoutes.Categories}`,
-            component: CategoriesRoot,
-            exact: true,
-            restricted: true,
-            permission: PERMISSIONS.CATEGORIES_INDEX,
-          },
+          // {
+          //   path: `${root}${ISupportedRoutes.Categories}`,
+          //   component: CategoriesRoot,
+          //   exact: true,
+          //   restricted: true,
+          //   permission: PERMISSIONS.CATEGORIES_INDEX,
+          // },
           {
             path: `${root}${ISupportedRoutes.Organizations}`,
             component: Organizations,

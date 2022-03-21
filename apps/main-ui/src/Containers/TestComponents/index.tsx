@@ -7,10 +7,10 @@ import { CsvImportAPi } from '../../api';
 import {
   Document,
   PDFViewer,
-  Page,
   PDFDownloadLink,
+  renderToString,
 } from '@react-pdf/renderer';
-import { PdfTable } from '@invyce/pdf-table';
+import { InvoicePDF } from '../../components/PDFs';
 
 const columns = [
   {
@@ -88,26 +88,15 @@ export const TestComponents: FC = () => {
   return (
     // <div>test</div>
     <div>
-      <PDFDownloadLink document={<Doc />} fileName="generated.pdf">
+      {/* <PDFDownloadLink
+        document={<InvoicePDF data={null} type={null} />}
+        fileName="generated.pdf"
+      >
         Generate PDF
-      </PDFDownloadLink>
-      <PDFViewer width={'100%'} height={900}>
-        <Document>
-          <Page size={'A4'}>
-            <PdfTable columns={columns} data={data} />
-          </Page>
-        </Document>
-      </PDFViewer>
+      </PDFDownloadLink> */}
+      {/* <PDFViewer width={'100%'} height={900}>
+        <InvoicePDF />
+      </PDFViewer> */}
     </div>
-  );
-};
-
-const Doc = () => {
-  return (
-    <Document>
-      <Page size={'A4'}>
-        <PdfTable columns={columns} data={data} />
-      </Page>
-    </Document>
   );
 };

@@ -82,7 +82,7 @@ export const TrialBalanceList: FC = () => {
           key: 'opening_balance',
           className: 'static-width',
           render: (data, row, index) => {
-            if (row.isLastIndex) {
+            if (row?.isLastIndex) {
               return null;
             } else {
               return data ? data : '-';
@@ -110,7 +110,7 @@ export const TrialBalanceList: FC = () => {
 
       key: 'credit',
       render: (data, row, index) => {
-        if (row.isLastIndex) {
+        if (row?.isLastIndex) {
           return <BoldText>{moneyFormat(data.toFixed(2))}</BoldText>;
         } else {
           return data ? data.toFixed(2) : '-';
@@ -124,7 +124,7 @@ export const TrialBalanceList: FC = () => {
           key: 'balance',
           className: 'static-width',
           render: (data, row, index) => {
-            if (row.isLastIndex) {
+            if (row?.isLastIndex) {
               return null;
             } else {
               return Math.abs(data);

@@ -8,8 +8,12 @@ export default function (amount: number | string) {
     name: 'United States dollar',
     code: 'USD',
     symbol: '$',
+    symbolNative: '$',
     id: null,
   };
 
-  return formatMoney(amount, { symbol: currency?.symbol, format: '%v %s' });
+  return formatMoney(amount, {
+    symbol: currency?.symbolNative,
+    format: '%s %v ',
+  });
 }

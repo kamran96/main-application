@@ -272,6 +272,16 @@ input:-webkit-autofill{
       props?.theme?.colors?.inputColor} !important;
 }
 
+.new-contact-btn{
+  width: 100% !important;
+  text-align: left !important;
+  padding: 0 !important;
+  user-select: auto !important;
+}
+.new-contact-btn:hover{
+  
+  color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE} !important
+}
 
 
 `;

@@ -4,7 +4,7 @@ export function invycePersist(
   key?: string,
   data?: any,
   storage: 'localStorage' | 'sessionStorage' | 'cookie' = 'localStorage',
-  expiresAt?: string
+  expiresAt?: string | any
 ) {
   const _ = new PersistManager(key, data, storage, expiresAt);
 

@@ -41,6 +41,8 @@ export const WrapperTable = styled.div`
   }
   .ant-table-thead > tr > th {
     padding: 9px 16px;
+    background: ${(props: IThemeProps) =>
+      props?.theme?.theme === 'dark' ? props?.theme?.colors?.bgTh : ''};
   }
   .ant-table-thead {
     tr {
@@ -126,6 +128,15 @@ export const WrapperTable = styled.div`
       }
     }
   }
+  ._exportable_button.disabled {
+    button {
+      background: ${(props: IThemeProps) =>
+        props?.theme?.colors?.buttonTagBg} !important;
+      color: ${(props: IThemeProps) => props?.theme?.colors?.buttonTagColor};
+      border: none;
+      outline: none;
+    }
+  }
 
   ::-webkit-scrollbar {
     width: 10px !important;
@@ -185,5 +196,7 @@ export const DefaultWrapper = styled.div`
     padding: 13px 16px;
     color: ${(props: IThemeProps) =>
       props?.theme?.theme === 'dark' ? '#ffff' : 'unset'};
+    background: ${(props: IThemeProps) =>
+      props?.theme?.theme === 'dark' ? props?.theme?.colors?.bgTh : ''};
   }
 `;

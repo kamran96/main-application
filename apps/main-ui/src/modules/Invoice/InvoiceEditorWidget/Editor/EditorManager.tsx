@@ -96,12 +96,32 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
   const [rowsErrors, setRowsErrors] = useState([]);
   const [width] = useWindowSize();
+  const { notificationCallback, setItemsModalConfig, userDetails } =
+    useGlobalContext();
+
+  const { organization } = userDetails;
 
   /* ************ HOOKS *************** */
+  // Accounts Fetched By Types
+
+  const { data: accountsData, isLoading: accountsLoading } = useQuery(
+    [`accounts-${type}`, type === IInvoiceType.INVOICE ? 'invoice' : 'bill'],
+    getAccountsByTypeAPI,
+    {
+      enabled:
+        type === IInvoiceType.INVOICE &&
+        organization.organizationType === IOrganizationType.SAAS,
+    }
+  );
+
+  const accountsList: IAccountsResult[] = accountsData?.data?.result || [];
+  const [defaultAccount] = accountsList.filter((i) => i.code === '50001');
 
   /* Component State Hooks */
   const [invoiceDiscount, setInvoiceDiscount] = useState(0);
-  const [invoiceItems, setInvoiceItems] = useState<any>([defaultItems]);
+  const [invoiceItems, setInvoiceItems] = useState<any>([
+    { ...defaultItems, accountId: defaultAccount?.id },
+  ]);
   const [invoiceStatus, setInvoiceStatus] = useState(1);
   const [deleteIds, setDeleteIds] = useState([]);
   const [paymentReset, setPaymentReset] = useState(false);
@@ -112,6 +132,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     dueDate: dayjs(),
     paymentType: null,
   });
+
+  const [bypassCreditLimit, setBypassCreditLimit] = useState(false);
 
   /* Antd antd form */
   /* And Form Hook */
@@ -180,11 +202,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
   useEffect(() => {
     AntForm.setFieldsValue(defaultFormData);
   }, [AntForm]);
-
-  const { notificationCallback, setItemsModalConfig, userDetails } =
-    useGlobalContext();
-
-  const { organization } = userDetails;
 
   const { data: invoicesData, isLoading: invoiceLoading } = useQuery(
     [`${type}-${id}-view`, id],
@@ -265,20 +282,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         }
       })) ||
     [];
-
-  // Accounts Fetched By Types
-
-  const { data: accountsData, isLoading: accountsLoading } = useQuery(
-    [`accounts-${type}`, type === IInvoiceType.INVOICE ? 'invoice' : 'bill'],
-    getAccountsByTypeAPI,
-    {
-      enabled:
-        type === IInvoiceType.INVOICE &&
-        organization.organizationType === IOrganizationType.SAAS,
-    }
-  );
-
-  const accountsList: IAccountsResult[] = accountsData?.data?.result || [];
 
   const getSubTotal = useCallback(() => {
     let subTotal = 0;
@@ -410,6 +413,9 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
     return errors;
   };
+  const a = AntForm.getFieldsValue();
+
+  console.log(a, 'al');
 
   const columns: ColumnsType<any> = useMemo(() => {
     return [
@@ -543,6 +549,9 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       total,
                       costOfGoodAmount,
                       description,
+                      accountId: record?.accountId
+                        ? record?.accountId
+                        : defaultAccount?.id,
                     });
                     return allItems;
                   });
@@ -804,7 +813,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                   error={record?.errors?.includes('accountId')}
                   className={`border-less-select`}
                   value={{
-                    value: value !== null ? value : '',
+                    value: value !== null ? value : defaultAccount?.id || '',
                     label:
                       (accountsList?.length && getAccountNameByID(value)) ||
                       'Select Account',
@@ -927,7 +936,10 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
   const handleAddRow = () => {
     setInvoiceItems((prev) => {
       const items = [...prev];
-      items.push({ ...defaultItems, index: items.length });
+      items.push({
+        ...defaultItems,
+        index: items.length,
+      });
       return items;
     });
 
@@ -954,11 +966,12 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
   const ClearAll = () => {
     AntForm.resetFields();
     setInvoiceDiscount(0);
-    setInvoiceItems([{ ...defaultItems }]);
+    setInvoiceItems([{ ...defaultItems, accountId: defaultAccount?.id }]);
     setPayment({ ...defaultPayment });
     AntForm.setFieldsValue({
       ...defaultFormData,
     });
+    setBypassCreditLimit(false);
     setDeleteIds([]);
     resetPersist();
     setPaymentReset(true);
@@ -1019,6 +1032,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         isFetching: itemsLoading || invoiceLoading || accountsLoading,
         handleCheckValidation,
         getCachedInvoice,
+        bypassCreditLimit,
+        setBypassCreditLimit,
       }}
     >
       <LayoutWrapper>

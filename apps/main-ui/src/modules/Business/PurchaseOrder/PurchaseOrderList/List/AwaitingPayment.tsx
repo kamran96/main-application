@@ -12,7 +12,7 @@ import {
 } from '../../../../../modal/invoice';
 import convertToRem from '../../../../../utils/convertToRem';
 import { Link } from 'react-router-dom';
-import { _csvColumns } from './CommonCol';
+import { pdfColsPO, _csvColumns } from './CommonCol';
 
 interface IProps {
   columns?: any[];
@@ -101,6 +101,7 @@ export const AwaitingPayment: FC<IProps> = ({ columns }) => {
   return (
     <ALlWrapper>
       <CommonTable
+        pdfExportable={{ columns: pdfColsPO }}
         exportable
         exportableProps={{
           fields: _csvColumns,

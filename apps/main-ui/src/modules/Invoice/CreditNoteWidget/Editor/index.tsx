@@ -3,7 +3,7 @@ import printIcon from '@iconify-icons/bytesize/print';
 import Icon from '@iconify/react';
 import { EditableTable } from '@invyce/editable-table';
 import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
-import { IContactTypes, CreditNoteType } from '../../../../modal';
+import { IInvoiceType, ITaxTypes } from '@invyce/shared/types';
 import dayjs from 'dayjs';
 import { FC, useRef, useState } from 'react';
 import { useQueryClient, useMutation } from 'react-query';
@@ -24,9 +24,6 @@ import {
   ISupportedRoutes,
   NOTIFICATIONTYPE,
 } from '../../../../modal';
-import { IInvoiceType, ITaxTypes } from '../../../../modal/invoice';
-import { IOrganizationType } from '../../../../modal/organization';
-import { addition } from '../../../../utils/helperFunctions';
 import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv, { DownloadPDF } from '../../../../utils/Print';
 import defaultItems, { Requires } from './defaultStates';
@@ -57,17 +54,15 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
   /* ************ HOOKS *************** */
   /* Component State Hooks */
   const { routeHistory, userDetails } = useGlobalContext();
-  const { organization } = userDetails;
+
   const { history } = routeHistory;
   const [printModal, setPrintModal] = useState(false);
   const [taxType, setTaxType] = useState<ITaxTypes>(ITaxTypes.TAX_INCLUSIVE);
 
   const {
-    rowsErrors,
     columns,
     contactResult,
     GrossTotal,
-    TotalDiscount,
     NetTotal,
     invoiceDiscount,
     setInvoiceDiscount,
@@ -78,9 +73,8 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
     isFetching,
     handleAddRow,
     ClearAll,
-    contactType,
-    setContactType,
     accountsList,
+    relation,
   } = usePurchaseWidget();
 
   const __columns =
@@ -145,14 +139,12 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
       let payload: any = {
         ...value,
         status: value.status.status,
-        invoiceType:
-          filteredContact?.contactType === IContactTypes?.CUSTOMER
-            ? CreditNoteType.CREDITNOTE
-            : CreditNoteType.DEBITNOTE,
-        discount: addition(invoiceDiscount, TotalDiscount),
+        invoiceType: IInvoiceType.CREDITNOTE,
+        discount: invoiceDiscount,
         netTotal: NetTotal,
         grossTotal: GrossTotal,
         total: '',
+        invoiceId: id,
         isNewRecord: true,
 
         invoice_items: invoiceItems.map((item, index) => {
@@ -162,15 +154,19 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
 
       delete payload.invoiceDiscount;
       delete payload.total;
-      if (id) {
+      if (id && !relation?.type) {
         payload = {
           ...payload,
 
           ...payload.invoice,
-          invoiceId: id,
+          id,
           isNewRecord: false,
           deleted_ids: deleteIds,
         };
+
+        delete payload.invoiceId;
+      } else if (id && relation?.type) {
+        payload.invoiceId = id;
       }
 
       await muatateCreateInvoice(payload, {
@@ -198,12 +194,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
           });
         },
         onError: (error: IServerError) => {
-          if (
-            error &&
-            error.response &&
-            error.response.data &&
-            error.response.data.message
-          ) {
+          if (error?.response?.data?.message) {
             const { message } = error.response.data;
             notificationCallback(NOTIFICATIONTYPE.ERROR, message);
           } else {
@@ -301,10 +292,6 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                         onChange={(val) => {
                           if (val !== 'newContact') {
                             AntForm.setFieldsValue({ contactId: val });
-                            const [filteredContact] = contactResult?.filter(
-                              (i) => i.id === val
-                            );
-                            setContactType(filteredContact?.contactType);
                           }
                         }}
                       >
@@ -472,16 +459,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                       {GrossTotal ? moneyFormat(GrossTotal) : moneyFormat(0)}
                     </p>
                   </Col>
-                  <Col className="flex alignCenter" span={12}>
-                    <p className="bold">Items Discount</p>
-                  </Col>
-                  <Col span={12}>
-                    <p className="light textRight">
-                      {TotalDiscount
-                        ? moneyFormat(TotalDiscount)
-                        : moneyFormat(0)}
-                    </p>
-                  </Col>
+
                   <Col className="flex alignCenter" span={12}>
                     <p className="bold">Invoice Discount</p>
                   </Col>
@@ -547,77 +525,56 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                   >
                     Draft
                   </Button>
-                  {true && (
-                    <Rbac permission={PERMISSIONS.INVOICES_DRAFT_APPROVE}>
-                      <>
-                        <Button
-                          disabled={creatingInvoice}
-                          loading={
-                            creatingInvoice && submitType === ISUBMITTYPE.RETURN
-                          }
-                          htmlType="submit"
-                          size={'middle'}
-                          onClick={() => {
-                            setSubmitType(ISUBMITTYPE.RETURN);
-                            AntForm.setFieldsValue({
-                              status: {
-                                status: 3,
-                                print: false,
-                              },
-                            });
-                          }}
-                        >
-                          Return
-                        </Button>
 
-                        <Button
-                          disabled={creatingInvoice}
-                          loading={
-                            creatingInvoice &&
-                            submitType === ISUBMITTYPE.APPROVE_PRINT
-                          }
-                          htmlType="submit"
-                          size={'middle'}
-                          type="primary"
-                          onClick={() => {
-                            setSubmitType(ISUBMITTYPE.APPROVE_PRINT);
-                            AntForm.setFieldsValue({
-                              status: {
-                                status: 1,
-                                print: true,
-                              },
-                            });
-                          }}
-                        >
-                          <span className="flex alignCenter ">
-                            <Icon icon={printIcon} className="mr-10" />
-                            Approve and Print
-                          </span>
-                        </Button>
-                        <Button
-                          disabled={creatingInvoice}
-                          loading={
-                            creatingInvoice &&
-                            submitType === ISUBMITTYPE.ONLYAPPROVE
-                          }
-                          htmlType="submit"
-                          size={'middle'}
-                          type="primary"
-                          onClick={() => {
-                            setSubmitType(ISUBMITTYPE.ONLYAPPROVE);
-                            AntForm.setFieldsValue({
-                              status: {
-                                status: 1,
-                                print: false,
-                              },
-                            });
-                          }}
-                        >
-                          Approve
-                        </Button>
-                      </>
-                    </Rbac>
-                  )}
+                  <Rbac permission={PERMISSIONS.INVOICES_DRAFT_APPROVE}>
+                    <>
+                      <Button
+                        disabled={creatingInvoice}
+                        loading={
+                          creatingInvoice &&
+                          submitType === ISUBMITTYPE.APPROVE_PRINT
+                        }
+                        htmlType="submit"
+                        size={'middle'}
+                        type="primary"
+                        onClick={() => {
+                          setSubmitType(ISUBMITTYPE.APPROVE_PRINT);
+                          AntForm.setFieldsValue({
+                            status: {
+                              status: 1,
+                              print: true,
+                            },
+                          });
+                        }}
+                      >
+                        <span className="flex alignCenter ">
+                          <Icon icon={printIcon} className="mr-10" />
+                          Approve and Print
+                        </span>
+                      </Button>
+                      <Button
+                        disabled={creatingInvoice}
+                        loading={
+                          creatingInvoice &&
+                          submitType === ISUBMITTYPE.ONLYAPPROVE
+                        }
+                        htmlType="submit"
+                        size={'middle'}
+                        type="primary"
+                        onClick={() => {
+                          setSubmitType(ISUBMITTYPE.ONLYAPPROVE);
+                          AntForm.setFieldsValue({
+                            status: {
+                              status: 1,
+                              print: false,
+                            },
+                          });
+                        }}
+                      >
+                        Approve
+                      </Button>
+                    </>
+                  </Rbac>
                 </Form.Item>
               </div>
             </Col>

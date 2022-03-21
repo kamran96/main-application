@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { Breadcrumb } from "antd";
-import styled from "styled-components";
-import { BreadCrumbArea } from "../../../components/BreadCrumbArea";
-import { Heading } from "../../../components/Heading";
-import { TableCard } from "../../../components/TableCard";
-import { LedgerList } from "./LedgerList";
-import { Link } from "react-router-dom";
-import { ISupportedRoutes } from "../../../modal/routing";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { useQuery } from "react-query";
-import { getAllContacts } from "../../../api";
-import { IContactType } from "../../../modal";
+import React, { useEffect, useState } from 'react';
+import { Breadcrumb } from 'antd';
+import styled from 'styled-components';
+import { BreadCrumbArea } from '../../../components/BreadCrumbArea';
+import { Heading } from '../../../components/Heading';
+import { TableCard } from '../../../components/TableCard';
+import { LedgerList } from './LedgerList';
+import { Link } from 'react-router-dom';
+import { ISupportedRoutes } from '../../../modal/routing';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { useQuery } from 'react-query';
+import { getAllContacts } from '../../../api';
+import { IContactType } from '../../../modal';
+import { Capitalize } from '../../../components/Typography';
 
 export const ContactLedger = () => {
   const { routeHistory } = useGlobalContext();
@@ -18,24 +19,27 @@ export const ContactLedger = () => {
   const [id, setId] = useState(null);
   const [type, setType] = useState(1);
   useEffect(() => {
-    if (location?.search.includes("type=supplier")) {
+    if (location?.search.includes('type=supplier')) {
       setType(2);
     } else {
       setType(1);
     }
 
-    setId(parseInt(location.pathname.split("/app/contacts/")[1]));
+    setId(location.pathname.split('/app/contacts/')[1]);
   }, [location]);
 
-  const { data } = useQuery([`all-contacts`, "ALL"], getAllContacts);
+  console.log(id, 'islkdjfaois');
+
+  const { data } = useQuery([`all-contacts`, 'ALL'], getAllContacts);
   const result: IContactType[] = (data && data.data && data.data.result) || [];
 
-  const getContactById = (id: Number) => {
+  const getContactById = (id: number) => {
+    console.log(id, 'id');
     if (result && result.length > 0) {
       const [filtered] = result.filter((item) => item.id === id);
       return filtered;
-    }else{
-      return null
+    } else {
+      return null;
     }
   };
 
@@ -52,12 +56,14 @@ export const ContactLedger = () => {
       <TableCard>
         <div>
           <Heading type="table">
-            {result.length > 0
-              ? ` ${getContactById(id) && getContactById(id).name}   Ledger`
-              : ""}
+            <Capitalize>
+              {result.length > 0
+                ? ` ${getContactById(id) && getContactById(id).name}   Ledger`
+                : ''}
+            </Capitalize>
           </Heading>
         </div>
-        <LedgerList type={type} id={parseInt(id)} />
+        <LedgerList type={type} id={id} />
       </TableCard>
     </WrapperContactLedger>
   );
