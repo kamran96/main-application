@@ -86,8 +86,11 @@ export class ItemController {
 
   @Put()
   @UseGuards(GlobalAuthGuard)
-  async delete(@Body() itemDeleteIds: ItemIdsDto): Promise<IItemWithResponse> {
-    const item = await this.itemService.DeleteItem(itemDeleteIds);
+  async delete(
+    @Body() itemDeleteIds: ItemIdsDto,
+    @Req() req: IRequest
+  ): Promise<IItemWithResponse> {
+    const item = await this.itemService.DeleteItem(itemDeleteIds, req);
 
     if (item !== undefined) {
       return {

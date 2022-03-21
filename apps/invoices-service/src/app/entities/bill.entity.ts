@@ -16,7 +16,7 @@ export class Bills {
   @Column()
   invoiceNumber: string;
   @Column()
-  discount: number;
+  adjustment: number;
   @Column()
   grossTotal: number;
   @Column()

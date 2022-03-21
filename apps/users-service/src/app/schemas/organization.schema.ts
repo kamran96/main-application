@@ -1,5 +1,7 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
+import * as mongoose from 'mongoose';
 import { IAddress } from '@invyce/interfaces';
+import { Currency } from './currency.schema';
 
 @Schema()
 export class Organization {
@@ -33,6 +35,8 @@ export class Organization {
   address: IAddress;
   @Prop()
   attachmentId: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Currency' })
+  currencyId: Currency;
   @Prop()
   status: number;
   @Prop()
@@ -51,6 +55,13 @@ OrganizationSchema.virtual('branches', {
   ref: 'Branch',
   localField: '_id',
   foreignField: 'organizationId',
+});
+
+OrganizationSchema.virtual('currency', {
+  ref: 'Currency',
+  localField: 'currencyId',
+  foreignField: '_id',
+  justOne: true,
 });
 
 OrganizationSchema.set('toObject', { virtuals: true });

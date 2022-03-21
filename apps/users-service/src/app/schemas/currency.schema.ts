@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema()
-export class Currrency {
+export class Currency {
   @Prop()
   name: string;
   @Prop()
@@ -16,4 +16,4 @@ export class Currrency {
   rounding: number;
 }
 
-export const CurrencySchema = SchemaFactory.createForClass(Currrency);
+export const CurrencySchema = SchemaFactory.createForClass(Currency);

@@ -6,7 +6,7 @@ export interface IBill extends IBase {
   issueDate: string;
   dueDate: string;
   invoiceNumber: string;
-  discount: number;
+  adjustment: number;
   grossTotal: number;
   netTotal: number;
   date: string;
@@ -27,7 +27,6 @@ export interface IBillItem extends IBase {
   itemId: string;
   description: string;
   quantity: number;
-  itemDiscount: number;
   purchasePrice: number;
   tax: string;
   sequence: number;

@@ -1,5 +1,13 @@
 import * as en from 'world_countries_lists/data/en/world.json';
-import { ICurrency } from '@invyce/shared/types';
+import { formatMoney } from 'accounting-js';
+
+interface ICurrency {
+  id: number;
+  name: string;
+  code: string;
+  symbol: string;
+  symbolNative: string;
+}
 
 export const getCountryById = (id: number) => {
   const [filtered] = en?.filter((i) => i.id === id);
@@ -12,8 +20,6 @@ export const getCountryById = (id: number) => {
   };
 };
 
-import formatMoney from 'accounting-js/lib/formatMoney.js';
-
 export const moneyFormatJs = (
   amount: number | string,
   currency: ICurrency = {
@@ -21,9 +27,24 @@ export const moneyFormatJs = (
     code: 'USD',
     symbol: '$',
     id: null,
+    symbolNative: '$',
   }
 ) => {
-  return formatMoney(amount, { symbol: currency?.symbol, format: '%v %s' });
+  return formatMoney(amount, {
+    symbol: currency?.symbol,
+    format: '%s %v ',
+  });
+};
+
+export const Capitalize = (sentance) => {
+  return sentance
+    ?.split(' ')
+    .map((word, index) => {
+      return word
+        .toLowerCase()
+        .replace(/\w/, (firstLetter) => firstLetter.toUpperCase());
+    })
+    .join(' ');
 };
 
 export const CalculatePercentage = (value: number, percentage: number) => {
