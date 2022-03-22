@@ -13,14 +13,14 @@ spec:
         app: contacts-app
     spec:
       containers:
-      - name: contacts-app
-        image: <IMAGE>
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
-        ports:
-        - containerPort: 3333
+        - name: contacts-app
+          image: registry.digitalocean.com/invyce-images/contacts-service:549b285
+          resources:
+            limits:
+              memory: '128Mi'
+              cpu: '500m'
+          ports:
+            - containerPort: 3333
 
 ---
 # k8s service for this micro-service
@@ -33,5 +33,46 @@ spec:
   selector:
     app: contacts-app
   ports:
-  - port: 80
-    targetPort: 3333
+    - port: 80
+      targetPort: 3333
+      protocol: TCP
+
+---
+# take outside traffic to service using istio
+# See more at https://istio.io/docs/reference/config/networking/gateway/
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: contacts-gateway
+spec:
+  selector:
+    istio: ingress
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - 'staging.invyce.com'
+
+---
+
+# See more at https://istio.io/docs/reference/config/networking/virtual-service/
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: contacts-vs
+spec:
+  gateways:
+    - contacts-gateway
+  hosts:
+  - "staging.invyce.com"
+  http:
+  - name: 'contacts-endpoint'
+    match:
+    - uri:
+        prefix: '/contacts'
+    route:
+    - destination:
+        host: contacts-http
+

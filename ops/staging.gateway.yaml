@@ -1,0 +1,26 @@
+# See more at https://istio.io/docs/reference/config/networking/gateway/
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: invyce-staging-gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - 'staging.invyce.com'
+  # - port:
+  #     number: 443
+  #     name: https
+  #     protocol: HTTPS
+  #   hosts:
+  #   - '*/*.invyce.com'
+  #   - '*/invyce.com'
+  #   tls:
+  #     mode: SIMPLE
+  #     serverCertificate: /etc/istio/ingressgateway-certs/invyce-io-crt.pem
+  #     privateKey: /etc/istio/ingressgateway-certs/invyce-io-key.pem
