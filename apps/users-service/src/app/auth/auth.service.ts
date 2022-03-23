@@ -43,7 +43,7 @@ const generateRandomNDigits = (n) => {
 };
 
 const secret = speakeasy.generateSecret({
-  name: 'invyce',
+  name: 'Invyce',
 });
 
 @Injectable()
@@ -329,6 +329,28 @@ export class AuthService {
     }
   }
 
+  async RequestChangeVerify(body) {
+    const user_code = await this.userTokenModel.findOne({
+      code: body.otp,
+    });
+
+    const oneHour = user_code.expiresAt;
+    const currentTime = new Date().getTime() / 1000;
+
+    if (currentTime && currentTime > oneHour) {
+      throw new HttpException(
+        'Otp is expired, Click on resend to generate new verification code.',
+        HttpStatus.BAD_REQUEST
+      );
+    } else {
+      return {
+        message: 'Verification successful',
+        verified: true,
+        status: true,
+      };
+    }
+  }
+
   async ResendOtp(body: SendOtp): Promise<void> {
     const time = Moment(new Date()).add(1, 'h').calendar();
 
@@ -347,12 +369,13 @@ export class AuthService {
   }
 
   async ChangeEmailOtp(body, usr) {
-    const time = Moment(new Date()).add(1, 'h');
+    const time = new Date().getTime() / 1000 + 1 * (60 * 60);
 
     const user = await this.userModel.findOne({ email: usr.email });
 
     const generateOtp: number = generateRandomNDigits(4);
     parseInt(generateOtp as unknown as string);
+    console.log(generateOtp, 'otp');
 
     const user_token = new this.userTokenModel();
     user_token.code = generateOtp;
@@ -489,17 +512,32 @@ export class AuthService {
     }
   }
 
-  async GenerateGoogleAuthenticatorToken() {
-    return await qrcode.toDataURL(secret.otpauth_url);
+  async GenerateGoogleAuthenticatorToken(): Promise<unknown> {
+    const token = await qrcode.toDataURL(secret.otpauth_url);
+
+    return {
+      result: token,
+    };
   }
 
-  async VerifyGoogleAuthenticatorToken(data) {
+  async VerifyGoogleAuthenticatorToken(data, user): Promise<unknown> {
+    console.log(secret, 'okkkkkkkk');
+
     const { code } = data;
     const verified = await speakeasy.totp.verify({
       secret: secret.base32,
       encoding: 'base32',
       token: code,
     });
+
+    await this.userModel.updateOne(
+      {
+        _id: user._id,
+      },
+      {
+        twoFactorEnabled: true,
+      }
+    );
 
     return verified;
   }

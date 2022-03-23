@@ -12,7 +12,7 @@ export class bill1630669334276 implements MigrationInterface {
           { name: 'issueDate', type: 'varchar', isNullable: true },
           { name: 'dueDate', type: 'varchar', isNullable: true },
           { name: 'invoiceNumber', type: 'varchar', isNullable: true },
-          { name: 'discount', type: 'float', isNullable: true },
+          { name: 'adjustment', type: 'float', isNullable: true },
           { name: 'grossTotal', type: 'float', isNullable: true },
           { name: 'netTotal', type: 'float', isNullable: true },
           { name: 'date', type: 'varchar', isNullable: true },

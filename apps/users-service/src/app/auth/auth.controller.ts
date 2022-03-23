@@ -220,14 +220,35 @@ export class AuthController {
   }
 
   @UseGuards(GlobalAuthGuard)
-  @Post('/authenticator')
-  async GoogleAuthenticator() {
+  @Post('request-change-verify')
+  async requestChangeVerify(@Body() body: SendOtp): Promise<IUserWithResponse> {
+    return await this.authService.RequestChangeVerify(body);
+  }
+
+  @UseGuards(GlobalAuthGuard)
+  @Post('/gen-authenticator')
+  async GoogleAuthenticator(): Promise<unknown> {
     return await this.authService.GenerateGoogleAuthenticatorToken();
   }
 
   @UseGuards(GlobalAuthGuard)
   @Post('/authenticator')
-  async verifyGoogleAuthenticatorToken(@Body() body) {
-    return await this.authService.VerifyGoogleAuthenticatorToken(body);
+  async verifyGoogleAuthenticatorToken(
+    @Body() body,
+    @Req() req: IRequest
+  ): Promise<unknown> {
+    const resp = await this.authService.VerifyGoogleAuthenticatorToken(
+      body,
+      req.user
+    );
+
+    if (resp === true) {
+      return {
+        message: 'Successfull added',
+        status: true,
+      };
+    } else {
+      throw new HttpException('Authentication Failed', HttpStatus.BAD_REQUEST);
+    }
   }
 }

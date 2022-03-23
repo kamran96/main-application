@@ -16,6 +16,8 @@ export class User {
   password: string;
   @Prop()
   theme: string;
+  @Prop({ default: false })
+  twoFactorEnabled: boolean;
   @Prop()
   terms: boolean;
   @Prop()
