@@ -521,8 +521,6 @@ export class AuthService {
   }
 
   async VerifyGoogleAuthenticatorToken(data, user): Promise<unknown> {
-    console.log(secret, 'okkkkkkkk');
-
     const { code } = data;
     const verified = await speakeasy.totp.verify({
       secret: secret.base32,
