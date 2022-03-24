@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Form, Input, Button, Row, Col, Checkbox } from 'antd';
 import { FormLabel } from '../../components/FormLabel';
 import { useMutation } from 'react-query';
-import { LoginAPI } from '../../api';
+import { googleLoginAPI, LoginAPI } from '../../api';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { ILoginActions } from '../../hooks/globalContext/globalManager';
 import { updateToken } from '../../utils/http';
@@ -11,10 +11,12 @@ import { ISupportedRoutes, NOTIFICATIONTYPE } from '../../modal';
 import { IBaseAPIError } from '../../modal/base';
 import { HeadingTemplate1 } from '../../components/HeadingTemplates';
 import { BOLDTEXT } from '../../components/Para/BoldText';
-import { CommonModal } from '../../components/Modal';
+import GoogleLogin from 'react-google-login';
 
 export const LoginForm: FC = () => {
   const { mutate: mutateLogin, isLoading: logginIn } = useMutation(LoginAPI);
+  const { mutate: mutateGoogleLogin, isLoading: googleLoginLoading } =
+    useMutation(googleLoginAPI);
 
   const { notificationCallback, routeHistory, handleLogin }: any =
     useGlobalContext();
@@ -79,6 +81,32 @@ export const LoginForm: FC = () => {
     console.log('Failed:', errorInfo);
   };
   //--------------------------------------------------------
+
+  const submitGoogleLogin = async (token?: string) => {
+    await mutateGoogleLogin(
+      { token },
+      {
+        onSuccess: (data) => {
+          if (process.env.NODE_ENV === 'production') {
+            handleLogin({
+              type: ILoginActions.LOGIN,
+              payload: { autherization: true },
+            });
+          } else {
+            handleLogin({
+              type: ILoginActions.LOGIN,
+              payload: data?.data,
+            });
+            updateToken(data?.data.access_token);
+          }
+          notificationCallback(
+            NOTIFICATIONTYPE.SUCCESS,
+            `Logged in SuccessFully`
+          );
+        },
+      }
+    );
+  };
 
   return (
     <LoginFormWrapper>
@@ -161,6 +189,23 @@ export const LoginForm: FC = () => {
                   Sign In
                 </Button>
               </Form.Item>
+              <Form.Item>
+                <GoogleLogin
+                  className="google-signin mv-10"
+                  clientId={`739410132871-45r2feessjs5l5rtbk1kekr5t78aa7ee.apps.googleusercontent.com`}
+                  buttonText="Log in with Google"
+                  onSuccess={(data: any) => {
+                    const { tokenId } = data;
+                    console.log(data, 'id token');
+
+                    submitGoogleLogin(tokenId);
+                  }}
+                  onFailure={(err) => {
+                    console.log(err);
+                  }}
+                  cookiePolicy={'single_host_origin'}
+                />
+              </Form.Item>
               <h5 className="textCenter mt-10">
                 <BOLDTEXT>OR</BOLDTEXT>
               </h5>
@@ -221,5 +266,11 @@ export const LoginFormWrapper = styled.div`
     left: 0;
     text-align: center;
     background-color: white;
+  }
+
+  .google-signin {
+    justify-content: center;
+    width: 100%;
+    box-shadow: 0px 2px 5px 1px #e4e4e4 !important;
   }
 `;

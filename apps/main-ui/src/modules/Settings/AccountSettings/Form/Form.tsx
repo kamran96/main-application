@@ -1,20 +1,35 @@
 import styled from 'styled-components';
-import { FC, useState } from 'react';
-import { Row, Col, Form, Input, Select, Button } from 'antd';
+import { FC, useEffect, useState } from 'react';
+import {
+  Row,
+  Col,
+  Form,
+  Input,
+  Select,
+  Button,
+  Space,
+  Checkbox,
+  Switch,
+} from 'antd';
 import { FormLabel } from '../../../../components/FormLabel';
-import { Heading } from '../../../../components/Heading';
-import { Color } from '../../../../modal';
+import { Color, DivProps, IBaseAPIError, IErrorData } from '../../../../modal';
 import convertToRem from '../../../../utils/convertToRem';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import ReactInputVerificationCode from 'react-input-verification-code';
 import { BOLDTEXT } from '../../../../components/Para/BoldText';
 import { useMutation, useQuery } from 'react-query';
-import { ChangeAccountPreferencesAPI, verifyAccountAPI } from '../../../../api';
+import {
+  ChangeAccountPreferencesAPI,
+  ChangeRequestOtpVerification,
+  generateAuthenticator,
+  updateAccountSetting,
+  verifyAuthenticatorCode,
+} from '../../../../api';
 import dayjs from 'dayjs';
 import { invycePersist } from '@invyce/invyce-persist';
-
-const { Option } = Select;
+import { updateToken } from '../../../../utils/http';
+import { CommonModal } from '../../../../components';
 
 const defaultState = {
   email: false,
@@ -23,19 +38,52 @@ const defaultState = {
 };
 
 export const AccountsSettingsForm: FC = () => {
+  const {
+    mutate: verifyOTP,
+    isLoading: verifyingOTP,
+    isError,
+    error,
+    reset: resetVerifyingOPT,
+  } = useMutation(ChangeRequestOtpVerification);
+  const otpError: IBaseAPIError = error;
+  const { mutate: requestChange, isLoading } = useMutation(
+    ChangeAccountPreferencesAPI
+  );
+  const { mutate: requestQRCode, data } = useMutation(generateAuthenticator, {
+    onSuccess: () => {
+      setTwoFactorAuthModal(true);
+    },
+  });
+
+  const { mutate: verifyAuthenticatorToken } = useMutation(
+    verifyAuthenticatorCode
+  );
+
+  const { mutate: updateSetting, isLoading: updatingSetting } =
+    useMutation(updateAccountSetting);
   const [editable, setEditable] = useState({
     email: false,
     password: false,
     twoStepAuth: false,
   });
+  const [otpValue, setOtpValue] = useState('');
+  const { userDetails, refetchUser } = useGlobalContext();
+  const { email, twoFactorEnabled } = userDetails;
+  const [twoFactorAuthModal, setTwoFactorAuthModal] = useState(false);
+
+  useEffect(() => {
+    form.setFieldsValue({
+      email,
+      twoFactorEnabled,
+    });
+  }, [userDetails]);
+
+  const [form] = Form.useForm();
   // const [verified, setVerified] = useState(false);
   const [verifyModal, setVerifyModal] = useState({
     visibility: false,
     type: null,
   });
-
-  const { mutate: verifyOTP, isLoading: verifyingOTP } =
-    useMutation(verifyAccountAPI);
 
   const getVerifiedStatus = (type) => {
     const data = invycePersist().get(`${type}-request`, 'cookie');
@@ -43,35 +91,156 @@ export const AccountsSettingsForm: FC = () => {
     return data ? data : null;
   };
 
-  const { mutate: requestChange, isLoading } = useMutation(
-    ChangeAccountPreferencesAPI
-  );
-
-  const { userDetails } = useGlobalContext();
-  const { email } = userDetails;
-
   const requestChangePreferences = async (type) => {
     const payload = {
       type,
     };
     await requestChange(payload, {
       onSuccess: (data) => {
-        const nextFiveMins = dayjs().add(5, 'minutes');
-        console.log(nextFiveMins, 'next');
+        const nextFiveMins = dayjs().add(3, 'minutes');
         invycePersist(`${type}-request`, true, 'cookie', nextFiveMins).set();
-
         setVerifyModal({ visibility: true, type });
+        resetVerifyingOPT();
       },
     });
   };
 
   const checkVerifyCode = async (otp, type) => {
-    console.log(otp, type);
+    verifyOTP(
+      { otp },
+      {
+        onSuccess: (data) => {
+          setEditable({ ...defaultState, [type]: true });
+          setVerifyModal({ visibility: false, type: null });
+          invycePersist().resetData(`${type}-request`, 'cookie');
+        },
+      }
+    );
+  };
+
+  const updateFormItem = async (formItem) => {
+    await updateSetting(
+      { ...formItem },
+      {
+        onSuccess: async (data) => {
+          await updateToken(data?.data?.access_token);
+          refetchUser();
+          setEditable(defaultState);
+        },
+      }
+    );
+  };
+
+  const geterateQRCode = async () => {
+    await requestQRCode();
+  };
+
+  const verifyAuthToken = async (code) => {
+    await verifyAuthenticatorToken(
+      { code },
+      {
+        onSuccess: (data) => {
+          setTwoFactorAuthModal(false);
+          refetchUser();
+          setOtpValue('');
+        },
+      }
+    );
   };
 
   return (
     <WrapperSettingsForm>
-      <Form>
+      <Form form={form}>
+        <FormLabel>Email</FormLabel>
+        <div className="flex">
+          <Form.Item
+            style={{ width: 300 }}
+            rules={[{ type: 'email' }]}
+            name="email"
+            shouldUpdate
+          >
+            <Input disabled={!editable.email} size="middle" />
+          </Form.Item>
+          <Button
+            onClick={() =>
+              editable?.email
+                ? updateFormItem({ email: form.getFieldValue('email') })
+                : true && getVerifiedStatus('email')
+                ? setVerifyModal({ visibility: true, type: 'email' })
+                : requestChangePreferences('email')
+            }
+            size="middle"
+            type="link"
+          >
+            {editable?.email
+              ? 'Change'
+              : getVerifiedStatus('email') && true
+              ? 'Verify'
+              : 'Request Change'}
+          </Button>
+        </div>
+        <FormLabel>Password</FormLabel>
+        <div className="flex">
+          <Form.Item
+            style={{ width: 300 }}
+            name="password"
+            rules={[
+              { required: true, message: 'Please add a password' },
+              {
+                min: 6,
+                message: 'Your Password shold have minimum 6 characters',
+              },
+            ]}
+            hasFeedback
+          >
+            <Input.Password disabled={!editable.password} size="middle" />
+          </Form.Item>
+          <Button
+            onClick={() =>
+              editable?.password
+                ? updateFormItem({ password: form.getFieldValue('password') })
+                : true && getVerifiedStatus('password')
+                ? setVerifyModal({ visibility: true, type: 'password' })
+                : requestChangePreferences('password')
+            }
+            size="middle"
+            type="link"
+          >
+            {editable?.password
+              ? 'Change'
+              : getVerifiedStatus('password') && true
+              ? 'Verify'
+              : 'Request Change'}
+          </Button>
+        </div>
+        <div className="flex">
+          <Form.Item
+            style={{ width: 300 }}
+            label="Two Factor Authentication"
+            colon={false}
+            name="twoFactorEnabled"
+            valuePropName="checked"
+            getValueFromEvent={(value) => {
+              if (value === true) {
+                geterateQRCode();
+              } else {
+                updateFormItem({ twoFactorEnabled: value });
+              }
+            }}
+          >
+            <Switch />
+          </Form.Item>
+        </div>
+      </Form>
+      {/* <Form
+        onFinish={(value) => {
+          console.log(value);
+        }}
+        onFinishFailed={(err) => {
+          console.log(err);
+        }}
+        form={form}
+      >
         <Row gutter={24}>
           <Col span={10}>
             <Row gutter={24}>
@@ -83,31 +252,34 @@ export const AccountsSettingsForm: FC = () => {
               </Col>
               <Col span={24}>
                 <FormLabel>Email Address</FormLabel>
-                <Form.Item name="email">
+                <Form.Item rules={[{ type: 'email' }]} name="email">
                   <Input
                     defaultValue={email}
                     disabled={!editable.email}
                     placeholder="something@example.com"
                     size="large"
+                    onChange={(value) => {
+                      form.setFieldsValue({ email: value });
+                    }}
                   />
-                  {!editable.email && (
-                    <p
-                      onClick={() =>
-                        editable?.email
-                          ? null
-                          : true && getVerifiedStatus('email')
-                          ? setVerifyModal({ visibility: true, type: 'email' })
-                          : requestChangePreferences('email')
-                      }
-                      className="changeText"
-                    >
-                      {editable?.email
-                        ? 'Change'
-                        : getVerifiedStatus('email') && true
-                        ? 'Verify'
-                        : 'Request Change'}
-                    </p>
-                  )}
+
+                  <p
+                    onClick={() =>
+                      editable?.email
+                        ? form.submit()
+                        : true && getVerifiedStatus('email')
+                        ? setVerifyModal({ visibility: true, type: 'email' })
+                        : requestChangePreferences('email')
+                    }
+                    className="changeText"
+                  >
+                    {editable?.email
+                      ? 'Change'
+                      : getVerifiedStatus('email') && true
+                      ? 'Verify'
+                      : 'Request Change'}
+                  </p>
+
                   <br />
                 </Form.Item>
               </Col>
@@ -200,36 +372,86 @@ export const AccountsSettingsForm: FC = () => {
             </Row>
           </Col>
         </Row>
-      </Form>
+      </Form> */}
       <ConfirmModal
         visible={verifyModal?.visibility}
         onCancel={() => {
           setVerifyModal({ visibility: false, type: null });
+          setOtpValue('');
+          resetVerifyingOPT();
         }}
         showButtons={false}
         type="info"
         confirmText="Verify"
         children={
-          <WrapperOtpModal>
+          <WrapperOtpModal error={isError}>
             <p>
-              Otp has been sent to <br /> <BOLDTEXT>kamran@invyce.com</BOLDTEXT>{' '}
-              please verify!
+              Otp has been sent to <br /> <BOLDTEXT>{email}</BOLDTEXT> please
+              verify!
             </p>
             <div className="flex alignCenter justifyCenter">
               <ReactInputVerificationCode
-                length={4}
+                value={otpValue}
+                length={5}
                 placeholder={'*'}
                 onChange={(value) => {
+                  setOtpValue(value);
                   const bool = value.includes('*');
-                  if (value?.split('').length === 4 && !bool) {
+                  if (value?.split('').length === 5 && !bool) {
                     checkVerifyCode(value, verifyModal?.type);
                   }
                 }}
               />
             </div>
+            {otpError?.response?.data?.message && (
+              <p className="ant-form-item-explain mv-5">
+                {otpError?.response?.data?.message}
+              </p>
+            )}
+
+            <Button
+              onClick={() => {
+                requestChangePreferences(verifyModal?.type);
+              }}
+              type="link"
+              size="small"
+            >
+              Resend OTP
+            </Button>
           </WrapperOtpModal>
         }
       />
+      <CommonModal
+        width={350}
+        visible={twoFactorAuthModal}
+        footer={false}
+        onCancel={() => {
+          setTwoFactorAuthModal(false);
+          setOtpValue('');
+          form.setFieldsValue({ twoFactorEnable: false });
+        }}
+        title="Scan QR Code"
+      >
+        <WrapperOtpModal error={false}>
+          <div className="flex justifyCenter">
+            <img src={data?.data?.result} alt="qr-code" />
+          </div>
+          <div className="mv-10 flex justifyCenter">
+            <ReactInputVerificationCode
+              value={otpValue}
+              length={6}
+              placeholder={'*'}
+              onChange={(value) => {
+                setOtpValue(value);
+                const bool = value.includes('*');
+                if (value?.split('').length === 6 && !bool) {
+                  verifyAuthToken(value);
+                }
+              }}
+            />
+          </div>
+        </WrapperOtpModal>
+      </CommonModal>
     </WrapperSettingsForm>
   );
 };
@@ -251,13 +473,20 @@ export const WrapperSettingsForm = styled.div`
   }
 `;
 
-export const WrapperOtpModal = styled.div`
+interface IWrrapper extends DivProps {
+  error: boolean;
+}
+
+export const WrapperOtpModal = styled.div<IWrrapper>`
   .ReactInputVerificationCode__container {
-    width: ${convertToRem(200)} !important;
+    width: ${convertToRem(320)} !important;
   }
   .ReactInputVerificationCode__item {
-    width: 3rem !important;
-    height: 4rem !important;
+    width: 3.4rem !important;
+    height: 3.4rem !important;
     line-height: 4rem !important;
+    margin: 1px;
+
+    ${(props) => (props?.error ? `border: 1px solid red !important` : '')}
   }
 `;

@@ -362,7 +362,8 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
       render: (data) => moneyFormat(data),
     },
     response?.invoiceType !== IInvoiceType?.CREDITNOTE &&
-    response?.invoiceType !== IInvoiceType?.DEBITNOTE
+    response?.invoiceType !== IInvoiceType?.DEBITNOTE &&
+    response?.invoiceType !== IInvoiceType?.PURCHASE_ENTRY
       ? {
           title: 'DISCOUNT',
           dataIndex: 'itemDiscount',
@@ -710,14 +711,23 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
                   <th>Sub Total</th>
                   <td>{moneyFormat(response?.grossTotal)}</td>
                 </tr>
-                <tr>
-                  <th>Items Discount</th>
-                  <td>{response && moneyFormat(itemsDiscount)}</td>
-                </tr>
-                <tr>
-                  <th>Invoice Discount</th>
-                  <td>{response && moneyFormat(invoiceDiscount)}</td>
-                </tr>
+                {type !== 'PO' ? (
+                  <>
+                    <tr>
+                      <th>Items Discount</th>
+                      <td>{response && moneyFormat(itemsDiscount)}</td>
+                    </tr>
+                    <tr>
+                      <th>Invoice Discount</th>
+                      <td>{response && moneyFormat(invoiceDiscount)}</td>
+                    </tr>
+                  </>
+                ) : (
+                  <tr>
+                    <th>Adjustments</th>
+                    <td>{response && moneyFormat(response?.adjustment)}</td>
+                  </tr>
+                )}
                 <tr>
                   <th>Tax Rate</th>
                   <td>{response && moneyFormat(TotalTax)}</td>

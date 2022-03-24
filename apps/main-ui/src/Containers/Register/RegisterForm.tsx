@@ -176,7 +176,6 @@ export const RegisterForm: FC = () => {
                 <Seprator />
               </div>
               <Form
-                autoComplete="off"
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
                 layout="vertical"
@@ -197,7 +196,7 @@ export const RegisterForm: FC = () => {
                       <Input
                         placeholder={'eg John'}
                         size="middle"
-                        autoComplete="off"
+                        autoComplete="new-password"
                       />
                     </Form.Item>
                   </Col>
@@ -222,7 +221,7 @@ export const RegisterForm: FC = () => {
                       <Input
                         placeholder="e.g John"
                         size="middle"
-                        autoComplete="off"
+                        autoComplete="new-password"
                       />
                     </Form.Item>
                   </Col>
@@ -252,7 +251,7 @@ export const RegisterForm: FC = () => {
                       <Input
                         placeholder="e.g someone@example.com"
                         size="middle"
-                        autoComplete="off"
+                        autoComplete="new-password"
                       />
                     </Form.Item>
                   </Col>
@@ -307,7 +306,7 @@ export const RegisterForm: FC = () => {
                       ]}
                     >
                       <Input
-                        autoComplete="off"
+                        autoComplete="new-password"
                         addonBefore={prefixSelector}
                         type="text"
                         placeholder="3188889898"
