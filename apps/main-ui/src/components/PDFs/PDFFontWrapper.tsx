@@ -14,7 +14,7 @@ Font.register({
     { src: require('../../assets/fonts/RobotoSlab-ExtraBold.ttf') },
     { src: require('../../assets/fonts/RobotoSlab-ExtraLight.ttf') },
     { src: require('../../assets/fonts/RobotoSlab-Light.ttf') },
-    { src: require('../../assets/fonts/RobotoSlab-medium.ttf') },
+    { src: require('../../assets/fonts/RobotoSlab-Medium.ttf') },
     { src: require('../../assets/fonts/RobotoSlab-Regular.ttf') },
     { src: require('../../assets/fonts/RobotoSlab-SemiBold.ttf') },
   ],
