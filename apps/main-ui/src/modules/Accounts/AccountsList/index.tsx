@@ -221,7 +221,15 @@ export const AccountsList: FC<IProps> = ({ data }) => {
   );
 
   const onSelectedRow = (item) => {
-    setSelectedRow(item.selectedRowKeys);
+    const lastIndex = item?.selectedRows?.length - 1;
+
+    if (lastIndex >= 0) {
+      if (!item?.selectedRows[lastIndex]?.isSystemAccount) {
+        setSelectedRow(item.selectedRowKeys);
+      }
+    } else {
+      setSelectedRow(item?.selectedRowKeys);
+    }
   };
 
   const renderCustomTopbar = () => {
@@ -342,6 +350,9 @@ export const AccountsList: FC<IProps> = ({ data }) => {
           }}
           hasfooter={true}
           onSelectRow={onSelectedRow}
+          rowSelection={{
+            selectedRowKeys: selectedRow,
+          }}
           enableRowSelection
         />
       </ListWrapper>

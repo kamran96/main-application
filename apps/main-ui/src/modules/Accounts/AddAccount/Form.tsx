@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import {
   createUpdateAccountAPI,
   getAccountByIDAPI,
+  getAccountCodeAPI,
   getSecondaryAccounts,
 } from '../../../api/accounts';
 import { CommonModal } from '../../../components';
@@ -22,6 +23,9 @@ export const AccountsForm: FC = () => {
   const { mutate: mutateAddAccount, isLoading: creatingAccount } = useMutation(
     createUpdateAccountAPI
   );
+
+  const { mutate: mutateGetAccountCode } = useMutation(getAccountCodeAPI);
+
   const [secondaryAccounts, setSecondaryAccounts] = useState<
     ISecondaryAccount[]
   >([]);
@@ -126,6 +130,21 @@ export const AccountsForm: FC = () => {
               <Form.Item
                 name="secondaryAccountId"
                 rules={[{ required: true, message: 'Please account' }]}
+                getValueFromEvent={(value) => {
+                  if (!id) {
+                    mutateGetAccountCode(
+                      { id: value },
+                      {
+                        onSuccess: (data) => {
+                          form.setFieldsValue({
+                            code: data?.data?.result?.code,
+                          });
+                        },
+                      }
+                    );
+                  }
+                  return value;
+                }}
               >
                 <Select
                   loading={isLoading}
@@ -161,7 +180,7 @@ export const AccountsForm: FC = () => {
             <Col span={12}>
               <FormLabel>Code</FormLabel>
               <Form.Item name="code">
-                <Input size="large" type="number" />
+                <Input size="large" type="number" disabled />
               </Form.Item>
               <p className="input-info">
                 A unique code/number for this account (limited to 10 characters)

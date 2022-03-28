@@ -67,3 +67,6 @@ export const getAccountsByTypeAPI = ({ queryKey }: QueryKey) => {
   const type = queryKey[1] || 'invoice';
   return http(`accounts/account/type?type=${type}`);
 };
+
+export const getAccountCodeAPI = (payload?: { id: number }) =>
+  http?.post(`accounts/account/code`, payload);

@@ -117,7 +117,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   } = useQuery(
     [
       `invoices-${ORDER_TYPE.PURCAHSE_ORDER}-${INVOICETYPE.DRAFT}?page=${page}&query=${query}&sort=${sortid}&page_size=${pageSize}`,
-      ORDER_TYPE.PURCAHSE_ORDER,
+      INVOICETYPE.ALL,
       INVOICETYPE.DRAFT,
       page,
       pageSize,
