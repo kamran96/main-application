@@ -24,7 +24,7 @@ import {
   getAllContacts,
   getAllItems,
   getInvoiceNumber,
-  getPurchasesById,
+  getBillsById,
 } from '../../../../api';
 import { getAccountsByTypeAPI } from '../../../../api/accounts';
 import { Option } from '../../../../components/CommonSelect';
@@ -190,7 +190,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   const APICATEGORYSTAKE =
     relation?.type === IInvoiceType.PURCHASE_ENTRY ||
     relation?.type === IInvoiceType.PURCHASE_ORDER
-      ? getPurchasesById
+      ? getBillsById
       : creditNoteViewAPI;
 
   const key =

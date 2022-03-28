@@ -118,8 +118,8 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
   } = useQuery(
     [
       `invoices-${ORDER_TYPE.PURCAHSE_ORDER}-${INVOICETYPE.Approved}?page=${page}&query=${query}&sort=${sortid}&page_size=${pageSize}`,
-      [ORDER_TYPE.PURCAHSE_ORDER],
-      'PROCESSED',
+      INVOICETYPE.ALL,
+      INVOICETYPE.Approved,
       page,
       pageSize,
       query,

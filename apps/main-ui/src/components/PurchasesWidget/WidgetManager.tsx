@@ -23,7 +23,7 @@ import {
   getAllItems,
   getInvoiceByIDAPI,
   getInvoiceNumber,
-  getPurchasesById,
+  getBillsById,
 } from '../../api';
 import { getAccountsByTypeAPI } from '../../api/accounts';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
@@ -122,7 +122,7 @@ export const PurchaseManager: FC<IProps> = ({
     type === IInvoiceType.BILL ||
     type === IInvoiceType.PURCHASE_ENTRY ||
     type === IInvoiceType.PURCHASE_ORDER
-      ? getPurchasesById
+      ? getBillsById
       : getInvoiceByIDAPI;
 
   const [rowsErrors, setRowsErrors] = useState([]);
@@ -745,7 +745,7 @@ export const PurchaseManager: FC<IProps> = ({
         return (
           <Editable
             error={record?.errors?.includes('purchasePrice')}
-            disabled={!record.itemId}
+            disabled={false}
             onChange={(value) => {
               clearTimeout(setStateTimeOut);
 
@@ -761,7 +761,7 @@ export const PurchaseManager: FC<IProps> = ({
                 const indexed =
                   allItems[index].errors?.indexOf('purchasePrice');
                 if (indexed !== -1) {
-                  allItems[index].errors.splice(indexed, 1);
+                  allItems[index]?.errors?.splice(indexed, 1);
                 }
 
                 allItems[index] = {

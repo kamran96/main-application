@@ -93,7 +93,7 @@ export const Themes: IThemes = {
     tableRowHover: '#151515',
     td: `#ffff`,
     seprator: '#F4F4F4',
-    bgTh: `#1E75F1`,
+    bgTh: `#fafafa`,
     textTd: `#272727`,
     modalOverlay: `rgba(0, 0, 0, 0.45)`,
     placeHolder: ``,
