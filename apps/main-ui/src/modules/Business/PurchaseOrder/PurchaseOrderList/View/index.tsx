@@ -1,17 +1,22 @@
-import { Breadcrumb } from "antd";
-import React from "react";
-import { Link } from "react-router-dom";
+import { Breadcrumb } from 'antd';
+import React from 'react';
+import { Link, useHistory } from 'react-router-dom';
 
-import { BreadCrumbArea } from "../../../../../components/BreadCrumbArea";
-import { PurchasesView } from "../../../../../components/PurchasesView";
-import { TableCard } from "../../../../../components/TableCard";
-import { useGlobalContext } from "../../../../../hooks/globalContext/globalContext";
-import { ISupportedRoutes } from "../../../../../modal";
+import { BreadCrumbArea } from '../../../../../components/BreadCrumbArea';
+import { PurchasesView } from '../../../../../components/PurchasesView';
+import { TableCard } from '../../../../../components/TableCard';
+import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
+import { IInvoiceType, ISupportedRoutes } from '../../../../../modal';
 
 export const PurchaseView = () => {
-  const { routeHistory } = useGlobalContext();
-  const { pathname } = routeHistory.location;
-  let invId = pathname.split("app/purchase-orders/")[1];
+  const history = useHistory();
+
+  const { pathname } = history.location;
+
+  // console.log
+  const invId = pathname.split(
+    `${ISupportedRoutes.DASHBOARD_LAYOUT}${ISupportedRoutes?.PURCHASE_ORDER}/`
+  )[1];
 
   return (
     <>
@@ -26,7 +31,7 @@ export const PurchaseView = () => {
         </Breadcrumb>
       </BreadCrumbArea>
       <TableCard>
-        <PurchasesView type="PO" id={invId} />
+        <PurchasesView type={IInvoiceType.PURCHASE_ORDER} id={invId} />
       </TableCard>
     </>
   );

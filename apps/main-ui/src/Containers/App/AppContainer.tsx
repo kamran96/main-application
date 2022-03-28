@@ -5,12 +5,7 @@ import { Color } from '../../modal';
 import { routes } from '../../routes/index';
 
 const AppContainer = () => {
-  // react query config
-
   const { theme } = useGlobalContext();
-  // let layoutTheme: ITheme = {
-  //   colors: Themes[theme],
-  // };
 
   return <ThemeWrapper theme={theme}>{renderRoutes(routes())}</ThemeWrapper>;
 };

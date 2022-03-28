@@ -25,7 +25,7 @@ export const BillsEditorWidget: FC = () => {
 
   const Requires = {
     itemId: {
-      require: true,
+      require: false,
       message: 'Item is Requred to Proceed invoice',
     },
     description: {
@@ -37,7 +37,7 @@ export const BillsEditorWidget: FC = () => {
       message: 'Item is Requred to Proceed invoice',
     },
     unitPrice: {
-      require: true,
+      require: false,
       message: 'Item is Requred to Proceed invoice',
     },
     purchasePrice: {

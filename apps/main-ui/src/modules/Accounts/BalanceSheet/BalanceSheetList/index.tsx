@@ -59,6 +59,8 @@ export const BalanceSheetList: FC = () => {
     query: '',
   });
 
+  console.log(balanceSheetData, 'balance sheet data');
+
   const { query } = config;
 
   useEffect(() => {
@@ -240,12 +242,12 @@ export const BalanceSheetList: FC = () => {
                                   </>
                                 ) : (
                                   <>
-                                    <td>
+                                    <td className="textCenter">
                                       {accountHead.type ===
                                         ITransactionType.DEBIT &&
                                         moneyFormat(acc.balance.toFixed(2))}
                                     </td>
-                                    <td>
+                                    <td className="textCenter">
                                       {' '}
                                       {accountHead.type ===
                                         ITransactionType.CREDIT &&
@@ -262,7 +264,7 @@ export const BalanceSheetList: FC = () => {
                                 <BOLDTEXT>Total {accountHead?.name}</BOLDTEXT>
                               </Capitalize>
                             </td>
-                            <td>
+                            <td className="textCenter">
                               <BOLDTEXT>
                                 {moneyFormat(accountHead?.balance)}
                               </BOLDTEXT>
@@ -279,10 +281,10 @@ export const BalanceSheetList: FC = () => {
                       <BoldText>Total</BoldText>
                     </td>
                     {searchedQueryItem?.date && <td />}
-                    <td>
+                    <td className="textCenter">
                       <BoldText>{moneyFormat(totalDebits.toFixed(2))}</BoldText>
                     </td>
-                    <td>
+                    <td className="textCenter">
                       <BoldText>
                         {moneyFormat(totalCredits.toFixed(2))}
                       </BoldText>
@@ -308,7 +310,8 @@ const WrapperBalanceSheetList = styled.div<WrapperBalanceSheetProps>`
       background: ${(props: IThemeProps) => props?.theme?.colors?.bgTh};
       box-sizing: border-box;
       padding: 11px 24px;
-      color: #ffff;
+      font-weight: normal;
+      color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
     }
     table thead tr th:first-child {
       border-top-left-radius: 5px;

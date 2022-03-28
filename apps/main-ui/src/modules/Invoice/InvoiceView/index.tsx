@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { PurchasesView } from '../../../components/PurchasesView';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { BreadCrumbArea } from '../../../components/BreadCrumbArea';
-import { ISupportedRoutes } from '../../../modal';
+import { IInvoiceType, ISupportedRoutes } from '../../../modal';
 
 export const InvoiceView = () => {
   const { routeHistory } = useGlobalContext();
@@ -24,7 +24,7 @@ export const InvoiceView = () => {
         </Breadcrumb>
       </BreadCrumbArea>
 
-      <PurchasesView type="SI" id={invId} />
+      <PurchasesView type={IInvoiceType.INVOICE} id={invId} />
     </WrapperInvoiceView>
   );
 };
