@@ -42,6 +42,7 @@ export const Search: SFC<IProps> = ({
       <input
         placeholder={placeholder ? placeholder : "Search"}
         value={searchValue}
+        autoComplete="off"
         onChange={updateValue}
       />
     </SearchWrapper>

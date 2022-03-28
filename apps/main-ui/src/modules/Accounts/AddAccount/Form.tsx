@@ -152,7 +152,7 @@ export const AccountsForm: FC = () => {
             <Col span={12}>
               <FormLabel>Name</FormLabel>
               <Form.Item name="name">
-                <Input size="large" />
+                <Input autoComplete="off" size="large" />
               </Form.Item>
               <p className="input-info">
                 A short title for this account (limited to 150 characters)
@@ -160,8 +160,8 @@ export const AccountsForm: FC = () => {
             </Col>
             <Col span={12}>
               <FormLabel>Code</FormLabel>
-              <Form.Item name="code">
-                <Input size="large" type="number" />
+              <Form.Item  name="code">
+                <Input size="large" autoComplete="off" type="number" />
               </Form.Item>
               <p className="input-info">
                 A unique code/number for this account (limited to 10 characters)

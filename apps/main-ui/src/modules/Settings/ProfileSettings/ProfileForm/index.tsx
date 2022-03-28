@@ -117,7 +117,7 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
                   name="fullName"
                   rules={[{ required: true, message: 'Full Name' }]}
                 >
-                  <Input placeholder={'Your full name'} size="large" />
+                  <Input placeholder={'Your full name'} size="large" autoComplete='off'/>
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -126,7 +126,7 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
                   name="jobTitle"
                   rules={[{ required: false, message: 'Your job title' }]}
                 >
-                  <Input placeholder={''} size="large" />
+                  <Input placeholder={''} size="large" autoComplete='off'/>
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -194,6 +194,7 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
                     type="text"
                     placeholder="3188889898"
                     size="middle"
+                    autoComplete='off'
                   />
                 </Form.Item>
               </Col>
@@ -203,6 +204,7 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
                   <Input
                     placeholder={'eg: http://www.example.com'}
                     size="large"
+                    autoComplete='off'
                   />
                 </Form.Item>
               </Col>

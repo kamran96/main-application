@@ -144,6 +144,7 @@ const PricingEditorWidget: FC = () => {
                   placeholder={'eg: milk, match'}
                   size="middle"
                   type="number"
+                  autoComplete='off'
                 />
               </Form.Item>
             </Col>
@@ -163,6 +164,7 @@ const PricingEditorWidget: FC = () => {
                   placeholder={'eg: milk, match'}
                   size="middle"
                   type="number"
+                  autoComplete='off'
                 />
               </Form.Item>
             </Col>
@@ -178,7 +180,7 @@ const PricingEditorWidget: FC = () => {
                   },
                 ]}
               >
-                <Input placeholder={'eg: 100 or 10%'} size="middle" />
+                <Input placeholder={'eg: 100 or 10%'} size="middle" autoComplete='off'/>
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -193,7 +195,7 @@ const PricingEditorWidget: FC = () => {
                   },
                 ]}
               >
-                <Input placeholder={'eg. 10% or 100'} size="middle" />
+                <Input placeholder={'eg. 10% or 100'} size="middle" autoComplete='off'/>
               </Form.Item>
             </Col>
             <Col span={24}>
