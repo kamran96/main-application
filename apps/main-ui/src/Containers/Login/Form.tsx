@@ -182,7 +182,7 @@ export const LoginForm: FC = () => {
                   htmlType="submit"
                   style={{ width: '100%' }}
                   type="primary"
-                  size="middle"
+                  size="large"
                   loading={logginIn}
                 >
                   Sign In
