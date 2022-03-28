@@ -78,19 +78,26 @@ export const RolesEditorWidget: FC = () => {
     await mutateAddRoles(payload, {
       onSuccess: () => {
         (queryCache.invalidateQueries as any)((q) => q.startsWith('rbac-list'));
-        onCancel();
+        onCloseModal();
       },
     });
   };
 
-  const onCancel = () => {
+
+  const onCloseModal = () =>{
     form.resetFields();
     notificationCallback(
       NOTIFICATIONTYPE.SUCCESS,
       `${id ? 'Updated' : 'Created'}`
     );
+    setRbacConfigModal(false)
+  }
+
+  const onCancel = () => {
+    form.resetFields();
     setRbacConfigModal(false);
   };
+
 
   return (
     <CommonModal
@@ -112,7 +119,7 @@ export const RolesEditorWidget: FC = () => {
               },
             ]}
           >
-            <Input size="middle" />
+            <Input size="middle" autoComplete='off' />
           </Form.Item>
           <FormLabel>Description</FormLabel>
           <Form.Item name="description">

@@ -247,15 +247,12 @@ export const PurchaseManager: FC<IProps> = ({
     if (invoicesData && invoicesData.data && invoicesData.data.result) {
       const { result } = invoicesData.data;
       // const { payment } = result;
-      const { discount } = result;
+      const { adjustment: discount } = result;
 
       const key =
         type === IInvoiceType.PURCHASE_ENTRY ? `purchaseItems` : 'invoiceItems';
-      const itemsDiscount =
-        (result && totalDiscountInInvoice(result[key], 'itemDiscount', type)) ||
-        0;
 
-      const invoiceDiscount = discount - itemsDiscount;
+      const invoiceDiscount = discount;
       setInvoiceDiscount(invoiceDiscount);
       AntForm.setFieldsValue({
         ...result,
@@ -270,7 +267,6 @@ export const PurchaseManager: FC<IProps> = ({
         const unitPrice = item.unitPrice ? item.unitPrice : 0;
         const tax = item.tax ? item.tax : 0;
         const total = item.total ? item.total : 0;
-        const itemDiscount = item.itemDiscount ? item.itemDiscount : 0;
         const quantity = item.quantity ? item.quantity : 1;
         delete item.item;
         invoice_items.push({
@@ -280,7 +276,6 @@ export const PurchaseManager: FC<IProps> = ({
           tax,
           total,
           quantity,
-          itemDiscount,
         });
       });
 
@@ -351,9 +346,6 @@ export const PurchaseManager: FC<IProps> = ({
   }, [getSubTotal(), TotalTax]);
 
   /* Gets Total Discount on items */
-  const TotalDiscount = useMemo(() => {
-    return totalDiscountInInvoice(invoiceItems, 'itemDiscount', type);
-  }, [invoiceItems, type]);
 
   const GrandTotal: any = useMemo(() => {
     return invoiceItems.length
@@ -517,11 +509,7 @@ export const PurchaseManager: FC<IProps> = ({
                       selectedItem.price &&
                       selectedItem.price.purchasePrice) ||
                     0;
-                  const itemDiscount =
-                    (selectedItem &&
-                      selectedItem.price &&
-                      selectedItem.price.discount) ||
-                    '0';
+
                   const tax =
                     (selectedItem &&
                       selectedItem.price &&
@@ -551,8 +539,8 @@ export const PurchaseManager: FC<IProps> = ({
 
                   const total =
                     type === IInvoiceType.PURCHASE_ENTRY
-                      ? calculateInvoice(purchasePrice, tax, itemDiscount)
-                      : calculateInvoice(unitPrice, tax, itemDiscount);
+                      ? calculateInvoice(purchasePrice, tax, '0')
+                      : calculateInvoice(unitPrice, tax, '0');
                   [
                     'itemId',
                     'unitPrice',
@@ -570,7 +558,6 @@ export const PurchaseManager: FC<IProps> = ({
                     itemId: val.value,
                     unitPrice: unitPrice.toFixed(2),
                     tax,
-                    itemDiscount,
                     total,
                     costOfGoodAmount,
                     description,
@@ -699,7 +686,6 @@ export const PurchaseManager: FC<IProps> = ({
                     const allItems = [...prev];
                     const unitPrice = record.unitPrice;
                     const purchasePrice = record.purchasePrice;
-                    const itemDiscount = record.itemDiscount;
 
                     const costOfGoodAmount = record.purchasePrice * quantity;
                     const tax = record.tax;
@@ -723,10 +709,8 @@ export const PurchaseManager: FC<IProps> = ({
 
                     const total =
                       type === IInvoiceType.PURCHASE_ENTRY
-                        ? calculateInvoice(purchasePrice, tax, itemDiscount) *
-                          quantity
-                        : calculateInvoice(unitPrice, tax, itemDiscount) *
-                          quantity;
+                        ? calculateInvoice(purchasePrice, tax, '0') * quantity
+                        : calculateInvoice(unitPrice, tax, '0') * quantity;
 
                     const indexed = allItems[index].errors?.indexOf('quantity');
                     if (indexed !== -1 && allItems[index].errors?.length) {
@@ -753,100 +737,44 @@ export const PurchaseManager: FC<IProps> = ({
       },
     },
     {
-      title: 'Unit Price',
-      dataIndex: 'unitPrice',
-      key: 'unitPrice',
-      width: width > 1500 ? 150 : '',
+      title: 'Purchase Price',
+      dataIndex: 'purchasePrice',
+      key: 'purchasePrice',
 
       render: (value, record, index) => {
         return (
           <Editable
-            error={record?.errors?.includes('unitPrice')}
+            error={record?.errors?.includes('purchasePrice')}
+            disabled={!record.itemId}
             onChange={(value) => {
               clearTimeout(setStateTimeOut);
-              setStateTimeOut = setTimeout(() => {
-                setInvoiceItems((prev) => {
-                  const allItems = [...prev];
-                  const unitPrice = value;
-                  const purchasePrice = record.purchasePrice;
-                  const itemDiscount = record.itemDiscount;
-                  const tax = record.tax;
-                  const total =
-                    type === IInvoiceType.PURCHASE_ENTRY
-                      ? calculateInvoice(purchasePrice, tax, itemDiscount) *
-                        parseInt(record.quantity)
-                      : calculateInvoice(unitPrice, tax, itemDiscount) *
-                        parseInt(record.quantity);
 
-                  const indexed = allItems[index].errors?.indexOf('unitPrice');
-                  if (indexed !== -1) {
-                    allItems[index].errors.splice(indexed, 1);
-                  }
+              setTimeout(() => {
+                const allItems = [...invoiceItems];
+                const purchasePrice = value;
+                const costOfGoodAmount =
+                  purchasePrice * allItems[index].quantity;
+                const total =
+                  calculateInvoice(purchasePrice, record.tax, '0') *
+                  record.quantity;
 
-                  allItems[index] = {
-                    ...allItems[index],
-                    unitPrice,
-                    total,
-                  };
-                  return allItems;
-                });
+                const indexed =
+                  allItems[index].errors?.indexOf('purchasePrice');
+                if (indexed !== -1) {
+                  allItems[index].errors.splice(indexed, 1);
+                }
+
+                allItems[index] = {
+                  ...allItems[index],
+                  purchasePrice,
+                  total,
+                  costOfGoodAmount,
+                };
+                setInvoiceItems(allItems);
               }, 500);
             }}
             type="number"
             value={value}
-            size={'middle'}
-          />
-        );
-      },
-    },
-    {
-      title: 'Disc %',
-      dataIndex: 'itemDiscount',
-      key: 'itemDiscount',
-      // width: width > 1500 ? 150 : "",
-
-      render: (value, record, index) => {
-        return (
-          <Editable
-            error={record?.errors?.includes('itemDiscount')}
-            disabled={!record.itemId}
-            type="text"
-            value={value}
-            onChange={(e) => {
-              const { value } = e.target;
-              clearTimeout(setStateTimeOut);
-              setStateTimeOut = setTimeout(() => {
-                setInvoiceItems((prev) => {
-                  const allItems = [...prev];
-                  let itemDiscount = value.replace(/\b0+/g, '');
-
-                  if (itemDiscount === '') {
-                    itemDiscount = '0';
-                  }
-                  const unitPrice = record.unitPrice;
-                  const purchasePrice = record.purchasePrice;
-                  const tax = record.tax;
-                  const total =
-                    type === IInvoiceType.PURCHASE_ENTRY
-                      ? calculateInvoice(purchasePrice, tax, itemDiscount) *
-                        parseInt(record.quantity)
-                      : calculateInvoice(unitPrice, tax, itemDiscount) *
-                        parseInt(record.quantity);
-                  const indexed =
-                    allItems[index].errors?.indexOf('itemDiscount');
-                  if (indexed !== -1) {
-                    allItems[index]?.errors?.splice(indexed, 1);
-                  }
-                  allItems[index] = {
-                    ...allItems[index],
-                    itemDiscount,
-                    total,
-                  };
-
-                  return allItems;
-                });
-              }, 400);
-            }}
             size={'middle'}
           />
         );
@@ -968,56 +896,6 @@ export const PurchaseManager: FC<IProps> = ({
     },
   ];
 
-  if (type === IInvoiceType.PURCHASE_ENTRY) {
-    columns.splice(5, 0, {
-      title: 'Purchase Price',
-      dataIndex: 'purchasePrice',
-      key: 'purchasePrice',
-
-      render: (value, record, index) => {
-        return (
-          <Editable
-            error={record?.errors?.includes('purchasePrice')}
-            disabled={!record.itemId}
-            onChange={(value) => {
-              clearTimeout(setStateTimeOut);
-
-              setTimeout(() => {
-                const allItems = [...invoiceItems];
-                const purchasePrice = value;
-                const costOfGoodAmount =
-                  purchasePrice * allItems[index].quantity;
-                const total =
-                  calculateInvoice(
-                    purchasePrice,
-                    record.tax,
-                    record.itemDiscount
-                  ) * record.quantity;
-
-                const indexed =
-                  allItems[index].errors?.indexOf('purchasePrice');
-                if (indexed !== -1) {
-                  allItems[index].errors.splice(indexed, 1);
-                }
-
-                allItems[index] = {
-                  ...allItems[index],
-                  purchasePrice,
-                  total,
-                  costOfGoodAmount,
-                };
-                setInvoiceItems(allItems);
-              }, 500);
-            }}
-            type="number"
-            value={value}
-            size={'middle'}
-          />
-        );
-      },
-    });
-  }
-
   /* Scroll to last added item */
 
   const handleScroll = () => {
@@ -1093,7 +971,7 @@ export const PurchaseManager: FC<IProps> = ({
         getSubTotal,
         TotalTax,
         GrossTotal,
-        TotalDiscount,
+
         GrandTotal,
         IDiscount,
         NetTotal,
@@ -1113,7 +991,8 @@ export const PurchaseManager: FC<IProps> = ({
         setPaymentReset,
         ClearAll,
         handleAddRow,
-        isFetching: itemsLoading || invoiceLoading || accountsLoading,
+        isFetching:
+          itemsLoading || invoiceLoading || accountsLoading || isLoading,
       }}
     >
       <LayoutWrapper>

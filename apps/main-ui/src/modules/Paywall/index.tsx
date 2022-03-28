@@ -121,6 +121,7 @@ export const Paywall: FC = () => {
                             size="middle"
                             placeholder="Alex Smith"
                             className="payment-input"
+                            autoComplete="off"
                           />
                         </Form.Item>
                       </Col>

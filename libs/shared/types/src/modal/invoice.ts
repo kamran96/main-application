@@ -16,6 +16,7 @@ export enum IInvoiceType {
 }
 
 export interface IInvoiceResult extends IBase {
+  adjustment?: number;
   id: number;
   reference: string;
   contactId: number;

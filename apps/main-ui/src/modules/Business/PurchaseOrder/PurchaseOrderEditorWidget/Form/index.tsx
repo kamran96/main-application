@@ -315,7 +315,7 @@ const Editor: FC<IProps> = ({ id }) => {
                       name="reference"
                       rules={[{ required: false, message: 'Required !' }]}
                     >
-                      <Input size="middle" />
+                      <Input size="middle" autoComplete='off'/>
                     </Form.Item>
                   </Col>
                   <Col span={4} className="custom_col">

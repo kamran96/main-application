@@ -71,7 +71,7 @@ export const EmailForm: FC = () => {
                   ]}
                   hasFeedback
                 >
-                  <Input size="middle" />
+                  <Input size="middle" autoComplete="off" />
                 </Form.Item>
                 <Form.Item hasFeedback={isSuccess ? true : false}>
                   <Button

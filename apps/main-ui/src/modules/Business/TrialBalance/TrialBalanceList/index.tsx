@@ -18,6 +18,7 @@ import { _csvColumnsTrialBalance } from './exportableCols';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import dayjs from 'dayjs';
 import { P } from '../../../../components/Typography';
+import { Text } from '@react-pdf/renderer';
 interface IExtendedValues extends IAccountsResult {
   credit: number;
   debit: number;
@@ -85,7 +86,7 @@ export const TrialBalanceList: FC = () => {
             if (row?.isLastIndex) {
               return null;
             } else {
-              return data ? data : '-';
+              return data ? moneyFormat(data) : '-';
             }
           },
         }
@@ -99,7 +100,7 @@ export const TrialBalanceList: FC = () => {
         if (row.isLastIndex) {
           return <BoldText>{moneyFormat(data.toFixed(2))}</BoldText>;
         } else {
-          return data ? data.toFixed(2) : '-';
+          return data ? moneyFormat(data?.toFixed(2)) : '-';
         }
       },
     },
@@ -113,7 +114,7 @@ export const TrialBalanceList: FC = () => {
         if (row?.isLastIndex) {
           return <BoldText>{moneyFormat(data.toFixed(2))}</BoldText>;
         } else {
-          return data ? data.toFixed(2) : '-';
+          return data ? moneyFormat(data.toFixed(2)) : '-';
         }
       },
     },
@@ -127,7 +128,86 @@ export const TrialBalanceList: FC = () => {
             if (row?.isLastIndex) {
               return null;
             } else {
-              return Math.abs(data);
+              return moneyFormat(Math.abs(data));
+            }
+          },
+        }
+      : {},
+  ];
+  const pdfCols: ColumnsType<any> = [
+    {
+      title: 'Particulars',
+      dataIndex: 'name',
+      key: 'name',
+      render: (data, row, index) => {
+        if (row.isLastIndex) {
+          return <Text style={{ fontWeight: 'bold' }}>{data}</Text>;
+        } else {
+          return data;
+        }
+      },
+    },
+    searchedQueryItem?.date && isFetched
+      ? {
+          title: 'Opening Balance',
+          dataIndex: 'opening_balance',
+          key: 'opening_balance',
+          className: 'static-width',
+          render: (data, row, index) => {
+            if (row?.isLastIndex) {
+              return null;
+            } else {
+              return data ? moneyFormat(data) : '-';
+            }
+          },
+        }
+      : {},
+    {
+      title: 'Debit',
+      dataIndex: 'debit',
+      className: 'static-width',
+      key: 'debit',
+      render: (data, row, index) => {
+        if (row.isLastIndex) {
+          return (
+            <Text style={{ fontWeight: 'bold' }}>
+              {moneyFormat(data.toFixed(2))}
+            </Text>
+          );
+        } else {
+          return data ? moneyFormat(data.toFixed(2)) : '-';
+        }
+      },
+    },
+    {
+      title: 'Credit',
+      dataIndex: 'credit',
+      className: 'static-width',
+
+      key: 'credit',
+      render: (data, row, index) => {
+        if (row?.isLastIndex) {
+          return (
+            <Text style={{ fontWeight: 'bold' }}>
+              {moneyFormat(data.toFixed(2))}
+            </Text>
+          );
+        } else {
+          return data ? moneyFormat(data.toFixed(2)) : '-';
+        }
+      },
+    },
+    searchedQueryItem?.date && isFetched
+      ? {
+          title: 'Closing balance',
+          dataIndex: 'balance',
+          key: 'balance',
+          className: 'static-width',
+          render: (data, row, index) => {
+            if (row?.isLastIndex) {
+              return null;
+            } else {
+              return moneyFormat(Math.abs(data));
             }
           },
         }
@@ -182,6 +262,9 @@ export const TrialBalanceList: FC = () => {
     <WrapperTrialBalanceList>
       <TableCard className="card-wrapper">
         <CommonTable
+          pdfExportable={{
+            columns: pdfCols,
+          }}
           loading={isLoading}
           exportableProps={{
             fields: _csvColumnsTrialBalance,

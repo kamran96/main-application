@@ -359,7 +359,7 @@ export const ItemsForm: FC = () => {
               name="name"
               rules={[{ required: true, message: 'Please add item name' }]}
             >
-              <Input placeholder="eg. milk, match" size="middle" />
+              <Input autoComplete="off" placeholder="eg. milk, match" size="middle" />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -368,7 +368,7 @@ export const ItemsForm: FC = () => {
               name="code"
               rules={[{ required: true, message: 'Please add item code' }]}
             >
-              <Input size="middle" type="text" />
+              <Input autoComplete="off" size="middle" type="text" />
             </Form.Item>
           </Col>
 

@@ -45,19 +45,19 @@ export const AddressForm: FC<IProps> = ({ onChange, item, index, reset }) => {
           },
         ]}
       >
-        <Input placeholder={"Address"} size="large" />
+        <Input placeholder={"Address"} size="large" autoComplete="off"/>
       </Form.Item>
       <Form.Item
         name="city"
         rules={[{ required: false, message: "Please provide Skype ID" }]}
       >
-        <Input placeholder={"City/Town"} size="large" />
+        <Input placeholder={"City/Town"} size="large" autoComplete="off" />
       </Form.Item>
       <Form.Item
         name="country"
         rules={[{ required: false, message: "Please provide country" }]}
       >
-        <Input placeholder={"Country"} size="large" />
+        <Input placeholder={"Country"} size="large"  autoComplete="off"/>
       </Form.Item>
       <Row gutter={24}>
         <Col span={12}>
