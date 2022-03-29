@@ -28,6 +28,11 @@ import { IAccountsResult } from '../../../../modal/accounts';
 import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv from '../../../../utils/Print';
 import FilterSchema from './filterSchema';
+// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
+import {BalanceSheetPdf} from 'apps/main-ui/src/components/PDFs/BalanceSheetPdf';
+import DUMMYLOGO from "../../../../assets/quickbook.png";
+import { PDFViewer } from '@react-pdf/renderer';
+
 
 interface IBalanceSheetConfig {
   columns: ColumnsType<any>;
@@ -52,14 +57,39 @@ export const BalanceSheetList: FC = () => {
     totalCredits: 0,
     totalDebits: 0,
   });
-  const { routeHistory } = useGlobalContext();
+  const { routeHistory , userDetails} = useGlobalContext();
   const { history } = routeHistory;
 
   const [config, setConfig] = useState({
     query: '',
   });
+ 
+  // console.log(userDetails, 'balance sheet data');
 
-  console.log(balanceSheetData, 'balance sheet data');
+//handle Organization Data
+const { organization } = userDetails;
+const {
+  address: organizationAddress,
+  name: organizationName,
+  email: organizationEmail,
+  phoneNumber: organizationContact,
+  website,
+} = organization;
+const { city, country, postalCode } = organizationAddress;
+
+const headerprops = {
+    organizationName,
+    city,
+    country,
+    title: 'BalanceSheet',
+    organizationContact,
+    organizationEmail,
+    address: '',
+    code: postalCode,
+    logo: DUMMYLOGO,
+    website,
+  };
+
 
   const { query } = config;
 
@@ -99,6 +129,7 @@ export const BalanceSheetList: FC = () => {
   const searchedQueryItem: any = useMemo(() => {
     return query ? JSON.parse(atob(query)) : query;
   }, [query]);
+
 
   return (
     <WrapperBalanceSheetList
@@ -296,6 +327,10 @@ export const BalanceSheetList: FC = () => {
           </>
         </PrintFormat>
       </Card>
+      <br/>
+      <PDFViewer height={'1080px'} width={'100%'}>
+        <BalanceSheetPdf header = {headerprops} balanceSheetData={balanceSheetData} searchquery={searchedQueryItem}/>
+       </PDFViewer>
     </WrapperBalanceSheetList>
   );
 };

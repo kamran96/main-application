@@ -100,6 +100,7 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
   const { rbac } = useRbac(null);
   const { userDetails, notificationCallback, handleUploadPDF } =
     useGlobalContext();
+    console.log("userdetails", userDetails)
 
   const history = useHistory();
 
