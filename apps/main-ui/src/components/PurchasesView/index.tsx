@@ -131,6 +131,8 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
   const [emailModal, setEmailModal] = useState(false);
   const [tableData, setTableData] = useState<IInvoiceItem[]>([]);
 
+  console.log(tableData, 'table data');
+
   /* LOCAL STATES ENDS HERE */
 
   /* ***** COMPONENT LIFE CYCLES */
