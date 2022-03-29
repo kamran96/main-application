@@ -398,3 +398,8 @@ input:-webkit-autofill:active {
   text-align: 'left';
   padding: 0 !important;
 } */
+
+.ant-form-item-explain,
+.ant-form-item-extra {
+  color: red !important;
+}

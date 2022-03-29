@@ -257,7 +257,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                 { required: true, message: 'Please provide Company Name' },
               ]}
             >
-              <Input placeholder={''} size="large" />
+              <Input placeholder={''} autoComplete="off" size="large" />
             </Form.Item>
           </Col>
 
@@ -273,7 +273,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                 },
               ]}
             >
-              <Input placeholder={'john@example.com'} size="large" />
+              <Input placeholder={'john@example.com'} autoComplete="off" size="large" />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -287,7 +287,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                 },
               ]}
             >
-              <Input placeholder={'john@example.com'} size="large" />
+              <Input placeholder={'john@example.com'} autoComplete="off" size="large" />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -305,6 +305,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                 style={{ width: '100%' }}
                 placeholder={'(Area code + Alot number). eg : 05811-45XXXX'}
                 size="large"
+                autoComplete="off"
               />
             </Form.Item>
           </Col>
@@ -325,6 +326,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                 style={{ width: '100%' }}
                 placeholder={'0310XXXXXXX'}
                 size="large"
+                autoComplete="off"
               />
             </Form.Item>
           </Col>
@@ -346,6 +348,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                 style={{ width: '100%' }}
                 placeholder={'0215XXXX'}
                 size="large"
+                autoComplete="off"
               />
             </Form.Item>
           </Col>
@@ -355,7 +358,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               name="skypeName"
               rules={[{ required: false, message: 'Please provide Skype ID' }]}
             >
-              <Input placeholder={'live:@example'} size="large" />
+              <Input autoComplete="off" placeholder={'live:@example'} size="large" />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -373,6 +376,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               <Input
                 placeholder={'http://www.phunar.example.com'}
                 size="large"
+                autoComplete="off"
               />
             </Form.Item>
           </Col>
@@ -392,6 +396,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                 style={{ width: '100%' }}
                 size="large"
                 placeholder={'Your CNIC without (-) eg: 7150112547851'}
+                autoComplete="off"
               />
             </Form.Item>
           </Col>
@@ -502,6 +507,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                           style={{ width: '100%' }}
                           placeholder={''}
                           size="large"
+                          autoComplete="off"
                         />
                       </Form.Item>
                     </Col>
@@ -608,6 +614,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                     style={{ width: '100%' }}
                     placeholder={'add credit limit block'}
                     size="large"
+                    autoComplete='off'
                   />
                 </Form.Item>
               </Col>
@@ -627,6 +634,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                     type="number"
                     placeholder={'Sales discount in percentage or amount'}
                     size="large"
+                    autoComplete='off'
                   />
                 </Form.Item>
               </Col>
@@ -645,6 +653,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                     style={{ width: '100%' }}
                     placeholder={'Please add payment days limit'}
                     size="large"
+                    autoComplete="off"
                   />
                 </Form.Item>
               </Col>

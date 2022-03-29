@@ -199,7 +199,7 @@ const Editor = () => {
                   label="Reference #"
                   rules={[{ required: true, message: 'Required !' }]}
                 >
-                  <Input size="middle" />
+                  <Input size="middle"  autoComplete='off'/>
                 </Form.Item>
               </Col>
               <Col span={5}>

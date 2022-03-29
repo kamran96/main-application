@@ -71,14 +71,14 @@ export const EmailForm: FC = () => {
                   ]}
                   hasFeedback
                 >
-                  <Input size="middle" />
+                  <Input size="large" autoComplete="off" />
                 </Form.Item>
                 <Form.Item hasFeedback={isSuccess ? true : false}>
                   <Button
                     loading={isLoading}
                     className="mt-10"
                     style={{ width: '100%' }}
-                    size="middle"
+                    size="large"
                     type="primary"
                     htmlType="submit"
                   >

@@ -52,11 +52,11 @@ export const EmailModal: FC<IProps> = ({
         <Form form={form} onFinish={onFinish}>
           <FormLabel>Email</FormLabel>
           <Form.Item name="email" rules={[{ required: true, type: "email" }]}>
-            <Input />
+            <Input autoComplete="off"/>
           </Form.Item>
           <FormLabel>Subject</FormLabel>
           <Form.Item name="subject">
-            <Input />
+            <Input autoComplete="off"/>
           </Form.Item>
           <FormLabel>CC Email</FormLabel>
           <Form.Item name="cc">

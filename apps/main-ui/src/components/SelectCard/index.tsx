@@ -52,6 +52,7 @@ export const SelectCard: FC<IProps> = ({
         className="select_input"
         type="checkbox"
         name="fruit-1"
+        autoComplete="off"
       />
     </WrapperSelectCard>
   );

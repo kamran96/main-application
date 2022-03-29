@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { BreadCrumbArea } from '../../../../components/BreadCrumbArea';
 import { Breadcrumb } from 'antd';
 import { Link } from 'react-router-dom';
-import { ISupportedRoutes } from '@invyce/shared/types';
+import { IInvoiceType, ISupportedRoutes } from '@invyce/shared/types';
 import { PurchasesView } from '../../../../components/PurchasesView';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 
@@ -25,7 +25,7 @@ export const DebitNotesView: FC = () => {
         </Breadcrumb>
       </BreadCrumbArea>
 
-      <PurchasesView type="credit-note" id={invId} />
+      <PurchasesView type={IInvoiceType.CREDITNOTE} id={invId} />
     </WrapperCreditNoteView>
   );
 };

@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import React, { FC } from 'react';
-import { IInvoiceResult, IAddress } from '../../modal';
+import { IInvoiceResult, IAddress, IInvoiceItem } from '../../modal';
 import { totalDiscountInInvoice } from '../../utils/formulas';
 import moneyFormat from '../../utils/moneyFormat';
 import { BoldText } from '../Para/BoldText';
@@ -21,17 +21,6 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
   heading,
   hideCalculation = false,
 }) => {
-  const asessorTableData =
-    type === 'SI'
-      ? 'invoiceItems'
-      : type === 'PO'
-      ? 'purchaseItems'
-      : type === 'BILL'
-      ? 'billItems'
-      : type === 'credit-note'
-      ? 'credit_note_items'
-      : 'invoice_items';
-
   const priceAccessor =
     // eslint-disable-next-line no-constant-condition
     type === 'SI' || 'QO' || 'BILL' ? 'unitPrice' : 'purchasePrice';
@@ -41,7 +30,7 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
   const itemsDiscount =
     (data &&
       totalDiscountInInvoice(
-        asessorTableData,
+        'invoiceItems',
         'itemDiscount',
         type === 'PO' ? 'POE' : 'SI'
       )) ||
@@ -56,22 +45,22 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
   const TotalTax =
     (data &&
       totalDiscountInInvoice(
-        asessorTableData,
+        'invoiceItems',
         'tax',
         type === 'PO' ? 'POE' : 'SI'
       )) ||
     0;
 
-  const _heading =
-    data.invoiceType === 'SI'
-      ? 'Sale Invoice'
-      : data.invoiceType === 'PO' || data.invoiceType === 'POE'
-      ? 'Purchase Order'
-      : data.invoiceType === 'QO'
-      ? data.invoiceType === 'BILL'
-        ? 'Bill'
-        : 'Quotation'
-      : '';
+  // const _heading =
+  //   data.invoiceType === 'SI'
+  //     ? 'Sale Invoice'
+  //     : data.invoiceType === 'PO' || data.invoiceType === 'POE'
+  //     ? 'Purchase Order'
+  //     : data.invoiceType === 'QO'
+  //     ? data?.invoiceType=== 'BILL'
+  //       ? 'Bill'
+  //       : 'Quotation'
+  //     : '';
 
   return (
     <div id="purchase_order_print_view">
@@ -194,14 +183,15 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
                 <th style={{ textAlign: 'center' }}> Amount</th>
               </tr>
             </thead>
+            {console.log(data, 'what is data')}
             <tbody>
-              {data[asessorTableData] &&
-                Array.isArray(data[asessorTableData]) &&
-                data[asessorTableData]
+              {data?.invoiceItems &&
+                Array.isArray(data?.invoiceItems) &&
+                data?.invoiceItems
                   .sort((a, b) => {
                     return a.sequence - b.sequence;
                   })
-                  .map((listItem, index) => {
+                  .map((listItem: IInvoiceItem, index) => {
                     return (
                       <tr>
                         {/* <td style={{ textAlign: "center" }}>
@@ -209,7 +199,7 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
                         </td> */}
                         <td>
                           <p className="item_name">
-                            {listItem.item.code} / {listItem.item.name}
+                            {listItem?.item?.code} / {listItem?.item?.name}
                           </p>
                           <p className="item_desc">{listItem.description}</p>
                         </td>
@@ -223,7 +213,7 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
                         </td>
                         <td style={{ textAlign: 'center' }}>
                           {typeof listItem.discount === 'string' &&
-                          listItem.itemDiscount.includes('%')
+                          listItem?.itemDiscount?.includes('%')
                             ? `${listItem.itemDiscount}%`
                             : listItem.itemDiscount
                             ? moneyFormat(listItem.itemDiscount)
@@ -300,7 +290,7 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
                     <th>Grand Total</th>
                     <td>
                       <BoldText style={{ fontSize: 16 }}>
-                        {moneyFormat(data.netTotal)}
+                        {moneyFormat(data?.netTotal)}
                       </BoldText>
                     </td>
                   </tr>

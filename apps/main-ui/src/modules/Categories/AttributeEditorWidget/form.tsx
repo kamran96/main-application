@@ -57,7 +57,7 @@ export const AttriForm: FC<IProps> = ({
                 },
               ]}
             >
-              <Input placeholder="Attribute Name" size="middle" />
+              <Input autoComplete="off" placeholder="Attribute Name" size="middle" />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -121,6 +121,7 @@ export const AttriForm: FC<IProps> = ({
                   <Input
                     size="middle"
                     placeholder={"eg: 100ml, 200ml, 250ml, 300ml etc"}
+                    autoComplete="off"
                   />
                 </Form.Item>
               </Col>

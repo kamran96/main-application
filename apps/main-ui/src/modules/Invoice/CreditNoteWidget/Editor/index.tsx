@@ -325,7 +325,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                       name="reference"
                       rules={[{ required: true, message: 'Required !' }]}
                     >
-                      <Input size="middle" />
+                      <Input size="middle"  autoComplete='off'/>
                     </Form.Item>
                   </Col>
                   <Col span={6}>
