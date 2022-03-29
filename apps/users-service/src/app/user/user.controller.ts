@@ -117,16 +117,10 @@ export class UserController {
     }
   }
 
-  @Post('change-email')
   @UseGuards(GlobalAuthGuard)
-  async changeEmail(@Req() req: IRequest, @Body() body) {
-    const user = await this.userService.ChangeEmail(req.user, body.email);
-
-    if (user) {
-      return {
-        result: user,
-      };
-    }
+  @Post('account-settings')
+  async changeEmail(@Req() req: IRequest, @Body() body, @Res() res: Response) {
+    return await this.userService.ChangeUserDetails(req.user, body, res);
   }
 
   @Post('/check')

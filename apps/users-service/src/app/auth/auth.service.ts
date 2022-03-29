@@ -16,6 +16,7 @@ import * as ip from 'ip';
 import * as speakeasy from 'speakeasy';
 import * as qrcode from 'qrcode';
 import { Response } from 'express';
+import { OAuth2Client } from 'google-auth-library';
 import { User } from '../schemas/user.schema';
 import {
   CHANGE_EMAIL_OTP,
@@ -38,12 +39,14 @@ import {
 
 import { SendOtp, UserLoginDto, UserRegisterDto } from '../dto/user.dto';
 
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 const generateRandomNDigits = (n) => {
   return Math.floor(Math.random() * (9 * Math.pow(10, n))) + Math.pow(10, n);
 };
 
 const secret = speakeasy.generateSecret({
-  name: 'invyce',
+  name: 'Invyce',
 });
 
 @Injectable()
@@ -115,6 +118,46 @@ export class AuthService {
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async GoogleLogin(data, @Res() res: Response) {
+    const ticket = await client.verifyIdToken({
+      idToken: data.token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const user = await this.userModel.find({
+      email: payload.email,
+    });
+
+    if (user.length > 0) {
+      if (user.length > 0 && user[0].loginWith === 'google') {
+        await this.Login(user, res);
+      } else {
+        throw new HttpException(
+          'You are alreay registered with this email please login instead.',
+          HttpStatus.BAD_REQUEST
+        );
+      }
+    }
+
+    const profile = {
+      fullName: payload.name,
+      photo: payload.picture,
+    };
+
+    const userArr = [];
+    const newUser = new this.userModel();
+    newUser.email = payload.email;
+    newUser.username = payload.given_name;
+    newUser.profile = profile;
+    newUser.status = 1;
+    newUser.loginWith = 'google';
+    await newUser.save();
+
+    userArr.push(newUser);
+    await this.Login(userArr, res);
   }
 
   async AddUser(
@@ -329,6 +372,28 @@ export class AuthService {
     }
   }
 
+  async RequestChangeVerify(body) {
+    const user_code = await this.userTokenModel.findOne({
+      code: body.otp,
+    });
+
+    const oneHour = user_code.expiresAt;
+    const currentTime = new Date().getTime() / 1000;
+
+    if (currentTime && currentTime > oneHour) {
+      throw new HttpException(
+        'Otp is expired, Click on resend to generate new verification code.',
+        HttpStatus.BAD_REQUEST
+      );
+    } else {
+      return {
+        message: 'Verification successful',
+        verified: true,
+        status: true,
+      };
+    }
+  }
+
   async ResendOtp(body: SendOtp): Promise<void> {
     const time = Moment(new Date()).add(1, 'h').calendar();
 
@@ -347,7 +412,7 @@ export class AuthService {
   }
 
   async ChangeEmailOtp(body, usr) {
-    const time = Moment(new Date()).add(1, 'h');
+    const time = new Date().getTime() / 1000 + 1 * (60 * 60);
 
     const user = await this.userModel.findOne({ email: usr.email });
 
@@ -489,17 +554,30 @@ export class AuthService {
     }
   }
 
-  async GenerateGoogleAuthenticatorToken() {
-    return await qrcode.toDataURL(secret.otpauth_url);
+  async GenerateGoogleAuthenticatorToken(): Promise<unknown> {
+    const token = await qrcode.toDataURL(secret.otpauth_url);
+
+    return {
+      result: token,
+    };
   }
 
-  async VerifyGoogleAuthenticatorToken(data) {
+  async VerifyGoogleAuthenticatorToken(data, user): Promise<unknown> {
     const { code } = data;
     const verified = await speakeasy.totp.verify({
       secret: secret.base32,
       encoding: 'base32',
       token: code,
     });
+
+    await this.userModel.updateOne(
+      {
+        _id: user._id,
+      },
+      {
+        twoFactorEnabled: true,
+      }
+    );
 
     return verified;
   }

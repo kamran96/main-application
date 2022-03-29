@@ -373,7 +373,7 @@ export class CreditNoteService {
         });
 
         if (updatedCreditNote.status === Statuses.AUTHORISED) {
-          await http.post(`reports/inventory/manage`, {
+          await http.post(`items/item/manage-inventory`, {
             payload: itemLedgerArray,
           });
 
@@ -567,7 +567,7 @@ export class CreditNoteService {
       }
 
       if (credit_note.status === Statuses.AUTHORISED) {
-        await http.post(`reports/inventory/manage`, {
+        await http.post(`items/item/manage-inventory`, {
           payload: itemLedgerArray,
         });
 
@@ -856,7 +856,7 @@ export class CreditNoteService {
             : EntryType.DEBITNOTE,
       });
 
-      await http.post(`reports/inventory/manage`, {
+      await http.post(`items/item/manage-inventory`, {
         payload: itemLedgerArray,
       });
     }

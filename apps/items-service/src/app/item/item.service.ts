@@ -13,13 +13,16 @@ import {
 } from '@invyce/interfaces';
 import { Price } from '../schemas/price.schema';
 import { ItemCodesDto, ItemDto, ItemIdsDto } from '../dto/item.dto';
+import { ItemLedger } from '../schemas/itemLedger.schema';
+import { ItemLedgerDetailDto } from '../dto/ItemLedger.dto';
 
 @Injectable()
 export class ItemService {
   constructor(
     @InjectModel(Item.name) private itemModel,
     @InjectModel(AttributeValue.name) private attributeValueModel,
-    @InjectModel(Price.name) private priceModel
+    @InjectModel(Price.name) private priceModel,
+    @InjectModel(ItemLedger.name) private itemLedgerModel
   ) {}
 
   async ListItems(
@@ -153,7 +156,6 @@ export class ItemService {
           organizationId: itemData.organizationId,
           branchId: itemData.branchId,
         });
-        console.log(find_item, 'item');
       }
 
       if (find_item?.length > 0) {
@@ -225,7 +227,7 @@ export class ItemService {
           item.status = 1;
           await item.save();
 
-          if (itemDto.attribute_values.length > 0) {
+          if (itemDto.itemType === 1 && itemDto.attribute_values.length > 0) {
             for (const values of itemDto.attribute_values) {
               const attribute_value = new this.attributeValueModel(values);
               attribute_value.itemId = item.id;
@@ -243,6 +245,40 @@ export class ItemService {
         error.status || HttpStatus.BAD_REQUEST
       );
     }
+  }
+
+  // async ItemCode(data) {
+  //   const item = await this.itemModel
+  //     .findOne({
+  //       organizationId: data.organizationId,
+  //       branchId: data.branchId,
+  //     })
+  //     .sort({ createdAt: -1 })
+  //     .limit(1);
+  // }
+
+  async ManageInventory(data: ItemLedgerDetailDto, user: IBaseUser) {
+    for (const i of data.payload) {
+      if (i.action === 'create') {
+        const details = {
+          type: i.type,
+          targetId: i.targetId,
+          value: i.value,
+        };
+        const itemLedger = new this.itemLedgerModel({
+          itemId: i.itemId,
+          details: JSON.stringify(details),
+          branchId: user.branchId,
+          organizationId: user.organizationId,
+          createdById: user.id,
+          updatedById: user.id,
+          status: 1,
+        });
+        await itemLedger.save();
+      }
+    }
+
+    await this.ManageItemStock(data);
   }
 
   async FindById(itemId: string): Promise<IItem> {

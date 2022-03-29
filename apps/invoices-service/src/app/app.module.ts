@@ -9,6 +9,7 @@ import { InvoiceModule } from './invoice/inovice.module';
 import { Authenticate } from '@invyce/auth-middleware';
 import { BillModule } from './bill/bill.module';
 import { CreditNoteModule } from './credit-note/credit-note.module';
+import { PurchaseOrderModule } from './purchase-order/purchase-order.module';
 dotenv.config();
 
 @Module({
@@ -38,6 +39,7 @@ dotenv.config();
     InvoiceModule,
     BillModule,
     CreditNoteModule,
+    PurchaseOrderModule,
   ],
   controllers: [AppController],
   providers: [AppService, Authenticate],
