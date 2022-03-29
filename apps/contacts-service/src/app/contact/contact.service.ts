@@ -465,6 +465,13 @@ export class ContactService {
           });
         }
         return {
+          initial_balance: {
+            comment: 'Initial opening balance',
+            amount: contact.openingBalance,
+            date: contact.createdAt,
+            createdAt: contact.createdAt,
+            entryType: 1,
+          },
           pagination: payments.pagination,
           result: newLedgerArray,
           contact,
