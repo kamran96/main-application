@@ -28,8 +28,7 @@ import { IAccountsResult } from '../../../../modal/accounts';
 import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv from '../../../../utils/Print';
 import FilterSchema from './filterSchema';
-// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
-import {BalanceSheetPdf} from 'apps/main-ui/src/components/PDFs/BalanceSheetPdf';
+import { BalanceSheetPdf } from '../../../../components/PDFs/BalanceSheetPdf';
 import DUMMYLOGO from "../../../../assets/quickbook.png";
 import { PDFViewer } from '@react-pdf/renderer';
 
@@ -327,9 +326,11 @@ const headerprops = {
           </>
         </PrintFormat>
       </Card>
-      <br/>
+
       <PDFViewer height={'1080px'} width={'100%'}>
-        <BalanceSheetPdf header = {headerprops} balanceSheetData={balanceSheetData} searchquery={searchedQueryItem}/>
+        <BalanceSheetPdf header = {headerprops} 
+        balanceSheetData={balanceSheetData} 
+        searchquery={searchedQueryItem}/>
        </PDFViewer>
     </WrapperBalanceSheetList>
   );
