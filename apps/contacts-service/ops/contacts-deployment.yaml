@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: contacts-app
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: contacts-app
@@ -14,7 +13,7 @@ spec:
     spec:
       containers:
         - name: contacts-app
-          image: registry.digitalocean.com/invyce-images/contacts-service:549b285
+          image: registry.digitalocean.com/invyce-images/contacts-service:c3f0a9b
           resources:
             limits:
               memory: '128Mi'
@@ -35,25 +34,6 @@ spec:
   ports:
     - port: 80
       targetPort: 3333
-      protocol: TCP
-
----
-# take outside traffic to service using istio
-# See more at https://istio.io/docs/reference/config/networking/gateway/
-apiVersion: networking.istio.io/v1beta1
-kind: Gateway
-metadata:
-  name: contacts-gateway
-spec:
-  selector:
-    istio: ingress
-  servers:
-    - port:
-        number: 80
-        name: http
-        protocol: HTTP
-      hosts:
-        - 'staging.invyce.com'
 
 ---
 
@@ -64,7 +44,7 @@ metadata:
   name: contacts-vs
 spec:
   gateways:
-    - contacts-gateway
+    - invyce-staging-gateway
   hosts:
   - "staging.invyce.com"
   http:
