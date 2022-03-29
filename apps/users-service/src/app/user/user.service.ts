@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Res,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcryptjs';
@@ -19,7 +25,11 @@ import {
 } from '../dto/user.dto';
 import { Response } from 'express';
 import { UserStatuses } from '@invyce/global-constants';
-import { EMAIL_CHANGED, SEND_FORGOT_PASSWORD } from '@invyce/send-email';
+import {
+  EMAIL_CHANGED,
+  PASSWORD_UPDATED,
+  SEND_FORGOT_PASSWORD,
+} from '@invyce/send-email';
 
 @Injectable()
 export class UserService {
@@ -150,32 +160,73 @@ export class UserService {
     }
   }
 
-  async ChangeEmail(loginUser: IBaseUser, email: string) {
-    const userEmail = await this.userModel.findOne({
-      email,
-    });
+  async ChangeUserDetails(loginUser: IBaseUser, data, @Res() res: Response) {
+    const email = data?.email;
+    const twoFactorEnabled = data?.twoFactorEnabled;
 
-    if (userEmail) {
-      throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST);
-    }
-
-    await this.userModel.update(
-      { _id: loginUser.id },
-      {
+    if (email) {
+      const userEmail = await this.userModel.findOne({
         email,
+      });
+
+      if (userEmail) {
+        throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST);
       }
-    );
 
-    await this.emailService.emit(EMAIL_CHANGED, {
-      to: loginUser.email,
-      user_name: loginUser.profile.fullName,
-      user_new_email: email,
-    });
+      await this.userModel.updateOne(
+        { _id: loginUser.id },
+        {
+          email,
+        }
+      );
 
-    return {
-      message: 'Email successfully changed',
-      status: true,
-    };
+      const user = await this.userModel.find({
+        _id: loginUser.id,
+      });
+
+      await this.emailService.emit(EMAIL_CHANGED, {
+        to: loginUser.email,
+        user_name: loginUser.profile.fullName,
+        user_new_email: email,
+      });
+
+      const userWithToken = await this.authService.Login(user, res);
+
+      return {
+        message: 'Email successfully changed',
+        result: userWithToken,
+        status: true,
+      };
+    } else if (twoFactorEnabled !== undefined) {
+      await this.userModel.updateOne(
+        { _id: loginUser.id },
+        {
+          twoFactorEnabled,
+        }
+      );
+
+      return {
+        message: 'Two factor successfully updated',
+        status: true,
+      };
+    } else {
+      await this.userModel.updateOne(
+        { _id: loginUser.id },
+        {
+          password: bcrypt.hashSync(data.password, 10),
+        }
+      );
+
+      await this.emailService.emit(PASSWORD_UPDATED, {
+        to: loginUser.email,
+        user_name: loginUser.profile.fullName,
+      });
+
+      return {
+        message: 'Password successfully changed',
+        status: true,
+      };
+    }
   }
 
   async FindUserById(userId: string, req: IRequest): Promise<IUser> {

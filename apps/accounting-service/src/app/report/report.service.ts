@@ -87,7 +87,7 @@ export class ReportService {
           FROM accounts
           inner join secondary_accounts
           on secondary_accounts.id = accounts."secondaryAccountId"
-          inner join primary_accounts
+          inner join primary_accountsß
           on primary_accounts.id = secondary_accounts."primaryAccountId"
           `;
       } else if (type == 'between') {
@@ -164,7 +164,7 @@ export class ReportService {
           });
           return {
             name: item,
-            type: item === 'revenue' ? 1 : 2,
+            type: item === 'asset' ? 1 : 2,
             balance,
             accounts: filtered,
           };
@@ -256,7 +256,7 @@ export class ReportService {
     }
 
     const account = await this.manager.query(main_query);
-    const newResult = ['revenue', 'expense']
+    const newResult = ['income', 'expense']
       .map((item) => {
         const filtered = account.filter((acc) => {
           return acc.primary_name === item && acc?.balance !== 0;

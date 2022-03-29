@@ -5,14 +5,14 @@ import {
   TableForeignKey,
 } from 'typeorm';
 
-export class billItems1630669523250 implements MigrationInterface {
+export class purchaseOrderItems1648107524188 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'bill_items',
+        name: 'purchase_order_items',
         columns: [
           { name: 'id', type: 'serial', isPrimary: true },
-          { name: 'billId', type: 'int', isNullable: false },
+          { name: 'purchaseOrderId', type: 'int', isNullable: false },
           { name: 'itemId', type: 'varchar', isNullable: true },
           { name: 'accountId', type: 'int', isNullable: true },
           { name: 'description', type: 'varchar', isNullable: true },
@@ -31,17 +31,17 @@ export class billItems1630669523250 implements MigrationInterface {
     );
 
     await queryRunner.createForeignKey(
-      'bill_items',
+      'purchase_order_items',
       new TableForeignKey({
-        columnNames: ['billId'],
+        columnNames: ['purchaseOrderId'],
         referencedColumnNames: ['id'],
-        referencedTableName: 'bills',
+        referencedTableName: 'purchase_orders',
         onDelete: 'CASCADE',
       })
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('bill_items');
+    await queryRunner.dropTable('purchase_order_items');
   }
 }

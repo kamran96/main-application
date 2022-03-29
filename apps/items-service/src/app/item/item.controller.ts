@@ -15,6 +15,7 @@ import { ItemCodesDto, ItemDto, ItemIdsDto, ParamsDto } from '../dto/item.dto';
 import { ItemService } from './item.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 import { IRequest, IPage, IItemWithResponse, IItem } from '@invyce/interfaces';
+import { ItemLedgerDetailDto } from '../dto/ItemLedger.dto';
 
 @Controller('item')
 export class ItemController {
@@ -98,6 +99,15 @@ export class ItemController {
         status: true,
       };
     }
+  }
+
+  @Post('manage-inventory')
+  @UseGuards(GlobalAuthGuard)
+  async manageInventory(
+    @Body() body: ItemLedgerDetailDto,
+    @Req() req: IRequest
+  ) {
+    return await this.itemService.ManageInventory(body, req.user);
   }
 
   @Post('ids-or-codes')
