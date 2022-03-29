@@ -43,7 +43,7 @@ metadata:
   name: users-vs
 spec:
   gateways:
-    - contacts-gateway
+    - invyce-staging-gateway
   hosts:
   - "staging.invyce.com"
   http:

@@ -1,11 +1,11 @@
 # See more at https://istio.io/docs/reference/config/networking/gateway/
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
   name: invyce-staging-gateway
 spec:
   selector:
-    istio: ingressgateway
+    istio: ingress
   servers:
   - port:
       number: 80
