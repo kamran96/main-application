@@ -38,3 +38,20 @@ export const LogoutAPI = (key?: any) => http.post(`users/auth/logout`);
 
 export const ChangeAccountPreferencesAPI = (payload?: { type: string }) =>
   http?.post(`users/auth/request-change`, payload);
+
+export const ChangeRequestOtpVerification = (payload?: { otp: number }) =>
+  http?.post(`users/auth/request-change-verify`, payload);
+
+export const updateAccountSetting = (payload?: {
+  email?: string;
+  password?: string;
+}) => http?.post(`users/user/account-settings`, payload);
+
+export const generateAuthenticator = () =>
+  http?.post(`users/auth/gen-authenticator`);
+
+export const verifyAuthenticatorCode = (payload?: { code: number }) =>
+  http?.post(`users/auth/authenticator`, payload);
+
+export const googleLoginAPI = (payload?: { token?: string }) =>
+  http?.post(`users/auth/google-login`, payload);

@@ -14,19 +14,12 @@ import { CommonTable } from '../Table';
 import { ColumnsType } from 'antd/lib/table';
 import { useRbac } from '../Rbac/useRbac';
 import {
-  creditNoteViewAPI,
-  getInvoiceByIDAPI,
-  getPurchasesById,
   pushDraftToInvoiceAPI,
   pushDraftToPurchaseAPI,
+  findInvoiceByID,
 } from '../../api';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
-import {
-  IAddress,
-  IInvoiceItem,
-  IInvoiceResult,
-  IInvoiceType,
-} from '@invyce/shared/types';
+import { IInvoiceItem, IInvoiceType } from '@invyce/shared/types';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import {
   IErrorMessages,
@@ -34,6 +27,8 @@ import {
   ISupportedRoutes,
   NOTIFICATIONTYPE,
   PaymentMode,
+  IInvoiceMutatedResult,
+  IInvoiceResult,
 } from '../../modal';
 import dayjs from 'dayjs';
 import { useRef } from 'react';
@@ -43,9 +38,7 @@ import printDiv, {
   DownloadPDF,
 } from '../../utils/Print';
 import { Link, useHistory } from 'react-router-dom';
-import CommonModal from '../Modal';
 import { EmailModal } from './Email';
-import { Payment } from '../Payment';
 import { IThemeProps } from '../../hooks/useTheme/themeColors';
 import { PrintFormat } from '../PrintFormat';
 import { PrintViewPurchaseWidget } from '../PurchasesWidget/PrintViewPurchaseWidget';
@@ -53,9 +46,14 @@ import { totalDiscountInInvoice } from '../../utils/formulas';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { InvoicePDF } from '../PDFs';
 import DummyLogo from '../../assets/quickbook.png';
+import { plainToClass } from 'class-transformer';
 interface IProps {
-  type?: 'SI' | 'PO' | 'credit-note';
-  id?: number;
+  type?:
+    | IInvoiceType.INVOICE
+    | IInvoiceType.PURCHASE_ORDER
+    | IInvoiceType.BILL
+    | IInvoiceType.CREDITNOTE;
+  id?: number | string;
   onApprove?: (payload?: any) => void;
 }
 
@@ -88,25 +86,13 @@ const defaultStates = {
   paymentType: null,
 };
 
-export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
+export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
   const queryCache = useQueryClient();
   /* ******API STAKE******* */
-  const APISTAKE =
-    type === 'SI'
-      ? getInvoiceByIDAPI
-      : type === 'credit-note'
-      ? creditNoteViewAPI
-      : getPurchasesById;
+
   const APISTAKE_APPROVED =
     type === 'PO' ? pushDraftToPurchaseAPI : pushDraftToInvoiceAPI;
   /* ******API STAKE ENDS HERE******* */
-
-  const accessor =
-    type === 'SI'
-      ? 'invoiceItems'
-      : type === 'credit-note'
-      ? 'creditNoteItems'
-      : 'purchaseItems';
 
   /* *************** HOOKS HERE ************** */
 
@@ -118,12 +104,18 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
   const history = useHistory();
 
   /* ************ QUERIES & MUTATIONS **************  */
-  const { data, isLoading } = useQuery([`invoice-view-${id}`, id], APISTAKE, {
-    enabled: !!id,
-  });
+  const { data, isLoading } = useQuery(
+    [`invoice-view-${id}`, id, type],
+    findInvoiceByID,
+    {
+      enabled: !!id,
+    }
+  );
 
-  const response: IInvoiceResult =
-    (data && data.data && data.data.result) || {};
+  const response = plainToClass(
+    IInvoiceMutatedResult,
+    data?.data
+  )?.getConstructedResult();
 
   const { mutate: mutateApprove, isLoading: approving } =
     useMutation(APISTAKE_APPROVED);
@@ -138,27 +130,21 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
   /* LOCAL STATES */
   const [emailModal, setEmailModal] = useState(false);
   const [tableData, setTableData] = useState<IInvoiceItem[]>([]);
-  const [paymentModal, setPaymentModal] = useState(false);
-  const [payment, setPayment] = useState<IPaymentPayload>({ ...defaultStates });
+
+  console.log(tableData, 'table data');
 
   /* LOCAL STATES ENDS HERE */
 
   /* ***** COMPONENT LIFE CYCLES */
 
   useEffect(() => {
-    if (response) {
-      setPayment({
-        ...payment,
-      });
-
-      if (response && response[accessor]) {
-        const sortedItems = response[accessor].sort((a, b) => {
-          return a.sequence - b.sequence;
-        });
-        setTableData(sortedItems);
-      }
+    if (data?.data?.result) {
+      const resolvedData = plainToClass(IInvoiceMutatedResult, data?.data);
+      setTableData(
+        resolvedData?.getConstructedResult().invoiceItems as IInvoiceItem[]
+      );
     }
-  }, [response]);
+  }, [data]);
 
   /* ***** COMPONENT LIFE CYCLES */
 
@@ -184,9 +170,6 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
         ? ISupportedRoutes?.ADD_DEBIT_NOTE
         : ISupportedRoutes?.ADD_CREDIT_NOTE;
     switch (e?.key) {
-      case IInvoiceActions?.APPROVE:
-        setPaymentModal(true);
-        break;
       case IInvoiceActions?.PROCEED:
         history.push(
           `/app${ISupportedRoutes.CREATE_PURCHASE_Entry}/${response.id}`,
@@ -217,21 +200,13 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
   }
 
   const handleApprove = () => {
-    const allItem = [...response[accessor]];
+    const allItem = tableData;
     const payload = {
       invoice: {
         ...response,
         status: 1,
       },
-      payment: {
-        ...payment,
-        amount:
-          payment.paymentMode === PaymentMode.CREDIT
-            ? 0
-            : payment.paymentMode === PaymentMode.CASH
-            ? response.netTotal
-            : parseFloat(payment.amount),
-      },
+
       invoice_items: [...allItem],
     };
     delete payload.invoice.contact;
@@ -252,8 +227,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
     mutateApprove(payload, {
       onSuccess: () => {
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Approved Successfully');
-        setPayment({ ...defaultStates });
-        setPaymentModal(false);
+
         [
           'invoices',
           'transactions',
@@ -265,12 +239,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
         });
       },
       onError: (error: IServerError) => {
-        if (
-          error &&
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
+        if (error?.response?.data?.message) {
           const { message } = error.response.data;
           notificationCallback(NOTIFICATIONTYPE.SUCCESS, message);
         } else {
@@ -304,7 +273,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
   const itemsDiscount =
     (response &&
       totalDiscountInInvoice(
-        response[accessor],
+        tableData,
         'itemDiscount',
         type === 'PO' ? 'POE' : 'SI'
       )) ||
@@ -315,11 +284,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
   /* ************* THIS WILL CALCULATE TOTAL TAX ************* */
   const TotalTax =
     (response &&
-      totalDiscountInInvoice(
-        response[accessor],
-        'tax',
-        type === 'PO' ? 'POE' : 'SI'
-      )) ||
+      totalDiscountInInvoice(tableData, 'tax', type === 'PO' ? 'POE' : 'SI')) ||
     0;
 
   const getRemainigAmount = () => {
@@ -359,15 +324,16 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
       title: 'RATE',
       dataIndex: priceAccessor,
       key: type === 'PO' ? `purchasePrice` : `unitPrice`,
-      render: (data) => moneyFormat(data),
+      render: (data) => (data ? moneyFormat(data) : '-'),
     },
     response?.invoiceType !== IInvoiceType?.CREDITNOTE &&
-    response?.invoiceType !== IInvoiceType?.DEBITNOTE
+    response?.invoiceType !== IInvoiceType?.DEBITNOTE &&
+    response?.invoiceType !== IInvoiceType?.PURCHASE_ENTRY
       ? {
           title: 'DISCOUNT',
           dataIndex: 'itemDiscount',
           key: 'itemDiscount',
-          render: (data) => moneyFormat(data),
+          render: (data) => (data ? moneyFormat(data) : '-'),
         }
       : {},
     {
@@ -384,17 +350,17 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
   ];
 
   const _options: IInvoiceOptions[] = [
-    response.invoiceType === 'PO' && {
+    response?.invoiceType === 'PO' && {
       title: 'Approve',
       permission: PERMISSIONS?.PURCHASE_ORDERS_APPROVE,
       key: IInvoiceActions.APPROVE,
     },
 
-    response.status === 2 &&
-      response.invoiceType !== 'QO' && {
+    response?.status === 2 &&
+      response?.invoiceType !== 'QO' && {
         title: 'Proceed',
         permission:
-          type === 'SI' || type === 'credit-note'
+          type === IInvoiceType.INVOICE || type === IInvoiceType.CREDITNOTE
             ? PERMISSIONS?.INVOICES_DRAFT_APPROVE
             : PERMISSIONS?.PURCHASES_DRAFT_APPROVE,
         key: IInvoiceActions.PROCEED,
@@ -405,8 +371,8 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
       key: IInvoiceActions.PRINT,
     },
 
-    (response.invoiceType === IInvoiceType?.PURCHASE_ENTRY ||
-      response.invoiceType === IInvoiceType?.INVOICE) && {
+    (response?.invoiceType === IInvoiceType?.PURCHASE_ENTRY ||
+      response?.invoiceType === IInvoiceType?.INVOICE) && {
       title: 'Add Credit note',
       permission: PERMISSIONS?.INVOICES_CREATE,
       key: IInvoiceActions.CREDIT_NOTE,
@@ -466,7 +432,14 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
                   <InvoicePDF
                     header={headerprops}
                     data={response}
-                    type={type}
+                    type={
+                      type === IInvoiceType.CREDITNOTE
+                        ? 'credit-note'
+                        : type === IInvoiceType.BILL ||
+                          type === IInvoiceType?.PURCHASE_ORDER
+                        ? 'PO'
+                        : 'SI'
+                    }
                     reportGeneratedUser={userDetails?.profile?.fullName}
                   />
                 }
@@ -486,14 +459,26 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
   const addresses = response?.contact?.addresses || [];
 
   const getTotal = () => {
-    const { netTotal, relation } = response;
-    const { balance } = (relation?.links?.length &&
-      relation?.links?.reduce((a, b) => {
+    const { balance } = (response?.relation?.links?.length &&
+      response?.relation?.links?.reduce((a, b) => {
         return { balance: a.balance + b.balance };
       })) || { balance: 0 };
 
-    return netTotal - balance;
+    return response?.netTotal - balance;
   };
+
+  const Title =
+    type === IInvoiceType.INVOICE
+      ? 'Invoice'
+      : type === IInvoiceType.BILL
+      ? 'Bills'
+      : type === IInvoiceType.PURCHASE_ORDER
+      ? 'Purchase Order'
+      : type === IInvoiceType.CREDITNOTE
+      ? 'Credit Note'
+      : type === IInvoiceType.QUOTE
+      ? 'Quote'
+      : 'Debit Note';
 
   return (
     <WrapperNewPurchaseView>
@@ -502,25 +487,14 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
           <Col span={12}>
             <Heading type="container">
               {' '}
-              {type === 'SI'
-                ? 'Invoice'
-                : type === 'PO'
-                ? 'Bill'
-                : 'Credit Note'}{' '}
+              {Title}
               {response?.invoiceNumber ? `(${response?.invoiceNumber})` : null}
             </Heading>
           </Col>
           <Col span={12}>
             <div className="textRight">
               <Dropdown overlay={menu}>
-                <Button type="primary">
-                  {type === 'SI'
-                    ? 'Invoice'
-                    : type === 'PO'
-                    ? 'Bill'
-                    : 'Credit Note'}{' '}
-                  Options
-                </Button>
+                <Button type="primary">{Title}&nbsp;Options</Button>
               </Dropdown>
             </div>
           </Col>
@@ -674,7 +648,16 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
           <CommonTable
             loading={isLoading}
             data={tableData}
-            columns={columns}
+            columns={
+              type === IInvoiceType?.PURCHASE_ORDER
+                ? columns.filter(
+                    (i, index) =>
+                      i?.title !== 'RATE' &&
+                      i?.title !== 'DISCOUNT' &&
+                      i?.title !== 'TAX'
+                  )
+                : columns
+            }
             pagination={false}
             size="small"
           />
@@ -705,57 +688,71 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
           </Col>
           <Col span={8}>
             <div className="calculation textRight">
-              <table>
-                <tr>
-                  <th>Sub Total</th>
-                  <td>{moneyFormat(response?.grossTotal)}</td>
-                </tr>
-                <tr>
-                  <th>Items Discount</th>
-                  <td>{response && moneyFormat(itemsDiscount)}</td>
-                </tr>
-                <tr>
-                  <th>Invoice Discount</th>
-                  <td>{response && moneyFormat(invoiceDiscount)}</td>
-                </tr>
-                <tr>
-                  <th>Tax Rate</th>
-                  <td>{response && moneyFormat(TotalTax)}</td>
-                </tr>
-                {response?.relation?.links?.length > 0 &&
-                  response?.relation?.links?.map((item, key) => {
-                    const generateLink = () => {
-                      let link = ``;
-                      switch (response?.relation?.type) {
-                        case 'CN':
-                          link = `/app${ISupportedRoutes.CREDIT_NOTES}/${item.id}`;
-                          break;
-                        case 'SI':
-                          link = `/app${ISupportedRoutes.INVOICES_VIEW}/${item.id}`;
-                          break;
-                        case 'PO':
-                          link = `/app${ISupportedRoutes.PURCHASES}/${item.id}`;
-                          break;
-
-                        default:
-                          return ``;
-                      }
-                      return link;
-                    };
-                    return (
+              {response?.invoiceType !== 'PO' && (
+                <table>
+                  <tr>
+                    <th>Sub Total</th>
+                    <td>{moneyFormat(response?.grossTotal)}</td>
+                  </tr>
+                  {type !== IInvoiceType.PURCHASE_ORDER &&
+                  type !== IInvoiceType.BILL ? (
+                    <>
                       <tr>
-                        <th>
-                          <Link to={generateLink()}>{item?.invoiceNumber}</Link>
-                        </th>
-                        <td>{moneyFormat(item?.balance)}</td>
+                        <th>Items Discount</th>
+                        <td>{response && moneyFormat(itemsDiscount)}</td>
                       </tr>
-                    );
-                  })}
-                <tr>
-                  <th>Total</th>
-                  <td>{moneyFormat(getTotal())}</td>
-                </tr>
-              </table>
+                      <tr>
+                        <th>Invoice Discount</th>
+                        <td>{response && moneyFormat(invoiceDiscount)}</td>
+                      </tr>
+                    </>
+                  ) : (
+                    <tr>
+                      <th>Adjustments</th>
+                      <td>{response && moneyFormat(response?.adjustment)}</td>
+                    </tr>
+                  )}
+                  <tr>
+                    <th>Tax Rate</th>
+                    <td>{response && moneyFormat(TotalTax)}</td>
+                  </tr>
+                  {response?.relation?.links?.length > 0 &&
+                    response?.relation?.links?.map((item, key) => {
+                      const generateLink = () => {
+                        let link = ``;
+                        switch (response?.relation?.type) {
+                          case 'CN':
+                            link = `/app${ISupportedRoutes.CREDIT_NOTES}/${item.id}`;
+                            break;
+                          case 'SI':
+                            link = `/app${ISupportedRoutes.INVOICES_VIEW}/${item.id}`;
+                            break;
+                          case 'PO':
+                            link = `/app${ISupportedRoutes.PURCHASES}/${item.id}`;
+                            break;
+
+                          default:
+                            return ``;
+                        }
+                        return link;
+                      };
+                      return (
+                        <tr>
+                          <th>
+                            <Link to={generateLink()}>
+                              {item?.invoiceNumber}
+                            </Link>
+                          </th>
+                          <td>{moneyFormat(item?.balance)}</td>
+                        </tr>
+                      );
+                    })}
+                  <tr>
+                    <th>Total</th>
+                    <td>{moneyFormat(getTotal())}</td>
+                  </tr>
+                </table>
+              )}
             </div>
           </Col>
           {response?.comment && (
@@ -770,7 +767,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
           )}
         </Row>
       </Card>
-      <CommonModal
+      {/* <CommonModal
         footer={false}
         onCancel={() => setPaymentModal(false)}
         visible={paymentModal}
@@ -806,7 +803,7 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
             Payment Proceed
           </Button>
         </div>
-      </CommonModal>
+      </CommonModal> */}
       <EmailModal
         onSendEmail={onEmail}
         visibility={emailModal}
@@ -816,8 +813,15 @@ export const PurchasesView: FC<IProps> = ({ id, type = 'SI', onApprove }) => {
       <div className="_visibleOnPrint" ref={printRef}>
         <PrintFormat>
           <PrintViewPurchaseWidget
-            hideCalculation={response.invoiceType === 'PO' ? true : false}
-            type={type}
+            hideCalculation={response?.invoiceType === 'PO' ? true : false}
+            type={
+              type === IInvoiceType.CREDITNOTE
+                ? 'credit-note'
+                : type === IInvoiceType.BILL ||
+                  type === IInvoiceType?.PURCHASE_ORDER
+                ? 'PO'
+                : 'SI'
+            }
             data={response}
           />
         </PrintFormat>

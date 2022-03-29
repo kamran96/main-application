@@ -176,7 +176,6 @@ export const RegisterForm: FC = () => {
                 <Seprator />
               </div>
               <Form
-                autoComplete="off"
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
                 layout="vertical"
@@ -330,7 +329,7 @@ export const RegisterForm: FC = () => {
                       ]}
                       hasFeedback
                     >
-                      <Input.Password size="middle" />
+                      <Input.Password autoComplete="off" size="middle" />
                     </Form.Item>
                   </Col>
 

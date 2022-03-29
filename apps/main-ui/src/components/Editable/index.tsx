@@ -121,7 +121,7 @@ export const Editable: FC<IProps> = ({
             </div>
           )
         ) : isEditable ? (
-          <Input
+          <Input 
             ref={inputRef}
             disabled={disabled}
             onChange={(e) => {
@@ -135,6 +135,7 @@ export const Editable: FC<IProps> = ({
             size={size}
             value={inputVal}
             autoFocus
+            autoComplete="off"
           />
         ) : (
           <div

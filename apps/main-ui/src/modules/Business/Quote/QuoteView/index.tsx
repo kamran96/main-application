@@ -4,7 +4,7 @@ import { BreadCrumbArea } from '../../../../components/BreadCrumbArea';
 import { TableCard } from '../../../../components/TableCard';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { Link } from 'react-router-dom';
-import { ISupportedRoutes } from '../../../../modal';
+import { IInvoiceType, ISupportedRoutes } from '../../../../modal';
 import { PurchasesView } from '../../../../components/PurchasesView';
 
 export const QuoteView = () => {
@@ -23,7 +23,7 @@ export const QuoteView = () => {
         </Breadcrumb>
       </BreadCrumbArea>
       <TableCard>
-        <PurchasesView type="SI" id={invId} />
+        <PurchasesView type={IInvoiceType.INVOICE} id={invId} />
       </TableCard>
     </>
   );

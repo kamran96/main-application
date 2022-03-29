@@ -90,7 +90,7 @@ export const ResetForm: FC = () => {
                   ]}
                   hasFeedback
                 >
-                  <Input.Password size="middle" />
+                  <Input.Password size="middle" autoComplete="off"/>
                 </Form.Item>
                 <Form.Item
                   label="Confirm Password"
@@ -108,7 +108,7 @@ export const ResetForm: FC = () => {
                   ]}
                   hasFeedback
                 >
-                  <Input.Password size="middle" />
+                  <Input.Password size="middle" autoComplete="off"/>
                 </Form.Item>
                 <Form.Item hasFeedback={isSuccess ? true : false}>
                   <Button

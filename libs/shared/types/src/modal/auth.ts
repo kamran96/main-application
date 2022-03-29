@@ -24,6 +24,7 @@ export interface IUser extends IBase {
   profile?: IProfile;
   username?: string;
   email?: string;
+  twoFactorEnabled?: boolean;
 }
 
 export interface IOrganization extends IBase {

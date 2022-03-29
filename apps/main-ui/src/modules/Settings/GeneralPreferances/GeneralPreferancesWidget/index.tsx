@@ -48,6 +48,7 @@ export const GeneralPreferencesWidget: FC = () => {
                       value={formItem.name}
                       name="name"
                       onChange={(e) => handleChange(e, index)}
+                      autoComplete="off"
                     />
                   </Col>
                   <Col span={12}>
@@ -57,6 +58,7 @@ export const GeneralPreferencesWidget: FC = () => {
                       value={formItem.type}
                       name="type"
                       onChange={(e) => handleChange(e, index)}
+                      autoComplete="off"
                     />
                   </Col>
                 </Row>

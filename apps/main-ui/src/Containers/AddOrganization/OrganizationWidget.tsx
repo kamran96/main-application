@@ -139,7 +139,7 @@ export const OrganizationWidget: FC = () => {
                   { required: true, message: 'Organization Name is required!' },
                 ]}
               >
-                <Input size="middle" placeholder="e.g Abc pvt ltd" />
+                <Input size="middle" autoComplete="off" placeholder="e.g Abc pvt ltd" />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -148,7 +148,7 @@ export const OrganizationWidget: FC = () => {
                 label="Email?"
                 rules={[{ required: true, message: 'Email is required!' }]}
               >
-                <Input size="middle" placeholder="abce@domain.com" />
+                <Input size="middle" autoComplete="off" placeholder="abce@domain.com" />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -157,7 +157,7 @@ export const OrganizationWidget: FC = () => {
                 label="Fax No"
                 rules={[{ required: false, message: 'Fax is required!' }]}
               >
-                <Input size="middle" placeholder="Enter your fax number" />
+                <Input size="middle" autoComplete="off" placeholder="Enter your fax number" />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -170,6 +170,7 @@ export const OrganizationWidget: FC = () => {
                 ]}
               >
                 <Input
+                  autoComplete="off"
                   addonBefore={prefixSelector}
                   type="text"
                   placeholder="3188889898"
@@ -179,7 +180,7 @@ export const OrganizationWidget: FC = () => {
             </Col>
             <Col span={12}>
               <Form.Item name="website" label="Website">
-                <Input size="middle" placeholder="Website link" />
+                <Input size="middle" autoComplete="off" placeholder="Website link" />
               </Form.Item>
             </Col>
           </Row>
@@ -230,13 +231,13 @@ export const OrganizationWidget: FC = () => {
 
             <Col span={12}>
               <Form.Item name="city" label="City">
-                <Input size="middle" placeholder="New York" />
+                <Input size="middle" autoComplete="off" placeholder="New York" />
               </Form.Item>
             </Col>
 
             <Col span={12}>
               <Form.Item name="postalCode" label="Area Code">
-                <Input size="middle" placeholder="8898" />
+                <Input size="middle" autoComplete="off" placeholder="8898" />
               </Form.Item>
             </Col>
           </Row>

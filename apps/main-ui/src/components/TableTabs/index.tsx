@@ -87,7 +87,7 @@ const CustomizedTabs: any = styled(Tabs)`
     &:hover {
       border: 1px solid transparent !important;
       background: ${(props: IThemeProps) =>
-        props?.theme?.colors?.bgTh} !important;
+        props?.theme?.colors?.sidebarListActive} !important;
       .ant-tabs-tab-btn {
         color: ${Color.$WHITE};
       }
@@ -96,7 +96,7 @@ const CustomizedTabs: any = styled(Tabs)`
 
   .ant-tabs-tab-active {
     background: ${(props: IThemeProps) =>
-      props?.theme?.colors?.bgTh} !important;
+      props?.theme?.colors?.sidebarListActive} !important;
     .ant-tabs-tab-btn {
       color: white !important;
     }

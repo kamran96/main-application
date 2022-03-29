@@ -69,8 +69,8 @@ export const PurchaseOrderColumns: ColumnsType<any> = [
   },
   {
     title: 'Items',
-    dataIndex: 'purchase_items',
-    key: 'purchase_items',
+    dataIndex: 'purchaseOrderItems',
+    key: 'purchaseOrderItems',
     render: (data: any[]) => (
       <>{data.length === 1 ? `${data.length} Item` : `${data.length} Items`}</>
     ),

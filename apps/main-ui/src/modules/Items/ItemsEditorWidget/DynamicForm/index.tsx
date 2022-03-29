@@ -22,6 +22,7 @@ export const DynamicForm: FC<IProps> = ({ item, onChange, value }) => {
             value={value}
             onChange={(e) => onChange(e.target.value)}
             size="middle"
+            autoComplete="off"
           />
         );
       case "DROPDOWN":
