@@ -80,7 +80,7 @@ export const AddBankWidget: FC = () => {
                 name="name"
                 rules={[{ required: true, message: 'Please add Bank name' }]}
               >
-                <Input size="large" placeholder="eg. Habib Bank Ltd." />
+                <Input size="large" placeholder="eg. Habib Bank Ltd."  autoComplete='off'/>
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -91,7 +91,7 @@ export const AddBankWidget: FC = () => {
                   { required: true, message: 'Please add Account Number' },
                 ]}
               >
-                <Input size="large" />
+                <Input size="large" autoComplete='off'/>
               </Form.Item>
             </Col>
             <Col span={24}>

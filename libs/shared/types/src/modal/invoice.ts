@@ -1,5 +1,6 @@
+import { IItem } from '@invyce/interfaces';
 import { IBranch, IOrganization, IUser } from './auth';
-import { IBase, IBaseRequest } from './base';
+import { IBase, IBaseRequest, IBaseRequestResponse } from './base';
 import { IContactType } from './contact';
 
 export interface IInvoiceResponse extends IBaseRequest {
@@ -13,9 +14,12 @@ export enum IInvoiceType {
   QUOTE = 'QO',
   CREDITNOTE = 'ACCRECCREDIT',
   DEBITNOTE = 'ACCPAYCREDIT',
+  BILL = 'BILL',
 }
 
 export interface IInvoiceResult extends IBase {
+  item: IItem;
+  adjustment?: number;
   id: number;
   reference: string;
   contactId: number;
@@ -32,18 +36,21 @@ export interface IInvoiceResult extends IBase {
   status: number;
   organizationId: number;
   invoiceType:
-    | IInvoiceType.CREDITNOTE
-    | IInvoiceType.DEBITNOTE
-    | IInvoiceType.QUOTE
-    | IInvoiceType.INVOICE
-    | IInvoiceType.PURCHASE_ENTRY
-    | any;
+    | `${IInvoiceType.CREDITNOTE}`
+    | `${IInvoiceType.DEBITNOTE}`
+    | `${IInvoiceType.QUOTE}`
+    | `${IInvoiceType.INVOICE}`
+    | `${IInvoiceType.PURCHASE_ENTRY}`
+    | `${IInvoiceType.PURCHASE_ORDER}`
+    | `${IInvoiceType.BILL}`;
+
   invoiceNumber: string;
   invoiceStatus: number;
 
   isTaxIncluded: number;
   currency: string;
   invoice_items: IInvoiceItem[];
+  invoiceItems: IInvoiceItem[];
   credit_note_items?: IInvoiceItem[];
   payments: IInvoicePayment[] | any;
   contact: IContactType;
@@ -59,6 +66,32 @@ export interface IInvoiceResult extends IBase {
     type: 'SI' | 'PO' | 'QO' | 'CN';
     links: { id?: number; invoiceNumber?: string; balance?: number }[];
   };
+}
+
+export class IInvoiceMutatedResult extends IBaseRequestResponse {
+  result?: IInvoiceResult;
+
+  getSquenceData(accessor: string) {
+    const sortedData = this.result?.[accessor]?.sort((a: any, b: any) => {
+      return a.sequence - b.sequence;
+    });
+
+    return sortedData;
+  }
+
+  getConstructedResult() {
+    const type = this.result?.invoiceType;
+    const accessor =
+      type === IInvoiceType.INVOICE
+        ? 'invoiceItems'
+        : type === IInvoiceType.CREDITNOTE || IInvoiceType.DEBITNOTE
+        ? 'creditNoteItems'
+        : type === IInvoiceType.PURCHASE_ORDER
+        ? 'purchaseOrderItems'
+        : 'purchaseItems';
+
+    return { ...this.result, invoiceItems: this.getSquenceData(accessor) };
+  }
 }
 
 export interface IAddress {
@@ -80,7 +113,7 @@ export interface IInvoiceItem extends IBase {
   itemId: number;
   description: number;
   quantity: number;
-  itemDiscount: string | number;
+  itemDiscount: string;
   total: number;
   organizationId: number;
   tax: string;
@@ -89,6 +122,7 @@ export interface IInvoiceItem extends IBase {
   purchasePrice?: number;
   salesPrice?: number;
   discount?: number | string;
+  item?: IItem;
 }
 
 export enum ORDER_TYPE {

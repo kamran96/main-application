@@ -93,7 +93,7 @@ export const TaxEditorWidget: FC<IProps> = ({
         >
           <div className="form_list">
             <Form.Item name="title" label="Tax rate display title">
-              <Input size="middle" placeholder="eg. Example" />
+              <Input size="middle" placeholder="eg. Example" autoComplete='off'/>
             </Form.Item>
             <Form.List name="tax_rate_items" initialValue={formInitialValues}>
               {(fields, { add, remove }) => (
@@ -117,7 +117,7 @@ export const TaxEditorWidget: FC<IProps> = ({
                             },
                           ]}
                         >
-                          <Input placeholder={'Federal Tax'} size="middle" />
+                          <Input placeholder={'Federal Tax'} size="middle" autoComplete='off'/>
                         </Form.Item>
                         <Form.Item
                           {...field}
@@ -127,7 +127,7 @@ export const TaxEditorWidget: FC<IProps> = ({
                             { required: true, message: 'Rate is required!' },
                           ]}
                         >
-                          <Input placeholder={'4.5%'} size="middle" />
+                          <Input placeholder={'4.5%'} size="middle" autoComplete='off'/>
                         </Form.Item>
                         <Form.Item
                           {...field}

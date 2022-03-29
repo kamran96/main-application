@@ -38,7 +38,6 @@ export const ItemsForm: FC = () => {
   const queryCache = useQueryClient();
   const [formData, setFormData] = useState({});
   const [attribute_values, setAttriValue] = useState([]);
-  const [hasInventory, setHasInventory] = useState(false);
 
   /* Mutations */
   const { mutate: mutateItems, isLoading: itemCreating } =
@@ -152,7 +151,6 @@ export const ItemsForm: FC = () => {
   };
 
   const onFinish = async (values) => {
-    console.log(values, 'values');
     if (!validateAttributes()) {
       let payload: any = {
         ...values,
@@ -359,7 +357,7 @@ export const ItemsForm: FC = () => {
               name="name"
               rules={[{ required: true, message: 'Please add item name' }]}
             >
-              <Input placeholder="eg. milk, match" size="middle" />
+              <Input autoComplete="off" placeholder="eg. milk, match" size="middle" />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -368,83 +366,95 @@ export const ItemsForm: FC = () => {
               name="code"
               rules={[{ required: true, message: 'Please add item code' }]}
             >
-              <Input size="middle" type="text" />
+              <Input autoComplete="off" size="middle" type="text" />
             </Form.Item>
           </Col>
 
-          {!data?.data?.result?.hasStock && (
+          {form.getFieldValue('itemType') === ITEM_TYPE.PRODUCT && (
             <>
               <Col span={24}>
                 <div className="pb-10">
                   <Form.Item name="hasInventory" valuePropName="checked">
-                    <Checkbox checked={hasInventory}>
-                      Has Opening Inventory
-                    </Checkbox>
+                    <Checkbox>Track Inventory</Checkbox>
                   </Form.Item>
                 </div>
               </Col>
-              {form.getFieldValue('hasInventory') && (
-                <>
-                  <Col span={12}>
-                    <FormLabel>Opening Inventory</FormLabel>
-                    <Form.Item
-                      name="openingStock"
-                      rules={[{ required: false }]}
-                    >
-                      <InputNumber
-                        disabled={
-                          form.getFieldValue('itemType') !== ITEM_TYPE.PRODUCT
-                        }
-                        style={{ width: '100%' }}
-                        size="middle"
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col span={12}>
-                    <FormLabel>Account</FormLabel>
-                    <Form.Item
-                      name="targetAccount"
-                      rules={[{ required: false }]}
-                    >
-                      <Select
-                        size="middle"
-                        disabled={
-                          form.getFieldValue('itemType') !== ITEM_TYPE.PRODUCT
-                        }
-                        showSearch
-                        style={{ width: '100%' }}
-                        placeholder="Select Account"
-                        optionFilterProp="children"
-                      >
-                        {allLiabilitiesAcc.length &&
-                          allLiabilitiesAcc.map(
-                            (acc: IAccountsResult, index: number) => {
-                              return (
-                                <Option key={index} value={acc.id}>
-                                  {acc.name}
-                                </Option>
-                              );
-                            }
-                          )}
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                  <Col span={12}>
-                    <FormLabel>Minimum Stock limit</FormLabel>
-                    <Form.Item
-                      name="minimumStock"
-                      rules={[
-                        {
-                          required: true,
-                          message: 'Minimum stock limit required!',
-                        },
-                      ]}
-                    >
-                      <InputNumber size="middle" type="text" />
-                    </Form.Item>
-                  </Col>
-                </>
-              )}
+              {form.getFieldValue('hasInventory') &&
+                !data?.data?.result?.hasStock && (
+                  <>
+                    <Col span={24}>
+                      <div className="pb-10">
+                        <Form.Item name="hasOpening" valuePropName="checked">
+                          <Checkbox>Has Opening Inventory</Checkbox>
+                        </Form.Item>
+                      </div>
+                    </Col>
+                    {form.getFieldValue('hasOpening') && (
+                      <>
+                        <Col span={12}>
+                          <FormLabel>Opening Inventory</FormLabel>
+                          <Form.Item
+                            name="openingStock"
+                            rules={[{ required: false }]}
+                          >
+                            <InputNumber
+                              disabled={
+                                form.getFieldValue('itemType') !==
+                                ITEM_TYPE.PRODUCT
+                              }
+                              style={{ width: '100%' }}
+                              size="middle"
+                            />
+                          </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                          <FormLabel>Account</FormLabel>
+                          <Form.Item
+                            name="targetAccount"
+                            rules={[{ required: false }]}
+                          >
+                            <Select
+                              size="middle"
+                              disabled={
+                                form.getFieldValue('itemType') !==
+                                ITEM_TYPE.PRODUCT
+                              }
+                              showSearch
+                              style={{ width: '100%' }}
+                              placeholder="Select Account"
+                              optionFilterProp="children"
+                            >
+                              {allLiabilitiesAcc.length &&
+                                allLiabilitiesAcc.map(
+                                  (acc: IAccountsResult, index: number) => {
+                                    return (
+                                      <Option key={index} value={acc.id}>
+                                        {acc.name}
+                                      </Option>
+                                    );
+                                  }
+                                )}
+                            </Select>
+                          </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                          <FormLabel>Minimum Stock limit</FormLabel>
+                          <Form.Item
+                            name="minimumStock"
+                            rules={[
+                              {
+                                required: true,
+                                message: 'Minimum stock limit required!',
+                              },
+                            ]}
+                          >
+                            <InputNumber size="middle" type="text" />
+                          </Form.Item>
+                        </Col>
+                      </>
+                    )}
+                  </>
+                )}
             </>
           )}
           <Col span={24}>
@@ -456,11 +466,13 @@ export const ItemsForm: FC = () => {
               <TextArea rows={5} />
             </Form.Item>
           </Col>
-          <Col span={24}>
-            <Form.Item name="hasPricing" valuePropName="checked">
-              <Checkbox>Add pricing to this item</Checkbox>
-            </Form.Item>
-          </Col>
+          {form.getFieldValue('itemType') === ITEM_TYPE.PRODUCT && (
+            <Col span={24}>
+              <Form.Item name="hasPricing" valuePropName="checked">
+                <Checkbox>Add pricing to this item</Checkbox>
+              </Form.Item>
+            </Col>
+          )}
           <Col span={24}>
             <Form.Item>
               <div className="action_buttons">

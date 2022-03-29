@@ -8,7 +8,7 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
 
-import { getAllContacts } from '../../../../../api';
+import { getAllContacts, getInvoiceNumber } from '../../../../../api';
 import { CreatePurchaseOrderAPI } from '../../../../../api/purchaseOrder';
 import { ConfirmModal } from '../../../../../components/ConfirmModal';
 import { DatePicker } from '../../../../../components/DatePicker';
@@ -19,6 +19,7 @@ import { useGlobalContext } from '../../../../../hooks/globalContext/globalConte
 import {
   IContactType,
   IContactTypes,
+  IInvoiceTypes,
   NOTIFICATIONTYPE,
 } from '../../../../../modal';
 import { ISupportedRoutes } from '../../../../../modal/routing';
@@ -82,6 +83,18 @@ const Editor: FC<IProps> = ({ id }) => {
 
   const [form] = Form.useForm();
 
+  const { data: invoiceNumberData } = useQuery(
+    ['', IInvoiceTypes.PURCHASE_ORDER],
+    getInvoiceNumber
+  );
+
+  useEffect(() => {
+    if (invoiceNumberData?.data?.result) {
+      const { result } = invoiceNumberData?.data;
+      form.setFieldsValue({ invoiceNumber: result });
+    }
+  }, [invoiceNumberData, form]);
+
   /* Scroll to last added item */
 
   const ClearAll = () => {
@@ -141,12 +154,11 @@ const Editor: FC<IProps> = ({ id }) => {
     const invId = id && typeof id === 'string' ? parseInt(id) : id;
 
     let payload = {
-      invoice: {
-        ...value,
-        status: value?.status?.status,
-        invoiceType: 'PO',
-        isNewRecord: true,
-      },
+      ...value,
+      status: value?.status?.status,
+      invoiceType: 'PO',
+      isNewRecord: true,
+
       invoice_items: state.map((item, index) => {
         if (id) {
           delete item.item;
@@ -157,7 +169,8 @@ const Editor: FC<IProps> = ({ id }) => {
     if (id) {
       payload = {
         ...payload,
-        invoice: { ...payload.invoice, id: invId, isNewRecord: false },
+        id: invId,
+        isNewRecord: false,
       };
     }
 
@@ -166,9 +179,7 @@ const Editor: FC<IProps> = ({ id }) => {
         onSuccess: () => {
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
-            `Purchase Order ${
-              payload.invoice.status === 1 ? 'Created' : 'Saved'
-            }`
+            `Purchase Order ${payload.status === 1 ? 'Created' : 'Saved'}`
           );
           if (value.email_pdf) {
             const message = `Purchase Order From ${userDetails?.organization?.name}, Branch ${userDetails?.branch?.name} \n Reference: ${value.referance}`;
@@ -306,7 +317,7 @@ const Editor: FC<IProps> = ({ id }) => {
                       name="invoiceNumber"
                       rules={[{ required: false, message: 'Required !' }]}
                     >
-                      <Input disabled={true} size="middle" type="number" />
+                      <Input disabled={true} size="middle" />
                     </Form.Item>
                   </Col>
                   <Col span={4} className="custom_col">
@@ -315,7 +326,7 @@ const Editor: FC<IProps> = ({ id }) => {
                       name="reference"
                       rules={[{ required: false, message: 'Required !' }]}
                     >
-                      <Input size="middle" />
+                      <Input size="middle" autoComplete='off'/>
                     </Form.Item>
                   </Col>
                   <Col span={4} className="custom_col">

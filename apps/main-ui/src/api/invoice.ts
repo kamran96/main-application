@@ -1,12 +1,12 @@
 import http from '../utils/http';
-import { QueryKey } from '../modal';
+import { IInvoiceType, QueryKey } from '../modal';
 
 enum INVOICES_API {
   INDEX = 'invoices/invoice',
   CREATE = 'invoices/invoice',
-  PO = 'invoices/bill',
   CREDIT_NOTE = 'invoices/credit-note',
   BILL = 'invoices/bill',
+  PO = 'invoices/purchase-order',
 }
 
 export const InvoiceCreateAPI = (payload) =>
@@ -34,6 +34,40 @@ export const getInvoiceByIDAPI = ({ queryKey }: QueryKey) => {
   return http.get(`${INVOICES_API.INDEX}/${id}`);
 };
 
+export const findInvoiceByID = ({ queryKey }: QueryKey) => {
+  const id: number = queryKey[1];
+  const type:
+    | IInvoiceType.INVOICE
+    | IInvoiceType.PURCHASE_ORDER
+    | IInvoiceType.BILL
+    | IInvoiceType.CREDITNOTE
+    | IInvoiceType.DEBITNOTE = queryKey[2];
+
+  let url = ``;
+
+  switch (type) {
+    case IInvoiceType.INVOICE:
+      url = `${INVOICES_API.INDEX}/${id}`;
+      break;
+    case IInvoiceType.PURCHASE_ORDER:
+      url = `${INVOICES_API.PO}/${id}`;
+      break;
+    case IInvoiceType.BILL:
+      url = `${INVOICES_API.BILL}/${id}`;
+      break;
+    case IInvoiceType.CREDITNOTE || IInvoiceType.DEBITNOTE:
+      url = `${INVOICES_API.CREDIT_NOTE}/${id}`;
+      break;
+    default:
+      url = ``;
+      break;
+  }
+
+  console.log(url, id, 'urls');
+
+  return http.get(url);
+};
+
 export const purchaseOrderCreateAPI = (payload) =>
   http.post(`purchases/create`, payload);
 
@@ -44,7 +78,7 @@ export const getPoListAPI = ({ queryKey }: QueryKey) => {
   const page: number = queryKey[4];
   const pageSize: number = queryKey[5];
   const query: string = queryKey[6];
-  let url = `${INVOICES_API.PO}?page_size=${pageSize}&page_no=${page}&status=${status}&type=${type}`;
+  let url = `${INVOICES_API.BILL}?page_size=${pageSize}&page_no=${page}&status=${status}&type=${type}`;
   if (query) {
     url = `${url}&query=${query}`;
   }
@@ -63,9 +97,9 @@ export const deleteInvoicesAPI = (payload?: any) =>
 export const createPurchaseEntryAPI = (payload?: any) =>
   http.post(`${INVOICES_API.BILL}`, payload);
 
-export const getPurchasesById = ({ queryKey }: QueryKey) => {
+export const getBillsById = ({ queryKey }: QueryKey) => {
   const id: number = queryKey[1];
-  return http.get(`${INVOICES_API.PO}/${id}`);
+  return http.get(`${INVOICES_API.BILL}/${id}`);
 };
 
 export const deletePurchaseDrafts = (payload?: any) =>
@@ -110,3 +144,6 @@ export const invoiceFlowChartAPI = (key?: any) =>
 
 export const quotationApproveAPI = (id: string | number) =>
   http?.put(`quote-update/${id}`);
+
+export const deleteCreditNoteAPI = (paylod: { ids: number[]; type: number }) =>
+  http.put(`/invoices/credit-note/delete`, paylod);

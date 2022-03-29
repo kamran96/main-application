@@ -5,7 +5,7 @@ import { BreadCrumbArea } from '../../../../../components/BreadCrumbArea';
 import { PurchasesView } from '../../../../../components/PurchasesView';
 import { TableCard } from '../../../../../components/TableCard';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
-import { ISupportedRoutes } from '../../../../../modal';
+import { IInvoiceType, ISupportedRoutes } from '../../../../../modal';
 
 export const PurchaseEntryView = () => {
   const { routeHistory } = useGlobalContext();
@@ -23,7 +23,7 @@ export const PurchaseEntryView = () => {
         </Breadcrumb>
       </BreadCrumbArea>
       <TableCard>
-        <PurchasesView type="PO" id={invId} />
+        <PurchasesView type={IInvoiceType.BILL} id={invId} />
       </TableCard>
     </>
   );

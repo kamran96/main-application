@@ -9,8 +9,6 @@ export const DefaultLayout = (props: RouteConfigComponentProps) => {
 
   const history = useHistory();
 
-  console.log(history, 'history');
-
   if (isUserLogin) {
     if (userDetails && userDetails.organizationId && userDetails.branchId) {
       const state: any = history.location.state;

@@ -218,7 +218,7 @@ export const ItemsList: FC = () => {
       dataIndex: 'purchasePrice',
       key: 'purchasePrice',
       render: (price, row, index) => {
-        return price && moneyFormat(price);
+        return (price && moneyFormat(price)) || '-';
       },
     },
     {
@@ -228,7 +228,7 @@ export const ItemsList: FC = () => {
       sorter: false,
       showSorterTooltip: false,
       render: (price, row, index) => {
-        return price && moneyFormat(price);
+        return (price && moneyFormat(price)) || '-';
       },
     },
     {
@@ -253,7 +253,7 @@ export const ItemsList: FC = () => {
       title: 'Stock',
       dataIndex: 'showStock',
       render: (data, row, index) => {
-        return data;
+        return data ? data : '-';
       },
     },
 

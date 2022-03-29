@@ -136,6 +136,7 @@ export const UserInviteModal: FC = () => {
                             <Input
                               placeholder="Please type Email"
                               size="middle"
+                              autoComplete='off'
                             />
                           </Form.Item>
                           {/* <Form.Item
