@@ -66,7 +66,6 @@ const Editor: FC<IProps> = ({ type, id }) => {
     columns,
     contactResult,
     GrossTotal,
-    TotalDiscount,
     NetTotal,
     invoiceDiscount,
     setInvoiceDiscount,
@@ -162,11 +161,11 @@ const Editor: FC<IProps> = ({ type, id }) => {
         ...value,
         status: value.status.status,
         invoiceType: type ? type : IInvoiceType.INVOICE,
-        discount: addition(
+        adjustment: addition(
           typeof invoiceDiscount === 'string'
             ? parseInt(invoiceDiscount)
             : invoiceDiscount,
-          TotalDiscount
+          0
         ).toString(),
         netTotal: NetTotal,
         grossTotal: GrossTotal,
@@ -430,7 +429,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
                       name="reference"
                       rules={[{ required: true, message: 'Required !' }]}
                     >
-                      <Input size="middle" />
+                      <Input autoComplete="off" size="middle" />
                     </Form.Item>
                   </Col>
                   <Col span={5}>
@@ -639,18 +638,9 @@ const Editor: FC<IProps> = ({ type, id }) => {
                       {GrossTotal ? moneyFormat(GrossTotal) : moneyFormat(0)}
                     </p>
                   </Col>
+
                   <Col className="flex alignCenter" span={12}>
-                    <p className="bold">Items Discount</p>
-                  </Col>
-                  <Col span={12}>
-                    <p className="light textRight">
-                      {TotalDiscount
-                        ? moneyFormat(TotalDiscount)
-                        : moneyFormat(0)}
-                    </p>
-                  </Col>
-                  <Col className="flex alignCenter" span={12}>
-                    <p className="bold">Invoice Discount</p>
+                    <p className="bold">Adjustments</p>
                   </Col>
                   <Col span={12}>
                     <div className="flex alignCenter justifyFlexEnd">

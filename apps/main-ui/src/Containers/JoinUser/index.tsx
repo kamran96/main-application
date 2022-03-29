@@ -188,7 +188,7 @@ export const JoinUser: FC = () => {
               name="fullName"
               rules={[{ required: true, message: 'Name is required!' }]}
             >
-              <Input size="middle" />
+              <Input size="middle" autoComplete="off" />
             </Form.Item>
             <Form.Item
               label="User Name"
@@ -199,6 +199,7 @@ export const JoinUser: FC = () => {
                 onChange={onChangeUsername}
                 size="middle"
                 placeholder="Username"
+                autoComplete="off"
               />
             </Form.Item>
             <Form.Item
@@ -209,7 +210,7 @@ export const JoinUser: FC = () => {
                 { type: 'email' },
               ]}
             >
-              <Input disabled size="middle" />
+              <Input disabled size="middle" autoComplete="off"/>
             </Form.Item>
             <Form.Item
               label="Country"
@@ -233,28 +234,28 @@ export const JoinUser: FC = () => {
               name="role"
               rules={[{ required: true, message: 'email is required!' }]}
             >
-              <Input disabled size="middle" />
+              <Input disabled size="middle" autoComplete="off"/>
             </Form.Item>
             <Form.Item
               label="Branch"
               name="branch"
               rules={[{ required: true, message: 'email is required!' }]}
             >
-              <Input disabled size="middle" />
+              <Input disabled size="middle" autoComplete="off"/>
             </Form.Item>
             <Form.Item
               label="Phone Number"
               name="phoneNumber"
               rules={[{ required: true, message: 'phone number is required!' }]}
             >
-              <Input size="middle" placeholder="Phone Number" />
+              <Input size="middle" placeholder="Phone Number" autoComplete="off"/>
             </Form.Item>
             <Form.Item
               label="Password"
               name="password"
               rules={[{ required: true, message: 'password is required!' }]}
             >
-              <Input.Password size="large" />
+              <Input.Password size="large" autoComplete="off"/>
             </Form.Item>
             <Form.Item name="agreed" valuePropName="checked">
               <Checkbox>

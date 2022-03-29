@@ -15,7 +15,7 @@ export default {
 };
 export const Requires = {
   itemId: {
-    require: true,
+    require: false,
     message: 'Item is Requred to Proceed invoice',
   },
   description: {

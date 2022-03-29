@@ -296,7 +296,7 @@ export const PaymentsForm: FC = () => {
               rules={[{ required: true, message: 'Reference is required!' }]}
               name="reference"
             >
-              <Input style={{ width: '100%' }} size="middle" />
+              <Input autoComplete="off" style={{ width: '100%' }} size="middle" />
             </Form.Item>
           </Col>
 
@@ -470,7 +470,7 @@ export const PaymentsForm: FC = () => {
                     },
                   ]}
                 >
-                  <InputNumber size="middle" />
+                  <InputNumber size="middle" autoComplete='off'/>
                 </Form.Item>
               </div>
               <hr className="sep" />
