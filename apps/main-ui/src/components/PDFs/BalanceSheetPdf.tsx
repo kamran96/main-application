@@ -158,7 +158,7 @@ export const BalanceSheetPdf: FC<IProps> = ({
         <View style={styles.tableBody}>
           {balanceSheetData.map((item, index) => {
             return (
-              <View>
+              <View key={index}>
                 <View style={styles.filterTable}>
                 <Text style={[styles.LabelName, styles.ItemName]}>{item?.name}</Text>
                         {searchquery?.date && index == 0 ? (
@@ -189,10 +189,10 @@ export const BalanceSheetPdf: FC<IProps> = ({
                               </>
                             )}
                           </View>
-                {item.accounts.map((accountItem) => {
+                {item.accounts.map((accountItem, index) => {
                   return (
                     // eslint-disable-next-line react/jsx-no-useless-fragment
-                    <Fragment>
+                    <Fragment key={index}>
                     {
                       searchquery?.date ? (
                         <View style={styles.filterTable}>
