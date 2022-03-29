@@ -189,6 +189,11 @@ export class AuthController {
     }
   }
 
+  @Post('/google-login')
+  async googleLogin(@Body() data, @Res() res: Response) {
+    return await this.authService.GoogleLogin(data, res);
+  }
+
   @UseGuards(GlobalAuthGuard)
   @Post('/request-change')
   async changeEmailOtp(@Body() data, @Req() req: IRequest) {

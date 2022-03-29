@@ -16,6 +16,7 @@ import * as ip from 'ip';
 import * as speakeasy from 'speakeasy';
 import * as qrcode from 'qrcode';
 import { Response } from 'express';
+import { OAuth2Client } from 'google-auth-library';
 import { User } from '../schemas/user.schema';
 import {
   CHANGE_EMAIL_OTP,
@@ -37,6 +38,8 @@ import {
 } from '@invyce/interfaces';
 
 import { SendOtp, UserLoginDto, UserRegisterDto } from '../dto/user.dto';
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const generateRandomNDigits = (n) => {
   return Math.floor(Math.random() * (9 * Math.pow(10, n))) + Math.pow(10, n);
@@ -115,6 +118,46 @@ export class AuthService {
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async GoogleLogin(data, @Res() res: Response) {
+    const ticket = await client.verifyIdToken({
+      idToken: data.token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const user = await this.userModel.find({
+      email: payload.email,
+    });
+
+    if (user.length > 0) {
+      if (user.length > 0 && user[0].loginWith === 'google') {
+        await this.Login(user, res);
+      } else {
+        throw new HttpException(
+          'You are alreay registered with this email please login instead.',
+          HttpStatus.BAD_REQUEST
+        );
+      }
+    }
+
+    const profile = {
+      fullName: payload.name,
+      photo: payload.picture,
+    };
+
+    const userArr = [];
+    const newUser = new this.userModel();
+    newUser.email = payload.email;
+    newUser.username = payload.given_name;
+    newUser.profile = profile;
+    newUser.status = 1;
+    newUser.loginWith = 'google';
+    await newUser.save();
+
+    userArr.push(newUser);
+    await this.Login(userArr, res);
   }
 
   async AddUser(
@@ -375,7 +418,6 @@ export class AuthService {
 
     const generateOtp: number = generateRandomNDigits(4);
     parseInt(generateOtp as unknown as string);
-    console.log(generateOtp, 'otp');
 
     const user_token = new this.userTokenModel();
     user_token.code = generateOtp;

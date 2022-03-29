@@ -44,6 +44,8 @@ export class User {
     })
   )
   profile: IProfile;
+  @Prop()
+  loginWith: string;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Organization' })
   organizationId: Organization;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Role' })

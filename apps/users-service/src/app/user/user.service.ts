@@ -197,7 +197,7 @@ export class UserService {
         result: userWithToken,
         status: true,
       };
-    } else if (twoFactorEnabled) {
+    } else if (twoFactorEnabled !== undefined) {
       await this.userModel.updateOne(
         { _id: loginUser.id },
         {
