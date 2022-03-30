@@ -148,7 +148,7 @@ export const LoginForm: FC = () => {
                   { required: true, message: 'Please input your username!' },
                 ]}
               >
-                <Input size="large" autoComplete="off"/>
+                <Input size="large" autoComplete="off" />
               </Form.Item>
 
               <FormLabel>Password</FormLabel>
@@ -195,7 +195,6 @@ export const LoginForm: FC = () => {
                   buttonText="Log in with Google"
                   onSuccess={(data: any) => {
                     const { tokenId } = data;
-                    console.log(data, 'id token');
 
                     submitGoogleLogin(tokenId);
                   }}

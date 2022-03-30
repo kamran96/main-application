@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 12
+    paddingHorizontal: 12,
   },
   tableBody: {
     padding: '10px 30px',
@@ -108,25 +108,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filterTable: {
-    display:'flex',
+    display: 'flex',
     flexDirection: 'row',
     fontFamily: 'Roboto Slab',
-    fontSize: '12'
+    fontSize: '12',
   },
   itemCenter: {
     width: '13%',
-    padding: '12px 0'
+    padding: '12px 0',
   },
   ItemName: {
     width: '22%',
-    padding: '12px 0'
+    padding: '12px 0',
   },
   tableHeaderWidth: {
-    width: '35%'
+    width: '35%',
   },
   tableHeaderItem: {
-    width: '33%'
-  }
+    width: '33%',
+  },
 });
 
 export const BalanceSheetPdf: FC<IProps> = ({
@@ -134,8 +134,6 @@ export const BalanceSheetPdf: FC<IProps> = ({
   balanceSheetData,
   searchquery,
 }) => {
-  console.log('balance Sheet data', balanceSheetData);
-  // console.log('search query', searchquery);
   return (
     <PdfDocument>
       <PDFFontWrapper>
@@ -160,83 +158,81 @@ export const BalanceSheetPdf: FC<IProps> = ({
             return (
               <View key={index}>
                 <View style={styles.filterTable}>
-                <Text style={[styles.LabelName, styles.ItemName]}>{item?.name}</Text>
-                        {searchquery?.date && index == 0 ? (
-                              <>
-                                <Text style={[styles.LabelName, styles.itemCenter]}>
-                                Dr 
-                                </Text>
-                                <Text style={[styles.LabelName, styles.itemCenter]}>
-                                Cr 
-                                </Text>
-                                <Text style={[styles.LabelName, styles.itemCenter]}>
-                                Dr 
-                                </Text>
-                                <Text style={[styles.LabelName, styles.itemCenter]}>
-                                Cr 
-                                </Text>
-                                <Text style={[styles.LabelName, styles.itemCenter]}>
-                                Dr 
-                                </Text>
-                                <Text style={[styles.LabelName, styles.itemCenter]}>
-                                Cr 
-                                </Text>
-                              </>
-                            ) : (
-                              <>
-                                <Text></Text>
-                                <Text></Text>
-                              </>
-                            )}
-                          </View>
+                  <Text style={[styles.LabelName, styles.ItemName]}>
+                    {item?.name}
+                  </Text>
+                  {searchquery?.date && index == 0 ? (
+                    <>
+                      <Text style={[styles.LabelName, styles.itemCenter]}>
+                        Dr
+                      </Text>
+                      <Text style={[styles.LabelName, styles.itemCenter]}>
+                        Cr
+                      </Text>
+                      <Text style={[styles.LabelName, styles.itemCenter]}>
+                        Dr
+                      </Text>
+                      <Text style={[styles.LabelName, styles.itemCenter]}>
+                        Cr
+                      </Text>
+                      <Text style={[styles.LabelName, styles.itemCenter]}>
+                        Dr
+                      </Text>
+                      <Text style={[styles.LabelName, styles.itemCenter]}>
+                        Cr
+                      </Text>
+                    </>
+                  ) : (
+                    <>
+                      <Text></Text>
+                      <Text></Text>
+                    </>
+                  )}
+                </View>
                 {item.accounts.map((accountItem, index) => {
                   return (
                     // eslint-disable-next-line react/jsx-no-useless-fragment
                     <Fragment key={index}>
-                    {
-                      searchquery?.date ? (
+                      {searchquery?.date ? (
                         <View style={styles.filterTable}>
-                        <Text style={styles.ItemName}>
+                          <Text style={styles.ItemName}>
                             {accountItem?.name}
-                        </Text>
-                        <Text style={styles.itemCenter}>
-                          {accountItem?.opening_debits}
-                        </Text>
-                        <Text style={styles.itemCenter}>
-                          {accountItem?.opening_credits}
-                        </Text>
-                        <Text style={styles.itemCenter}>
-                          {accountItem?.total_debits}
-                        </Text>
-                        <Text style={styles.itemCenter}>
-                          {accountItem?.total_credits}
-                        </Text>
-                        <Text style={styles.itemCenter}>
-                          {accountItem?.closing_debits}
-                        </Text>
-                        <Text style={styles.itemCenter}>
-                          {accountItem?.closing_credits}
-                        </Text>
-                      </View>
-
-                      )
-                      : (
+                          </Text>
+                          <Text style={styles.itemCenter}>
+                            {accountItem?.opening_debits}
+                          </Text>
+                          <Text style={styles.itemCenter}>
+                            {accountItem?.opening_credits}
+                          </Text>
+                          <Text style={styles.itemCenter}>
+                            {accountItem?.total_debits}
+                          </Text>
+                          <Text style={styles.itemCenter}>
+                            {accountItem?.total_credits}
+                          </Text>
+                          <Text style={styles.itemCenter}>
+                            {accountItem?.closing_debits}
+                          </Text>
+                          <Text style={styles.itemCenter}>
+                            {accountItem?.closing_credits}
+                          </Text>
+                        </View>
+                      ) : (
                         <View style={styles.bodyFont}>
-                      <View
-                        style={
-                          item.type === ITransactionType.DEBIT
-                            ? styles.Debit
-                            : styles.Credit
-                        }
-                      >
-                        <Text>{accountItem?.name}</Text>
-                      </View>
-                      <Text>
-                        {moneyFormat(accountItem?.balance.toFixed(2))}
-                      </Text>
-                    </View>
-                      )
-                    }
+                          <View
+                            style={
+                              item.type === ITransactionType.DEBIT
+                                ? styles.Debit
+                                : styles.Credit
+                            }
+                          >
+                            <Text>{accountItem?.name}</Text>
+                          </View>
+                          <Text>
+                            {moneyFormat(accountItem?.balance.toFixed(2))}
+                          </Text>
+                        </View>
+                      )}
                     </Fragment>
                   );
                 })}

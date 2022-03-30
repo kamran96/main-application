@@ -367,9 +367,6 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                         showSearch
                         style={{ width: '100%' }}
                         placeholder="Select Contact"
-                        onChange={(value) => {
-                          console.log(value);
-                        }}
                         // optionFilterProp="children"
                         filterOption={(input, option) => {
                           const valueInput = input.toLowerCase();
@@ -418,7 +415,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                       name="reference"
                       rules={[{ required: true, message: 'Required !' }]}
                     >
-                      <Input size="middle"  autoComplete='off'/>
+                      <Input size="middle" autoComplete="off" />
                     </Form.Item>
                   </Col>
                   <Col span={5}>

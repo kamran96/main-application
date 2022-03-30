@@ -186,7 +186,7 @@ export const SmartFilter: FC<IProps> = ({
                 <div className="filter-item flex alignCenter justifySpaceBetween">
                   <p>Filter 1</p>
                   <div className="actions flex alignCenter">
-                    <i className="mr-10" onClick={() => console.log('edit')}>
+                    <i className="mr-10">
                       {' '}
                       <Icon
                         style={{
@@ -197,7 +197,7 @@ export const SmartFilter: FC<IProps> = ({
                         icon={editSolid}
                       />
                     </i>
-                    <i onClick={() => console.log('delete')}>
+                    <i>
                       {' '}
                       <Icon
                         style={{
@@ -266,7 +266,7 @@ export const SmartFilter: FC<IProps> = ({
                               );
 
                               return (
-                                <>
+                                <div key={index}>
                                   <FormLabel>{vari.title}</FormLabel>
                                   <DynamicForm
                                     value={
@@ -317,7 +317,7 @@ export const SmartFilter: FC<IProps> = ({
                                     }}
                                     item={vari}
                                   />
-                                </>
+                                </div>
                               );
                             }
                           )}

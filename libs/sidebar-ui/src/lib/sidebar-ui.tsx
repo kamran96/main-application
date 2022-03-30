@@ -50,6 +50,7 @@ const MenuPopOver: FC<IPopOverProps> = ({ route }) => {
       {route?.children?.map((childRoute, index) => {
         return (
           <li
+            key={index}
             className={`popover_list_item mv-4 ${
               _activeIndex === index ? 'active_child' : ''
             }`}

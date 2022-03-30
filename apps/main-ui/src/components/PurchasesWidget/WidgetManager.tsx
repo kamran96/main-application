@@ -24,6 +24,7 @@ import {
   getInvoiceByIDAPI,
   getInvoiceNumber,
   getBillsById,
+  findInvoiceByID,
 } from '../../api';
 import { getAccountsByTypeAPI } from '../../api/accounts';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
@@ -32,6 +33,7 @@ import {
   Color,
   IContactType,
   IContactTypes,
+  IInvoiceMutatedResult,
   NOTIFICATIONTYPE,
   PaymentMode,
 } from '../../modal';
@@ -51,6 +53,8 @@ import c from './keys';
 import styled from 'styled-components';
 import usePrevious from '../../hooks/usePrevious';
 import { IPurchaseManagerProps } from './types';
+import { useHistory } from 'react-router-dom';
+import { plainToClass } from 'class-transformer';
 
 interface IManagerContext {
   rowsErrors: number[];
@@ -117,14 +121,9 @@ export const PurchaseManager: FC<IProps> = ({
   id,
   requires,
 }) => {
+  const { location } = useHistory();
+  const routeState: any = location?.state;
   /* API STAKE */
-  const APISTAKE_GETORDERS =
-    type === IInvoiceType.BILL ||
-    type === IInvoiceType.PURCHASE_ENTRY ||
-    type === IInvoiceType.PURCHASE_ORDER
-      ? getBillsById
-      : getInvoiceByIDAPI;
-
   const [rowsErrors, setRowsErrors] = useState([]);
   const [width] = useWindowSize();
 
@@ -234,8 +233,14 @@ export const PurchaseManager: FC<IProps> = ({
   }, [AntForm]);
 
   const { data: invoicesData, isLoading: invoiceLoading } = useQuery(
-    [`${type}-${id}-view`, id],
-    APISTAKE_GETORDERS,
+    [
+      `${type}-${id}-view`,
+      id,
+      routeState?.relation === IInvoiceType.PURCHASE_ORDER
+        ? IInvoiceType.PURCHASE_ORDER
+        : IInvoiceType.BILL,
+    ],
+    findInvoiceByID,
     {
       enabled: !!id,
       cacheTime: Infinity,
@@ -249,9 +254,6 @@ export const PurchaseManager: FC<IProps> = ({
       // const { payment } = result;
       const { adjustment: discount } = result;
 
-      const key =
-        type === IInvoiceType.PURCHASE_ENTRY ? `purchaseItems` : 'invoiceItems';
-
       const invoiceDiscount = discount;
       setInvoiceDiscount(invoiceDiscount);
       AntForm.setFieldsValue({
@@ -261,29 +263,32 @@ export const PurchaseManager: FC<IProps> = ({
         invoiceDiscount,
       });
 
+      const resolvedData = plainToClass(
+        IInvoiceMutatedResult,
+        invoicesData?.data
+      );
+
       const invoice_items = [];
-      result[key].forEach((item, index) => {
-        const purchasePrice = item.purchasePrice ? item.purchasePrice : 0;
-        const unitPrice = item.unitPrice ? item.unitPrice : 0;
-        const tax = item.tax ? item.tax : 0;
-        const total = item.total ? item.total : 0;
-        const quantity = item.quantity ? item.quantity : 1;
-        delete item.item;
-        invoice_items.push({
-          ...item,
-          purchasePrice,
-          unitPrice,
-          tax,
-          total,
-          quantity,
+      resolvedData
+        ?.getConstructedResult()
+        ?.invoiceItems.forEach((item, index) => {
+          const purchasePrice = item?.purchasePrice || 0;
+          const unitPrice = item?.unitPrice || 0;
+          const tax = item?.tax || 0;
+          const total = item?.total || 0;
+          const quantity = item?.quantity || 1;
+          delete item.item;
+          invoice_items.push({
+            ...item,
+            purchasePrice,
+            unitPrice,
+            tax,
+            total,
+            quantity,
+          });
         });
-      });
 
-      const sortedItems = invoice_items.sort((a, b) => {
-        return a.sequence - b.sequence;
-      });
-
-      setInvoiceItems(sortedItems);
+      setInvoiceItems(invoice_items);
     }
   }, [invoicesData, AntForm, type]);
 
