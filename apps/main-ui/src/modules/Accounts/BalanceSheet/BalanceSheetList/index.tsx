@@ -28,6 +28,9 @@ import { IAccountsResult } from '../../../../modal/accounts';
 import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv from '../../../../utils/Print';
 import FilterSchema from './filterSchema';
+import { BalanceSheetPdf } from '../../../../components/PDFs/BalanceSheetPdf';
+import DUMMYLOGO from '../../../../assets/quickbook.png';
+import { PDFViewer } from '@react-pdf/renderer';
 
 interface IBalanceSheetConfig {
   columns: ColumnsType<any>;
@@ -52,13 +55,36 @@ export const BalanceSheetList: FC = () => {
     totalCredits: 0,
     totalDebits: 0,
   });
-  const { routeHistory } = useGlobalContext();
+  const { routeHistory, userDetails } = useGlobalContext();
   const { history } = routeHistory;
 
   const [config, setConfig] = useState({
     query: '',
   });
 
+  //handle Organization Data
+  const { organization } = userDetails;
+  const {
+    address: organizationAddress,
+    name: organizationName,
+    email: organizationEmail,
+    phoneNumber: organizationContact,
+    website,
+  } = organization;
+  const { city, country, postalCode } = organizationAddress;
+
+  const headerprops = {
+    organizationName,
+    city,
+    country,
+    title: 'BalanceSheet',
+    organizationContact,
+    organizationEmail,
+    address: '',
+    code: postalCode,
+    logo: DUMMYLOGO,
+    website,
+  };
   const { query } = config;
 
   useEffect(() => {
@@ -319,6 +345,14 @@ export const BalanceSheetList: FC = () => {
           </PrintFormat>
         </div>
       </Card>
+
+      <PDFViewer height={'1080px'} width={'100%'}>
+        <BalanceSheetPdf
+          header={headerprops}
+          balanceSheetData={balanceSheetData}
+          searchquery={searchedQueryItem}
+        />
+      </PDFViewer>
     </WrapperBalanceSheetList>
   );
 };

@@ -128,8 +128,6 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
 
   /* Async function to create and update a contact */
   const onFinish = async (values) => {
-    console.log(values, 'valuse');
-
     let payload = {
       ...values,
       isNewRecord: true,
@@ -273,7 +271,11 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                 },
               ]}
             >
-              <Input placeholder={'john@example.com'} autoComplete="off" size="large" />
+              <Input
+                placeholder={'john@example.com'}
+                autoComplete="off"
+                size="large"
+              />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -287,7 +289,11 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                 },
               ]}
             >
-              <Input placeholder={'john@example.com'} autoComplete="off" size="large" />
+              <Input
+                placeholder={'john@example.com'}
+                autoComplete="off"
+                size="large"
+              />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -358,7 +364,11 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               name="skypeName"
               rules={[{ required: false, message: 'Please provide Skype ID' }]}
             >
-              <Input autoComplete="off" placeholder={'live:@example'} size="large" />
+              <Input
+                autoComplete="off"
+                placeholder={'live:@example'}
+                size="large"
+              />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -614,7 +624,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                     style={{ width: '100%' }}
                     placeholder={'add credit limit block'}
                     size="large"
-                    autoComplete='off'
+                    autoComplete="off"
                   />
                 </Form.Item>
               </Col>
@@ -634,7 +644,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                     type="number"
                     placeholder={'Sales discount in percentage or amount'}
                     size="large"
-                    autoComplete='off'
+                    autoComplete="off"
                   />
                 </Form.Item>
               </Col>

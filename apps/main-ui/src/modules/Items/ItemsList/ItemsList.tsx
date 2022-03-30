@@ -66,8 +66,6 @@ export const ItemsList: FC = () => {
     y: `100vh`,
   });
 
-  // console.log(width)
-
   /* Print Ref */
 
   /* user manager CONTEXT API */

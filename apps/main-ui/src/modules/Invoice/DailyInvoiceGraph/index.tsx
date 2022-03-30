@@ -15,8 +15,6 @@ export const DailySalesReportGraph: FC = () => {
     series: [],
   });
 
-  console.log(graphFlowData, 'flowgraph');
-
   const { data: invoicesSummaryData, isLoading: invoicesSummaryFetching } =
     useQuery([], invoiceFlowChartAPI);
   useEffect(() => {

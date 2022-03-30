@@ -48,8 +48,6 @@ export const PermissionsLayout: FC = () => {
     }
   }, [history]);
 
-  console.log(selectedPermission, 'which permission is selected');
-
   const {
     data: selectedPermissionData,
     isLoading: selectedPermissionFetching,
@@ -115,8 +113,6 @@ export const PermissionsLayout: FC = () => {
       setPermissionsTable(newResult);
     }
   }, [selectedPermissionData, rolesList]);
-
-  console.log(permissionTable, rolesList, 'permission table data');
 
   useEffect(() => {
     if (

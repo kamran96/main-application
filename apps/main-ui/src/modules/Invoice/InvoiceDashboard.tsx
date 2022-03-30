@@ -1,38 +1,35 @@
-import fileText from "@iconify-icons/feather/file-text";
-import Icon from "@iconify/react";
-import { Button, Col, Row, Select } from "antd";
-import { Option } from "antd/lib/mentions";
-import React, { FC, useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import styled from "styled-components";
-import { invoiceDashboardDetailsAPI } from "../../api";
+import fileText from '@iconify-icons/feather/file-text';
+import Icon from '@iconify/react';
+import { Button, Col, Row, Select } from 'antd';
+import { Option } from 'antd/lib/mentions';
+import React, { FC, useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
+import styled from 'styled-components';
+import { invoiceDashboardDetailsAPI } from '../../api';
 
-import { Heading } from "../../components/Heading";
-import { P } from "../../components/Typography";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { IThemeProps } from "../../hooks/useTheme/themeColors";
-import { Color, ISupportedRoutes } from "../../modal";
-import { IInvoiceDashboardDetails } from "../../modal/invoice";
-import convertToRem from "../../utils/convertToRem";
-import { AllInvoices } from "./Allinvoices";
-import { DailySalesReportGraph } from "./DailyInvoiceGraph";
-import { DraftInvoices } from "./DraftInvoice";
-import { SummaryInvoice } from "./SummaryInvoice";
-import { Card } from "../../components/Card";
+import { Heading } from '../../components/Heading';
+import { P } from '../../components/Typography';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
+import { Color, ISupportedRoutes } from '../../modal';
+import { IInvoiceDashboardDetails } from '../../modal/invoice';
+import convertToRem from '../../utils/convertToRem';
+import { AllInvoices } from './Allinvoices';
+import { DailySalesReportGraph } from './DailyInvoiceGraph';
+import { DraftInvoices } from './DraftInvoice';
+import { SummaryInvoice } from './SummaryInvoice';
+import { Card } from '../../components/Card';
 
 export const InvoiceDashboard: FC = () => {
   const { routeHistory } = useGlobalContext();
   const { history } = routeHistory;
   /* React Hooks Here */
   /* Local States */
-  const [detailsResult, setDetailsResult] = useState<IInvoiceDashboardDetails>(
-    null
-  );
+  const [detailsResult, setDetailsResult] =
+    useState<IInvoiceDashboardDetails>(null);
 
-  const {
-    data: dashboardDetailsData,
-    isLoading: dashboardDetailsFetching,
-  } = useQuery(["invoices_dashboard_details"], invoiceDashboardDetailsAPI);
+  const { data: dashboardDetailsData, isLoading: dashboardDetailsFetching } =
+    useQuery(['invoices_dashboard_details'], invoiceDashboardDetailsAPI);
 
   useEffect(() => {
     if (
@@ -44,7 +41,6 @@ export const InvoiceDashboard: FC = () => {
       setDetailsResult(result[0]);
     }
   }, [dashboardDetailsData]);
-  console.log(detailsResult);
   return (
     <WrappperInvoiceDashboard>
       <div className="invoice_header">
@@ -132,10 +128,10 @@ export const InvoiceDashboard: FC = () => {
               <Select
                 size="small"
                 showSearch
-                style={{ textAlign: "right" }}
+                style={{ textAlign: 'right' }}
                 placeholder="Select Time"
                 optionFilterProp="children"
-                defaultValue={"current_week"}
+                defaultValue={'current_week'}
               >
                 <Option value="today">Today</Option>
                 <Option value="current_week">Last 10 days</Option>

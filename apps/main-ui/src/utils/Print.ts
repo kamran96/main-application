@@ -54,7 +54,6 @@ export function DownloadPDF(printItem) {
   </style>
   </head><body >${printItem.innerHTML}</body></html>`;
 
-  console.log(printHTML, 'print html');
   return printHTML;
 }
 
