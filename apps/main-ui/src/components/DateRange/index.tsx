@@ -1,12 +1,12 @@
-import dayjs from "dayjs";
-import React, { FC } from "react";
-import styled from "styled-components";
-import { DatePicker } from "../DatePicker";
+import dayjs from 'dayjs';
+import React, { FC } from 'react';
+import styled from 'styled-components';
+import { DatePicker } from '../DatePicker';
 
 const { RangePicker } = DatePicker;
 interface IProps {
   onChange?: (paylod?: any) => void;
-  size?: "large" | "middle" | "small";
+  size?: 'large' | 'middle' | 'small';
   value?: any;
   style?: any;
   format?: string;
@@ -14,10 +14,10 @@ interface IProps {
 
 export const CustomDateRange: FC<IProps> = ({
   onChange,
-  size = "middle",
+  size = 'middle',
   value,
   style,
-  format = "YYYY/MM/DD",
+  format = 'YYYY/MM/DD',
 }) => {
   // const days = function (month, year) {
   //   return new Date(year, month, 0).getDate();
@@ -61,8 +61,6 @@ export const CustomDateRange: FC<IProps> = ({
   //   };
   // };
 
-  console.log(value, "check value")
-
   return (
     <WrapperParent>
       <RangePicker
@@ -73,17 +71,17 @@ export const CustomDateRange: FC<IProps> = ({
         onChange={onChange}
         ranges={{
           Today: [dayjs(), dayjs()],
-          "This Week": [dayjs().startOf("week"), dayjs()],
-          "Last 10 Days": [dayjs().subtract(9, "day"), dayjs()],
-          "This Month": [dayjs().startOf("month"), dayjs()],
-          "Last Month": [
-            dayjs().subtract(1, "month").startOf("month"),
-            dayjs().subtract(1, "month").endOf("month"),
+          'This Week': [dayjs().startOf('week'), dayjs()],
+          'Last 10 Days': [dayjs().subtract(9, 'day'), dayjs()],
+          'This Month': [dayjs().startOf('month'), dayjs()],
+          'Last Month': [
+            dayjs().subtract(1, 'month').startOf('month'),
+            dayjs().subtract(1, 'month').endOf('month'),
           ],
-          "This Year": [dayjs().startOf("year"), dayjs()],
-          "Last Year": [
-            dayjs().subtract(1, "year").startOf("year"),
-            dayjs().subtract(1, "year").endOf("year"),
+          'This Year': [dayjs().startOf('year'), dayjs()],
+          'Last Year': [
+            dayjs().subtract(1, 'year').startOf('year'),
+            dayjs().subtract(1, 'year').endOf('year'),
           ],
         }}
         size={size}

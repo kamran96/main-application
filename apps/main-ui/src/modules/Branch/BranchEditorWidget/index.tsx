@@ -138,16 +138,16 @@ export const BranchEditorWidget: FC = () => {
         showSearch
         defaultValue={92}
         filterOption={(input, option) => {
-          console.log(input, 'what is input here');
           return (
             option?.id?.toLowerCase().includes(input?.toLocaleLowerCase()) ||
             option?.title?.toLowerCase().includes(input?.toLocaleLowerCase())
           );
         }}
       >
-        {phoneCodes?.map((country) => {
+        {phoneCodes?.map((country, index) => {
           return (
             <Option
+              key={index}
               value={country?.phoneCode}
               title={`${country?.phoneCode}`}
               id={country?.short}

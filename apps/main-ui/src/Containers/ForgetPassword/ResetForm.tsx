@@ -90,7 +90,7 @@ export const ResetForm: FC = () => {
                   ]}
                   hasFeedback
                 >
-                  <Input.Password size="middle" autoComplete="off"/>
+                  <Input.Password size="middle" autoComplete="off" />
                 </Form.Item>
                 <Form.Item
                   label="Confirm Password"
@@ -99,7 +99,6 @@ export const ResetForm: FC = () => {
                     { required: true, message: 'Please re-type Password' },
                     {
                       validator: async (rule, value, callback) => {
-                        console.log(form.getFieldValue('password') !== value);
                         if (value !== form.getFieldValue('password')) {
                           throw new Error(`Password is not matched`);
                         }
@@ -108,7 +107,7 @@ export const ResetForm: FC = () => {
                   ]}
                   hasFeedback
                 >
-                  <Input.Password size="middle" autoComplete="off"/>
+                  <Input.Password size="middle" autoComplete="off" />
                 </Form.Item>
                 <Form.Item hasFeedback={isSuccess ? true : false}>
                   <Button

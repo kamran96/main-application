@@ -10,16 +10,12 @@ export const InvoiceImportManager = ({ onLoad, headers }: IProps) => {
   };
   function readDocument(e) {
     const input = e.target;
-    console.log(e?.target?.files[0], 'input');
     if (input.files && input.files[0]) {
       const reader = new FileReader();
       reader.readAsBinaryString(input.files[0]);
       reader.onload = function (e) {
-        console.log(e);
         obj_csv.size = e.total;
         obj_csv.dataFile = e.target.result as any;
-
-        console.log(obj_csv, 'obj_csv');
 
         parseData(obj_csv.dataFile);
       };
@@ -36,8 +32,6 @@ export const InvoiceImportManager = ({ onLoad, headers }: IProps) => {
   // [milk, 1, 1.5, 0.2, 1.7]
 
   function parseData(data) {
-    console.log(data, 'what is data now');
-
     const csvData = []; // array of objects
     const string = data.replace('\r', '');
     const lbreak = string.split('\n');
@@ -50,7 +44,6 @@ export const InvoiceImportManager = ({ onLoad, headers }: IProps) => {
       for (let i = 1; i < lbreak.length; i++) {
         const obj = {};
         lbreak[i].split(',').forEach((item, index) => {
-          console.log(accessors[index], item, 'why item');
           obj[
             accessors[index]
               ?.split(' ')
@@ -70,12 +63,10 @@ export const InvoiceImportManager = ({ onLoad, headers }: IProps) => {
       alert('incorrect data');
     }
 
-    console.log(csvData, 'csvData');
     // lbreak.forEach((res) => {
     //   csvData.push(res.split(','));
     // });
     onLoad(csvData);
-    // console.table(csvData);
   }
   return <input type="file" onChange={readDocument} />;
 };

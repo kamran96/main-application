@@ -24,7 +24,6 @@ import { useQueryClient, useMutation, useQuery } from 'react-query';
 import {
   IErrorMessages,
   IServerError,
-  ISupportedRoutes,
   NOTIFICATIONTYPE,
   PaymentMode,
   IInvoiceMutatedResult,
@@ -47,6 +46,7 @@ import { PDFDownloadLink } from '@react-pdf/renderer';
 import { InvoicePDF } from '../PDFs';
 import DummyLogo from '../../assets/quickbook.png';
 import { plainToClass } from 'class-transformer';
+import { ISupportedRoutes } from '@invyce/shared/types';
 interface IProps {
   type?:
     | IInvoiceType.INVOICE
@@ -80,14 +80,8 @@ interface IInvoiceOptions {
   key: string;
   icon?: any;
 }
-const defaultStates = {
-  paymentMode: PaymentMode.CREDIT,
-  dueDate: dayjs(),
-  paymentType: null,
-};
 
 export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
-  const queryCache = useQueryClient();
   /* ******API STAKE******* */
 
   const APISTAKE_APPROVED =
@@ -170,13 +164,43 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
         ? ISupportedRoutes?.ADD_DEBIT_NOTE
         : ISupportedRoutes?.ADD_CREDIT_NOTE;
     switch (e?.key) {
-      case IInvoiceActions?.PROCEED:
+      case IInvoiceActions?.APPROVE:
         history.push(
-          `/app${ISupportedRoutes.CREATE_PURCHASE_Entry}/${response.id}`,
+          `/app${
+            response?.invoiceType === 'PO'
+              ? ISupportedRoutes.CREATE_BILL
+              : ISupportedRoutes.CREATE_INVOICE
+          }/${response.id}`,
           {
-            type: response?.invoiceType,
+            relation: response?.invoiceType,
           }
         );
+        break;
+      case IInvoiceActions?.PROCEED:
+        // eslint-disable-next-line no-case-declarations
+        const route = (type) => {
+          switch (type) {
+            case IInvoiceType.INVOICE:
+              return ISupportedRoutes.CREATE_INVOICE;
+
+            case IInvoiceType.BILL:
+              return ISupportedRoutes.CREATE_BILL;
+            case IInvoiceType.PURCHASE_ENTRY:
+              return ISupportedRoutes.CREATE_BILL;
+
+            case IInvoiceType.CREDITNOTE:
+              return ISupportedRoutes.ADD_CREDIT_NOTE;
+
+            case IInvoiceType.DEBITNOTE:
+              return ISupportedRoutes.ADD_DEBIT_NOTE;
+
+            default:
+              return null;
+          }
+        };
+        history.push(`/app${route(response?.invoiceType)}/${response.id}`, {
+          type: response?.invoiceType,
+        });
         break;
       case IInvoiceActions?.DOWNLOAD_PDF:
         onPDF();
@@ -198,59 +222,6 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
         break;
     }
   }
-
-  const handleApprove = () => {
-    const allItem = tableData;
-    const payload = {
-      invoice: {
-        ...response,
-        status: 1,
-      },
-
-      invoice_items: [...allItem],
-    };
-    delete payload.invoice.contact;
-    delete payload.invoice.branchId;
-    delete payload.invoice.createdAt;
-    delete payload.invoice.updatedAt;
-    delete payload.invoice.organizationId;
-    delete payload.invoice.createdById;
-    delete payload.invoice.updatedById;
-    delete payload.invoice.isReturn;
-
-    if (type === 'PO') {
-      delete payload.invoice.purchase_items;
-    } else {
-      delete payload.invoice.invoice_items;
-    }
-
-    mutateApprove(payload, {
-      onSuccess: () => {
-        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Approved Successfully');
-
-        [
-          'invoices',
-          'transactions',
-          'items?page',
-          'invoice-view',
-          'ledger-contact',
-        ].forEach((key) => {
-          (queryCache.invalidateQueries as any)((q) => q?.startsWith(`${key}`));
-        });
-      },
-      onError: (error: IServerError) => {
-        if (error?.response?.data?.message) {
-          const { message } = error.response.data;
-          notificationCallback(NOTIFICATIONTYPE.SUCCESS, message);
-        } else {
-          notificationCallback(
-            NOTIFICATIONTYPE.ERROR,
-            IErrorMessages.NETWORK_ERROR
-          );
-        }
-      },
-    });
-  };
 
   const onEmail = (values) => {
     const printItem = printRef.current;
@@ -286,13 +257,6 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
     (response &&
       totalDiscountInInvoice(tableData, 'tax', type === 'PO' ? 'POE' : 'SI')) ||
     0;
-
-  const getRemainigAmount = () => {
-    const { netTotal, paid_amount } = response;
-    return typeof netTotal === 'string'
-      ? parseFloat(netTotal) - Math.abs(paid_amount)
-      : netTotal - Math.abs(paid_amount);
-  };
 
   const priceAccessor =
     response?.invoiceType === IInvoiceType.DEBITNOTE ||
@@ -350,8 +314,12 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
   ];
 
   const _options: IInvoiceOptions[] = [
-    response?.invoiceType === 'PO' && {
-      title: 'Approve',
+    (response?.invoiceType === IInvoiceType.PURCHASE_ORDER ||
+      response?.invoiceType === IInvoiceType.QUOTE) && {
+      title:
+        response?.invoiceType === IInvoiceType.PURCHASE_ORDER
+          ? 'Create Bill'
+          : 'Create Invoice',
       permission: PERMISSIONS?.PURCHASE_ORDERS_APPROVE,
       key: IInvoiceActions.APPROVE,
     },

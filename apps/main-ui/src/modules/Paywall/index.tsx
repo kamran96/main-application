@@ -1,24 +1,24 @@
-import React, { FC, useState } from "react";
-import { Card } from "../../components/Card";
-import { H2, H4, P } from "../../components/Typography";
-import { Button, Col, Input, Row, Switch } from "antd";
-import PaywallPackages from "./offers";
-import checkIcon from "@iconify-icons/fe/check";
-import chevronLeft from "@iconify-icons/feather/chevron-left";
-import Icon from "@iconify/react";
-import { Form } from "antd";
-import { FormLabel } from "../../components/FormLabel";
-import { WrapperPaywall, PaywallModal } from "./styles";
-import Illustration from "../../assets/paywall.png";
-import MaskedInput from "antd-mask-input";
+import React, { FC, useState } from 'react';
+import { Card } from '../../components/Card';
+import { H2, H4, P } from '../../components/Typography';
+import { Button, Col, Input, Row, Switch } from 'antd';
+import PaywallPackages from './offers';
+import checkIcon from '@iconify-icons/fe/check';
+import chevronLeft from '@iconify-icons/feather/chevron-left';
+import Icon from '@iconify/react';
+import { Form } from 'antd';
+import { FormLabel } from '../../components/FormLabel';
+import { WrapperPaywall, PaywallModal } from './styles';
+import Illustration from '../../assets/paywall.png';
+import MaskedInput from 'antd-mask-input';
 
 export const Paywall: FC = () => {
   const [step, setStep] = useState(1);
 
   const onFinish = (value) => {
-    let payload = {
+    const payload = {
       ...value,
-      card_number: value.card_number.replace(/\s+/g, ""),
+      card_number: value.card_number.replace(/\s+/g, ''),
     };
   };
 
@@ -26,7 +26,7 @@ export const Paywall: FC = () => {
     <>
       {/* <GlobalStylesReplacer /> */}
       <PaywallModal visible={false} footer={false} width={1003}>
-        <WrapperPaywall step={step} >
+        <WrapperPaywall step={step}>
           <div className="main-wrapper">
             <div className="flex alignCenter package_screen">
               <Card className="free_card">
@@ -40,7 +40,7 @@ export const Paywall: FC = () => {
                     <ul className="list_packages">
                       {PaywallPackages.free.package.map((item, index) => {
                         return (
-                          <li className="flex alignCenter">
+                          <li key={index} className="flex alignCenter">
                             <Icon className="mr-10 icon" icon={checkIcon} />
                             {item.title}
                           </li>
@@ -57,12 +57,7 @@ export const Paywall: FC = () => {
                 <div>
                   <div className="package_switch">
                     <div>
-                      Monthly &nbsp;{" "}
-                      <Switch
-                        size="small"
-                        defaultChecked
-                        onChange={(checked) => console.log(checked)}
-                      />{" "}
+                      Monthly &nbsp; <Switch size="small" defaultChecked />{' '}
                       &nbsp; Yearly
                     </div>
                   </div>
@@ -74,7 +69,7 @@ export const Paywall: FC = () => {
                     <ul className="list_packages premium_offers">
                       {PaywallPackages.pro.package.map((item, index) => {
                         return (
-                          <li className="flex alignCenter">
+                          <li key={index} className="flex alignCenter">
                             <Icon className="mr-10 icon" icon={checkIcon} />
                             {item.title}
                           </li>
@@ -114,7 +109,7 @@ export const Paywall: FC = () => {
                       <Col span={24}>
                         <FormLabel className="mb-6">Full Name</FormLabel>
                         <Form.Item
-                          rules={[{ required: true, message: "Name required" }]}
+                          rules={[{ required: true, message: 'Name required' }]}
                           name="name"
                         >
                           <Input
@@ -133,7 +128,7 @@ export const Paywall: FC = () => {
                           <MaskedInput
                             className="payment-input"
                             mask="1111   1111   1111   1111"
-                            placeholder={"1111   1111   1111   1111"}
+                            placeholder={'1111   1111   1111   1111'}
                             size="middle"
                           />
                         </Form.Item>
@@ -145,14 +140,14 @@ export const Paywall: FC = () => {
                           rules={[
                             {
                               required: true,
-                              message: "Expiry date is required",
+                              message: 'Expiry date is required',
                             },
                           ]}
                         >
                           <MaskedInput
                             className="payment-input"
                             mask="11/11"
-                            placeholder={"MM/YY"}
+                            placeholder={'MM/YY'}
                             size="middle"
                           />
                         </Form.Item>
@@ -162,7 +157,7 @@ export const Paywall: FC = () => {
                         <Form.Item
                           name="cvv"
                           rules={[
-                            { required: true, message: "CVV is required" },
+                            { required: true, message: 'CVV is required' },
                           ]}
                         >
                           <MaskedInput

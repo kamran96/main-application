@@ -202,7 +202,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
     [`${type}-${id}-view`, id],
     APICATEGORYSTAKE,
     {
-      enabled: !!id && !!relation?.type,
+      enabled: !!id,
       cacheTime: Infinity,
     }
   );

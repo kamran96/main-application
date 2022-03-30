@@ -93,13 +93,16 @@ export const TaxEditorWidget: FC<IProps> = ({
         >
           <div className="form_list">
             <Form.Item name="title" label="Tax rate display title">
-              <Input size="middle" placeholder="eg. Example" autoComplete='off'/>
+              <Input
+                size="middle"
+                placeholder="eg. Example"
+                autoComplete="off"
+              />
             </Form.Item>
             <Form.List name="tax_rate_items" initialValue={formInitialValues}>
               {(fields, { add, remove }) => (
                 <>
                   {fields?.map((field, index) => {
-                    console.log(field, 'field');
                     return (
                       <Space
                         className="flex alignCenter  form-list-item"
@@ -117,7 +120,11 @@ export const TaxEditorWidget: FC<IProps> = ({
                             },
                           ]}
                         >
-                          <Input placeholder={'Federal Tax'} size="middle" autoComplete='off'/>
+                          <Input
+                            placeholder={'Federal Tax'}
+                            size="middle"
+                            autoComplete="off"
+                          />
                         </Form.Item>
                         <Form.Item
                           {...field}
@@ -127,7 +134,11 @@ export const TaxEditorWidget: FC<IProps> = ({
                             { required: true, message: 'Rate is required!' },
                           ]}
                         >
-                          <Input placeholder={'4.5%'} size="middle" autoComplete='off'/>
+                          <Input
+                            placeholder={'4.5%'}
+                            size="middle"
+                            autoComplete="off"
+                          />
                         </Form.Item>
                         <Form.Item
                           {...field}

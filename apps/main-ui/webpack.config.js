@@ -43,8 +43,6 @@ function getCustomWebpackConfig(webpackConfig) {
     },
   });
 
-  console.log(config.module.rules, 'webpack config');
-
   return config;
 }
 

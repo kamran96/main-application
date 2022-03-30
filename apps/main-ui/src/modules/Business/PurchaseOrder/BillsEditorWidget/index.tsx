@@ -1,11 +1,10 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { Breadcrumb } from 'antd';
 import styled from 'styled-components';
 import { BreadCrumbArea } from '../../../../components/BreadCrumbArea';
 import { Link } from 'react-router-dom';
 import { ISupportedRoutes } from '../../../../modal';
 import { Heading } from '../../../../components/Heading';
-import { TableCard } from '../../../../components/TableCard';
 import { PurchasesWidget } from '../../../../components/PurchasesWidget';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 

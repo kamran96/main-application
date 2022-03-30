@@ -1,6 +1,11 @@
 import dayjs from 'dayjs';
 import React, { FC } from 'react';
-import { IInvoiceResult, IAddress, IInvoiceItem } from '../../modal';
+import {
+  IInvoiceResult,
+  IAddress,
+  IInvoiceItem,
+  IInvoiceType,
+} from '../../modal';
 import { totalDiscountInInvoice } from '../../utils/formulas';
 import moneyFormat from '../../utils/moneyFormat';
 import { BoldText } from '../Para/BoldText';
@@ -39,7 +44,11 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
   const recieverAddress: IAddress =
     data?.contact?.addresses?.length && data?.contact?.addresses[0];
 
-  const invoiceDiscount = calculatedDisc - itemsDiscount;
+  const invoiceDiscount =
+    data?.invoiceType === IInvoiceType.PURCHASE_ENTRY ||
+    data?.invoiceType === IInvoiceType.BILL
+      ? data?.adjustment
+      : calculatedDisc - itemsDiscount;
 
   /* ************* THIS WILL CALCULATE TOTAL TAX ************* */
   const TotalTax =
@@ -183,7 +192,6 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
                 <th style={{ textAlign: 'center' }}> Amount</th>
               </tr>
             </thead>
-            {console.log(data, 'what is data')}
             <tbody>
               {data?.invoiceItems &&
                 Array.isArray(data?.invoiceItems) &&
@@ -273,12 +281,19 @@ export const PrintViewPurchaseWidget: FC<IProps> = ({
                     <th>Sub Total</th>
                     <td>{data && moneyFormat(data.grossTotal)}</td>
                   </tr>
+                  {data?.invoiceType === IInvoiceType.INVOICE && (
+                    <tr>
+                      <th>Items Discount</th>
+                      <td>{moneyFormat(itemsDiscount)}</td>
+                    </tr>
+                  )}
                   <tr>
-                    <th>Items Discount</th>
-                    <td>{moneyFormat(itemsDiscount)}</td>
-                  </tr>
-                  <tr>
-                    <th>Invoice Discount</th>
+                    <th>
+                      {data?.invoiceType === IInvoiceType.BILL ||
+                      data?.invoiceType === IInvoiceType.PURCHASE_ENTRY
+                        ? 'Adjustments'
+                        : 'Invoice Discount'}
+                    </th>
                     <td>{moneyFormat(invoiceDiscount)}</td>
                   </tr>
                   <tr>
