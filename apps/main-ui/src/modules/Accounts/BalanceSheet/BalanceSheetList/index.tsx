@@ -63,7 +63,6 @@ export const BalanceSheetList: FC = () => {
     query: '',
   });
  
-  // console.log(userDetails, 'balance sheet data');
 
 //handle Organization Data
 const { organization } = userDetails;
