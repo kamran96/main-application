@@ -1,27 +1,38 @@
-import { ColumnsType } from 'antd/lib/table';
-import dayjs from 'dayjs';
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import styled from 'styled-components';
-import { getAllContacts, getCreditNotes } from '../../../api';
+import {
+  getAllContacts,
+  getCreditNotes,
+  deleteCreditNoteAPI,
+} from '../../../api';
 import { CommonTable } from '../../../components/Table';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { IInvoiceType, IContactTypes, ISupportedRoutes } from '../../../modal';
+import {
+  IInvoiceType,
+  IContactTypes,
+  ISupportedRoutes,
+  NOTIFICATIONTYPE,
+  IServerError,
+} from '../../../modal';
 import { IInvoiceResponse } from '../../../modal/invoice';
 import { ButtonTag } from '../../../components/ButtonTags';
 import editSolid from '@iconify-icons/clarity/edit-solid';
 import { SmartFilter } from '../../../components/SmartFilter';
-import { PDFICON } from '../../../components/Icons';
 import FilteringSchema from './FilteringSchema';
+import deleteIcon from '@iconify/icons-carbon/delete';
 import columns, { pdfCols, csvColumns } from './commonCols';
+import { ConfirmModal } from '../../../components/ConfirmModal';
+import { useHistory } from 'react-router-dom';
 
 export const AprovedCreditNotes: FC = () => {
+  const queryCache = useQueryClient();
   /* HOOKS HERE */
 
-  const { routeHistory } = useGlobalContext();
-  const { history } = routeHistory;
+  const { notificationCallback } = useGlobalContext();
+  const history = useHistory();
   const { location } = history;
 
   /* LOCATL STATES */
@@ -37,6 +48,10 @@ export const AprovedCreditNotes: FC = () => {
     pageSize: 20,
     query: '',
   });
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState(false);
+
+  const { mutate: mutateDelete, isLoading: isDeleting } =
+    useMutation(deleteCreditNoteAPI);
   const { page, pageSize, query } = creditNoteConfig;
 
   /* LOCAL STATE ENDS HERE */
@@ -104,9 +119,44 @@ export const AprovedCreditNotes: FC = () => {
     setSelectedRow(item.selectedRowKeys);
   };
 
+  const handleConfirmDelete = async () => {
+    await mutateDelete(
+      { ids: selectedRows, type: 1 },
+      {
+        onSuccess: () => {
+          [
+            'invoices',
+            'transactions',
+            'items?page',
+            'invoice-view',
+            'ledger-contact',
+            'all-items',
+          ].forEach((key) => {
+            (queryCache.invalidateQueries as any)((q) =>
+              q?.queryKey[0]?.toString()?.startsWith(`${key}`)
+            );
+          });
+          notificationCallback(
+            NOTIFICATIONTYPE.SUCCESS,
+            'Deleted Successfully'
+          );
+
+          setSelectedRow([]);
+          setDeleteConfirmModal(false);
+        },
+        onError: (error: IServerError) => {
+          if (error?.response?.data?.message) {
+            const { message } = error.response.data;
+            notificationCallback(NOTIFICATIONTYPE.ERROR, message);
+          }
+        },
+      }
+    );
+  };
+
   const renderCustomTableTobar = () => {
     return (
-      <div className="pv-10">
+      <div className="pv-10 flex ">
         <ButtonTag
           disabled
           onClick={() => {
@@ -116,6 +166,15 @@ export const AprovedCreditNotes: FC = () => {
           }}
           title="Edit"
           icon={editSolid}
+          size={'middle'}
+        />
+        <ButtonTag
+          disabled={selectedRows.length === 0}
+          onClick={() => {
+            setDeleteConfirmModal(true);
+          }}
+          title="Delete"
+          icon={deleteIcon}
           size={'middle'}
         />
       </div>
@@ -174,6 +233,14 @@ export const AprovedCreditNotes: FC = () => {
         hasfooter={true}
         onSelectRow={onSelectedRow}
         enableRowSelection
+      />
+      <ConfirmModal
+        loading={isDeleting}
+        visible={deleteConfirmModal}
+        onCancel={() => setDeleteConfirmModal(false)}
+        onConfirm={handleConfirmDelete}
+        type="delete"
+        text="Are you sure want to delete selected Contact?"
       />
     </CreditNoteWrapper>
   );

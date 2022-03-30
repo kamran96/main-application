@@ -96,6 +96,7 @@ const CustomizedTabs: any = styled(Tabs)`
   .ant-tabs-tab-active {
     background: ${(props: IThemeProps) =>
       props?.theme?.colors?.tabBgActive} !important;
+
     .ant-tabs-tab-btn {
       color: white !important;
     }

@@ -30,7 +30,7 @@ export const defaultFormData = {
 
 export const Requires = {
   itemId: {
-    require: true,
+    require: false,
     message: 'Item is Requred to Proceed invoice',
   },
   description: {

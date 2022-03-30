@@ -16,6 +16,8 @@ export class User {
   password: string;
   @Prop()
   theme: string;
+  @Prop({ default: false })
+  twoFactorEnabled: boolean;
   @Prop()
   terms: boolean;
   @Prop()
@@ -42,6 +44,8 @@ export class User {
     })
   )
   profile: IProfile;
+  @Prop()
+  loginWith: string;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Organization' })
   organizationId: Organization;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Role' })

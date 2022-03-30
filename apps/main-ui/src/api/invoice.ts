@@ -142,3 +142,6 @@ export const invoiceFlowChartAPI = (key?: any) =>
 
 export const quotationApproveAPI = (id: string | number) =>
   http?.put(`quote-update/${id}`);
+
+export const deleteCreditNoteAPI = (paylod: { ids: number[]; type: number }) =>
+  http.put(`/invoices/credit-note/delete`, paylod);
