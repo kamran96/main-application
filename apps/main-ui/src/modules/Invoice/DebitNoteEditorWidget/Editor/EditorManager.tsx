@@ -188,13 +188,12 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   }, [AntForm]);
 
   const APICATEGORYSTAKE =
-    relation?.type === IInvoiceType.PURCHASE_ENTRY ||
-    relation?.type === IInvoiceType.PURCHASE_ORDER
+    relation?.type === IInvoiceType.BILL || relation?.type === IInvoiceType.BILL
       ? getBillsById
       : creditNoteViewAPI;
 
   const key =
-    relation?.type === IInvoiceType.PURCHASE_ENTRY ||
+    relation?.type === IInvoiceType.BILL ||
     relation?.type === IInvoiceType.PURCHASE_ORDER
       ? 'purchaseItems'
       : 'creditNoteItems';
@@ -215,7 +214,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
         !id ||
         id === null ||
         relation?.type === IInvoiceType?.PURCHASE_ORDER ||
-        relation?.type === IInvoiceType?.PURCHASE_ENTRY,
+        relation?.type === IInvoiceType?.BILL,
     }
   );
 
@@ -267,13 +266,9 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   }, [invoicesData, AntForm, type]);
 
   /*Query hook for  Fetching all accounts against ID */
-  const { isLoading, data } = useQuery(
-    [`all-contacts`, 'ALL'],
-    getAllContacts,
-    {
-      cacheTime: Infinity,
-    }
-  );
+  const { data } = useQuery([`all-contacts`, 'ALL'], getAllContacts, {
+    cacheTime: Infinity,
+  });
 
   const contactResult: IContactType[] =
     data?.data?.result?.filter(

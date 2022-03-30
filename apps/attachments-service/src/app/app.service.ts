@@ -66,7 +66,7 @@ export class AppService {
   upload = multer({
     storage: multerS3({
       s3,
-      bucket: 'invyce',
+      bucket: 'invyce/attachments',
       acl: 'public-read',
       key: function (request, file, cb) {
         cb(null, `${Date.now().toString()} - ${file.originalname}`);
@@ -114,7 +114,7 @@ export class AppService {
       const data = await fs.createReadStream(location);
 
       const params = {
-        Bucket: 'invyce',
+        Bucket: 'invyce/attachments',
         Key: pdf,
         Body: data,
         ACL: 'public-read',
@@ -158,7 +158,7 @@ export class AppService {
 
         heading.push([
           index + 1,
-          item.name,
+          item?.name ? item?.name : '',
           tr.quantity,
           tr.unitPrice,
           tr.itemDiscount,
@@ -167,12 +167,12 @@ export class AppService {
         ]);
         newArr.push({
           sno: index + 1,
-          item: item.name,
+          item: item?.name ? item?.name : '',
           quantity: tr.quantity,
-          unitPrice: moneyFormatJs(tr.unitPrice, currency),
+          unitPrice: moneyFormatJs(tr.unitPrice, currency || 'USD'),
           discount: tr.itemDiscount,
           saleTax: tr.tax,
-          total: moneyFormatJs(tr.total, currency),
+          total: moneyFormatJs(tr.total, currency || 'USD'),
         });
       });
 
@@ -215,7 +215,13 @@ export class AppService {
         data: { result },
       } = await http.get(`users/organization/${req.user.organizationId}`);
 
-      const defaultCurrency = result.currency;
+      const defaultCurrency = result.currency || {
+        name: 'United States dollar',
+        code: 'USD',
+        symbol: '$',
+        id: null,
+        symbolNative: '$',
+      };
 
       const contents = await this.pdfData(data, defaultCurrency);
 
@@ -347,25 +353,13 @@ export class AppService {
         ],
       ];
 
-      const {
-        country: contactCountry,
-        city: contactCity,
-        postalCode: contactPostalCode,
-      } = data?.contact?.addresses[0] || {
-        country: '',
-        city: '',
-        postalCode: '',
-      };
-
       const docDefinition = {
         pageMargins: [0, 0, 0, 20],
         footer: function (currentPage, pageCount) {
           return {
             columns: [
               {
-                text: `Reported generated on: ${moment(new Date()).format(
-                  'dddd'
-                )}`,
+                text: `Reported generated on: ${moment(new Date()).format()}`,
                 fontSize: 9,
                 margin: [5, 0],
               },
@@ -403,10 +397,19 @@ export class AppService {
                       {
                         margin: [10, 0],
                         stack: [
-                          { text: Capitalize(result?.name), style: 'c_name' },
-                          { text: result?.phoneNumber, style: 'address_style' },
-                          { text: result?.email, style: 'address_style' },
-                          { text: result?.website, style: 'address_style' },
+                          {
+                            text: Capitalize(result?.name ? result?.name : ''),
+                            style: 'c_name',
+                          },
+                          {
+                            text: result?.phoneNumber || '',
+                            style: 'address_style',
+                          },
+                          { text: result?.email || '', style: 'address_style' },
+                          {
+                            text: result?.website || '',
+                            style: 'address_style',
+                          },
                         ],
                       },
                     ],
@@ -420,15 +423,15 @@ export class AppService {
                         alignment: 'right',
                         stack: [
                           {
-                            text: Capitalize(result?.address?.city),
+                            text: Capitalize(result?.address?.city || ''),
                             style: 'address_style',
                           },
                           {
-                            text: result?.address?.postalCode,
+                            text: result?.address?.postalCode || '',
                             style: 'address_style',
                           },
                           {
-                            text: Capitalize(result?.address?.country),
+                            text: Capitalize(result?.address?.country || ''),
                             style: 'address_style',
                           },
                         ],
@@ -450,12 +453,19 @@ export class AppService {
               {
                 stack: [
                   { text: 'To', style: 'label' },
-                  { text: Capitalize(data?.contact?.name), style: 'data' },
+                  {
+                    text: Capitalize(
+                      data?.contact?.name ? data?.contact?.name : ''
+                    ),
+                    style: 'data',
+                  },
                   { text: 'Address', style: 'label' },
                   {
-                    text: `${Capitalize(contactCountry)}, ${Capitalize(
-                      contactCity
-                    )}, ${contactPostalCode}`,
+                    text: `${Capitalize(
+                      data?.contact?.addresses[0].country || ''
+                    )}, ${Capitalize(
+                      data?.contact?.addresses[0].city || ''
+                    )}, ${data?.contact?.addresses[0].postalCode || ''}`,
                     style: 'data',
                   },
                 ],
@@ -463,12 +473,14 @@ export class AppService {
               {
                 stack: [
                   { text: 'Invoice Number', style: 'label' },
-                  { text: data?.invoice?.invoiceNumber, style: 'data' },
+                  { text: data?.invoice?.invoiceNumber || '', style: 'data' },
                   { text: 'Reference', style: 'label' },
-                  { text: data?.invoice?.reference, style: 'data' },
+                  { text: data?.invoice?.reference || '', style: 'data' },
                   { text: 'Invoice Date', style: 'label' },
                   {
-                    text: moment(data?.invoice?.issueDate).format('MM/DD/YYYY'),
+                    text: moment(data?.invoice?.issueDate || '').format(
+                      'MM/DD/YYYY'
+                    ),
                     style: 'data',
                   },
                 ],
@@ -476,13 +488,13 @@ export class AppService {
               {
                 stack: [
                   {
-                    text: `Invoice of ${defaultCurrency.code}`,
+                    text: `Invoice of ${defaultCurrency?.code || ''}`,
                     alignment: 'right',
                     style: 'label',
                   },
                   {
                     text: moneyFormatJs(
-                      data?.invoice?.netTotal,
+                      data?.invoice?.netTotal || '',
                       defaultCurrency
                     ),
                     color: '#143c69',
@@ -492,7 +504,9 @@ export class AppService {
                   },
                   { text: 'Due Date', alignment: 'right', style: 'label' },
                   {
-                    text: moment(data?.invoice?.dueDate).format('MM/DD/YYYY'),
+                    text: moment(data?.invoice?.dueDate || '').format(
+                      'MM/DD/YYYY'
+                    ),
                     alignment: 'right',
                     style: 'data',
                   },

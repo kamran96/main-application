@@ -3,12 +3,22 @@ import dayjs from 'dayjs';
 import React, { FC } from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import styled from 'styled-components';
-import { getAllContacts, getCreditNotes } from '../../../api';
+import {
+  deleteCreditNoteAPI,
+  getAllContacts,
+  getCreditNotes,
+} from '../../../api';
 import { CommonTable } from '../../../components/Table';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { IInvoiceType, IContactTypes, ISupportedRoutes } from '../../../modal';
+import {
+  IInvoiceType,
+  IContactTypes,
+  ISupportedRoutes,
+  NOTIFICATIONTYPE,
+  IServerError,
+} from '../../../modal';
 import { IInvoiceResponse } from '../../../modal/invoice';
 import { ButtonTag } from '../../../components/ButtonTags';
 import editSolid from '@iconify-icons/clarity/edit-solid';
@@ -16,13 +26,22 @@ import { SmartFilter } from '../../../components/SmartFilter';
 import { PDFICON } from '../../../components/Icons';
 import FilteringSchema from './FilteringSchema';
 import columns, { pdfCols } from './commonCols';
+import { useHistory } from 'react-router-dom';
+import deleteIcon from '@iconify/icons-carbon/delete';
+import { ConfirmModal } from '../../../components/ConfirmModal';
 
 export const DraftCreditNotes: FC = () => {
   /* HOOKS HERE */
 
-  const { routeHistory } = useGlobalContext();
-  const { history } = routeHistory;
+  const { notificationCallback } = useGlobalContext();
+  const history = useHistory();
   const { location } = history;
+  const queryCache = useQueryClient();
+
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState(false);
+
+  const { mutate: mutateDelete, isLoading: isDeleting } =
+    useMutation(deleteCreditNoteAPI);
 
   /* LOCATL STATES */
   const [{ result, pagination }, setCreditNoteResponse] =
@@ -104,9 +123,44 @@ export const DraftCreditNotes: FC = () => {
     setSelectedRow(item.selectedRowKeys);
   };
 
+  const handleConfirmDelete = async () => {
+    await mutateDelete(
+      { ids: selectedRows, type: 2 },
+      {
+        onSuccess: () => {
+          [
+            'invoices',
+            'transactions',
+            'items?page',
+            'invoice-view',
+            'ledger-contact',
+            'all-items',
+          ].forEach((key) => {
+            (queryCache.invalidateQueries as any)((q) =>
+              q?.queryKey[0]?.toString()?.startsWith(`${key}`)
+            );
+          });
+          notificationCallback(
+            NOTIFICATIONTYPE.SUCCESS,
+            'Deleted Successfully'
+          );
+
+          setSelectedRow([]);
+          setDeleteConfirmModal(false);
+        },
+        onError: (error: IServerError) => {
+          if (error?.response?.data?.message) {
+            const { message } = error.response.data;
+            notificationCallback(NOTIFICATIONTYPE.ERROR, message);
+          }
+        },
+      }
+    );
+  };
+
   const renderCustomTableTobar = () => {
     return (
-      <div className="pv-10">
+      <div className="pv-10 flex">
         <ButtonTag
           disabled={!selectedRows?.length || selectedRows?.length > 1}
           onClick={() => {
@@ -116,6 +170,16 @@ export const DraftCreditNotes: FC = () => {
           }}
           title="Edit"
           icon={editSolid}
+          size={'middle'}
+        />
+
+        <ButtonTag
+          disabled={selectedRows.length === 0}
+          onClick={() => {
+            setDeleteConfirmModal(true);
+          }}
+          title="Delete"
+          icon={deleteIcon}
           size={'middle'}
         />
       </div>
@@ -170,6 +234,14 @@ export const DraftCreditNotes: FC = () => {
         hasfooter={true}
         onSelectRow={onSelectedRow}
         enableRowSelection
+      />
+      <ConfirmModal
+        loading={isDeleting}
+        visible={deleteConfirmModal}
+        onCancel={() => setDeleteConfirmModal(false)}
+        onConfirm={handleConfirmDelete}
+        type="delete"
+        text="Are you sure want to delete selected Contact?"
       />
     </CreditNoteWrapper>
   );

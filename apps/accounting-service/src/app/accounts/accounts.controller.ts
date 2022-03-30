@@ -146,7 +146,7 @@ export class AccountsController {
     @Param() params: ParamsDto
   ): Promise<IAccountWithResponse> {
     try {
-      const account = await this.accountService.AccountLedger(
+      const account = await this.accountService.AccountLedgerUpdated(
         req.user,
         query,
         params.id
@@ -156,10 +156,10 @@ export class AccountsController {
         return {
           message: 'Account ledger fetched successfull',
           status: true,
-          // account,
-          pagination: account.pagination,
-          opening_balance: account.opening_balance,
-          result: account.transaction_items,
+          ...account,
+          // pagination: account.pagination,
+          // opening_balance: account.opening_balance,
+          // result: account.transaction_items,
         };
       }
     } catch (error) {
@@ -184,8 +184,6 @@ export class AccountsController {
         params.id
       );
 
-      console.log(account);
-
       if (account) {
         return {
           message: 'Account ledger fetched successfull',
@@ -202,6 +200,12 @@ export class AccountsController {
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  @Post('code')
+  @UseGuards(GlobalAuthGuard)
+  async AccountCodes(@Req() req: IRequest, @Body() data) {
+    return await this.accountService.AccountCodes(req.user, data.id);
   }
 
   @Get('/:id')
