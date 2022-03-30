@@ -29,9 +29,8 @@ import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv from '../../../../utils/Print';
 import FilterSchema from './filterSchema';
 import { BalanceSheetPdf } from '../../../../components/PDFs/BalanceSheetPdf';
-import DUMMYLOGO from "../../../../assets/quickbook.png";
+import DUMMYLOGO from '../../../../assets/quickbook.png';
 import { PDFViewer } from '@react-pdf/renderer';
-
 
 interface IBalanceSheetConfig {
   columns: ColumnsType<any>;
@@ -56,27 +55,25 @@ export const BalanceSheetList: FC = () => {
     totalCredits: 0,
     totalDebits: 0,
   });
-  const { routeHistory , userDetails} = useGlobalContext();
+  const { routeHistory, userDetails } = useGlobalContext();
   const { history } = routeHistory;
 
   const [config, setConfig] = useState({
     query: '',
   });
- 
-  // console.log(userDetails, 'balance sheet data');
 
-//handle Organization Data
-const { organization } = userDetails;
-const {
-  address: organizationAddress,
-  name: organizationName,
-  email: organizationEmail,
-  phoneNumber: organizationContact,
-  website,
-} = organization;
-const { city, country, postalCode } = organizationAddress;
+  //handle Organization Data
+  const { organization } = userDetails;
+  const {
+    address: organizationAddress,
+    name: organizationName,
+    email: organizationEmail,
+    phoneNumber: organizationContact,
+    website,
+  } = organization;
+  const { city, country, postalCode } = organizationAddress;
 
-const headerprops = {
+  const headerprops = {
     organizationName,
     city,
     country,
@@ -88,7 +85,6 @@ const headerprops = {
     logo: DUMMYLOGO,
     website,
   };
-
 
   const { query } = config;
 
@@ -128,7 +124,6 @@ const headerprops = {
   const searchedQueryItem: any = useMemo(() => {
     return query ? JSON.parse(atob(query)) : query;
   }, [query]);
-
 
   return (
     <WrapperBalanceSheetList
@@ -328,10 +323,12 @@ const headerprops = {
       </Card>
 
       <PDFViewer height={'1080px'} width={'100%'}>
-        <BalanceSheetPdf header = {headerprops} 
-        balanceSheetData={balanceSheetData} 
-        searchquery={searchedQueryItem}/>
-       </PDFViewer>
+        <BalanceSheetPdf
+          header={headerprops}
+          balanceSheetData={balanceSheetData}
+          searchquery={searchedQueryItem}
+        />
+      </PDFViewer>
     </WrapperBalanceSheetList>
   );
 };

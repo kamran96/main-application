@@ -15,8 +15,6 @@ export const DebitNoteEditorWidget: FC = () => {
     location?.pathname?.split(`app${ISupportedRoutes.ADD_DEBIT_NOTE}/`)[1] ||
     null;
 
-  console.log(id, location);
-
   return (
     <>
       <Heading>Debit Note</Heading>

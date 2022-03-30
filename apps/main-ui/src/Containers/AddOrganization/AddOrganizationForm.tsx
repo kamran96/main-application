@@ -156,9 +156,10 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
           );
         }}
       >
-        {phoneCodes?.map((country) => {
+        {phoneCodes?.map((country, index) => {
           return (
             <Option
+              key={index}
               value={`${country?.phoneCode}`}
               title={`${country?.phoneCode}`}
               id={country?.short}
@@ -199,7 +200,11 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
                   { required: true, message: 'Organization Name is required!' },
                 ]}
               >
-                <Input size="middle" autoComplete="off" placeholder="e.g Abc pvt ltd" />
+                <Input
+                  size="middle"
+                  autoComplete="off"
+                  placeholder="e.g Abc pvt ltd"
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -208,7 +213,11 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
                 label="Organization Niche"
                 rules={[{ required: true, message: 'Niche is required!' }]}
               >
-                <Input size="middle" autoComplete="off" placeholder="e.g Abc pvt ltd" />
+                <Input
+                  size="middle"
+                  autoComplete="off"
+                  placeholder="e.g Abc pvt ltd"
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -217,7 +226,11 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
                 label="Email?"
                 rules={[{ required: true, message: 'Email is required!' }]}
               >
-                <Input size="middle" autoComplete="off" placeholder="abce@domain.com" />
+                <Input
+                  size="middle"
+                  autoComplete="off"
+                  placeholder="abce@domain.com"
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -226,7 +239,11 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
                 label="Fax No"
                 rules={[{ required: false, message: 'Fax is required!' }]}
               >
-                <Input size="middle" autoComplete="off" placeholder="Enter your fax number" />
+                <Input
+                  size="middle"
+                  autoComplete="off"
+                  placeholder="Enter your fax number"
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -249,7 +266,11 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
             </Col>
             <Col span={12}>
               <Form.Item name="website" label="Website">
-                <Input size="middle" autoComplete="off" placeholder="Website link" />
+                <Input
+                  size="middle"
+                  autoComplete="off"
+                  placeholder="Website link"
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -277,9 +298,13 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
                       .includes(input?.toLocaleLowerCase());
                   }}
                 >
-                  {en?.map((country) => {
+                  {en?.map((country, index) => {
                     return (
-                      <Option title={country?.name} value={`${country?.name}`}>
+                      <Option
+                        key={index}
+                        title={country?.name}
+                        value={`${country?.name}`}
+                      >
                         <img
                           className="mr-10"
                           alt="flag"
@@ -300,7 +325,11 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
 
             <Col span={12}>
               <Form.Item name="city" label="City">
-                <Input size="middle" autoComplete="off" placeholder="New York" />
+                <Input
+                  size="middle"
+                  autoComplete="off"
+                  placeholder="New York"
+                />
               </Form.Item>
             </Col>
 

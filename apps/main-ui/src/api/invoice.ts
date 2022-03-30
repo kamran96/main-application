@@ -63,8 +63,6 @@ export const findInvoiceByID = ({ queryKey }: QueryKey) => {
       break;
   }
 
-  console.log(url, id, 'urls');
-
   return http.get(url);
 };
 

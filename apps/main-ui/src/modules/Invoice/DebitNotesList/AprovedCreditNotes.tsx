@@ -101,8 +101,6 @@ export const AprovedDebitNotes: FC = () => {
 
   /* Local utility functions here */
   const onSelectedRow = (item) => {
-    console.log(item, 'what is item');
-
     setSelectedRow(item.selectedRowKeys);
   };
 

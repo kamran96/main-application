@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button } from 'antd';
+import { ButtonTag } from '../../../components/ButtonTags';
 import React, { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import {
@@ -40,7 +40,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
 
   const { rbac } = useRbac(null);
 
-  const { routeHistory } = useGlobalContext();
+  const { routeHistory, setPaymentsModalConfig } = useGlobalContext();
   const { history } = routeHistory;
   const [confirmModal, setConfirmModal] = useState(false);
   const { notificationCallback } = useGlobalContext();
@@ -123,8 +123,6 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
     }
   }, [resolvedData]);
 
-  console.log(result, 'list');
-
   /* Function select rows and to set selectedRow state */
 
   const handleDelete = async () => {
@@ -203,23 +201,36 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
         exportable
         printTitle={'Approved Invoices'}
         customTopbar={
-          <PurchaseListTopbar
-            disabled={!selectedRow.length}
-            onDelete={() => setConfirmModal(true)}
-            hideDeleteButton={!rbac.can(PERMISSIONS.INVOICES_DELETE)}
-            renderSmartFilter={
-              <SmartFilter
-                onFilter={(encode) => {
-                  setAllInvoicesConfig({ ...allInvoicesConfig, query: encode });
-                  const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
-                  history.push(route);
-                }}
-                onClose={() => setFilterBar(false)}
-                visible={filterBar}
-                formSchema={invoiceFiltersSchema}
-              />
-            }
-          />
+          <div className="flex alignCenter">
+            <PurchaseListTopbar
+              disabled={!selectedRow.length}
+              onDelete={() => setConfirmModal(true)}
+              hideDeleteButton={!rbac.can(PERMISSIONS.INVOICES_DELETE)}
+              renderSmartFilter={
+                <SmartFilter
+                  onFilter={(encode) => {
+                    setAllInvoicesConfig({
+                      ...allInvoicesConfig,
+                      query: encode,
+                    });
+                    const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
+                    history.push(route);
+                  }}
+                  onClose={() => setFilterBar(false)}
+                  visible={filterBar}
+                  formSchema={invoiceFiltersSchema}
+                />
+              }
+            />
+            <ButtonTag
+              onClick={() => {
+                setPaymentsModalConfig(true, 5);
+              }}
+              className="ml-5s"
+              title="Create Payment"
+              size="middle"
+            />
+          </div>
         }
         data={result}
         columns={cols}

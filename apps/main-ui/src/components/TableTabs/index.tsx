@@ -33,7 +33,6 @@ export const TableTabs: FC<IProps> = ({
   const { routeHistory } = useGlobalContext();
   const onChangeTab = (key) => {
     const location = routeHistory.location.pathname;
-    console.log(`${location}?tabIndex=${key}`);
 
     routeHistory.history.push(`${location}?tabIndex=${key}`);
   };
@@ -87,7 +86,7 @@ const CustomizedTabs: any = styled(Tabs)`
     &:hover {
       border: 1px solid transparent !important;
       background: ${(props: IThemeProps) =>
-        props?.theme?.colors?.bgTh} !important;
+        props?.theme?.colors?.tabBgActive} !important;
       .ant-tabs-tab-btn {
         color: ${Color.$WHITE};
       }
@@ -96,7 +95,7 @@ const CustomizedTabs: any = styled(Tabs)`
 
   .ant-tabs-tab-active {
     background: ${(props: IThemeProps) =>
-      props?.theme?.colors?.bgTh} !important;
+      props?.theme?.colors?.tabBgActive} !important;
     .ant-tabs-tab-btn {
       color: white !important;
     }

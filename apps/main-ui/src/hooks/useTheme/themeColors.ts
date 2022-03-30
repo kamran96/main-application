@@ -50,6 +50,7 @@ export interface IThemeVariables {
   cmdbg: string;
   cardBg: string;
   stroke: string;
+  tabBgActive: string;
 }
 
 export interface ITheme {
@@ -110,6 +111,7 @@ export const Themes: IThemes = {
     buttonTagColor: `#333333`,
     buttonDisabledBg: ``,
     buttonDisabledText: ``,
+    tabBgActive: '#1E75F1',
     tabsBg: ``,
     paginationBg: ``,
     paginationColor: '',
@@ -162,6 +164,7 @@ export const Themes: IThemes = {
     buttonDisabledBg: `#3f3f3f4d`,
     buttonDisabledText: `rgb(153 153 153 / 25%)`,
     tabsBg: `#4a4a4a`,
+    tabBgActive: '#b1b1b1',
     paginationColor: `#e4e4e4`,
     paginationBg: '#4a4a4a',
     selectOptionBg: `#121212`,
