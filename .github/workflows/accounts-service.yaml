@@ -46,6 +46,13 @@ jobs:
         if: steps.cache-node-modules.cache-hit != 'true'
         run: yarn install --prefer-offline
 
+      - name: Add IP address to trusted source (managed database)
+        uses: GarreauArthur/manage-digital-ocean-managed-database-trusted-sources-gh-action@main
+        with:
+          action: "add"
+          database_id: ${{ secrets.DATABASE_ID }}
+          digitalocean_token: ${{ secrets.DO_ACCESS_TOKEN }}
+
       # Run database migration
       - name: run db migrations
         run: yarn run acc_migration_run
@@ -56,6 +63,13 @@ jobs:
           ACC_DB_PASSWORD: '0jN4FNuqynhGR7zT'
           ACC_DB_USER: 'doadmin'
           NODE_ENV: 'production'
+
+      - name: Remove IP address to trusted source (managed database)
+        uses: GarreauArthur/manage-digital-ocean-managed-database-trusted-sources-gh-action@main
+        with:
+          action: "remove"
+          database_id: ${{ secrets.DATABASE_ID }}
+          digitalocean_token: ${{ secrets.DO_ACCESS_TOKEN }}
       
       # docker build item service images
       - name: Build container image
