@@ -42,9 +42,18 @@ jobs:
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DO_ACCESS_TOKEN }}
+
       - name: install dependencies
         if: steps.cache-node-modules.cache-hit != 'true'
         run: yarn install --prefer-offline
+      
+      # docker build item service images
+      - name: Build container image
+        run: docker build -f $GITHUB_WORKSPACE/apps/accounting-service/Dockerfile -t registry.digitalocean.com/invyce-images/accounting-service:$(echo $GITHUB_SHA | head -c7) .
+
+      # Runs a set of commands using the runners shell
+      - name: build required projects
+        run: NODE_ENV='production' yarn build accounting-service
 
       - name: Add IP address to trusted source (managed database)
         uses: GarreauArthur/manage-digital-ocean-managed-database-trusted-sources-gh-action@main
@@ -70,14 +79,6 @@ jobs:
           action: "remove"
           database_id: ${{ secrets.DATABASE_ID }}
           digitalocean_token: ${{ secrets.DO_ACCESS_TOKEN }}
-      
-      # docker build item service images
-      - name: Build container image
-        run: docker build -f $GITHUB_WORKSPACE/apps/accounting-service/Dockerfile -t registry.digitalocean.com/invyce-images/accounting-service:$(echo $GITHUB_SHA | head -c7) .
-
-      # Runs a set of commands using the runners shell
-      - name: build required projects
-        run: NODE_ENV='production' yarn build accounting-service
 
       #login to digitalocean for 1200 seconds
       - name: Log in to DigitalOcean Container Registry with short-lived credentials

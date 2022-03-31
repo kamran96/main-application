@@ -42,6 +42,7 @@ jobs:
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DO_ACCESS_TOKEN }}
+
       - name: install dependencies
         if: steps.cache-node-modules.cache-hit != 'true'
         run: yarn install --prefer-offline
@@ -61,9 +62,37 @@ jobs:
       # push image to registry
       - name: Push service image to DigitalOcean Container Registry
         run: docker push registry.digitalocean.com/invyce-images/users-service:$(echo $GITHUB_SHA | head -c7)
-      
+
       - name: Update deployment file
         run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/invyce-images/users-service:'${TAG}'|' $GITHUB_WORKSPACE/apps/users-service/ops/users-deployment.yaml
+
+      # Install yq
+      - name: Install yq 
+        run: |
+          wget https://github.com/mikefarah/yq/releases/download/v4.12.0/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
+          yq --version
+
+       # Clone git repository with Helm charts, update and push changes
+      - name: Update image tag in Helm git repo 
+        run: | 
+          CONTAINER_IMAGE_TAG=${TAG}
+          echo New container image tag: $CONTAINER_IMAGE_TAG
+          echo Create temporary folder to clone the repo into...
+          TEMP_FOLDER="$(mktemp -d)" 
+          echo Clone the repository...
+          https://github.com/invyce/invyce-ops.git
+          git clone -b main "https://zeeshooo:${ACCESS_TOKEN}@github.com/invyce/invyce-ops.git" ${TEMP_FOLDER} 
+          cd ${TEMP_FOLDER}/invyce-ops/contacts 
+          ls
+          echo Update Helm chart values-dev with new image tag
+          CONTAINER_IMAGE_TAG=$CONTAINER_IMAGE_TAG yq e -i '.image.tag = env(CONTAINER_IMAGE_TAG)' ./values.yaml
+          echo 'Container image tag updated in contacts/values.yaml' 
+          cd ../../
+          git config user.email "zeeshan@invyce.com" 
+          git config user.name "zeeshooo" 
+          git add .  
+          git commit -m "refactor - updated Helm chart values for dev environment with container image - $CONTAINER_IMAGE_TAG" 
+          git push -u origin main
 
       - name: Save DigitalOcean kubeconfig with short-lived credentials
         run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 k8s-invyce-app-stg
