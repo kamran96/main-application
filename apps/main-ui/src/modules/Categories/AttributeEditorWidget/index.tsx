@@ -58,8 +58,6 @@ export const AttributeEditorWidget: FC = () => {
     }
   }, [categoryData]);
 
-  console.log(attriData, 'attributes data');
-
   const { mutate: mutateAttributes, isLoading: addingAttributte } =
     useMutation(addAttributesAPI);
 

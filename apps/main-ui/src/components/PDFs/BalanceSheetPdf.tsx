@@ -36,9 +36,6 @@ interface IProps {
 }
 
 const styles = StyleSheet.create({
-  page: {
-    paddingBottom: 60,
-  },
   tableHeader: {
     display: 'flex',
     flexDirection: 'row',
@@ -51,13 +48,6 @@ const styles = StyleSheet.create({
     fontWeight: 'normal',
     lineHeight: '1.5',
     margin: '0 12px',
-  },
-  queryHeader: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 12,
   },
   tableBody: {
     padding: '10px 30px',
@@ -121,6 +111,15 @@ const styles = StyleSheet.create({
   tableHeaderItem: {
     width: '33%',
   },
+  border: {
+    borderTop: '1px solid #F4F4F4',
+    borderBottom: '1px solid #F4F4F4',
+    margin: '10px 0',
+    padding: '12px 0',
+  },
+  marginLeft: {
+    marginLeft: '20px'
+  }
 });
 
 export const BalanceSheetPdf: FC<IProps> = ({
@@ -128,6 +127,7 @@ export const BalanceSheetPdf: FC<IProps> = ({
   balanceSheetData,
   searchquery,
 }) => {
+  console.log(balanceSheetData);
   return (
     <PdfDocument>
       <PDFFontWrapper>
@@ -229,10 +229,27 @@ export const BalanceSheetPdf: FC<IProps> = ({
                     </Fragment>
                   );
                 })}
-                <View style={styles.totalContainer}>
-                  <Text>Total {item.name}</Text>
-                  <Text>{moneyFormat(item?.balance.toFixed(2))}</Text>
-                </View>
+
+                {searchquery?.date ? (
+                  <View style={[styles.totalContainer]}>
+                    <Text>Total {item.name}</Text>
+                    <Text>{moneyFormat(item?.balance.toFixed(2))}</Text>
+                  </View>
+                ) : (
+                  <View style={[styles.totalFooter, styles.border]}>
+                    <Text style={[styles.LabelName, styles.tableHeaderWidth]}>Total {item.name}</Text>
+                    <Text style={[styles.LabelName, ]}>
+                      {item.type === 1
+                        ? moneyFormat(item?.balance.toFixed(2))
+                        : null}
+                    </Text>
+                    <Text style={[styles.LabelName]}>
+                      {item.type === 2
+                        ? moneyFormat(item?.balance.toFixed(2))
+                        : null}
+                    </Text>
+                  </View>
+                )}
               </View>
             );
           })}

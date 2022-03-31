@@ -1,13 +1,13 @@
-import { Button, Select } from "antd";
-import React, { FC } from "react";
-import styled from "styled-components";
-import { IThemeProps } from "../../hooks/useTheme/themeColors";
-import { Color } from "../../modal";
-import moneyFormat from "../../utils/moneyFormat";
-import { Card } from "../Card";
-import { P } from "../Para/P";
-import { Seprator } from "../Seprator";
-import { H4 } from "../Typography";
+import { Button, Select } from 'antd';
+import React, { FC } from 'react';
+import styled from 'styled-components';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
+import { Color } from '../../modal';
+import moneyFormat from '../../utils/moneyFormat';
+import { Card } from '../Card';
+import { P } from '../Para/P';
+import { Seprator } from '../Seprator';
+import { H4 } from '../Typography';
 
 const { Option } = Select;
 
@@ -21,10 +21,10 @@ export const ProfitAndLossOverview: FC = () => {
             <Select
               size="small"
               showSearch
-              style={{ width: "100%", textAlign: "right" }}
+              style={{ width: '100%', textAlign: 'right' }}
               placeholder="Select Time"
               optionFilterProp="children"
-              defaultValue={"current_week"}
+              defaultValue={'current_week'}
             >
               <Option value="today">Today</Option>
               <Option value="current_week">This Week</Option>
@@ -35,10 +35,13 @@ export const ProfitAndLossOverview: FC = () => {
         </div>
         <Seprator />
         <div className="mt-20">
-          {[0, 1, 2].map(() => (
-            <div className="flex alignCenter justifySpaceBetween listItem">
+          {[0, 1, 2].map((item, index) => (
+            <div
+              key={index}
+              className="flex alignCenter justifySpaceBetween listItem"
+            >
               <P>Net income of last 15 days</P>
-              <P>{moneyFormat("150")}</P>
+              <P>{moneyFormat('150')}</P>
             </div>
           ))}
         </div>

@@ -6,14 +6,9 @@ import { BillItemRepository } from '../repositories/billItem.repository';
 import { Sorting } from '@invyce/sorting';
 import { IPage, IBillWithResponse, IRequest, IBill } from '@invyce/interfaces';
 import { BillDto, BillIdsDto } from '../dto/bill.dto';
-import {
-  EntryType,
-  PaymentModes,
-  PdfType,
-  Statuses,
-} from '@invyce/global-constants';
+import { EntryType, PaymentModes, Statuses } from '@invyce/global-constants';
 import { ClientProxy } from '@nestjs/microservices';
-import { BILL_CREATED, BILL_UPDATED } from '@invyce/send-email';
+import { BILL_UPDATED } from '@invyce/send-email';
 import { CreditNoteRepository } from '../repositories/creditNote.repository';
 
 @Injectable()
@@ -23,7 +18,9 @@ export class BillService {
   ) {}
 
   async IndexBill(req: IRequest, queryData: IPage): Promise<IBillWithResponse> {
-    const { page_no, page_size, status, type, sort, query } = queryData;
+    const { page_no, page_size, status, type, query } = queryData;
+    let sort = queryData.sort;
+    sort = sort ? sort : '-id';
 
     let token;
     if (process.env.NODE_ENV === 'development') {
@@ -467,7 +464,7 @@ export class BillService {
       });
 
       if (updatedBill.status === Statuses.AUTHORISED) {
-        await http.post(`reports/inventory/manage`, {
+        await http.post(`items/item/manage-inventory`, {
           payload: itemLedgerArray,
         });
 
@@ -584,7 +581,7 @@ export class BillService {
       }
 
       if (bill.status === Statuses.AUTHORISED) {
-        await http.post(`reports/inventory/manage`, {
+        await http.post(`items/item/manage-inventory`, {
           payload: itemLedgerArray,
         });
 
@@ -851,7 +848,7 @@ export class BillService {
         type: PaymentModes.BILLS,
       });
 
-      await http.post(`reports/inventory/manage`, {
+      await http.post(`items/item/manage-inventory`, {
         payload: itemLedgerArray,
       });
     }

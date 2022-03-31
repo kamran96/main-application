@@ -415,8 +415,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
   };
   const a = AntForm.getFieldsValue();
 
-  console.log(a, 'al');
-
   const columns: ColumnsType<any> = useMemo(() => {
     return [
       {

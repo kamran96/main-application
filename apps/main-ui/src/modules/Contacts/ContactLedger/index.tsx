@@ -28,13 +28,10 @@ export const ContactLedger = () => {
     setId(location.pathname.split('/app/contacts/')[1]);
   }, [location]);
 
-  console.log(id, 'islkdjfaois');
-
   const { data } = useQuery([`all-contacts`, 'ALL'], getAllContacts);
   const result: IContactType[] = (data && data.data && data.data.result) || [];
 
   const getContactById = (id: number) => {
-    console.log(id, 'id');
     if (result && result.length > 0) {
       const [filtered] = result.filter((item) => item.id === id);
       return filtered;

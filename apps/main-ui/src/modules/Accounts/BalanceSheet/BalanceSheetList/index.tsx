@@ -29,9 +29,8 @@ import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv from '../../../../utils/Print';
 import FilterSchema from './filterSchema';
 import { BalanceSheetPdf } from '../../../../components/PDFs/BalanceSheetPdf';
-import DUMMYLOGO from "../../../../assets/quickbook.png";
+import DUMMYLOGO from '../../../../assets/quickbook.png';
 import { PDFViewer } from '@react-pdf/renderer';
-
 
 interface IBalanceSheetConfig {
   columns: ColumnsType<any>;
@@ -56,26 +55,25 @@ export const BalanceSheetList: FC = () => {
     totalCredits: 0,
     totalDebits: 0,
   });
-  const { routeHistory , userDetails} = useGlobalContext();
+  const { routeHistory, userDetails } = useGlobalContext();
   const { history } = routeHistory;
 
   const [config, setConfig] = useState({
     query: '',
   });
- 
 
-//handle Organization Data
-const { organization } = userDetails;
-const {
-  address: organizationAddress,
-  name: organizationName,
-  email: organizationEmail,
-  phoneNumber: organizationContact,
-  website,
-} = organization;
-const { city, country, postalCode } = organizationAddress;
+  //handle Organization Data
+  const { organization } = userDetails;
+  const {
+    address: organizationAddress,
+    name: organizationName,
+    email: organizationEmail,
+    phoneNumber: organizationContact,
+    website,
+  } = organization;
+  const { city, country, postalCode } = organizationAddress;
 
-const headerprops = {
+  const headerprops = {
     organizationName,
     city,
     country,
@@ -87,8 +85,6 @@ const headerprops = {
     logo: DUMMYLOGO,
     website,
   };
-
-
   const { query } = config;
 
   useEffect(() => {
@@ -112,6 +108,19 @@ const headerprops = {
   useEffect(() => {
     if (data && data.data && data.data.result) {
       const { result } = data.data;
+
+      result?.forEach((item: IBalanceSheetData, index) => {
+        if (item?.type === ITransactionType.DEBIT) {
+          setTotals((prev) => {
+            return { ...prev, totalDebits: item.balance };
+          });
+        } else {
+          setTotals((prev) => {
+            return { ...prev, totalCredits: item.balance };
+          });
+        }
+      });
+
       setBalanceSheet(result);
     }
   }, [data]);
@@ -127,7 +136,6 @@ const headerprops = {
   const searchedQueryItem: any = useMemo(() => {
     return query ? JSON.parse(atob(query)) : query;
   }, [query]);
-
 
   return (
     <WrapperBalanceSheetList
@@ -158,179 +166,193 @@ const headerprops = {
             />
           </div>
         </div>
-        <PrintFormat>
-          <>
-            <div className="mb-30 _visibleOnPrint">
-              <PrintHeaderFormat hasbackgroundColor={true}>
-                <TableDivisions
-                  divisions={[
-                    {
-                      element: <TopbarLogoWithDetails />,
-                    },
-                    {
-                      element: <Addressbar />,
-                    },
-                  ]}
-                />
-              </PrintHeaderFormat>
-            </div>
-            <div className="balance_sheet_table_wrapper">
-              <table style={{ width: '100%' }}>
-                <thead>
-                  <tr>
-                    <th className="ant-table-cell textLeft">Particulars</th>
-                    {searchedQueryItem?.date ? (
-                      <>
-                        <th className="textCenter ant-table-cell" colSpan={2}>
-                          Opening
-                        </th>
-                        <th className="textCenter ant-table-cell" colSpan={2}>
-                          Changed
-                        </th>
-                        <th className="textCenter ant-table-cell" colSpan={2}>
-                          Closing
-                        </th>
-                      </>
-                    ) : (
-                      <>
-                        <th className="ant-table-cell">Debit</th>
-                        <th className="ant-table-cell">Credit</th>
-                      </>
-                    )}
-                  </tr>
-                </thead>
-                <tbody>
-                  {balanceSheetData.map(
-                    (accountHead: IBalanceSheetData, index: number) => {
-                      return (
+        <div ref={printRef}>
+          <PrintFormat>
+            <>
+              <div className="mb-30 _visibleOnPrint">
+                <PrintHeaderFormat hasbackgroundColor={true}>
+                  <TableDivisions
+                    divisions={[
+                      {
+                        element: <TopbarLogoWithDetails />,
+                      },
+                      {
+                        element: <Addressbar />,
+                      },
+                    ]}
+                  />
+                </PrintHeaderFormat>
+              </div>
+              <div className="balance_sheet_table_wrapper">
+                <table style={{ width: '100%' }}>
+                  <thead>
+                    <tr>
+                      <th className="ant-table-cell textLeft">Particulars</th>
+                      {searchedQueryItem?.date ? (
                         <>
-                          <tr>
-                            {/* heads will be here */}
-                            <td
-                              className="_account_group_header"
-                              colSpan={
-                                searchedQueryItem?.date && index == 0 ? 1 : 7
-                              }
-                            >
-                              <Capitalize>
-                                <BOLDTEXT>{accountHead?.name}</BOLDTEXT>
-                              </Capitalize>
-                            </td>
-                            {searchedQueryItem?.date && index == 0 ? (
-                              <>
-                                <td className="textCenter _account_group_header">
-                                  <BOLDTEXT>Dr </BOLDTEXT>
-                                </td>
-                                <td className="textCenter _account_group_header">
-                                  <BOLDTEXT>Cr </BOLDTEXT>
-                                </td>
-                                <td className="textCenter _account_group_header">
-                                  <BOLDTEXT>Dr </BOLDTEXT>
-                                </td>
-                                <td className="textCenter _account_group_header">
-                                  <BOLDTEXT>Cr </BOLDTEXT>
-                                </td>
-                                <td className="textCenter _account_group_header">
-                                  <BOLDTEXT>Dr </BOLDTEXT>
-                                </td>
-                                <td className="textCenter _account_group_header">
-                                  <BOLDTEXT>Cr </BOLDTEXT>
-                                </td>
-                              </>
-                            ) : (
-                              <>
-                                <td></td>
-                                <td></td>
-                              </>
-                            )}
-                          </tr>
-                          {accountHead?.accounts?.map((acc, index) => {
-                            return (
-                              <tr>
-                                <td>{acc?.name}</td>
-                                {searchedQueryItem?.date ? (
-                                  <>
-                                    <td className="textCenter">
-                                      {acc?.opening_debits}
-                                    </td>
-                                    <td className="textCenter">
-                                      {acc?.opening_credits}
-                                    </td>
-                                    <td className="textCenter">
-                                      {acc?.total_debits}
-                                    </td>
-                                    <td className="textCenter">
-                                      {acc?.total_credits}
-                                    </td>
-                                    <td className="textCenter">
-                                      {acc?.closing_debits}
-                                    </td>
-                                    <td className="textCenter">
-                                      {acc?.closing_credits}
-                                    </td>
-                                  </>
-                                ) : (
-                                  <>
-                                    <td className="textCenter">
-                                      {accountHead.type ===
-                                        ITransactionType.DEBIT &&
-                                        moneyFormat(acc.balance.toFixed(2))}
-                                    </td>
-                                    <td className="textCenter">
-                                      {' '}
-                                      {accountHead.type ===
-                                        ITransactionType.CREDIT &&
-                                        moneyFormat(acc.balance.toFixed(2))}
-                                    </td>
-                                  </>
-                                )}
-                              </tr>
-                            );
-                          })}
-                          <tr className="calculated_groups">
-                            <td colSpan={searchedQueryItem?.date ? 6 : 2}>
-                              <Capitalize>
-                                <BOLDTEXT>Total {accountHead?.name}</BOLDTEXT>
-                              </Capitalize>
-                            </td>
-                            <td className="textCenter">
-                              <BOLDTEXT>
-                                {moneyFormat(accountHead?.balance)}
-                              </BOLDTEXT>
-                            </td>
-                          </tr>
+                          <th className="textCenter ant-table-cell" colSpan={2}>
+                            Opening
+                          </th>
+                          <th className="textCenter ant-table-cell" colSpan={2}>
+                            Changed
+                          </th>
+                          <th className="textCenter ant-table-cell" colSpan={2}>
+                            Closing
+                          </th>
                         </>
-                      );
-                    }
-                  )}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td>
-                      <BoldText>Total</BoldText>
-                    </td>
-                    {searchedQueryItem?.date && <td />}
-                    <td className="textCenter">
-                      <BoldText>{moneyFormat(totalDebits.toFixed(2))}</BoldText>
-                    </td>
-                    <td className="textCenter">
-                      <BoldText>
-                        {moneyFormat(totalCredits.toFixed(2))}
-                      </BoldText>
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-          </>
-        </PrintFormat>
+                      ) : (
+                        <>
+                          <th className="ant-table-cell">Debit</th>
+                          <th className="ant-table-cell">Credit</th>
+                        </>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {balanceSheetData.map(
+                      (accountHead: IBalanceSheetData, index: number) => {
+                        return (
+                          <>
+                            <tr>
+                              {/* heads will be here */}
+                              <td
+                                className="_account_group_header"
+                                colSpan={
+                                  searchedQueryItem?.date && index == 0 ? 1 : 7
+                                }
+                              >
+                                <Capitalize>
+                                  <BOLDTEXT>{accountHead?.name}</BOLDTEXT>
+                                </Capitalize>
+                              </td>
+                              {searchedQueryItem?.date && index == 0 ? (
+                                <>
+                                  <td className="textCenter _account_group_header">
+                                    <BOLDTEXT>Dr </BOLDTEXT>
+                                  </td>
+                                  <td className="textCenter _account_group_header">
+                                    <BOLDTEXT>Cr </BOLDTEXT>
+                                  </td>
+                                  <td className="textCenter _account_group_header">
+                                    <BOLDTEXT>Dr </BOLDTEXT>
+                                  </td>
+                                  <td className="textCenter _account_group_header">
+                                    <BOLDTEXT>Cr </BOLDTEXT>
+                                  </td>
+                                  <td className="textCenter _account_group_header">
+                                    <BOLDTEXT>Dr </BOLDTEXT>
+                                  </td>
+                                  <td className="textCenter _account_group_header">
+                                    <BOLDTEXT>Cr </BOLDTEXT>
+                                  </td>
+                                </>
+                              ) : (
+                                <>
+                                  <td></td>
+                                  <td></td>
+                                </>
+                              )}
+                            </tr>
+                            {accountHead?.accounts?.map((acc, index) => {
+                              return (
+                                <tr>
+                                  <td>{acc?.name}</td>
+                                  {searchedQueryItem?.date ? (
+                                    <>
+                                      <td className="textCenter">
+                                        {acc?.opening_debits}
+                                      </td>
+                                      <td className="textCenter">
+                                        {acc?.opening_credits}
+                                      </td>
+                                      <td className="textCenter">
+                                        {acc?.total_debits}
+                                      </td>
+                                      <td className="textCenter">
+                                        {acc?.total_credits}
+                                      </td>
+                                      <td className="textCenter">
+                                        {acc?.closing_debits}
+                                      </td>
+                                      <td className="textCenter">
+                                        {acc?.closing_credits}
+                                      </td>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <td className="textCenter">
+                                        {accountHead.type ===
+                                          ITransactionType.DEBIT &&
+                                          moneyFormat(acc.balance.toFixed(2))}
+                                      </td>
+                                      <td className="textCenter">
+                                        {accountHead.type ===
+                                          ITransactionType.CREDIT &&
+                                          moneyFormat(acc.balance.toFixed(2))}
+                                      </td>
+                                    </>
+                                  )}
+                                </tr>
+                              );
+                            })}
+                            <tr className="calculated_groups">
+                              <td
+                                colSpan={
+                                  searchedQueryItem?.date
+                                    ? 6
+                                    : accountHead.type ===
+                                      ITransactionType.DEBIT
+                                    ? 1
+                                    : 2
+                                }
+                              >
+                                <Capitalize>
+                                  <BOLDTEXT>Total {accountHead?.name}</BOLDTEXT>
+                                </Capitalize>
+                              </td>
+                              <td className="textCenter">
+                                <BOLDTEXT>
+                                  {moneyFormat(accountHead?.balance)}
+                                </BOLDTEXT>
+                              </td>
+                            </tr>
+                          </>
+                        );
+                      }
+                    )}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td>
+                        <BoldText>Total</BoldText>
+                      </td>
+                      {searchedQueryItem?.date && <td />}
+                      <td className="textCenter">
+                        <BoldText>
+                          {moneyFormat(totalDebits.toFixed(2))}
+                        </BoldText>
+                      </td>
+                      <td className="textCenter">
+                        <BoldText>
+                          {moneyFormat(totalCredits.toFixed(2))}
+                        </BoldText>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </>
+          </PrintFormat>
+        </div>
       </Card>
 
       <PDFViewer height={'1080px'} width={'100%'}>
-        <BalanceSheetPdf header = {headerprops} 
-        balanceSheetData={balanceSheetData} 
-        searchquery={searchedQueryItem}/>
-       </PDFViewer>
+        <BalanceSheetPdf
+          header={headerprops}
+          balanceSheetData={balanceSheetData}
+          searchquery={searchedQueryItem}
+        />
+      </PDFViewer>
     </WrapperBalanceSheetList>
   );
 };

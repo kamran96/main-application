@@ -21,7 +21,6 @@ const PricingEditorWidget: FC = () => {
 
   const id = obj && obj.id ? obj.id : null;
   const pricingId = (Array.isArray(id) && id.length > 0 && id[0]) || null;
-  console.log(id, pricingId, 'pricing');
 
   const { data } = useQuery(
     [`price-${pricingId}`, pricingId],
@@ -144,7 +143,7 @@ const PricingEditorWidget: FC = () => {
                   placeholder={'eg: milk, match'}
                   size="middle"
                   type="number"
-                  autoComplete='off'
+                  autoComplete="off"
                 />
               </Form.Item>
             </Col>
@@ -164,7 +163,7 @@ const PricingEditorWidget: FC = () => {
                   placeholder={'eg: milk, match'}
                   size="middle"
                   type="number"
-                  autoComplete='off'
+                  autoComplete="off"
                 />
               </Form.Item>
             </Col>
@@ -180,7 +179,11 @@ const PricingEditorWidget: FC = () => {
                   },
                 ]}
               >
-                <Input placeholder={'eg: 100 or 10%'} size="middle" autoComplete='off'/>
+                <Input
+                  placeholder={'eg: 100 or 10%'}
+                  size="middle"
+                  autoComplete="off"
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -195,7 +198,11 @@ const PricingEditorWidget: FC = () => {
                   },
                 ]}
               >
-                <Input placeholder={'eg. 10% or 100'} size="middle" autoComplete='off'/>
+                <Input
+                  placeholder={'eg. 10% or 100'}
+                  size="middle"
+                  autoComplete="off"
+                />
               </Form.Item>
             </Col>
             <Col span={24}>

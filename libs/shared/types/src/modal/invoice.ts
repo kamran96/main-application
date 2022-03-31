@@ -71,12 +71,8 @@ export interface IInvoiceResult extends IBase {
 export class IInvoiceMutatedResult extends IBaseRequestResponse {
   result?: IInvoiceResult;
 
-  getConsole() {
-    console.log('console hit');
-  }
-
   getSquenceData(accessor: string) {
-    const sortedData = this.result?.[accessor].sort((a: any, b: any) => {
+    const sortedData = this.result?.[accessor]?.sort((a: any, b: any) => {
       return a.sequence - b.sequence;
     });
 
@@ -88,7 +84,7 @@ export class IInvoiceMutatedResult extends IBaseRequestResponse {
     const accessor =
       type === IInvoiceType.INVOICE
         ? 'invoiceItems'
-        : type === IInvoiceType.CREDITNOTE
+        : type === IInvoiceType.CREDITNOTE || IInvoiceType.DEBITNOTE
         ? 'creditNoteItems'
         : type === IInvoiceType.PURCHASE_ORDER
         ? 'purchaseOrderItems'

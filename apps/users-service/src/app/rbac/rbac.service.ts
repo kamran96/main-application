@@ -155,7 +155,6 @@ export class RbacService {
   }
 
   async GetRole(roleId: string): Promise<IRole> {
-    console.log(roleId, 'roleid');
     return await this.roleModel.findById(roleId);
   }
 

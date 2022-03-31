@@ -26,6 +26,7 @@ export function PDFTable({ data, columns }: ITableProps) {
         {columns.map((column, index) => {
           return (
             <Text
+              key={index}
               style={{
                 ...styles.th,
                 width: column.width ? column.width : '100%',

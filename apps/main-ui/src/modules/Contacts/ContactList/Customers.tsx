@@ -8,7 +8,6 @@ import { Link } from 'react-router-dom';
 import { deleteContacts, getContacts } from '../../../api/Contact';
 import { ButtonTag } from '../../../components/ButtonTags';
 import { ConfirmModal } from '../../../components/ConfirmModal';
-import { PDFICON } from '../../../components/Icons';
 import { SmartFilter } from '../../../components/SmartFilter';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { IContactTypes, NOTIFICATIONTYPE } from '../../../modal';

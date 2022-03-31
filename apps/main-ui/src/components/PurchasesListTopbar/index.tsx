@@ -1,14 +1,14 @@
-import { Button } from "antd";
-import React, { FC, ReactElement } from "react";
-import styled from "styled-components";
-import deleteIcon from "@iconify/icons-carbon/delete";
-import Icon from "@iconify/react";
-import baselineAlternateEmail from "@iconify-icons/ic/baseline-alternate-email";
-import editSolid from "@iconify/icons-clarity/edit-solid";
-import printIcon from "@iconify-icons/bytesize/print";
-import { PDFICON } from "../Icons";
-import { Color } from "../../modal";
-import { ButtonTag } from "../ButtonTags";
+import { Button } from 'antd';
+import React, { FC, ReactElement } from 'react';
+import styled from 'styled-components';
+import deleteIcon from '@iconify/icons-carbon/delete';
+import Icon from '@iconify/react';
+import baselineAlternateEmail from '@iconify-icons/ic/baseline-alternate-email';
+import editSolid from '@iconify/icons-clarity/edit-solid';
+import printIcon from '@iconify-icons/bytesize/print';
+import { PDFICON } from '../Icons';
+import { Color } from '../../modal';
+import { ButtonTag } from '../ButtonTags';
 
 interface IProps {
   disabled?: boolean;
@@ -55,6 +55,7 @@ export const PurchaseListTopbar: FC<IProps> = ({
         )}
         {isEditable && (
           <ButtonTag
+            disabled={disabled}
             className="mr-10"
             onClick={onEdit}
             title="Edit"
