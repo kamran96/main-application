@@ -36,16 +36,18 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Get Yarn cache directory
+      - name: Get yarn cache directory path
         id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: Use Yarn cache
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+      - name: Restore yarn cache
         uses: actions/cache@v2
-        id: yarn-cache
+        id: yarn-cache 
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}       
+          key: yarn-cache-folder-os-${{ runner.os }}-node-${{ env.node-version }}-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}      
+          restore-keys: |
+            yarn-cache-folder-os-${{ runner.os }}-node-${{ env.node-version }}-
+            yarn-cache-folder-os-${{ runner.os }}-
 
       # `--prefer-offline` gives cache priority
       - name: Install dependencies
@@ -89,7 +91,7 @@ jobs:
        # Clone git repository with Helm charts, update and push changes
       - name: Update image tag in Helm git repo 
         run: | 
-          CONTAINER_IMAGE_TAG="${TAG}"
+          CONTAINER_IMAGE_TAG="$(node -e "console.log(require('./package.json').version);")"
           echo New container image tag: $CONTAINER_IMAGE_TAG
           echo Create temporary folder to clone the repo into...
           TEMP_FOLDER="$(mktemp -d)" 
