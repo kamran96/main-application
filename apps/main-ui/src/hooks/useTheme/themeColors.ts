@@ -51,6 +51,8 @@ export interface IThemeVariables {
   cardBg: string;
   stroke: string;
   tabBgActive: string;
+  itmbg: string;
+  itmText: string;
 }
 
 export interface ITheme {
@@ -120,9 +122,11 @@ export const Themes: IThemes = {
     breadCrumbs: ``,
     breadCrumbsActive: '',
     fallbackLoader: '#ffffff8c',
-    cmdbg: '#e5e5e5',
+    cmdbg: '#FFFFFF',
     cardBg: '#ffffff',
     stroke: '#F2F2F2',
+    itmbg: '#F4F4F5',
+    itmText: '#454545'
   },
   dark: {
     $PRIMARY: '#e4e4e4',
@@ -173,8 +177,10 @@ export const Themes: IThemes = {
     breadCrumbs: 'rgb(152 152 152 / 68%)',
     fallbackLoader: '#282828',
     inputColorBg: `#121212`,
-    cmdbg: `#272727`,
+    cmdbg: `#000000`,
     cardBg: '#0B1822',
     stroke: '#222e39',
+    itmbg: '#08131D',
+    itmText: '#FFFFFF'
   },
 };
