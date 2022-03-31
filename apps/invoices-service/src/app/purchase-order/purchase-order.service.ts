@@ -138,11 +138,24 @@ export class PurchaseOrderService {
       type: 1,
     });
 
+    // get distinct userids
+    const key = 'createdById';
+    const mapUniqueUserId = [
+      ...new Map(purchaseOrder.map((item) => [item[key], item])).values(),
+    ].map((i) => i[key]);
+
+    const { data: users } = await http.post(`users/user/ids`, {
+      ids: mapUniqueUserId,
+      type: 1,
+    });
+
     for (const i of purchaseOrder) {
       const contact = contacts.find((c) => c.id === i.contactId);
+      const user = users.find((u) => u.id === i.createdById);
       newPoArray.push({
         ...i,
         contact,
+        owner: user,
       });
     }
 
@@ -340,7 +353,7 @@ export class PurchaseOrderService {
   }
 
   async DeletePurchaseOrder(purchaseOrders, req: IRequest) {
-    for (const i of purchaseOrders.id) {
+    for (const i of purchaseOrders.ids) {
       const purchaseOrder = await getCustomRepository(
         PurchaseOrderRepository
       ).findOne({

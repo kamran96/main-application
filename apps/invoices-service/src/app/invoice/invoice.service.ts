@@ -355,11 +355,24 @@ export class InvoiceService {
       type: 1,
     });
 
+    // get distinct userids
+    const key = 'createdById';
+    const mapUniqueUserId = [
+      ...new Map(invoice_arr.map((item) => [item[key], item])).values(),
+    ].map((i) => i[key]);
+
+    const { data: users } = await http.post(`users/user/ids`, {
+      ids: mapUniqueUserId,
+      type: 1,
+    });
+
     for (const i of invoice_arr) {
       const contact = contacts.find((c) => c.id === i.contactId);
+      const user = users.find((u) => u.id === i.createdById);
       new_invoices.push({
         ...i,
         contact,
+        owner: user,
       });
     }
 
@@ -1042,7 +1055,6 @@ export class InvoiceService {
 
   async Pdf() {
     console.log('Sending pdf please wait...');
-    console.log(process.env.PDF_GENERATOR_KEY);
 
     const requestObj = {
       url: 'https://api.pdfmonkey.io/api/v1/documents',
