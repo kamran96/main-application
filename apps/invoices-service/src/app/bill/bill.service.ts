@@ -308,11 +308,24 @@ export class BillService {
       type: 1,
     });
 
+    // get distinct userids
+    const key = 'createdById';
+    const mapUniqueUserId = [
+      ...new Map(bill_arr.map((item) => [item[key], item])).values(),
+    ].map((i) => i[key]);
+
+    const { data: users } = await http.post(`users/user/ids`, {
+      ids: mapUniqueUserId,
+      type: 1,
+    });
+
     for (const i of bill_arr) {
       const contact = contacts.find((c) => c.id === i.contactId);
+      const user = users.find((u) => u.id === i.createdById);
       new_bills.push({
         ...i,
         contact,
+        owner: user,
       });
     }
 
