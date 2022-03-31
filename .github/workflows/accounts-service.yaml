@@ -46,9 +46,15 @@ jobs:
         if: steps.cache-node-modules.cache-hit != 'true'
         run: yarn install --prefer-offline
 
-      - name: run migrations
+      # Run database migration
+      - name: run db migrations
         run: yarn run acc_migration_run
-
+        env: 
+          ACC_DB_HOST: db-postgresql-sgp1-12041-do-user-4046074-0.b.db.ondigitalocean.com
+          ACC_DB_PORT: 25060
+          ACC_DB_NAME: accounts
+          ACC_DB_PASSWORD: 0jN4FNuqynhGR7zT
+          ACC_DB_USER: doadmin
       
       # docker build item service images
       - name: Build container image
@@ -70,7 +76,7 @@ jobs:
         run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/invyce-images/accounting-service:'${TAG}'|' $GITHUB_WORKSPACE/apps/accounting-service/ops/accounting-deployment.yaml
 
       - name: Save DigitalOcean kubeconfig with short-lived credentials
-        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 invyce-cluster
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 k8s-invyce-app-stg
 
       - name: Deploy to DigitalOcean Kubernetes
         run: kubectl apply -f $GITHUB_WORKSPACE/apps/accounting-service/ops/accounting-deployment.yaml
