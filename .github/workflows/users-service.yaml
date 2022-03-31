@@ -11,8 +11,12 @@ on:
       - 'apps/users-service'
       - ".github/workflows/users-service.yaml"
 
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+
+env:
+  ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -90,7 +94,7 @@ jobs:
           echo Create temporary folder to clone the repo into...
           TEMP_FOLDER="$(mktemp -d)" 
           echo Clone the repository...
-          git clone -b main "https://zeeshooo:${secrets.ACCESS_TOKEN}@github.com/invyce/invyce-ops.git" ${TEMP_FOLDER} 
+          git clone -b main "https://zeeshooo:${ACCESS_TOKEN}@github.com/invyce/invyce-ops.git" ${TEMP_FOLDER} 
           cd ${TEMP_FOLDER}/invyce-ops/contacts 
           ls
           echo Update Helm chart values-dev with new image tag
