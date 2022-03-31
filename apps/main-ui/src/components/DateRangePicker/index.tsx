@@ -1,36 +1,36 @@
-import { DatePicker, Select } from "antd";
-import React, { FC, useState } from "react";
-import styled from "styled-components";
+import { DatePicker, Select } from 'antd';
+import React, { FC, useState } from 'react';
+import styled from 'styled-components';
 
 const { Option } = Select;
 
 const { RangePicker } = DatePicker;
 
-const dateFormat = "YYYY/MM/DD";
+const dateFormat = 'YYYY/MM/DD';
 
 interface IDateRangePicker {
-  size?: "small" | "middle" | "larget";
+  size?: 'small' | 'middle' | 'larget';
   onChange?: (payload: any) => void;
 }
 
 function PickerWithType({ type, onChange }) {
-  if (type === "custom")
+  if (type === 'custom')
     return (
       <RangePicker
         onChange={onChange}
-        style={{ width: "100%" }}
+        style={{ width: '100%' }}
         size="large"
         format={dateFormat}
       />
     );
-  if (type === "date") return <DatePicker onChange={onChange} />;
+  if (type === 'date') return <DatePicker onChange={onChange} />;
   return (
-    <DatePicker style={{ width: "100%" }} picker={type} onChange={onChange} />
+    <DatePicker style={{ width: '100%' }} picker={type} onChange={onChange} />
   );
 }
 
-export const CommonDateRangePicker: FC<IDateRangePicker> = () => {
-  const [type, setType] = useState("date");
+export const CommonDateRangePicker: FC<IDateRangePicker> = ({ onChange }) => {
+  const [type, setType] = useState('date');
 
   return (
     <WrapperDateRange>
@@ -42,7 +42,7 @@ export const CommonDateRangePicker: FC<IDateRangePicker> = () => {
         <Option value="year">Year</Option>
         <Option value="custom">Custom</Option>
       </Select>
-      <PickerWithType type={type} onChange={(value) => console.log(value)} />
+      <PickerWithType type={type} onChange={onChange} />
     </WrapperDateRange>
   );
 };

@@ -621,13 +621,6 @@ export class AccountsService {
         const filterData = Buffer.from(query, 'base64').toString();
         const data = JSON.parse(filterData);
 
-        // const data = {
-        //   date: {
-        //     type: 'date-between',
-        //     value: ['2022-01-5', '2022-01-07'],
-        //   },
-        // };
-
         for (const i in data) {
           if (data[i].type === 'date-between') {
             const start_date = data[i].value[0];
@@ -770,6 +763,7 @@ export class AccountsService {
           secondaryAccountId: accountDto.secondaryAccountId,
           primaryAccountId: accountDto.primaryAccountId,
           taxRate: accountDto.taxRate,
+          isSystemAccount: false,
           // branchId: accountDto.branchId,
           organizationId: accountData.organizationId,
           status: 1,
@@ -781,6 +775,38 @@ export class AccountsService {
       } catch (error) {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
+    }
+  }
+
+  async AccountCodes(user: IBaseUser, secondaryAccountId: number) {
+    const secondaryAccount = await getCustomRepository(
+      SecondaryAccountRepository
+    ).findOne({
+      id: secondaryAccountId,
+    });
+
+    if (secondaryAccount) {
+      const account = await getCustomRepository(AccountRepository).find({
+        where: {
+          organizationId: user.organizationId,
+          secondaryAccountId: secondaryAccountId,
+        },
+        take: 1,
+        order: {
+          createdAt: 'DESC',
+        },
+      });
+
+      const code = parseInt(account[0].code) + 1;
+
+      return {
+        result: {
+          message: 'code fetched successfully',
+          code: code,
+        },
+      };
+    } else {
+      throw new HttpException('Invalid params', HttpStatus.BAD_REQUEST);
     }
   }
 

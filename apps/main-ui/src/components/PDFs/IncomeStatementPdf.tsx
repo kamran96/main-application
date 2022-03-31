@@ -46,7 +46,6 @@ const styles = StyleSheet.create({
   Header: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     fontSize: '12px',
     fontWeight: 'bold',
@@ -57,11 +56,8 @@ const styles = StyleSheet.create({
   ItemWidth: {
     padding: '11px 20px',
   },
-  onlyWidth: {
-    width: '100%',
-  },
   fontsDetails: {
-    fontSize: '12px',
+    fontSize: '11px',
     fontWeight: 'normal',
   },
   padding: {
@@ -72,9 +68,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  widthItems: {
-    width: '30%',
   },
   borderRight: {
     borderRight: '1px solid black',
@@ -91,6 +84,7 @@ const styles = StyleSheet.create({
   },
   fontBold: {
     fontWeight: 'bold',
+    fontSize: '12px',
   },
   smallWidth: {
     width: '20%',
@@ -102,21 +96,18 @@ const styles = StyleSheet.create({
   paddingTopBottom: {
     padding: '10px 0',
   },
-  totalWidth: {
-    width: '85%',
-    padding: '10px 5px',
-  },
-  totalValueWidth: {
-    width: '15%',
-    padding: '10px 5px',
-    borderLeft: '1px solid #F4F4F4',
-  },
   paddingBottom: {
-      paddingBottom: '5px'
+    paddingBottom: '5px',
   },
-  paddingLeft: {
-      paddingLeft: '5px'
-  }
+  totalMargin: {
+    marginRight: '10%',
+  },
+  partiallargeWidth: {
+    width: '60%',
+  },
+  ItemMarginRight: {
+    marginLeft: '10px',
+  },
 });
 
 export const IncomeStatementPdf: FC<IProps> = ({
@@ -136,7 +127,7 @@ export const IncomeStatementPdf: FC<IProps> = ({
                 style={[
                   styles.Itemborder,
                   styles.ItemWidth,
-                  !searchedQueryItem?.date && styles.onlyWidth,
+                  !searchedQueryItem?.date && styles.partiallargeWidth,
                 ]}
               >
                 Particulars
@@ -161,7 +152,7 @@ export const IncomeStatementPdf: FC<IProps> = ({
                 style={[
                   styles.Itemborder,
                   styles.ItemWidth,
-                  !searchedQueryItem?.date && styles.onlyWidth,
+                  !searchedQueryItem?.date && styles.partialWidth,
                 ]}
               >
                 {searchedQueryItem?.date ? 'Closing' : 'Amount'}
@@ -170,15 +161,13 @@ export const IncomeStatementPdf: FC<IProps> = ({
                 style={[
                   styles.Itemborder,
                   styles.ItemWidth,
-                  !searchedQueryItem?.date && styles.onlyWidth,
+                  !searchedQueryItem?.date && styles.partialWidth,
                 ]}
               >
                 Total
               </Text>
             </View>
           </View>
-
-          {/* Body starts from here */}
           <View style={[styles.Itemborder, styles.paddingBottom]}>
             {incomeStatement.map((income) => {
               return (
@@ -192,13 +181,16 @@ export const IncomeStatementPdf: FC<IProps> = ({
                         <View style={[styles.itemFlex]}>
                           <Text
                             style={[
-                              !searchedQueryItem?.date && styles.widthItems,
+                              !searchedQueryItem?.date &&
+                                styles.partiallargeWidth,
                               searchedQueryItem?.date && styles.partialWidth,
-                              styles.paddingTopBottom, styles.paddingLeft
+                              styles.paddingTopBottom,
+                              styles.ItemMarginRight,
                             ]}
                           >
                             {acc.name}
                           </Text>
+
                           {searchedQueryItem?.date && (
                             <>
                               <Text
@@ -233,7 +225,7 @@ export const IncomeStatementPdf: FC<IProps> = ({
                           )}
                           <Text
                             style={[
-                              !searchedQueryItem?.date && styles.widthItems,
+                              !searchedQueryItem?.date && styles.partialWidth,
                               searchedQueryItem?.date && styles.smallWidth,
                             ]}
                           >
@@ -241,14 +233,21 @@ export const IncomeStatementPdf: FC<IProps> = ({
                           </Text>
                           <Text
                             style={[
-                              !searchedQueryItem?.date && styles.widthItems,
+                              !searchedQueryItem?.date && styles.partialWidth,
                               searchedQueryItem?.date && styles.smallWidth,
                             ]}
                           ></Text>
                         </View>
                       );
                     })}
-                    <Text style={[styles.totalValue, styles.fontBold]}>
+
+                    <Text
+                      style={[
+                        styles.totalValue,
+                        styles.fontBold,
+                        !searchedQueryItem?.date && styles.totalMargin,
+                      ]}
+                    >
                       {moneyFormat(income?.balance.toFixed(2))}
                     </Text>
                   </View>
@@ -256,9 +255,11 @@ export const IncomeStatementPdf: FC<IProps> = ({
               );
             })}
           </View>
-          <View style={[styles.Header, styles.Itemborder]}>
-            <Text style={styles.totalWidth}>Total</Text>
-            <Text style={styles.totalValueWidth}>{moneyFormat(total.toFixed(2))}</Text>
+          <View style={[styles.itemFlex, styles.Itemborder, styles.fontBold]}>
+            <Text style={[styles.padding]}>Total</Text>
+            <Text style={[!searchedQueryItem?.date && styles.totalMargin]}>
+              {moneyFormat(total.toFixed(2))}
+            </Text>
           </View>
         </View>
       </PDFFontWrapper>

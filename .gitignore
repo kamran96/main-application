@@ -5,6 +5,10 @@
 /tmp
 /out-tsc
 
+build.pdf
+archive.zip
+.env
+
 # dependencies
 /node_modules
 yarn.lock

@@ -87,8 +87,6 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
         resolvedData.data
       );
 
-      console.log(resolvedResult, 'resolved result');
-
       const contact_ledger: any =
         (resolvedResult.result && resolvedResult.getGeneratedResult()) || [];
       setResponse({

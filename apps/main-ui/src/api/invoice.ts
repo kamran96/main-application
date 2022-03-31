@@ -63,8 +63,6 @@ export const findInvoiceByID = ({ queryKey }: QueryKey) => {
       break;
   }
 
-  console.log(url, id, 'urls');
-
   return http.get(url);
 };
 
@@ -144,3 +142,6 @@ export const invoiceFlowChartAPI = (key?: any) =>
 
 export const quotationApproveAPI = (id: string | number) =>
   http?.put(`quote-update/${id}`);
+
+export const deleteCreditNoteAPI = (paylod: { ids: number[]; type: number }) =>
+  http.put(`/invoices/credit-note/delete`, paylod);

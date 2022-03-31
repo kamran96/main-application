@@ -229,7 +229,7 @@ export const IncomeStatementList: FC = () => {
                                 <td colSpan={searchedQueryItem?.date ? 7 : 3}>
                                   <table style={{ width: '100%' }}>
                                     <thead>
-                                      <th>{accountHead.name}</th>
+                                      <th className='ItemName'>{accountHead.name}</th>
                                       <th className="static-width"></th>
                                       <th className="static-width"></th>
                                       {searchedQueryItem?.date && (
@@ -417,6 +417,11 @@ const WrapperIncomeStatement = styled.div`
   }
   .static-width-header {
     width: 160px;
+  }
+  .ItemName{
+    display: flex;
+    jutsify-content: flex-start;
+    align-items: center;
   }
 
   .dark-text {

@@ -155,7 +155,6 @@ export const PurchaseOrderWidgetManager: FC<IProps> = ({ children }) => {
             optionFilterProp="children"
             labelInValue={true}
             onChange={(val) => {
-              console.log(val, 'value');
               setState((prev) => {
                 const allItems = [...prev];
                 allItems?.splice(index, 1, {

@@ -13,7 +13,6 @@ export const PurchaseView = () => {
 
   const { pathname } = history.location;
 
-  // console.log
   const invId = pathname.split(
     `${ISupportedRoutes.DASHBOARD_LAYOUT}${ISupportedRoutes?.PURCHASE_ORDER}/`
   )[1];

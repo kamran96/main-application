@@ -11,7 +11,7 @@ export class Attribute {
   @Prop()
   valueType: string;
   @Prop(raw({}))
-  values: object;
+  values: string;
   @Prop({ type: mongoose.Schema.Types.ObjectId, schema: 'Category' })
   categoryId: Category;
   @Prop()

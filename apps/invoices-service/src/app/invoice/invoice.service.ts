@@ -40,6 +40,7 @@ import {
   INVOICE_UPDATED,
   SEND_FORGOT_PASSWORD,
 } from '@invyce/send-email';
+import { PurchaseOrderRepository } from '../repositories/purchaseOrder.repository';
 
 dotenv.config();
 
@@ -502,7 +503,7 @@ export class InvoiceService {
         });
 
         if (updatedInvoice.status === Statuses.AUTHORISED) {
-          await http.post(`reports/inventory/manage`, {
+          await http.post(`items/item/manage-inventory`, {
             payload: itemLedgerArray,
           });
 
@@ -627,7 +628,7 @@ export class InvoiceService {
       }
 
       if (invoice.status === Statuses.AUTHORISED) {
-        await http.post(`reports/inventory/manage`, {
+        await http.post(`items/item/manage-inventory`, {
           payload: itemLedgerArray,
         });
 
@@ -714,19 +715,17 @@ export class InvoiceService {
           }
         );
 
-        console.log(attachment, 'atta');
-
         await this.emailService.emit(INVOICE_CREATED, {
           to: contact[0]?.email,
-          user_name: contact[0]?.name,
+          user_name: contact[0]?.name || null,
           invoice_number: invoice.invoiceNumber,
           issueDate: invoice.issueDate,
           gross_total: invoice.grossTotal,
           itemDisTotal: invoice.discount,
           net_total: invoice.netTotal,
           invoice_details,
-          download_link: attachment?.path,
-          attachment_name: attachment?.name,
+          download_link: attachment?.path || null,
+          attachment_name: attachment?.name || null,
         });
 
         await http.get(`contacts/contact/balance`);
@@ -1012,6 +1011,30 @@ export class InvoiceService {
       } else {
         invoiceNo = `CN-${new Date().getFullYear()}-1`;
       }
+    } else if (type === InvTypes.PURCHASE_ORDER) {
+      const [purchase_order] = await getCustomRepository(
+        PurchaseOrderRepository
+      ).find({
+        where: {
+          organizationId: user.organizationId,
+          branchId: user.branchId,
+          invoiceNumber: ILike(`%PO-${new Date().getFullYear()}%`),
+        },
+        order: {
+          id: 'DESC',
+        },
+        take: 1,
+      });
+
+      if (purchase_order) {
+        const year = new Date().getFullYear();
+        const n = purchase_order.invoiceNumber.split('-');
+        let m = parseInt(n[2]);
+        const o = (m += 1);
+        invoiceNo = `PO-${year}-${o}`;
+      } else {
+        invoiceNo = `PO-${new Date().getFullYear()}-1`;
+      }
     }
 
     return invoiceNo;
@@ -1140,7 +1163,7 @@ export class InvoiceService {
         type: PaymentModes.INVOICES,
       });
 
-      await http.post(`reports/inventory/manage`, {
+      await http.post(`items/item/manage-inventory`, {
         payload: itemLedgerArray,
       });
     }

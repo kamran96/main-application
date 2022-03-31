@@ -125,7 +125,6 @@ export const ManageInventoryForm: FC = () => {
             placeholder="Select Item"
             optionFilterProp="children"
             onChange={(val) => {
-              console.log(val, 'what is val');
               const [filtered] = itemsList?.filter(
                 (item) => item?.id === val?.value
               );

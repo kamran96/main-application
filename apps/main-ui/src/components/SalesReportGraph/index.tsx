@@ -90,7 +90,6 @@ export const SalesReportGraph: FC = () => {
     }
   };
 
-  // console.log()
   return (
     <WrapperSlaesReportGraph
       heightConfig={chartHeight}
