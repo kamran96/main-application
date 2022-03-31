@@ -102,7 +102,7 @@ jobs:
           echo Update Helm chart values-dev with new image tag
           CONTAINER_IMAGE_TAG=$CONTAINER_IMAGE_TAG yq e -i '.image.tag = env(CONTAINER_IMAGE_TAG)' ./values.yaml
           echo 'Container image tag updated in contacts/values.yaml' 
-          cd ../../
+          cd ../
           git config user.email "zeeshan@invyce.com" 
           git config user.name "zeeshooo" 
           git add .  
