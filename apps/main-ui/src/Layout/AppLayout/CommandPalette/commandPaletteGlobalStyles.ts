@@ -1,6 +1,7 @@
 import { IThemeProps } from './../../../hooks/useTheme/themeColors';
 import { createGlobalStyle } from 'styled-components';
 
+
 const CommandPlatteGlobalStyles = createGlobalStyle`
 .react-command-palette{
   visibility: hidden;
@@ -19,7 +20,6 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
   overflow: hidden;
   border-radius: 4px;
   outline: none;
-  padding: 15px 20px;
   box-shadow: #353535 0px 2px 4px 0px;
   margin-right: -50%;
   transform: translate(-50%, 0px);
@@ -36,7 +36,8 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
 }
 
 .invyce-header {
-  color: #d7dae0;
+  color: #FFFFFF;
+  padding: 8px 24px;
 }
 
 .invyce-content {
@@ -69,15 +70,16 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
 }
 
 .invyce-input {
-  font-size: 14px;
+  font-size: 16px;
   border-radius: 4px;
   border: 1.5px solid #1e5490;
-  width: 100%;
-  padding: 6px;
+  width: 530px;
+  padding: 21px 19px;
   outline: none;
-  background-color: #e5e5e5;
-  color: #111111;
+  background-color: ${(props: IThemeProps) => props?.theme?.colors?.itmbg};
+  color: ${(props: IThemeProps) => props?.theme?.colors?.itmText};
   caret-color: #4b4b4b;
+  margin: 24px 24px 0 24px;
 }
 
 .invyce-inputOpen {
@@ -94,14 +96,6 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
 .invyce-suggestionsContainerOpen {
   overflow-y: auto;
   overflow-x: hidden;
-  border-top: 1px solid ${(props: IThemeProps) =>
-    props?.theme?.theme === 'dark'
-      ? props?.theme?.colors?.seprator
-      : '#cbcccd'};
-  border-bottom: 1px solid ${(props: IThemeProps) =>
-    props?.theme?.theme === 'dark'
-      ? props?.theme?.colors?.seprator
-      : '#cbcccd'};
   max-height: 315px;
   margin-top: 10px;
 }
@@ -114,23 +108,15 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
 }
 
 .invyce-suggestion {
-  color: ${(props: IThemeProps) =>
-    props?.theme?.theme === 'dark'
-      ? props?.theme?.colors?.sidebarDefaultText
-      : '#3d3d3d'};
-  border-left: 1px solid ${(props: IThemeProps) =>
-    props?.theme?.theme === 'dark'
-      ? props?.theme?.colors?.seprator
-      : '#cbcccd'};
-  border-right: 1px solid ${(props: IThemeProps) =>
-    props?.theme?.theme === 'dark'
-      ? props?.theme?.colors?.seprator
-      : '#cbcccd'};
-  border-top: 0px none;
-  background-color: ${(props: IThemeProps) => props?.theme?.colors?.cmdbg};
+  color: ${(props: IThemeProps) => props?.theme?.colors?.itmText};
+  background-color: ${(props: IThemeProps) => props?.theme?.colors?.itmbg};
   cursor: pointer;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: normal;
+  width: 530px;
+  margin: 8px 24px;
+  padding: 21px 19px;
+  border-radius: 6px;
 }
 
 .invyce-suggestion b {

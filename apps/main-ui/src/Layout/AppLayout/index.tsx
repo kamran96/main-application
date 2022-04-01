@@ -4,7 +4,7 @@ import Icon from '@iconify/react';
 import { IRoutesSchema, ISupportedRoutes } from '@invyce/shared/types';
 import { SidebarUi } from '@invyce/sidebar-ui';
 import { Button } from 'antd';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { FC } from 'react';
 import { useMutation } from 'react-query';
 import { updateThemeAPI } from '../../api';
