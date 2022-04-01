@@ -24,9 +24,11 @@ import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 import { DivProps, ISupportedRoutes } from '../../../modal';
 import CommandPlatteGlobalStyles from './commandPaletteGlobalStyles';
+import { useEffect } from 'react';
 
 export const InvyceCmdPalette = () => {
   const { rbac } = useRbac(null);
+  
   const {
     routeHistory,
     setItemsModalConfig,
@@ -338,6 +340,7 @@ export const InvyceCmdPalette = () => {
   };
 
   const renderHeader = () => {
+
     return (
       <Wrapperheader>
         <h3 className="mr-20">Search for a Command</h3>
@@ -360,7 +363,18 @@ export const InvyceCmdPalette = () => {
     );
   };
 
+  
   const RenderCommand = (suggestion) => {
+
+    const ele = document?.querySelector('.invyce-modal');
+
+    useEffect(()=>{
+      if(ele && ele!==null){
+        ele?.children[0].classList.add('wrapper-palate');
+        ele.append();
+      }
+    },[ele])
+
     const { icon, name, highlight, type, lastIndex } = suggestion;
     const highlitedWord = () => {
       return {
@@ -451,7 +465,7 @@ const Wrapperheader = styled.div`
   h3,
   h5 {
     margin: 0;
-    color: ${(props: IThemeProps) => props?.theme?.colors?.sidebarDefaultText};
+    color: #454545;
   }
 
   i,
@@ -459,13 +473,14 @@ const Wrapperheader = styled.div`
     background: #777777;
     display: flex;
     align-items: center;
-    padding: 2px 14px;
+    padding: 10px 14px;
     border-radius: 5px;
     justify-content: center;
     font-size: 10px;
+    
   }
   .icon {
-    padding: 6px 7px;
+    padding: 10px 14px;
   }
 `;
 
@@ -474,7 +489,7 @@ interface IWrapperCommandsProps extends DivProps {
 }
 
 const WrapperCommands = styled.div<IWrapperCommandsProps>`
-  border-bottom: ${(props) =>
-    props.isLastindex ? `1.5px solid #cbcccd` : `none`};
-  padding: 9px 12px;
+border-bottom: ${(props) =>
+  props.isLastindex ? `1.5px solid #cbcccd` : `none`};
+
 `;
