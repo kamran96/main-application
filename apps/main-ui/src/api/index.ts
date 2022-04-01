@@ -12,3 +12,4 @@ export * from './reports';
 export * from './integration';
 export * from './tax';
 export * from './csv';
+export * from './purchaseOrder';
