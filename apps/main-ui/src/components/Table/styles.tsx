@@ -26,9 +26,9 @@ export const WrapperTable = styled.div`
   .ant-table-container table > thead > tr th {
     transition: 0.3s all ease-in-out;
   }
-  .ant-table-thead th.ant-table-column-has-sorters:hover {
+  /* .ant-table-thead th.ant-table-column-has-sorters:hover {
     background-color: #376da9;
-  }
+  } */
 
   .ant-table-container table > thead > tr:first-child th:first-child {
     border-top-left-radius: ${convertToRem(0)};
