@@ -30,7 +30,7 @@ import {
 import { IInvoiceType, ITaxTypes } from '../../../../modal/invoice';
 import { addition } from '../../../../utils/helperFunctions';
 import moneyFormat from '../../../../utils/moneyFormat';
-import printDiv, { DownloadPDF } from '../../../../utils/Print';
+import printDiv from '../../../../utils/Print';
 import { PurchaseManager, usePurchaseWidget } from './EditorManager';
 import c from './keys';
 import { WrapperInvoiceForm } from './styles';
@@ -88,7 +88,10 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     handleCheckValidation,
     bypassCreditLimit,
     setBypassCreditLimit,
+    rowsErrors,
   } = usePurchaseWidget();
+
+  console.log(rowsErrors, 'rows errors');
 
   const __columns =
     taxType === ITaxTypes.NO_TAX
@@ -129,28 +132,6 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   const onPrint = () => {
     const printItem = printRef.current;
     printDiv(printItem);
-  };
-
-  const onSendPDF = (contactId, invoiceId) => {
-    const printItem = printRef.current;
-    let email = ``;
-
-    const [filteredContact] = contactResult.filter(
-      (cont) => cont.id === contactId
-    );
-
-    if (filteredContact) {
-      email = filteredContact.email;
-    }
-
-    const pdf = DownloadPDF(printItem);
-    const payload = {
-      email: 'kamran@invyce.com',
-      html: `${pdf}`,
-      id: invoiceId,
-      type: type,
-    };
-    handleUploadPDF(payload);
   };
 
   const onCreateContact = async () => {
@@ -212,10 +193,6 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
 
           if (value && value.status.print) {
             setPrintModal(true);
-          }
-
-          if (payload?.invoice?.status !== 2) {
-            onSendPDF(value.contactId, data?.data?.result?.id);
           }
 
           ClearAll();
@@ -309,7 +286,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                 : ''
             }
             hideCalculation={type === IInvoiceType.INVOICE ? false : true}
-            data={responseInvoice?.data?.result || {}}
+            data={{ ...responseInvoice?.data?.result } || {}}
           />
         </PrintFormat>
       </div>
@@ -529,6 +506,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
           <Form>
             <div className="table_area">
               <EditableTable
+                // rowClassName={(record, index) => 'sdfio'}
                 loading={isFetching}
                 dragable={(data) => setInvoiceItems(data)}
                 columns={__columns}

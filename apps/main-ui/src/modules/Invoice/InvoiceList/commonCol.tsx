@@ -28,7 +28,15 @@ export const InvoiceColumns: ColumnsType<any> = [
     dataIndex: 'contact',
     key: 'contact',
     render: (contact, row, index) => {
-      return contact ? contact.name : '-';
+      return contact ? (
+        <Link
+          to={`${ISupportedRoutes.DASHBOARD_LAYOUT}${ISupportedRoutes.CONTACTS}/${row?.id}?type="customer"`}
+        >
+          {contact.name}
+        </Link>
+      ) : (
+        '-'
+      );
     },
   },
 
@@ -78,6 +86,14 @@ export const InvoiceColumns: ColumnsType<any> = [
     render: (data, row, index) => {
       const rowData = plainToClass(InvoiceResultClass, row);
       return row && rowData.getStatus();
+    },
+  },
+  {
+    title: 'Created By',
+    dataIndex: '',
+    key: '',
+    render: (data, row, index) => {
+      return data?.owner?.profile?.fullName;
     },
   },
 ];
