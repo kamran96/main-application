@@ -11,6 +11,7 @@ export interface EditableListItemProps extends DivProps {
   id: string;
   selectedIndex: number | null;
   customMount: any;
+  rowClassName?: (record: any, index: number) => string;
 }
 
 const _EditableListItem = ({
@@ -19,6 +20,7 @@ const _EditableListItem = ({
   moveCard,
   index,
   id,
+  rowClassName,
   ...rest
 }: EditableListItemProps) => {
   const renderData = (column: EditableColumnsType, row: any, index: number) => {
@@ -37,7 +39,11 @@ const _EditableListItem = ({
   };
 
   return (
-    <tr id={id} {...rest}>
+    <tr
+      className={`${rowClassName ? rowClassName(row, index) : ''}`}
+      id={id}
+      {...rest}
+    >
       {columns?.map((colD) => {
         return renderData(colD, row, index);
       })}
@@ -51,6 +57,8 @@ export const EditableListItem = memo(
     return (
       JSON.stringify(prevprops.row) === JSON.stringify(nextProps.row) &&
       JSON.stringify(prevprops.columns) === JSON.stringify(nextProps.columns) &&
+      JSON.stringify(prevprops.rowClassName) ===
+        JSON.stringify(nextProps.rowClassName) &&
       prevprops?.customMount === nextProps?.customMount
     );
   }

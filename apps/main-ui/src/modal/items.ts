@@ -37,6 +37,7 @@ export interface IItemsResult extends IBase {
   categoryId?: number;
   category: ICategory;
   stock?: number;
+  hasInventory?: boolean;
 }
 
 export class ITemsResult extends IBaseResponse {
