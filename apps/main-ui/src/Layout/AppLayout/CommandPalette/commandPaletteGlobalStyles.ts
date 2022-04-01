@@ -1,6 +1,7 @@
 import { IThemeProps } from './../../../hooks/useTheme/themeColors';
 import { createGlobalStyle } from 'styled-components';
 
+
 const CommandPlatteGlobalStyles = createGlobalStyle`
 .react-command-palette{
   visibility: hidden;

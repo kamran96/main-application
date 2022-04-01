@@ -24,9 +24,11 @@ import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 import { DivProps, ISupportedRoutes } from '../../../modal';
 import CommandPlatteGlobalStyles from './commandPaletteGlobalStyles';
+import { useEffect } from 'react';
 
 export const InvyceCmdPalette = () => {
   const { rbac } = useRbac(null);
+  
   const {
     routeHistory,
     setItemsModalConfig,
@@ -338,6 +340,7 @@ export const InvyceCmdPalette = () => {
   };
 
   const renderHeader = () => {
+
     return (
       <Wrapperheader>
         <h3 className="mr-20">Search for a Command</h3>
@@ -360,7 +363,18 @@ export const InvyceCmdPalette = () => {
     );
   };
 
+  
   const RenderCommand = (suggestion) => {
+
+    const ele = document?.querySelector('.invyce-modal');
+
+    useEffect(()=>{
+      if(ele && ele!==null){
+        ele?.children[0].classList.add('wrapper-palate');
+        ele.append();
+      }
+    },[ele])
+
     const { icon, name, highlight, type, lastIndex } = suggestion;
     const highlitedWord = () => {
       return {
