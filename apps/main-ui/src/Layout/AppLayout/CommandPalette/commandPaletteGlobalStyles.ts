@@ -1,6 +1,6 @@
 import { IThemeProps } from './../../../hooks/useTheme/themeColors';
 import { createGlobalStyle } from 'styled-components';
-
+import convertToRem from '../../../utils/convertToRem';
 
 const CommandPlatteGlobalStyles = createGlobalStyle`
 .react-command-palette{
@@ -23,6 +23,11 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
   box-shadow: #353535 0px 2px 4px 0px;
   margin-right: -50%;
   transform: translate(-50%, 0px);
+
+  .wrapper-palate {
+    display: flex;
+    flex-direction: column-reverse;
+  }
 }
 
 .invyce-overlay {
@@ -73,7 +78,7 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
   font-size: 16px;
   border-radius: 4px;
   border: 1.5px solid #1e5490;
-  width: 530px;
+  width: ${convertToRem(530)};
   padding: 21px 19px;
   outline: none;
   background-color: ${(props: IThemeProps) => props?.theme?.colors?.itmbg};
@@ -113,7 +118,7 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
   cursor: pointer;
   font-size: 16px;
   font-weight: normal;
-  width: 530px;
+  width: ${convertToRem(530)};
   margin: 8px 24px;
   padding: 21px 19px;
   border-radius: 6px;
