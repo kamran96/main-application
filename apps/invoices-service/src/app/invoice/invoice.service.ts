@@ -715,6 +715,12 @@ export class InvoiceService {
           type: 1,
         });
 
+        const email = contact[0].email
+          ? contact[0].email
+          : dto.email
+          ? dto.email
+          : null;
+
         const { data: attachment } = await http.post(
           `attachments/attachment/generate-pdf`,
           {
@@ -728,18 +734,20 @@ export class InvoiceService {
           }
         );
 
-        await this.emailService.emit(INVOICE_CREATED, {
-          to: contact[0]?.email,
-          user_name: contact[0]?.name || null,
-          invoice_number: invoice.invoiceNumber,
-          issueDate: invoice.issueDate,
-          gross_total: invoice.grossTotal,
-          itemDisTotal: invoice.discount,
-          net_total: invoice.netTotal,
-          invoice_details,
-          download_link: attachment?.path || null,
-          attachment_name: attachment?.name || null,
-        });
+        if (email) {
+          await this.emailService.emit(INVOICE_CREATED, {
+            to: email,
+            user_name: contact[0]?.name || null,
+            invoice_number: invoice.invoiceNumber,
+            issueDate: invoice.issueDate,
+            gross_total: invoice.grossTotal,
+            itemDisTotal: invoice.discount,
+            net_total: invoice.netTotal,
+            invoice_details,
+            download_link: attachment?.path || null,
+            attachment_name: attachment?.name || null,
+          });
+        }
 
         await http.get(`contacts/contact/balance`);
       }
