@@ -42,7 +42,7 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
 
 .invyce-header {
   color: #FFFFFF;
-  padding: 8px 24px;
+  padding: 4px 0;
 }
 
 .invyce-content {
@@ -84,15 +84,15 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
   background-color: ${(props: IThemeProps) => props?.theme?.colors?.itmbg};
   color: ${(props: IThemeProps) => props?.theme?.colors?.itmText};
   caret-color: #4b4b4b;
-  margin: 24px 24px 0 24px;
+  margin: 24px 24px 10px 36px;
 }
 
 .invyce-inputOpen {
 }
 
 .invyce-inputFocused {
-  border: 1px solid #143c69;
-  background-color: #e5e5e5;
+  border: 1px solid #1E75F1;
+  background-color: ${(props: IThemeProps) => props?.theme?.colors?.inptFocusedBg};
 }
 
 .invyce-suggestionsContainer {
@@ -121,19 +121,22 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
   width: ${convertToRem(530)};
   margin: 8px 24px;
   padding: 21px 19px;
+  margin: 8px 32px 8px 36px;
   border-radius: 6px;
 }
 
 .invyce-suggestion b {
-  color: #8b8b8b;
+  color: #454545;
   font-weight: bold;
+  font-size: 16px;
+  line-height: 19px;
 }
 .invyce-suggestionFirst {
 }
 
 .invyce-suggestionHighlighted {
   color: #ffffff;
-  background-color: #1e5490;
+  background-color: #1E75F1;
 }
 
 .invyce-spinner {

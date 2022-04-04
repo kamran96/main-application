@@ -9,6 +9,16 @@ build.pdf
 archive.zip
 .env
 
+apps/accounting-service/.env
+apps/attachments-service/.env
+apps/contacts-service/.env
+apps/email-service/.env
+apps/invoices-service/.env
+apps/items-service/.env
+apps/payments-service/.env
+apps/reports-service/.env
+apps/users-service/.env
+
 # dependencies
 /node_modules
 yarn.lock

@@ -509,6 +509,13 @@ export class UserService {
 
   // }
 
+  async GetUserByIds(data, user: IBaseUser) {
+    return await this.userModel.find({
+      _id: { $in: data.ids },
+      organizationId: user.organizationId,
+    });
+  }
+
   async DeleteUser(userIds: UserIdsDto): Promise<boolean> {
     for (const i of userIds.ids) {
       await this.userModel.updateOne(

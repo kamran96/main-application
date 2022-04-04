@@ -26,6 +26,10 @@ interface IPropsHeader {
 
 interface IProps {
   header: IPropsHeader;
+  totals: {
+    totalCredits: number;
+    totalDebits: number;
+  };
   balanceSheetData: {
     name: string;
     accounts: IAccountsResult[];
@@ -117,17 +121,17 @@ const styles = StyleSheet.create({
     margin: '10px 0',
     padding: '12px 0',
   },
-  marginLeft: {
-    marginLeft: '20px'
-  }
+  totalCenter: {
+    marginLeft: '-50px',
+  },
 });
 
 export const BalanceSheetPdf: FC<IProps> = ({
   header,
   balanceSheetData,
   searchquery,
+  totals,
 }) => {
-  console.log(balanceSheetData);
   return (
     <PdfDocument>
       <PDFFontWrapper>
@@ -155,7 +159,7 @@ export const BalanceSheetPdf: FC<IProps> = ({
                   <Text style={[styles.LabelName, styles.ItemName]}>
                     {item?.name}
                   </Text>
-                  {searchquery?.date && index == 0 ? (
+                  {searchquery?.date && index === 0 ? (
                     <>
                       <Text style={[styles.LabelName, styles.itemCenter]}>
                         Dr
@@ -237,8 +241,10 @@ export const BalanceSheetPdf: FC<IProps> = ({
                   </View>
                 ) : (
                   <View style={[styles.totalFooter, styles.border]}>
-                    <Text style={[styles.LabelName, styles.tableHeaderWidth]}>Total {item.name}</Text>
-                    <Text style={[styles.LabelName, ]}>
+                    <Text style={[styles.LabelName, styles.tableHeaderWidth]}>
+                      Total {item.name}
+                    </Text>
+                    <Text style={[styles.LabelName, styles.totalCenter]}>
                       {item.type === 1
                         ? moneyFormat(item?.balance.toFixed(2))
                         : null}
@@ -255,8 +261,12 @@ export const BalanceSheetPdf: FC<IProps> = ({
           })}
           <View style={styles.totalFooter}>
             <Text style={styles.LabelName}>Total</Text>
-            <Text style={styles.LabelName}>$ 0</Text>
-            <Text style={styles.LabelName}>$ 0</Text>
+            <Text style={styles.LabelName}>
+              {moneyFormat(totals?.totalDebits)}
+            </Text>
+            <Text style={styles.LabelName}>
+              {moneyFormat(totals?.totalCredits)}
+            </Text>
           </View>
         </View>
       </PDFFontWrapper>

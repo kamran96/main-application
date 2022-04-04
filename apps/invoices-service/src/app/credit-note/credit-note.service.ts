@@ -167,11 +167,24 @@ export class CreditNoteService {
       type: 1,
     });
 
+    // get distinct userids
+    const key = 'createdById';
+    const mapUniqueUserId = [
+      ...new Map(credit_note.map((item) => [item[key], item])).values(),
+    ].map((i) => i[key]);
+
+    const { data: users } = await http.post(`users/user/ids`, {
+      ids: mapUniqueUserId,
+      type: 1,
+    });
+
     for (const i of credit_note) {
       const contact = contacts.find((c) => c.id === i.contactId);
+      const user = users.find((u) => u.id === i.createdById);
       new_credit_note.push({
         ...i,
         contact,
+        owner: user,
       });
     }
 
@@ -230,8 +243,6 @@ export class CreditNoteService {
     const debitsArray = [];
     const credit_note_item_array = [];
     const itemLedgerArray = [];
-
-    console.log(dto.invoice_items, 'items');
 
     // Will check if the params have id and isNewRecord true
     if (dto?.isNewRecord === false) {
@@ -314,7 +325,6 @@ export class CreditNoteService {
 
             debitsArray.push(debit);
           } else if (creditNote.invoiceType === CreditNoteType.ACCPAYCREDIT) {
-            console.log(item.quantity, item.purchasePrice, 'okkkk');
             const credit = {
               amount: Number(item.quantity) * Number(item.purchasePrice),
               account_id: item.accountId,

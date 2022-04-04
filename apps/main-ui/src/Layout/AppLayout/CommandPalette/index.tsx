@@ -343,20 +343,21 @@ export const InvyceCmdPalette = () => {
 
     return (
       <Wrapperheader>
-        <h3 className="mr-20">Search for a Command</h3>
-        <div className="flex alignCenter">
-          <i className="icon">
+        {/* <h3 className="mr-20">Search for a Command</h3> */}
+        <div className="flex alignCenter ">
+          <i className="label icon mr-10">
             <Icon icon={arrowUp} />
             <Icon icon={arrowDown} />
           </i>
+          <h5>To navigate</h5>
         </div>
-        <h5>To navigate</h5>
+        
         <div className="flex alignCenter">
-          <div className="label mr-10">Enter</div>
+          <div className="label mr-10 itm">Enter</div>
           <h5>To select</h5>
         </div>
         <div className="flex alignCenter">
-          <div className="label mr-10">Esc</div>
+          <div className="label mr-10 itm">Esc</div>
           <h5>To dismiss</h5>
         </div>
       </Wrapperheader>
@@ -367,13 +368,23 @@ export const InvyceCmdPalette = () => {
   const RenderCommand = (suggestion) => {
 
     const ele = document?.querySelector('.invyce-modal');
-
+    
     useEffect(()=>{
       if(ele && ele!==null){
         ele?.children[0].classList.add('wrapper-palate');
         ele.append();
       }
+
     },[ele])
+
+    const inputEleParent  = document.querySelector('.invyce-container');
+ 
+    useEffect(()=>{
+      
+      if(inputEleParent && inputEleParent!==null ){
+        console.log(inputEleParent, "render count")
+      }
+    },[inputEleParent])
 
     const { icon, name, highlight, type, lastIndex } = suggestion;
     const highlitedWord = () => {
@@ -398,6 +409,7 @@ export const InvyceCmdPalette = () => {
       </WrapperCommands>
     );
   };
+
 
   const commandsList = () => {
     const sortedCommands = commands
@@ -439,6 +451,7 @@ export const InvyceCmdPalette = () => {
     <>
       <CommandPlatteGlobalStyles />
       <CommandPalette
+
         renderCommand={RenderCommand}
         header={renderHeader()}
         maxDisplayed={
@@ -451,38 +464,45 @@ export const InvyceCmdPalette = () => {
         closeOnSelect
         resetInputOnClose
         theme={theme}
+        placeholder=  "Search in Invoyce"
       />
     </>
   );
 };
 
 const Wrapperheader = styled.div`
-  padding: 13px 0;
+  padding: 19px 24px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
+  border-top:1px solid #F4F4F5;
 
   h3,
   h5 {
-    margin: 0;
+    margin: 0 5px;
     color: #454545;
     font-size: 16px;
+    paddingLeft: 2px;
+  }
+  .itm{
+    background-color: ${(props: IThemeProps) => props?.theme?.colors?.paletteBtn};
+    border-radius: 5px;
+    padding: 10px 14px;
   }
 
   i,
   .label {
-    backgorund: ${(props: IThemeProps) => props?.theme?.colors?.paletteBtn}
     display: flex;
     align-items: center;
-    padding: 11px 12px;
-    border-radius: 5px;
-    justify-content: center;
-    font-size: 10px;
-    font-weight: 400;
-    color: #FFFFFF
+    justify-content: space-around;
+    font-size: 14px;
+    height: 100%;
+    
   }
   .icon {
-    padding: 11px 12px;
+    padding: 12px 14px;
+    background-color: ${(props: IThemeProps) => props?.theme?.colors?.paletteBtn};
+    border-radius: 5px;
   }
 `;
 
@@ -491,7 +511,5 @@ interface IWrapperCommandsProps extends DivProps {
 }
 
 const WrapperCommands = styled.div<IWrapperCommandsProps>`
-border-bottom: ${(props) =>
-  props.isLastindex ? `1.5px solid #cbcccd` : `none`};
 
 `;
