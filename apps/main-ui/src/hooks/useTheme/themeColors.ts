@@ -54,6 +54,7 @@ export interface IThemeVariables {
   itmbg: string;
   itmText: string;
   paletteBtn: string;
+  inptFocusedBg: string;
 }
 
 export interface ITheme {
@@ -100,7 +101,7 @@ export const Themes: IThemes = {
     bgTh: `#fafafa`,
     textTd: `#272727`,
     modalOverlay: `rgba(0, 0, 0, 0.45)`,
-    placeHolder: ``,
+    placeHolder: `#6D7D88`,
     inputColor: `rgba(0, 0, 0, 0.85)`,
     inputColorBg: ``,
     antIcon: ``,
@@ -128,7 +129,8 @@ export const Themes: IThemes = {
     stroke: '#F2F2F2',
     itmbg: '#F4F4F5',
     itmText: '#454545',
-    paletteBtn: '#1E75F1'
+    paletteBtn: '#1E75F1',
+    inptFocusedBg: '#F4F4F5'
   },
   dark: {
     $PRIMARY: '#e4e4e4',
@@ -156,7 +158,7 @@ export const Themes: IThemes = {
     textTd: `rgba(255, 255, 255, 0.6)`,
     seprator: `#1e1e1e`,
     modalOverlay: `rgb(128 128 128 / 45%)`,
-    placeHolder: `rgb(84 84 84)`,
+    placeHolder: `#F0F0F0`,
     inputColor: `rgb(125 125 125)`,
     antIcon: `#6b6b6b`,
     disabled: `rgb(134 134 134 / 25%)`,
@@ -184,6 +186,7 @@ export const Themes: IThemes = {
     stroke: '#222e39',
     itmbg: '#08131D',
     itmText: '#FFFFFF',
-    paletteBtn: '#08131D'
+    paletteBtn: '#08131D',
+    inptFocusedBg: '#08131D'
   },
 };

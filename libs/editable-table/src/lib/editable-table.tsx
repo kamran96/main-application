@@ -31,6 +31,7 @@ export interface EditableTableProps {
   cacheKey?: string;
   resetCache?: boolean;
   customMount?: any;
+  rowClassName?: (record: any, index: number) => string;
 
   // onMoveCard: (data: any[])=>void;
 }
@@ -44,6 +45,7 @@ export function EditableTable({
   cacheKey,
   resetCache,
   customMount,
+  rowClassName,
 }: EditableTableProps) {
   const [{ tableColumns, tableData }, setLoadingConfig] = useState<{
     tableColumns: EditableColumnsType[];
@@ -141,8 +143,6 @@ export function EditableTable({
     setDragEnd(false);
   };
 
-  console.log(columns, 'collumns');
-
   return (
     <EditableTableWrapper scrollable={scrollable ? scrollable : null}>
       <table>
@@ -156,7 +156,7 @@ export function EditableTable({
           <tr>
             {columns?.map((col, index) => {
               return (
-                <th className="ant-table-cell" key={col.key + index}>
+                <th className={`ant-table-cell`} key={col.key + index}>
                   {col.title}
                 </th>
               );
@@ -181,6 +181,7 @@ export function EditableTable({
                 row={item}
                 columns={tableColumns}
                 customMount={customMount}
+                rowClassName={rowClassName}
               />
             );
           })}

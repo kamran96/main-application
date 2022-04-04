@@ -15,5 +15,6 @@ module.exports = {
   cli: {
     migrationsDir: './apps/accounting-service/migrations',
   },
-  // ssl: { rejectUnauthorized: false },
+  ssl:
+    process.env.NODE_ENV === 'development' ? {} : { rejectUnauthorized: false },
 };

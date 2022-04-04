@@ -16,3 +16,11 @@ export const purchaseOrderList = ({ queryKey }: QueryKey) => {
   }
   return http.get(url);
 };
+
+export const getPurchaseOrderByIDAPI = ({ queryKey }: QueryKey) => {
+  const id: number = queryKey[1];
+  return http.get(`invoices/purchase-order/${id}`);
+};
+
+export const purchaseOrderDeleteAPI = (payload?: { ids: number[] }) =>
+  http?.put(`invoices/purchase-order`, payload);

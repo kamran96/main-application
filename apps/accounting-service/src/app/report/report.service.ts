@@ -87,7 +87,7 @@ export class ReportService {
           FROM accounts
           inner join secondary_accounts
           on secondary_accounts.id = accounts."secondaryAccountId"
-          inner join primary_accountsß
+          inner join primary_accounts
           on primary_accounts.id = secondary_accounts."primaryAccountId"
           `;
       } else if (type == 'between') {

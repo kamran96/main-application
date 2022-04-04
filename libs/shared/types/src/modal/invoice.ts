@@ -81,10 +81,11 @@ export class IInvoiceMutatedResult extends IBaseRequestResponse {
 
   getConstructedResult() {
     const type = this.result?.invoiceType;
+
     const accessor =
       type === IInvoiceType.INVOICE
         ? 'invoiceItems'
-        : type === IInvoiceType.CREDITNOTE || IInvoiceType.DEBITNOTE
+        : type === IInvoiceType.CREDITNOTE || type === IInvoiceType.DEBITNOTE
         ? 'creditNoteItems'
         : type === IInvoiceType.PURCHASE_ORDER
         ? 'purchaseOrderItems'

@@ -250,6 +250,12 @@ export class UserController {
     }
   }
 
+  @Post('ids')
+  @UseGuards(GlobalAuthGuard)
+  async GetUserByIds(@Body() data, @Req() req: IRequest) {
+    return await this.userService.GetUserByIds(data, req.user);
+  }
+
   @Put('delete')
   @UseGuards(GlobalAuthGuard)
   async deleteUser(@Body() userIds: UserIdsDto) {

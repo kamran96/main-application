@@ -78,9 +78,7 @@ export const TestComponents: FC = () => {
 
   const handleLoad = async (payload) => {
     await mutateCsv(payload, {
-      onSuccess: (data) => {
-        console.log(data);
-      },
+      onSuccess: (data) => {},
     });
   };
 

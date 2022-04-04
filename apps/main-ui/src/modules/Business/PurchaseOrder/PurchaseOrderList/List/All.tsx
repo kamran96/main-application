@@ -3,7 +3,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
-import { deletePurchaseDrafts, getAllContacts } from '../../../../../api';
+import { purchaseOrderDeleteAPI, getAllContacts } from '../../../../../api';
 import { CommonTable } from '../../../../../components/Table';
 import {
   IInvoiceResponse,
@@ -37,7 +37,7 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
   const queryCache = useQueryClient();
   /* Mutations */
   const { mutate: mutateDeleteOrders, isLoading: deletingPurchaseOrder } =
-    useMutation(deletePurchaseDrafts);
+    useMutation(purchaseOrderDeleteAPI);
 
   /* RBAC */
   const { rbac } = useRbac(null);
@@ -191,7 +191,7 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
     title: 'Approved By',
     dataIndex: 'owner',
     key: 'owner',
-    render: (data) => <p className="capitalize">{data?.name}</p>,
+    render: (data) => <p className="capitalize">{data?.profile?.fullName}</p>,
   });
 
   const renerTopRightbar = () => {

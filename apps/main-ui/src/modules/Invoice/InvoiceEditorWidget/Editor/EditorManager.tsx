@@ -500,11 +500,13 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
                     if (
                       type === IInvoiceType.INVOICE &&
-                      selectedItem.stock < record.quantity
+                      selectedItem.stock < record.quantity &&
+                      selectedItem?.hasInventory
                     ) {
                       const allErrors = [...rowsErrors];
                       allErrors[index] = { hasError: true };
                       setRowsErrors(allErrors);
+
                       notificationCallback(
                         NOTIFICATIONTYPE.WARNING,
                         `You are out of stock! Only ${selectedItem.stock} items left in your stock`
@@ -663,7 +665,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
                       if (
                         type === IInvoiceType.INVOICE &&
-                        selectedItem.stock < value
+                        selectedItem.stock < value &&
+                        selectedItem?.hasInventory
                       ) {
                         const allErrors = [...rowsErrors];
                         allErrors[index] = { hasError: true };

@@ -3,20 +3,32 @@ import React, {
   FC,
   ReactElement,
   useContext,
+  useEffect,
   useState,
 } from 'react';
 import { ColumnsType } from 'antd/lib/table';
-import { Select } from 'antd';
+import { Form, Select } from 'antd';
 import { Editable, EditableSelect } from '../../../../../components/Editable';
 import { useQuery } from 'react-query';
-import { getAllItems, getInvoiceNumber } from '../../../../../api';
+import {
+  getAllItems,
+  getInvoiceNumber,
+  getPurchaseOrderByIDAPI,
+} from '../../../../../api';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import convertToRem from '../../../../../utils/convertToRem';
-import { Color, IInvoiceTypes } from '../../../../../modal';
+import {
+  Color,
+  IInvoiceMutatedResult,
+  IInvoiceTypes,
+} from '../../../../../modal';
 import { SortableHandle } from 'react-sortable-hoc';
 import { Icon } from '@iconify/react';
 import dotsGrid from '@iconify-icons/mdi/dots-grid';
 import { useShortcut } from '../../../../../hooks/useShortcut';
+import { response } from 'express';
+import { plainToClass } from 'class-transformer';
+import dayjs from 'dayjs';
 
 const { Option } = Select;
 
@@ -37,8 +49,10 @@ export const usePurchaseOrderContext: any = () =>
 
 interface IProps {
   children: ReactElement<any>;
+  id?: number | string;
 }
-export const PurchaseOrderWidgetManager: FC<IProps> = ({ children }) => {
+export const PurchaseOrderWidgetManager: FC<IProps> = ({ children, id }) => {
+  const [antForm] = Form.useForm();
   const [state, setState] = useState([
     {
       itemId: null,
@@ -56,13 +70,37 @@ export const PurchaseOrderWidgetManager: FC<IProps> = ({ children }) => {
     });
   };
   /*Query hook for  Fetching all items against ID */
-  const {
-    data: itemsData,
-    isLoading: itemsLoading,
-    isError,
-    isFetched,
-  } = useQuery([`all-items`, 'ALL'], getAllItems);
+  const { data: itemsData, isLoading: itemsLoading } = useQuery(
+    [`all-items`, 'ALL'],
+    getAllItems
+  );
   const allItemsResult = itemsData?.data?.result || [];
+
+  const { data: responsePurchaseView } = useQuery(
+    [`purchase-order-${id}`, id],
+    getPurchaseOrderByIDAPI,
+    {
+      enabled: !!id,
+    }
+  );
+
+  useEffect(() => {
+    if (responsePurchaseView?.data?.result) {
+      const { result } = responsePurchaseView.data;
+      const { issueDate, contactId, invoiceNumber, dueDate } = result;
+      const generatedData = plainToClass(
+        IInvoiceMutatedResult,
+        responsePurchaseView?.data
+      );
+      setState(generatedData?.getConstructedResult()?.invoiceItems);
+      antForm.setFieldsValue({
+        ...result,
+        issueDate: dayjs(issueDate),
+
+        dueDate: dayjs(dueDate),
+      });
+    }
+  }, [responsePurchaseView]);
 
   const handleAddRow = () => {
     setState((prev) => {
@@ -283,6 +321,7 @@ export const PurchaseOrderWidgetManager: FC<IProps> = ({ children }) => {
         state,
         setState,
         columns,
+        antForm,
         loading: itemsLoading,
         reset: () => {
           setState([
