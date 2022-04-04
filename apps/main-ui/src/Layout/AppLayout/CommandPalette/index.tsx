@@ -466,21 +466,23 @@ const Wrapperheader = styled.div`
   h5 {
     margin: 0;
     color: #454545;
+    font-size: 16px;
   }
 
   i,
   .label {
-    background: #777777;
+    backgorund: ${(props: IThemeProps) => props?.theme?.colors?.paletteBtn}
     display: flex;
     align-items: center;
-    padding: 10px 14px;
+    padding: 11px 12px;
     border-radius: 5px;
     justify-content: center;
     font-size: 10px;
-    
+    font-weight: 400;
+    color: #FFFFFF
   }
   .icon {
-    padding: 10px 14px;
+    padding: 11px 12px;
   }
 `;
 

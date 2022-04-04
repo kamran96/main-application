@@ -53,6 +53,7 @@ export interface IThemeVariables {
   tabBgActive: string;
   itmbg: string;
   itmText: string;
+  paletteBtn: string;
 }
 
 export interface ITheme {
@@ -126,7 +127,8 @@ export const Themes: IThemes = {
     cardBg: '#ffffff',
     stroke: '#F2F2F2',
     itmbg: '#F4F4F5',
-    itmText: '#454545'
+    itmText: '#454545',
+    paletteBtn: '#1E75F1'
   },
   dark: {
     $PRIMARY: '#e4e4e4',
@@ -181,6 +183,7 @@ export const Themes: IThemes = {
     cardBg: '#0B1822',
     stroke: '#222e39',
     itmbg: '#08131D',
-    itmText: '#FFFFFF'
+    itmText: '#FFFFFF',
+    paletteBtn: '#08131D'
   },
 };
