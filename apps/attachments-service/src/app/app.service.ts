@@ -153,6 +153,7 @@ export class AppService {
         ),
       ];
 
+      console.log(data.invoice_items, 'ite');
       data.invoice_items.forEach((tr, index) => {
         const item = data.items.find((i) => i.id === tr.itemId);
 
@@ -231,6 +232,8 @@ export class AppService {
       };
 
       const contents = await this.pdfData(data, defaultCurrency);
+
+      console.log(contents, 'con');
 
       const tableStylesConfig = {
         th: {
@@ -359,8 +362,6 @@ export class AppService {
           },
         ],
       ];
-
-      console.log('okkkkk');
 
       const docDefinition = {
         pageMargins: [0, 0, 0, 20],

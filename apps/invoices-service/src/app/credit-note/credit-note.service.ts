@@ -334,9 +334,7 @@ export class CreditNoteService {
           }
         }
         if (dto.invoiceId) {
-          const invoice: IInvoice = await getCustomRepository(
-            InvoiceRepository
-          ).findOne({
+          const invoice = await getCustomRepository(InvoiceRepository).findOne({
             where: {
               id: dto.invoiceId,
             },
@@ -458,9 +456,7 @@ export class CreditNoteService {
           });
           await http.get(`contacts/contact/balance`);
         }
-        return await getCustomRepository(CreditNoteRepository).findOne({
-          id: dto.id,
-        });
+        return await this.FindById(dto.id, req);
       }
       throw new HttpException('Credit Note not found', HttpStatus.NOT_FOUND);
     } else {
@@ -651,7 +647,7 @@ export class CreditNoteService {
         await http.get(`contacts/contact/balance`);
       }
 
-      return credit_note;
+      return await this.FindById(credit_note.id, req);
     }
   }
 

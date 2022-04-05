@@ -89,6 +89,12 @@ export class InvoiceController {
     return await this.invoiceService.PendingPaymentInvoices(req);
   }
 
+  @Post('pdf')
+  @UseGuards(GlobalAuthGuard)
+  async generatePdfAndSendEmail(@Body() data, @Req() req: IRequest) {
+    return await this.invoiceService.GeneratePdfAndSendEamil(data, req);
+  }
+
   @Post('ids')
   @UseGuards(GlobalAuthGuard)
   async findByInvoiceIds(
