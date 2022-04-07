@@ -284,10 +284,12 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
     });
     return subTotal;
   }, [invoiceItems, type]);
+
   /* Gets total Tax on each item */
   const TotalTax = useMemo(() => {
-    return totalDiscountInInvoice(invoiceItems, 'tax', type);
+    return totalDiscountInInvoice(invoiceItems, 'tax', type) || 0;
   }, [invoiceItems, type]);
+
   /* Gets Gross total amount on invoices */
   const GrossTotal = useMemo(() => {
     return getSubTotal() + TotalTax;
@@ -359,6 +361,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
           )) ||
         []
       : result;
+
+  console.log(invoiceItems, 'items klasjdfoad');
 
   const columns: ColumnsType<any> = [
     {
@@ -510,22 +514,24 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
             }
             onChange={(e) => {
               const value = e.target.value;
+
               e.preventDefault();
               clearTimeout(setStateTimeOut);
               setStateTimeOut = setTimeout(() => {
                 if (value) {
+                  const description = value;
                   setInvoiceItems((prev) => {
                     const allItems = [...prev];
-
                     allItems[index] = {
                       ...allItems[index],
-                      description: value,
+                      description,
                       errors: RemovedErrors(
                         allItems[index].errors,
                         'description'
                       ),
                     };
-                    return prev;
+
+                    return allItems;
                   });
                 }
               }, 500);

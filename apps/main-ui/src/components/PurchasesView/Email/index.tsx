@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps
  */
-import { Button, Form, Input, Select } from "antd";
-import TextArea from "antd/lib/input/TextArea";
-import React, { FC, useEffect } from "react";
-import styled from "styled-components";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import convertToRem from "../../../utils/convertToRem";
-import { FormLabel } from "../../FormLabel";
-import CommonModal from "../../Modal";
+import { Button, Form, Input, Select } from 'antd';
+import TextArea from 'antd/lib/input/TextArea';
+import React, { FC, useEffect } from 'react';
+import styled from 'styled-components';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import convertToRem from '../../../utils/convertToRem';
+import { FormLabel } from '../../FormLabel';
+import CommonModal from '../../Modal';
 
 interface IProps {
   onSendEmail: (payload: any) => void;
@@ -22,7 +22,7 @@ export const EmailModal: FC<IProps> = ({
 }) => {
   const [form] = Form.useForm();
 
-  const { pdfStatus, resetUPloadPDF } = useGlobalContext();
+  const { pdfStatus } = useGlobalContext();
   const { sendingPDF, pdfUploaded } = pdfStatus;
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export const EmailModal: FC<IProps> = ({
 
   return (
     <CommonModal
-      title={"Email PDF"}
+      title={'Email PDF'}
       footer={false}
       visible={visibility}
       onCancel={sendingPDF ? null : handleCancel}
@@ -51,18 +51,18 @@ export const EmailModal: FC<IProps> = ({
       <EmailWrapper>
         <Form form={form} onFinish={onFinish}>
           <FormLabel>Email</FormLabel>
-          <Form.Item name="email" rules={[{ required: true, type: "email" }]}>
-            <Input autoComplete="off"/>
+          <Form.Item name="email" rules={[{ required: true, type: 'email' }]}>
+            <Input autoComplete="off" />
           </Form.Item>
           <FormLabel>Subject</FormLabel>
           <Form.Item name="subject">
-            <Input autoComplete="off"/>
+            <Input autoComplete="off" />
           </Form.Item>
           <FormLabel>CC Email</FormLabel>
           <Form.Item name="cc">
             <Select
               mode="tags"
-              style={{ width: "100%" }}
+              style={{ width: '100%' }}
               placeholder="Tags Mode"
             />
           </Form.Item>
@@ -70,7 +70,7 @@ export const EmailModal: FC<IProps> = ({
           <Form.Item name="bcc">
             <Select
               mode="tags"
-              style={{ width: "100%" }}
+              style={{ width: '100%' }}
               placeholder="Tags Mode"
             />
           </Form.Item>
