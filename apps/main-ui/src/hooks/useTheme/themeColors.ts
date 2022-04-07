@@ -53,6 +53,17 @@ export interface IThemeVariables {
   tabBgActive: string;
   itmbg: string;
   itmText: string;
+  paletteBtn: string;
+  palateBtnColor: string;
+  inptFocusedBg: string;
+  itmHover: string;
+  itmHoverText: string;
+  crossBtn: string;
+  paletteBorder: string;
+  svgColor: string;
+  svgBg: string;
+  svgHoverBg:string;
+  svgHoverColor: string;
 }
 
 export interface ITheme {
@@ -99,7 +110,7 @@ export const Themes: IThemes = {
     bgTh: `#fafafa`,
     textTd: `#272727`,
     modalOverlay: `rgba(0, 0, 0, 0.45)`,
-    placeHolder: ``,
+    placeHolder: `#697781`,
     inputColor: `rgba(0, 0, 0, 0.85)`,
     inputColorBg: ``,
     antIcon: ``,
@@ -126,7 +137,18 @@ export const Themes: IThemes = {
     cardBg: '#ffffff',
     stroke: '#F2F2F2',
     itmbg: '#F4F4F5',
-    itmText: '#454545'
+    itmText: '#454545',
+    paletteBtn: '#F3F3F3',
+    palateBtnColor: '#67656A',
+    inptFocusedBg: '#F4F4F5',
+    itmHover: 'rgba(148, 188, 247, 0.31)',
+    itmHoverText: '#232C3A',
+    crossBtn: 'rgba(105, 119, 129, 0.8)',
+    paletteBorder: '##EEEEEE',
+    svgColor: '#485161',
+    svgBg: '#EFF3F8',
+    svgHoverBg:'#FBFDFF',
+    svgHoverColor: '#232C3A'
   },
   dark: {
     $PRIMARY: '#e4e4e4',
@@ -154,7 +176,7 @@ export const Themes: IThemes = {
     textTd: `rgba(255, 255, 255, 0.6)`,
     seprator: `#1e1e1e`,
     modalOverlay: `rgb(128 128 128 / 45%)`,
-    placeHolder: `rgb(84 84 84)`,
+    placeHolder: `#CFD9DF`,
     inputColor: `rgb(125 125 125)`,
     antIcon: `#6b6b6b`,
     disabled: `rgb(134 134 134 / 25%)`,
@@ -177,10 +199,21 @@ export const Themes: IThemes = {
     breadCrumbs: 'rgb(152 152 152 / 68%)',
     fallbackLoader: '#282828',
     inputColorBg: `#121212`,
-    cmdbg: `#000000`,
+    cmdbg: `#111727`,
     cardBg: '#0B1822',
     stroke: '#222e39',
     itmbg: '#08131D',
-    itmText: '#FFFFFF'
+    itmText: '#FFFFFF',
+    paletteBtn: '#272D3F',
+    palateBtnColor: '#DFDFDF',
+    inptFocusedBg: '#08131D',
+    itmHover: '#202938',
+    itmHoverText: '#FFFFFF',
+    crossBtn: '#FFFFFF',
+    paletteBorder: '#273048',
+    svgColor: '#667284',
+    svgBg: '#242B3E',
+    svgHoverBg:'#434D5E',
+    svgHoverColor: '#FFFFFF' 
   },
 };
