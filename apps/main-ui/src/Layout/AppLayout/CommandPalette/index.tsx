@@ -24,11 +24,14 @@ import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 import { DivProps, ISupportedRoutes } from '../../../modal';
 import CommandPlatteGlobalStyles from './commandPaletteGlobalStyles';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import Backbtn from "../../../assets/backBtn.svg";
 
 export const InvyceCmdPalette = () => {
   const { rbac } = useRbac(null);
-  
+  const [showClear, setShowClear] = useState(false);
+  const [values, setValues] = useState("");
+
   const {
     routeHistory,
     setItemsModalConfig,
@@ -340,7 +343,6 @@ export const InvyceCmdPalette = () => {
   };
 
   const renderHeader = () => {
-
     return (
       <Wrapperheader>
         {/* <h3 className="mr-20">Search for a Command</h3> */}
@@ -351,7 +353,7 @@ export const InvyceCmdPalette = () => {
           </i>
           <h5>To navigate</h5>
         </div>
-        
+
         <div className="flex alignCenter">
           <div className="label mr-10 itm">Enter</div>
           <h5>To select</h5>
@@ -364,29 +366,49 @@ export const InvyceCmdPalette = () => {
     );
   };
 
-  
-  const RenderCommand = (suggestion) => {
 
+  const RenderCommand = (suggestion) => {
     const ele = document?.querySelector('.invyce-modal');
-    
-    useEffect(()=>{
-      if(ele && ele!==null){
+
+    useEffect(() => {
+      if (ele && ele !== null) {
         ele?.children[0].classList.add('wrapper-palate');
         ele.append();
       }
+    }, [ele]);
 
-    },[ele])
+    const inputEleParent = document.querySelector('.invyce-container');
+    const invyceSuggestionsContainer = document.querySelector('.invyce-suggestionsContainer');
 
-    const inputEleParent  = document.querySelector('.invyce-container');
- 
-    useEffect(()=>{
-      
-      if(inputEleParent && inputEleParent!==null ){
-        console.log(inputEleParent, "render count")
+    useEffect(() =>{
+      if(invyceSuggestionsContainer && invyceSuggestionsContainer !== null && !invyceSuggestionsContainer.children[0].classList.contains("SearchHeader")){
+        const heading = document.createElement("p");
+        heading.innerHTML = "Recent Searches";
+        heading.classList.add("SearchHeader");
+        invyceSuggestionsContainer.insertBefore(heading, invyceSuggestionsContainer.children[0]);
       }
-    },[inputEleParent])
+    }, [invyceSuggestionsContainer])
+    
+    //invyce Container
+    useEffect(() => {
+      if (showClear && !inputEleParent.children[2]) {
+        const Iele = document.createElement('i');
+        Iele.classList.add('crossBtn');
+        Iele.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16.0637 8.31567C16.0637 8.21255 15.9793 8.12817 15.8762 8.12817L14.3293 8.13521L11.9996 10.9125L9.67227 8.13755L8.12305 8.13052C8.01992 8.13052 7.93555 8.21255 7.93555 8.31802C7.93555 8.36255 7.95195 8.40474 7.98008 8.43989L11.0293 12.0727L7.98008 15.7032C7.95176 15.7375 7.93604 15.7805 7.93555 15.8251C7.93555 15.9282 8.01992 16.0126 8.12305 16.0126L9.67227 16.0055L11.9996 13.2282L14.327 16.0032L15.8738 16.0102C15.977 16.0102 16.0613 15.9282 16.0613 15.8227C16.0613 15.7782 16.0449 15.736 16.0168 15.7008L12.9723 12.0704L16.0215 8.43755C16.0496 8.40474 16.0637 8.36021 16.0637 8.31567Z" fill="white"/>
+        <path d="M12 1.52344C6.20156 1.52344 1.5 6.225 1.5 12.0234C1.5 17.8219 6.20156 22.5234 12 22.5234C17.7984 22.5234 22.5 17.8219 22.5 12.0234C22.5 6.225 17.7984 1.52344 12 1.52344ZM12 20.7422C7.18594 20.7422 3.28125 16.8375 3.28125 12.0234C3.28125 7.20938 7.18594 3.30469 12 3.30469C16.8141 3.30469 20.7188 7.20938 20.7188 12.0234C20.7188 16.8375 16.8141 20.7422 12 20.7422Z" fill="white"/>
+        </svg>        
+        `;
+        inputEleParent.appendChild(Iele);
+      } else if (showClear && inputEleParent.children[2]) {
+        inputEleParent.children[2].classList.remove('hide');
+      } else if (!showClear && inputEleParent.children[2]) {
+        inputEleParent.children[2].classList.add('hide');
+      }
+    }, [inputEleParent]);
 
     const { icon, name, highlight, type, lastIndex } = suggestion;
+
     const highlitedWord = () => {
       return {
         __html: highlight,
@@ -397,7 +419,7 @@ export const InvyceCmdPalette = () => {
         isLastindex={lastIndex}
         className={`item flex alignCenter`}
       >
-        <span className="flex alignCenter mr-10">
+        <span className="flex icons alignCenter mr-10">
           <Icon icon={icon} />
         </span>
         {highlight ? (
@@ -410,7 +432,6 @@ export const InvyceCmdPalette = () => {
     );
   };
 
-
   const commandsList = () => {
     const sortedCommands = commands
       .filter((c) => !c.permission || rbac.can(c.permission))
@@ -420,19 +441,18 @@ export const InvyceCmdPalette = () => {
 
         return 0;
       });
-
     const _commands = [];
 
     const types = [];
     sortedCommands.forEach((ty, ti) => {
       if (!types.includes(ty.type)) {
-        types.push(ty.type);
+        types.push(ty.type)
       }
     });
-
+    
     types.forEach((type, typeIndex) => {
       const filtered = sortedCommands.filter((scItem) => scItem.type === type);
-
+       
       const cmdGroup = filtered.map((item, index) => {
         if (filtered.length - 1 === index) {
           return { ...item, lastIndex: true };
@@ -447,11 +467,12 @@ export const InvyceCmdPalette = () => {
     return _commands;
   };
 
+
+   
   return (
     <>
       <CommandPlatteGlobalStyles />
       <CommandPalette
-
         renderCommand={RenderCommand}
         header={renderHeader()}
         maxDisplayed={
@@ -464,30 +485,35 @@ export const InvyceCmdPalette = () => {
         closeOnSelect
         resetInputOnClose
         theme={theme}
-        placeholder=  "Search in Invoyce"
+        placeholder="Search in Invoyce"
+        onChange = {(newValue) =>{
+          newValue ? setShowClear(true) : setShowClear(false);
+        } }
       />
     </>
   );
 };
 
 const Wrapperheader = styled.div`
-  padding: 19px 24px;
+  padding: 10px 24px;
   display: flex;
   align-items: center;
   justify-content: space-around;
-  border-top:1px solid #F4F4F5;
+  border-top: 1px solid ${(props: IThemeProps) => props?.theme?.colors?.paletteBorder};
 
   h3,
   h5 {
     margin: 0 5px;
-    color: #454545;
+    color: background-color: ${(props: IThemeProps) =>
+      props?.theme?.colors?.itmText};;
     font-size: 16px;
-    paddingLeft: 2px;
+    paddingleft: 2px;
   }
-  .itm{
-    background-color: ${(props: IThemeProps) => props?.theme?.colors?.paletteBtn};
+  .itm {
+    background-color: ${(props: IThemeProps) =>
+      props?.theme?.colors?.paletteBtn};
     border-radius: 5px;
-    padding: 10px 14px;
+    padding: 6px 10px;
   }
 
   i,
@@ -497,11 +523,12 @@ const Wrapperheader = styled.div`
     justify-content: space-around;
     font-size: 14px;
     height: 100%;
-    
   }
   .icon {
-    padding: 12px 14px;
-    background-color: ${(props: IThemeProps) => props?.theme?.colors?.paletteBtn};
+    width: 46px;
+    height: 32px;
+    background-color: ${(props: IThemeProps) =>
+      props?.theme?.colors?.paletteBtn};
     border-radius: 5px;
   }
 `;
