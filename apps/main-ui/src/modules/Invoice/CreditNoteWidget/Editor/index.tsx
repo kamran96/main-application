@@ -103,28 +103,6 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
     printDiv(printItem);
   };
 
-  const onSendPDF = (contactId, invoiceId) => {
-    const printItem = printRef.current;
-    let email = ``;
-
-    const [filteredContact] = contactResult.filter(
-      (cont) => cont.id === contactId
-    );
-
-    if (filteredContact) {
-      email = filteredContact.email;
-    }
-
-    const pdf = DownloadPDF(printItem);
-    const payload = {
-      email: 'kamran@invyce.com',
-      html: `${pdf}`,
-      id: invoiceId,
-      type: type,
-    };
-    handleUploadPDF(payload);
-  };
-
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   const onFinish = async (value) => {
@@ -175,9 +153,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
           if (value && value.status.print) {
             setPrintModal(true);
           }
-          if (payload?.invoice?.status !== 2) {
-            onSendPDF(value.contactId, data?.data?.result?.id);
-          }
+
           ClearAll();
           setInvoiceDiscount(0);
           /* this will clear invoice items, formdata and payment */
@@ -325,7 +301,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                       name="reference"
                       rules={[{ required: true, message: 'Required !' }]}
                     >
-                      <Input size="middle"  autoComplete='off'/>
+                      <Input size="middle" autoComplete="off" />
                     </Form.Item>
                   </Col>
                   <Col span={6}>

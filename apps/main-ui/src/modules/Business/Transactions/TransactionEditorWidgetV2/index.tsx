@@ -199,7 +199,7 @@ const Editor = () => {
                   label="Reference #"
                   rules={[{ required: true, message: 'Required !' }]}
                 >
-                  <Input size="middle"  autoComplete='off'/>
+                  <Input size="middle" autoComplete="off" />
                 </Form.Item>
               </Col>
               <Col span={5}>
@@ -275,11 +275,28 @@ const Editor = () => {
                 </Form.Item>
               </Col>
               <Col className="flex alignFEnd justifyFlexEnd" span={6}>
-                <Form.Item>
-                  <Button className="mr-10" type="default">
+                <Form.Item name="status">
+                  <Button
+                    onClick={() => {
+                      form.setFieldsValue({ status: 2 });
+                      setTimeout(() => {
+                        form.submit();
+                      }, 200);
+                    }}
+                    className="mr-10"
+                    type="default"
+                  >
                     Save
                   </Button>
-                  <Button htmlType="submit" type="primary">
+                  <Button
+                    onClick={() => {
+                      form.setFieldsValue({ status: 1 });
+                      setTimeout(() => {
+                        form.submit();
+                      }, 200);
+                    }}
+                    type="primary"
+                  >
                     Approve
                   </Button>
                 </Form.Item>

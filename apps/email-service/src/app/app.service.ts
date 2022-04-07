@@ -313,6 +313,8 @@ export class AppService {
         TemplateAlias: 'invoice-has-been-created',
         TemplateModel: TemplateModel,
         Attachments: [payload],
+        Cc: data.cc,
+        Bcc: data.bcc,
       });
       console.log(email, 'email successfully.');
     }, 5000);

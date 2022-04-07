@@ -288,7 +288,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   }, [invoiceItems, type]);
   /* Gets total Tax on each item */
   const TotalTax = useMemo(() => {
-    return totalDiscountInInvoice(invoiceItems, 'tax', type);
+    return totalDiscountInInvoice(invoiceItems, 'tax', type) || 0;
   }, [invoiceItems, type]);
   /* Gets Gross total amount on invoices */
   const GrossTotal = useMemo(() => {
@@ -434,19 +434,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
                   const costOfGoodAmount =
                     purchasePrice * allItems[index].quantity;
 
-                  // if (type === 'CN' && selectedItem.stock < record.quantity) {
-                  //   const allErrors = [...rowsErrors];
-                  //   allErrors[index] = { hasError: true };
-                  //   setRowsErrors(allErrors);
-                  //   notificationCallback(
-                  //     NOTIFICATIONTYPE.WARNING,
-                  //     `You are out of stock! Only ${selectedItem.stock} items left in your stock`
-                  //   );
-                  // } else {
-                  //   const allErrors = [...rowsErrors];
-                  //   allErrors[index] = { hasError: false };
-                  //   setRowsErrors(allErrors);
-                  // }
                   const description = `${selectedItem?.category?.title || ''}/`;
 
                   const total = calculateInvoice(unitPrice, tax, '0');
@@ -547,7 +534,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
                         'description'
                       ),
                     };
-                    return prev;
+                    return allItems;
                   });
                 }
               }, 500);

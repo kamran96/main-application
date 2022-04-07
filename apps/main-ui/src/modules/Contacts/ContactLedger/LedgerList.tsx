@@ -145,6 +145,7 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
       dataIndex: 'entryType',
       key: 'entryType',
       render: (data, row, index) => {
+        console.log(row, data, index, 'debit');
         const renderDebit = () => {
           return data === IEntryType.DEBIT || data === IEntryType?.DEBIT_NOTE
             ? moneyFormat(row.amount)
