@@ -9,7 +9,7 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
   height: 0;
 }
 .invyce-modal {
-  width: 605px;
+  width: 600px;
   position: absolute;
   top: 80px;
   left: 50%;
@@ -18,12 +18,11 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
   border: 0px none;
   background: ${(props: IThemeProps) => props?.theme?.colors?.cmdbg};
   overflow: hidden;
-  border-radius: 4px;
+  border-radius: 8px;
   outline: none;
   box-shadow: #353535 0px 2px 4px 0px;
   margin-right: -50%;
   transform: translate(-50%, 0px);
-
   .wrapper-palate {
     display: flex;
     flex-direction: column-reverse;
@@ -41,7 +40,7 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
 }
 
 .invyce-header {
-  color: #FFFFFF;
+  color: ${(props: IThemeProps) => props?.theme?.colors?.palateBtnColor};
   padding: 4px 0;
 }
 
@@ -61,7 +60,6 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
   border-radius: 4px;
   outline: none;
   padding: 10px;
-  min-width: 600px;
 }
 
 .invyce-container {
@@ -69,64 +67,104 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
     "Helvetica Neue", Arial, sans-serif;
   font-weight: lighter;
   font-size: 12px;
+  position: relative;
+
+  }
+  .crossBtn{
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    cursor: pointer;
+    svg path{
+      fill: ${(props: IThemeProps) => props?.theme?.colors?.crossBtn};  
+    }
+  }
+  .hide{
+    display: none;
+  }
 }
 
 .invyce-containerOpen {
 }
 
 .invyce-input {
-  font-size: 16px;
-  border-radius: 4px;
-  border: 1.5px solid #1e5490;
-  width: ${convertToRem(530)};
-  padding: 21px 19px;
+  font-size: 18px;
+  font-family: Poppins;
+  border: none;
+  width: 100%;
+  padding: 20px 35px;
   outline: none;
-  background-color: ${(props: IThemeProps) => props?.theme?.colors?.itmbg};
-  color: ${(props: IThemeProps) => props?.theme?.colors?.itmText};
+  background: ${(props: IThemeProps) => props?.theme?.colors?.cmdbg};
+  color: ${(props: IThemeProps) => props?.theme?.colors?.itmHoverText};
   caret-color: #4b4b4b;
-  margin: 24px 24px 10px 36px;
+  border-bottom: 1px solid ${(props: IThemeProps) => props?.theme?.colors?.paletteBorder};
 }
 
 .invyce-inputOpen {
 }
 
 .invyce-inputFocused {
-  border: 1px solid #1E75F1;
-  background-color: ${(props: IThemeProps) => props?.theme?.colors?.inptFocusedBg};
+   border: none;
+   border-bottom: 1px solid ${(props: IThemeProps) => props?.theme?.colors?.paletteBorder};
 }
 
 .invyce-suggestionsContainer {
+
+  .SearchHeader {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    text-transform: capitalize;
+    color: #757375;
+    padding: 14px;
+    margin: 0 0 0 30px;
+  }
 }
 
 .invyce-suggestionsContainerOpen {
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: 315px;
-  margin-top: 10px;
 }
 
 .invyce-suggestionsList {
   list-style: none;
   padding: 0;
   margin-bottom: 0;
-  margin-top: 0;
+  max-height:220px;
 }
 
 .invyce-suggestion {
   color: ${(props: IThemeProps) => props?.theme?.colors?.itmText};
-  background-color: ${(props: IThemeProps) => props?.theme?.colors?.itmbg};
+  background: ${(props: IThemeProps) => props?.theme?.colors?.cmdbg};
+  font-family: Poppins;
   cursor: pointer;
   font-size: 16px;
-  font-weight: normal;
+  line-height:24px;
+  font-weight: 400;
   width: ${convertToRem(530)};
-  margin: 8px 24px;
-  padding: 21px 19px;
-  margin: 8px 32px 8px 36px;
-  border-radius: 6px;
+  padding: 14px 35px;
+  width: 100%;
+  
+  
+  .icons{
+    height: 28px;
+    width: 28px;
+    border-radius: 50%;
+    background: ${(props: IThemeProps) => props?.theme?.colors?.svgBg};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    }
+    .icons svg path{
+      font-weight: 400;
+      color: #${(props: IThemeProps) => props?.theme?.colors?.svgColor};
+    }
 }
 
 .invyce-suggestion b {
-  color: #454545;
+  // color: #454545;
   font-weight: bold;
   font-size: 16px;
   line-height: 19px;
@@ -135,8 +173,19 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
 }
 
 .invyce-suggestionHighlighted {
-  color: #ffffff;
-  background-color: #1E75F1;
+  color: ${(props: IThemeProps) => props?.theme?.colors?.itmHoverText};
+  background-color: ${(props: IThemeProps) => props?.theme?.colors?.itmHover};
+  border-left: 3px solid #1E75F1;
+  font-weight: 500;
+
+  .icons {
+    background: ${(props: IThemeProps) => props?.theme?.colors?.svgHoverBg};
+  }
+
+  .icons svg path{
+  font-weight: 500;
+  color: ${(props: IThemeProps) => props?.theme?.colors?.svgHoverColor};
+  }
 }
 
 .invyce-spinner {
