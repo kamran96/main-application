@@ -359,9 +359,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
       ? (result.length > 0 &&
           result.filter(
             (item) =>
-              item.price &&
-              item.price.purchasePrice !== null &&
-              item.price.salePrice !== null
+              item?.price?.purchasePrice !== null &&
+              item?.price?.salePrice !== null
           )) ||
         []
       : result;
@@ -413,7 +412,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
     return errors;
   };
-  const a = AntForm.getFieldsValue();
 
   const columns: ColumnsType<any> = useMemo(() => {
     return [

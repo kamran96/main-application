@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useMutation } from 'react-query';
 
 import { CsvImportAPi } from '../../api';
@@ -11,6 +11,8 @@ import {
   renderToString,
 } from '@react-pdf/renderer';
 import { InvoicePDF } from '../../components/PDFs';
+import { EditableTable } from '@invyce/editable-table';
+import { Editable } from '../../components/Editable';
 
 const columns = [
   {
@@ -76,24 +78,43 @@ const data = [
 export const TestComponents: FC = () => {
   const { mutate: mutateCsv } = useMutation(CsvImportAPi);
 
-  const handleLoad = async (payload) => {
-    await mutateCsv(payload, {
-      onSuccess: (data) => {},
-    });
-  };
+  const [data, setData] = useState([
+    {
+      id: '1',
+      description: 'sdfjafdiosaf',
+    },
+  ]);
+
+  const cols: any = [
+    {
+      title: 'item id',
+      dataIndex: 'id',
+      key: 'id',
+    },
+    {
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
+      render: (_data, row, index) => {
+        console.log(data, row, index);
+        return (
+          <Editable
+            onChange={(e) => {
+              console.log(e, 'event');
+            }}
+          />
+        );
+      },
+    },
+  ];
 
   return (
     // <div>test</div>
-    <div>
-      {/* <PDFDownloadLink
-        document={<InvoicePDF data={null} type={null} />}
-        fileName="generated.pdf"
-      >
-        Generate PDF
-      </PDFDownloadLink> */}
-      {/* <PDFViewer width={'100%'} height={900}>
-        <InvoicePDF />
-      </PDFViewer> */}
-    </div>
+    <EditableTable
+      cacheKey={'invoice-data'}
+      dragable={(newData) => setData(newData)}
+      columns={cols}
+      data={data}
+    />
   );
 };

@@ -503,18 +503,17 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
               </Col>
             </Row>
           </div>
-          <Form>
-            <div className="table_area">
-              <EditableTable
-                // rowClassName={(record, index) => 'sdfio'}
-                loading={isFetching}
-                dragable={(data) => setInvoiceItems(data)}
-                columns={__columns}
-                data={invoiceItems}
-                scrollable={{ offsetY: 400, offsetX: 0 }}
-              />
-            </div>
-          </Form>
+
+          <div className="table_area">
+            <EditableTable
+              // rowClassName={(record, index) => 'sdfio'}
+              loading={isFetching}
+              dragable={(data) => setInvoiceItems(data)}
+              columns={__columns}
+              data={invoiceItems}
+              scrollable={{ offsetY: 400, offsetX: 0 }}
+            />
+          </div>
           <div className="add_item">
             <Button
               className="flex alignCenter"
