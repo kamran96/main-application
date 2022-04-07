@@ -121,10 +121,12 @@ export const Editable: FC<IProps> = ({
             </div>
           )
         ) : isEditable ? (
-          <Input 
+          <Input
             ref={inputRef}
             disabled={disabled}
             onChange={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               const val = e.target.value;
               setInputValue(val);
               onChange(e);
