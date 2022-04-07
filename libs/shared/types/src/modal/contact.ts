@@ -103,15 +103,13 @@ export class IContactLedgerResp extends IBaseRequestResponse {
             return {
               ...item,
               entryType:
-                item?.entryType === IEntryType?.CREDIT
+                item?.entryType === IEntryType?.CREDIT ||
+                item?.entryType === IEntryType?.DEBIT_NOTE
                   ? IEntryType?.DEBIT
                   : IEntryType?.CREDIT,
             };
           })
-        : generatedResult;
-    } else {
-      return this?.contact?.contactType === IContactTypes.SUPPLIER
-        ? this.result?.map((item: IContactLedger, index) => {
+        : generatedResult.map((item: IContactLedger, index) => {
             return {
               ...item,
               entryType:
@@ -119,8 +117,28 @@ export class IContactLedgerResp extends IBaseRequestResponse {
                   ? IEntryType?.DEBIT
                   : IEntryType?.CREDIT,
             };
+          });
+    } else {
+      return this?.contact?.contactType === IContactTypes.SUPPLIER
+        ? this.result?.map((item: IContactLedger, index) => {
+            return {
+              ...item,
+              entryType:
+                item?.entryType === IEntryType?.CREDIT ||
+                item?.entryType === IEntryType?.DEBIT_NOTE
+                  ? IEntryType?.DEBIT
+                  : IEntryType?.CREDIT,
+            };
           })
-        : this.result;
+        : this.result?.map((item: IContactLedger, index) => {
+            return {
+              ...item,
+              entryType:
+                item?.entryType === IEntryType?.CREDIT_NOTE
+                  ? IEntryType.DEBIT
+                  : item?.entryType,
+            };
+          });
     }
   }
 

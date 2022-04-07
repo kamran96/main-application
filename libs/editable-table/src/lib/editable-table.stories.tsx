@@ -36,13 +36,12 @@ const Template: Story<EditableTableProps> = (args) => {
         return (
           <input
             onChange={(e) => {
-              let payload: any = { ...row, description: e.target.value };
-
-              setData((prev) => {
-                let a = [...prev];
-                a.splice(index, 1, payload);
-                return a;
-              });
+              // let payload: any = { ...row , description: e.target.value };
+              // setData((prev) => {
+              //   let a = [...prev];
+              //   a.splice(index, 1, payload);
+              //   return a;
+              // });
             }}
             type="text"
           />
@@ -68,9 +67,10 @@ const Template: Story<EditableTableProps> = (args) => {
           data={data}
         />
 
-        <button
+        {/* <button
           onClick={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             setData((prev) => {
               return [
                 ...prev,
@@ -80,9 +80,11 @@ const Template: Story<EditableTableProps> = (args) => {
           }}
         >
           add row
-        </button>
+        </button> */}
 
-        <Button type="primary" htmlType="submit">Submit</Button>
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
       </Form>
     </div>
   );

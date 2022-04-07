@@ -103,28 +103,6 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
     printDiv(printItem);
   };
 
-  const onSendPDF = (contactId, invoiceId) => {
-    const printItem = printRef.current;
-    let email = ``;
-
-    const [filteredContact] = contactResult.filter(
-      (cont) => cont.id === contactId
-    );
-
-    if (filteredContact) {
-      email = filteredContact.email;
-    }
-
-    const pdf = DownloadPDF(printItem);
-    const payload = {
-      email: 'kamran@invyce.com',
-      html: `${pdf}`,
-      id: invoiceId,
-      type: type,
-    };
-    handleUploadPDF(payload);
-  };
-
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   const onFinish = async (value) => {
@@ -232,6 +210,10 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
     orderNo: 'Invoice #',
   };
 
+  const printData = {
+    ...responseCreatedInvoice?.data?.result,
+    invoiceItems: responseCreatedInvoice?.data?.result?.creditNoteItems,
+  };
   /* JSX  */
   return (
     <WrapperInvoiceForm>
@@ -239,9 +221,9 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
         <PrintFormat>
           <PrintViewPurchaseWidget
             type={'credit-note'}
-            heading={'Credit Note'}
-            hideCalculation={type === IInvoiceType.INVOICE ? false : true}
-            data={responseCreatedInvoice?.data?.result || {}}
+            heading={'Debit Note'}
+            hideCalculation={false}
+            data={printData}
           />
         </PrintFormat>
       </div>
@@ -317,7 +299,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                       name="reference"
                       rules={[{ required: true, message: 'Required !' }]}
                     >
-                      <Input size="middle"  autoComplete='off'/>
+                      <Input size="middle" autoComplete="off" />
                     </Form.Item>
                   </Col>
                   <Col span={6}>

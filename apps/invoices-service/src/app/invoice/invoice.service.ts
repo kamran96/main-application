@@ -715,6 +715,12 @@ export class InvoiceService {
           type: 1,
         });
 
+        const email = contact[0].email
+          ? contact[0].email
+          : dto.email
+          ? dto.email
+          : null;
+
         const { data: attachment } = await http.post(
           `attachments/attachment/generate-pdf`,
           {
@@ -728,22 +734,193 @@ export class InvoiceService {
           }
         );
 
-        await this.emailService.emit(INVOICE_CREATED, {
-          to: contact[0]?.email,
-          user_name: contact[0]?.name || null,
-          invoice_number: invoice.invoiceNumber,
-          issueDate: invoice.issueDate,
-          gross_total: invoice.grossTotal,
-          itemDisTotal: invoice.discount,
-          net_total: invoice.netTotal,
-          invoice_details,
-          download_link: attachment?.path || null,
-          attachment_name: attachment?.name || null,
-        });
+        if (email) {
+          await this.emailService.emit(INVOICE_CREATED, {
+            to: email,
+            user_name: contact[0]?.name || null,
+            invoice_number: invoice.invoiceNumber,
+            issueDate: invoice.issueDate,
+            gross_total: invoice.grossTotal,
+            itemDisTotal: invoice.discount,
+            net_total: invoice.netTotal,
+            invoice_details,
+            download_link: attachment?.path || null,
+            attachment_name: attachment?.name || null,
+          });
+        }
 
         await http.get(`contacts/contact/balance`);
       }
       return invoice;
+    }
+  }
+
+  async GeneratePdfAndSendEamil(data, req) {
+    let token;
+    if (process.env.NODE_ENV === 'development') {
+      const header = req.headers?.authorization?.split(' ')[1];
+      token = header;
+    } else {
+      if (!req || !req.cookies) return null;
+      token = req.cookies['access_token'];
+    }
+
+    const type =
+      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    const value =
+      process.env.NODE_ENV === 'development'
+        ? `Bearer ${token}`
+        : `access_token=${token}`;
+
+    const http = axios.create({
+      baseURL: 'http://localhost',
+      headers: {
+        [type]: value,
+      },
+    });
+
+    if (data.type === InvTypes.INVOICE) {
+      const invoice = await getCustomRepository(InvoiceRepository).findOne({
+        id: data.id,
+        status: 1,
+      });
+
+      const invoiceItems = await getCustomRepository(
+        InvoiceItemRepository
+      ).find({
+        where: {
+          invoiceId: invoice.id,
+        },
+      });
+
+      const mapItemIds = invoiceItems.map((ids) => ids.itemId);
+      const { data: items } = await http.post(`items/item/ids`, {
+        ids: mapItemIds,
+      });
+
+      const { data: contact } = await http.post(`contacts/contact/ids`, {
+        ids: [invoice.contactId],
+        type: 1,
+      });
+
+      const invoice_details = [];
+      let i = 0;
+      for (const item of invoiceItems) {
+        i++;
+        if (i < 6) {
+          invoice_details.push({
+            itemName: await items.find((i) => i.id === item.itemId).name,
+            quantity: item.quantity,
+            price: item.purchasePrice,
+            itemDiscount: item.itemDiscount,
+            tax: item.tax,
+            total: item.total,
+          });
+        }
+      }
+
+      const { data: attachment } = await http.post(
+        `attachments/attachment/generate-pdf`,
+        {
+          data: {
+            invoice: { ...invoice, invoice_items: invoiceItems },
+            invoice_items: invoiceItems,
+            contact: contact[0],
+            items,
+            type: PdfType.INVOICE,
+          },
+        }
+      );
+
+      await this.emailService.emit(INVOICE_CREATED, {
+        to: data.email,
+        user_name: contact[0]?.name || null,
+        invoice_number: invoice.invoiceNumber,
+        issueDate: invoice.issueDate,
+        gross_total: invoice.grossTotal,
+        itemDisTotal: invoice.discount,
+        net_total: invoice.netTotal,
+        invoice_details,
+        download_link: attachment?.path || null,
+        attachment_name: attachment?.name || null,
+        cc: data.cc,
+        bcc: data.bcc,
+      });
+
+      return {
+        message: 'Invoice sent successfully.',
+        status: true,
+      };
+    } else if (data.type === InvTypes.BILL || data.type === 'POE') {
+      const bill = await getCustomRepository(BillRepository).findOne({
+        id: data.id,
+        status: 1,
+      });
+
+      const billItems = await getCustomRepository(InvoiceItemRepository).find({
+        where: {
+          invoiceId: bill.id,
+        },
+      });
+
+      const mapItemIds = billItems.map((ids) => ids.itemId);
+      const { data: items } = await http.post(`items/item/ids`, {
+        ids: mapItemIds,
+      });
+
+      const { data: contact } = await http.post(`contacts/contact/ids`, {
+        ids: [bill.contactId],
+        type: 1,
+      });
+
+      const invoice_details = [];
+      let i = 0;
+      for (const item of billItems) {
+        i++;
+        if (i < 6) {
+          invoice_details.push({
+            itemName: await items.find((i) => i.id === item.itemId).name,
+            quantity: item.quantity,
+            price: item.purchasePrice,
+            itemDiscount: item.itemDiscount,
+            tax: item.tax,
+            total: item.total,
+          });
+        }
+      }
+
+      const { data: attachment } = await http.post(
+        `attachments/attachment/generate-pdf`,
+        {
+          data: {
+            invoice: { ...bill, invoice_items: billItems },
+            invoice_items: billItems,
+            contact: contact[0],
+            items,
+            type: PdfType.BILL,
+          },
+        }
+      );
+
+      await this.emailService.emit(INVOICE_CREATED, {
+        to: data.email,
+        user_name: contact[0]?.name || null,
+        invoice_number: bill.invoiceNumber,
+        issueDate: bill.issueDate,
+        gross_total: bill.grossTotal,
+        itemDisTotal: 0,
+        net_total: bill.netTotal,
+        invoice_details,
+        download_link: attachment?.path || null,
+        attachment_name: attachment?.name || null,
+        cc: data.cc,
+        bcc: data.bcc,
+      });
+
+      return {
+        message: 'Bill sent successfully.',
+        status: true,
+      };
     }
   }
 
