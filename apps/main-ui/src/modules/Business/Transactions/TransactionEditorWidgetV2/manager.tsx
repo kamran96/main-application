@@ -273,6 +273,7 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
     ];
   }, [getAvailableAccounts, transactionsList]);
 
+
   return (
     <transactionContext.Provider
       value={{

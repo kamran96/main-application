@@ -13,12 +13,25 @@ import { Heading } from '../../../../components/Heading';
 import TextArea from 'antd/lib/input/TextArea';
 import { BoldText } from '../../../../components/Para/BoldText';
 import moneyFormat from '../../../../utils/moneyFormat';
-import { createTransactionAPI } from '../../../../api';
-import { useMutation, useQueryClient } from 'react-query';
+import {
+  createTransactionAPI,
+  getSingleTransactionById,
+} from '../../../../api';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { NOTIFICATIONTYPE } from '@invyce/shared/types';
 import { ITransactionsList } from './types';
-const Editor = () => {
+import { FC, useEffect } from 'react';
+import { IServerError } from '../../../../modal';
+import data from '@iconify-icons/feather/check';
+
+interface Iprops {
+  id: number;
+}
+
+const Editor: FC<Iprops> = ({ id }) => {
+  const queryCache = useQueryClient();
+
   // ****** HOOKS IMPLEMENTATION ******
   const {
     columns,
@@ -34,7 +47,44 @@ const Editor = () => {
   const { mutate: mutateCreateTransaction, isLoading: creatingTransaction } =
     useMutation(createTransactionAPI);
 
-  const queryCache = useQueryClient();
+  const { data: TransactionData, isLoading: isTransactionLoading } = useQuery(
+    [`transaction-${id}`, id],
+    getSingleTransactionById,
+    {
+      enabled: !!id,
+      onSuccess: (data) => {
+        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Transaction Fetched');
+      },
+      onError: (error: IServerError) => {
+        if (
+          error &&
+          error?.response &&
+          error?.response?.data &&
+          error?.response?.data?.message
+        ) {
+          const { message } = error?.response?.data;
+          notificationCallback(NOTIFICATIONTYPE.ERROR, message);
+        }
+      },
+    }
+  );
+
+  useEffect(() => {
+    if (id && TransactionData && TransactionData?.data?.result) {
+      console.log(TransactionData.data)
+      const {result} = TransactionData?.data
+      const Resultdata = {
+        ref: result?.ref,
+        date: dayjs(result?.date).endOf('day'),
+        narration:result?.narration ,
+        notes: result?.notes
+      }
+
+      form.setFieldsValue(Resultdata)
+    }
+  }, [TransactionData, id]);
+
+  
 
   const totalDebits = (transactionsList.length &&
     transactionsList.reduce((a, b) => {
@@ -174,7 +224,7 @@ const Editor = () => {
 
   // JSX RENDER
   return (
-    <>
+    <> 
       <BreadCrumbArea>
         <Breadcrumb>
           <Breadcrumb.Item>
@@ -185,7 +235,7 @@ const Editor = () => {
           <Breadcrumb.Item>Journal Entry</Breadcrumb.Item>
         </Breadcrumb>
       </BreadCrumbArea>
-
+   
       <div className="mb-10">
         <Heading type="table">Journal Entry</Heading>
       </div>
@@ -199,7 +249,7 @@ const Editor = () => {
                   label="Reference #"
                   rules={[{ required: true, message: 'Required !' }]}
                 >
-                  <Input size="middle"  autoComplete='off'/>
+                  <Input size="middle" autoComplete="off" />
                 </Form.Item>
               </Col>
               <Col span={5}>
@@ -275,11 +325,28 @@ const Editor = () => {
                 </Form.Item>
               </Col>
               <Col className="flex alignFEnd justifyFlexEnd" span={6}>
-                <Form.Item>
-                  <Button className="mr-10" type="default">
+                <Form.Item name="status">
+                  <Button
+                    onClick={() => {
+                      form.setFieldsValue({ status: 2 });
+                      setTimeout(() => {
+                        form.submit();
+                      }, 200);
+                    }}
+                    className="mr-10"
+                    type="default"
+                  >
                     Save
                   </Button>
-                  <Button htmlType="submit" type="primary">
+                  <Button
+                    onClick={() => {
+                      form.setFieldsValue({ status: 1 });
+                      setTimeout(() => {
+                        form.submit();
+                      }, 200);
+                    }}
+                    type="primary"
+                  >
                     Approve
                   </Button>
                 </Form.Item>
@@ -293,9 +360,17 @@ const Editor = () => {
 };
 
 export const TransactionsWidget = () => {
+  const { routeHistory } = useGlobalContext();
+  const { history } = routeHistory;
+
+  const id =
+    history &&
+    history?.location &&
+    history?.location?.pathname?.split('/app/journal-entry/')[1];
+
   return (
     <TransactionManager>
-      <Editor />
+      <Editor id={id} />
     </TransactionManager>
   );
 };

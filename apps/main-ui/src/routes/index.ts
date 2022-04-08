@@ -388,6 +388,13 @@ export const routes = (root = '/app'): RouteConfig[] => [
             permission: PERMISSIONS.TRANSACTIONS_CREATE,
           },
           {
+            path: `${root}${ISupportedRoutes.CREATE_TRANSACTION}/:id`,
+            component: TransactionsWidget,
+            exact: true,
+            restricted: true,
+            permission: PERMISSIONS.TRANSACTIONS_CREATE,
+          },
+          {
             path: `${root}${ISupportedRoutes.QUOTE}`,
             component: QuotesContainer,
             exact: true,

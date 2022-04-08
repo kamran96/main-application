@@ -9,9 +9,6 @@ enum TRANSACTION {
 export const createTransactionAPI = (payload) =>
   http.post(TRANSACTION.CREATE, payload);
 
-export const deleteTransactionApiById = ({queryKey} : QueryKey) => 
-    http.put(`${TRANSACTION.INDEX}`);
-
 export const getAllTransactionsAPI = ({ queryKey }: QueryKey) => {
   const page: number = queryKey[1];
   const pageSize: number = queryKey[2];
@@ -27,3 +24,12 @@ export const getAllTransactionsAPI = ({ queryKey }: QueryKey) => {
 
   return http.get(url);
 };
+
+export const deleteTransactionApiById = (payload? : any) => 
+  http.put(`accounts/transaction/delete`, payload)
+
+export const getSingleTransactionById = ({queryKey}: QueryKey) => {
+  const id: number = queryKey[1]
+  return http.get(`${TRANSACTION.INDEX}/${id}`)
+}
+    
