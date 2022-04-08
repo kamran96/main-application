@@ -157,14 +157,6 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
     });
   };
 
-  const cols = [...columns];
-
-  cols.splice(2, 0, {
-    title: 'Return',
-    dataIndex: 'isReturn',
-    render: (data) => <>{data && data === true ? 'Returned' : ''}</>,
-  });
-
   /* Functions Here */
 
   const renderTobarRight = () => {
@@ -233,7 +225,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
           </div>
         }
         data={result}
-        columns={cols}
+        columns={columns}
         loading={isFetching || isLoading}
         onChange={(pagination, filters, sorter: any, extra) => {
           if (sorter.order === undefined) {

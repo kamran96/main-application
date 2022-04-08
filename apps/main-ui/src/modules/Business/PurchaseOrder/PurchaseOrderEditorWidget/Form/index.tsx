@@ -6,7 +6,7 @@ import TextArea from 'antd/lib/input/TextArea';
 import dayjs from 'dayjs';
 import { FC, useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 import { getAllContacts, getInvoiceNumber } from '../../../../../api';
 import { CreatePurchaseOrderAPI } from '../../../../../api/purchaseOrder';
@@ -61,12 +61,12 @@ const Editor: FC<IProps> = ({ id }) => {
   /* ********* API CALL STAKE ENDS HERE *******/
 
   /* GLOBAL CONTEXT (GLOBAL STATE) */
-  const { notificationCallback, handleUploadPDF, routeHistory, userDetails } =
+  const { notificationCallback, handleUploadPDF, userDetails } =
     useGlobalContext();
-  const { history } = routeHistory;
+  const history = useHistory();
 
   /* WIDGET CONTEXT */
-  const { state, setState, columns, reset, loading, addRow } =
+  const { state, setState, columns, reset, loading, addRow, antForm } =
     usePurchaseOrderContext();
 
   useEffect(() => {
@@ -81,8 +81,6 @@ const Editor: FC<IProps> = ({ id }) => {
 
   const Printref = useRef();
 
-  const [form] = Form.useForm();
-
   const { data: invoiceNumberData } = useQuery(
     ['', IInvoiceTypes.PURCHASE_ORDER],
     getInvoiceNumber
@@ -91,16 +89,19 @@ const Editor: FC<IProps> = ({ id }) => {
   useEffect(() => {
     if (invoiceNumberData?.data?.result) {
       const { result } = invoiceNumberData?.data;
-      form.setFieldsValue({ invoiceNumber: result });
+      antForm.setFieldsValue({ invoiceNumber: result });
     }
-  }, [invoiceNumberData, form]);
+  }, [invoiceNumberData, antForm]);
 
   /* Scroll to last added item */
 
   const ClearAll = () => {
-    form.resetFields();
-    form.setFieldsValue({ issueDate: dayjs(), dueDate: dayjs() });
+    antForm.resetFields();
+    antForm.setFieldsValue({ issueDate: dayjs(), dueDate: dayjs() });
     reset();
+    history.push(
+      `${ISupportedRoutes?.DASHBOARD_LAYOUT}${ISupportedRoutes?.CREATE_PURCHASE_ORDER}`
+    );
   };
 
   const onCancelPrint = () => {
@@ -108,7 +109,7 @@ const Editor: FC<IProps> = ({ id }) => {
 
     if (id) {
       queryCache.removeQueries(`PO-view-${id}`);
-      let route = history.location.pathname.split('/');
+      let route: any = history.location.pathname.split('/');
       if (route.length > 3) {
         const removeIndex = route.length - 1;
         route.splice(removeIndex, 1);
@@ -147,7 +148,7 @@ const Editor: FC<IProps> = ({ id }) => {
   };
 
   useEffect(() => {
-    form.setFieldsValue({ issueDate: dayjs(), dueDate: dayjs() });
+    antForm.setFieldsValue({ issueDate: dayjs(), dueDate: dayjs() });
   }, []);
 
   const onFinish = async (value) => {
@@ -201,14 +202,15 @@ const Editor: FC<IProps> = ({ id }) => {
             'invoice-view',
             'ledger-contact',
             'all-items',
+            `purchase-order-${id}`,
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           });
           if (value?.status?.type === 2) {
             setPrintModal(true);
           }
-          form.resetFields();
-          form.setFieldsValue({ issueDate: dayjs(), dueDate: dayjs() });
+          antForm.resetFields();
+          antForm.setFieldsValue({ issueDate: dayjs(), dueDate: dayjs() });
           ClearAll();
         },
       });
@@ -229,7 +231,13 @@ const Editor: FC<IProps> = ({ id }) => {
             heading={'Purchase Order'}
             type={'PO'}
             hideCalculation={true}
-            data={responseCreatedPO?.data?.result || {}}
+            data={
+              {
+                ...responseCreatedPO?.data?.result,
+                invoiceItems:
+                  responseCreatedPO?.data?.result?.purchaseOrderItems,
+              } || {}
+            }
           />
         </PrintFormat>
       </div>
@@ -246,7 +254,7 @@ const Editor: FC<IProps> = ({ id }) => {
               </h4>
             </div>
             <Form
-              form={form}
+              form={antForm}
               onFinish={onFinish}
               onFinishFailed={onFinishFailed}
             >
@@ -284,7 +292,7 @@ const Editor: FC<IProps> = ({ id }) => {
                     >
                       <DatePicker
                         onChange={(val) =>
-                          form.setFieldsValue({
+                          antForm.setFieldsValue({
                             dueDate: val,
                           })
                         }
@@ -303,7 +311,7 @@ const Editor: FC<IProps> = ({ id }) => {
                         disabledDate={(current) => {
                           return (
                             current &&
-                            current < dayjs(form.getFieldValue('issueDate'))
+                            current < dayjs(antForm.getFieldValue('issueDate'))
                           );
                         }}
                         style={{ width: '100%' }}
@@ -326,7 +334,7 @@ const Editor: FC<IProps> = ({ id }) => {
                       name="reference"
                       rules={[{ required: false, message: 'Required !' }]}
                     >
-                      <Input size="middle" autoComplete='off'/>
+                      <Input size="middle" autoComplete="off" />
                     </Form.Item>
                   </Col>
                   <Col span={4} className="custom_col">
@@ -384,7 +392,7 @@ const Editor: FC<IProps> = ({ id }) => {
                 <Form.Item name="status">
                   <Button
                     onClick={() => {
-                      form.setFieldsValue({
+                      antForm.setFieldsValue({
                         status: {
                           status: 2,
                           type: 1,
@@ -392,7 +400,10 @@ const Editor: FC<IProps> = ({ id }) => {
                       });
                       setStatus(2);
                     }}
-                    loading={creatingPurchaseOrder && status === 2}
+                    loading={
+                      creatingPurchaseOrder &&
+                      antForm.getFieldValue(status)?.type === 1
+                    }
                     type="default"
                     size="middle"
                     className="mr-10"
@@ -402,7 +413,7 @@ const Editor: FC<IProps> = ({ id }) => {
                   </Button>
                   <Button
                     onClick={() => {
-                      form.setFieldsValue({
+                      antForm.setFieldsValue({
                         status: {
                           status: 2,
                           type: 2,
@@ -410,7 +421,10 @@ const Editor: FC<IProps> = ({ id }) => {
                       });
                       setStatus(2);
                     }}
-                    loading={creatingPurchaseOrder && status === 2}
+                    loading={
+                      creatingPurchaseOrder &&
+                      antForm.getFieldValue(status)?.type === 2
+                    }
                     type="primary"
                     size="middle"
                     className="mr-10"
@@ -437,7 +451,7 @@ const Editor: FC<IProps> = ({ id }) => {
 
 export const PurchaseOrderForm: FC<IProps> = ({ id }) => {
   return (
-    <PurchaseOrderWidgetManager>
+    <PurchaseOrderWidgetManager id={id}>
       <Editor id={id} />
     </PurchaseOrderWidgetManager>
   );

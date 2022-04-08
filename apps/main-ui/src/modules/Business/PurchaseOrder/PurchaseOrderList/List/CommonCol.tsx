@@ -151,7 +151,7 @@ export const _csvColumns: ITableExportFields = {
       return data ? dayjs(data).format(`MM/DD/YYYY h:mm A`) : '-';
     },
   },
-  purchase_items: {
+  purchaseOrderItems: {
     header: 'Items Count',
     formatter: (data) => {
       return data.length;

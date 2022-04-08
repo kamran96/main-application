@@ -73,7 +73,7 @@ export const Suppliers: FC = () => {
   const handleContactsConfig = (pagination, filters, sorter: any, extra) => {
     if (sorter.order === undefined) {
       history.push(
-        `/app${ISupportedRoutes.CONTACTS}?sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+        `/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
       );
       setConfig({
         ...config,
@@ -84,7 +84,7 @@ export const Suppliers: FC = () => {
       });
     } else {
       history.push(
-        `/app${ISupportedRoutes.CONTACTS}?sortid=${
+        `/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers&sortid=${
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field
@@ -172,15 +172,12 @@ export const Suppliers: FC = () => {
       title: 'Contact Type',
       dataIndex: 'contactType',
       key: 'contactType',
-      render: (data) => (
-        <>
-          {data && data === IContactTypes.CUSTOMER
-            ? 'Customer'
-            : data === IContactTypes.SUPPLIER
-            ? 'Supplier'
-            : '-'}
-        </>
-      ),
+      render: (data) =>
+        data && data === IContactTypes.CUSTOMER
+          ? 'Customer'
+          : data === IContactTypes.SUPPLIER
+          ? 'Supplier'
+          : '-',
     },
     {
       title: 'Credit Limit',
@@ -196,7 +193,7 @@ export const Suppliers: FC = () => {
       title: 'Balance',
       dataIndex: 'balance',
       key: 'balance',
-      render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
+      render: (data) => (data ? moneyFormat(data) : moneyFormat(0)),
     },
   ];
 
