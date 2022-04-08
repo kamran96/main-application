@@ -79,7 +79,7 @@ export const Customers: FC = () => {
       });
     } else {
       history.push(
-        `/app${ISupportedRoutes.CONTACTS}?sortid=${
+        `/app${ISupportedRoutes.CONTACTS}?tabIndex=customers&sortid=${
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field

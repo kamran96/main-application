@@ -348,6 +348,7 @@ export const BalanceSheetList: FC = () => {
 
       <PDFViewer height={'1080px'} width={'100%'}>
         <BalanceSheetPdf
+          totals={{ totalCredits, totalDebits }}
           header={headerprops}
           balanceSheetData={balanceSheetData}
           searchquery={searchedQueryItem}

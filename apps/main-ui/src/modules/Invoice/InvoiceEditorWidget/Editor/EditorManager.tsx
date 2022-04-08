@@ -359,9 +359,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
       ? (result.length > 0 &&
           result.filter(
             (item) =>
-              item.price &&
-              item.price.purchasePrice !== null &&
-              item.price.salePrice !== null
+              item?.price?.purchasePrice !== null &&
+              item?.price?.salePrice !== null
           )) ||
         []
       : result;
@@ -413,7 +412,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
     return errors;
   };
-  const a = AntForm.getFieldsValue();
 
   const columns: ColumnsType<any> = useMemo(() => {
     return [
@@ -500,11 +498,13 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
                     if (
                       type === IInvoiceType.INVOICE &&
-                      selectedItem.stock < record.quantity
+                      selectedItem.stock < record.quantity &&
+                      selectedItem?.hasInventory
                     ) {
                       const allErrors = [...rowsErrors];
                       allErrors[index] = { hasError: true };
                       setRowsErrors(allErrors);
+
                       notificationCallback(
                         NOTIFICATIONTYPE.WARNING,
                         `You are out of stock! Only ${selectedItem.stock} items left in your stock`
@@ -663,7 +663,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
                       if (
                         type === IInvoiceType.INVOICE &&
-                        selectedItem.stock < value
+                        selectedItem.stock < value &&
+                        selectedItem?.hasInventory
                       ) {
                         const allErrors = [...rowsErrors];
                         allErrors[index] = { hasError: true };

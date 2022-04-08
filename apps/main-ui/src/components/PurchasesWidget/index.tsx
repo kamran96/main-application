@@ -114,27 +114,6 @@ const Editor: FC<IProps> = ({ type, id }) => {
     printDiv(printItem);
   };
 
-  const onSendPDF = (contactId, message) => {
-    const printItem = printRef.current;
-    let email = ``;
-
-    const [filteredContact] = contactResult.filter(
-      (cont) => cont.id === contactId
-    );
-
-    if (filteredContact) {
-      email = filteredContact.email;
-    }
-
-    const pdf = DownloadPDF(printItem);
-    const payload = {
-      email,
-      html: `${pdf}`,
-      message,
-    };
-    handleUploadPDF(payload);
-  };
-
   const onCreateContact = async () => {
     await mutateCreateContact(
       { name: createContactName, contactType: IContactTypes.SUPPLIER },
@@ -149,6 +128,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
 
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
+  const RouteState: any = history?.location?.state;
   const onFinish = async (value) => {
     const errors = handleCheckValidation();
 
@@ -183,10 +163,9 @@ const Editor: FC<IProps> = ({ type, id }) => {
       if (id) {
         payload = {
           ...payload,
+
           id,
-          isNewRecord: history?.location?.search?.includes('relation')
-            ? true
-            : false,
+          isNewRecord: RouteState?.relation ? true : false,
           deleted_ids: deleteIds,
         };
       }
@@ -201,25 +180,6 @@ const Editor: FC<IProps> = ({ type, id }) => {
           if (value && value.status.print) {
             setPrintModal(true);
           }
-
-          // if (payload.status !== 2) {
-          //   if (
-          //     type !== IInvoiceType.PURCHASE_ENTRY &&
-          //     type !== IInvoiceType.QUOTE
-          //   ) {
-          //     const messages = {
-          //       invoice: `Invoice from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.reference}`,
-          //       quotes: `Quotation from ${userDetails?.organization?.name}, ${userDetails?.branch?.name} Branch \n ${payload.reference}`,
-          //     };
-
-          //     onSendPDF(
-          //       value.contactId,
-          //       type === IInvoiceType.INVOICE
-          //         ? messages.invoice
-          //         : messages.quotes
-          //     );
-          //   }
-          // }
 
           ClearAll();
 

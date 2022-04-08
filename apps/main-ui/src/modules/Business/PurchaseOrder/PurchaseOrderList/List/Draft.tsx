@@ -3,7 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 
-import { deletePurchaseDrafts, getAllContacts } from '../../../../../api';
+import { purchaseOrderDeleteAPI, getAllContacts } from '../../../../../api';
 import { purchaseOrderList } from '../../../../../api/purchaseOrder';
 import { ConfirmModal } from '../../../../../components/ConfirmModal';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
@@ -39,7 +39,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
 
   /* THIS MUTATION IS RESPONSIBLE FOR DELETE ORDERS */
   const { mutate: mutateDeleteOrders, isLoading: deletingPurchaseOrders } =
-    useMutation(deletePurchaseDrafts);
+    useMutation(purchaseOrderDeleteAPI);
   /* COMPONENT STATE MANAGEMENT HOOKS */
   const [selectedRow, setSelectedRow] = useState([]);
   const [filterBar, setFilterbar] = useState(false);
@@ -186,7 +186,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
     title: 'Created By',
     dataIndex: 'owner',
     key: 'owner',
-    render: (data) => <p className="capitalize">{data?.name}</p>,
+    render: (data) => <p className="capitalize">{data?.profile?.fullName}</p>,
   });
 
   const renerTopRightbar = () => {

@@ -153,6 +153,7 @@ export class AppService {
         ),
       ];
 
+      console.log(data.invoice_items, 'ite');
       data.invoice_items.forEach((tr, index) => {
         const item = data.items.find((i) => i.id === tr.itemId);
 
@@ -211,6 +212,13 @@ export class AppService {
 
       const { data } = body;
 
+      const contact = {
+        name: data?.contact?.name || '',
+        country: data?.contact?.addresses[0]?.country || '',
+        city: data?.contact?.addresses[0]?.city || '',
+        postalCode: data?.contact?.addresses[0]?.postalCode || '',
+      };
+
       const {
         data: { result },
       } = await http.get(`users/organization/${req.user.organizationId}`);
@@ -224,6 +232,8 @@ export class AppService {
       };
 
       const contents = await this.pdfData(data, defaultCurrency);
+
+      console.log(contents, 'con');
 
       const tableStylesConfig = {
         th: {
@@ -454,18 +464,14 @@ export class AppService {
                 stack: [
                   { text: 'To', style: 'label' },
                   {
-                    text: Capitalize(
-                      data?.contact?.name ? data?.contact?.name : ''
-                    ),
+                    text: Capitalize(contact?.name),
                     style: 'data',
                   },
                   { text: 'Address', style: 'label' },
                   {
-                    text: `${Capitalize(
-                      data?.contact?.addresses[0].country || ''
-                    )}, ${Capitalize(
-                      data?.contact?.addresses[0].city || ''
-                    )}, ${data?.contact?.addresses[0].postalCode || ''}`,
+                    text: `${Capitalize(contact?.country)}, ${Capitalize(
+                      contact?.city
+                    )}, ${contact.postalCode}`,
                     style: 'data',
                   },
                 ],
@@ -574,6 +580,8 @@ export class AppService {
           font: 'RobotoSlab',
         },
       };
+
+      console.log(docDefinition, 'def');
 
       const fonts = {
         RobotoSlab: {

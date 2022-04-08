@@ -145,3 +145,11 @@ export const quotationApproveAPI = (id: string | number) =>
 
 export const deleteCreditNoteAPI = (paylod: { ids: number[]; type: number }) =>
   http.put(`/invoices/credit-note/delete`, paylod);
+
+export const EmailInvoiceAPI = (payload: {
+  type: string;
+  id: number;
+  email: string;
+  cc: string[];
+  bcc: string[];
+}) => http?.post(`invoices/invoice/pdf`, payload);
