@@ -9,7 +9,6 @@ export class BillDto {
   grossTotal: number;
   currency: number;
   netTotal: number;
-  date: string;
   invoiceType: string;
   directTax: number;
   indirectTax: number;

@@ -17,6 +17,7 @@ import {
   pushDraftToInvoiceAPI,
   pushDraftToPurchaseAPI,
   findInvoiceByID,
+  EmailInvoiceAPI,
 } from '../../api';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { IInvoiceItem, IInvoiceType } from '@invyce/shared/types';
@@ -92,8 +93,10 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
 
   /* **************UTILITY HOOKS**************** */
   const { rbac } = useRbac(null);
-  const { userDetails, notificationCallback, handleUploadPDF } =
-    useGlobalContext();
+  const { userDetails, notificationCallback } = useGlobalContext();
+
+  const { mutate: mutateEmailInvoice, isLoading: sendingEmail } =
+    useMutation(EmailInvoiceAPI);
 
   const history = useHistory();
 
@@ -124,8 +127,6 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
   /* LOCAL STATES */
   const [emailModal, setEmailModal] = useState(false);
   const [tableData, setTableData] = useState<IInvoiceItem[]>([]);
-
-  console.log(tableData, 'table data');
 
   /* LOCAL STATES ENDS HERE */
 
@@ -223,18 +224,23 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
     }
   }
 
-  const onEmail = (values) => {
-    const printItem = printRef.current;
-
-    const pdf = DownloadPDF(printItem);
+  const onEmail = async (values) => {
     const payload = {
       ...values,
       id,
-      type,
-      html: `${pdf}`,
+      type: response?.invoiceType,
     };
 
-    handleUploadPDF(payload);
+    await mutateEmailInvoice(payload, {
+      onSuccess: () => {
+        notificationCallback(
+          NOTIFICATIONTYPE.SUCCESS,
+          'Email Send Sucessfully'
+        );
+
+        setEmailModal(false);
+      },
+    });
   };
 
   /* *********************CALCULATIONS**************** */
@@ -544,7 +550,7 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
                 <td className="invoice_reference">
                   <table>
                     <tr>
-                      <td className="head">Invoice number</td>
+                      <td className="head">Order Number</td>
                     </tr>
                     <tr>
                       <td>
@@ -580,7 +586,7 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
                 <td className="invoice_amount">
                   <table>
                     <tr>
-                      <td className="head">Invoice of (USD)</td>
+                      <td className="head">Total</td>
                     </tr>
                     <tr>
                       <td>
@@ -593,18 +599,22 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
                         </H3>
                       </td>
                     </tr>
-                    <tr>
-                      <td className="head">Due Date</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <BoldText>
-                          <Capitalize>
-                            {dayjs(response?.dueDate).format('MM/DD/YYYY')}
-                          </Capitalize>
-                        </BoldText>
-                      </td>
-                    </tr>
+                    {response?.dueDate && (
+                      <>
+                        <tr>
+                          <td className="head">Due Date</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <BoldText>
+                              <Capitalize>
+                                {dayjs(response?.dueDate).format('MM/DD/YYYY')}
+                              </Capitalize>
+                            </BoldText>
+                          </td>
+                        </tr>
+                      </>
+                    )}
                   </table>
                 </td>
               </tr>

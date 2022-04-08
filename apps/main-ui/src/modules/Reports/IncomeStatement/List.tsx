@@ -29,6 +29,9 @@ import {
   Addressbar,
   TopbarLogoWithDetails,
 } from '../../../components/PrintHeader/Formats';
+import DUMMYLOGO from '../../../assets/quickbook.png';
+import { PDFViewer } from '@react-pdf/renderer';
+import { IncomeStatementPdf } from '../../../components/PDFs/IncomeStatementPdf';
 // import FilterSchema from "./filterSchema";
 
 interface IBalanceSheetConfig {
@@ -53,13 +56,39 @@ export const IncomeStatementList: FC = () => {
     IBalanceSheetData[]
   >([]);
   const [total, setTotals] = useState(0);
-  const { routeHistory } = useGlobalContext();
+  const { routeHistory, userDetails } = useGlobalContext();
   const { history } = routeHistory;
 
   const [config, setConfig] = useState({
     query: '',
   });
   const { query } = config;
+
+  //User details
+  const { organization } = userDetails;
+
+  const {
+    address: organizationAddress,
+    name: organizationName,
+    email: organizationEmail,
+    phoneNumber: organizationContact,
+    website,
+  } = organization;
+
+  const { city, country, postalCode } = organizationAddress;
+
+  const headerprops = {
+    organizationName,
+    city,
+    country,
+    title: 'IncomeStatement',
+    organizationContact,
+    organizationEmail,
+    address: '',
+    code: postalCode,
+    logo: DUMMYLOGO,
+    website,
+  };
 
   useEffect(() => {
     if (history?.location?.search) {
@@ -103,6 +132,8 @@ export const IncomeStatementList: FC = () => {
   const searchedQueryItem: any = useMemo(() => {
     return query ? JSON.parse(atob(query)) : query;
   }, [query]);
+
+  console.log('incomestatementdata', incomeStatementData);
 
   return (
     <WrapperIncomeStatement>
@@ -198,7 +229,7 @@ export const IncomeStatementList: FC = () => {
                                 <td colSpan={searchedQueryItem?.date ? 7 : 3}>
                                   <table style={{ width: '100%' }}>
                                     <thead>
-                                      <th>{accountHead.name}</th>
+                                      <th className='ItemName'>{accountHead.name}</th>
                                       <th className="static-width"></th>
                                       <th className="static-width"></th>
                                       {searchedQueryItem?.date && (
@@ -311,6 +342,14 @@ export const IncomeStatementList: FC = () => {
           </PrintFormat>
         </div>
       </TableCard>
+      <PDFViewer height={'1080px'} width={'100%'}>
+        <IncomeStatementPdf
+          header={headerprops}
+          incomeStatement={incomeStatementData}
+          searchedQueryItem={searchedQueryItem}
+          total={total}
+        />
+      </PDFViewer>
     </WrapperIncomeStatement>
   );
 };
@@ -378,6 +417,11 @@ const WrapperIncomeStatement = styled.div`
   }
   .static-width-header {
     width: 160px;
+  }
+  .ItemName{
+    display: flex;
+    jutsify-content: flex-start;
+    align-items: center;
   }
 
   .dark-text {

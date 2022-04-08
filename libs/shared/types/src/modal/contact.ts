@@ -92,7 +92,15 @@ export class IContactLedgerResp extends IBaseRequestResponse {
                   : IEntryType?.CREDIT,
             };
           })
-        : generatedResult;
+        : generatedResult?.map((item: IContactLedger, index) => {
+            return {
+              ...item,
+              entryType:
+                item?.entryType === IEntryType?.CREDIT_NOTE
+                  ? IEntryType.CREDIT
+                  : item?.entryType,
+            };
+          });
     } else if (this.initial_balance && this.initial_balance.amount) {
       const generatedResult: IContactLedger | any[] = this.result;
       generatedResult.splice(0, 0, {
@@ -103,24 +111,42 @@ export class IContactLedgerResp extends IBaseRequestResponse {
             return {
               ...item,
               entryType:
-                item?.entryType === IEntryType?.CREDIT
+                item?.entryType === IEntryType?.CREDIT ||
+                item?.entryType === IEntryType?.DEBIT_NOTE
                   ? IEntryType?.DEBIT
                   : IEntryType?.CREDIT,
             };
           })
-        : generatedResult;
+        : generatedResult.map((item: IContactLedger, index) => {
+            return {
+              ...item,
+              entryType:
+                item?.entryType === IEntryType?.DEBIT
+                  ? IEntryType?.DEBIT
+                  : IEntryType?.CREDIT,
+            };
+          });
     } else {
       return this?.contact?.contactType === IContactTypes.SUPPLIER
         ? this.result?.map((item: IContactLedger, index) => {
             return {
               ...item,
               entryType:
-                item?.entryType === IEntryType?.CREDIT
+                item?.entryType === IEntryType?.CREDIT ||
+                item?.entryType === IEntryType?.DEBIT_NOTE
                   ? IEntryType?.DEBIT
                   : IEntryType?.CREDIT,
             };
           })
-        : this.result;
+        : this.result?.map((item: IContactLedger, index) => {
+            return {
+              ...item,
+              entryType:
+                item?.entryType === IEntryType?.CREDIT_NOTE
+                  ? IEntryType.CREDIT
+                  : item?.entryType,
+            };
+          });
     }
   }
 

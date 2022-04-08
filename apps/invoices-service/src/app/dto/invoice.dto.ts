@@ -14,6 +14,7 @@ export class InvoiceDto {
   invoiceType: string;
   directTax: number;
   indirectTax: number;
+  email: string;
   isTaxIncluded: number;
   status: number;
   isReturn: boolean;
