@@ -30,7 +30,7 @@ export const useTransaction = () => useContext(transactionContext);
 let timeout: any;
 
 export const TransactionManager: FC<ITransactionEditorProps> = ({
-  children,
+  children, id
 }) => {
   const [width] = useWindowSize();
   const [transactionsList, setTransactionsList] = useState<ITransactionsList[]>(
@@ -283,6 +283,7 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
         addRow: handleAddRow,
         resetTransactions,
         loading: accountsLoading,
+        id,
       }}
     >
       <div>{children}</div>
