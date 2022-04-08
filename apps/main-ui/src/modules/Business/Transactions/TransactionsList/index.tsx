@@ -13,6 +13,7 @@ export const TransactionsList: FC = () => {
   const { routeHistory } = useGlobalContext();
   const { search } = routeHistory.history.location;
 
+
   useEffect(() => {
     if (!activeTab) {
       setActiveTab('approve');

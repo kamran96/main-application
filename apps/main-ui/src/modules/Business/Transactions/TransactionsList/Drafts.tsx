@@ -2,8 +2,8 @@
 import { ColumnsType } from 'antd/lib/table';
 import dayjs from 'dayjs';
 import { FC, useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
-import { getAllTransactionsAPI } from '../../../../api';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { deleteTransactionApiById, getAllTransactionsAPI } from '../../../../api';
 import { SmartFilter } from '../../../../components/SmartFilter';
 import { CommonTable } from '../../../../components/Table';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
@@ -17,22 +17,24 @@ import moneyFormat from '../../../../utils/moneyFormat';
 import { WrapperTransactionCustomBar, WrapperTransactionsList } from './styles';
 import { TransactionItemTable } from './TransactionItemsTable';
 import transactionsFilterSchema from './transactionsFilterSchema';
-import { Button } from 'antd';
-import { BoldText } from '../../../../components/Para/BoldText';
-import styled from 'styled-components';
+import { ConfirmModal } from '../../../../components/ConfirmModal';
+import { PurchaseListTopbar } from '../../../../components/PurchasesListTopbar';
+import { NOTIFICATIONTYPE, IServerError} from '../../../../modal';
+
 
 const DRAFTTransactionsList: FC = () => {
+  const queryCache = useQueryClient();
   const [filterBar, setFilterbar] = useState<boolean>(false);
+  const [userId, setUserId] = useState([]);
   const [{ result, pagination }, setResponse] = useState<IResponseTransactions>(
     {
       result: [],
     }
   );
-
   const [filterSchema, setFilterSchema] = useState(transactionsFilterSchema);
+  const [confirmModal, setConfirmModal] = useState(false);
 
-  const { routeHistory } = useGlobalContext();
-
+  const { routeHistory , notificationCallback} = useGlobalContext();
   const { history } = routeHistory;
 
   const [transactionConfig, setTransactionsConfig] = useState({
@@ -43,7 +45,10 @@ const DRAFTTransactionsList: FC = () => {
     status: TransactionsStatus.DRAFT,
   });
 
-  const { page, query, sortid, page_size, status } = transactionConfig;
+
+  const {mutate: mutateDeleteTrasaction, isLoading: isDeletingTransactions} = useMutation(deleteTransactionApiById)
+
+  const { page, query, page_size, status } = transactionConfig;
 
   const [accountsResponse, setAccountsResponse] = useState<IAccountsResult[]>(
     []
@@ -105,6 +110,34 @@ const DRAFTTransactionsList: FC = () => {
   //     setFilterSchema(schema);
   //   }
   // }, [allAccounts.data]);
+
+  const handleDelete = async() =>{
+    const payload = {
+      ids: [userId],
+    };
+    // console.log(payload, "payload");
+    await mutateDeleteTrasaction(payload, {
+      onSuccess: () => {
+        ['transactions'].forEach(
+          (key) => {
+            (queryCache.invalidateQueries as any)((q) =>
+              q.queryKey[0].toString().startsWith(key)
+            );
+          }
+        );
+
+        setConfirmModal(false);
+      },
+      onError: (error: IServerError) => {
+        if(error && error?.response && error?.response?.data && error?.response?.data?.message){
+          const {message} = error?.response?.data;
+          notificationCallback(NOTIFICATIONTYPE.ERROR, message);
+        }
+      }
+    })
+    setConfirmModal(false);
+  }
+
 
   const columns: ColumnsType<any> = [
     {
@@ -213,18 +246,28 @@ const DRAFTTransactionsList: FC = () => {
         expandable={{
           expandedRowRender: (record, index) => {
             return (
-              <ActionWrapper>
-                <BoldText className="mr-10">Action</BoldText>
-                <Button className="button">Edit</Button>
-                <Button className="button">Approve</Button>
-                <Button danger className="button">
-                  Delete
-                </Button>
+              <>
+               <PurchaseListTopbar
+                 // hideDeleteButton={!rbac.can(PERMISSIONS.INVOICES_DELETE)}
+                  disabled={false}
+                  isEditable={true}
+                   hasApproveButton={true}
+                  onEdit={() => {
+                    history.push(`/app${ISupportedRoutes.CREATE_TRANSACTION}/${record.id}`)
+                  }}
+                  onDelete={() => {
+                    setUserId(record?.id);
+                    setConfirmModal(true);
+                  }}
+                  onApprove = {() =>{
+                    console.log("Approve")
+                  }}
+                />
                 <TransactionItemTable
                   allAccounts={accountsResponse}
                   data={record.transactionItems}
                 />
-              </ActionWrapper>
+              </>
             );
           },
         }}
@@ -248,14 +291,19 @@ const DRAFTTransactionsList: FC = () => {
         }}
         hasfooter={true}
       />
+
+      <ConfirmModal
+        loading={false}
+        visible={confirmModal}
+        onCancel={() => setConfirmModal(false)}
+        onConfirm={handleDelete}
+        type="delete"
+        text="Are you sure want to delete selected Category?"
+      />
+
     </WrapperTransactionsList>
   );
 };
 export default DRAFTTransactionsList;
 
-const ActionWrapper = styled.div`
-  margin: 10px 20px;
-  .button {
-    margin: 0 10px;
-  }
-`;
+
