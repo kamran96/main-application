@@ -25,11 +25,9 @@ import { FC, useEffect } from 'react';
 import { IServerError } from '../../../../modal';
 import data from '@iconify-icons/feather/check';
 
-interface Iprops {
-  id: number;
-}
 
-const Editor: FC<Iprops> = ({ id }) => {
+
+const Editor = () => {
   const queryCache = useQueryClient();
 
   // ****** HOOKS IMPLEMENTATION ******
@@ -39,6 +37,7 @@ const Editor: FC<Iprops> = ({ id }) => {
     setTransactionsList,
     addRow,
     loading,
+    id,
     resetTransactions,
   } = useTransaction();
   const [form] = Form.useForm();
@@ -369,8 +368,8 @@ export const TransactionsWidget = () => {
     history?.location?.pathname?.split('/app/journal-entry/')[1];
 
   return (
-    <TransactionManager>
-      <Editor id={id} />
+    <TransactionManager id={id}>
+      <Editor />
     </TransactionManager>
   );
 };

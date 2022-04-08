@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 
 export interface ITransactionEditorProps {
   children: ReactNode;
+  id: number
 }
 
 export interface ITranactionContext {
@@ -12,6 +13,7 @@ export interface ITranactionContext {
   addRow: () => void;
   loading: boolean;
   resetTransactions: () => void;
+  id: number
 }
 export interface ITransactionsList {
   account: number | string;
