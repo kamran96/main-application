@@ -1,5 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { BillItems } from './billItem.entity';
+import { CreditNotes } from './creditNote.entity';
 
 @Entity()
 export class Bills {
@@ -58,4 +66,8 @@ export class Bills {
 
   @OneToMany(() => BillItems, (billItem) => billItem.bill)
   purchaseItems: BillItems[];
+
+  @OneToOne(() => CreditNotes)
+  @JoinColumn({ name: 'id', referencedColumnName: 'billId' })
+  creditNote: CreditNotes;
 }

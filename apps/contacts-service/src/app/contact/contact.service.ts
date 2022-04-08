@@ -439,7 +439,14 @@ export class ContactService {
 
               newLedgerArray.push({
                 ...i,
-                bill,
+                bill: {
+                  ...bill,
+                  invoiceNumber:
+                    i.entryType === EntryType.CREDITNOTE && bill.creditNote
+                      ? bill.creditNote.invoiceNumber
+                      : bill.invoiceNumber,
+                  // id: invoice.creditNote ? invoice.creditNote.id : invoice.id,
+                },
               });
             }
             return {
@@ -461,7 +468,14 @@ export class ContactService {
 
           newLedgerArray.push({
             ...i,
-            bill,
+            bill: {
+              ...bill,
+              invoiceNumber:
+                i.entryType === EntryType.CREDITNOTE && bill.creditNote
+                  ? bill.creditNote.invoiceNumber
+                  : bill.invoiceNumber,
+              // id: invoice.creditNote ? invoice.creditNote.id : invoice.id,
+            },
           });
         }
         return {
@@ -552,7 +566,7 @@ export class ContactService {
                 i.entryType === EntryType.CREDITNOTE && invoice.creditNote
                   ? invoice.creditNote.invoiceNumber
                   : invoice.invoiceNumber,
-              id: invoice.creditNote ? invoice.creditNote.id : invoice.id,
+              // id: invoice.creditNote ? invoice.creditNote.id : invoice.id,
             },
           });
         }
