@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: users-app
-        image: <IMAGE>
+        image: registry.digitalocean.com/invyce-images/users-service:af90f94
         resources:
           limits:
             memory: "128Mi"
@@ -33,3 +33,25 @@ spec:
   ports:
   - port: 80
     targetPort: 3334
+
+---
+
+# See more at https://istio.io/docs/reference/config/networking/virtual-service/
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: users-vs
+spec:
+  gateways:
+    - invyce-staging-gateway
+  hosts:
+  - "staging.invyce.com"
+  http:
+  - name: 'users-endpoint'
+    match:
+    - uri:
+        prefix: '/users'
+    route:
+    - destination:
+        host: users-http
+

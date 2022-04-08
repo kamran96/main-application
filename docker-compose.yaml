@@ -1,0 +1,45 @@
+
+version: "3.8"
+services:
+  mongodb:
+    image: mongo
+    container_name: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+      - MONGO_INITDB_DATABASE=test
+    ports:
+      - "27017:27017"
+    volumes:
+      - /data/db:/data/db
+    networks:
+      - mongo
+  
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=test
+    ports:
+      - "5432:5432"
+    volumes:
+      - /data/db:/var/lib/postgresql/data
+    networks:
+      - postgres
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - redis
+networks:
+  mongo:
+    driver: bridge
+  postgres:
+    driver: bridge
+  redis:
+    driver: bridge
