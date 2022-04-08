@@ -118,10 +118,10 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
     },
     {
       title: 'Date',
-      dataIndex: `${type === IContactTypes.CUSTOMER ? `invoice` : 'bill'}`,
-      key: 'date',
+      dataIndex: `createdAt`,
+      key: 'createdAt',
       render: (data, row, index) => {
-        return <>{dayjs(data?.issueDate).format(`MMMM D, YYYY h:mm A`)}</>;
+        return <>{data ? dayjs(data).format(`MMMM D, YYYY h:mm A`) : '-'}</>;
       },
     },
     {
