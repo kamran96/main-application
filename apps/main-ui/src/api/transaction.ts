@@ -9,11 +9,15 @@ enum TRANSACTION {
 export const createTransactionAPI = (payload) =>
   http.post(TRANSACTION.CREATE, payload);
 
+export const deleteTransactionApiById = ({queryKey} : QueryKey) => 
+    http.put(`${TRANSACTION.INDEX}`);
+
 export const getAllTransactionsAPI = ({ queryKey }: QueryKey) => {
   const page: number = queryKey[1];
   const pageSize: number = queryKey[2];
   const query: string = queryKey[3];
-  let url = `${TRANSACTION.INDEX}?page_size=${pageSize}&page_no=${page}`;
+  const status: number = queryKey[4]
+  let url = `${TRANSACTION.INDEX}?page_size=${pageSize}&page_no=${page}&status=${status}`;
   if (query) {
     url = `${url}&query=${query}`;
   }
