@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { Between, getCustomRepository, ILike, In, LessThan } from 'typeorm';
 import axios from 'axios';
 import { BillRepository } from '../repositories/bill.repository';
@@ -403,6 +403,7 @@ export class BillService {
         },
       });
 
+      if (bill) {  
       await getCustomRepository(BillRepository).update(
         { id: dto.id },
         {
@@ -428,112 +429,114 @@ export class BillService {
         }
       );
 
-      await getCustomRepository(BillItemRepository).delete({
-        billId: dto.id,
-      });
-
-      for (const item of dto.invoice_items) {
-        const bItem = await getCustomRepository(BillItemRepository).save({
-          itemId: item.itemId,
+        await getCustomRepository(BillItemRepository).delete({
           billId: dto.id,
-          accountId: item.accountId,
-          description: item.description,
-          quantity: item.quantity,
-          purchasePrice: item.purchasePrice,
-          costOfGoodAmount: item.costOfGoodAmount,
-          sequence: item.sequence,
-          tax: item.tax,
-          total: item.total,
-          status: 1,
         });
 
-        const itemDetail = items.find((i) => i.id === item.itemId);
-        if (itemDetail?.hasInventory === true) {
-          itemLedgerArray.push({
+        for (const item of dto.invoice_items) {
+          const bItem = await getCustomRepository(BillItemRepository).save({
             itemId: item.itemId,
-            value: item.quantity,
-            targetId: bill.id,
-            type: 'increase',
-            action: 'create',
+            billId: dto.id,
+            accountId: item.accountId,
+            description: item.description,
+            quantity: item.quantity,
+            purchasePrice: item.purchasePrice,
+            costOfGoodAmount: item.costOfGoodAmount,
+            sequence: item.sequence,
+            tax: item.tax,
+            total: item.total,
+            status: 1,
           });
+
+          const itemDetail = items.find((i) => i.id === item.itemId);
+          if (itemDetail?.hasInventory === true) {
+            itemLedgerArray.push({
+              itemId: item.itemId,
+              value: item.quantity,
+              targetId: bill.id,
+              type: 'increase',
+              action: 'create',
+            });
+          }
+
+          const debit = {
+            amount: Number(item.quantity) * Number(item.purchasePrice),
+            account_id: item.accountId,
+          };
+
+          debitsArrray.push(debit);
+          billItems.push(bItem);
         }
 
-        const debit = {
-          amount: Number(item.quantity) * Number(item.purchasePrice),
-          account_id: item.accountId,
-        };
-
-        debitsArrray.push(debit);
-        billItems.push(bItem);
-      }
-
-      const updatedBill: IBill = await getCustomRepository(
-        BillRepository
-      ).findOne({
-        where: {
-          id: dto.id,
-          organizationId: req.user.organizationId,
-        },
-      });
-
-      if (updatedBill.status === Statuses.AUTHORISED) {
-        await http.post(`items/item/manage-inventory`, {
-          payload: itemLedgerArray,
-        });
-
-        const creditsArray = [
-          {
-            account_id: await accounts.find((i) => i.code === '40001').id,
-            amount: dto.netTotal,
+        const updatedBill: IBill = await getCustomRepository(
+          BillRepository
+        ).findOne({
+          where: {
+            id: dto.id,
+            organizationId: req.user.organizationId,
           },
-        ];
-
-        const payload = {
-          dr: debitsArrray,
-          cr: creditsArray,
-          type: 'bill',
-          reference: dto.reference,
-          amount: dto.grossTotal,
-          status: updatedBill.status,
-        };
-
-        const { data: transaction } = await http.post(
-          'accounts/transaction/api',
-          {
-            transactions: payload,
-          }
-        );
-
-        const paymentArr = [
-          {
-            ...updatedBill,
-            billId: bill.id,
-            balance: `-${bill.netTotal}`,
-            data: bill.issueDate,
-            dueDate: bill.dueDate,
-            paymentType: PaymentModes.BILLS,
-            transactionId: transaction.id,
-            entryType: EntryType.CREDIT,
-          },
-        ];
-
-        const billLink = `${process.env.FRONTEND_HOST}/bills/view/${updatedBill.id}`;
-
-        await this.emailService.emit(BILL_UPDATED, {
-          to: req.user.email,
-          user_name: req.user.profile.fullName,
-          invoice_number: bill.invoiceNumber,
-          invoice_name: bill.reference,
-          link: billLink,
         });
 
-        await http.post(`payments/payment/add`, {
-          payments: paymentArr,
-        });
-        await http.get(`contacts/contact/balance`);
+        if (updatedBill.status === Statuses.AUTHORISED) {
+          await http.post(`items/item/manage-inventory`, {
+            payload: itemLedgerArray,
+          });
+
+          const creditsArray = [
+            {
+              account_id: await accounts.find((i) => i.code === '40001').id,
+              amount: dto.netTotal,
+            },
+          ];
+
+          const payload = {
+            dr: debitsArrray,
+            cr: creditsArray,
+            type: 'bill',
+            reference: dto.reference,
+            amount: dto.grossTotal,
+            status: updatedBill.status,
+          };
+
+          const { data: transaction } = await http.post(
+            'accounts/transaction/api',
+            {
+              transactions: payload,
+            }
+          );
+
+          const paymentArr = [
+            {
+              ...updatedBill,
+              billId: bill.id,
+              balance: `-${bill.netTotal}`,
+              data: bill.issueDate,
+              dueDate: bill.dueDate,
+              paymentType: PaymentModes.BILLS,
+              transactionId: transaction.id,
+              entryType: EntryType.CREDIT,
+            },
+          ];
+
+          const billLink = `${process.env.FRONTEND_HOST}/bills/view/${updatedBill.id}`;
+
+          await this.emailService.emit(BILL_UPDATED, {
+            to: req.user.email,
+            user_name: req.user.profile.fullName,
+            invoice_number: bill.invoiceNumber,
+            invoice_name: bill.reference,
+            link: billLink,
+          });
+
+          await http.post(`payments/payment/add`, {
+            payments: paymentArr,
+          });
+          await http.get(`contacts/contact/balance`);
+        }
+
+        return bill;
       }
-
-      return bill;
+      throw new HttpException('Bill not found', HttpStatus.BAD_REQUEST);
     } else {
       const bill = await getCustomRepository(BillRepository).save({
         contactId: dto.contactId,
