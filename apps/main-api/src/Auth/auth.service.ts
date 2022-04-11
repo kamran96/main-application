@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { getCustomRepository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import * as queryString from 'query-string';
+import * as crypto from 'crypto';
 import * as redis from 'redis';
 import * as Moment from 'moment';
 import { JwtService } from '@nestjs/jwt';
@@ -22,7 +23,9 @@ import { EmailService } from '../Common/services/email.service';
 // const set = promisify(client.set).bind(client);
 
 const generateRandomNDigits = (n) => {
-  return Math.floor(Math.random() * (9 * Math.pow(10, n))) + Math.pow(10, n);
+  return (
+    Math.floor(crypto.randomInt(1) * (9 * Math.pow(10, n))) + Math.pow(10, n)
+  );
 };
 
 @Injectable()
@@ -305,7 +308,6 @@ export class AuthService {
   }
 
   async ForgetPassword(userDto): Promise<boolean> {
-    console.log(userDto);
     const userRepository = getCustomRepository(UserRepository);
     const user = await userRepository
       .createQueryBuilder('users')

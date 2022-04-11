@@ -273,13 +273,47 @@ export class TransactionService {
     }
   }
 
+  async ApproveTransaction(transactionId) {
+    const transaction = await getCustomRepository(
+      TransactionRepository
+    ).findOne({
+      id: transactionId,
+    });
+
+    if (transaction) {
+      await getCustomRepository(TransactionRepository).update(
+        {
+          id: transactionId,
+        },
+        {
+          status: 1,
+        }
+      );
+
+      await getCustomRepository(TransactionItemRepository).update(
+        {
+          transactionId: transactionId,
+        },
+        {
+          status: 1,
+        }
+      );
+
+      return {
+        message: 'Transaction approved successfully',
+        status: true,
+      };
+    }
+  }
+
   async FindTransactionById(transactionId: number): Promise<ITransaction> {
     const [transaction] = await getCustomRepository(TransactionRepository).find(
       {
         where: { id: transactionId },
-        relations: ['transactionItems'],
+        relations: ['transactionItems', 'transactionItems.account'],
       }
     );
+
     return transaction;
   }
 

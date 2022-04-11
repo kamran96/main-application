@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -59,10 +60,7 @@ export class TransactionController {
 
   @Post()
   @UseGuards(GlobalAuthGuard)
-  async create(
-    @Body() transactionDto: TransactionDto,
-    @Req() req: Request
-  ): Promise<ITransactionWithResponse> {
+  async create(@Body() transactionDto: TransactionDto, @Req() req: Request) {
     try {
       const transaction = await this.transactionService.CreateTransaction(
         transactionDto,
@@ -144,6 +142,12 @@ export class TransactionController {
     return await this.transactionService.AddTransaction(data, req);
   }
 
+  @Put('approve/:id')
+  @UseGuards(GlobalAuthGuard)
+  async approveTransaction(@Param() params) {
+    return await this.transactionService.ApproveTransaction(params.id);
+  }
+
   @Post('delete')
   @UseGuards(GlobalAuthGuard)
   async deleteJournalEntry(
@@ -151,5 +155,11 @@ export class TransactionController {
     @Req() req: IRequest
   ) {
     return await this.transactionService.DeleteJornalEntry(data, req.user);
+  }
+
+  @Put('delete')
+  @UseGuards(GlobalAuthGuard)
+  async deleteDraftTransactions(@Body() data: DeleteTransactionsDto) {
+    return await this.transactionService.DeleteTransaction(data);
   }
 }
