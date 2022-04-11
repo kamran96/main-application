@@ -1,7 +1,7 @@
-import styled from "styled-components";
-import { Menu } from "antd";
-import convertToRem from "../../../utils/convertToRem";
-import { Color } from "../../../modal";
+import styled from 'styled-components';
+import { Menu } from 'antd';
+import convertToRem from '../../../utils/convertToRem';
+import { Color } from '../../../modal';
 
 export const ItemsListWrapper = styled.div`
   .custom_topbar {
@@ -24,8 +24,6 @@ export const ItemsListWrapper = styled.div`
       cursor: pointer;
     }
   }
-
- 
 `;
 
 export const ActionsMenuWrapper = styled(Menu)`

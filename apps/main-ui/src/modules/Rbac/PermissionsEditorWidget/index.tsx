@@ -73,7 +73,7 @@ export const PermissionsEditorWidget: FC = () => {
               },
             ]}
           >
-            <Input size="middle" autoComplete='off'/>
+            <Input size="middle" autoComplete="off" />
           </Form.Item>
           <FormLabel>Description</FormLabel>
           <Form.Item name="description">

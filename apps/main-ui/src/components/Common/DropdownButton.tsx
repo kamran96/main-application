@@ -1,7 +1,7 @@
-import React, { ReactElement, FC } from "react";
-import { Button } from "antd";
-import { ButtonProps } from "antd/es/button";
-import { ButtonHTMLType } from "antd/es/button/button";
+import React, { ReactElement, FC } from 'react';
+import { Button } from 'antd';
+import { ButtonProps } from 'antd/es/button';
+import { ButtonHTMLType } from 'antd/es/button/button';
 
 interface IProps
   extends React.ForwardRefExoticComponent<

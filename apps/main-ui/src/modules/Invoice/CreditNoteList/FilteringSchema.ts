@@ -1,26 +1,26 @@
-import { FilterType } from "../../../modal";
+import { FilterType } from '../../../modal';
 
 export default {
   contactId: {
     type: FilterType.LIST_IDS,
-    label: "Customer",
+    label: 'Customer',
     value: [],
   },
   reference: {
     type: FilterType.SEARCH,
-    label: "Reference",
-    value: "",
+    label: 'Reference',
+    value: '',
     isFullSearch: true,
   },
   issueDate: {
     type: FilterType.DATE_BETWEEN,
-    label: "Credit Note Date",
-    value: "",
+    label: 'Credit Note Date',
+    value: '',
   },
   invoiceNumber: {
     type: FilterType.SEARCH,
-    label: "Credit Note Number",
-    value: "",
+    label: 'Credit Note Number',
+    value: '',
     isFullSearch: false,
-  }
+  },
 };

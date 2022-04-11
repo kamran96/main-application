@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from "react";
-import styled from "styled-components";
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
 
-import { TableTabs, TableTabsContent } from "../../../../components/TableTabs";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
-import { ALLQuotesList } from "./AllQuotes";
-import { QuoteColumns } from "./commonCol";
-import { DraftQuotesList } from "./DraftList";
-import { ProcessedQuotations } from "./Processed";
+import { TableTabs, TableTabsContent } from '../../../../components/TableTabs';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { ALLQuotesList } from './AllQuotes';
+import { QuoteColumns } from './commonCol';
+import { DraftQuotesList } from './DraftList';
+import { ProcessedQuotations } from './Processed';
 
 export const QuoteList = () => {
   const { routeHistory } = useGlobalContext();
-  const [activeTab, setActiveTab] = useState("processed");
+  const [activeTab, setActiveTab] = useState('processed');
   const { search } = routeHistory.history.location;
 
   useEffect(() => {
     if (search) {
-      let filterTab = search.split("?")[1].split("&")[0].split("=")[1];
-      if (filterTab !== null && filterTab !== "id") {
+      let filterTab = search.split('?')[1].split('&')[0].split('=')[1];
+      if (filterTab !== null && filterTab !== 'id') {
         setActiveTab(filterTab);
       }
     }

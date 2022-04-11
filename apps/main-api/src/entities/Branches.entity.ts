@@ -41,10 +41,7 @@ export class Branches {
   createdById: number;
   @Column()
   updatedById: number;
-  @ManyToOne(
-    type => Organizations,
-    organization => organization.id,
-  )
+  @ManyToOne((type) => Organizations, (organization) => organization.id)
   @JoinColumn()
   organization: Organizations;
 }

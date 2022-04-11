@@ -63,7 +63,7 @@ export class attributeValues1607685191493 implements MigrationInterface {
           },
         ],
       }),
-      true,
+      true
     );
 
     await queryRunner.createForeignKey(
@@ -73,7 +73,7 @@ export class attributeValues1607685191493 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'items',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -83,7 +83,7 @@ export class attributeValues1607685191493 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -93,7 +93,7 @@ export class attributeValues1607685191493 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'attributes',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -103,7 +103,7 @@ export class attributeValues1607685191493 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -113,7 +113,7 @@ export class attributeValues1607685191493 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

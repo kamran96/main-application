@@ -1,3 +1,3 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
-export const WrapperAccountSettings = styled.div``
+export const WrapperAccountSettings = styled.div``;

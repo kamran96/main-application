@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import convertToRem from "../../utils/convertToRem";
+import styled from 'styled-components';
+import convertToRem from '../../utils/convertToRem';
 
 export const SearchWrapper = styled.div`
   font-size: ${convertToRem(12)};

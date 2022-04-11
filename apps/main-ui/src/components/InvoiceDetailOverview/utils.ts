@@ -1,12 +1,12 @@
 export const chartConfig = ({ dataItems, labels }) => {
   return {
-    type: "doughnut",
+    type: 'doughnut',
     data: {
       labels,
       datasets: [
         {
           data: dataItems,
-          backgroundColor: ["#51E5FF", "#440381", "#EC368D", "#FFE66D"],
+          backgroundColor: ['#51E5FF', '#440381', '#EC368D', '#FFE66D'],
           borderWidth: 1,
         },
       ],
@@ -21,12 +21,12 @@ export const chartConfig = ({ dataItems, labels }) => {
             const label = data.labels[tooltipItem.index];
             const val =
               data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-            return label + ": $" + val;
+            return label + ': $' + val;
           },
         },
       },
       legend: {
-        position: "bottom",
+        position: 'bottom',
         display: false,
       },
       legendCallback: (chart) => {
@@ -49,7 +49,7 @@ export const chartConfig = ({ dataItems, labels }) => {
                 </li>
               `
             )
-            .join("");
+            .join('');
         };
         return `
           <ul class="chartjs-legend">
@@ -62,14 +62,14 @@ export const chartConfig = ({ dataItems, labels }) => {
 };
 
 export const bindChartEvents = (myChart, containerElement) => {
-  const legendItemSelector = ".legend-item";
-  const labelSeletor = ".label";
+  const legendItemSelector = '.legend-item';
+  const labelSeletor = '.label';
 
   const legendItems = [
     ...containerElement.querySelectorAll(legendItemSelector),
   ];
   legendItems.forEach((item, i) => {
-    item.addEventListener("click", (e) =>
+    item.addEventListener('click', (e) =>
       updateDataset(e.target.parentNode, i)
     );
   });
@@ -80,9 +80,9 @@ export const bindChartEvents = (myChart, containerElement) => {
     const result = meta.data[index].hidden === true ? false : true;
     if (result === true) {
       meta.data[index].hidden = true;
-      labelEl.style.textDecoration = "line-through";
+      labelEl.style.textDecoration = 'line-through';
     } else {
-      labelEl.style.textDecoration = "none";
+      labelEl.style.textDecoration = 'none';
       meta.data[index].hidden = false;
     }
     myChart.update();

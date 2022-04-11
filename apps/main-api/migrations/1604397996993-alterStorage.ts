@@ -16,7 +16,7 @@ export class alterStorage1604397996993 implements MigrationInterface {
         name: 'key',
         isNullable: true,
         type: 'varchar',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -25,7 +25,7 @@ export class alterStorage1604397996993 implements MigrationInterface {
         name: 'value',
         isNullable: true,
         type: 'jsonb',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -34,7 +34,7 @@ export class alterStorage1604397996993 implements MigrationInterface {
         name: 'organizationId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -44,7 +44,7 @@ export class alterStorage1604397996993 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

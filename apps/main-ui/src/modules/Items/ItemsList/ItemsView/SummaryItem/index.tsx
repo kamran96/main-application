@@ -1,9 +1,9 @@
-import { Card } from "antd";
-import React, { FC, ReactElement } from "react";
-import styled from "styled-components";
-import { BoldText } from "../../../../../components/Para/BoldText";
-import convertToRem from "../../../../../utils/convertToRem";
-import moneyFormat from "../../../../../utils/moneyFormat";
+import { Card } from 'antd';
+import React, { FC, ReactElement } from 'react';
+import styled from 'styled-components';
+import { BoldText } from '../../../../../components/Para/BoldText';
+import convertToRem from '../../../../../utils/convertToRem';
+import moneyFormat from '../../../../../utils/moneyFormat';
 
 interface IProps {
   amount: number | string;

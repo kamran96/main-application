@@ -13,7 +13,7 @@ export class ContactService {
     private manager: EntityManager,
     private pagination: Pagination,
     private emailService: EmailService,
-    private pdfService: PdfService,
+    private pdfService: PdfService
   ) {}
 
   async ListContact(contactData, take, page_no, sort, query) {
@@ -40,7 +40,7 @@ export class ContactService {
         page_no,
         sort,
         sql,
-        contactData,
+        contactData
       );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -90,7 +90,7 @@ export class ContactService {
           await this.manager.update(
             Contacts,
             { id: contactDto.id },
-            updatedContact,
+            updatedContact
           );
 
           const [getUpdatedContact] = await this.FindContactById(contactDto);
@@ -212,7 +212,7 @@ export class ContactService {
         'credit limit block',
         'sale discount',
         'payment days limit',
-      ].map(i => i.toUpperCase()),
+      ].map((i) => i.toUpperCase()),
     ];
 
     contactArr.forEach((tr, index) => {
@@ -290,7 +290,7 @@ export class ContactService {
         contactDto.email,
         'Request for Contact',
         `${contactDto.message}`,
-        'admin@invyce.com',
+        'admin@invyce.com'
       )
       .send();
 

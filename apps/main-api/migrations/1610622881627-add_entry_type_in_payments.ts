@@ -8,7 +8,7 @@ export class addEntryTypeInPayments1610622881627 implements MigrationInterface {
         name: 'entryType',
         type: 'smallint',
         isNullable: true,
-      }),
+      })
     );
   }
 

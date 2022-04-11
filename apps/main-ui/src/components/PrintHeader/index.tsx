@@ -1,10 +1,10 @@
-import dayjs from "dayjs";
-import React, { FC, ReactElement } from "react";
+import dayjs from 'dayjs';
+import React, { FC, ReactElement } from 'react';
 
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { IUser } from "../../modal";
-import { Heading } from "../Heading";
-import { BoldText } from "../Para/BoldText";
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { IUser } from '../../modal';
+import { Heading } from '../Heading';
+import { BoldText } from '../Para/BoldText';
 
 interface IProps {
   title?: string;
@@ -13,14 +13,14 @@ interface IProps {
 
 export const PrintHeader: FC<IProps> = ({
   title,
-  date = dayjs().format("MMMM D, YYYY"),
+  date = dayjs().format('MMMM D, YYYY'),
 }) => {
   const userDetails: IUser = useGlobalContext().userDetails;
   const _logo = userDetails?.profile?.attachment?.path;
 
   return (
     <div className="common_print_header">
-      <table style={{ width: "100%" }}>
+      <table style={{ width: '100%' }}>
         <tbody>
           <tr>
             <td></td>
@@ -41,7 +41,7 @@ export const PrintHeaderFormat: FC<IPrintHeaderFormat> = ({
   hasbackgroundColor = true,
 }) => {
   return (
-    <div className={`print_header_area ${hasbackgroundColor ? "hasbg" : ""}`}>
+    <div className={`print_header_area ${hasbackgroundColor ? 'hasbg' : ''}`}>
       {children}
     </div>
   );
@@ -55,7 +55,7 @@ interface IDivisionsProps {
 }
 export const TableDivisions: FC<IDivisionsProps> = ({ divisions }) => {
   return (
-    <table style={{ width: "100%" }}>
+    <table style={{ width: '100%' }}>
       <tbody>
         <tr>
           {divisions?.map((item, index) => {

@@ -13,7 +13,7 @@ export class alterPrices1603960058525 implements MigrationInterface {
         name: 'tax',
         isNullable: true,
         type: 'text',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'prices',
@@ -21,7 +21,7 @@ export class alterPrices1603960058525 implements MigrationInterface {
         name: 'discount',
         isNullable: true,
         type: 'text',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'prices',
@@ -29,7 +29,7 @@ export class alterPrices1603960058525 implements MigrationInterface {
         name: 'itemId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'prices',
@@ -38,7 +38,7 @@ export class alterPrices1603960058525 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'items',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

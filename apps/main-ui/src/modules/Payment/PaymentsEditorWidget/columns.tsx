@@ -1,51 +1,56 @@
 /* eslint-disable array-callback-return */
-import React from "react";
-import { Select } from "antd";
-import dayjs from "dayjs";
-import moneyFormat from "../../../utils/moneyFormat";
-import Icon from "@iconify/react";
-import convertToRem from "../../../utils/convertToRem";
-import { Color } from "../../../modal";
-import deleteIcon from "@iconify/icons-carbon/delete";
-import { ColumnsType } from "antd/lib/table";
-import { IInvoiceResult } from "apps/main-ui/src/modal/invoice";
+import React from 'react';
+import { Select } from 'antd';
+import dayjs from 'dayjs';
+import moneyFormat from '../../../utils/moneyFormat';
+import Icon from '@iconify/react';
+import convertToRem from '../../../utils/convertToRem';
+import { Color } from '../../../modal';
+import deleteIcon from '@iconify/icons-carbon/delete';
+import { ColumnsType } from 'antd/lib/table';
+import { IInvoiceResult } from 'apps/main-ui/src/modal/invoice';
 const { Option } = Select;
 
-export default function (state:any[], setState:(payload: any)=>void, contactInvoices: IInvoiceResult[]) {
+export default function (
+  state: any[],
+  setState: (payload: any) => void,
+  contactInvoices: IInvoiceResult[]
+) {
   const getContactInvById = (id: number | string) => {
     if (contactInvoices && contactInvoices.length) {
       let [filtered] = contactInvoices.filter((inv) => inv.id === id);
       return filtered;
-    }
-    else{
-      return null
+    } else {
+      return null;
     }
   };
 
   const columns: ColumnsType<any> = [
     {
-      title: "#",
+      title: '#',
       width: 30,
-      render: (data:any, row:IInvoiceResult, index:number) => <>{index + 1}</>,
+      render: (data: any, row: IInvoiceResult, index: number) => (
+        <>{index + 1}</>
+      ),
     },
     {
-      title: "Invoice no",
-      dataIndex: "id",
-      key: "id",
+      title: 'Invoice no',
+      dataIndex: 'id',
+      key: 'id',
       width: 150,
-      render: (data:any, row:IInvoiceResult, index:number) => {
+      render: (data: any, row: IInvoiceResult, index: number) => {
         return (
           <Select
             className="border-less-select"
             size="middle"
             value={{
-              value: data !== null ? data : "",
+              value: data !== null ? data : '',
               label: `${
                 data !== null && contactInvoices.length
                   ? contactInvoices &&
                     getContactInvById(data) &&
                     `${getContactInvById(data).invoiceNumber}`
-                  : "Select Item"
+                  : 'Select Item'
               }`,
             }}
             onChange={(itemObj) => {
@@ -63,7 +68,7 @@ export default function (state:any[], setState:(payload: any)=>void, contactInvo
             optionFilterProp="children"
           >
             {contactInvoices.length > 0 &&
-              contactInvoices.map((item:IInvoiceResult, index:number) => {
+              contactInvoices.map((item: IInvoiceResult, index: number) => {
                 let usedIds = [];
                 state.forEach((st) => {
                   if (st.id !== null) {
@@ -80,9 +85,8 @@ export default function (state:any[], setState:(payload: any)=>void, contactInvo
                       {item.invoiceNumber}
                     </Option>
                   );
-                }
-                else{
-                  return null
+                } else {
+                  return null;
                 }
               })}
           </Select>
@@ -90,60 +94,59 @@ export default function (state:any[], setState:(payload: any)=>void, contactInvo
       },
     },
     {
-      title: "Reference",
-      dataIndex: "reference",
-      key: "reference",
+      title: 'Reference',
+      dataIndex: 'reference',
+      key: 'reference',
       width: 120,
     },
     {
-      title: "Date",
-      dataIndex: "issueDate",
-      key: "issueDate",
-      render: (data:any) => (
+      title: 'Date',
+      dataIndex: 'issueDate',
+      key: 'issueDate',
+      render: (data: any) => (
         <>{data ? dayjs(data).format(`	YYYY-MM-DD h:mm A`) : data}</>
       ),
     },
     {
-      title: "Items",
-      dataIndex: "invoice_items",
+      title: 'Items',
+      dataIndex: 'invoice_items',
       width: 70,
-      key: "invoice_items",
-      render: (data:any) => <>{data && data.length}</>,
+      key: 'invoice_items',
+      render: (data: any) => <>{data && data.length}</>,
     },
     {
-      title: "Gross Total",
-      dataIndex: "grossTotal",
-      key: "grossTotal",
-      render: (data:any) => <>{data ? moneyFormat(data) : "-"}</>,
+      title: 'Gross Total',
+      dataIndex: 'grossTotal',
+      key: 'grossTotal',
+      render: (data: any) => <>{data ? moneyFormat(data) : '-'}</>,
     },
     {
-      title: "Discount",
-      dataIndex: "discount",
+      title: 'Discount',
+      dataIndex: 'discount',
       width: 100,
-      key: "discount",
-      render: (data) => <>{data ? moneyFormat(data) : "-"}</>,
+      key: 'discount',
+      render: (data) => <>{data ? moneyFormat(data) : '-'}</>,
     },
     {
-      title: "Total",
-      dataIndex: "netTotal",
-      key: "netTotal",
-      render: (data:any) => <>{data ? moneyFormat(data) : "-"}</>,
-    },
-
-    {
-      title: "Remaining",
-      dataIndex: "balance",
-      key: "balance",
-      render: (data:any) => <>{data ? moneyFormat(Math.abs(data)) : "-"}</>,
+      title: 'Total',
+      dataIndex: 'netTotal',
+      key: 'netTotal',
+      render: (data: any) => <>{data ? moneyFormat(data) : '-'}</>,
     },
 
     {
-      title: "",
-      dataIndex: "",
+      title: 'Remaining',
+      dataIndex: 'balance',
+      key: 'balance',
+      render: (data: any) => <>{data ? moneyFormat(Math.abs(data)) : '-'}</>,
+    },
+
+    {
+      title: '',
+      dataIndex: '',
       width: 50,
-      key: "",
-      render: (data:any, row:any, index:number) => {
-        
+      key: '',
+      render: (data: any, row: any, index: number) => {
         return (
           <i
             onClick={() => {
@@ -156,7 +159,7 @@ export default function (state:any[], setState:(payload: any)=>void, contactInvo
               style={{
                 fontSize: convertToRem(17),
                 color: Color.$GRAY,
-                cursor: "pointer",
+                cursor: 'pointer',
               }}
               icon={deleteIcon}
             />

@@ -36,7 +36,7 @@ export class XeroController {
     try {
       const xero = await this.integrationService.XeroCallback(
         data.token,
-        req.user,
+        req.user
       );
 
       if (xero) {
@@ -49,7 +49,7 @@ export class XeroController {
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -60,7 +60,7 @@ export class XeroController {
     try {
       const xero = await this.integrationService.ImportDataFromXero(
         dto.modules,
-        req.user,
+        req.user
       );
 
       if (xero) {
@@ -73,7 +73,7 @@ export class XeroController {
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }

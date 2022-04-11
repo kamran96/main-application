@@ -17,7 +17,7 @@ export class userCode1628597678650 implements MigrationInterface {
           { name: 'userId', isNullable: true, type: 'int' },
         ],
       }),
-      true,
+      true
     );
 
     await queryRunner.createForeignKey(
@@ -27,7 +27,7 @@ export class userCode1628597678650 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

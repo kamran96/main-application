@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from "react";
+import React, { FC, useCallback, useEffect, useState } from 'react';
 
 interface IProps {
   onClickOutSide?: () => void;
@@ -20,13 +20,15 @@ export const ClickOutSide: FC<IProps> = ({
   });
 
   const handleOutsideClick = useCallback(() => {
-    const body: any = document.querySelector("body");
+    const body: any = document.querySelector('body');
     // document.addEventListener
     if (body && initialVal && initialVal === true) {
-      body.addEventListener("click", (e) => {
+      body.addEventListener('click', (e) => {
         // e.stopPropagation();
-        if (!notEffectingClass.includes(e?.target?.className) && e.target.tagName!=='svg'  ) {
-
+        if (
+          !notEffectingClass.includes(e?.target?.className) &&
+          e.target.tagName !== 'svg'
+        ) {
           setTimeout(() => {
             onClickOutSide();
           }, timeout);

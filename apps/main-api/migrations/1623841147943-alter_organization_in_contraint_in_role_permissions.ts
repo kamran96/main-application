@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class alterOrganizationInContraintInRolePermissions1623841147943
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
             alter table role_permissions drop constraint "FK_aa7351da5a4b025f23b92aaa393";

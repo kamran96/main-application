@@ -1,25 +1,25 @@
-import { Button } from "antd";
-import React, { FC, useEffect, useState } from "react";
-import styled from "styled-components";
+import { Button } from 'antd';
+import React, { FC, useEffect, useState } from 'react';
+import styled from 'styled-components';
 
-import { Heading } from "../../components/Heading";
-import { Rbac } from "../../components/Rbac";
-import { PERMISSIONS } from "../../components/Rbac/permissions";
-import { TableTabs, TableTabsContent } from "../../components/TableTabs";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { PaymentPaidList } from "./PaymentsList/Payables";
-import { PaymentRecievedList } from "./PaymentsList/Recieveables";
+import { Heading } from '../../components/Heading';
+import { Rbac } from '../../components/Rbac';
+import { PERMISSIONS } from '../../components/Rbac/permissions';
+import { TableTabs, TableTabsContent } from '../../components/TableTabs';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { PaymentPaidList } from './PaymentsList/Payables';
+import { PaymentRecievedList } from './PaymentsList/Recieveables';
 
 export const PaymentContainer: FC = () => {
   const { routeHistory, setPaymentsModalConfig } = useGlobalContext();
-  const [activeTab, setActiveTab] = useState("paid");
+  const [activeTab, setActiveTab] = useState('paid');
   const { history } = routeHistory;
   const { search } = history.location;
 
   useEffect(() => {
     if (search) {
-      let filterTab = search.split("?")[1].split("&")[0].split("=")[1];
-      if (filterTab !== null && filterTab !== "id") {
+      let filterTab = search.split('?')[1].split('&')[0].split('=')[1];
+      if (filterTab !== null && filterTab !== 'id') {
         setActiveTab(filterTab);
       }
     }

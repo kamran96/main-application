@@ -14,7 +14,7 @@ export class packages1616055405557 implements MigrationInterface {
           { name: 'updatedAt', type: 'timestamp', default: 'NOW()' },
         ],
       }),
-      true,
+      true
     );
   }
 

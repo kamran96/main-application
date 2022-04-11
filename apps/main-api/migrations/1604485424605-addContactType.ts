@@ -8,7 +8,7 @@ export class addContactType1604485424605 implements MigrationInterface {
         name: 'contactType',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
   }
 

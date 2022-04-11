@@ -8,7 +8,7 @@ export class addProductTypeToItems1602671004452 implements MigrationInterface {
         name: 'itemType',
         isNullable: true,
         type: 'smallint',
-      }),
+      })
     );
   }
 

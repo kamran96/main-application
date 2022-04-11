@@ -6,7 +6,8 @@ import {
 } from 'typeorm';
 
 export class addDispatchIdToPayments1611661698395
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'payments',
@@ -14,7 +15,7 @@ export class addDispatchIdToPayments1611661698395
         name: 'dispatchId',
         type: 'int',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -24,7 +25,7 @@ export class addDispatchIdToPayments1611661698395
         referencedColumnNames: ['id'],
         referencedTableName: 'dispatches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

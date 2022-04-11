@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class addColumnStatusInContacts1600858118891
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'contacts',
@@ -9,7 +10,7 @@ export class addColumnStatusInContacts1600858118891
         name: 'status',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
   }
 

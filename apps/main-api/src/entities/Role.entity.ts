@@ -34,7 +34,7 @@ export class Roles {
   @Column()
   updatedAt: string;
 
-  @OneToOne(type => Roles)
+  @OneToOne((type) => Roles)
   @JoinColumn({ name: 'parentId', referencedColumnName: 'id' })
   role: Roles;
 }

@@ -1,7 +1,7 @@
-import React, { SFC, useState } from "react";
-import { SearchWrapper } from "./SearchStyles";
-import bxSearch from "@iconify/icons-bx/bx-search";
-import { Icon } from "@iconify/react";
+import React, { SFC, useState } from 'react';
+import { SearchWrapper } from './SearchStyles';
+import bxSearch from '@iconify/icons-bx/bx-search';
+import { Icon } from '@iconify/react';
 
 interface IProps {
   searchFind?: (searchVal: string) => void;
@@ -21,7 +21,7 @@ export const Search: SFC<IProps> = ({
   searchFind,
   showSearchIcon,
 }) => {
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
 
   const updateValue = (e: any): void => {
     let searchTerm = e.target.value;
@@ -38,9 +38,9 @@ export const Search: SFC<IProps> = ({
 
   return (
     <SearchWrapper className={className}>
-      <Icon className={"search_icon"} icon={bxSearch} />
+      <Icon className={'search_icon'} icon={bxSearch} />
       <input
-        placeholder={placeholder ? placeholder : "Search"}
+        placeholder={placeholder ? placeholder : 'Search'}
         value={searchValue}
         autoComplete="off"
         onChange={updateValue}

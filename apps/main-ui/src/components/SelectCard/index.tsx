@@ -1,8 +1,8 @@
-import React, { FC, useEffect, useState } from "react";
-import styled, { keyframes } from "styled-components";
-import { Color, DivProps } from "../../modal";
-import Icon from "@iconify/react";
-import checkCircle from "@iconify-icons/fe/check-circle";
+import React, { FC, useEffect, useState } from 'react';
+import styled, { keyframes } from 'styled-components';
+import { Color, DivProps } from '../../modal';
+import Icon from '@iconify/react';
+import checkCircle from '@iconify-icons/fe/check-circle';
 
 interface IProps {
   label: string;
@@ -68,8 +68,8 @@ const popin = keyframes`
 
 `;
 
-interface IWrapperSelectCardProps extends DivProps{
-  isChecked: boolean
+interface IWrapperSelectCardProps extends DivProps {
+  isChecked: boolean;
 }
 
 const WrapperSelectCard = styled.div<IWrapperSelectCardProps>`
@@ -85,16 +85,16 @@ const WrapperSelectCard = styled.div<IWrapperSelectCardProps>`
   justify-content: space-between;
   margin-top: 10px;
   overflow: hidden;
-  border:2px solid ;
-  border-color:${(props: any) =>
+  border: 2px solid;
+  border-color: ${(props: any) =>
     props.isChecked ? Color.$Secondary : Color.$WHITE};
 
   &::after {
     position: absolute;
-    content: "";
+    content: '';
     left: -150%;
     top: 0;
-    background:#1822500d;
+    background: #1822500d;
     width: 100%;
     height: 100%;
     transform: skewX(45deg);
@@ -111,7 +111,8 @@ const WrapperSelectCard = styled.div<IWrapperSelectCardProps>`
     font-size: 16px;
     line-height: 19px;
     text-transform: capitalize;
-    /* color: ${(props: any) => (props.isChecked ? Color.$WHITE : Color.$BLACK)}; */
+    /* color: ${(props: any) =>
+      props.isChecked ? Color.$WHITE : Color.$BLACK}; */
     margin: 0;
     transition: 0.3s all ease-in-out;
   }
@@ -124,7 +125,8 @@ const WrapperSelectCard = styled.div<IWrapperSelectCardProps>`
     text-transform: capitalize;
     margin: 0;
     transition: 0.3s all ease-in-out;
-    /* color: ${(props: any) => (props.isChecked ? Color.$WHITE : Color.$BLACK)}; */
+    /* color: ${(props: any) =>
+      props.isChecked ? Color.$WHITE : Color.$BLACK}; */
   }
   .select_input {
     width: 100%;

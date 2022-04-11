@@ -123,7 +123,7 @@ const UserInviteModal2: FC = () => {
               },
             ]}
           >
-            <Input placeholder="Eg.John Deo" size="middle" autoComplete='off' />
+            <Input placeholder="Eg.John Deo" size="middle" autoComplete="off" />
           </Form.Item>
           <FormLabel>Username</FormLabel>
           <Form.Item
@@ -135,7 +135,7 @@ const UserInviteModal2: FC = () => {
               },
             ]}
           >
-            <Input placeholder="Eg.John Deo" size="middle" autoComplete='off'/>
+            <Input placeholder="Eg.John Deo" size="middle" autoComplete="off" />
           </Form.Item>
           <FormLabel>Email</FormLabel>
           <Form.Item
@@ -147,7 +147,7 @@ const UserInviteModal2: FC = () => {
               },
             ]}
           >
-            <Input size="middle" autoComplete='off'/>
+            <Input size="middle" autoComplete="off" />
           </Form.Item>
           <FormLabel>Branch</FormLabel>
           <Form.Item
@@ -198,7 +198,7 @@ const UserInviteModal2: FC = () => {
             name="password"
             rules={[{ required: true, message: 'Password Required !' }]}
           >
-            <Input.Password size="middle"  autoComplete='off'/>
+            <Input.Password size="middle" autoComplete="off" />
           </Form.Item>
           <Form.Item>
             <div className="actions">
