@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class alterInvoiceTypeInPurchases1611149496824
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropColumn('purchases', 'invoiceType');
 
@@ -11,7 +12,7 @@ export class alterInvoiceTypeInPurchases1611149496824
         name: 'invoiceType',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
   }
 

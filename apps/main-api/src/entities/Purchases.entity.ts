@@ -60,23 +60,17 @@ export class Purchases {
   @Column()
   updatedById: number;
 
-  @OneToOne(
-    type => Branches,
-    branch => branch.id,
-  )
+  @OneToOne((type) => Branches, (branch) => branch.id)
   @JoinColumn()
   branch: Branches;
 
-  @OneToOne(
-    type => Contacts,
-    contact => contact.id,
-  )
+  @OneToOne((type) => Contacts, (contact) => contact.id)
   @JoinColumn()
   contact: Contacts;
 
   @OneToMany(
-    type => PurchaseItems,
-    purchase_items => purchase_items.purchaseId,
+    (type) => PurchaseItems,
+    (purchase_items) => purchase_items.purchaseId
   )
   @JoinColumn()
   purchase_items: PurchaseItems;

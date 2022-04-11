@@ -18,7 +18,7 @@ export default function (item, initialState, change) {
       return (
         <WrapperDyFrom>
           <FormLabel className="label">{item.label}</FormLabel>
-          <Input 
+          <Input
             value={initialState}
             onChange={(e) => change(e.target.value)}
             placeholder={`Search with ${item.label}`}

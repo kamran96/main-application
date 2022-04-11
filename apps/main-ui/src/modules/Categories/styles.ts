@@ -1,14 +1,13 @@
-import styled from "styled-components";
-import convertToRem from "../../utils/convertToRem";
+import styled from 'styled-components';
+import convertToRem from '../../utils/convertToRem';
 
 export const WrapperCategoriesContainer = styled.div`
-
-.edit{
-      display: flex;
-      a{
-        margin : 0 ${convertToRem(10)}
-      }
+  .edit {
+    display: flex;
+    a {
+      margin: 0 ${convertToRem(10)};
     }
+  }
 `;
 
 export const CategoriesContainerWrapper = styled.div`

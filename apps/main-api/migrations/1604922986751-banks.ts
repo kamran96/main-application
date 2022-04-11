@@ -13,7 +13,7 @@ export class banks1604922986751 implements MigrationInterface {
           { name: 'updatedAt', type: 'timestamp', default: 'NOW()' },
         ],
       }),
-      true,
+      true
     );
   }
 

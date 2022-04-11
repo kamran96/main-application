@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import convertToRem from "../../../../utils/convertToRem";
+import styled from 'styled-components';
+import convertToRem from '../../../../utils/convertToRem';
 
 export const WrapperTransactionsList = styled.div`
   .action-create-transaction {
@@ -12,10 +12,10 @@ export const WrapperTransactionsList = styled.div`
       padding: 2rem;
     }
 
-    .ant-table-row{
-        td{
-            padding: 10px 15px !important
-        }
+    .ant-table-row {
+      td {
+        padding: 10px 15px !important;
+      }
     }
   }
 `;

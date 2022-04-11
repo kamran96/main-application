@@ -25,7 +25,7 @@ export class alterDispatcheItems1611658966143 implements MigrationInterface {
           { name: 'updatedAt', type: 'timestamp', default: 'NOW()' },
         ],
       }),
-      true,
+      true
     );
 
     await queryRunner.createForeignKey(
@@ -35,7 +35,7 @@ export class alterDispatcheItems1611658966143 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'dispatches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -45,7 +45,7 @@ export class alterDispatcheItems1611658966143 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'items',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -55,7 +55,7 @@ export class alterDispatcheItems1611658966143 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -65,7 +65,7 @@ export class alterDispatcheItems1611658966143 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'branches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -75,7 +75,7 @@ export class alterDispatcheItems1611658966143 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -85,7 +85,7 @@ export class alterDispatcheItems1611658966143 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

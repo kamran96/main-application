@@ -8,9 +8,8 @@ import {
   Text,
   StatusBar,
   TouchableOpacity,
-  Linking
+  Linking,
 } from 'react-native';
-
 
 import {
   Colors,
@@ -32,7 +31,7 @@ const App = () => {
           <View style={styles.header}>
             <Image style={styles.logo} source={require('./logo.png')} />
             <Text style={styles.heading} testID="heading">
-             Wellcome to Invyce App
+              Wellcome to Invyce App
             </Text>
           </View>
           <View style={styles.body}>

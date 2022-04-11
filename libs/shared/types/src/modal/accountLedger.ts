@@ -1,5 +1,5 @@
-import { IBase, IBaseRequest, IBaseRequestResponse } from "./base";
-import { TransactionsType } from "./transaction";
+import { IBase, IBaseRequest, IBaseRequestResponse } from './base';
+import { TransactionsType } from './transaction';
 export interface IAccountOwner extends IBase {
   amount?: number;
   ref?: string;
@@ -56,7 +56,7 @@ export class IAccountLedgerResult extends IBaseRequestResponse {
           narration: this.opening_balance.comment,
         },
         account: {
-          name: "Opening Balance",
+          name: 'Opening Balance',
         },
         date: this.opening_balance.date,
         transactionType: this.opening_balance.amount < 0 ? 10 : 20,

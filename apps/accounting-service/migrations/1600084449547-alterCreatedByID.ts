@@ -2,10 +2,8 @@ import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class alterCreatedByID1600084449547 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
- 
     await queryRunner.dropColumn('accounts', 'createdByID');
     await queryRunner.dropColumn('accounts', 'updatedByID');
-
 
     // updating account attributes
     await queryRunner.addColumn(
@@ -14,7 +12,7 @@ export class alterCreatedByID1600084449547 implements MigrationInterface {
         name: 'createdById',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'accounts',
@@ -22,9 +20,8 @@ export class alterCreatedByID1600084449547 implements MigrationInterface {
         name: 'updatedById',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
-
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {}

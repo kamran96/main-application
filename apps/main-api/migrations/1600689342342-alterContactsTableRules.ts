@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class alterContactsTableRules1600689342342
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropColumn('contacts', 'branchId');
     await queryRunner.dropColumn('contacts', 'addressId');
@@ -14,7 +15,7 @@ export class alterContactsTableRules1600689342342
         name: 'branchId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'contacts',
@@ -22,7 +23,7 @@ export class alterContactsTableRules1600689342342
         name: 'addressId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'contacts',
@@ -30,7 +31,7 @@ export class alterContactsTableRules1600689342342
         name: 'createdById',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'contacts',
@@ -38,7 +39,7 @@ export class alterContactsTableRules1600689342342
         name: 'updatedById',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
   }
 

@@ -1,35 +1,35 @@
-import React, { SFC } from "react";
-import styled from "styled-components";
-import { AlertCircle, CheckCircle, AlertTriangle, Info } from "react-feather";
+import React, { SFC } from 'react';
+import styled from 'styled-components';
+import { AlertCircle, CheckCircle, AlertTriangle, Info } from 'react-feather';
 
 export enum StatusType {
-  DANGER = "danger",
-  SUCCESS = "success",
-  warning = "warning",
-  DEFAULT = "default",
-  INFO = "info"
+  DANGER = 'danger',
+  SUCCESS = 'success',
+  warning = 'warning',
+  DEFAULT = 'default',
+  INFO = 'info',
 }
 
 interface IProps {
-  type?: "danger" | "success" | "warning" | "default" | "info";
+  type?: 'danger' | 'success' | 'warning' | 'default' | 'info';
   text?: string;
 }
 
 const defaultProps: IProps = {
-  type: StatusType.DEFAULT
+  type: StatusType.DEFAULT,
 };
 export const Status: SFC<IProps> = ({ type, text } = defaultProps) => {
   return (
     <StatusWrapper type={type}>
-      {type !== "default" && (
+      {type !== 'default' && (
         <i>
-          {type === "warning" ? (
+          {type === 'warning' ? (
             <AlertCircle size={20} />
-          ) : type === "success" ? (
+          ) : type === 'success' ? (
             <CheckCircle size={20} />
-          ) : type === "danger" ? (
+          ) : type === 'danger' ? (
             <AlertTriangle size={20} />
-          ) : type === "info" ? (
+          ) : type === 'info' ? (
             <Info />
           ) : null}
         </i>
@@ -48,12 +48,12 @@ export const StatusWrapper: any = styled.p`
   margin: 4px 0;
   color: ${(props: any) =>
     props.type === StatusType.DANGER
-      ? "red"
+      ? 'red'
       : props.type === StatusType.SUCCESS
-      ? "green"
+      ? 'green'
       : props.type === StatusType.warning
-      ? "orange"
-      : "black"};
+      ? 'orange'
+      : 'black'};
 
   i {
     margin-right: 5px;
@@ -61,9 +61,9 @@ export const StatusWrapper: any = styled.p`
     align-items: center;
     svg {
       fill: ${(props: any) =>
-        props.type === StatusType.INFO ? "#2196F3" : "auto"};
+        props.type === StatusType.INFO ? '#2196F3' : 'auto'};
       color: ${(props: any) =>
-        props.type === StatusType.INFO ? "white" : "auto"};
+        props.type === StatusType.INFO ? 'white' : 'auto'};
     }
   }
 `;

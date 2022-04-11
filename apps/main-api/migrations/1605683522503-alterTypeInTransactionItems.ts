@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class alterTypeInTransactionItems1605683522503
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropColumn('transaction_items', 'transaction_type');
     await queryRunner.addColumn(
@@ -10,7 +11,7 @@ export class alterTypeInTransactionItems1605683522503
         name: 'transactionType',
         isNullable: true,
         type: 'integer',
-      }),
+      })
     );
   }
 

@@ -1,6 +1,6 @@
-import { IThemeProps } from "./../../hooks/useTheme/themeColors";
-import styled from "styled-components";
-import convertToRem from "../../utils/convertToRem";
+import { IThemeProps } from './../../hooks/useTheme/themeColors';
+import styled from 'styled-components';
+import convertToRem from '../../utils/convertToRem';
 
 export const WrapperTopbar = styled.div`
   background: ${(props: IThemeProps) => props.theme.colors.topbar};
@@ -19,11 +19,10 @@ export const WrapperTopbar = styled.div`
     display: flex;
     align-items: center;
     height: ${convertToRem(40)};
-   
-    span svg{
+
+    span svg {
       width: 108px;
     }
-    
   }
 `;
 

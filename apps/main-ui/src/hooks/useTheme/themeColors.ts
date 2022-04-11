@@ -62,7 +62,7 @@ export interface IThemeVariables {
   paletteBorder: string;
   svgColor: string;
   svgBg: string;
-  svgHoverBg:string;
+  svgHoverBg: string;
   svgHoverColor: string;
 }
 
@@ -147,8 +147,8 @@ export const Themes: IThemes = {
     paletteBorder: '##EEEEEE',
     svgColor: '#485161',
     svgBg: '#EFF3F8',
-    svgHoverBg:'#FBFDFF',
-    svgHoverColor: '#232C3A'
+    svgHoverBg: '#FBFDFF',
+    svgHoverColor: '#232C3A',
   },
   dark: {
     $PRIMARY: '#e4e4e4',
@@ -213,7 +213,7 @@ export const Themes: IThemes = {
     paletteBorder: '#273048',
     svgColor: '#667284',
     svgBg: '#242B3E',
-    svgHoverBg:'#434D5E',
-    svgHoverColor: '#FFFFFF' 
+    svgHoverBg: '#434D5E',
+    svgHoverColor: '#FFFFFF',
   },
 };

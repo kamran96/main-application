@@ -1,14 +1,14 @@
-import Icon from "@iconify/react";
-import { Select, Tooltip } from "antd";
-import React, { FC } from "react";
-import styled from "styled-components";
-import { Card } from "../Card";
-import { H4 } from "../Typography";
-import { Color, IDashboardSalesOverview } from "../../modal";
-import fileInvoiceDollar from "@iconify-icons/la/file-invoice-dollar";
-import { BoldText } from "../Para/BoldText";
-import { Inflation } from "../Inflation";
-import { kValue } from "../../utils/helperFunctions";
+import Icon from '@iconify/react';
+import { Select, Tooltip } from 'antd';
+import React, { FC } from 'react';
+import styled from 'styled-components';
+import { Card } from '../Card';
+import { H4 } from '../Typography';
+import { Color, IDashboardSalesOverview } from '../../modal';
+import fileInvoiceDollar from '@iconify-icons/la/file-invoice-dollar';
+import { BoldText } from '../Para/BoldText';
+import { Inflation } from '../Inflation';
+import { kValue } from '../../utils/helperFunctions';
 
 const { Option } = Select;
 
@@ -30,14 +30,14 @@ export const ExpensesOverview: FC<IProps> = ({ data }) => {
             <div className="sales_overview">
               <H4 className="_sales_title">Total Expenses</H4>
               <div className="flex alignCenter ">
-                <Tooltip placement={"top"} title={data?.totalExpenses}>
+                <Tooltip placement={'top'} title={data?.totalExpenses}>
                   <BoldText className="sales_amount">
                     {kValue(data?.totalExpenses?.toFixed(0))}
                   </BoldText>
                 </Tooltip>
                 <Inflation
                   value={`${data?.purchasePercent?.toFixed(2)} %`}
-                  status={data?.purchasePercent >= 0 ? "up" : "down"}
+                  status={data?.purchasePercent >= 0 ? 'up' : 'down'}
                 />
               </div>
             </div>
@@ -46,9 +46,9 @@ export const ExpensesOverview: FC<IProps> = ({ data }) => {
         <div className="foooter">
           <div className="_footer_desc textCenter">
             <p className="m-reset">
-              <Tooltip placement={"top"} title={data?.expenseDifference}>
+              <Tooltip placement={'top'} title={data?.expenseDifference}>
                 {kValue(data?.expenseDifference?.toFixed(0))}
-              </Tooltip>{" "}
+              </Tooltip>{' '}
               increase compare to last week
             </p>
           </div>

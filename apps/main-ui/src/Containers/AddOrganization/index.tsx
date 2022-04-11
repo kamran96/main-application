@@ -1,8 +1,8 @@
-import React from "react";
-import styled from "styled-components";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { OrganizationsList } from "./AddOrganization";
-import { OrganizationWidget } from "./OrganizationWidget";
+import React from 'react';
+import styled from 'styled-components';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { OrganizationsList } from './AddOrganization';
+import { OrganizationWidget } from './OrganizationWidget';
 
 export const Organizations = () => {
   const { userDetails } = useGlobalContext();

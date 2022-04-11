@@ -6,7 +6,8 @@ import {
 } from 'typeorm';
 
 export class addPurchaseIdInPayments1607325307964
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropColumn('purchases', 'orderNumber');
 
@@ -16,7 +17,7 @@ export class addPurchaseIdInPayments1607325307964
         name: 'invoiceNumber',
         isNullable: true,
         type: 'varchar',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -25,7 +26,7 @@ export class addPurchaseIdInPayments1607325307964
         name: 'purchaseId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -35,7 +36,7 @@ export class addPurchaseIdInPayments1607325307964
         referencedColumnNames: ['id'],
         referencedTableName: 'purchases',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

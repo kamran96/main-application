@@ -6,7 +6,8 @@ import {
 } from 'typeorm';
 
 export class addAttachmentIdToProfile1602763024902
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'user_profiles',
@@ -14,7 +15,7 @@ export class addAttachmentIdToProfile1602763024902
         name: 'attachmentId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -24,7 +25,7 @@ export class addAttachmentIdToProfile1602763024902
         referencedColumnNames: ['id'],
         referencedTableName: 'attachments',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

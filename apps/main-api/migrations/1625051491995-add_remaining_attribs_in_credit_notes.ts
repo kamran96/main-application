@@ -6,7 +6,8 @@ import {
 } from 'typeorm';
 
 export class addRemainingAttribsInCreditNotes1625051491995
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'credit_notes',
@@ -14,7 +15,7 @@ export class addRemainingAttribsInCreditNotes1625051491995
         name: 'reference',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -23,7 +24,7 @@ export class addRemainingAttribsInCreditNotes1625051491995
         name: 'issueDate',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'credit_notes',
@@ -31,7 +32,7 @@ export class addRemainingAttribsInCreditNotes1625051491995
         name: 'invoiceNumber',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'credit_notes',
@@ -39,7 +40,7 @@ export class addRemainingAttribsInCreditNotes1625051491995
         name: 'discount',
         type: 'float',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'credit_notes',
@@ -47,7 +48,7 @@ export class addRemainingAttribsInCreditNotes1625051491995
         name: 'netTotal',
         type: 'float',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'credit_notes',
@@ -55,7 +56,7 @@ export class addRemainingAttribsInCreditNotes1625051491995
         name: 'grossTotal',
         type: 'float',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'credit_note_items',
@@ -63,7 +64,7 @@ export class addRemainingAttribsInCreditNotes1625051491995
         name: 'total',
         type: 'float',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'credit_note_items',
@@ -71,7 +72,7 @@ export class addRemainingAttribsInCreditNotes1625051491995
         name: 'discount',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'credit_note_items',
@@ -79,7 +80,7 @@ export class addRemainingAttribsInCreditNotes1625051491995
         name: 'tax',
         type: 'text',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'credit_note_items',
@@ -87,7 +88,7 @@ export class addRemainingAttribsInCreditNotes1625051491995
         name: 'accountId',
         type: 'int',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'credit_note_items',
@@ -96,7 +97,7 @@ export class addRemainingAttribsInCreditNotes1625051491995
         referencedColumnNames: ['id'],
         referencedTableName: 'accounts',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

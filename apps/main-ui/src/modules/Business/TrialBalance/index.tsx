@@ -1,7 +1,7 @@
-import { Col, Row } from "antd";
-import React, { FC } from "react";
-import styled from "styled-components";
-import { TrialBalanceList } from "./TrialBalanceList";
+import { Col, Row } from 'antd';
+import React, { FC } from 'react';
+import styled from 'styled-components';
+import { TrialBalanceList } from './TrialBalanceList';
 
 export const TraialBalance: FC = () => {
   return (

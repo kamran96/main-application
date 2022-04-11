@@ -1,5 +1,5 @@
-import { IBase } from "./base";
-import { ICurrency, IOrganizationType } from "./organization";
+import { IBase } from './base';
+import { ICurrency, IOrganizationType } from './organization';
 
 export interface IAuth {
   access_token?: string;
@@ -17,7 +17,6 @@ export interface IUser extends IBase {
   organization?: IOrganization;
   fax?: string;
 
-
   branch?: IBranch;
   role?: IRole;
   profile?: IProfile;
@@ -33,7 +32,7 @@ export interface IOrganization extends IBase {
   financialEnding?: string;
   status?: number;
   organizationType?: IOrganizationType;
-  
+
   branches?: IBranch[];
   currency?: ICurrency;
 }

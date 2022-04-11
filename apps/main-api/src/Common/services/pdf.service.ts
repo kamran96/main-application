@@ -12,9 +12,9 @@ export class PdfService {
       const [header] = contents;
       contents.splice(0, 1);
       const newRows = [
-        header.map(item => ({ text: item, bold: true, fontSize: 8 })),
-        ...contents.map(c => {
-          return Array.prototype.map.call(c, function(i) {
+        header.map((item) => ({ text: item, bold: true, fontSize: 8 })),
+        ...contents.map((c) => {
+          return Array.prototype.map.call(c, function (i) {
             return {
               text: i,
               fontSize: 9,
@@ -24,7 +24,7 @@ export class PdfService {
         }),
       ];
 
-      const rows = newRows.filter(item => item.length !== 0);
+      const rows = newRows.filter((item) => item.length !== 0);
 
       let docDefinition = {
         header: {

@@ -15,7 +15,7 @@ export class addCategoryIdToItems1608046903614 implements MigrationInterface {
         name: 'values',
         isNullable: true,
         type: 'json',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -24,7 +24,7 @@ export class addCategoryIdToItems1608046903614 implements MigrationInterface {
         name: 'categoryId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -34,7 +34,7 @@ export class addCategoryIdToItems1608046903614 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'categories',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

@@ -1,3 +1,3 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
-export const WrapperContactsEditor:any = styled.div``
+export const WrapperContactsEditor: any = styled.div``;

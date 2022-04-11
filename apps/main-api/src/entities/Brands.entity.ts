@@ -26,10 +26,7 @@ export class Brands {
   @Column()
   updatedById: number;
 
-  @OneToOne(
-    type => Branches,
-    branch => branch.id,
-  )
+  @OneToOne((type) => Branches, (branch) => branch.id)
   @JoinColumn()
   branch: Branches;
 }

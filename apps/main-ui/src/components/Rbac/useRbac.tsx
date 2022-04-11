@@ -1,7 +1,7 @@
-import React, { useMemo } from "react";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { IUser } from "../../modal";
-import { RbacManager } from "./RbacManager";
+import React, { useMemo } from 'react';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { IUser } from '../../modal';
+import { RbacManager } from './RbacManager';
 
 export const useRbac = (permission: string) => {
   const { rolePermissions } = useGlobalContext();
@@ -23,6 +23,6 @@ const useRole = () => {
 
   return (
     (userDetails && userDetails.role && userDetails.role.name) ||
-    "onboarding-user"
+    'onboarding-user'
   );
 };

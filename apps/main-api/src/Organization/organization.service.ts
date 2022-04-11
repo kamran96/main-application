@@ -19,7 +19,7 @@ export class OrganizationService {
     private manager: EntityManager,
     private accountService: AccountService,
     private authService: AuthService,
-    private rbacService: RbacService,
+    private rbacService: RbacService
   ) {}
 
   async ListOrganizations(organizationData) {
@@ -35,7 +35,7 @@ export class OrganizationService {
 
   async CreateOrUpdateOrganization(
     organizationDto,
-    organizationData,
+    organizationData
   ): Promise<any> {
     const organizationRepository = getCustomRepository(OrganizationRepository);
     if (organizationDto && organizationDto.isNewRecord === false) {
@@ -60,7 +60,7 @@ export class OrganizationService {
                 city: organizationDto.city,
                 country: organizationDto.country,
                 postalCode: organizationDto.postalCode,
-              },
+              }
             );
           } else {
             const address = await getCustomRepository(AddressRepository).save({
@@ -103,7 +103,7 @@ export class OrganizationService {
           await this.manager.update(
             Organizations,
             { id: organizationDto.id },
-            updatedOrganization,
+            updatedOrganization
           );
 
           return updatedOrganization;
@@ -117,7 +117,7 @@ export class OrganizationService {
         // we need to create organization
 
         const organizationUserRepository = getCustomRepository(
-          OrganizationUserRepository,
+          OrganizationUserRepository
         );
 
         const address = await getCustomRepository(AddressRepository).save({
@@ -167,7 +167,7 @@ export class OrganizationService {
         const roles = await this.rbacService.InsertRoles(organization.id);
         await this.rbacService.InsertRolePermission(organization.id);
 
-        const [adminRole] = roles.filter(r => r.name === 'admin');
+        const [adminRole] = roles.filter((r) => r.name === 'admin');
 
         if (organizationData.organizationId === null) {
           await this.manager.update(
@@ -177,7 +177,7 @@ export class OrganizationService {
               organizationId: organization.id,
               roleId: adminRole.id,
               branchId: branchArr.length > 0 ? branchArr[0].id : null,
-            },
+            }
           );
 
           const new_user = await this.authService.CheckUser({
