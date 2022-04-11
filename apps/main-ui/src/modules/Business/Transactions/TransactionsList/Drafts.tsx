@@ -118,7 +118,7 @@ const DRAFTTransactionsList: FC = () => {
     // console.log(payload, "payload");
     await mutateDeleteTrasaction(payload, {
       onSuccess: () => {
-        ['transactions'].forEach(
+        ['transactions, transactions?page'].forEach(
           (key) => {
             (queryCache.invalidateQueries as any)((q) =>
               q.queryKey[0].toString().startsWith(key)

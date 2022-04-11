@@ -1,4 +1,5 @@
 import { useWindowSize } from '../../../../utils/useWindowSize';
+import { Form, Result } from 'antd';
 import {
   useContext,
   createContext,
@@ -16,13 +17,26 @@ import {
 import { EditableColumnsType } from '@invyce/editable-table';
 import defaultState from './default';
 import Icon from '@iconify/react';
+import dayjs from 'dayjs';
 import { convertToRem } from '@invyce/pixels-to-rem';
 import { Color } from '../../../../modal/theme';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import dotsGrid from '@iconify-icons/mdi/dots-grid';
-import { useQuery } from 'react-query';
 import { getAllAccounts } from '../../../../api/accounts';
 import { IAccountsResult } from '@invyce/shared/types';
+import { getSingleTransactionById } from '../../../../api';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { NOTIFICATIONTYPE } from '@invyce/shared/types';
+import { IServerError } from '../../../../modal';
+import { number } from 'echarts';
+
+// interface ResultPrps {
+//   ref: string | number;
+//   date: any,
+//   narration?: string ,
+//   notes?: string
+// }
 
 const transactionContext = createContext<Partial<ITranactionContext>>({});
 export const useTransaction = () => useContext(transactionContext);
@@ -30,11 +44,41 @@ export const useTransaction = () => useContext(transactionContext);
 let timeout: any;
 
 export const TransactionManager: FC<ITransactionEditorProps> = ({
-  children, id
+  children,
+  id,
 }) => {
+  const [form] = Form.useForm();
+  const { notificationCallback } = useGlobalContext();
   const [width] = useWindowSize();
   const [transactionsList, setTransactionsList] = useState<ITransactionsList[]>(
     [{ ...defaultState }]
+  );
+
+  //state and fetch single data by Id;
+  const [HeaderFooterData, setHeaderFooterData] = useState(null);
+  const { data: TransactionData, isLoading: isTransactionLoading } = useQuery(
+    [`transaction-${id}`, id],
+    getSingleTransactionById,
+    {
+      enabled: !!id,
+      onSuccess: (data) => {
+        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Transaction Fetched');
+      },
+      onError: (error: IServerError) => {
+        if (
+          error &&
+          error?.response &&
+          error?.response?.data &&
+          error?.response?.data?.message
+        ) {
+          // const { message } = error?.response?.data;
+          notificationCallback(
+            NOTIFICATIONTYPE.ERROR,
+            'Unabale to fetch Data!'
+          );
+        }
+      },
+    }
   );
 
   const { isLoading: accountsLoading, data: accountsData } = useQuery(
@@ -81,6 +125,7 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
     });
   };
 
+
   const getAccountId = (id: string | number) => {
     if (accounts && accounts.length) {
       const [filtered] = accounts.filter((item) => item.id === id);
@@ -90,6 +135,39 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
       return id;
     }
   };
+
+  useEffect(() => {
+    if (
+      id &&
+      id !== undefined &&
+      TransactionData &&
+      TransactionData?.data?.result
+    ) {
+      const { result } = TransactionData?.data;
+      console.log(result, 'Transaction data result');
+      const Resultdata = {
+        ref: result?.ref,
+        date: dayjs(result?.date).endOf('day'),
+        narration: result?.narration,
+        notes: result?.notes,
+      };
+
+      const data = [];
+      //rename the item name
+      result.transactionItems.forEach((item, index) => {
+        data.push({
+          key: index + 1,
+          account: item.account.name,
+          description: item.description,
+          debit: item.transactionType === 10 ? item.amount: 0,
+          credit: item.transactionType === 20 ? item.amount: 0,
+          error: false,
+        });
+      });
+      setTransactionsList(data);
+      setHeaderFooterData(Resultdata);
+    }
+  }, [TransactionData, id]);
 
   const columns: EditableColumnsType[] = useMemo(() => {
     return [
@@ -122,13 +200,14 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
         width: width > 1500 ? 220 : 170,
         render: (value: number | string, row: any, index: number) => {
           return (
+            <>
             <EditableSelect
               error={!!row?.accountError}
               style={{ width: '100%', minWidth: '180px', maxWidth: '180px' }}
               labelInValue={true}
               value={{
                 value: 'value',
-                label: `${getAccountId(value) || 'Select Account'}`,
+                label:`${getAccountId(value) || 'Select Account'}`,
               }}
               onChange={(selectedItem) => {
                 setTransactionsList((prev) => {
@@ -156,6 +235,8 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
                 };
               })}
             />
+            {/* //added new here */}
+            </>
           );
         },
       },
@@ -273,7 +354,6 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
     ];
   }, [getAvailableAccounts, transactionsList]);
 
-
   return (
     <transactionContext.Provider
       value={{
@@ -284,6 +364,7 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
         resetTransactions,
         loading: accountsLoading,
         id,
+        HeaderFooterData,
       }}
     >
       <div>{children}</div>

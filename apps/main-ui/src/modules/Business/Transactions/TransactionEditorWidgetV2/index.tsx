@@ -13,17 +13,12 @@ import { Heading } from '../../../../components/Heading';
 import TextArea from 'antd/lib/input/TextArea';
 import { BoldText } from '../../../../components/Para/BoldText';
 import moneyFormat from '../../../../utils/moneyFormat';
-import {
-  createTransactionAPI,
-  getSingleTransactionById,
-} from '../../../../api';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import {createTransactionAPI } from '../../../../api';
+import { useMutation, useQueryClient } from 'react-query';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { NOTIFICATIONTYPE } from '@invyce/shared/types';
 import { ITransactionsList } from './types';
-import { FC, useEffect } from 'react';
-import { IServerError } from '../../../../modal';
-import data from '@iconify-icons/feather/check';
+
 
 
 
@@ -39,6 +34,7 @@ const Editor = () => {
     loading,
     id,
     resetTransactions,
+    HeaderFooterData
   } = useTransaction();
   const [form] = Form.useForm();
   const { notificationCallback } = useGlobalContext();
@@ -46,43 +42,24 @@ const Editor = () => {
   const { mutate: mutateCreateTransaction, isLoading: creatingTransaction } =
     useMutation(createTransactionAPI);
 
-  const { data: TransactionData, isLoading: isTransactionLoading } = useQuery(
-    [`transaction-${id}`, id],
-    getSingleTransactionById,
-    {
-      enabled: !!id,
-      onSuccess: (data) => {
-        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Transaction Fetched');
-      },
-      onError: (error: IServerError) => {
-        if (
-          error &&
-          error?.response &&
-          error?.response?.data &&
-          error?.response?.data?.message
-        ) {
-          const { message } = error?.response?.data;
-          notificationCallback(NOTIFICATIONTYPE.ERROR, message);
-        }
-      },
-    }
-  );
+  // useEffect(() => {
+  //   if (id && TransactionData && TransactionData?.data?.result) {
+  //     console.log(TransactionData.data)
+  //     const {result} = TransactionData?.data
+  //     const Resultdata = {
+  //       ref: result?.ref,
+  //       date: dayjs(result?.date).endOf('day'),
+  //       narration:result?.narration ,
+  //       notes: result?.notes
+  //     }
 
-  useEffect(() => {
-    if (id && TransactionData && TransactionData?.data?.result) {
-      console.log(TransactionData.data)
-      const {result} = TransactionData?.data
-      const Resultdata = {
-        ref: result?.ref,
-        date: dayjs(result?.date).endOf('day'),
-        narration:result?.narration ,
-        notes: result?.notes
-      }
+  //     form.setFieldsValue(Resultdata)
+  //   }
+  // }, [TransactionData, id]);
 
-      form.setFieldsValue(Resultdata)
-    }
-  }, [TransactionData, id]);
-
+   if(id){
+     form.setFieldsValue(HeaderFooterData)
+   }
   
 
   const totalDebits = (transactionsList.length &&
