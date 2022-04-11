@@ -24,7 +24,6 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
           return header;
         } else {
           if (!req || !req.cookies) return null;
-          req.cookies['access_token'];
           data = {
             cookies: req.cookies,
             headers: null,
