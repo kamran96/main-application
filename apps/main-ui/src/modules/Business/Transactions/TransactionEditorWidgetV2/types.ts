@@ -13,7 +13,13 @@ export interface ITranactionContext {
   addRow: () => void;
   loading: boolean;
   resetTransactions: () => void;
-  id: number
+  id: number,
+  HeaderFooterData: {
+    ref: string | number;
+    date: any,
+    narration?: string ,
+    notes?: string
+  }
 }
 export interface ITransactionsList {
   account: number | string;
