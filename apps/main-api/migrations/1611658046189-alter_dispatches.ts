@@ -10,7 +10,7 @@ export class alterDispatches1611658046189 implements MigrationInterface {
         name: 'reference',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -18,7 +18,7 @@ export class alterDispatches1611658046189 implements MigrationInterface {
       new TableColumn({
         name: 'dispatch_no',
         type: 'varchar',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -27,7 +27,7 @@ export class alterDispatches1611658046189 implements MigrationInterface {
         name: 'discount',
         type: 'float',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -36,7 +36,7 @@ export class alterDispatches1611658046189 implements MigrationInterface {
         name: 'grossTotal',
         type: 'float',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -45,7 +45,7 @@ export class alterDispatches1611658046189 implements MigrationInterface {
         name: 'netTotal',
         type: 'float',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -54,7 +54,7 @@ export class alterDispatches1611658046189 implements MigrationInterface {
         name: 'remaining',
         type: 'float',
         isNullable: true,
-      }),
+      })
     );
   }
 

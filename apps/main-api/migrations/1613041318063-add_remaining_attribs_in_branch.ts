@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class addRemainingAttribsInBranch1613041318063
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'branches',
@@ -9,7 +10,7 @@ export class addRemainingAttribsInBranch1613041318063
         name: 'phone_no',
         type: 'varchar(255)',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -18,7 +19,7 @@ export class addRemainingAttribsInBranch1613041318063
         name: 'fax_no',
         type: 'varchar(255)',
         isNullable: true,
-      }),
+      })
     );
   }
 

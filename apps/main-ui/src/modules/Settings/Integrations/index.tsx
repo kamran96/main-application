@@ -1,10 +1,10 @@
-import { Col, Row } from "antd";
-import React, { FC } from "react";
-import styled from "styled-components";
-import { H4 } from "../../../components/Typography";
-import { Gmail } from "./Gmail";
-import { QuickBooks } from "./Quickbooks";
-import { Xero } from "./Xero";
+import { Col, Row } from 'antd';
+import React, { FC } from 'react';
+import styled from 'styled-components';
+import { H4 } from '../../../components/Typography';
+import { Gmail } from './Gmail';
+import { QuickBooks } from './Quickbooks';
+import { Xero } from './Xero';
 export const Integrations: FC = () => {
   return (
     <WrapperIntegrations>
@@ -33,10 +33,8 @@ export const Integrations: FC = () => {
           <div className="module">
             <Gmail />
           </div>
-         
         </div>
       </div>
-     
     </WrapperIntegrations>
   );
 };

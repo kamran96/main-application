@@ -1,10 +1,10 @@
-import React, { FC } from "react";
-import styled from "styled-components";
-import redTrianglePointedDown from "@iconify-icons/emojione-monotone/red-triangle-pointed-down";
-import Icon from "@iconify/react";
+import React, { FC } from 'react';
+import styled from 'styled-components';
+import redTrianglePointedDown from '@iconify-icons/emojione-monotone/red-triangle-pointed-down';
+import Icon from '@iconify/react';
 
 interface IProps {
-  status: "up" | "down";
+  status: 'up' | 'down';
   value: string;
 }
 
@@ -14,7 +14,7 @@ export const Inflation: FC<IProps> = ({ status, value }) => {
       <p className="m-reset">{value}</p>
       <i
         className={`_icon flex alignCenter ${
-          status === "down" ? "_down" : "_up"
+          status === 'down' ? '_down' : '_up'
         }`}
       >
         <Icon icon={redTrianglePointedDown} />
@@ -23,8 +23,8 @@ export const Inflation: FC<IProps> = ({ status, value }) => {
   );
 };
 
-interface IInflationWraperProps{
-  status: 'up' | 'down',
+interface IInflationWraperProps {
+  status: 'up' | 'down';
 }
 
 const WrapperInflation = styled.div<IInflationWraperProps>`
@@ -34,12 +34,12 @@ const WrapperInflation = styled.div<IInflationWraperProps>`
     font-size: 12px;
     line-height: 14px;
     text-transform: capitalize;
-    color: ${(props: any) => (props.status === "down" ? `#F5222D` : "#48AF08")};
+    color: ${(props: any) => (props.status === 'down' ? `#F5222D` : '#48AF08')};
   }
   ._icon {
     font-size: 9px;
-    color: ${(props: any) => (props.status === "down" ? "#F5222D" : "#48AF08")};
+    color: ${(props: any) => (props.status === 'down' ? '#F5222D' : '#48AF08')};
     transform: ${(props: any) =>
-      props.status === "up" ? `rotate(-180deg)` : `rotate(0)`};
+      props.status === 'up' ? `rotate(-180deg)` : `rotate(0)`};
   }
 `;

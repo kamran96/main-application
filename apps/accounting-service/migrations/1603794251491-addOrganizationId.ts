@@ -14,7 +14,7 @@ export class addOrganizationId1603794251491 implements MigrationInterface {
         name: 'organizationId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     // await queryRunner.createForeignKey(
@@ -26,14 +26,16 @@ export class addOrganizationId1603794251491 implements MigrationInterface {
     //     onDelete: 'CASCADE',
     //   }),
     // );
-    await queryRunner.createIndex("accounts", new TableIndex({
-      name: "account_organization_indexes",
-      columnNames: ["organizationId"]
-    }));
-  
+    await queryRunner.createIndex(
+      'accounts',
+      new TableIndex({
+        name: 'account_organization_indexes',
+        columnNames: ['organizationId'],
+      })
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropIndex('accounts',"account_organization_indexes")
+    await queryRunner.dropIndex('accounts', 'account_organization_indexes');
   }
 }

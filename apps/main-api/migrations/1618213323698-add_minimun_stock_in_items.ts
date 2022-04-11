@@ -8,7 +8,7 @@ export class addMinimunStockInItems1618213323698 implements MigrationInterface {
         name: 'minimumStock',
         type: 'int',
         default: 0,
-      }),
+      })
     );
   }
 

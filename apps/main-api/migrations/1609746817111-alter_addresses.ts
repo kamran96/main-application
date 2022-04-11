@@ -15,7 +15,7 @@ export class alterAddresses1609746817111 implements MigrationInterface {
         name: 'contactId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -24,7 +24,7 @@ export class alterAddresses1609746817111 implements MigrationInterface {
         name: 'country',
         isNullable: true,
         type: 'varchar',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -34,7 +34,7 @@ export class alterAddresses1609746817111 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'contacts',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class addPrefixTermsMarketingInUser1627974891789
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'users',
@@ -9,7 +10,7 @@ export class addPrefixTermsMarketingInUser1627974891789
         name: 'prefix',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'users',
@@ -17,7 +18,7 @@ export class addPrefixTermsMarketingInUser1627974891789
         name: 'terms',
         type: 'boolean',
         default: false,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'users',
@@ -25,7 +26,7 @@ export class addPrefixTermsMarketingInUser1627974891789
         name: 'marketing',
         type: 'boolean',
         default: false,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'users',
@@ -33,7 +34,7 @@ export class addPrefixTermsMarketingInUser1627974891789
         name: 'isVerified',
         type: 'boolean',
         default: false,
-      }),
+      })
     );
   }
 

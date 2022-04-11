@@ -1,5 +1,5 @@
-import { IBaseRequest } from "./base";
-import { IAccountsResult } from "./accounts";
+import { IBaseRequest } from './base';
+import { IAccountsResult } from './accounts';
 
 export interface ICashFlowResponse extends IBaseRequest {
   result: ICashFlowResult;

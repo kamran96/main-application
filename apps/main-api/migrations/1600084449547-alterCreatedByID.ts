@@ -17,7 +17,7 @@ export class alterCreatedByID1600084449547 implements MigrationInterface {
         name: 'createdById',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'accounts',
@@ -25,7 +25,7 @@ export class alterCreatedByID1600084449547 implements MigrationInterface {
         name: 'updatedById',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     // updating branch attributes
@@ -35,7 +35,7 @@ export class alterCreatedByID1600084449547 implements MigrationInterface {
         name: 'createdById',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     // updating items attributes
@@ -45,7 +45,7 @@ export class alterCreatedByID1600084449547 implements MigrationInterface {
         name: 'createdById',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'items',
@@ -53,7 +53,7 @@ export class alterCreatedByID1600084449547 implements MigrationInterface {
         name: 'updatedById',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
   }
 

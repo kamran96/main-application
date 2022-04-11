@@ -87,7 +87,7 @@ export class AccountService {
         take,
         page_no,
         sort,
-        sql,
+        sql
       );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -96,7 +96,7 @@ export class AccountService {
 
   async SecondaryAccountName(accountData) {
     const secondaryAccountRepository = getCustomRepository(
-      SecondaryAccountRepository,
+      SecondaryAccountRepository
     );
 
     const account = await secondaryAccountRepository.find({
@@ -114,10 +114,10 @@ export class AccountService {
     try {
       const accountRepository = getCustomRepository(AccountRepository);
       const primaryAccountRepository = getCustomRepository(
-        PrimaryAccountRepository,
+        PrimaryAccountRepository
       );
       const secondaryAccountRepository = getCustomRepository(
-        SecondaryAccountRepository,
+        SecondaryAccountRepository
       );
 
       const { primary, secondary } = await import('../accounts');
@@ -132,10 +132,10 @@ export class AccountService {
         };
 
         const primaryAccount = await primaryAccountRepository.save(
-          accountModel,
+          accountModel
         );
         const secondaryAccounts = secondary.filter(
-          item => item.primary_account_id === account.oldId,
+          (item) => item.primary_account_id === account.oldId
         );
         for (let secondaryAccount of secondaryAccounts) {
           const secondaryModel = {
@@ -148,7 +148,7 @@ export class AccountService {
             createdById: user.userId,
           };
           const insertSecondary = await secondaryAccountRepository.save(
-            secondaryModel,
+            secondaryModel
           );
 
           for (let account of secondaryAccount.accounts) {
@@ -201,7 +201,7 @@ export class AccountService {
           await this.manager.update(
             Accounts,
             { id: accountDto.id },
-            updatedAccount,
+            updatedAccount
           );
 
           const [updated] = await accountRepository.find({

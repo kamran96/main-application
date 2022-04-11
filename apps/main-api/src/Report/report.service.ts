@@ -17,15 +17,11 @@ export class ReportService {
     }
 
     function add_a_day(value) {
-      return Moment(value)
-        .add(1, 'day')
-        .format('YYYY-MM-DD');
+      return Moment(value).add(1, 'day').format('YYYY-MM-DD');
     }
     const add_one_day =
       type !== null
-        ? Moment(value[1])
-            .add(1, 'day')
-            .format('YYYY-MM-DD')
+        ? Moment(value[1]).add(1, 'day').format('YYYY-MM-DD')
         : null;
 
     let total_debits = `
@@ -158,8 +154,8 @@ export class ReportService {
     const account = await this.manager.query(main_query);
 
     const newResult = ['asset', 'equity', 'liability']
-      .map(item => {
-        let filtered: any[] = account.filter(acc => {
+      .map((item) => {
+        let filtered: any[] = account.filter((acc) => {
           return acc.primary_name === item && acc?.balance !== 0;
         });
         if (filtered.length > 0) {
@@ -176,7 +172,7 @@ export class ReportService {
           return null;
         }
       })
-      .filter(item => item !== null);
+      .filter((item) => item !== null);
     return newResult;
   }
 
@@ -193,7 +189,7 @@ export class ReportService {
             main_query = await this.BalanceQuery(
               user,
               data[i].value,
-              'between',
+              'between'
             );
           } else if (data[i].type == 'date-in') {
             main_query = await this.BalanceQuery(user, data[i].value, 'in');
@@ -206,11 +202,11 @@ export class ReportService {
       const account = await this.manager.query(main_query);
       const newResult = account
         .filter(
-          item =>
+          (item) =>
             (item.opening_balance && item.opening_balance !== 0) ||
-            item.balance !== 0,
+            item.balance !== 0
         )
-        .map(acc => {
+        .map((acc) => {
           if (['asset', 'expense'].includes(acc?.primary_name)) {
             return { ...acc, debit: acc.balance, credit: 0 };
           } else if (!['asset', 'expense'].includes(acc?.primary_name)) {
@@ -261,8 +257,8 @@ export class ReportService {
 
     const account = await this.manager.query(main_query);
     const newResult = ['revenue', 'expense']
-      .map(item => {
-        let filtered: any[] = account.filter(acc => {
+      .map((item) => {
+        let filtered: any[] = account.filter((acc) => {
           return acc.primary_name === item && acc?.balance !== 0;
         });
         if (filtered.length > 0) {
@@ -279,7 +275,7 @@ export class ReportService {
           return null;
         }
       })
-      .filter(item => item !== null);
+      .filter((item) => item !== null);
     return newResult;
   }
 }

@@ -18,7 +18,7 @@ export class createCurrency1621844990751 implements MigrationInterface {
           { name: 'symbol', isNullable: true, type: 'varchar' },
         ],
       }),
-      true,
+      true
     );
   }
 

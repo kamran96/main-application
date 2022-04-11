@@ -1,6 +1,6 @@
-export enum NOTIFICATIONTYPE{
-    SUCCESS = "success",
-    INFO ="info",
-    WARNING ="warning",
-    ERROR ="error"
+export enum NOTIFICATIONTYPE {
+  SUCCESS = 'success',
+  INFO = 'info',
+  WARNING = 'warning',
+  ERROR = 'error',
 }

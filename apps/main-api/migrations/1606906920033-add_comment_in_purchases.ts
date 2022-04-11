@@ -8,7 +8,7 @@ export class addCommentInPurchases1606906920033 implements MigrationInterface {
         name: 'comment',
         isNullable: true,
         type: 'varchar',
-      }),
+      })
     );
   }
 

@@ -37,17 +37,11 @@ export class PurchaseItems {
   // @Column()
   // createdBy: number;
 
-  @ManyToOne(
-    type => Purchases,
-    purchase => purchase.id,
-  )
+  @ManyToOne((type) => Purchases, (purchase) => purchase.id)
   @JoinColumn()
   purchase: Purchase;
 
-  @ManyToOne(
-    type => Items,
-    item => item.id,
-  )
+  @ManyToOne((type) => Items, (item) => item.id)
   @JoinColumn()
   item: Items;
 }

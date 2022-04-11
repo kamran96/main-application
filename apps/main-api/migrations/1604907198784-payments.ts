@@ -28,7 +28,7 @@ export class payments1604907198784 implements MigrationInterface {
           { name: 'updatedAt', type: 'timestamp', default: 'NOW()' },
         ],
       }),
-      true,
+      true
     );
 
     await queryRunner.createForeignKey(
@@ -38,7 +38,7 @@ export class payments1604907198784 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'branches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -48,7 +48,7 @@ export class payments1604907198784 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'invoices',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -58,7 +58,7 @@ export class payments1604907198784 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'contacts',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -68,7 +68,7 @@ export class payments1604907198784 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

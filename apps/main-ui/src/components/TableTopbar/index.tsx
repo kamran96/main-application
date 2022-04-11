@@ -1,11 +1,11 @@
-import React, { ReactElement, SFC } from "react";
-import styled from "styled-components";
-import { Icon } from "@iconify/react";
-import editSolid from "@iconify/icons-clarity/edit-solid";
-import deleteIcon from "@iconify/icons-carbon/delete";
-import { MoreActions, TableActions } from "../TableActions";
-import convertToRem from "../../utils/convertToRem";
-import { Color } from "../../modal";
+import React, { ReactElement, SFC } from 'react';
+import styled from 'styled-components';
+import { Icon } from '@iconify/react';
+import editSolid from '@iconify/icons-clarity/edit-solid';
+import deleteIcon from '@iconify/icons-carbon/delete';
+import { MoreActions, TableActions } from '../TableActions';
+import convertToRem from '../../utils/convertToRem';
+import { Color } from '../../modal';
 
 interface IProps {
   selectedRow?: number[];
@@ -37,7 +37,7 @@ export const TableTopbar: SFC<IProps> = ({
                       style={{
                         fontSize: convertToRem(16),
                         color: Color.$GRAY_LIGHT,
-                        cursor: "pointer",
+                        cursor: 'pointer',
                       }}
                       icon={editSolid}
                     />
@@ -48,7 +48,7 @@ export const TableTopbar: SFC<IProps> = ({
                     style={{
                       fontSize: convertToRem(16),
                       color: Color.$GRAY_LIGHT,
-                      cursor: "pointer",
+                      cursor: 'pointer',
                     }}
                     icon={deleteIcon}
                   />

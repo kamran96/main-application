@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class addTransactionModeInTransactions1627561840421
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'transactions',
@@ -9,7 +10,7 @@ export class addTransactionModeInTransactions1627561840421
         name: 'transactionMode',
         type: 'smallint',
         isNullable: true,
-      }),
+      })
     );
   }
 

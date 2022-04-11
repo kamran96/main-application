@@ -19,7 +19,7 @@ export class InvoiceService {
           'discount',
           's tax',
           'total',
-        ].map(i => i.toUpperCase()),
+        ].map((i) => i.toUpperCase()),
       ];
       invoiceData.invoice.invoice_items.forEach((tr, index) => {
         heading.push([
@@ -59,9 +59,9 @@ export class InvoiceService {
       const [header] = contents;
       contents.splice(0, 1);
       const newRows = [
-        header.map(item => ({ text: item, bold: true, fontSize: 8 })),
-        ...contents.map(c => {
-          return Array.prototype.map.call(c, function(i) {
+        header.map((item) => ({ text: item, bold: true, fontSize: 8 })),
+        ...contents.map((c) => {
+          return Array.prototype.map.call(c, function (i) {
             return {
               text: i,
               fontSize: 9,
@@ -71,7 +71,7 @@ export class InvoiceService {
         }),
       ];
 
-      const rows = newRows.filter(item => item.length !== 0);
+      const rows = newRows.filter((item) => item.length !== 0);
 
       let docDefinition = {
         header: {

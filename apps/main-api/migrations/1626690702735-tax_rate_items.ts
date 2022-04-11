@@ -25,7 +25,7 @@ export class taxRateItems1626690702735 implements MigrationInterface {
           { name: 'updatedAt', type: 'timestamp', default: 'NOW()' },
         ],
       }),
-      true,
+      true
     );
 
     await queryRunner.createForeignKey(
@@ -35,7 +35,7 @@ export class taxRateItems1626690702735 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'tax_rates',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'tax_rate_items',
@@ -44,7 +44,7 @@ export class taxRateItems1626690702735 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'tax_rate_items',
@@ -53,7 +53,7 @@ export class taxRateItems1626690702735 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'branches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'tax_rate_items',
@@ -62,7 +62,7 @@ export class taxRateItems1626690702735 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'tax_rate_items',
@@ -71,7 +71,7 @@ export class taxRateItems1626690702735 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

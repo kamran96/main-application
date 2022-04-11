@@ -6,7 +6,8 @@ import {
 } from 'typeorm';
 
 export class addAttribsToOrganization1628585350736
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'organizations',
@@ -14,7 +15,7 @@ export class addAttribsToOrganization1628585350736
         name: 'email',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'organizations',
@@ -22,7 +23,7 @@ export class addAttribsToOrganization1628585350736
         name: 'website',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'organizations',
@@ -30,7 +31,7 @@ export class addAttribsToOrganization1628585350736
         name: 'attachmentId',
         type: 'int',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'organizations',
@@ -38,7 +39,7 @@ export class addAttribsToOrganization1628585350736
         name: 'addressId',
         type: 'int',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'branches',
@@ -46,7 +47,7 @@ export class addAttribsToOrganization1628585350736
         name: 'email',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'branches',
@@ -54,7 +55,7 @@ export class addAttribsToOrganization1628585350736
         name: 'prefix',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'branches',
@@ -62,7 +63,7 @@ export class addAttribsToOrganization1628585350736
         name: 'addressId',
         type: 'int',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -72,7 +73,7 @@ export class addAttribsToOrganization1628585350736
         referencedColumnNames: ['id'],
         referencedTableName: 'addressId',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'organizations',
@@ -81,7 +82,7 @@ export class addAttribsToOrganization1628585350736
         referencedColumnNames: ['id'],
         referencedTableName: 'attachments',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'organizations',
@@ -90,7 +91,7 @@ export class addAttribsToOrganization1628585350736
         referencedColumnNames: ['id'],
         referencedTableName: 'addresses',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

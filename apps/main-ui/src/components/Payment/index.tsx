@@ -1,13 +1,13 @@
-import React, { FC, memo, useEffect, useState } from "react";
-import { Form, Input, Select, Tabs } from "antd";
-import styled from "styled-components";
-import { FormLabel } from "../FormLabel";
-import { useQuery } from "react-query";
-import { getBankAccounts, getBanks } from "../../api/accounts";
-import { PaymentMode, PaymentType } from "../../modal";
-import { defaultSettings } from "./constants";
-import { DatePicker } from "../DatePicker";
-import dayjs from "dayjs";
+import React, { FC, memo, useEffect, useState } from 'react';
+import { Form, Input, Select, Tabs } from 'antd';
+import styled from 'styled-components';
+import { FormLabel } from '../FormLabel';
+import { useQuery } from 'react-query';
+import { getBankAccounts, getBanks } from '../../api/accounts';
+import { PaymentMode, PaymentType } from '../../modal';
+import { defaultSettings } from './constants';
+import { DatePicker } from '../DatePicker';
+import dayjs from 'dayjs';
 
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -68,11 +68,11 @@ const _Payment: FC<IProps> = ({
     }
   }, [data]);
 
-  let paymentTypeStatus = form.getFieldValue("paymentType");
+  let paymentTypeStatus = form.getFieldValue('paymentType');
 
   const disableDates = (current) => {
     if (issueDate) {
-      return current <= dayjs(issueDate).subtract(1, "day");
+      return current <= dayjs(issueDate).subtract(1, 'day');
     } else {
       return false;
     }
@@ -83,7 +83,6 @@ const _Payment: FC<IProps> = ({
       <Form
         form={form}
         onValuesChange={(changedValues, allValues) => {
-        
           onChange({ ...initialValues, ...allValues, paymentMode });
           setInitialvalue({ ...initialValues, allValues, paymentMode });
         }}
@@ -130,7 +129,7 @@ const _Payment: FC<IProps> = ({
               <Form.Item name="dueDate">
                 <DatePicker
                   disabledDate={disableDates}
-                  style={{ width: "100%" }}
+                  style={{ width: '100%' }}
                   size="middle"
                 />
               </Form.Item>
@@ -155,15 +154,19 @@ const _Payment: FC<IProps> = ({
                 <Select
                   size="middle"
                   showSearch
-                  style={{ width: "100%" }}
+                  style={{ width: '100%' }}
                   placeholder="Select Type"
                   optionFilterProp="children"
                 >
                   {[
-                    { value: 1, name: "Bank" },
-                    { value: 2, name: "Cash" },
+                    { value: 1, name: 'Bank' },
+                    { value: 2, name: 'Cash' },
                   ].map((type, index) => {
-                    return <Option key={index} value={type.value}>{type.name}</Option>;
+                    return (
+                      <Option key={index} value={type.value}>
+                        {type.name}
+                      </Option>
+                    );
                   })}
                 </Select>
               </Form.Item>
@@ -172,8 +175,8 @@ const _Payment: FC<IProps> = ({
               <>
                 <FormLabel>
                   {paymentTypeStatus === PaymentType.BANK
-                    ? "Select Bank"
-                    : "Amount"}
+                    ? 'Select Bank'
+                    : 'Amount'}
                 </FormLabel>
                 <div className="pv-2">
                   <Form.Item name="bankId">
@@ -181,12 +184,16 @@ const _Payment: FC<IProps> = ({
                       loading={isLoading}
                       size="middle"
                       showSearch
-                      style={{ width: "100%" }}
+                      style={{ width: '100%' }}
                       placeholder="Select Bank"
                       optionFilterProp="children"
                     >
                       {banksList.map((bank, index) => {
-                        return <Option key={index} value={bank.id}>{bank.name}</Option>;
+                        return (
+                          <Option key={index} value={bank.id}>
+                            {bank.name}
+                          </Option>
+                        );
                       })}
                     </Select>
                   </Form.Item>
@@ -209,29 +216,33 @@ const _Payment: FC<IProps> = ({
             </div>
             <FormLabel>Amount Paid</FormLabel>
             <div className="pv-2">
-              <Form.Item name="amount"
-               
+              <Form.Item
+                name="amount"
                 rules={[
                   {
-                    whitespace: false
+                    whitespace: false,
                   },
                   {
-                    validator: (rule, value, callback)=>{
-                      
+                    validator: (rule, value, callback) => {
                       let amount = form.getFieldValue('totalAmount');
-                      if(parseInt(value)>amount){
-                         try{
-                          throw new Error(`Value should be less than ${amount}`)
-                         }catch(err){
-                          callback(err)
-                         }
+                      if (parseInt(value) > amount) {
+                        try {
+                          throw new Error(
+                            `Value should be less than ${amount}`
+                          );
+                        } catch (err) {
+                          callback(err);
+                        }
                       }
-                    }  
-                  }
-
+                    },
+                  },
                 ]}
               >
-                <Input placeholder="Enter Amount" type="number" autoComplete="off"/>
+                <Input
+                  placeholder="Enter Amount"
+                  type="number"
+                  autoComplete="off"
+                />
               </Form.Item>
             </div>
             <FormLabel>Type</FormLabel>
@@ -240,15 +251,19 @@ const _Payment: FC<IProps> = ({
                 <Select
                   size="large"
                   showSearch
-                  style={{ width: "100%" }}
+                  style={{ width: '100%' }}
                   placeholder="Select Type"
                   optionFilterProp="children"
                 >
                   {[
-                    { value: 1, name: "Bank" },
-                    { value: 2, name: "Cash" },
+                    { value: 1, name: 'Bank' },
+                    { value: 2, name: 'Cash' },
                   ].map((type, index) => {
-                    return <Option key={index} value={type.value}>{type.name}</Option>;
+                    return (
+                      <Option key={index} value={type.value}>
+                        {type.name}
+                      </Option>
+                    );
                   })}
                 </Select>
               </Form.Item>
@@ -257,20 +272,24 @@ const _Payment: FC<IProps> = ({
               <>
                 <FormLabel>
                   {paymentTypeStatus === PaymentType.BANK
-                    ? "Select Bank"
-                    : "Amount"}
+                    ? 'Select Bank'
+                    : 'Amount'}
                 </FormLabel>
                 <div className="pv-2">
                   <Form.Item name="bankId">
                     <Select
                       size="large"
                       showSearch
-                      style={{ width: "100%" }}
+                      style={{ width: '100%' }}
                       placeholder="Select Bank"
                       optionFilterProp="children"
                     >
                       {banksList.map((bank, index) => {
-                        return <Option key={index} value={bank.id}>{bank.name}</Option>;
+                        return (
+                          <Option key={index} value={bank.id}>
+                            {bank.name}
+                          </Option>
+                        );
                       })}
                     </Select>
                   </Form.Item>
@@ -284,10 +303,11 @@ const _Payment: FC<IProps> = ({
   );
 };
 
-export const Payment = memo(_Payment, (prevProps, nextProps)=>{
-
-  
-  return JSON.stringify(prevProps.initialValues)===JSON.stringify(nextProps.initialValues)
+export const Payment = memo(_Payment, (prevProps, nextProps) => {
+  return (
+    JSON.stringify(prevProps.initialValues) ===
+    JSON.stringify(nextProps.initialValues)
+  );
 });
 
 const WrapperPayment = styled.div``;

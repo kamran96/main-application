@@ -19,7 +19,7 @@ export class alterCodeInAccount1603360269295 implements MigrationInterface {
         name: 'code',
         isNullable: true,
         type: 'varchar',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -28,7 +28,7 @@ export class alterCodeInAccount1603360269295 implements MigrationInterface {
         name: 'secondaryAccountId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'accounts',
@@ -36,7 +36,7 @@ export class alterCodeInAccount1603360269295 implements MigrationInterface {
         name: 'primaryAccountId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -45,7 +45,7 @@ export class alterCodeInAccount1603360269295 implements MigrationInterface {
         name: 'branchId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -54,7 +54,7 @@ export class alterCodeInAccount1603360269295 implements MigrationInterface {
         name: 'organizationId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -63,7 +63,7 @@ export class alterCodeInAccount1603360269295 implements MigrationInterface {
         name: 'organizationId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     // await queryRunner.createForeignKey(
@@ -75,11 +75,13 @@ export class alterCodeInAccount1603360269295 implements MigrationInterface {
     //     onDelete: 'CASCADE',
     //   }),
     // );
-    await queryRunner.createIndex("accounts", new TableIndex({
-      name: "account_indexes",
-      columnNames: ["branchId", "primaryAccountId","secondaryAccountId"]
-  }));
-
+    await queryRunner.createIndex(
+      'accounts',
+      new TableIndex({
+        name: 'account_indexes',
+        columnNames: ['branchId', 'primaryAccountId', 'secondaryAccountId'],
+      })
+    );
 
     // await queryRunner.createForeignKey(
     //   'primary_accounts',
@@ -113,6 +115,6 @@ export class alterCodeInAccount1603360269295 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropIndex('accounts','account_indexes');
+    await queryRunner.dropIndex('accounts', 'account_indexes');
   }
 }

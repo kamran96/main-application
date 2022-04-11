@@ -1,30 +1,36 @@
 import React from 'react';
-import {  useDrag, useDrop } from 'react-dnd';
-
+import { useDrag, useDrop } from 'react-dnd';
 
 const type = 'DragableBodyRow';
 
-export const DragableBodyRow = ({ index, moveRow, className, style, ...restProps }) => {
+export const DragableBodyRow = ({
+  index,
+  moveRow,
+  className,
+  style,
+  ...restProps
+}) => {
   const ref = React.useRef();
   const [{ isOver, dropClassName }, drop] = useDrop({
     accept: type,
-    collect: monitor => {
+    collect: (monitor) => {
       const { index: dragIndex } = monitor.getItem() || {};
       if (dragIndex === index) {
         return {};
       }
       return {
         isOver: monitor.isOver(),
-        dropClassName: dragIndex < index ? ' drop-over-downward' : ' drop-over-upward',
+        dropClassName:
+          dragIndex < index ? ' drop-over-downward' : ' drop-over-upward',
       };
     },
-    drop: (item:any) => {
+    drop: (item: any) => {
       moveRow(item.index, index);
     },
   });
   const [, drag] = useDrag({
     item: { type, index },
-    collect: monitor => ({
+    collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
   });

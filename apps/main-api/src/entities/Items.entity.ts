@@ -59,24 +59,15 @@ export class Items {
   @Column()
   updatedById: number;
 
-  @OneToOne(
-    type => Branches,
-    branch => branch.id,
-  )
+  @OneToOne((type) => Branches, (branch) => branch.id)
   @JoinColumn()
   branch: Branches;
 
-  @OneToMany(
-    type => KeyStorages,
-    key => key.id,
-  )
+  @OneToMany((type) => KeyStorages, (key) => key.id)
   @JoinColumn()
   key: KeyStorages;
 
-  @OneToOne(
-    type => Prices,
-    price => price.id,
-  )
+  @OneToOne((type) => Prices, (price) => price.id)
   @JoinColumn()
   price: Prices;
 }

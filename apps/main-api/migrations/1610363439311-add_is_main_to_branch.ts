@@ -8,7 +8,7 @@ export class addIsMainToBranch1610363439311 implements MigrationInterface {
         name: 'isMain',
         type: 'boolean',
         default: 'false',
-      }),
+      })
     );
   }
 
