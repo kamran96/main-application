@@ -76,16 +76,9 @@ export class UserController {
   async inviteUsers(
     @Body() userDto: InvitedUserDto,
     @Req() req: IRequest
-  ): Promise<IUserWithResponse> {
+  ): Promise<void> {
     try {
-      const user = this.userService.InviteUserToOrganization(userDto, req.user);
-
-      if (user) {
-        return {
-          message: 'successfull.',
-          status: true,
-        };
-      }
+      return await this.userService.InviteUserToOrganization(userDto, req.user);
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
