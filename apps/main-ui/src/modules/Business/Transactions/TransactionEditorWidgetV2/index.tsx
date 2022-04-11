@@ -8,7 +8,7 @@ import { DatePicker } from '../../../../components/DatePicker';
 import dayjs from 'dayjs';
 import { BreadCrumbArea } from '../../../../components/BreadCrumbArea';
 import { ISupportedRoutes } from '../../../../modal/routing';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { Heading } from '../../../../components/Heading';
 import TextArea from 'antd/lib/input/TextArea';
 import { BoldText } from '../../../../components/Para/BoldText';
@@ -18,7 +18,11 @@ import { useMutation, useQueryClient } from 'react-query';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { NOTIFICATIONTYPE } from '@invyce/shared/types';
 import { ITransactionsList } from './types';
+
 const Editor = () => {
+  const queryCache = useQueryClient();
+  const history = useHistory();
+
   // ****** HOOKS IMPLEMENTATION ******
   const {
     columns,
@@ -26,15 +30,30 @@ const Editor = () => {
     setTransactionsList,
     addRow,
     loading,
+    id,
     resetTransactions,
+    form,
   } = useTransaction();
-  const [form] = Form.useForm();
+
   const { notificationCallback } = useGlobalContext();
 
   const { mutate: mutateCreateTransaction, isLoading: creatingTransaction } =
     useMutation(createTransactionAPI);
 
-  const queryCache = useQueryClient();
+  // useEffect(() => {
+  //   if (id && TransactionData && TransactionData?.data?.result) {
+  //     console.log(TransactionData.data)
+  //     const {result} = TransactionData?.data
+  //     const Resultdata = {
+  //       ref: result?.ref,
+  //       date: dayjs(result?.date).endOf('day'),
+  //       narration:result?.narration ,
+  //       notes: result?.notes
+  //     }
+
+  //     form.setFieldsValue(Resultdata)
+  //   }
+  // }, [TransactionData, id]);
 
   const totalDebits = (transactionsList.length &&
     transactionsList.reduce((a, b) => {
@@ -126,7 +145,8 @@ const Editor = () => {
         return { amount: a.amount + b.amount };
       });
 
-      const payload = {
+      let payload = {
+        isNewRecord: true,
         ...values,
         entries: {
           credits,
@@ -134,6 +154,10 @@ const Editor = () => {
         },
         amount,
       };
+
+      if (id) {
+        payload = { ...payload, id, isNewRecord: false };
+      }
 
       try {
         if (totalDebits.amount === totalCredits.amount && true) {
@@ -151,9 +175,14 @@ const Editor = () => {
                 NOTIFICATIONTYPE.SUCCESS,
                 'Transaction Created'
               );
+              history.push(
+                `${ISupportedRoutes?.DASHBOARD_LAYOUT}${ISupportedRoutes?.CREATE_TRANSACTION}`
+              );
             },
           });
-        } else
+        }
+        // eslint-disable-next-line no-throw-literal
+        else
           throw {
             status: 501,
             message:
@@ -310,8 +339,16 @@ const Editor = () => {
 };
 
 export const TransactionsWidget = () => {
+  const { routeHistory } = useGlobalContext();
+  const { history } = routeHistory;
+
+  const id =
+    history &&
+    history?.location &&
+    history?.location?.pathname?.split('/app/journal-entry/')[1];
+
   return (
-    <TransactionManager>
+    <TransactionManager id={id}>
       <Editor />
     </TransactionManager>
   );
