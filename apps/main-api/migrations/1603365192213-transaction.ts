@@ -25,7 +25,7 @@ export class transaction1603365192213 implements MigrationInterface {
           { name: 'updatedById', type: 'int', isNullable: true },
         ],
       }),
-      true,
+      true
     );
 
     await queryRunner.createForeignKey(
@@ -35,7 +35,7 @@ export class transaction1603365192213 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'branches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -45,7 +45,7 @@ export class transaction1603365192213 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

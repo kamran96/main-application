@@ -25,7 +25,6 @@ function createFontWeight() {
         };`;
   }
 
-
   return css`
     ${styles}
   `;
@@ -50,7 +49,6 @@ function createPadding() {
 
         };`;
   }
-
 
   return css`
     ${styles}
@@ -89,7 +87,6 @@ function createMargin() {
         };
         `;
   }
- 
 
   return css`
     ${styles}

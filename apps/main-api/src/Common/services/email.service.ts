@@ -39,7 +39,7 @@ export class EmailService {
     template: string = null,
     attachments: any[] = [],
     cc: any[] = [],
-    bcc: any[] = [],
+    bcc: any[] = []
   ) {
     this.state.to = to;
     this.state.subject = subject;

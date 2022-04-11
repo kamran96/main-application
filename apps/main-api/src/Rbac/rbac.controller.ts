@@ -59,7 +59,7 @@ export class RbacController {
   async test(@Req() req: any) {
     await this.rbacService.InsertRoles(
       req.user.organizationId,
-      req.user.userId,
+      req.user.userId
     );
     await this.rbacService.InsertRolePermission(req.user.organizationId);
 
@@ -74,7 +74,7 @@ export class RbacController {
   async viewRole(@Req() req: any, @Param() params) {
     const role = await this.rbacService.GetRole(
       params.id,
-      req.user.organizationId,
+      req.user.organizationId
     );
 
     if (role) {
@@ -92,7 +92,7 @@ export class RbacController {
     const permission = await this.rbacService.GetPermissions(
       req.user,
       page_no,
-      page_size,
+      page_size
     );
 
     if (permission) {
@@ -148,7 +148,7 @@ export class RbacController {
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -157,11 +157,11 @@ export class RbacController {
   @Post('/role-permission')
   async addRolePermission(
     @Body() rolePermissionDto: RolePermissionDto,
-    @Req() req: Request,
+    @Req() req: Request
   ) {
     const role_permission = await this.rbacService.AddRolePermission(
       rolePermissionDto,
-      req.user,
+      req.user
     );
 
     if (role_permission) {
@@ -177,12 +177,12 @@ export class RbacController {
   @Post('/permission')
   async createPermission(
     @Body() permissionDto: PermissionDto,
-    @Req() req: Request,
+    @Req() req: Request
   ) {
     try {
       const permission = await this.rbacService.CreatePermission(
         permissionDto,
-        req.user,
+        req.user
       );
 
       if (permission) {
@@ -195,7 +195,7 @@ export class RbacController {
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -230,7 +230,7 @@ export class RbacController {
   @Put('/permission/delete')
   async deletePermission(@Body() permissionIdsDto: PermissionIdsDto) {
     const permission = await this.rbacService.DeletePermission(
-      permissionIdsDto,
+      permissionIdsDto
     );
 
     if (permission) {

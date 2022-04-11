@@ -29,7 +29,7 @@ export class SecondaryAccounts {
   @Column()
   updatedById: number;
 
-  @ManyToOne(type => PrimaryAccounts)
+  @ManyToOne((type) => PrimaryAccounts)
   @JoinColumn({ name: 'primaryAccountId', referencedColumnName: 'id' })
   primaryAccount: PrimaryAccounts;
 }

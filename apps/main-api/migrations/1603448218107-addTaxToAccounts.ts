@@ -8,7 +8,7 @@ export class addTaxToAccounts1603448218107 implements MigrationInterface {
         name: 'taxRate',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
   }
 

@@ -1,2 +1,2 @@
 export * from './lib/shared-types';
-export * from "./modal/index";
+export * from './modal/index';

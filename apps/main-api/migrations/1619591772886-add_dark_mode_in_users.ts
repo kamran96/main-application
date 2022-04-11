@@ -8,7 +8,7 @@ export class addDarkModeInUsers1619591772886 implements MigrationInterface {
         name: 'theme',
         type: 'varchar',
         default: "'light'",
-      }),
+      })
     );
   }
 

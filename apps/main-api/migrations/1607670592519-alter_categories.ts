@@ -71,7 +71,7 @@ export class alterCategories1607670592519 implements MigrationInterface {
           },
         ],
       }),
-      true,
+      true
     );
 
     await queryRunner.createForeignKey(
@@ -81,7 +81,7 @@ export class alterCategories1607670592519 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'categories',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -91,7 +91,7 @@ export class alterCategories1607670592519 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'attachments',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -101,7 +101,7 @@ export class alterCategories1607670592519 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -111,7 +111,7 @@ export class alterCategories1607670592519 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

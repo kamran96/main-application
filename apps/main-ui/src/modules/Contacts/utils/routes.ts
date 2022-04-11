@@ -1,7 +1,7 @@
-import { RouteConfig } from "react-router-config";
-import { ContactsContainer } from "..";
-import { ISupportedRoutes } from "../../../modal/routing";
-import { ContactsEditorWidget } from "../ContactsEditorWiget";
+import { RouteConfig } from 'react-router-config';
+import { ContactsContainer } from '..';
+import { ISupportedRoutes } from '../../../modal/routing';
+import { ContactsEditorWidget } from '../ContactsEditorWiget';
 
 export const ContactsManagerRoutes = (root): RouteConfig[] => [
   {

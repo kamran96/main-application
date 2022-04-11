@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Col, Form, Input, Row, Select } from "antd";
-import React, { FC, useEffect } from "react";
-import styled from "styled-components";
+import { Col, Form, Input, Row, Select } from 'antd';
+import React, { FC, useEffect } from 'react';
+import styled from 'styled-components';
 
 const { Option } = Select;
 
@@ -53,11 +53,15 @@ export const AttriForm: FC<IProps> = ({
               rules={[
                 {
                   required: true,
-                  message: "Attribute Name required !",
+                  message: 'Attribute Name required !',
                 },
               ]}
             >
-              <Input autoComplete="off" placeholder="Attribute Name" size="middle" />
+              <Input
+                autoComplete="off"
+                placeholder="Attribute Name"
+                size="middle"
+              />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -66,23 +70,23 @@ export const AttriForm: FC<IProps> = ({
               rules={[
                 {
                   required: true,
-                  message: "Attribute Type required !",
+                  message: 'Attribute Type required !',
                 },
               ]}
             >
               <Select
                 size="middle"
                 showSearch
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 placeholder="Select Type"
                 optionFilterProp="children"
               >
-                <Option value={"DROPDOWN"}>Dropdown</Option>
-                <Option value={"INPUT"}>Input</Option>
+                <Option value={'DROPDOWN'}>Dropdown</Option>
+                <Option value={'INPUT'}>Input</Option>
               </Select>
             </Form.Item>
           </Col>
-          {state[index] && state[index].type === "DROPDOWN" && (
+          {state[index] && state[index].type === 'DROPDOWN' && (
             <>
               <Col span={12}>
                 <Form.Item
@@ -90,19 +94,19 @@ export const AttriForm: FC<IProps> = ({
                   rules={[
                     {
                       required: false,
-                      message: "Please mention value type !",
+                      message: 'Please mention value type !',
                     },
                   ]}
                 >
                   <Select
                     size="middle"
                     showSearch
-                    style={{ width: "100%" }}
+                    style={{ width: '100%' }}
                     placeholder="Select Type"
                     optionFilterProp="children"
                     defaultValue="custom"
                   >
-                    <Option value={"custom"}>Custom Value</Option>
+                    <Option value={'custom'}>Custom Value</Option>
                     {/* <Option value={"INPUT"}>Choose Lookup</Option> */}
                   </Select>
                 </Form.Item>
@@ -114,13 +118,13 @@ export const AttriForm: FC<IProps> = ({
                     {
                       required: true,
                       message:
-                        "Please add values in this format eg: 100ml , 200ml , etc",
+                        'Please add values in this format eg: 100ml , 200ml , etc',
                     },
                   ]}
                 >
                   <Input
                     size="middle"
-                    placeholder={"eg: 100ml, 200ml, 250ml, 300ml etc"}
+                    placeholder={'eg: 100ml, 200ml, 250ml, 300ml etc'}
                     autoComplete="off"
                   />
                 </Form.Item>

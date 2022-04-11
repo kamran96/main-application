@@ -1,24 +1,24 @@
-import { FilterType } from "../../../../modal";
+import { FilterType } from '../../../../modal';
 
 export default {
   contactId: {
     type: FilterType.LIST_IDS,
-    label: "Customer",
+    label: 'Customer',
     value: [],
   },
   reference: {
     type: FilterType.SEARCH,
-    label: "Referance",
-    value: "",
+    label: 'Referance',
+    value: '',
   },
   dueDate: {
     type: FilterType.EQUALSTO,
-    label: "Expiry Date",
-    value: "",
+    label: 'Expiry Date',
+    value: '',
   },
   createdAt: {
     type: FilterType.DATE_BETWEEN,
-    label: "Created At",
-    value: "",
+    label: 'Created At',
+    value: '',
   },
 };

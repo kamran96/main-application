@@ -248,7 +248,6 @@
         }
       }
     },
-
     "contacts-service": {
       "root": "apps/contacts-service",
       "sourceRoot": "apps/contacts-service/src",

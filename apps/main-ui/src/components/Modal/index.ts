@@ -1,11 +1,11 @@
-import { IThemeProps } from "./../../hooks/useTheme/themeColors";
-import { Modal } from "antd";
-import OriginModal from "antd/lib/modal/Modal";
+import { IThemeProps } from './../../hooks/useTheme/themeColors';
+import { Modal } from 'antd';
+import OriginModal from 'antd/lib/modal/Modal';
 import {
   ModalStaticFunctions,
   modalGlobalConfig,
-} from "antd/lib/modal/confirm";
-import styled from "styled-components";
+} from 'antd/lib/modal/confirm';
+import styled from 'styled-components';
 
 declare type ModalType = typeof OriginModal &
   ModalStaticFunctions & {

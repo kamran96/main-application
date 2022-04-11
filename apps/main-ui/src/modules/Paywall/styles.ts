@@ -1,19 +1,19 @@
-import styled, { createGlobalStyle } from "styled-components";
-import { CommonModal } from "../../components";
+import styled, { createGlobalStyle } from 'styled-components';
+import { CommonModal } from '../../components';
 
-type DivProps = JSX.IntrinsicElements['div']
+type DivProps = JSX.IntrinsicElements['div'];
 
 interface WrapperPaywallProps extends DivProps {
   step?: Number;
 }
 
-export const WrapperPaywall  = styled.div<WrapperPaywallProps>`
+export const WrapperPaywall = styled.div<WrapperPaywallProps>`
   overflow: hidden;
   .main-wrapper {
     display: flex;
     overflow-x: hidden;
     transition: 0.6s all ease-in-out;
-    margin-left: ${(props: any) => (props?.step === 2 ? "-1037px" : 0)};
+    margin-left: ${(props: any) => (props?.step === 2 ? '-1037px' : 0)};
 
     .package_screen {
       padding: 36px 0;

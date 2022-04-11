@@ -17,7 +17,7 @@ export class alterCreatedAtInUsers1600159328695 implements MigrationInterface {
         name: 'createdById',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'users',
@@ -25,7 +25,7 @@ export class alterCreatedAtInUsers1600159328695 implements MigrationInterface {
         name: 'updatedById',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'users',
@@ -33,7 +33,7 @@ export class alterCreatedAtInUsers1600159328695 implements MigrationInterface {
         name: 'createdAt',
         type: 'timestamp',
         default: 'NOW()',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'users',
@@ -41,7 +41,7 @@ export class alterCreatedAtInUsers1600159328695 implements MigrationInterface {
         name: 'updatedAt',
         type: 'timestamp',
         default: 'NOW()',
-      }),
+      })
     );
 
     // updating user_roles attributes
@@ -51,7 +51,7 @@ export class alterCreatedAtInUsers1600159328695 implements MigrationInterface {
         name: 'createdAt',
         type: 'timestamp',
         default: 'NOW()',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'user_roles',
@@ -59,7 +59,7 @@ export class alterCreatedAtInUsers1600159328695 implements MigrationInterface {
         name: 'updatedAt',
         type: 'timestamp',
         default: 'NOW()',
-      }),
+      })
     );
   }
 

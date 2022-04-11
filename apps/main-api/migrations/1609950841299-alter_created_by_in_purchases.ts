@@ -6,7 +6,8 @@ import {
 } from 'typeorm';
 
 export class alterCreatedByInPurchases1609950841299
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropColumn('purchases', 'createdBy');
 
@@ -16,7 +17,7 @@ export class alterCreatedByInPurchases1609950841299
         name: 'updatedAt',
         type: 'timestamp',
         default: 'NOW()',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -25,7 +26,7 @@ export class alterCreatedByInPurchases1609950841299
         name: 'createdById',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -35,7 +36,7 @@ export class alterCreatedByInPurchases1609950841299
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'purchases',
@@ -43,7 +44,7 @@ export class alterCreatedByInPurchases1609950841299
         name: 'updatedById',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -53,7 +54,7 @@ export class alterCreatedByInPurchases1609950841299
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

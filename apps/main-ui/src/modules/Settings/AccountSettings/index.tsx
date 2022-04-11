@@ -1,9 +1,9 @@
-import React, { FC } from "react";
+import React, { FC } from 'react';
 
-import { Heading } from "../../../components/Heading";
-import { TableCard } from "../../../components/TableCard";
-import { AccountsSettingsForm } from "./Form/Form";
-import { WrapperAccountSettings } from "./styles";
+import { Heading } from '../../../components/Heading';
+import { TableCard } from '../../../components/TableCard';
+import { AccountsSettingsForm } from './Form/Form';
+import { WrapperAccountSettings } from './styles';
 
 export const AccountSettings: FC = () => {
   return (

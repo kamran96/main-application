@@ -1,9 +1,9 @@
-import React, { FC } from "react";
-import { Input, Select } from "antd";
-import styled from "styled-components";
+import React, { FC } from 'react';
+import { Input, Select } from 'antd';
+import styled from 'styled-components';
 
-import { IVariants } from "../../../../modal/categories";
-import convertToRem from "../../../../utils/convertToRem";
+import { IVariants } from '../../../../modal/categories';
+import convertToRem from '../../../../utils/convertToRem';
 
 const { Option } = Select;
 
@@ -16,7 +16,7 @@ interface IProps {
 export const DynamicForm: FC<IProps> = ({ item, onChange, value }) => {
   const renderForm = (item: IVariants) => {
     switch (item.valueType) {
-      case "INPUT":
+      case 'INPUT':
         return (
           <Input
             value={value}
@@ -25,17 +25,17 @@ export const DynamicForm: FC<IProps> = ({ item, onChange, value }) => {
             autoComplete="off"
           />
         );
-      case "DROPDOWN":
+      case 'DROPDOWN':
         return (
           <Select
             allowClear
             onClear={() => {
-              onChange("");
+              onChange('');
             }}
             value={value}
             size="middle"
             showSearch
-            style={{ width: "100%" }}
+            style={{ width: '100%' }}
             placeholder="Select Type"
             optionFilterProp="children"
             onChange={(val) => onChange(val)}
@@ -47,7 +47,7 @@ export const DynamicForm: FC<IProps> = ({ item, onChange, value }) => {
           </Select>
         );
       default:
-        return null
+        return null;
         break;
     }
   };

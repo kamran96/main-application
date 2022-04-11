@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class addPurchaseAndSalePriceToDispatchItems1611662766092
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'dispatch_items',
@@ -9,7 +10,7 @@ export class addPurchaseAndSalePriceToDispatchItems1611662766092
         name: 'purchasePrice',
         type: 'float',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'dispatch_items',
@@ -17,7 +18,7 @@ export class addPurchaseAndSalePriceToDispatchItems1611662766092
         name: 'salePrice',
         type: 'float',
         isNullable: true,
-      }),
+      })
     );
   }
 

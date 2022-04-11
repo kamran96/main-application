@@ -8,7 +8,7 @@ export class addOpeningStockInItems1608380535897 implements MigrationInterface {
         name: 'openingStock',
         isNullable: true,
         type: 'float',
-      }),
+      })
     );
   }
 

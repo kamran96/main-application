@@ -1,7 +1,7 @@
-import { Col, Form, Input, InputNumber, Row } from "antd";
-import React, { FC, useEffect } from "react";
+import { Col, Form, Input, InputNumber, Row } from 'antd';
+import React, { FC, useEffect } from 'react';
 
-import { FormLabel } from "../../../components/FormLabel";
+import { FormLabel } from '../../../components/FormLabel';
 
 interface IProps {
   item: any;
@@ -34,30 +34,30 @@ export const AddressForm: FC<IProps> = ({ onChange, item, index, reset }) => {
       }}
     >
       <FormLabel isRequired={true}>
-        {item.addressType === 1 ? "Postal Address" : "Street Address"}
+        {item.addressType === 1 ? 'Postal Address' : 'Street Address'}
       </FormLabel>
       <Form.Item
         name="description"
         rules={[
           {
             required: true,
-            message: "Please provide postal address",
+            message: 'Please provide postal address',
           },
         ]}
       >
-        <Input placeholder={"Address"} size="large" autoComplete="off"/>
+        <Input placeholder={'Address'} size="large" autoComplete="off" />
       </Form.Item>
       <Form.Item
         name="city"
-        rules={[{ required: false, message: "Please provide Skype ID" }]}
+        rules={[{ required: false, message: 'Please provide Skype ID' }]}
       >
-        <Input placeholder={"City/Town"} size="large" autoComplete="off" />
+        <Input placeholder={'City/Town'} size="large" autoComplete="off" />
       </Form.Item>
       <Form.Item
         name="country"
-        rules={[{ required: false, message: "Please provide country" }]}
+        rules={[{ required: false, message: 'Please provide country' }]}
       >
-        <Input placeholder={"Country"} size="large"  autoComplete="off"/>
+        <Input placeholder={'Country'} size="large" autoComplete="off" />
       </Form.Item>
       <Row gutter={24}>
         <Col span={12}>
@@ -66,14 +66,14 @@ export const AddressForm: FC<IProps> = ({ onChange, item, index, reset }) => {
             rules={[
               {
                 required: false,
-                message: "Please provide Skype ID",
+                message: 'Please provide Skype ID',
               },
             ]}
           >
             <InputNumber
               type="number"
-              style={{ width: "100%" }}
-              placeholder={"Postal/ Zip Code"}
+              style={{ width: '100%' }}
+              placeholder={'Postal/ Zip Code'}
               size="large"
             />
           </Form.Item>

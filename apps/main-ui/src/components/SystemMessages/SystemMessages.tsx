@@ -1,10 +1,10 @@
-import React, { SFC } from "react";
-import styled from "styled-components";
-import { Card } from "../Card";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { Color } from "../../modal";
-import convertToRem from "../../utils/convertToRem";
-import { H4, P } from "../Typography";
+import React, { SFC } from 'react';
+import styled from 'styled-components';
+import { Card } from '../Card';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { Color } from '../../modal';
+import convertToRem from '../../utils/convertToRem';
+import { H4, P } from '../Typography';
 
 export const SystemMessages: SFC = () => {
   const { userDetails } = useGlobalContext();
@@ -37,7 +37,7 @@ const WrapperWellcome = styled.div`
     }
     p {
       color: ${Color.$WHITE};
-      padding:  ${convertToRem(8)} 0;
+      padding: ${convertToRem(8)} 0;
     }
   }
 `;

@@ -13,7 +13,7 @@ export class addAccountIdInItems1608623850284 implements MigrationInterface {
         name: 'accountId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -23,7 +23,7 @@ export class addAccountIdInItems1608623850284 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'accounts',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

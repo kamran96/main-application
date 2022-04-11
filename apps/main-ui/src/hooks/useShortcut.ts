@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
 export function useShortcut(key, cb) {
   const callbackRef = useRef(cb);
@@ -17,7 +17,7 @@ export function useShortcut(key, cb) {
       }
     }
 
-    document.addEventListener("keyup", handle);
-    return () => document.removeEventListener("keyup", handle);
+    document.addEventListener('keyup', handle);
+    return () => document.removeEventListener('keyup', handle);
   }, [key]);
 }

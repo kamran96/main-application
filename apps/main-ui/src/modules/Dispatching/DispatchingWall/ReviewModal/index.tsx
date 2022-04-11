@@ -1,11 +1,11 @@
-import { List } from "antd";
-import React, { FC } from "react";
-import styled from "styled-components";
-import { CommonModal } from "../../../../components";
-import { Heading } from "../../../../components/Heading";
-import { Seprator } from "../../../../components/Seprator";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
-import { Color } from "../../../../modal";
+import { List } from 'antd';
+import React, { FC } from 'react';
+import styled from 'styled-components';
+import { CommonModal } from '../../../../components';
+import { Heading } from '../../../../components/Heading';
+import { Seprator } from '../../../../components/Seprator';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { Color } from '../../../../modal';
 
 export const ReviewModal: FC = () => {
   const { reviewConfigModal, setreviewConfigModal } = useGlobalContext();

@@ -1,12 +1,12 @@
-import { Button, Switch } from "antd";
-import React, { FC } from "react";
-import styled from "styled-components";
-import { CommonModal } from "../../../../components";
-import { Heading } from "../../../../components/Heading";
-import { SelectCard } from "../../../../components/SelectCard";
-import { Seprator } from "../../../../components/Seprator";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
-import { Color } from "../../../../modal";
+import { Button, Switch } from 'antd';
+import React, { FC } from 'react';
+import styled from 'styled-components';
+import { CommonModal } from '../../../../components';
+import { Heading } from '../../../../components/Heading';
+import { SelectCard } from '../../../../components/SelectCard';
+import { Seprator } from '../../../../components/Seprator';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { Color } from '../../../../modal';
 
 export const EnableDispatchModal: FC = () => {
   const { dispatchConfigModal, setDispatchConfigModal } = useGlobalContext();
@@ -24,18 +24,18 @@ export const EnableDispatchModal: FC = () => {
         <Seprator />
         <ModalBodyWrapper>
           <SelectCard
-            label={"Branch Name"}
-            description={"Shahra -e - quaid azam"}
+            label={'Branch Name'}
+            description={'Shahra -e - quaid azam'}
             changedValue={() => null}
           />
           <SelectCard
-            label={"Branch Name"}
-            description={"Shahra -e - quaid azam"}
+            label={'Branch Name'}
+            description={'Shahra -e - quaid azam'}
             changedValue={() => null}
           />
           <SelectCard
-            label={"Branch Name"}
-            description={"Shahra -e - quaid azam"}
+            label={'Branch Name'}
+            description={'Shahra -e - quaid azam'}
             changedValue={() => null}
           />
           <div className="branchCard">
