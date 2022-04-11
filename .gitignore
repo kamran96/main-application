@@ -21,7 +21,6 @@ apps/users-service/.env
 
 # dependencies
 /node_modules
-yarn.lock
 
 # IDEs and editors
 /.idea
