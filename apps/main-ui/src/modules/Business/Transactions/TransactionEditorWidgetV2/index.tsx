@@ -18,6 +18,7 @@ import { useMutation, useQueryClient } from 'react-query';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { NOTIFICATIONTYPE } from '@invyce/shared/types';
 import { ITransactionsList } from './types';
+import { Status } from '@sentry/react';
 
 const Editor = () => {
   const queryCache = useQueryClient();
@@ -39,21 +40,6 @@ const Editor = () => {
 
   const { mutate: mutateCreateTransaction, isLoading: creatingTransaction } =
     useMutation(createTransactionAPI);
-
-  // useEffect(() => {
-  //   if (id && TransactionData && TransactionData?.data?.result) {
-  //     console.log(TransactionData.data)
-  //     const {result} = TransactionData?.data
-  //     const Resultdata = {
-  //       ref: result?.ref,
-  //       date: dayjs(result?.date).endOf('day'),
-  //       narration:result?.narration ,
-  //       notes: result?.notes
-  //     }
-
-  //     form.setFieldsValue(Resultdata)
-  //   }
-  // }, [TransactionData, id]);
 
   const totalDebits = (transactionsList.length &&
     transactionsList.reduce((a, b) => {
@@ -145,6 +131,7 @@ const Editor = () => {
         return { amount: a.amount + b.amount };
       });
 
+
       let payload = {
         isNewRecord: true,
         ...values,
@@ -165,12 +152,24 @@ const Editor = () => {
             onSuccess: () => {
               resetTransactions();
               form.resetFields();
-              ['accounts', `transactions`]?.forEach((key) => {
-                (queryCache?.invalidateQueries as any)((q) =>
-                  q?.queryKey[0]?.toString().startsWith(key)
-                );
-              });
-
+              if (form.getFieldValue("status") === 2) {
+                [`transactions`]?.forEach((key) => {
+                  (queryCache?.invalidateQueries as any)((q) =>
+                    q?.queryKey[0]?.toString().startsWith(key)
+                  );
+                });
+              } else {
+                     [
+                  'accounts',
+                  `transactions`,
+                  `report-trialbalance`,
+                  `report-balance-sheet`,
+                ]?.forEach((key) => {
+                  (queryCache?.invalidateQueries as any)((q) =>
+                    q?.queryKey[0]?.toString().startsWith(key)
+                  );
+                });
+              }
               notificationCallback(
                 NOTIFICATIONTYPE.SUCCESS,
                 'Transaction Created'
@@ -181,9 +180,8 @@ const Editor = () => {
             },
           });
         }
-        // eslint-disable-next-line no-throw-literal
         else
-          throw {
+          throw{
             status: 501,
             message:
               "The Transaction Amount Are Not Seem's Equal Please Take A Look Again",
