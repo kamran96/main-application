@@ -3,6 +3,7 @@ WORKDIR /app
 COPY ./dist/apps/accounting-service .
 ENV PORT=3336
 ENV NODE_ENV=production
+ENV JWT_SECRET=alalsdflasjlf343424
 EXPOSE ${PORT}
 RUN npm install --production
 RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express
