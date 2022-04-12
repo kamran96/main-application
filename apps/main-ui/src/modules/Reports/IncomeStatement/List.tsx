@@ -30,8 +30,9 @@ import {
   TopbarLogoWithDetails,
 } from '../../../components/PrintHeader/Formats';
 import DUMMYLOGO from '../../../assets/quickbook.png';
-import { PDFViewer } from '@react-pdf/renderer';
+import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
 import { IncomeStatementPdf } from '../../../components/PDFs/IncomeStatementPdf';
+import { PDFICON } from '../../../components/Icons';
 // import FilterSchema from "./filterSchema";
 
 interface IBalanceSheetConfig {
@@ -133,7 +134,6 @@ export const IncomeStatementList: FC = () => {
     return query ? JSON.parse(atob(query)) : query;
   }, [query]);
 
-  console.log('incomestatementdata', incomeStatementData);
 
   return (
     <WrapperIncomeStatement>
@@ -144,6 +144,22 @@ export const IncomeStatementList: FC = () => {
             <P className="dark-text"></P>
           </div>
           <div className="_disable_print flex alignCenter">
+          <PDFDownloadLinkWrapper
+          document={
+            <IncomeStatementPdf
+          header={headerprops}
+          incomeStatement={incomeStatementData}
+          searchedQueryItem={searchedQueryItem}
+          total={total}
+        />
+          }
+        >
+          <div className="flex alignCenter">
+            <PDFICON className="flex alignCenter mr-5" />
+
+            <span> Download PDF</span>
+          </div>
+        </PDFDownloadLinkWrapper>
             <ButtonTag
               className="mr-10"
               onClick={onPrint}
@@ -342,14 +358,7 @@ export const IncomeStatementList: FC = () => {
           </PrintFormat>
         </div>
       </TableCard>
-      <PDFViewer height={'1080px'} width={'100%'}>
-        <IncomeStatementPdf
-          header={headerprops}
-          incomeStatement={incomeStatementData}
-          searchedQueryItem={searchedQueryItem}
-          total={total}
-        />
-      </PDFViewer>
+      
     </WrapperIncomeStatement>
   );
 };
@@ -436,5 +445,20 @@ const WrapperIncomeStatement = styled.div`
 
   .nodata_loader {
     padding: 130px 0 !important;
+  }
+`;
+
+const PDFDownloadLinkWrapper = styled(PDFDownloadLink)`
+  background: #e4e4e4;
+  padding: 5px 5px;
+  border-radius: 2px;
+  margin-right: 8px;
+  color: #333333;
+  border: none;
+  outline: none;
+  transition: 0.4s all ease-in-out;
+  &:hover {
+    background: #143c69;
+    color: #ffff;
   }
 `;
