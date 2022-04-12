@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState, ReactNode } from 'react';
-import { Input, InputNumber, Tooltip } from 'antd';
+import { Input, InputNumber, Tooltip, Form } from 'antd';
 import { SizeType } from 'antd/lib/config-provider/SizeContext';
 import { ClickOutSide } from './../../utils/clickoutside';
 import { LiteralUnion } from 'antd/lib/_util/type';
@@ -62,6 +62,8 @@ export const Editable: FC<IProps> = ({
 }) => {
   const [isEditable, setIsEditable] = useState(false);
   const [inputVal, setInputValue] = useState(value);
+  const [form] = Form.useForm();
+  const inputRef = React.useRef<any>(null);
 
   useEffect(() => {
     if (value !== inputVal) {
@@ -76,8 +78,19 @@ export const Editable: FC<IProps> = ({
     ...style,
   };
 
-  const inputRef = React.useRef<any>(null);
+  // const regex = /^0+/
+  // console.log(inputVal, "inputVal")
 
+  // if(inputVal && inputVal!== undefined){
+  //   const res = inputVal.replace(regex, '')
+  //   console.log(+res)  
+  // }
+  
+  // //  if(inputRef.current){
+  // //   const input = inputRef.current;
+  // //   console.log(input.blur())
+  // //  }
+  
   return (
     <ClickOutSide
       initialVal={isEditable}
@@ -103,6 +116,7 @@ export const Editable: FC<IProps> = ({
               size={size}
               autoFocus
               disabled={disabled}
+              defaultValue={defaultValue}
               value={
                 type === 'number'
                   ? typeof value === 'string'
@@ -115,7 +129,7 @@ export const Editable: FC<IProps> = ({
             <div
               className={`rendered-text ${disabled ? 'disabled' : ''}`}
               onClick={() => setIsEditable(true)}
-              title={inputVal ? inputVal : placeholder ? placeholder : ''}
+              title={inputVal  ? inputVal : placeholder ? placeholder : ''}
             >
               {inputVal ? inputVal : placeholder ? placeholder : 0}
             </div>
@@ -138,6 +152,7 @@ export const Editable: FC<IProps> = ({
             value={inputVal}
             autoFocus
             autoComplete="off"
+            defaultValue={defaultValue}
           />
         ) : (
           <div
