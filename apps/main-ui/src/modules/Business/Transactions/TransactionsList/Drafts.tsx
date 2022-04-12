@@ -24,7 +24,11 @@ import transactionsFilterSchema from './transactionsFilterSchema';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import { PurchaseListTopbar } from '../../../../components/PurchasesListTopbar';
 import { NOTIFICATIONTYPE, IServerError } from '../../../../modal';
-import { Form } from 'antd';
+import { TransactionApprovePdf } from '../../../../components/PDFs/TransactionApprovePdf';
+import { PDFICON } from '../../../../components/Icons';
+import DUMMYLOGO from '../../../../assets/quickbook.png';
+import styled from 'styled-components';
+import { PDFViewer } from '@react-pdf/renderer';
 
 const DRAFTTransactionsList: FC = () => {
   const queryCache = useQueryClient();
@@ -38,7 +42,7 @@ const DRAFTTransactionsList: FC = () => {
   const [filterSchema, setFilterSchema] = useState(transactionsFilterSchema);
   const [confirmModal, setConfirmModal] = useState(false);
 
-  const { routeHistory, notificationCallback } = useGlobalContext();
+  const { routeHistory, notificationCallback, userDetails } = useGlobalContext();
   const { history } = routeHistory;
 
   const [transactionConfig, setTransactionsConfig] = useState({
@@ -59,6 +63,31 @@ const DRAFTTransactionsList: FC = () => {
   const [accountsResponse, setAccountsResponse] = useState<IAccountsResult[]>(
     []
   );
+
+  const { organization } = userDetails;
+  const {
+    address: organizationAddress,
+    email: organizationEmail,
+    phoneNumber: organizationContact,
+    name: organizationName,
+    website,
+  } = organization;
+
+  const { city, country, postalCode } = organizationAddress;
+
+  const headerprops = {
+    organizationName,
+    city,
+    country,
+    title: 'Journal Entries',
+    organizationContact,
+    organizationEmail,
+    address: '',
+    code: postalCode,
+    logo: DUMMYLOGO,
+    website,
+  };
+
 
   useEffect(() => {
     if (history?.location?.search) {
@@ -341,6 +370,10 @@ const DRAFTTransactionsList: FC = () => {
         type="delete"
         text="Are you sure want to delete selected Category?"
       />
+
+    <PDFViewer height={'1080px'} width={'100%'}>
+      <TransactionApprovePdf resultData={result} header={headerprops} />
+      </PDFViewer>
     </WrapperTransactionsList>
   );
 };
