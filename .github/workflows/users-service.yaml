@@ -69,7 +69,7 @@ jobs:
 
       #login to digitalocean for 1200 seconds
       - name: Log in to DigitalOcean Container Registry with short-lived credentials
-        run: doctl registry login --expiry-seconds 1200
+        run: doctl registry login
      
       # push image to registry
       - name: Push service image to DigitalOcean Container Registry
