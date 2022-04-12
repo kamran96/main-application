@@ -111,11 +111,11 @@ jobs:
           TEMP_FOLDER="$(mktemp -d)" 
           echo Clone the repository...
           git clone -b main "https://zeeshooo:${ACCESS_TOKEN}@github.com/invyce/invyce-ops.git" ${TEMP_FOLDER} 
-          cd ${TEMP_FOLDER}/users 
+          cd ${TEMP_FOLDER}/accounts 
           ls
           echo Update Helm chart values-dev with new image tag
           CONTAINER_IMAGE_TAG=$CONTAINER_IMAGE_TAG yq e -i '.image.tag = env(CONTAINER_IMAGE_TAG)' ./values.yaml
-          echo 'Container image tag updated in users/values.yaml'
+          echo 'Container image tag updated in accounts/values.yaml'
           cd ../
           git config user.email "zeeshan@invyce.com"
           git config user.name "zeeshooo" 
