@@ -13,7 +13,8 @@ export const getAllTransactionsAPI = ({ queryKey }: QueryKey) => {
   const page: number = queryKey[1];
   const pageSize: number = queryKey[2];
   const query: string = queryKey[3];
-  let url = `${TRANSACTION.INDEX}?page_size=${pageSize}&page_no=${page}`;
+  const status: number = queryKey[4]
+  let url = `${TRANSACTION.INDEX}?page_size=${pageSize}&page_no=${page}&status=${status}`;
   if (query) {
     url = `${url}&query=${query}`;
   }
@@ -23,3 +24,12 @@ export const getAllTransactionsAPI = ({ queryKey }: QueryKey) => {
 
   return http.get(url);
 };
+
+export const deleteTransactionApiById = (payload? : any) => 
+  http.put(`accounts/transaction/delete`, payload)
+
+export const getSingleTransactionById = ({queryKey}: QueryKey) => {
+  const id: number = queryKey[1]
+  return http.get(`${TRANSACTION.INDEX}/${id}`)
+}
+    

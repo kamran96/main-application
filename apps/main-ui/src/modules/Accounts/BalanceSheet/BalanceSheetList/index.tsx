@@ -2,7 +2,15 @@
 import printIcon from '@iconify-icons/bytesize/print';
 import { Card } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  FC,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  lazy,
+  Suspense,
+} from 'react';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
 import { BalanceSheetAPI } from '../../../../api';
@@ -19,7 +27,6 @@ import {
   TopbarLogoWithDetails,
 } from '../../../../components/PrintHeader/Formats';
 import { SmartFilter } from '../../../../components/SmartFilter';
-import { TableCard } from '../../../../components/TableCard';
 import { Capitalize, P } from '../../../../components/Typography';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { IThemeProps } from '@invyce/shared/invyce-theme';
@@ -28,10 +35,9 @@ import { IAccountsResult } from '../../../../modal/accounts';
 import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv from '../../../../utils/Print';
 import FilterSchema from './filterSchema';
-import { BalanceSheetPdf } from '../../../../components/PDFs/BalanceSheetPdf';
 import DUMMYLOGO from '../../../../assets/quickbook.png';
-import { PDFViewer } from '@react-pdf/renderer';
-
+import PDF from '../../../../components/PDFs/BalanceSheetPdf';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 interface IBalanceSheetConfig {
   columns: ColumnsType<any>;
   data: any[];
@@ -50,6 +56,9 @@ interface IBalanceSheetData {
 }
 
 export const BalanceSheetList: FC = () => {
+  const PDFDownloader = lazy(
+    () => import('../../../../components/PDFs/PDFDownloader')
+  );
   const [balanceSheetData, setBalanceSheet] = useState<IBalanceSheetData[]>([]);
   const [{ totalCredits, totalDebits }, setTotals] = useState({
     totalCredits: 0,
@@ -148,8 +157,22 @@ export const BalanceSheetList: FC = () => {
             <P className="dark-text"></P>
           </div>
           <div className="_disable_print flex alignCenter">
+            <Suspense fallback={<></>}>
+              <PDFDownloadLink
+                document={
+                  <PDF
+                    totals={{ totalCredits, totalDebits }}
+                    header={headerprops}
+                    balanceSheetData={balanceSheetData}
+                    searchquery={searchedQueryItem}
+                  />
+                }
+              >
+                download
+              </PDFDownloadLink>
+            </Suspense>
             <ButtonTag
-              className="mr-10"
+              className="mh-10"
               onClick={onPrint}
               title="Print"
               size="middle"
@@ -345,15 +368,6 @@ export const BalanceSheetList: FC = () => {
           </PrintFormat>
         </div>
       </Card>
-
-      <PDFViewer height={'1080px'} width={'100%'}>
-        <BalanceSheetPdf
-          totals={{ totalCredits, totalDebits }}
-          header={headerprops}
-          balanceSheetData={balanceSheetData}
-          searchquery={searchedQueryItem}
-        />
-      </PDFViewer>
     </WrapperBalanceSheetList>
   );
 };
