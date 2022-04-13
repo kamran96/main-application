@@ -16,7 +16,7 @@ import styled from 'styled-components';
 import { BalanceSheetAPI } from '../../../../api';
 import { ButtonTag } from '../../../../components/ButtonTags';
 import { Heading } from '../../../../components/Heading';
-import { BoldText, BOLDTEXT } from '../../../../components/Para/BoldText';
+import { BoldText, BOLDTEXT , MeduimText} from '../../../../components/Para/BoldText';
 import { PrintFormat } from '../../../../components/PrintFormat';
 import {
   PrintHeaderFormat,
@@ -195,7 +195,13 @@ export const BalanceSheetList: FC = () => {
             <PDFDownloadLinkWrapper
               document={
                 <BalanceSheetPdf
-                  totals={{ totalCredits, totalDebits }}
+                  totals={{ 
+                    totalCredits,
+                    totalDebits,
+                    closing_credits,
+                    closing_debits,
+                    opening_credits,
+                    opening_debits, }}
                   header={headerprops}
                   balanceSheetData={balanceSheetData}
                   searchquery={searchedQueryItem}
@@ -384,41 +390,41 @@ export const BalanceSheetList: FC = () => {
                   <tfoot>
                     <tr>
                       <td>
-                        <BoldText>Total</BoldText>
+                        <MeduimText>Total</MeduimText>
                       </td>
                       {searchedQueryItem?.date && (
                         <>
                           <td>
-                            <BoldText>
+                            <MeduimText>
                               {moneyFormat(opening_debits.toFixed(2))}
-                            </BoldText>
+                            </MeduimText>
                           </td>
                           <td>
-                            <BoldText>
+                            <MeduimText>
                               {moneyFormat(opening_credits.toFixed(2))}
-                            </BoldText>
+                            </MeduimText>
                           </td>
                           <td>
-                            <BoldText>
+                            <MeduimText>
                               {moneyFormat(closing_debits.toFixed(2))}
-                            </BoldText>
+                            </MeduimText>
                           </td>
                           <td>
-                            <BoldText>
+                            <MeduimText>
                               {moneyFormat(closing_credits.toFixed(2))}
-                            </BoldText>
+                            </MeduimText>
                           </td>
                         </>
                       )}
                       <td className="textCenter">
-                        <BoldText>
+                        <MeduimText>
                           {moneyFormat(totalDebits.toFixed(2))}
-                        </BoldText>
+                        </MeduimText>
                       </td>
                       <td className="textCenter">
-                        <BoldText>
+                        <MeduimText>
                           {moneyFormat(totalCredits.toFixed(2))}
-                        </BoldText>
+                        </MeduimText>
                       </td>
                     </tr>
                   </tfoot>
@@ -428,6 +434,21 @@ export const BalanceSheetList: FC = () => {
           </PrintFormat>
         </div>
       </Card>
+           <PDFViewer height={'1080px'} width={'100%'}>
+             <BalanceSheetPdf
+                 totals={{ 
+                   totalCredits,
+                   totalDebits,
+                   closing_credits,
+                   closing_debits,
+                   opening_credits,
+                   opening_debits
+                    }}
+                  header={headerprops}
+                  balanceSheetData={balanceSheetData}
+                  searchquery={searchedQueryItem}
+                />
+          </PDFViewer>
     </WrapperBalanceSheetList>
   );
 };
@@ -469,6 +490,7 @@ const WrapperBalanceSheetList = styled.div<WrapperBalanceSheetProps>`
     table tbody tr td:first-child {
       padding-left: 24px;
     }
+
 
     .calculated_groups {
       td {
