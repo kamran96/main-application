@@ -26,9 +26,10 @@ dotenv.config();
           password: configService.get('DB_PASSWORD', process.env.DB_PASSWORD),
           database: configService.get('ACC_DB_NAME', process.env.ACC_DB_NAME),
           entities: getMetadataArgsStorage().tables.map((tbl) => tbl.target),
-          ...(process.env.NODE_ENV === 'development'
-            ? {}
-            : { ssl: { rejectUnauthorized: false } }),
+          ssl:
+            process.env.NODE_ENV === 'production'
+              ? { rejectUnauthorized: false }
+              : false,
         } as TypeOrmModuleOptions),
     }),
     AccountsModule,
