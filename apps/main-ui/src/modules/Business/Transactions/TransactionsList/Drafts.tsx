@@ -28,7 +28,7 @@ import { TransactionApprovePdf } from '../../../../components/PDFs/TransactionAp
 import { PDFICON } from '../../../../components/Icons';
 import DUMMYLOGO from '../../../../assets/quickbook.png';
 import styled from 'styled-components';
-import { PDFViewer } from '@react-pdf/renderer';
+import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
 
 const DRAFTTransactionsList: FC = () => {
   const queryCache = useQueryClient();
@@ -248,6 +248,17 @@ const DRAFTTransactionsList: FC = () => {
   const renderCustomTopbar = () => {
     return (
       <WrapperTransactionCustomBar>
+         <PDFDownloadLinkWrapper
+          document={
+            <TransactionApprovePdf resultData={result} header={headerprops} />
+          }
+        >
+          <div className="flex alignCenter">
+            <PDFICON className="flex alignCenter mr-5" />
+
+            <span> Download PDF</span>
+          </div>
+        </PDFDownloadLinkWrapper>
         <SmartFilter
           onFilter={(encode) => {
             setTransactionsConfig({
@@ -371,10 +382,22 @@ const DRAFTTransactionsList: FC = () => {
         text="Are you sure want to delete selected Category?"
       />
 
-    <PDFViewer height={'1080px'} width={'100%'}>
-      <TransactionApprovePdf resultData={result} header={headerprops} />
-      </PDFViewer>
     </WrapperTransactionsList>
   );
 };
 export default DRAFTTransactionsList;
+
+const PDFDownloadLinkWrapper = styled(PDFDownloadLink)`
+  background: #e4e4e4;
+  padding: 5px 5px;
+  border-radius: 2px;
+  margin-right: 8px;
+  color: #333333;
+  border: none;
+  outline: none;
+  transition: 0.4s all ease-in-out;
+  &:hover {
+    background: #143c69;
+    color: #ffff;
+  }
+`;

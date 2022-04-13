@@ -280,9 +280,6 @@ const APPROVETransactionList: FC = () => {
         }}
         hasfooter={true}
       />
-      <PDFViewer height={'1080px'} width={'100%'}>
-      <TransactionApprovePdf resultData={result} header={headerprops} />
-      </PDFViewer>
     </WrapperTransactionsList>
   );
 };
