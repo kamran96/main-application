@@ -529,7 +529,7 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
                         <Capitalize></Capitalize>
                       </td>
                     </tr>
-                    {addresses?.length && (
+                    {addresses?.length > 0 && (
                       <>
                         <tr>
                           <td className="head">Address</td>
