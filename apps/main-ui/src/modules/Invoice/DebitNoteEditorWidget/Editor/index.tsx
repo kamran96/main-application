@@ -33,6 +33,7 @@ import { WrapperInvoiceForm } from './styles';
 import { handleCheckValidation } from './handlers';
 import c from './key';
 import { invycePersist } from '@invyce/invyce-persist';
+import { useHistory } from 'react-router-dom';
 
 const { Option } = Select;
 
@@ -54,9 +55,8 @@ let debounce: any;
 const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
   /* ************ HOOKS *************** */
   /* Component State Hooks */
-  const { routeHistory, userDetails } = useGlobalContext();
 
-  const { history } = routeHistory;
+  const history = useHistory();
   const [printModal, setPrintModal] = useState(false);
   const [taxType, setTaxType] = useState<ITaxTypes>(ITaxTypes.TAX_INCLUSIVE);
 
@@ -143,6 +143,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
 
       await muatateCreateInvoice(payload, {
         onSuccess: (data) => {
+          const { id: invoiceId } = data?.data?.result;
           notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Invoice Created');
           if (value && value.status.print) {
             setPrintModal(true);
@@ -164,6 +165,9 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           });
+          history.push(
+            `${ISupportedRoutes?.DASHBOARD_LAYOUT}${ISupportedRoutes?.DEBIT_NOTES}/${invoiceId}`
+          );
         },
         onError: (error: IServerError) => {
           if (error?.response?.data?.message) {
@@ -184,7 +188,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
     ClearAll();
     if (id) {
       queryCache.removeQueries(`${type}-${id}-view`);
-      let route = history.location.pathname.split('/');
+      let route: any = history.location.pathname.split('/');
       if (route.length > 3) {
         const removeIndex = route.length - 1;
         route.splice(removeIndex, 1);

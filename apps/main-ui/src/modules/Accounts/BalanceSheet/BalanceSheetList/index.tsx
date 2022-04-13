@@ -2,7 +2,15 @@
 import printIcon from '@iconify-icons/bytesize/print';
 import { Card } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  FC,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  lazy,
+  Suspense,
+} from 'react';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
 import { BalanceSheetAPI } from '../../../../api';
@@ -19,7 +27,6 @@ import {
   TopbarLogoWithDetails,
 } from '../../../../components/PrintHeader/Formats';
 import { SmartFilter } from '../../../../components/SmartFilter';
-import { TableCard } from '../../../../components/TableCard';
 import { Capitalize, P } from '../../../../components/Typography';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { IThemeProps } from '@invyce/shared/invyce-theme';
@@ -28,10 +35,10 @@ import { IAccountsResult } from '../../../../modal/accounts';
 import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv from '../../../../utils/Print';
 import FilterSchema from './filterSchema';
-import { BalanceSheetPdf } from '../../../../components/PDFs/BalanceSheetPdf';
 import DUMMYLOGO from '../../../../assets/quickbook.png';
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
 import { PDFICON } from '../../../../components/Icons';
+import { BalanceSheetPdf } from '../../../../components/PDFs/BalanceSheetPdf';
 
 interface IBalanceSheetConfig {
   columns: ColumnsType<any>;
@@ -51,10 +58,27 @@ interface IBalanceSheetData {
 }
 
 export const BalanceSheetList: FC = () => {
+  const PDFDownloader = lazy(
+    () => import('../../../../components/PDFs/PDFDownloader')
+  );
   const [balanceSheetData, setBalanceSheet] = useState<IBalanceSheetData[]>([]);
-  const [{ totalCredits, totalDebits }, setTotals] = useState({
+  const [
+    {
+      totalCredits,
+      totalDebits,
+      closing_credits,
+      closing_debits,
+      opening_credits,
+      opening_debits,
+    },
+    setTotals,
+  ] = useState({
     totalCredits: 0,
     totalDebits: 0,
+    closing_credits: 0,
+    closing_debits: 0,
+    opening_credits: 0,
+    opening_debits: 0,
   });
   const { routeHistory, userDetails } = useGlobalContext();
   const { history } = routeHistory;
@@ -110,16 +134,35 @@ export const BalanceSheetList: FC = () => {
     if (data && data.data && data.data.result) {
       const { result } = data.data;
 
-      result?.forEach((item: IBalanceSheetData, index) => {
-        if (item?.type === ITransactionType.DEBIT) {
-          setTotals((prev) => {
-            return { ...prev, totalDebits: item.balance };
+      setTotals(() => {
+        return result
+          ?.map((item) => {
+            return {
+              ...item?.accounts?.reduce((a, b) => {
+                // debugger;
+                return {
+                  closing_credits: a?.closing_credits + b?.closing_credits,
+                  closing_debits: a?.closing_debits + b?.closing_debits,
+                  opening_credits: a?.opening_credits + b?.opening_credits,
+                  opening_debits: a?.opening_debits + b?.opening_debits,
+                };
+              }),
+              totalCredits:
+                item?.type === ITransactionType?.CREDIT ? item?.balance : 0,
+              totalDebits:
+                item?.type === ITransactionType?.DEBIT ? item?.balance : 0,
+            };
+          })
+          ?.reduce((a, b) => {
+            return {
+              totalCredits: a?.totalCredits + b?.totalCredits,
+              totalDebits: a?.totalDebits + b?.totalDebits,
+              closing_credits: a?.closing_credits + b?.closing_credits,
+              closing_debits: a?.closing_debits + b?.closing_debits,
+              opening_credits: a?.opening_credits + b?.opening_credits,
+              opening_debits: a?.opening_debits + b?.opening_debits,
+            };
           });
-        } else {
-          setTotals((prev) => {
-            return { ...prev, totalCredits: item.balance };
-          });
-        }
       });
 
       setBalanceSheet(result);
@@ -149,24 +192,24 @@ export const BalanceSheetList: FC = () => {
             <P className="dark-text"></P>
           </div>
           <div className="_disable_print flex alignCenter">
-          <PDFDownloadLinkWrapper
-          document={
-            <BalanceSheetPdf
-            totals={{ totalCredits, totalDebits }}
-            header={headerprops}
-            balanceSheetData={balanceSheetData}
-            searchquery={searchedQueryItem}
-          />
-          }
-        >
-          <div className="flex alignCenter">
-            <PDFICON className="flex alignCenter mr-5" />
+            <PDFDownloadLinkWrapper
+              document={
+                <BalanceSheetPdf
+                  totals={{ totalCredits, totalDebits }}
+                  header={headerprops}
+                  balanceSheetData={balanceSheetData}
+                  searchquery={searchedQueryItem}
+                />
+              }
+            >
+              <div className="flex alignCenter">
+                <PDFICON className="flex alignCenter mr-5" />
 
-            <span> Download PDF</span>
-          </div>
-        </PDFDownloadLinkWrapper>
+                <span> Download PDF</span>
+              </div>
+            </PDFDownloadLinkWrapper>
             <ButtonTag
-              className="mr-10"
+              className="mh-10"
               onClick={onPrint}
               title="Print"
               size="middle"
@@ -343,7 +386,30 @@ export const BalanceSheetList: FC = () => {
                       <td>
                         <BoldText>Total</BoldText>
                       </td>
-                      {searchedQueryItem?.date && <td />}
+                      {searchedQueryItem?.date && (
+                        <>
+                          <td>
+                            <BoldText>
+                              {moneyFormat(opening_debits.toFixed(2))}
+                            </BoldText>
+                          </td>
+                          <td>
+                            <BoldText>
+                              {moneyFormat(opening_credits.toFixed(2))}
+                            </BoldText>
+                          </td>
+                          <td>
+                            <BoldText>
+                              {moneyFormat(closing_debits.toFixed(2))}
+                            </BoldText>
+                          </td>
+                          <td>
+                            <BoldText>
+                              {moneyFormat(closing_credits.toFixed(2))}
+                            </BoldText>
+                          </td>
+                        </>
+                      )}
                       <td className="textCenter">
                         <BoldText>
                           {moneyFormat(totalDebits.toFixed(2))}
@@ -362,7 +428,6 @@ export const BalanceSheetList: FC = () => {
           </PrintFormat>
         </div>
       </Card>
-
     </WrapperBalanceSheetList>
   );
 };

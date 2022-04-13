@@ -273,3 +273,5 @@ export const BalanceSheetPdf: FC<IProps> = ({
     </PdfDocument>
   );
 };
+
+export default BalanceSheetPdf;
