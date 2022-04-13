@@ -16,22 +16,10 @@ import { PaymentModule } from './payment/payment.module';
       useFactory: async (configService: ConfigService) =>
         ({
           type: 'postgres',
-          host: configService.get(
-            'PAYMENT_DB_HOST',
-            process.env.PAYMENT_DB_HOST
-          ),
-          port: configService.get<any>(
-            'PAYMENT_DB_PORT',
-            process.env.PAYMENT_DB_PORT
-          ),
-          username: configService.get(
-            'PAYMENT_DB_USER',
-            process.env.PAYMENT_DB_USER
-          ),
-          password: configService.get(
-            'PAYMENT_DB_PASSWORD',
-            process.env.PAYMENT_DB_PASSWORD
-          ),
+          host: configService.get('DB_HOST', process.env.DB_HOST),
+          port: configService.get<any>('DB_PORT', process.env.DB_PORT),
+          username: configService.get('DB_USER', process.env.DB_USER),
+          password: configService.get('DB_PASSWORD', process.env.DB_PASSWORD),
           database: configService.get(
             'PAYMENT_DB_NAME',
             process.env.PAYMENT_DB_NAME
