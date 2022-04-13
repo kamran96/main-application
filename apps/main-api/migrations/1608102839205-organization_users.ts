@@ -58,7 +58,7 @@ export class organizationUsers1608102839205 implements MigrationInterface {
           },
         ],
       }),
-      true,
+      true
     );
 
     await queryRunner.createForeignKey(
@@ -68,7 +68,7 @@ export class organizationUsers1608102839205 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -78,7 +78,7 @@ export class organizationUsers1608102839205 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -88,7 +88,7 @@ export class organizationUsers1608102839205 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'user_roles',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -98,7 +98,7 @@ export class organizationUsers1608102839205 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -108,7 +108,7 @@ export class organizationUsers1608102839205 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

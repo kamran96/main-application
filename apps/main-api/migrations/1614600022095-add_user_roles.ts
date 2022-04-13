@@ -21,7 +21,7 @@ export class addUserRoles1614600022095 implements MigrationInterface {
           { name: 'updatedAt', type: 'timestamp', default: 'NOW()' },
         ],
       }),
-      true,
+      true
     );
 
     await queryRunner.createForeignKey(
@@ -31,7 +31,7 @@ export class addUserRoles1614600022095 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -41,7 +41,7 @@ export class addUserRoles1614600022095 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'roles',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -51,7 +51,7 @@ export class addUserRoles1614600022095 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -61,7 +61,7 @@ export class addUserRoles1614600022095 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'branches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

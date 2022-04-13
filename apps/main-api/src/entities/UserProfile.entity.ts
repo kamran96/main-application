@@ -39,17 +39,11 @@ export class UserProfiles {
   @Column()
   marketingStatus: string;
 
-  @OneToOne(
-    type => Users,
-    user => user.id,
-  )
+  @OneToOne((type) => Users, (user) => user.id)
   @JoinColumn()
   user: Users;
 
-  @OneToOne(
-    type => Attachments,
-    attachment => attachment.id,
-  )
+  @OneToOne((type) => Attachments, (attachment) => attachment.id)
   @JoinColumn()
   attachment: Attachments;
 }

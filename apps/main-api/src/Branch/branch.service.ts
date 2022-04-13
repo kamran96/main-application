@@ -13,7 +13,7 @@ import { AuthService } from '../Auth/auth.service';
 export class BranchService {
   constructor(
     private manager: EntityManager,
-    private authService: AuthService,
+    private authService: AuthService
   ) {}
 
   async ListBranch(branchData) {
@@ -50,7 +50,7 @@ export class BranchService {
               {
                 city: branchDto.city,
                 postalCode: branchDto.postalCode,
-              },
+              }
             );
           } else {
             const address = await getCustomRepository(AddressRepository).save({
@@ -74,7 +74,7 @@ export class BranchService {
           await this.manager.update(
             Branches,
             { id: branchDto.id },
-            updatedBranch,
+            updatedBranch
           );
           return updatedBranch;
         }
@@ -117,7 +117,7 @@ export class BranchService {
           await this.manager.update(
             Users,
             { id: branchData.userId },
-            { branchId: branch.id },
+            { branchId: branch.id }
           );
 
           const new_user = await this.authService.CheckUser({

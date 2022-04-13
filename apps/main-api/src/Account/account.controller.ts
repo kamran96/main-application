@@ -25,7 +25,7 @@ export class AccountController {
   @Get()
   async index(
     @Req() req: Request,
-    @Query() { take, page_no, sort, query, purpose },
+    @Query() { take, page_no, sort, query, purpose }
   ) {
     try {
       const account = await this.accountService.ListAccounts(
@@ -34,7 +34,7 @@ export class AccountController {
         page_no,
         sort,
         query,
-        purpose,
+        purpose
       );
 
       if (account) {
@@ -47,7 +47,7 @@ export class AccountController {
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -57,7 +57,7 @@ export class AccountController {
   async secondaryAccounts(@Req() req: Request) {
     try {
       const secondaryAccounts = await this.accountService.SecondaryAccountName(
-        req.user,
+        req.user
       );
 
       if (secondaryAccounts) {
@@ -69,7 +69,7 @@ export class AccountController {
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -80,7 +80,7 @@ export class AccountController {
     try {
       const account = await this.accountService.CreateOrUpdateAccount(
         accountDto,
-        req.user,
+        req.user
       );
 
       if (account) {
@@ -92,7 +92,7 @@ export class AccountController {
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -103,7 +103,7 @@ export class AccountController {
     try {
       const account = await this.accountService.FindAccountById(
         params,
-        req.user,
+        req.user
       );
 
       if (account) {
@@ -116,7 +116,7 @@ export class AccountController {
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -138,7 +138,7 @@ export class AccountController {
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }

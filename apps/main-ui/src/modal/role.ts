@@ -1,4 +1,4 @@
-import { IBaseRequest } from "./base";
+import { IBaseRequest } from './base';
 
 export interface IRolesResponse extends IBaseRequest {
   result: IRoleRequest[];

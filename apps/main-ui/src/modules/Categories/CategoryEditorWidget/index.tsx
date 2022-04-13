@@ -111,7 +111,7 @@ const CategoryEditorWidget: FC = () => {
             <Input
               size="middle"
               placeholder={'eg. Baking, Dairy, Crockery etc'}
-              autoComplete='off'
+              autoComplete="off"
             />
           </Form.Item>
           <FormLabel>Description</FormLabel>

@@ -403,31 +403,31 @@ export class BillService {
         },
       });
 
-      if (bill) {  
-      await getCustomRepository(BillRepository).update(
-        { id: dto.id },
-        {
-          contactId: dto.contactId || bill.contactId,
-          reference: dto.reference || bill.reference,
-          issueDate: dto.issueDate || bill.issueDate,
-          dueDate: dto.dueDate || bill.dueDate,
-          invoiceNumber: dto.invoiceNumber || bill.invoiceNumber,
-          adjustment: dto.adjustment || bill.adjustment,
-          grossTotal: dto.grossTotal || bill.grossTotal,
-          netTotal: dto.netTotal || bill.netTotal,
-          date: dto.issueDate || bill.issueDate,
-          invoiceType: dto.invoiceType || bill.invoiceType,
-          directTax: dto.directTax || bill.directTax,
-          indirectTax: dto.indirectTax || bill.indirectTax,
-          isTaxIncluded: dto.isTaxIncluded || bill.isTaxIncluded,
-          comment: dto.comment || bill.comment,
-          organizationId: bill.organizationId,
-          branchId: bill.branchId,
-          createdById: bill.createdById,
-          updatedById: req.user.id,
-          status: dto.status || bill.status,
-        }
-      );
+      if (bill) {
+        await getCustomRepository(BillRepository).update(
+          { id: dto.id },
+          {
+            contactId: dto.contactId || bill.contactId,
+            reference: dto.reference || bill.reference,
+            issueDate: dto.issueDate || bill.issueDate,
+            dueDate: dto.dueDate || bill.dueDate,
+            invoiceNumber: dto.invoiceNumber || bill.invoiceNumber,
+            adjustment: dto.adjustment || bill.adjustment,
+            grossTotal: dto.grossTotal || bill.grossTotal,
+            netTotal: dto.netTotal || bill.netTotal,
+            date: dto.issueDate || bill.issueDate,
+            invoiceType: dto.invoiceType || bill.invoiceType,
+            directTax: dto.directTax || bill.directTax,
+            indirectTax: dto.indirectTax || bill.indirectTax,
+            isTaxIncluded: dto.isTaxIncluded || bill.isTaxIncluded,
+            comment: dto.comment || bill.comment,
+            organizationId: bill.organizationId,
+            branchId: bill.branchId,
+            createdById: bill.createdById,
+            updatedById: req.user.id,
+            status: dto.status || bill.status,
+          }
+        );
 
         await getCustomRepository(BillItemRepository).delete({
           billId: dto.id,

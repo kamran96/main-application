@@ -1,5 +1,5 @@
-import React, { FC, ReactElement } from "react";
-import { useRbac } from "./useRbac";
+import React, { FC, ReactElement } from 'react';
+import { useRbac } from './useRbac';
 
 interface IProps {
   permission: string;

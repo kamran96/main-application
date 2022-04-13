@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 
-export const PDFICON = ({ width = 20, height = 20, className = "" }) => {
+export const PDFICON = ({ width = 20, height = 20, className = '' }) => {
   return (
     <span className={className}>
       <svg

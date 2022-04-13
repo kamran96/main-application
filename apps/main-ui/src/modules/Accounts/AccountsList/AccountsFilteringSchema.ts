@@ -1,21 +1,21 @@
-import { FilterType } from "../../../modal";
+import { FilterType } from '../../../modal';
 
 export default {
-    secondaryAccountId: {
-        type: FilterType.LIST_IDS,
-          label: "Account Type",
-          value: []
-      },
+  secondaryAccountId: {
+    type: FilterType.LIST_IDS,
+    label: 'Account Type',
+    value: [],
+  },
   name: {
     type: FilterType.SEARCH,
-    label: "Account Name",
-    value: "",
+    label: 'Account Name',
+    value: '',
     isFullSearch: true,
-},
-code: {
+  },
+  code: {
     type: FilterType.SEARCH,
-    label: "Account Code",
-    value: "",
+    label: 'Account Code',
+    value: '',
     isFullSearch: false,
-},
+  },
 };

@@ -1,9 +1,6 @@
-import React, { FC } from "react";
-import { DispatchingWall } from "./DispatchingWall";
+import React, { FC } from 'react';
+import { DispatchingWall } from './DispatchingWall';
 
-
-export const DispatchingContainer:FC = ()=>{
-    return(
-        <DispatchingWall/>
-    )
-}
+export const DispatchingContainer: FC = () => {
+  return <DispatchingWall />;
+};

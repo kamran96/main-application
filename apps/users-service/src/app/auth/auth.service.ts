@@ -258,7 +258,7 @@ export class AuthService {
   async Logout(res: Response): Promise<Response> {
     // return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
 
-    return res.clearCookie('access_token').send({
+    return await res.clearCookie('access_token').send({
       message: 'Logout successfully.',
       status: true,
     });
@@ -477,7 +477,7 @@ export class AuthService {
     await this.emailService.emit(SEND_INVITATION, payload);
   }
 
-  async ForgetPassword(userDto: UserLoginDto): Promise<void> {
+  async ForgetPassword(userDto: UserLoginDto) {
     const user = await this.userModel.findOne({
       $or: [{ username: userDto?.username }, { email: userDto?.username }],
     });
@@ -491,6 +491,10 @@ export class AuthService {
       const stringify = JSON.stringify(data);
       const base64 = Buffer.from(stringify).toString('base64');
       await this.SendForgetPassword(user, base64);
+
+      return {
+        message: 'forget password link send to your email',
+      };
     }
   }
 

@@ -6,7 +6,8 @@ import {
 } from 'typeorm';
 
 export class addOpeningBalanceInContact1609749567529
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'contacts',
@@ -14,7 +15,7 @@ export class addOpeningBalanceInContact1609749567529
         name: 'openingBalance',
         isNullable: true,
         type: 'float',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -23,7 +24,7 @@ export class addOpeningBalanceInContact1609749567529
         name: 'transactionId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -33,7 +34,7 @@ export class addOpeningBalanceInContact1609749567529
         referencedColumnNames: ['id'],
         referencedTableName: 'transactions',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

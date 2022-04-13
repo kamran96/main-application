@@ -1,10 +1,10 @@
-import { Button } from "antd";
-import React, { FC } from "react";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { WrapperTopbar, WrapperUnverified } from "./styled";
-import { UserAccountArea } from "./UserAccountArea";
-import InvyceLog from "../../assets/invyceLogo.png";
-import { InvyceLogo } from "../../assets/icons";
+import { Button } from 'antd';
+import React, { FC } from 'react';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { WrapperTopbar, WrapperUnverified } from './styled';
+import { UserAccountArea } from './UserAccountArea';
+import InvyceLog from '../../assets/invyceLogo.png';
+import { InvyceLogo } from '../../assets/icons';
 
 export const Topbar: FC = () => {
   const { userDetails, setVerifiedModal } = useGlobalContext();
@@ -24,7 +24,9 @@ export const Topbar: FC = () => {
       )}
       <WrapperTopbar>
         <div className="logo">
-         <span className="flex alignCenter"><InvyceLogo/></span>
+          <span className="flex alignCenter">
+            <InvyceLogo />
+          </span>
         </div>
         <UserAccountArea />
       </WrapperTopbar>

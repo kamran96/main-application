@@ -15,7 +15,7 @@ export class alterBankIdInPayments1628073973348 implements MigrationInterface {
         name: 'accountId',
         type: 'int',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -25,7 +25,7 @@ export class alterBankIdInPayments1628073973348 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'accounts',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

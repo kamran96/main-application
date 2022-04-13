@@ -1,6 +1,6 @@
-import { IThemeProps } from "./../../hooks/useTheme/themeColors";
-import styled from "styled-components";
-import { DivProps } from "../../modal";
+import { IThemeProps } from './../../hooks/useTheme/themeColors';
+import styled from 'styled-components';
+import { DivProps } from '../../modal';
 
 export const H4 = styled.h4`
   font-style: normal;
@@ -9,7 +9,7 @@ export const H4 = styled.h4`
   line-height: 20px;
   letter-spacing: 0.5px;
   margin: 0;
-  color: ${(props: IThemeProps) => props?.theme?.colors?.textTd || "#303030"};
+  color: ${(props: IThemeProps) => props?.theme?.colors?.textTd || '#303030'};
 `;
 
 export const H3 = styled.div`
@@ -19,7 +19,7 @@ export const H3 = styled.div`
   line-height: 20px;
   letter-spacing: 0.5px;
   margin: 0;
-  color: ${(props: IThemeProps) => props?.theme?.colors?.textTd || "#303030"};
+  color: ${(props: IThemeProps) => props?.theme?.colors?.textTd || '#303030'};
 `;
 
 export const H2 = styled.h2<DivProps>`
@@ -29,18 +29,18 @@ export const H2 = styled.h2<DivProps>`
   line-height: 20px;
   letter-spacing: 0.5px;
   margin: 0;
-  color: ${(props: IThemeProps) => props?.theme?.colors?.textTd || "#303030"};
+  color: ${(props: IThemeProps) => props?.theme?.colors?.textTd || '#303030'};
 `;
 
 export const Capitalize = styled.span`
   position: relative;
   text-transform: capitalize;
-`
+`;
 export const Uppercase = styled.span`
   position: relative;
   text-transform: uppercase;
-`
+`;
 export const Lowercase = styled.span`
   position: relative;
   text-transform: lowercase;
-`
+`;

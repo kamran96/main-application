@@ -24,7 +24,7 @@ export class OrganizationController {
   async index(@Req() req: Request) {
     try {
       const organization = await this.organizationService.ListOrganizations(
-        req.user,
+        req.user
       );
 
       if (organization) {
@@ -36,7 +36,7 @@ export class OrganizationController {
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -45,10 +45,11 @@ export class OrganizationController {
   @Post()
   async create(@Body() organizationDto: OrganizationDto, @Req() req: Request) {
     try {
-      const organization = await this.organizationService.CreateOrUpdateOrganization(
-        organizationDto,
-        req.user,
-      );
+      const organization =
+        await this.organizationService.CreateOrUpdateOrganization(
+          organizationDto,
+          req.user
+        );
 
       if (organization) {
         return {
@@ -59,7 +60,7 @@ export class OrganizationController {
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -69,7 +70,7 @@ export class OrganizationController {
   async view(@Param() params, @Req() req: Request) {
     try {
       const organization = await this.organizationService.ViewOrganization(
-        params,
+        params
       );
 
       if (organization) {
@@ -81,12 +82,12 @@ export class OrganizationController {
 
       throw new HttpException(
         'Failed to get Organization',
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.BAD_REQUEST
       );
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }

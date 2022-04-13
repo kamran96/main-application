@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class addIsReturnToInvoiceAndPurchases1610015931591
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'purchases',
@@ -9,7 +10,7 @@ export class addIsReturnToInvoiceAndPurchases1610015931591
         name: 'isReturn',
         type: 'boolean',
         default: 'false',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -18,7 +19,7 @@ export class addIsReturnToInvoiceAndPurchases1610015931591
         name: 'isReturn',
         type: 'boolean',
         default: 'false',
-      }),
+      })
     );
   }
 

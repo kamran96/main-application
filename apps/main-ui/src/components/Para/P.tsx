@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import { IThemeProps } from "../../hooks/useTheme/themeColors";
+import styled from 'styled-components';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
 export const P = styled.p`
   font-style: normal;

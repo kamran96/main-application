@@ -27,17 +27,11 @@ export class UsersToken {
   @Column()
   marketingStatus: string;
 
-  @OneToOne(
-    type => Users,
-    user => user.id,
-  )
+  @OneToOne((type) => Users, (user) => user.id)
   @JoinColumn()
   user: Users;
 
-  @OneToOne(
-    type => Organizations,
-    org => org.id,
-  )
+  @OneToOne((type) => Organizations, (org) => org.id)
   @JoinColumn()
   org: Organizations;
 }

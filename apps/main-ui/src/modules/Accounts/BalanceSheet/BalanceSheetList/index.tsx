@@ -36,8 +36,10 @@ import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv from '../../../../utils/Print';
 import FilterSchema from './filterSchema';
 import DUMMYLOGO from '../../../../assets/quickbook.png';
-import PDF from '../../../../components/PDFs/BalanceSheetPdf';
-import { PDFDownloadLink } from '@react-pdf/renderer';
+import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
+import { PDFICON } from '../../../../components/Icons';
+import { BalanceSheetPdf } from '../../../../components/PDFs/BalanceSheetPdf';
+
 interface IBalanceSheetConfig {
   columns: ColumnsType<any>;
   data: any[];
@@ -60,9 +62,23 @@ export const BalanceSheetList: FC = () => {
     () => import('../../../../components/PDFs/PDFDownloader')
   );
   const [balanceSheetData, setBalanceSheet] = useState<IBalanceSheetData[]>([]);
-  const [{ totalCredits, totalDebits }, setTotals] = useState({
+  const [
+    {
+      totalCredits,
+      totalDebits,
+      closing_credits,
+      closing_debits,
+      opening_credits,
+      opening_debits,
+    },
+    setTotals,
+  ] = useState({
     totalCredits: 0,
     totalDebits: 0,
+    closing_credits: 0,
+    closing_debits: 0,
+    opening_credits: 0,
+    opening_debits: 0,
   });
   const { routeHistory, userDetails } = useGlobalContext();
   const { history } = routeHistory;
@@ -118,16 +134,35 @@ export const BalanceSheetList: FC = () => {
     if (data && data.data && data.data.result) {
       const { result } = data.data;
 
-      result?.forEach((item: IBalanceSheetData, index) => {
-        if (item?.type === ITransactionType.DEBIT) {
-          setTotals((prev) => {
-            return { ...prev, totalDebits: item.balance };
+      setTotals(() => {
+        return result
+          ?.map((item) => {
+            return {
+              ...item?.accounts?.reduce((a, b) => {
+                // debugger;
+                return {
+                  closing_credits: a?.closing_credits + b?.closing_credits,
+                  closing_debits: a?.closing_debits + b?.closing_debits,
+                  opening_credits: a?.opening_credits + b?.opening_credits,
+                  opening_debits: a?.opening_debits + b?.opening_debits,
+                };
+              }),
+              totalCredits:
+                item?.type === ITransactionType?.CREDIT ? item?.balance : 0,
+              totalDebits:
+                item?.type === ITransactionType?.DEBIT ? item?.balance : 0,
+            };
+          })
+          ?.reduce((a, b) => {
+            return {
+              totalCredits: a?.totalCredits + b?.totalCredits,
+              totalDebits: a?.totalDebits + b?.totalDebits,
+              closing_credits: a?.closing_credits + b?.closing_credits,
+              closing_debits: a?.closing_debits + b?.closing_debits,
+              opening_credits: a?.opening_credits + b?.opening_credits,
+              opening_debits: a?.opening_debits + b?.opening_debits,
+            };
           });
-        } else {
-          setTotals((prev) => {
-            return { ...prev, totalCredits: item.balance };
-          });
-        }
       });
 
       setBalanceSheet(result);
@@ -157,20 +192,22 @@ export const BalanceSheetList: FC = () => {
             <P className="dark-text"></P>
           </div>
           <div className="_disable_print flex alignCenter">
-            <Suspense fallback={<></>}>
-              <PDFDownloadLink
-                document={
-                  <PDF
-                    totals={{ totalCredits, totalDebits }}
-                    header={headerprops}
-                    balanceSheetData={balanceSheetData}
-                    searchquery={searchedQueryItem}
-                  />
-                }
-              >
-                download
-              </PDFDownloadLink>
-            </Suspense>
+            <PDFDownloadLinkWrapper
+              document={
+                <BalanceSheetPdf
+                  totals={{ totalCredits, totalDebits }}
+                  header={headerprops}
+                  balanceSheetData={balanceSheetData}
+                  searchquery={searchedQueryItem}
+                />
+              }
+            >
+              <div className="flex alignCenter">
+                <PDFICON className="flex alignCenter mr-5" />
+
+                <span> Download PDF</span>
+              </div>
+            </PDFDownloadLinkWrapper>
             <ButtonTag
               className="mh-10"
               onClick={onPrint}
@@ -349,7 +386,30 @@ export const BalanceSheetList: FC = () => {
                       <td>
                         <BoldText>Total</BoldText>
                       </td>
-                      {searchedQueryItem?.date && <td />}
+                      {searchedQueryItem?.date && (
+                        <>
+                          <td>
+                            <BoldText>
+                              {moneyFormat(opening_debits.toFixed(2))}
+                            </BoldText>
+                          </td>
+                          <td>
+                            <BoldText>
+                              {moneyFormat(opening_credits.toFixed(2))}
+                            </BoldText>
+                          </td>
+                          <td>
+                            <BoldText>
+                              {moneyFormat(closing_debits.toFixed(2))}
+                            </BoldText>
+                          </td>
+                          <td>
+                            <BoldText>
+                              {moneyFormat(closing_credits.toFixed(2))}
+                            </BoldText>
+                          </td>
+                        </>
+                      )}
                       <td className="textCenter">
                         <BoldText>
                           {moneyFormat(totalDebits.toFixed(2))}
@@ -418,5 +478,19 @@ const WrapperBalanceSheetList = styled.div<WrapperBalanceSheetProps>`
           ${(props: IThemeProps) => props?.theme?.colors?.seprator};
       }
     }
+  }
+`;
+const PDFDownloadLinkWrapper = styled(PDFDownloadLink)`
+  background: #e4e4e4;
+  padding: 5px 5px;
+  border-radius: 2px;
+  margin-right: 8px;
+  color: #333333;
+  border: none;
+  outline: none;
+  transition: 0.4s all ease-in-out;
+  &:hover {
+    background: #143c69;
+    color: #ffff;
   }
 `;

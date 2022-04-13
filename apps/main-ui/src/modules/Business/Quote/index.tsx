@@ -1,11 +1,11 @@
-import { Button } from "antd";
-import React, { FC } from "react";
-import styled from "styled-components";
+import { Button } from 'antd';
+import React, { FC } from 'react';
+import styled from 'styled-components';
 
-import { Heading } from "../../../components/Heading";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { ISupportedRoutes } from "../../../modal/routing";
-import { QuoteList } from "./QuoteList";
+import { Heading } from '../../../components/Heading';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { ISupportedRoutes } from '../../../modal/routing';
+import { QuoteList } from './QuoteList';
 
 export const QuotesContainer: FC = () => {
   const { routeHistory } = useGlobalContext();

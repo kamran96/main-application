@@ -1,10 +1,10 @@
-import { FilterType } from "../../../modal";
+import { FilterType } from '../../../modal';
 
 export default {
   date: {
     type: FilterType.DATE_BETWEEN,
-    label: "Filter By Date",
-    value: "",
+    label: 'Filter By Date',
+    value: '',
   },
   // comment: {
   //   type: FilterType.SEARCH,
