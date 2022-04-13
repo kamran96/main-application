@@ -142,6 +142,7 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
     const payload = {
       ids: [...selectedRow],
     };
+    // console.log(payload, "payload");
     await mutateDeleteOrders(payload, {
       onSuccess: () => {
         ['invoices', 'transactions?page', 'items?page', 'invoice-view'].forEach(

@@ -30,7 +30,8 @@ import printDiv from '../../../../utils/Print';
 import FilterSchema from './filterSchema';
 import { BalanceSheetPdf } from '../../../../components/PDFs/BalanceSheetPdf';
 import DUMMYLOGO from '../../../../assets/quickbook.png';
-import { PDFViewer } from '@react-pdf/renderer';
+import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
+import { PDFICON } from '../../../../components/Icons';
 
 interface IBalanceSheetConfig {
   columns: ColumnsType<any>;
@@ -148,6 +149,22 @@ export const BalanceSheetList: FC = () => {
             <P className="dark-text"></P>
           </div>
           <div className="_disable_print flex alignCenter">
+          <PDFDownloadLinkWrapper
+          document={
+            <BalanceSheetPdf
+            totals={{ totalCredits, totalDebits }}
+            header={headerprops}
+            balanceSheetData={balanceSheetData}
+            searchquery={searchedQueryItem}
+          />
+          }
+        >
+          <div className="flex alignCenter">
+            <PDFICON className="flex alignCenter mr-5" />
+
+            <span> Download PDF</span>
+          </div>
+        </PDFDownloadLinkWrapper>
             <ButtonTag
               className="mr-10"
               onClick={onPrint}
@@ -346,14 +363,6 @@ export const BalanceSheetList: FC = () => {
         </div>
       </Card>
 
-      <PDFViewer height={'1080px'} width={'100%'}>
-        <BalanceSheetPdf
-          totals={{ totalCredits, totalDebits }}
-          header={headerprops}
-          balanceSheetData={balanceSheetData}
-          searchquery={searchedQueryItem}
-        />
-      </PDFViewer>
     </WrapperBalanceSheetList>
   );
 };
@@ -404,5 +413,19 @@ const WrapperBalanceSheetList = styled.div<WrapperBalanceSheetProps>`
           ${(props: IThemeProps) => props?.theme?.colors?.seprator};
       }
     }
+  }
+`;
+const PDFDownloadLinkWrapper = styled(PDFDownloadLink)`
+  background: #e4e4e4;
+  padding: 5px 5px;
+  border-radius: 2px;
+  margin-right: 8px;
+  color: #333333;
+  border: none;
+  outline: none;
+  transition: 0.4s all ease-in-out;
+  &:hover {
+    background: #143c69;
+    color: #ffff;
   }
 `;

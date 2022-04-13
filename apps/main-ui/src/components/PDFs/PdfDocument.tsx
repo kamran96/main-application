@@ -9,7 +9,7 @@ interface IDocumentProps {
 
 const styles = StyleSheet.create({
   page: {
-    paddingBottom: 60,
+    paddingBottom: 65,
   },
 
   tableWrapper: {
