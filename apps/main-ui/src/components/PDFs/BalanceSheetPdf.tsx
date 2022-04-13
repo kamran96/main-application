@@ -60,12 +60,12 @@ const styles = StyleSheet.create({
   },
   LabelName: {
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 12,
   },
   bodyFont: {
     fontWeight: 'normal',
     padding: '12px 2px',
-    fontSize: 12,
+    fontSize: 10,
     color: '#272727',
     display: 'flex',
     flexDirection: 'row',
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   },
   totalContainer: {
     fontWeight: 600,
-    fontSize: 14,
+    fontSize: 10,
     borderTop: '1px solid #F4F4F4',
     borderBottom: '1px solid #F4F4F4',
     margin: '10px 0',
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     fontFamily: 'Roboto Slab',
-    fontSize: '12',
+    fontSize: '10',
   },
   itemCenter: {
     width: '13%',
