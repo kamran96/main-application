@@ -1,7 +1,7 @@
-import { Button as AntDButton } from "antd";
-import Styled from "styled-components";
+import { Button as AntDButton } from 'antd';
+import Styled from 'styled-components';
 
-import convertToRem from "../../utils/convertToRem";
+import convertToRem from '../../utils/convertToRem';
 
 export default Styled.div`
     /* background-color: #fff; */

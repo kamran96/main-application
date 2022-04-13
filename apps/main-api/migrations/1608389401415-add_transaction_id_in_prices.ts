@@ -6,7 +6,8 @@ import {
 } from 'typeorm';
 
 export class addTransactionIdInPrices1608389401415
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'prices',
@@ -14,7 +15,7 @@ export class addTransactionIdInPrices1608389401415
         name: 'transactionId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -24,7 +25,7 @@ export class addTransactionIdInPrices1608389401415
         referencedColumnNames: ['id'],
         referencedTableName: 'transactions',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

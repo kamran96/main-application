@@ -1,15 +1,15 @@
-import React, { FC, useEffect, useState } from "react";
-import { ColumnsType } from "antd/lib/table";
-import dayjs from "dayjs";
-import { useQuery } from "react-query";
-import styled from "styled-components";
-import { getBankAccountsList } from "../../../../api/banks";
-import { CommonTable } from "../../../../components/Table";
-import { ACCOUNT_TYPES, ACCOUNT_TYPES_NAMES } from "../../../../modal/accounts";
-import { IBaseAPIError } from "../../../../modal/base";
-import { NOTIFICATIONTYPE } from "../../../../modal";
-import { useGlobalContext } from "../../../../hooks/globalContext/globalContext";
-import { TableCard } from "../../../../components/TableCard";
+import React, { FC, useEffect, useState } from 'react';
+import { ColumnsType } from 'antd/lib/table';
+import dayjs from 'dayjs';
+import { useQuery } from 'react-query';
+import styled from 'styled-components';
+import { getBankAccountsList } from '../../../../api/banks';
+import { CommonTable } from '../../../../components/Table';
+import { ACCOUNT_TYPES, ACCOUNT_TYPES_NAMES } from '../../../../modal/accounts';
+import { IBaseAPIError } from '../../../../modal/base';
+import { NOTIFICATIONTYPE } from '../../../../modal';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { TableCard } from '../../../../components/TableCard';
 
 export const BanksList: FC = () => {
   const [responseBanks, setResponseBanks] = useState([]);
@@ -51,67 +51,67 @@ export const BanksList: FC = () => {
         return ACCOUNT_TYPES_NAMES.SAVING_ACCOUNT;
 
       default:
-        return "";
+        return '';
     }
   };
 
   const columns: ColumnsType<any> = [
     {
-      title: "#",
-      dataIndex: "",
-      key: "",
+      title: '#',
+      dataIndex: '',
+      key: '',
       render: (data, row, index) => <>{index + 1}</>,
     },
     {
-      title: "Bank Name",
-      dataIndex: "name",
-      key: "name",
+      title: 'Bank Name',
+      dataIndex: 'name',
+      key: 'name',
     },
     {
-      title: "Account Number",
-      dataIndex: "accountNumber",
-      key: "accountNumber",
+      title: 'Account Number',
+      dataIndex: 'accountNumber',
+      key: 'accountNumber',
     },
     {
-      title: "Type",
-      dataIndex: "accountType",
-      key: "accountType",
+      title: 'Type',
+      dataIndex: 'accountType',
+      key: 'accountType',
       render: (data, row, index) => {
         return <>{renderAccountTypeName(data)}</>;
       },
     },
     {
-      title: "Last Updated",
-      dataIndex: "updatedAt",
-      key: "updatedAt",
+      title: 'Last Updated',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
       render: (data, row, index) => {
-        return <>{dayjs(data).format("MMMM D, YYYY")}</>;
+        return <>{dayjs(data).format('MMMM D, YYYY')}</>;
       },
     },
   ];
 
   return (
     <WrapperBanksList>
-     <TableCard>
-     <CommonTable
-        data={responseBanks}
-        columns={columns}
-        loading={isLoading}
-        pagination={false}
-        //    onChange={
-        //      handleContactsConfig
-        //    }
-        //    pagination={{
-        //      pageSize: page_size,
-        //      position: ["bottomRight"],
-        //      current: paginationData.page_no,
-        //      total: paginationData.total,
-        //    }}
-        //    hasfooter={true}
-        //    onSelectRow={onSelectedRow}
-        //    enableRowSelection
-      />
-     </TableCard>
+      <TableCard>
+        <CommonTable
+          data={responseBanks}
+          columns={columns}
+          loading={isLoading}
+          pagination={false}
+          //    onChange={
+          //      handleContactsConfig
+          //    }
+          //    pagination={{
+          //      pageSize: page_size,
+          //      position: ["bottomRight"],
+          //      current: paginationData.page_no,
+          //      total: paginationData.total,
+          //    }}
+          //    hasfooter={true}
+          //    onSelectRow={onSelectedRow}
+          //    enableRowSelection
+        />
+      </TableCard>
     </WrapperBanksList>
   );
 };

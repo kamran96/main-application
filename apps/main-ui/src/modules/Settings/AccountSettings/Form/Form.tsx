@@ -159,7 +159,11 @@ export const AccountsSettingsForm: FC = () => {
             name="email"
             shouldUpdate
           >
-            <Input autoComplete="off" disabled={!editable.email} size="middle" />
+            <Input
+              autoComplete="off"
+              disabled={!editable.email}
+              size="middle"
+            />
           </Form.Item>
           <Button
             onClick={() =>
@@ -193,7 +197,11 @@ export const AccountsSettingsForm: FC = () => {
             ]}
             hasFeedback
           >
-            <Input.Password disabled={!editable.password} autoComplete="off" size="middle" />
+            <Input.Password
+              disabled={!editable.password}
+              autoComplete="off"
+              size="middle"
+            />
           </Form.Item>
           <Button
             onClick={() =>

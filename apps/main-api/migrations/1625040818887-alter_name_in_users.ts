@@ -4,7 +4,7 @@ export class alterNameInUsers1625040818887 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `alter table users alter column name drop not null;
-            alter table users rename column name to username;`,
+            alter table users rename column name to username;`
     );
 
     await queryRunner.addColumn(
@@ -13,7 +13,7 @@ export class alterNameInUsers1625040818887 implements MigrationInterface {
         name: 'email',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
   }
 

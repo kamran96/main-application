@@ -62,16 +62,10 @@ export class Contacts {
   updatedAt: string;
   @Column()
   updatedById: number;
-  @OneToOne(
-    type => Branches,
-    branch => branch.id,
-  )
+  @OneToOne((type) => Branches, (branch) => branch.id)
   @JoinColumn()
   branch: Branches;
-  @OneToOne(
-    type => Addresses,
-    address => address.id,
-  )
+  @OneToOne((type) => Addresses, (address) => address.id)
   @JoinColumn()
   address: Addresses;
 }

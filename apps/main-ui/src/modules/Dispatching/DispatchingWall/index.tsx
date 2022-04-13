@@ -1,11 +1,11 @@
-import { Button } from "antd";
-import React, { FC } from "react";
-import styled from "styled-components";
-import { Heading } from "../../../components/Heading";
-import { H4 } from "../../../components/Typography";
-import Dispatch from "../../../assets/Dispatch.png";
-import { TableCard } from "../../../components/TableCard";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
+import { Button } from 'antd';
+import React, { FC } from 'react';
+import styled from 'styled-components';
+import { Heading } from '../../../components/Heading';
+import { H4 } from '../../../components/Typography';
+import Dispatch from '../../../assets/Dispatch.png';
+import { TableCard } from '../../../components/TableCard';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 
 export const DispatchingWall: FC = () => {
   const { setDispatchConfigModal } = useGlobalContext();
@@ -16,7 +16,7 @@ export const DispatchingWall: FC = () => {
       <TableCard className="_dispatchingcard">
         <div className="flex _dcard ">
           <div className="dispatch_img">
-            <img alt={""} src={Dispatch} />
+            <img alt={''} src={Dispatch} />
           </div>
         </div>
         <div className="flex _dcard mt-10">
@@ -47,7 +47,7 @@ export const DispatchingWall: FC = () => {
         <div className="flex _dcard mt-35">
           <h5>Note: </h5>
           <p className="note">
-            {" "}
+            {' '}
             Using dispatching plugin is free with the current plan.
           </p>
         </div>

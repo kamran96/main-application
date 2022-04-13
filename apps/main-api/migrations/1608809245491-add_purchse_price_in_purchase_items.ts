@@ -6,7 +6,8 @@ import {
 } from 'typeorm';
 
 export class addPurchsePriceInPurchaseItems1608809245491
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'purchase_items',
@@ -14,7 +15,7 @@ export class addPurchsePriceInPurchaseItems1608809245491
         name: 'purchasePrice',
         isNullable: true,
         type: 'float',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -23,7 +24,7 @@ export class addPurchsePriceInPurchaseItems1608809245491
         name: 'organizationId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -33,7 +34,7 @@ export class addPurchsePriceInPurchaseItems1608809245491
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

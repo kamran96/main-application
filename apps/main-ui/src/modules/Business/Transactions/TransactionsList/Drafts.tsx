@@ -3,7 +3,11 @@ import { ColumnsType } from 'antd/lib/table';
 import dayjs from 'dayjs';
 import { FC, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { deleteTransactionApiById, getAllTransactionsAPI } from '../../../../api';
+import {
+  deleteTransactionApiById,
+  getAllTransactionsAPI,
+  updateTransactionDraftStatus,
+} from '../../../../api';
 import { SmartFilter } from '../../../../components/SmartFilter';
 import { CommonTable } from '../../../../components/Table';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
@@ -19,8 +23,12 @@ import { TransactionItemTable } from './TransactionItemsTable';
 import transactionsFilterSchema from './transactionsFilterSchema';
 import { ConfirmModal } from '../../../../components/ConfirmModal';
 import { PurchaseListTopbar } from '../../../../components/PurchasesListTopbar';
-import { NOTIFICATIONTYPE, IServerError} from '../../../../modal';
-
+import { NOTIFICATIONTYPE, IServerError } from '../../../../modal';
+import { TransactionApprovePdf } from '../../../../components/PDFs/TransactionApprovePdf';
+import { PDFICON } from '../../../../components/Icons';
+import DUMMYLOGO from '../../../../assets/quickbook.png';
+import styled from 'styled-components';
+import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
 
 const DRAFTTransactionsList: FC = () => {
   const queryCache = useQueryClient();
@@ -34,7 +42,7 @@ const DRAFTTransactionsList: FC = () => {
   const [filterSchema, setFilterSchema] = useState(transactionsFilterSchema);
   const [confirmModal, setConfirmModal] = useState(false);
 
-  const { routeHistory , notificationCallback} = useGlobalContext();
+  const { routeHistory, notificationCallback, userDetails } = useGlobalContext();
   const { history } = routeHistory;
 
   const [transactionConfig, setTransactionsConfig] = useState({
@@ -45,14 +53,41 @@ const DRAFTTransactionsList: FC = () => {
     status: TransactionsStatus.DRAFT,
   });
 
-
-  const {mutate: mutateDeleteTrasaction, isLoading: isDeletingTransactions} = useMutation(deleteTransactionApiById)
+  const { mutate: mutateDeleteTrasaction, isLoading: isDeletingTransactions } =
+    useMutation(deleteTransactionApiById);
+  const { mutate: updateTransactionStatus, isLoading: isTransactionStatus } =
+    useMutation(updateTransactionDraftStatus);
 
   const { page, query, page_size, status } = transactionConfig;
 
   const [accountsResponse, setAccountsResponse] = useState<IAccountsResult[]>(
     []
   );
+
+  const { organization } = userDetails;
+  const {
+    address: organizationAddress,
+    email: organizationEmail,
+    phoneNumber: organizationContact,
+    name: organizationName,
+    website,
+  } = organization;
+
+  const { city, country, postalCode } = organizationAddress;
+
+  const headerprops = {
+    organizationName,
+    city,
+    country,
+    title: 'Journal Entries',
+    organizationContact,
+    organizationEmail,
+    address: '',
+    code: postalCode,
+    logo: DUMMYLOGO,
+    website,
+  };
+
 
   useEffect(() => {
     if (history?.location?.search) {
@@ -111,33 +146,63 @@ const DRAFTTransactionsList: FC = () => {
   //   }
   // }, [allAccounts.data]);
 
-  const handleDelete = async() =>{
+  const handleDelete = async () => {
     const payload = {
       ids: [userId],
     };
     // console.log(payload, "payload");
     await mutateDeleteTrasaction(payload, {
       onSuccess: () => {
-        ['transactions, transactions?page'].forEach(
-          (key) => {
-            (queryCache.invalidateQueries as any)((q) =>
-              q.queryKey[0].toString().startsWith(key)
-            );
-          }
-        );
+        ['transactions, transactions?page'].forEach((key) => {
+          (queryCache.invalidateQueries as any)((q) =>
+            q.queryKey[0].toString().startsWith(key)
+          );
+        });
 
         setConfirmModal(false);
       },
       onError: (error: IServerError) => {
-        if(error && error?.response && error?.response?.data && error?.response?.data?.message){
-          const {message} = error?.response?.data;
+        if (
+          error &&
+          error?.response &&
+          error?.response?.data &&
+          error?.response?.data?.message
+        ) {
+          const { message } = error?.response?.data;
           notificationCallback(NOTIFICATIONTYPE.ERROR, message);
         }
-      }
-    })
+      },
+    });
     setConfirmModal(false);
-  }
+  };
 
+  const ApprovedDraftStatus = async (userId: number) => {
+     await updateTransactionStatus(userId, {
+      onSuccess: () => {
+        [
+          'transactions, transactions?page',
+          'accounts',
+          `report-trialbalance`,
+          `report-balance-sheet`,
+        ].forEach((key) => {
+          (queryCache.invalidateQueries as any)((q) =>
+            q.queryKey[0].toString().startsWith(key)
+          );
+        });
+      },
+      onError: (error: IServerError) => {
+        if (
+          error &&
+          error?.response &&
+          error?.response?.data &&
+          error?.response?.data?.message
+        ) {
+          const { message } = error?.response?.data;
+          notificationCallback(NOTIFICATIONTYPE.ERROR, message);
+        }
+      },
+    });
+  };
 
   const columns: ColumnsType<any> = [
     {
@@ -183,6 +248,17 @@ const DRAFTTransactionsList: FC = () => {
   const renderCustomTopbar = () => {
     return (
       <WrapperTransactionCustomBar>
+         <PDFDownloadLinkWrapper
+          document={
+            <TransactionApprovePdf resultData={result} header={headerprops} />
+          }
+        >
+          <div className="flex alignCenter">
+            <PDFICON className="flex alignCenter mr-5" />
+
+            <span> Download PDF</span>
+          </div>
+        </PDFDownloadLinkWrapper>
         <SmartFilter
           onFilter={(encode) => {
             setTransactionsConfig({
@@ -240,6 +316,8 @@ const DRAFTTransactionsList: FC = () => {
     return a - b;
   });
 
+
+
   return (
     <WrapperTransactionsList>
       <CommonTable
@@ -247,20 +325,23 @@ const DRAFTTransactionsList: FC = () => {
           expandedRowRender: (record, index) => {
             return (
               <>
-               <PurchaseListTopbar
-                 // hideDeleteButton={!rbac.can(PERMISSIONS.INVOICES_DELETE)}
+                <PurchaseListTopbar
+                  // hideDeleteButton={!rbac.can(PERMISSIONS.INVOICES_DELETE)}
                   disabled={false}
                   isEditable={true}
-                   hasApproveButton={true}
+                  hasApproveButton={true}
+                  loading={isTransactionStatus}
                   onEdit={() => {
-                    history.push(`/app${ISupportedRoutes.CREATE_TRANSACTION}/${record.id}`)
+                    history.push(
+                      `/app${ISupportedRoutes.CREATE_TRANSACTION}/${record.id}`
+                    );
                   }}
                   onDelete={() => {
                     setUserId(record?.id);
                     setConfirmModal(true);
                   }}
-                  onApprove = {() =>{
-                    console.log("Approve")
+                  onApprove={() =>{
+                    ApprovedDraftStatus(record?.id)
                   }}
                 />
                 <TransactionItemTable
@@ -306,4 +387,17 @@ const DRAFTTransactionsList: FC = () => {
 };
 export default DRAFTTransactionsList;
 
-
+const PDFDownloadLinkWrapper = styled(PDFDownloadLink)`
+  background: #e4e4e4;
+  padding: 5px 5px;
+  border-radius: 2px;
+  margin-right: 8px;
+  color: #333333;
+  border: none;
+  outline: none;
+  transition: 0.4s all ease-in-out;
+  &:hover {
+    background: #143c69;
+    color: #ffff;
+  }
+`;

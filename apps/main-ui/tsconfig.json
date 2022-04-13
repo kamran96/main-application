@@ -9,7 +9,7 @@
     "strict": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true,
+    "skipLibCheck": true
   },
   "files": [],
   "include": ["src"],
@@ -23,8 +23,6 @@
   ],
   "baseUrl": "src",
   "paths": {
-    
-    "@components/*" : ["components/*"],
-    
-  } 
+    "@components/*": ["components/*"]
+  }
 }

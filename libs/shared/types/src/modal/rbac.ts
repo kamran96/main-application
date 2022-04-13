@@ -1,4 +1,4 @@
-import { IBaseRequest } from "./base";
+import { IBaseRequest } from './base';
 export interface IPermissionsResponsse extends IBaseRequest {
   result: IPermission[];
 }

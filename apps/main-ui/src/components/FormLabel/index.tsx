@@ -1,7 +1,7 @@
-import React, { FC, ReactElement } from "react";
-import styled from "styled-components";
-import { IThemeProps } from "../../hooks/useTheme/themeColors";
-import convertToRem from "../../utils/convertToRem";
+import React, { FC, ReactElement } from 'react';
+import styled from 'styled-components';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
+import convertToRem from '../../utils/convertToRem';
 
 interface IProps {
   children?: any | ReactElement<any>;

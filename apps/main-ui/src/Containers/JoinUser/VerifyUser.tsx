@@ -1,26 +1,23 @@
-import React from "react";
-import styled from "styled-components";
-import { Card } from "antd";
-import { VerifyingIllustrator } from "../../assets/icons";
-import { Spin } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
-import convertToRem from "../../utils/convertToRem";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { useEffect } from "react";
-import { useMutation } from "react-query";
-import { verifyUserInvitationAPI } from "../../api/users";
+import React from 'react';
+import styled from 'styled-components';
+import { Card } from 'antd';
+import { VerifyingIllustrator } from '../../assets/icons';
+import { Spin } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
+import convertToRem from '../../utils/convertToRem';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { useEffect } from 'react';
+import { useMutation } from 'react-query';
+import { verifyUserInvitationAPI } from '../../api/users';
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 export const VerifyUser = () => {
-
   // const [mutateVerify, resMutateVerify] = useMutation(verifyUserInvitationAPI);
-
 
   // const {routeHistory} = useGlobalContext();
   // const {history} = routeHistory;
   // const {search} = history?.location;
-
 
   // useEffect(()=>{
   //   if(search){
@@ -37,13 +34,12 @@ export const VerifyUser = () => {
   //   }
   // },[search])
 
-
   return (
     <VerifyWrapper>
       <Card bordered={false} className="verify-card">
         <VerifyingIllustrator />
         <p className="loading-description">
-          Please wait for a while we are verifying your account{" "}
+          Please wait for a while we are verifying your account{' '}
         </p>
         <Spin indicator={antIcon} />
       </Card>
@@ -82,8 +78,8 @@ const VerifyWrapper = styled.div`
         color: #585858;
       }
 
-      .ant-spin-spinning span{
-        font-size: ${convertToRem(44)} !important
+      .ant-spin-spinning span {
+        font-size: ${convertToRem(44)} !important;
       }
     }
   }

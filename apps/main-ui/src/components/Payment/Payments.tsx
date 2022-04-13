@@ -190,7 +190,11 @@ export const Payments = ({ initialValues, onChange, reset, issueDate }) => {
                     },
                   ]}
                 >
-                  <Input placeholder="Enter Amount" type="number" autoComplete="off"/>
+                  <Input
+                    placeholder="Enter Amount"
+                    type="number"
+                    autoComplete="off"
+                  />
                 </Form.Item>
               </div>
               <FormLabel>Type</FormLabel>

@@ -32,7 +32,7 @@ export class SettingController {
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -43,7 +43,7 @@ export class SettingController {
     try {
       const setting = await this.settingService.CreateStorage(
         settingDto,
-        req.user,
+        req.user
       );
 
       if (setting) {
@@ -55,7 +55,7 @@ export class SettingController {
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }

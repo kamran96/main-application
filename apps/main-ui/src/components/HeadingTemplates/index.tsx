@@ -1,7 +1,7 @@
-import React, { FC } from "react";
-import styled from "styled-components";
-import { Heading } from "../Heading";
-import { Seprator } from "../Seprator";
+import React, { FC } from 'react';
+import styled from 'styled-components';
+import { Heading } from '../Heading';
+import { Seprator } from '../Seprator';
 
 interface IProps {
   title: string;

@@ -1,9 +1,9 @@
-import { Button } from "antd";
-import React, { FC } from "react";
-import styled from "styled-components";
-import { Heading } from "../../../components/Heading";
-import { useGlobalContext } from "../../../hooks/globalContext/globalContext";
-import { PermissionList } from "../PermissionsList";
+import { Button } from 'antd';
+import React, { FC } from 'react';
+import styled from 'styled-components';
+import { Heading } from '../../../components/Heading';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { PermissionList } from '../PermissionsList';
 
 export const PermissionsSettingsContainer: FC = () => {
   const { setPermissionConfigModal } = useGlobalContext();

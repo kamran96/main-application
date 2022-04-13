@@ -1,6 +1,6 @@
-import { FC, ReactElement } from "react";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { IOrganizationType } from "../../modal/organization";
+import { FC, ReactElement } from 'react';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { IOrganizationType } from '../../modal/organization';
 
 interface IProps {
   enable: boolean | IOrganizationType[];
@@ -8,13 +8,13 @@ interface IProps {
 }
 
 export const EnterpriseWrapper: FC<IProps> = ({ enable, children }) => {
-  const {userDetails } = useGlobalContext();
+  const { userDetails } = useGlobalContext();
 
   const { organization } = userDetails;
   // organization.organizationType
 
   if (
-    (typeof enable === "boolean" && enable === true) ||
+    (typeof enable === 'boolean' && enable === true) ||
     (Array.isArray(enable) && enable.includes(organization.organizationType))
   ) {
     return children;

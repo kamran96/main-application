@@ -1,24 +1,24 @@
-import React, { FC, useMemo } from "react";
-import styled from "styled-components";
-import { CommonTable } from "../../../../components/Table";
+import React, { FC, useMemo } from 'react';
+import styled from 'styled-components';
+import { CommonTable } from '../../../../components/Table';
 
 export const GeneralPreferencesTable: FC = () => {
   const columns = useMemo(
     () => [
       {
-        title: "Name",
-        dataIndex: "name",
-        key: "name",
+        title: 'Name',
+        dataIndex: 'name',
+        key: 'name',
       },
       {
-        title: "Type",
-        dataIndex: "name",
-        key: "name",
+        title: 'Type',
+        dataIndex: 'name',
+        key: 'name',
       },
       {
-        title: "",
-        dataIndex: "action",
-        key: "action",
+        title: '',
+        dataIndex: 'action',
+        key: 'action',
       },
     ],
     []

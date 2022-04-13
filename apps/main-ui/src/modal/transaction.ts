@@ -1,8 +1,8 @@
-import { IBase, IBaseRequest } from "./base";
+import { IBase, IBaseRequest } from './base';
 
-export enum TransactionsType{
+export enum TransactionsType {
   CREDIT = 20,
-  DEBIT = 10
+  DEBIT = 10,
 }
 
 export enum TransactionsStatus{
@@ -27,7 +27,7 @@ export interface ITransactionResult extends IBase {
   updatedAt: string;
   createdById: null;
   updatedById: null;
-  transaction_items: ITransactionItem[];
+  transactionItems: ITransactionItem[];
 }
 
 export interface ITransactionItem extends IBase {

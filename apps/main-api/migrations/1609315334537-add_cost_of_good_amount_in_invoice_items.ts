@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class addCostOfGoodAmountInInvoiceItems1609315334537
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'invoice_items',
@@ -9,7 +10,7 @@ export class addCostOfGoodAmountInInvoiceItems1609315334537
         name: 'costOfGoodAmount',
         isNullable: true,
         type: 'float',
-      }),
+      })
     );
   }
 

@@ -1,4 +1,4 @@
-import { FilterType } from "../../../../modal";
+import { FilterType } from '../../../../modal';
 
 export default {
   // accountId: {
@@ -8,20 +8,20 @@ export default {
   // },
   ref: {
     type: FilterType.SEARCH,
-    label: "Reference",
-    value: "",
+    label: 'Reference',
+    value: '',
     isFullSearch: true,
   },
   narration: {
     type: FilterType.SEARCH,
-    label: "Narration",
-    value: "",
+    label: 'Narration',
+    value: '',
     isFullSearch: true,
   },
   date: {
     type: FilterType.DATE_BETWEEN,
-    label: "Created At",
-    value: "",
+    label: 'Created At',
+    value: '',
     isFullSearch: false,
   },
 };

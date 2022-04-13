@@ -8,7 +8,7 @@ export class alterTransactions1606288095812 implements MigrationInterface {
         name: 'notes',
         isNullable: true,
         type: 'varchar',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -17,7 +17,7 @@ export class alterTransactions1606288095812 implements MigrationInterface {
         name: 'description',
         isNullable: true,
         type: 'varchar',
-      }),
+      })
     );
   }
 

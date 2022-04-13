@@ -1,10 +1,10 @@
-import { Button } from "antd";
-import React, { FC } from "react";
-import { Link } from "react-router-dom";
-import styled from "styled-components";
-import { Heading } from "../../../components/Heading";
-import { ISupportedRoutes } from "../../../modal/routing";
-import { TransactionsList } from "./TransactionsList";
+import { Button } from 'antd';
+import React, { FC } from 'react';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
+import { Heading } from '../../../components/Heading';
+import { ISupportedRoutes } from '../../../modal/routing';
+import { TransactionsList } from './TransactionsList';
 
 export const TransactionContainer: FC = () => {
   return (

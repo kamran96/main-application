@@ -1,15 +1,15 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { FC } from "react";
-import styled from "styled-components";
-import { Icon } from "@iconify/react";
-import deleteIcon from "@iconify/icons-carbon/delete";
-import bxsEdit from "@iconify/icons-bx/bxs-edit";
-import convertToRem from "../../utils/convertToRem";
-import { Color } from "../../modal";
+import React, { FC } from 'react';
+import styled from 'styled-components';
+import { Icon } from '@iconify/react';
+import deleteIcon from '@iconify/icons-carbon/delete';
+import bxsEdit from '@iconify/icons-bx/bxs-edit';
+import convertToRem from '../../utils/convertToRem';
+import { Color } from '../../modal';
 
 interface IActionProps {
-  componentType: "icon" | "text";
-  type: "delete" | "edit" | "archive";
+  componentType: 'icon' | 'text';
+  type: 'delete' | 'edit' | 'archive';
   onClick?: () => void;
   className?: string;
 }
@@ -22,26 +22,26 @@ export const Action: FC<IActionProps> = ({
 }) => {
   return (
     <WrapperAction className={className} onClick={onClick}>
-      {componentType === "icon" ? (
+      {componentType === 'icon' ? (
         <i>
           <Icon
             style={{
               fontSize: convertToRem(20),
               color: Color.$GRAY,
-              cursor: "pointer",
+              cursor: 'pointer',
             }}
             icon={
-              type === "delete" ? deleteIcon : type === "edit" ? bxsEdit : null
+              type === 'delete' ? deleteIcon : type === 'edit' ? bxsEdit : null
             }
           />
         </i>
       ) : (
         <a
           className={
-            type === "delete" ? "delete" : type === "edit" ? "edit" : "archive"
+            type === 'delete' ? 'delete' : type === 'edit' ? 'edit' : 'archive'
           }
         >
-          {type === "delete" ? "Delete" : type === "edit" ? "Edit" : "Archive"}
+          {type === 'delete' ? 'Delete' : type === 'edit' ? 'Edit' : 'Archive'}
         </a>
       )}
     </WrapperAction>

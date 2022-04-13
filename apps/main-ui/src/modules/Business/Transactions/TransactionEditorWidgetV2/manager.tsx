@@ -1,5 +1,5 @@
 import { useWindowSize } from '../../../../utils/useWindowSize';
-import { Form, Result } from 'antd';
+import { Form } from 'antd';
 import {
   useContext,
   createContext,
@@ -29,14 +29,7 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { NOTIFICATIONTYPE } from '@invyce/shared/types';
 import { IServerError } from '../../../../modal';
-import { number } from 'echarts';
 
-// interface ResultPrps {
-//   ref: string | number;
-//   date: any,
-//   narration?: string ,
-//   notes?: string
-// }
 
 const transactionContext = createContext<Partial<ITranactionContext>>({});
 export const useTransaction = () => useContext(transactionContext);
@@ -53,7 +46,6 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
   const [transactionsList, setTransactionsList] = useState<ITransactionsList[]>(
     [{ ...defaultState }]
   );
-
   //state and fetch single data by Id;
   const { data: TransactionData, isLoading: isTransactionLoading } = useQuery(
     [`transaction-${id}`, id],
@@ -137,8 +129,7 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
   useEffect(() => {
     if (TransactionData?.data?.result) {
       const { result } = TransactionData?.data;
-      const { ref, date, narration, notes } = result;
-
+      const { ref, date, narration, notes , status} = result;
       form.setFieldsValue({
         ref,
         date: dayjs(date),
@@ -155,12 +146,14 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
           debit: item.transactionType === 10 ? item.amount : 0,
           credit: item.transactionType === 20 ? item.amount : 0,
           error: false,
-        });
+          });
       });
       setTransactionsList(data);
     }
   }, [TransactionData, form]);
 
+
+  
   const columns: EditableColumnsType[] = useMemo(() => {
     return [
       {
@@ -242,6 +235,7 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
             <Editable
               value={value}
               size="middle"
+              placeholder='description'
               onChange={(e) => {
                 const val = e?.target?.value;
                 clearTimeout(timeout);
@@ -276,6 +270,7 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
               value={value}
               type="number"
               size="middle"
+              defaultValue="1"
               style={{
                 width: '100%',
                 // minWidth: '180px',
@@ -313,6 +308,7 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
                 minWidth: '180px',
                 maxWidth: `${width > 1500 ? `520px` : `90px`}`,
               }}
+              defaultValue={record?.credit > 0 ? "" : 0}
             />
           );
         },
