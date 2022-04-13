@@ -1,8 +1,10 @@
 import { EditableColumnsType } from '@invyce/editable-table';
+import { FormInstance } from 'antd';
 import { ReactNode } from 'react';
 
 export interface ITransactionEditorProps {
   children: ReactNode;
+  id: number;
 }
 
 export interface ITranactionContext {
@@ -12,6 +14,8 @@ export interface ITranactionContext {
   addRow: () => void;
   loading: boolean;
   resetTransactions: () => void;
+  id: number;
+  form: FormInstance<any>;
 }
 export interface ITransactionsList {
   account: number | string;

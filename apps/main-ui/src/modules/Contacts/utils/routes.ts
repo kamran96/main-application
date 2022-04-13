@@ -18,5 +18,5 @@ export const ContactsManagerRoutes = (root): RouteConfig[] => [
     path: `${root}${ISupportedRoutes.UPDATE_CONTACT}/:id`,
     component: ContactsEditorWidget,
     exact: true,
-  },
+  }
 ];
