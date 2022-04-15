@@ -20,19 +20,13 @@ dotenv.config();
       useFactory: async (configService: ConfigService) =>
         ({
           type: 'postgres',
-          host: configService.get('ACC_DB_HOST', process.env.ACC_DB_HOST),
-          port: configService.get<unknown>(
-            'ACC_DB_PORT',
-            process.env.ACC_DB_PORT
-          ),
-          username: configService.get('ACC_DB_USER', process.env.ACC_DB_USER),
-          password: configService.get(
-            'ACC_DB_PASSWORD',
-            process.env.ACC_DB_PASSWORD
-          ),
+          host: configService.get('DB_HOST', process.env.DB_HOST),
+          port: configService.get<unknown>('DB_PORT', process.env.DB_PORT),
+          username: configService.get('DB_USER', process.env.DB_USER),
+          password: configService.get('DB_PASSWORD', process.env.DB_PASSWORD),
           database: configService.get('ACC_DB_NAME', process.env.ACC_DB_NAME),
           entities: getMetadataArgsStorage().tables.map((tbl) => tbl.target),
-          // ssl: { rejectUnauthorized: false },
+          ssl: { rejectUnauthorized: false },
         } as TypeOrmModuleOptions),
     }),
     AccountsModule,

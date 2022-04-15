@@ -20,6 +20,7 @@ interface IProps {
   renderSmartFilter?: ReactElement<any>;
   hasApproveButton?: boolean;
   hideDeleteButton?: boolean;
+  loading?: boolean;
 }
 
 export const PurchaseListTopbar: FC<IProps> = ({
@@ -31,6 +32,7 @@ export const PurchaseListTopbar: FC<IProps> = ({
   isEditable,
   hasApproveButton,
   hideDeleteButton,
+  loading
 }) => {
   return (
     <WrapperPurchaseTopbar className="flex alignCenter justifySpaceBetween">
@@ -43,6 +45,7 @@ export const PurchaseListTopbar: FC<IProps> = ({
             disabled={disabled}
             title="Approve"
             size="middle"
+            loading={loading}
             // icon={printIcon}
           />
           // <ButtonTag
@@ -61,6 +64,7 @@ export const PurchaseListTopbar: FC<IProps> = ({
             title="Edit"
             size="middle"
             icon={editSolid}
+            
           />
           // <Button
           //   disabled={disabled}
