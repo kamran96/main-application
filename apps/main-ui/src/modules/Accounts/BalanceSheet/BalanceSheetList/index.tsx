@@ -434,21 +434,6 @@ export const BalanceSheetList: FC = () => {
           </PrintFormat>
         </div>
       </Card>
-           <PDFViewer height={'1080px'} width={'100%'}>
-             <BalanceSheetPdf
-                 totals={{ 
-                   totalCredits,
-                   totalDebits,
-                   closing_credits,
-                   closing_debits,
-                   opening_credits,
-                   opening_debits
-                    }}
-                  header={headerprops}
-                  balanceSheetData={balanceSheetData}
-                  searchquery={searchedQueryItem}
-                />
-          </PDFViewer>
     </WrapperBalanceSheetList>
   );
 };
@@ -491,7 +476,10 @@ const WrapperBalanceSheetList = styled.div<WrapperBalanceSheetProps>`
       padding-left: 24px;
     }
 
-
+    table tfoot tr td{
+      padding: 10px 10px;
+    }
+  
     .calculated_groups {
       td {
         border-top: 1px solid

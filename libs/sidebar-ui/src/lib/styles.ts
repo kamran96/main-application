@@ -107,12 +107,38 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
       transition: 0.3s all ease-in-out;
       color: ${(props: IThemeProps) =>
         props?.theme?.colors?.sidebarDefaultText};
+
+        span svg path{
+          stroke: ${(props: IThemeProps) => props?.theme?.colors?.sidebarDefaultText};
+        }
+        
       &:hover {
         background: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarListActive};
         color: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarListActiveText};
+
+          span svg {
+            fill: #FFFFFF;
+            stroke: none;
+
+            path {
+              stroke: #FFFFFF;
+            } 
+            .BlackSpace{
+              stroke: #272525;
+            }
+            .fillTransparent{
+              fill: transparent;
+            }
+            .ReportColor{
+              stroke: ${(props: IThemeProps) =>
+                props?.theme?.colors?.sidebarListActiveText}
+            }
+          }
       }
+
+
     }
     .route_list_item {
       a {
@@ -123,11 +149,30 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
         color: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarDefaultText};
 
+       
+      span svg path{
+              stroke: ${(props: IThemeProps) => props?.theme?.colors?.sidebarDefaultText};
+            };
+      
         &:hover {
           background: ${(props: IThemeProps) =>
             props?.theme?.colors?.sidebarListActive};
           color: ${(props: IThemeProps) =>
             props?.theme?.colors?.sidebarListActiveText};
+            
+            span svg {
+              fill: #FFFFFF;
+              
+              path {
+                stroke: #FFFFFF;
+              } 
+              .BlackSpace{
+                stroke: #272525 !important;
+              }
+              .fillTransparent{
+                fill: transparent;
+              }
+            }
         }
       }
     }
@@ -140,6 +185,22 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
         color: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarListActiveText};
       }
+
+      span svg {
+        fill: ${(props: IThemeProps) =>
+          props?.theme?.colors?.sidebarListActiveText};
+        
+        // path {
+        //   stroke: #FFFFFF;
+        // } 
+        // .BlackSpace{
+        //   stroke: #272525 !important;
+        // }
+        .fillTransparent{
+          fill: transparent;
+        }
+      }
+
     }
   }
 
@@ -285,6 +346,7 @@ export const PopupGlobalStyles = createGlobalStyle`
 .open_popover{
   z-index: 1111 !important;
   width: 199px !important;
+  
 }
 
 `;

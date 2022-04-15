@@ -1,22 +1,37 @@
-import bxUser from '@iconify-icons/bx/bx-user';
-import bookOpen from '@iconify-icons/feather/book-open';
-import dollarSign from '@iconify-icons/feather/dollar-sign';
-import filePlus from '@iconify-icons/feather/file-plus';
-import fileText from '@iconify-icons/feather/file-text';
-import layersIcon from '@iconify-icons/feather/layers';
-import shoppingCart from '@iconify-icons/icons8/shopping-cart';
-import coinsIcon from '@iconify-icons/la/coins';
-import fileInvoiceDollar from '@iconify-icons/la/file-invoice-dollar';
-import viewDashboardOutline from '@iconify-icons/mdi/view-dashboard';
-import analyticsIcon from '@iconify-icons/uil/analytics';
-import gitMerge from '@iconify-icons/feather/git-merge';
-import bxsReport from '@iconify-icons/bx/bxs-report';
-import shoppingBag from '@iconify-icons/fe/shopping-bag';
-import slidersIcon from '@iconify-icons/feather/sliders';
-import billIcon from '@iconify-icons/uil/bill';
-
+// import bxUser from '@iconify-icons/bx/bx-user';
+// import bookOpen from '@iconify-icons/feather/book-open';
+// import dollarSign from '@iconify-icons/feather/dollar-sign';
+// import filePlus from '@iconify-icons/feather/file-plus';
+// import fileText from '@iconify-icons/feather/file-text';
+// import layersIcon from '@iconify-icons/feather/layers';
+// import shoppingCart from '@iconify-icons/icons8/shopping-cart';
+// import coinsIcon from '@iconify-icons/la/coins';
+// import fileInvoiceDollar from '@iconify-icons/la/file-invoice-dollar';
+// import viewDashboardOutline from '@iconify-icons/mdi/view-dashboard';
+// import analyticsIcon from '@iconify-icons/uil/analytics';
+// import gitMerge from '@iconify-icons/feather/git-merge';
+// import bxsReport from '@iconify-icons/bx/bxs-report';
+// import shoppingBag from '@iconify-icons/fe/shopping-bag';
+// import slidersIcon from '@iconify-icons/feather/sliders';
+// import billIcon from '@iconify-icons/uil/bill';
 import { IRoutingSchema, ISupportedRoutes } from '../modal';
 import { PERMISSIONS } from '../components/Rbac/permissions';
+import {
+  BussinesIcon,
+  ReportIcon,
+  Accounting,
+  Payments,
+  Contacts,
+  Items,
+  CreateNote,
+  CreateQuote,
+  CreateBill,
+  CreatePo,
+  CreateInvoice,
+  CreateContact,
+  JournalEntry,
+  Dashboard
+} from '../assets/icons/index';
 
 const root = `/app`;
 export const RoutingSchema: IRoutingSchema = {
@@ -25,7 +40,7 @@ export const RoutingSchema: IRoutingSchema = {
       tag: 'Dashboard',
       route: '/app/dashboard',
       children: [],
-      icon: viewDashboardOutline,
+      icon:<Dashboard />,
     },
     // {
     //   tag: 'Banking',
@@ -35,7 +50,7 @@ export const RoutingSchema: IRoutingSchema = {
     // },
     {
       tag: 'Business',
-      icon: coinsIcon,
+      icon: <BussinesIcon/>,
       children: [
         {
           route: `${root}${ISupportedRoutes.INVOICE_DASHBOARD}`,
@@ -75,7 +90,7 @@ export const RoutingSchema: IRoutingSchema = {
     },
     {
       tag: 'Reports',
-      icon: bxsReport,
+      icon: <ReportIcon/>,
       children: [
         {
           route: `${root}${ISupportedRoutes.TRIAL_BALANCE}`,
@@ -97,7 +112,7 @@ export const RoutingSchema: IRoutingSchema = {
     },
     {
       tag: 'Accounting',
-      icon: analyticsIcon,
+      icon: <Accounting/>,
       children: [
         {
           route: `${root}${ISupportedRoutes.ACCOUNTS}`,
@@ -128,7 +143,7 @@ export const RoutingSchema: IRoutingSchema = {
     },
     {
       tag: 'Payments',
-      icon: dollarSign,
+      icon: <Payments/>,
       route: `${root}${ISupportedRoutes.PAYMENTS}`,
       children: [],
       permission: PERMISSIONS.PAYMENTS_INDEX,
@@ -136,7 +151,7 @@ export const RoutingSchema: IRoutingSchema = {
 
     {
       tag: 'Contact',
-      icon: bxUser,
+      icon: <Contacts/>,
       route: `${root}${ISupportedRoutes.CONTACTS}`,
       children: [],
       permission: PERMISSIONS.CONTACTS_INDEX,
@@ -145,7 +160,7 @@ export const RoutingSchema: IRoutingSchema = {
       tag: 'Items',
       route: '/app/items',
       children: [],
-      icon: shoppingCart,
+      icon: <Items/>,
       permission: PERMISSIONS.ITEMS_INDEX,
     },
 
@@ -162,7 +177,7 @@ export const RoutingSchema: IRoutingSchema = {
       tag: 'Dispatching',
       route: `${root}${ISupportedRoutes.DISPATCHING}`,
       children: [],
-      icon: gitMerge,
+      icon: <Items/>,
       permission: 'DISABLED', // MAKE ONCE ITS INTEGRATED IT WILL BE ENABLE
     },
   ],
@@ -170,49 +185,49 @@ export const RoutingSchema: IRoutingSchema = {
     {
       route: `${root}${ISupportedRoutes.CREATE_TRANSACTION}`,
       tag: 'Journal Entry',
-      icon: filePlus,
+      icon: <JournalEntry/>,
       permission: PERMISSIONS.TRANSACTIONS_CREATE,
     },
     {
       route: `${root}${ISupportedRoutes.CREATE_CONTACT}`,
       tag: 'Create Contact',
-      icon: bxUser,
+      icon: <CreateContact/>,
       permission: PERMISSIONS.CONTACTS_CREATE,
     },
     {
       route: root + ISupportedRoutes.CREATE_INVOICE,
       tag: 'Create Invoice',
-      icon: fileText,
+      icon: <CreateInvoice/>,
       permission: PERMISSIONS.INVOICES_CREATE,
     },
 
     {
       route: `${root}${ISupportedRoutes.CREATE_PURCHASE_ORDER}`,
       tag: 'Create PO',
-      icon: bookOpen,
+      icon: <CreatePo/>,
       permission: PERMISSIONS.PURCHASE_ORDERS_CREATE,
     },
     {
       route: `${root}${ISupportedRoutes.CREATE_PURCHASE_Entry}`,
       tag: 'Create Bill',
-      icon: shoppingBag,
+      icon: <CreateBill/>,
     },
 
     {
       route: `${root}${ISupportedRoutes.CREATE_QUOTE}`,
       tag: 'Create Quote',
-      icon: fileInvoiceDollar,
+      icon: <CreateQuote/>,
       permission: PERMISSIONS.QUOTATIONS_CREATE,
     },
     {
       route: `${root}${ISupportedRoutes.ADD_CREDIT_NOTE}`,
       tag: 'Credit Note',
-      icon: billIcon,
+      icon: <CreateNote/>,
     },
     {
       route: `${root}${ISupportedRoutes.ADD_DEBIT_NOTE}`,
       tag: 'Debit Note',
-      icon: billIcon,
+      icon: <CreateNote/>,
     },
   ],
 };
