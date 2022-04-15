@@ -26,7 +26,8 @@
                   "replace": "apps/accounting-service/src/environments/environment.ts",
                   "with": "apps/accounting-service/src/environments/environment.prod.ts"
                 }
-              ]
+              ],
+              "generatePackageJson": true
             }
           }
         },
@@ -260,7 +261,8 @@
             "outputPath": "dist/apps/contacts-service",
             "main": "apps/contacts-service/src/main.ts",
             "tsConfig": "apps/contacts-service/tsconfig.app.json",
-            "assets": ["apps/contacts-service/src/assets"]
+            "assets": ["apps/contacts-service/src/assets"],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {
@@ -272,7 +274,8 @@
                   "replace": "apps/contacts-service/src/environments/environment.ts",
                   "with": "apps/contacts-service/src/environments/environment.prod.ts"
                 }
-              ]
+              ],
+              "generatePackageJson": true
             }
           }
         },

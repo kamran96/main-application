@@ -1,4 +1,5 @@
 import { useWindowSize } from '../../../../utils/useWindowSize';
+import { Form } from 'antd';
 import {
   useContext,
   createContext,
@@ -16,13 +17,19 @@ import {
 import { EditableColumnsType } from '@invyce/editable-table';
 import defaultState from './default';
 import Icon from '@iconify/react';
+import dayjs from 'dayjs';
 import { convertToRem } from '@invyce/pixels-to-rem';
 import { Color } from '../../../../modal/theme';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import dotsGrid from '@iconify-icons/mdi/dots-grid';
-import { useQuery } from 'react-query';
 import { getAllAccounts } from '../../../../api/accounts';
 import { IAccountsResult } from '@invyce/shared/types';
+import { getSingleTransactionById } from '../../../../api';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { NOTIFICATIONTYPE } from '@invyce/shared/types';
+import { IServerError } from '../../../../modal';
+
 
 const transactionContext = createContext<Partial<ITranactionContext>>({});
 export const useTransaction = () => useContext(transactionContext);
@@ -31,10 +38,38 @@ let timeout: any;
 
 export const TransactionManager: FC<ITransactionEditorProps> = ({
   children,
+  id,
 }) => {
+  const [form] = Form.useForm();
+  const { notificationCallback } = useGlobalContext();
   const [width] = useWindowSize();
   const [transactionsList, setTransactionsList] = useState<ITransactionsList[]>(
     [{ ...defaultState }]
+  );
+  //state and fetch single data by Id;
+  const { data: TransactionData, isLoading: isTransactionLoading } = useQuery(
+    [`transaction-${id}`, id],
+    getSingleTransactionById,
+    {
+      enabled: !!id,
+      onSuccess: (data) => {
+        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Transaction Fetched');
+      },
+      onError: (error: IServerError) => {
+        if (
+          error &&
+          error?.response &&
+          error?.response?.data &&
+          error?.response?.data?.message
+        ) {
+          // const { message } = error?.response?.data;
+          notificationCallback(
+            NOTIFICATIONTYPE.ERROR,
+            'Unabale to fetch Data!'
+          );
+        }
+      },
+    }
   );
 
   const { isLoading: accountsLoading, data: accountsData } = useQuery(
@@ -91,6 +126,34 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
     }
   };
 
+  useEffect(() => {
+    if (TransactionData?.data?.result) {
+      const { result } = TransactionData?.data;
+      const { ref, date, narration, notes , status} = result;
+      form.setFieldsValue({
+        ref,
+        date: dayjs(date),
+        narration,
+        notes,
+      });
+
+      const data = [];
+      //rename the item name
+      result.transactionItems.forEach((item, index) => {
+        data.push({
+          account: item?.accountId,
+          description: item.description,
+          debit: item.transactionType === 10 ? item.amount : 0,
+          credit: item.transactionType === 20 ? item.amount : 0,
+          error: false,
+          });
+      });
+      setTransactionsList(data);
+    }
+  }, [TransactionData, form]);
+
+
+  
   const columns: EditableColumnsType[] = useMemo(() => {
     return [
       {
@@ -122,40 +185,43 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
         width: width > 1500 ? 220 : 170,
         render: (value: number | string, row: any, index: number) => {
           return (
-            <EditableSelect
-              error={!!row?.accountError}
-              style={{ width: '100%', minWidth: '180px', maxWidth: '180px' }}
-              labelInValue={true}
-              value={{
-                value: 'value',
-                label: `${getAccountId(value) || 'Select Account'}`,
-              }}
-              onChange={(selectedItem) => {
-                setTransactionsList((prev) => {
-                  const row = [...prev];
-                  delete row[index][`accountError`];
-                  row.splice(index, 1, {
-                    ...row[index],
-                    account: selectedItem.value,
-                    description: '/',
-                    credit: row[index].credit || 0,
-                    debit: row[index].debit || 0,
-                  });
+            <>
+              <EditableSelect
+                error={!!row?.accountError}
+                style={{ width: '100%', minWidth: '180px', maxWidth: '180px' }}
+                labelInValue={true}
+                value={{
+                  value: 'value',
+                  label: `${getAccountId(value) || 'Select Account'}`,
+                }}
+                onChange={(selectedItem) => {
+                  setTransactionsList((prev) => {
+                    const row = [...prev];
+                    delete row[index][`accountError`];
+                    row.splice(index, 1, {
+                      ...row[index],
+                      account: selectedItem.value,
+                      description: '/',
+                      credit: row[index].credit || 0,
+                      debit: row[index].debit || 0,
+                    });
 
-                  return row;
-                });
-              }}
-              size="middle"
-              showSearch
-              optionFilterProp="children"
-              options={getAvailableAccounts()?.map((item, index) => {
-                return {
-                  key: item.id,
-                  value: item.id,
-                  customizedRender: item.name,
-                };
-              })}
-            />
+                    return row;
+                  });
+                }}
+                size="middle"
+                showSearch
+                optionFilterProp="children"
+                options={getAvailableAccounts()?.map((item, index) => {
+                  return {
+                    key: item.id,
+                    value: item.id,
+                    customizedRender: item.name,
+                  };
+                })}
+              />
+              {/* //added new here */}
+            </>
           );
         },
       },
@@ -169,6 +235,7 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
             <Editable
               value={value}
               size="middle"
+              placeholder='description'
               onChange={(e) => {
                 const val = e?.target?.value;
                 clearTimeout(timeout);
@@ -203,6 +270,7 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
               value={value}
               type="number"
               size="middle"
+              defaultValue="1"
               style={{
                 width: '100%',
                 // minWidth: '180px',
@@ -240,6 +308,7 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
                 minWidth: '180px',
                 maxWidth: `${width > 1500 ? `520px` : `90px`}`,
               }}
+              defaultValue={record?.credit > 0 ? "" : 0}
             />
           );
         },
@@ -282,6 +351,8 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
         addRow: handleAddRow,
         resetTransactions,
         loading: accountsLoading,
+        id,
+        form,
       }}
     >
       <div>{children}</div>

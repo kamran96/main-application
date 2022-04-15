@@ -5,6 +5,11 @@ export enum TransactionsType {
   DEBIT = 10,
 }
 
+export enum TransactionsStatus{
+  APPROVE = 1,
+  DRAFT = 2
+}
+
 export interface IResponseTransactions extends IBaseRequest {
   result: ITransactionResult[];
 }
@@ -22,7 +27,7 @@ export interface ITransactionResult extends IBase {
   updatedAt: string;
   createdById: null;
   updatedById: null;
-  transaction_items: ITransactionItem[];
+  transactionItems: ITransactionItem[];
 }
 
 export interface ITransactionItem extends IBase {

@@ -8,7 +8,7 @@ import { DatePicker } from '../../../../components/DatePicker';
 import dayjs from 'dayjs';
 import { BreadCrumbArea } from '../../../../components/BreadCrumbArea';
 import { ISupportedRoutes } from '../../../../modal/routing';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { Heading } from '../../../../components/Heading';
 import TextArea from 'antd/lib/input/TextArea';
 import { BoldText } from '../../../../components/Para/BoldText';
@@ -18,7 +18,12 @@ import { useMutation, useQueryClient } from 'react-query';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { NOTIFICATIONTYPE } from '@invyce/shared/types';
 import { ITransactionsList } from './types';
+import { Status } from '@sentry/react';
+
 const Editor = () => {
+  const queryCache = useQueryClient();
+  const history = useHistory();
+
   // ****** HOOKS IMPLEMENTATION ******
   const {
     columns,
@@ -26,15 +31,15 @@ const Editor = () => {
     setTransactionsList,
     addRow,
     loading,
+    id,
     resetTransactions,
+    form,
   } = useTransaction();
-  const [form] = Form.useForm();
+
   const { notificationCallback } = useGlobalContext();
 
   const { mutate: mutateCreateTransaction, isLoading: creatingTransaction } =
     useMutation(createTransactionAPI);
-
-  const queryCache = useQueryClient();
 
   const totalDebits = (transactionsList.length &&
     transactionsList.reduce((a, b) => {
@@ -126,7 +131,9 @@ const Editor = () => {
         return { amount: a.amount + b.amount };
       });
 
-      const payload = {
+
+      let payload = {
+        isNewRecord: true,
         ...values,
         entries: {
           credits,
@@ -135,26 +142,46 @@ const Editor = () => {
         amount,
       };
 
+      if (id) {
+        payload = { ...payload, id, isNewRecord: false };
+      }
+
       try {
         if (totalDebits.amount === totalCredits.amount && true) {
           await mutateCreateTransaction(payload, {
             onSuccess: () => {
               resetTransactions();
               form.resetFields();
-              ['accounts', `transactions`]?.forEach((key) => {
-                (queryCache?.invalidateQueries as any)((q) =>
-                  q?.queryKey[0]?.toString().startsWith(key)
-                );
-              });
-
+              if (form.getFieldValue("status") === 2) {
+                [`transactions`]?.forEach((key) => {
+                  (queryCache?.invalidateQueries as any)((q) =>
+                    q?.queryKey[0]?.toString().startsWith(key)
+                  );
+                });
+              } else {
+                     [
+                  'accounts',
+                  `transactions`,
+                  `report-trialbalance`,
+                  `report-balance-sheet`,
+                ]?.forEach((key) => {
+                  (queryCache?.invalidateQueries as any)((q) =>
+                    q?.queryKey[0]?.toString().startsWith(key)
+                  );
+                });
+              }
               notificationCallback(
                 NOTIFICATIONTYPE.SUCCESS,
                 'Transaction Created'
               );
+              history.push(
+                `${ISupportedRoutes?.DASHBOARD_LAYOUT}${ISupportedRoutes?.CREATE_TRANSACTION}`
+              );
             },
           });
-        } else
-          throw {
+        }
+        else
+          throw{
             status: 501,
             message:
               "The Transaction Amount Are Not Seem's Equal Please Take A Look Again",
@@ -310,8 +337,16 @@ const Editor = () => {
 };
 
 export const TransactionsWidget = () => {
+  const { routeHistory } = useGlobalContext();
+  const { history } = routeHistory;
+
+  const id =
+    history &&
+    history?.location &&
+    history?.location?.pathname?.split('/app/journal-entry/')[1];
+
   return (
-    <TransactionManager>
+    <TransactionManager id={id}>
       <Editor />
     </TransactionManager>
   );

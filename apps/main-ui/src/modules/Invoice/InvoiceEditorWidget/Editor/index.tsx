@@ -10,6 +10,7 @@ import TextArea from 'antd/lib/input/TextArea';
 import dayjs from 'dayjs';
 import { FC, useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useHistory } from 'react-router-dom';
 
 import { getInvoiceNumber, InvoiceCreateAPI } from '../../../../api';
 import { create_update_contact } from '../../../../api/Contact';
@@ -26,6 +27,7 @@ import {
   IErrorMessages,
   IServerError,
   NOTIFICATIONTYPE,
+  ISupportedRoutes,
 } from '../../../../modal';
 import { IInvoiceType, ITaxTypes } from '../../../../modal/invoice';
 import { addition } from '../../../../utils/helperFunctions';
@@ -56,8 +58,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   const queryCache = useQueryClient();
   /* ************ HOOKS *************** */
   /* Component State Hooks */
-  const { routeHistory } = useGlobalContext();
-  const { history } = routeHistory;
+  const history = useHistory();
   const [printModal, setPrintModal] = useState(false);
   const [creditLimitModal, setCreditLimitModal] = useState({
     visibility: false,
@@ -90,8 +91,6 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     setBypassCreditLimit,
     rowsErrors,
   } = usePurchaseWidget();
-
-  console.log(rowsErrors, 'rows errors');
 
   const __columns =
     taxType === ITaxTypes.NO_TAX
@@ -190,7 +189,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
       await muatateCreateInvoice(payload, {
         onSuccess: (data) => {
           notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Invoice Created');
-
+          const { id: invoiceId } = data?.data?.result;
           if (value && value.status.print) {
             setPrintModal(true);
           }
@@ -210,6 +209,9 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           });
+          history.push(
+            `${ISupportedRoutes?.DASHBOARD_LAYOUT}${ISupportedRoutes?.INVOICES_VIEW}/${invoiceId}`
+          );
         },
         onError: (error: IServerError) => {
           if (error?.response?.data?.message) {
@@ -230,7 +232,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     ClearAll();
     if (id) {
       queryCache.removeQueries(`${type}-${id}-view`);
-      let route = history.location.pathname.split('/');
+      let route: any = history.location.pathname.split('/');
       if (route.length > 3) {
         const removeIndex = route.length - 1;
         route.splice(removeIndex, 1);
