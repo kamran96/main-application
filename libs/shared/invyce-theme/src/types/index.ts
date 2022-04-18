@@ -8,7 +8,6 @@ export interface IThemeVariables {
   $GRAY: string;
   $THEME_RED: string;
   $WHITE: string;
-
   $GRAY_LIGHT: string;
   $SIDEBAR: string;
   $CHECK_BOX: string;

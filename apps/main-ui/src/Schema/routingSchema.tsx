@@ -1,19 +1,3 @@
-// import bxUser from '@iconify-icons/bx/bx-user';
-// import bookOpen from '@iconify-icons/feather/book-open';
-// import dollarSign from '@iconify-icons/feather/dollar-sign';
-// import filePlus from '@iconify-icons/feather/file-plus';
-// import fileText from '@iconify-icons/feather/file-text';
-// import layersIcon from '@iconify-icons/feather/layers';
-// import shoppingCart from '@iconify-icons/icons8/shopping-cart';
-// import coinsIcon from '@iconify-icons/la/coins';
-// import fileInvoiceDollar from '@iconify-icons/la/file-invoice-dollar';
-// import viewDashboardOutline from '@iconify-icons/mdi/view-dashboard';
-// import analyticsIcon from '@iconify-icons/uil/analytics';
-// import gitMerge from '@iconify-icons/feather/git-merge';
-// import bxsReport from '@iconify-icons/bx/bxs-report';
-// import shoppingBag from '@iconify-icons/fe/shopping-bag';
-// import slidersIcon from '@iconify-icons/feather/sliders';
-// import billIcon from '@iconify-icons/uil/bill';
 import { IRoutingSchema, ISupportedRoutes } from '../modal';
 import { PERMISSIONS } from '../components/Rbac/permissions';
 import {
@@ -30,7 +14,8 @@ import {
   CreateInvoice,
   CreateContact,
   JournalEntry,
-  Dashboard
+  Dashboard,
+  DebitNote
 } from '../assets/icons/index';
 
 const root = `/app`;
@@ -227,7 +212,7 @@ export const RoutingSchema: IRoutingSchema = {
     {
       route: `${root}${ISupportedRoutes.ADD_DEBIT_NOTE}`,
       tag: 'Debit Note',
-      icon: <CreateNote/>,
+      icon: <DebitNote/>,
     },
   ],
 };
