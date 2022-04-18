@@ -9,6 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { ClientProxy } from '@nestjs/microservices';
 import * as bcrypt from 'bcryptjs';
+import * as crypto from 'crypto';
 import * as Moment from 'moment';
 import * as queryString from 'query-string';
 import * as os from 'os';
@@ -41,8 +42,13 @@ import { SendOtp, UserLoginDto, UserRegisterDto } from '../dto/user.dto';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-const generateRandomNDigits = (n) => {
-  return Math.floor(Math.random() * (9 * Math.pow(10, n))) + Math.pow(10, n);
+const generateRandomNDigits = () => {
+  let code = '';
+
+  while (code.length < 6) {
+    code += crypto.randomBytes(3).readUIntBE(0, 3);
+  }
+  return code.slice(0, 6);
 };
 
 const secret = speakeasy.generateSecret({
@@ -201,7 +207,8 @@ export class AuthService {
     if (!email) {
       const time = Moment(new Date()).add(1, 'h').calendar();
 
-      const generateOtp: number = generateRandomNDigits(4);
+      const generateOtp: string = generateRandomNDigits();
+
       parseInt(generateOtp as unknown as string);
 
       const user_token = new this.userTokenModel();
@@ -315,7 +322,7 @@ export class AuthService {
 
   async sendVerificationEmail(
     usr = null as SendOtp,
-    generateOtp = null as number,
+    generateOtp = null as string,
     userData = null as IBaseUser
   ): Promise<boolean> {
     const user = await this.userModel.findOne({ email: usr.email });
@@ -399,7 +406,8 @@ export class AuthService {
 
     const user = await this.userModel.findOne({ email: body.email });
 
-    const generateOtp: number = generateRandomNDigits(4);
+    const generateOtp: string = generateRandomNDigits();
+    console.log(generateOtp, 'otp');
     parseInt(generateOtp as unknown as string);
 
     const user_token = new this.userTokenModel();
@@ -416,7 +424,7 @@ export class AuthService {
 
     const user = await this.userModel.findOne({ email: usr.email });
 
-    const generateOtp: number = generateRandomNDigits(4);
+    const generateOtp: string = generateRandomNDigits();
     parseInt(generateOtp as unknown as string);
 
     const user_token = new this.userTokenModel();
