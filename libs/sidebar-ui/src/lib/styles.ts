@@ -108,37 +108,39 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
       color: ${(props: IThemeProps) =>
         props?.theme?.colors?.sidebarDefaultText};
 
-        span svg path{
-          stroke: ${(props: IThemeProps) => props?.theme?.colors?.sidebarDefaultText};
-        }
-        
+      span svg path {
+        stroke: ${(props: IThemeProps) =>
+          props?.theme?.colors?.sidebarDefaultText};
+      }
+
       &:hover {
         background: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarListActive};
         color: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarListActiveText};
 
-          span svg {
-            fill: #FFFFFF;
-            stroke: none;
+        span svg {
+          fill: #ffffff;
+          stroke: none;
 
-            path {
-              stroke: #FFFFFF;
-            } 
-            .BlackSpace{
-              stroke: #272525;
-            }
-            .fillTransparent{
-              fill: transparent;
-            }
-            .ReportColor{
-              stroke: ${(props: IThemeProps) =>
-                props?.theme?.colors?.sidebarListActiveText}
-            }
+          path {
+            stroke: #ffffff;
           }
+          .BlackSpace {
+            stroke: #272525;
+          }
+          .fillTransparent {
+            fill: transparent;
+          }
+          .BlackFill {
+            fill: #272525 !important;
+          }
+          .ReportColor {
+            stroke: ${(props: IThemeProps) =>
+              props?.theme?.colors?.sidebarListActiveText};
+          }
+        }
       }
-
-
     }
     .route_list_item {
       a {
@@ -149,30 +151,52 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
         color: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarDefaultText};
 
-       
-      span svg path{
-              stroke: ${(props: IThemeProps) => props?.theme?.colors?.sidebarDefaultText};
-            };
-      
+        span svg {
+          path {
+            stroke: ${(props: IThemeProps) =>
+              props?.theme?.colors?.sidebarDefaultText};
+          }
+
+          .ItemsIconsColor {
+            fill: ${(props: IThemeProps) =>
+              props?.theme?.theme === 'dark' ? 'transparent' : 'transparent'};
+          }
+
+          .itemStroke {
+            stroke: none;
+          }
+        }
+
         &:hover {
           background: ${(props: IThemeProps) =>
             props?.theme?.colors?.sidebarListActive};
           color: ${(props: IThemeProps) =>
             props?.theme?.colors?.sidebarListActiveText};
-            
-            span svg {
-              fill: #FFFFFF;
-              
-              path {
-                stroke: #FFFFFF;
-              } 
-              .BlackSpace{
-                stroke: #272525 !important;
-              }
-              .fillTransparent{
-                fill: transparent;
-              }
+
+          span svg {
+            fill: #ffffff;
+
+            path {
+              stroke: #ffffff;
             }
+            .BlackSpace {
+              stroke: #272525 !important;
+            }
+            .BlackFill {
+              fill: #272525 !important;
+            }
+            .itemStroke {
+              stroke: none;
+            }
+
+            .fillTransparent {
+              fill: transparent !important;
+            }
+
+            .fillItemColor {
+              fill: #ffffff !important;
+            }
+          }
         }
       }
     }
@@ -187,20 +211,29 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
       }
 
       span svg {
-        fill: ${(props: IThemeProps) =>
-          props?.theme?.colors?.sidebarListActiveText};
-        
-        // path {
-        //   stroke: #FFFFFF;
-        // } 
-        // .BlackSpace{
-        //   stroke: #272525 !important;
-        // }
-        .fillTransparent{
+        fill: #ffffff;
+
+        path {
+          stroke: #ffffff !important;
+        }
+        .BlackSpace {
+          stroke: #272525 !important;
+        }
+        .BlackFill {
+          fill: #272525 !important;
+        }
+        .itemStroke {
+          stroke: none;
+        }
+
+        .fillTransparent {
           fill: transparent;
         }
-      }
 
+        .fillItemColor {
+          fill: #ffffff !important;
+        }
+      }
     }
   }
 
