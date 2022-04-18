@@ -61,6 +61,13 @@ jobs:
       # docker build item service images
       - name: Build container image
         run: docker build -f $GITHUB_WORKSPACE/apps/users-service/Dockerfile -t registry.digitalocean.com/invyce-images/users-service:$(echo $GITHUB_SHA | head -c7) .
+        env: 
+          MONGO_URI: ${{ secrets.USER_MONGO_URI }}
+          PORT: ${{ secrets.USER_SERVICE_PORT }}
+          JWT_SECRET: ${ secrets.JWT_SECRET }
+          EXPIRES: ${{ secrets.EXPIRES }}
+          NODE_ENV: ${{ secrets.NODE_ENV }}
+
 
       #login to digitalocean for 1200 seconds
       - name: Log in to DigitalOcean Container Registry with short-lived credentials
