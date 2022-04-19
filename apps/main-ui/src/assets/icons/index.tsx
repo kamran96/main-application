@@ -2044,7 +2044,7 @@ export const CreateInvoice = ({ height = 20, width = 20 }) => {
       height={height}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 30.96 30.24"
-      style={{ strokeWidth: '0.5' }}
+      style={{ strokeWidth: '0.2' }}
     >
       <g id="Object">
         <path
@@ -2052,12 +2052,12 @@ export const CreateInvoice = ({ height = 20, width = 20 }) => {
           d="M29 10.25V25.3a3 3 0 0 1-2.8 3.07H4.07a2 2 0 0 1-2-2.12V4.57A2.94 2.94 0 0 1 4.9 1.5H20a2.69 2.69 0 0 1 2 .93l6.23 5.63a3.21 3.21 0 0 1 .77 2.19Z"
         />
         <path
-          className="BlackSpace BlackFill"
+          className="BlackSpace BlackFill ItemsFill"
           d="M22.48 19H21v-1.49a.71.71 0 0 0-1.42 0V19H18a.71.71 0 0 0 0 1.42h1.51V22A.71.71 0 0 0 21 22v-1.56h1.51a.71.71 0 0 0 0-1.42Z"
         />
-        <path d="M28.19 8.06 22 2.43a2.69 2.69 0 0 0-2-.93H4.9a2.94 2.94 0 0 0-2.79 3.07v21.68a2 2 0 0 0 2 2.12h22.13A3 3 0 0 0 29 25.3v-15a3.21 3.21 0 0 0-.81-2.24Zm-.57 17.24a1.55 1.55 0 0 1-1.38 1.7H4.07a.65.65 0 0 1-.54-.7V4.57A1.53 1.53 0 0 1 4.9 2.92H20a1.31 1.31 0 0 1 1 .51l6.24 5.63a1.83 1.83 0 0 1 .43 1.19Z" />
+        <path className='ItemsFill' d="M28.19 8.06 22 2.43a2.69 2.69 0 0 0-2-.93H4.9a2.94 2.94 0 0 0-2.79 3.07v21.68a2 2 0 0 0 2 2.12h22.13A3 3 0 0 0 29 25.3v-15a3.21 3.21 0 0 0-.81-2.24Zm-.57 17.24a1.55 1.55 0 0 1-1.38 1.7H4.07a.65.65 0 0 1-.54-.7V4.57A1.53 1.53 0 0 1 4.9 2.92H20a1.31 1.31 0 0 1 1 .51l6.24 5.63a1.83 1.83 0 0 1 .43 1.19Z" />
         <path
-          className="BlackFill BlackSpace"
+          className="BlackFill BlackSpace ItemsFill"
           d="M15.71 13.09H7.14a.71.71 0 0 1 0-1.42h8.57a.71.71 0 0 1 0 1.42ZM16.21 7.94H7.14a.71.71 0 0 1 0-1.42h9.07a.71.71 0 0 1 0 1.42ZM20.14 14.11a5.62 5.62 0 1 0 5.62 5.62 5.62 5.62 0 0 0-5.62-5.62Zm0 9.71a4.09 4.09 0 1 1 4.09-4.09 4.09 4.09 0 0 1-4.09 4.09Z"
         />
       </g>
@@ -2081,6 +2081,7 @@ export const CreatePo = ({ height = 20, width = 20 }) => {
         stroke-linejoin="round"
       />
       <path
+      className='fillTransparent'
         d="M3.82812 5.43738C3.88382 4.25471 4.40384 3.13847 5.28005 2.32078C6.15627 1.5031 7.32129 1.04688 8.53292 1.04688C9.74454 1.04688 10.9096 1.5031 11.7858 2.32078C12.662 3.13847 13.182 4.25471 13.2377 5.43738"
         stroke="#272525"
         stroke-linecap="round"
@@ -2111,7 +2112,7 @@ export const CreatePo = ({ height = 20, width = 20 }) => {
   );
 };
 
-export const CreateBill = ({ height = 22, width = 25 }) => {
+export const CreateBill = ({ height = 20, width = 20 }) => {
   return (
     <svg
       height={height}
@@ -2128,19 +2129,19 @@ export const CreateBill = ({ height = 22, width = 25 }) => {
         />
         <g id="Object-2" data-name="Object">
           <path
-            className="BlackFill BlackSpace"
+            className="BlackFill BlackSpace ItemsFill"
             d="M14.78 13a.75.75 0 0 0-.73-.74H7.82a.73.73 0 0 0-.65.82.74.74 0 0 0 .65.65h6.23a.73.73 0 0 0 .73-.73ZM7.82 8.08H17a.73.73 0 0 0 .65-.82.74.74 0 0 0-.65-.65H7.82a.73.73 0 0 0-.65.82.74.74 0 0 0 .65.65Z"
           />
           <path
-            className=""
+            className="ItemsFill"
             d="M26.18 1.43H7.83A5.13 5.13 0 0 0 2.7 6.56v20.05a2.19 2.19 0 0 0 2.2 2.2h16.65a2.19 2.19 0 0 0 2.2-2.2V6.06h5.6a.73.73 0 0 0 .73-.73 3.92 3.92 0 0 0-3.9-3.9Zm-3.9 3.9v21.28a.75.75 0 0 1-.73.74H4.91a.75.75 0 0 1-.73-.74v-20A3.67 3.67 0 0 1 7.8 2.89H23a3.87 3.87 0 0 0-.72 2.44Zm1.63-.74A2.45 2.45 0 0 1 25.35 3a3.25 3.25 0 0 1 .65-.13h.21a2.44 2.44 0 0 1 2.32 1.7Z"
           />
           <path
-            className=" BlackFill BlackSpace"
+            className=" BlackFill BlackSpace ItemsFill"
             d="M17.4 20.25h-1.33v-1.32a.62.62 0 1 0-1.24 0v1.32h-1.32A.63.63 0 0 0 13 21a.64.64 0 0 0 .55.55h1.32v1.32a.62.62 0 0 0 1.24 0V21.5h1.29a.63.63 0 0 0 .55-.7.64.64 0 0 0-.55-.55Z"
           />
           <path
-            className="BlackFill BlackSpace"
+            className="BlackFill BlackSpace ItemsFill"
             d="M19.08 17.24a5.14 5.14 0 1 0 1.51 3.64 5.13 5.13 0 0 0-1.51-3.64Zm-3.61 7.53a3.9 3.9 0 1 1 3.9-3.9 3.91 3.91 0 0 1-3.9 3.9Z"
           />
         </g>
@@ -2250,25 +2251,26 @@ export const DebitNote = ({ height = 20, width = 20 }) => {
       width={width}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 30.96 30.24"
+      style={{ strokeWidth: '0.2' }}
     >
       <g id="Object">
         <path className='ItemsIconsColor fillItemColor'
           d="M29.74 3.25v20.62a5.29 5.29 0 0 1-5.28 5.28H5.59a4 4 0 0 1-4-4 .75.75 0 0 1 .76-.75H8.1V3.25A2.26 2.26 0 0 1 10.36 1h17.12a2.26 2.26 0 0 1 2.26 2.25Z"
         />
         <path
-          className="BlackFill BlackSpace"
+          className="BlackFill BlackSpace ItemsFill"
           d="M25.23 6.68a.76.76 0 0 0-.75-.76H13.54a.76.76 0 0 0 0 1.51h10.94a.76.76 0 0 0 .75-.75ZM24.48 11h-7.92a.76.76 0 0 0 0 1.51h7.92a.76.76 0 0 0 0-1.51Z"
         />
         <path
-          className=""
+          className="ItemsFill"
           d="M27.48 1H10.36A2.26 2.26 0 0 0 8.1 3.25v21.14H2.34a.75.75 0 0 0-.76.75 4 4 0 0 0 4 4h18.88a5.29 5.29 0 0 0 5.28-5.28V3.25A2.26 2.26 0 0 0 27.48 1ZM5.59 27.64a2.5 2.5 0 0 1-2.38-1.75H8a2.5 2.5 0 0 1-2.41 1.75Zm22.64-3.77a3.77 3.77 0 0 1-3.77 3.77H8.7a3.94 3.94 0 0 0 .9-2.5V3.25a.76.76 0 0 1 .76-.76h17.12a.76.76 0 0 1 .75.76Z"
         />
         <path
-          className="BlackFill BlackSpace"
+          className="BlackFill BlackSpace ItemsFill"
           d="M22.75 20.28h-1.36v-1.36a.64.64 0 0 0-1.27 0v1.36h-1.36a.64.64 0 0 0-.64.64.64.64 0 0 0 .64.64h1.36v1.36a.64.64 0 1 0 1.27 0v-1.36h1.36a.64.64 0 1 0 0-1.28Z"
         />
         <path
-          className="BlackFill BlackSpace"
+          className="BlackFill BlackSpace ItemsFill"
           d="M20.76 15.64A5.29 5.29 0 1 0 26 20.92a5.29 5.29 0 0 0-5.24-5.28Zm0 9.29a4 4 0 1 1 4-4 4 4 0 0 1-4 4Z"
         />
       </g>
