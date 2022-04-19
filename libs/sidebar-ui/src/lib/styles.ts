@@ -122,9 +122,11 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
         span svg {
           fill: #ffffff;
           stroke: none;
+          transition: 0.3s all ease-in-out;
 
           path {
             stroke: #ffffff;
+            transition: 0.3s all ease-in-out;
           }
           .BlackSpace {
             stroke: #272525;
@@ -165,6 +167,11 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
           .itemStroke {
             stroke: none;
           }
+
+          .ItemsFill {
+            fill: ${(props: IThemeProps) =>
+              props?.theme?.theme === 'dark' ? '#C2C2C2' : ''};
+          }
         }
 
         &:hover {
@@ -175,9 +182,11 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
 
           span svg {
             fill: #ffffff;
+            transition: 0.3s all ease-in-out;
 
             path {
               stroke: #ffffff;
+              transition: 0.3s all ease-in-out;
             }
             .BlackSpace {
               stroke: #272525 !important;
@@ -212,18 +221,22 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
 
       span svg {
         fill: #ffffff;
+        transition: 0.3s all ease-in-out;
 
         path {
           stroke: #ffffff !important;
+          transition: 0.3s all ease-in-out;
         }
         .BlackSpace {
           stroke: #272525 !important;
+          transition: 0.3s all ease-in-out;
         }
         .BlackFill {
           fill: #272525 !important;
         }
         .itemStroke {
           stroke: none;
+          transition: 0.3s all ease-in-out;
         }
 
         .fillTransparent {
@@ -232,6 +245,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
 
         .fillItemColor {
           fill: #ffffff !important;
+          transition: 0.3s all ease-in-out;
         }
       }
     }
