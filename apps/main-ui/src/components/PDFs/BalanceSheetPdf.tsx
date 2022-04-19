@@ -29,6 +29,10 @@ interface IProps {
   totals: {
     totalCredits: number;
     totalDebits: number;
+    closing_credits: number;
+    closing_debits: number;
+    opening_credits: number;
+    opening_debits: number;
   };
   balanceSheetData: {
     name: string;
@@ -72,7 +76,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   Debit: {
-    width: '55%',
+    width: '56%',
   },
   Credit: {
     width: '90%',
@@ -83,6 +87,7 @@ const styles = StyleSheet.create({
     borderTop: '1px solid #F4F4F4',
     borderBottom: '1px solid #F4F4F4',
     margin: '10px 0',
+    marginRight: '30px',
     padding: '12px 0',
     display: 'flex',
     justifyContent: 'space-between',
@@ -94,6 +99,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    fontSize: '8px',
   },
   filterTable: {
     display: 'flex',
@@ -106,7 +112,11 @@ const styles = StyleSheet.create({
     padding: '12px 0',
   },
   ItemName: {
-    width: '22%',
+    flex: '1 0 0',
+    padding: '12px 0',
+  },
+  ItemNameFilter: {
+    flex: '2.5 0 0',
     padding: '12px 0',
   },
   tableHeaderWidth: {
@@ -122,7 +132,24 @@ const styles = StyleSheet.create({
     padding: '12px 0',
   },
   totalCenter: {
-    marginLeft: '-50px',
+    marginLeft: '-75px',
+  },
+  boldText: {
+    fontWeight: 'bold',
+    fontSize: '10px',
+  },
+  itemDebit: {
+    flex: '1.5 0 0',
+  },
+  flextEnd: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: '12px 0',
+  },
+  marginRight: {
+    marginRight: '30px',
   },
 });
 
@@ -132,6 +159,15 @@ export const BalanceSheetPdf: FC<IProps> = ({
   searchquery,
   totals,
 }) => {
+  const {
+    totalCredits,
+    totalDebits,
+    closing_credits,
+    closing_debits,
+    opening_credits,
+    opening_debits,
+  } = totals;
+
   return (
     <PdfDocument>
       <PDFFontWrapper>
@@ -259,13 +295,46 @@ export const BalanceSheetPdf: FC<IProps> = ({
               </View>
             );
           })}
-          <View style={styles.totalFooter}>
-            <Text style={styles.LabelName}>Total</Text>
-            <Text style={styles.LabelName}>
-              {moneyFormat(totals?.totalDebits)}
+          <View
+            style={[
+              styles.boldText,
+              styles.filterTable,
+              searchquery?.date && styles.marginRight,
+            ]}
+          >
+            <Text
+              style={[
+                styles.ItemName,
+                !searchquery?.date && styles.tableHeaderWidth,
+                !searchquery?.date && styles.ItemNameFilter,
+                searchquery?.date && styles.itemDebit,
+              ]}
+            >
+              Total
             </Text>
-            <Text style={styles.LabelName}>
-              {moneyFormat(totals?.totalCredits)}
+            {searchquery?.date && (
+              <Fragment>
+                <Text style={styles.ItemName}>
+                  {moneyFormat(opening_debits.toFixed(2))}
+                </Text>
+                <Text style={styles.ItemName}>
+                  {moneyFormat(opening_credits.toFixed(2))}
+                </Text>
+                <Text style={styles.ItemName}>
+                  {moneyFormat(closing_debits.toFixed(2))}
+                </Text>
+                <Text style={styles.ItemName}>
+                  {moneyFormat(closing_credits.toFixed(2))}
+                </Text>
+              </Fragment>
+            )}
+            <Text
+              style={[styles.ItemName, !searchquery?.date && styles.itemDebit]}
+            >
+              {moneyFormat(totalDebits.toFixed(2))}
+            </Text>
+            <Text style={[styles.flextEnd]}>
+              {moneyFormat(totalCredits.toFixed(2))}
             </Text>
           </View>
         </View>

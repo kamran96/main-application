@@ -179,7 +179,7 @@ export const PermissionsLayout: FC = () => {
               <thead>
                 <tr>
                   <th>
-                    <p>Permissions</p>
+                    Permissions
                   </th>
                   {rolesList.map((item, index) => {
                     return <th key={index}>{item.name}</th>;
