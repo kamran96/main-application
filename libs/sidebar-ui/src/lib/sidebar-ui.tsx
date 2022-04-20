@@ -69,7 +69,6 @@ const MenuPopOver: FC<IPopOverProps> = ({ route }) => {
     </PopOverListWrapper>
   );
 
-  console.log(route.icon, "route");
 
   return (
     <>
@@ -111,10 +110,6 @@ export const SidebarUi: FC<SidebarUiProps> = ({
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const toggleCached: null | string = localStorage?.getItem('isToggle') || null;
-
-  // routes?.nestedRoutes?.map((parent, index) => {
-  //   console.log(parent, "parents")
-  // })
 
   useEffect(() => {
     if (toggleCached) {
