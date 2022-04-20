@@ -41,6 +41,7 @@ import {
   SEND_FORGOT_PASSWORD,
 } from '@invyce/send-email';
 import { PurchaseOrderRepository } from '../repositories/purchaseOrder.repository';
+import { QuotationRepository } from '../repositories/quotation.repository';
 
 dotenv.config();
 
@@ -1219,6 +1220,28 @@ export class InvoiceService {
       if (purchase_order) {
         const year = new Date().getFullYear();
         const n = purchase_order.invoiceNumber.split('-');
+        let m = parseInt(n[2]);
+        const o = (m += 1);
+        invoiceNo = `PO-${year}-${o}`;
+      } else {
+        invoiceNo = `PO-${new Date().getFullYear()}-1`;
+      }
+    } else if (type === InvTypes.QUOTATION) {
+      const [quotation] = await getCustomRepository(QuotationRepository).find({
+        where: {
+          organizationId: user.organizationId,
+          branchId: user.branchId,
+          invoiceNumber: ILike(`%QO-${new Date().getFullYear()}%`),
+        },
+        order: {
+          id: 'DESC',
+        },
+        take: 1,
+      });
+
+      if (quotation) {
+        const year = new Date().getFullYear();
+        const n = quotation.invoiceNumber.split('-');
         let m = parseInt(n[2]);
         const o = (m += 1);
         invoiceNo = `PO-${year}-${o}`;

@@ -29,6 +29,9 @@ import { PDFICON } from '../../../../components/Icons';
 import DUMMYLOGO from '../../../../assets/quickbook.png';
 import styled from 'styled-components';
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
+import { PERMISSIONS } from '../../../../components/Rbac/permissions';
+import { useRbac } from '../../../../components/Rbac/useRbac';
+import { TransactionItem } from '../../../../components/PDFs/TransactionSingleItemPdf';
 
 const DRAFTTransactionsList: FC = () => {
   const queryCache = useQueryClient();
@@ -42,7 +45,8 @@ const DRAFTTransactionsList: FC = () => {
   const [filterSchema, setFilterSchema] = useState(transactionsFilterSchema);
   const [confirmModal, setConfirmModal] = useState(false);
 
-  const { routeHistory, notificationCallback, userDetails } = useGlobalContext();
+  const { routeHistory, notificationCallback, userDetails } =
+    useGlobalContext();
   const { history } = routeHistory;
 
   const [transactionConfig, setTransactionsConfig] = useState({
@@ -53,6 +57,7 @@ const DRAFTTransactionsList: FC = () => {
     status: TransactionsStatus.DRAFT,
   });
 
+  const { rbac } = useRbac(null);
   const { mutate: mutateDeleteTrasaction, isLoading: isDeletingTransactions } =
     useMutation(deleteTransactionApiById);
   const { mutate: updateTransactionStatus, isLoading: isTransactionStatus } =
@@ -87,7 +92,6 @@ const DRAFTTransactionsList: FC = () => {
     logo: DUMMYLOGO,
     website,
   };
-
 
   useEffect(() => {
     if (history?.location?.search) {
@@ -177,7 +181,7 @@ const DRAFTTransactionsList: FC = () => {
   };
 
   const ApprovedDraftStatus = async (userId: number) => {
-     await updateTransactionStatus(userId, {
+    await updateTransactionStatus(userId, {
       onSuccess: () => {
         [
           'transactions, transactions?page',
@@ -248,7 +252,7 @@ const DRAFTTransactionsList: FC = () => {
   const renderCustomTopbar = () => {
     return (
       <WrapperTransactionCustomBar>
-         <PDFDownloadLinkWrapper
+        <PDFDownloadLinkWrapper
           document={
             <TransactionApprovePdf resultData={result} header={headerprops} />
           }
@@ -316,8 +320,6 @@ const DRAFTTransactionsList: FC = () => {
     return a - b;
   });
 
-
-
   return (
     <WrapperTransactionsList>
       <CommonTable
@@ -325,11 +327,25 @@ const DRAFTTransactionsList: FC = () => {
           expandedRowRender: (record, index) => {
             return (
               <>
+              <PDFDownloadLink
+                  document={
+                    <TransactionItem header={headerprops} resultData={record} />
+                  }
+                >
+                  <div className="flex alignCenter">
+                    <PDFICON className="flex alignCenter mr-5" />
+
+                    <span> Download PDF</span>
+                  </div>
+                </PDFDownloadLink>
+                
                 <PurchaseListTopbar
-                  // hideDeleteButton={!rbac.can(PERMISSIONS.INVOICES_DELETE)}
+                  hideDeleteButton={!rbac.can(PERMISSIONS.TRANSACTIONS_DELETE)}
                   disabled={false}
-                  isEditable={true}
-                  hasApproveButton={true}
+                  isEditable={rbac.can(PERMISSIONS.TRANSACTION_UPDATE)}
+                  hasApproveButton={rbac.can(
+                    PERMISSIONS.TRANSACTION_DRAFT_APPROVE
+                  )}
                   loading={isTransactionStatus}
                   onEdit={() => {
                     history.push(
@@ -340,8 +356,8 @@ const DRAFTTransactionsList: FC = () => {
                     setUserId(record?.id);
                     setConfirmModal(true);
                   }}
-                  onApprove={() =>{
-                    ApprovedDraftStatus(record?.id)
+                  onApprove={() => {
+                    ApprovedDraftStatus(record?.id);
                   }}
                 />
                 <TransactionItemTable
@@ -381,7 +397,6 @@ const DRAFTTransactionsList: FC = () => {
         type="delete"
         text="Are you sure want to delete selected Category?"
       />
-
     </WrapperTransactionsList>
   );
 };

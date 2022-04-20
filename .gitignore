@@ -110,3 +110,5 @@ buck-out/
 node_modules/
 
 apps/mobile-app-e2e/artifacts
+
+.scannerwork/
