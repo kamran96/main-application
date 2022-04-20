@@ -44,6 +44,7 @@ export const ItemsList: FC = () => {
     sortid: 'id',
     page_size: 20,
   });
+  const [sortedInfo, setSortedInfo] = useState(null);
   const { page, sortid, query, page_size } = itemsConfig;
   // const [mutateCheckEmail, resCheckEmail] = useMutation(uploadPdfAPI);
 
@@ -86,6 +87,25 @@ export const ItemsList: FC = () => {
         obj = { ...obj, [split[0]]: split[1] };
       });
       setItemsConfig({ ...itemsConfig, ...obj });
+
+      const filterType = history.location.search.split('&');
+      const filterIdType = filterType[1];
+      const filterOrder = filterType[4]?.split("=")[1];
+      
+      if(filterIdType?.includes("-")){
+         const fieldName = filterIdType?.split("=")[1].split("-")[1];
+         setSortedInfo({
+           order: filterOrder,
+           columnKey: fieldName
+         });
+      }
+      else{
+        const fieldName = filterIdType?.split("=")[1];
+        setSortedInfo({
+          order: filterOrder,
+          columnKey: fieldName
+        })
+      }
     }
   }, [history]);
 
@@ -130,6 +150,59 @@ export const ItemsList: FC = () => {
       keepPreviousData: true,
     }
   );
+
+
+  const handleItemsConfig = (pagination, filters, sorter: any, extra) => {
+    if (sorter.order === undefined) {
+      history.push(
+        `/app${ISupportedRoutes.ITEMS}?sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+      );
+      setItemsConfig({
+        ...itemsConfig,
+        sortid: 'id',
+        page: pagination.current,
+        page_size: pagination.pageSize,
+      });
+    } else {
+      if (sorter?.order === 'ascend') {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] > b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        // setItemsResponse({result: userData});
+      } else {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] < b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        // setItemsResponse({result: userData})
+      }
+      
+      setItemsConfig({
+        ...itemsConfig,
+        sortid:
+          sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field,
+      });
+      
+      history.push(
+        `/app${ISupportedRoutes.ITEMS}?sortid=${
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field
+        }&page=${pagination.current}&page_size=${
+          pagination.pageSize
+        }&filter=${sorter.order}&query=${query}`
+      );
+    }
+  }
 
   useEffect(() => {
     if (resolvedData && resolvedData.data && resolvedData.data.result) {
@@ -196,6 +269,7 @@ export const ItemsList: FC = () => {
       dataIndex: 'name',
       width: 300,
       key: 'name',
+      sorter: true,
       render: (data, row, index) => (
         <Link to={`/app${ISupportedRoutes.ITEMS}/${row.id}`}>{data}</Link>
       ),
@@ -210,11 +284,13 @@ export const ItemsList: FC = () => {
       title: 'Code',
       dataIndex: 'code',
       key: 'code',
+      sorter: true,
     },
     {
       title: 'Purchase Price',
       dataIndex: 'purchasePrice',
       key: 'purchasePrice',
+      sorter: true,
       render: (price, row, index) => {
         return (price && moneyFormat(price)) || '-';
       },
@@ -395,36 +471,7 @@ export const ItemsList: FC = () => {
           loading={isLoading}
           data={__data}
           columns={columns}
-          onChange={(pagination, filters, sorter: any, extra) => {
-            if (sorter.order === undefined) {
-              history.push(
-                `/app${ISupportedRoutes.ITEMS}?sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
-              );
-              setItemsConfig({
-                ...itemsConfig,
-                sortid: 'id',
-                page: pagination.current,
-                page_size: pagination.pageSize,
-              });
-            } else {
-              history.push(
-                `/app${ISupportedRoutes.ITEMS}?sortid=${
-                  sorter && sorter.order === 'descend'
-                    ? `-${sorter.field}`
-                    : sorter.field
-                }&page=${pagination.current}&page_size=${
-                  pagination.pageSize
-                }&query=${query}`
-              );
-              setItemsConfig({
-                ...itemsConfig,
-                sortid:
-                  sorter.order === 'descend'
-                    ? `-${sorter.field}`
-                    : sorter.field,
-              });
-            }
-          }}
+          onChange={handleItemsConfig}
           pagination={{
             showSizeChanger: true,
             pageSizeOptions: ['10', '20', '50', '100', '150'],
