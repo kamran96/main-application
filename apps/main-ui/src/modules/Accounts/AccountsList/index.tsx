@@ -170,11 +170,13 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         title: 'Code',
         dataIndex: 'code',
         key: 'code',
+        sorter: true,
       },
       {
         title: 'Account Head',
         dataIndex: 'name',
         key: 'name',
+        sorter: true,
         render: (data, row, index) => {
           return (
             <Link
@@ -190,30 +192,35 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         title: 'Type',
         dataIndex: 'secondaryName',
         key: 'secondaryName',
+        sorter: true,
       },
       {
         width: 100,
         title: 'Tax Rate',
         dataIndex: 'tax_rate',
         key: 'tax_rate',
+        sorter: true,
         render: (data) => <>{data ? data : '-'}</>,
       },
       {
         title: 'Total Debits',
         dataIndex: 'total_debits',
         key: 'total_debits',
+        sorter: true,
         render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
       },
       {
         title: 'Total Credits',
         dataIndex: 'total_credits',
         key: 'total_credits',
+        sorter: true,
         render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
       },
       {
         title: 'Balance',
         dataIndex: 'balance',
         key: 'balance',
+        sorter: true,
         render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
       },
     ],
@@ -305,6 +312,26 @@ export const AccountsList: FC<IProps> = ({ data }) => {
           pagination.pageSize
         }query=${query}`
       );
+      if (sorter?.order === 'ascend') {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] > b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        setResponse(prev =>({...prev,  result: userData}))
+      } else {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] < b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+       
+        setResponse(prev =>({...prev,  result: userData}))
+      }
       setAccountConfig({
         ...accountsConfig,
         page: pagination.current,

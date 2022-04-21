@@ -87,11 +87,11 @@ export const ItemsList: FC = () => {
         obj = { ...obj, [split[0]]: split[1] };
       });
       setItemsConfig({ ...itemsConfig, ...obj });
-
-      const filterType = history.location.search.split('&');
-      const filterIdType = filterType[1];
-      const filterOrder = filterType[4]?.split("=")[1];
       
+      const filterType = history.location.search.split('&');
+      const filterIdType = filterType[0];
+      const filterOrder = filterType[3]?.split("=")[1];
+
       if(filterIdType?.includes("-")){
          const fieldName = filterIdType?.split("=")[1].split("-")[1];
          setSortedInfo({
@@ -106,13 +106,16 @@ export const ItemsList: FC = () => {
           columnKey: fieldName
         })
       }
+      
     }
-  }, [history]);
+  }, [history, routeHistory?.location?.search]);
+
 
   const { data: allCategoriesData } = useQuery(
     [`all-categories`],
     getAllCategories
   );
+  
 
   const resolvedCategories: ICategory[] =
     (allCategoriesData &&
@@ -154,15 +157,17 @@ export const ItemsList: FC = () => {
 
   const handleItemsConfig = (pagination, filters, sorter: any, extra) => {
     if (sorter.order === undefined) {
-      history.push(
-        `/app${ISupportedRoutes.ITEMS}?sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
-      );
+     
       setItemsConfig({
         ...itemsConfig,
         sortid: 'id',
         page: pagination.current,
         page_size: pagination.pageSize,
       });
+
+      history.push(
+        `/app${ISupportedRoutes.ITEMS}?sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+      );
     } else {
       if (sorter?.order === 'ascend') {
         const userData = [...result].sort((a, b) => {
@@ -172,7 +177,11 @@ export const ItemsList: FC = () => {
             return -1;
           }
         });
-        // setItemsResponse({result: userData});
+        setSortedInfo({
+               order: sorter.order,
+               columnKey: sorter.columnKey
+             });
+        setItemsConfig(prev =>({...prev,  result: userData}))
       } else {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
@@ -181,17 +190,13 @@ export const ItemsList: FC = () => {
             return -1;
           }
         });
-        // setItemsResponse({result: userData})
+        setSortedInfo({
+          order: sorter.order,
+          columnKey: sorter.columnKey
+        });
+        setItemsConfig(prev =>({...prev,  result: userData}))
       }
-      
-      setItemsConfig({
-        ...itemsConfig,
-        sortid:
-          sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field,
-      });
-      
+
       history.push(
         `/app${ISupportedRoutes.ITEMS}?sortid=${
           sorter && sorter.order === 'descend'
@@ -201,6 +206,14 @@ export const ItemsList: FC = () => {
           pagination.pageSize
         }&filter=${sorter.order}&query=${query}`
       );
+
+      setItemsConfig({
+        ...itemsConfig,
+        sortid:
+          sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field,
+      });
     }
   }
 
@@ -270,6 +283,7 @@ export const ItemsList: FC = () => {
       width: 300,
       key: 'name',
       sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'name' && sortedInfo?.order,
       render: (data, row, index) => (
         <Link to={`/app${ISupportedRoutes.ITEMS}/${row.id}`}>{data}</Link>
       ),
@@ -285,12 +299,14 @@ export const ItemsList: FC = () => {
       dataIndex: 'code',
       key: 'code',
       sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'code' && sortedInfo?.order,
     },
     {
       title: 'Purchase Price',
       dataIndex: 'purchasePrice',
       key: 'purchasePrice',
       sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'purchasePrice' && sortedInfo?.order,
       render: (price, row, index) => {
         return (price && moneyFormat(price)) || '-';
       },
@@ -299,8 +315,8 @@ export const ItemsList: FC = () => {
       title: 'Sale Price',
       dataIndex: 'salePrice',
       key: 'salePrice',
-      sorter: false,
-      showSorterTooltip: false,
+      sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'salePrice' && sortedInfo?.order,
       render: (price, row, index) => {
         return (price && moneyFormat(price)) || '-';
       },
@@ -309,8 +325,8 @@ export const ItemsList: FC = () => {
       title: 'Item Type',
       dataIndex: 'itemType',
       key: 'itemType',
-      sorter: false,
-      showSorterTooltip: false,
+      sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'itemType' && sortedInfo?.order,
       render: (data, row, index) => {
         return (
           <div>
@@ -326,6 +342,8 @@ export const ItemsList: FC = () => {
     {
       title: 'Stock',
       dataIndex: 'showStock',
+      sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'showStock' && sortedInfo?.order,
       render: (data, row, index) => {
         return data ? data : '-';
       },
@@ -335,6 +353,8 @@ export const ItemsList: FC = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'purchasePrice' && sortedInfo?.order,
       render: (status) => {
         return status === 1 ? 'Active' : 'Deactive';
       },

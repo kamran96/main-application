@@ -167,11 +167,11 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
           .itemStroke {
             stroke: none;
           }
-
           .ItemsFill {
             fill: ${(props: IThemeProps) =>
               props?.theme?.theme === 'dark' ? '#C2C2C2' : ''};
           }
+         
         }
 
         &:hover {
@@ -201,7 +201,6 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
             .fillTransparent {
               fill: transparent !important;
             }
-
             .fillItemColor {
               fill: #ffffff !important;
             }
