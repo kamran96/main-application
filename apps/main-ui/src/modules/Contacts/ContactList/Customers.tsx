@@ -110,9 +110,7 @@ export const Customers: FC = () => {
 
   const handleContactsConfig = (pagination, filters, sorter: any, extra) => {
     if (sorter.order === undefined) {
-      history.push(
-        `/app${ISupportedRoutes.CONTACTS}?tabIndex=customers&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
-      );
+     
       setConfig({
         ...config,
         sortid: null,
@@ -120,6 +118,9 @@ export const Customers: FC = () => {
         page: pagination.current,
         page_size: pagination.pageSize,
       });
+      history.push(
+        `/app${ISupportedRoutes.CONTACTS}?tabIndex=customers&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+      );
     } else {
       if (sorter?.order === 'ascend') {
         const userData = [...contactsResponse].sort((a, b) => {

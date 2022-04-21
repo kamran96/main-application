@@ -25,6 +25,7 @@ import styled from 'styled-components';
 import { TransactionItem } from '../../../../components/PDFs/TransactionSingleItemPdf';
 
 const APPROVETransactionList: FC = () => {
+  const [sortedInfo, setSortedInfo] = useState(null);
   const [filterBar, setFilterbar] = useState<boolean>(false);
   const [{ result, pagination }, setResponse] = useState<IResponseTransactions>(
     {
@@ -86,6 +87,31 @@ const APPROVETransactionList: FC = () => {
       });
 
       setTransactionsConfig({ ...transactionConfig, ...obj });
+
+
+      const filterType = history.location.search.split('&');
+      const filterIdType = filterType[1];
+      const filterOrder = filterType[4]?.split("=")[1];
+      
+     
+
+      if(filterIdType?.includes("-")){
+         const fieldName = filterIdType?.split("=")[1].split("-")[1];
+         setSortedInfo({
+           order: filterOrder,
+           columnKey: fieldName
+         });
+         console.log(filterOrder, fieldName)
+      }
+      else{
+        const fieldName = filterIdType?.split("=")[1];
+        setSortedInfo({
+          order: filterOrder,
+          columnKey: fieldName
+        })
+        console.log(filterOrder, fieldName)
+      }
+      
     }
   }, [history]);
 
@@ -96,6 +122,7 @@ const APPROVETransactionList: FC = () => {
       page_size,
       query,
       status,
+      sortid,
     ],
     getAllTransactionsAPI,
     {
@@ -144,11 +171,14 @@ const APPROVETransactionList: FC = () => {
       title: 'Ref',
       dataIndex: 'ref',
       key: 'ref',
+      sorter: true,
+     sortOrder: sortedInfo?.columnKey === 'ref' && sortedInfo?.order,
     },
     {
       title: 'Date',
       dataIndex: 'date',
       key: 'date',
+      sorter: true,
       render: (data) => {
         return <>{dayjs(data).format(`MMMM D, YYYY h:mm A`)}</>;
       },
@@ -158,18 +188,21 @@ const APPROVETransactionList: FC = () => {
       title: 'Narration',
       dataIndex: 'narration',
       key: 'narration',
+      sorter: true,
       render: (data, row, index) => <>{data ? data : '-'}</>,
     },
     {
       title: 'Note',
       dataIndex: 'notes',
       key: 'notes',
+      sorter: true,
       render: (data, row, index) => <>{data ? data : '-'}</>,
     },
     {
       title: 'Amount',
       dataIndex: 'amount',
       key: 'amount',
+      sorter: true,
       render: (data, row, index) => <>{data ? moneyFormat(data) : '-'}</>,
     },
   ];
@@ -209,6 +242,7 @@ const APPROVETransactionList: FC = () => {
   };
 
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
+    console.log(sorter, "sorter")
     if (sorter.order === undefined) {
       setTransactionsConfig({
         ...transactionConfig,
@@ -216,10 +250,36 @@ const APPROVETransactionList: FC = () => {
         page: pagination.current,
         page_size: pagination.pageSize,
       });
-      console.log(transactionConfig, 'transaction');
       const route = `/app${ISupportedRoutes.TRANSACTIONS}?tabIndex=approve&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}`;
       history.push(route);
     } else {
+      if (sorter?.order === 'ascend') {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] > b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        // setSortedInfo({
+        //   order: sorter?.order,
+        //   columnKey: sorter?.field
+        // })
+        setResponse(prev =>({...prev,  result: userData}))
+      } else {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] < b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        // setSortedInfo({
+        //   order: sorter?.order,
+        //   columnKey: sorter?.field
+        // })
+        setResponse(prev =>({...prev,  result: userData}))
+      }
       setTransactionsConfig({
         ...transactionConfig,
         page: pagination.current,
@@ -227,12 +287,11 @@ const APPROVETransactionList: FC = () => {
         sortid:
           sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field,
       });
-      console.log(transactionConfig, 'transaction else');
       const route = `/app${
         ISupportedRoutes.TRANSACTIONS
       }?tabIndex=approve&sortid=${
-        sorter?.order === 'descend' ? -sorter?.field : sorter?.field
-      }&page=${pagination.current}&page_size=${pagination.pageSize}`;
+        sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}`;
       history.push(route);
     }
   };
