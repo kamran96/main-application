@@ -16,10 +16,10 @@ export const getAllAccountsAPI = ({ queryKey }: QueryKey) => {
   const sortid: string = queryKey[2];
   const page_size: number = queryKey[3];
   const query: string = queryKey[4];
-  let url = `${ACCOUNT.RAILS_LIST}?page_size=${page_size}&page_no=${page}&sort=${sortid}`;
-  // if (sortid) {
-  //   url = `${url}&sort=${sortid}`;
-  // }
+  let url = `${ACCOUNT.RAILS_LIST}?page_size=${page_size}&page_no=${page}`;
+  if (sortid && sortid !== null) {
+    url = `${url}&sort=${sortid}`;
+  }
 
   if (query) {
     url = `${url}&query=${query}`;
@@ -70,3 +70,4 @@ export const getAccountsByTypeAPI = ({ queryKey }: QueryKey) => {
 
 export const getAccountCodeAPI = (payload?: { id: number }) =>
   http?.post(`accounts/account/code`, payload);
+

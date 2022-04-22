@@ -23,7 +23,7 @@ import {
   ORDER_TYPE,
 } from '../../../modal/invoice';
 import { ISupportedRoutes } from '../../../modal/routing';
-import { PdfCols, _exportableCols } from './commonCol';
+import { useCols } from './commonCol';
 import InvoicesFilterSchema from './InvoicesFilterSchema';
 
 interface IProps {
@@ -34,7 +34,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
     query: '',
-    sortid: '',
+    sortid: 'id',
     page_size: 10,
   });
 
@@ -44,6 +44,8 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   const { history } = routeHistory;
   const [confirmModal, setConfirmModal] = useState(false);
   const { notificationCallback } = useGlobalContext();
+
+  const {PdfCols, _exportableCols} = useCols();
 
   useEffect(() => {
     if (routeHistory?.history?.location?.search) {
@@ -85,6 +87,8 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
 
   const { page, query, sortid, page_size } = allInvoicesConfig;
 
+
+
   const {
     isLoading,
     data: resolvedData,
@@ -98,6 +102,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
       page,
       page_size,
       query,
+      sortid
     ],
     getInvoiceListAPI,
     {
@@ -122,6 +127,63 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
       setAllInvoicesRes({ ...resolvedData.data, result: newResult });
     }
   }, [resolvedData]);
+  
+  //handleChangePaginations
+
+  const onChangePagination = (pagination, filters, sorter: any, extra) => {
+    console.log(sorter, "sorter")
+    if (sorter.order === undefined) {
+      setAllInvoicesConfig({
+        ...allInvoicesConfig,
+        sortid: 'id',
+        page: pagination.current,
+        page_size: pagination.pageSize,
+      });
+      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+      history.push(route);
+    } else {
+      if (sorter?.order === 'ascend') {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] > b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        
+        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+      } else {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] < b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        
+        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+      }
+      setAllInvoicesConfig({
+        ...allInvoicesConfig,
+        page: pagination.current,
+        page_size: pagination.pageSize,
+        sortid:
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field,
+      });
+      const route = `/app${
+        ISupportedRoutes.INVOICES
+      }?tabIndex=all&sortid=${
+        sorter && sorter.order === 'descend'
+          ? `-${sorter.field}`
+          : sorter.field
+      }&page=${pagination.current}&page_size=${
+        pagination.pageSize
+      }&filter=${sorter.order}&query=${query}`;
+      history.push(route);
+    }
+  }
 
   /* Function select rows and to set selectedRow state */
 
@@ -227,38 +289,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
         data={result}
         columns={columns}
         loading={isFetching || isLoading}
-        onChange={(pagination, filters, sorter: any, extra) => {
-          if (sorter.order === undefined) {
-            setAllInvoicesConfig({
-              ...allInvoicesConfig,
-              sortid: null,
-              page: pagination.current,
-              page_size: pagination.pageSize,
-            });
-            const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
-            history.push(route);
-          } else {
-            setAllInvoicesConfig({
-              ...allInvoicesConfig,
-              page: pagination.current,
-              page_size: pagination.pageSize,
-              sortid:
-                sorter && sorter.order === 'descend'
-                  ? `-${sorter.field}`
-                  : sorter.field,
-            });
-            const route = `/app${
-              ISupportedRoutes.INVOICES
-            }?tabIndex=all&sortid=null&page=${pagination.current}&page_size=${
-              pagination.pageSize
-            }&query=${query}&sortid=${
-              sorter && sorter.order === 'descend'
-                ? `-${sorter.field}`
-                : sorter.field
-            }`;
-            history.push(route);
-          }
-        }}
+        onChange={onChangePagination}
         totalItems={pagination && pagination.total}
         pagination={{
           pageSize: page_size,

@@ -101,7 +101,6 @@ const APPROVETransactionList: FC = () => {
            order: filterOrder,
            columnKey: fieldName
          });
-         console.log(filterOrder, fieldName)
       }
       else{
         const fieldName = filterIdType?.split("=")[1];
@@ -109,7 +108,6 @@ const APPROVETransactionList: FC = () => {
           order: filterOrder,
           columnKey: fieldName
         })
-        console.log(filterOrder, fieldName)
       }
       
     }
@@ -179,6 +177,7 @@ const APPROVETransactionList: FC = () => {
       dataIndex: 'date',
       key: 'date',
       sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'date' && sortedInfo?.order,
       render: (data) => {
         return <>{dayjs(data).format(`MMMM D, YYYY h:mm A`)}</>;
       },
@@ -189,6 +188,7 @@ const APPROVETransactionList: FC = () => {
       dataIndex: 'narration',
       key: 'narration',
       sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'narration' && sortedInfo?.order,
       render: (data, row, index) => <>{data ? data : '-'}</>,
     },
     {
@@ -196,6 +196,7 @@ const APPROVETransactionList: FC = () => {
       dataIndex: 'notes',
       key: 'notes',
       sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'notes' && sortedInfo?.order,
       render: (data, row, index) => <>{data ? data : '-'}</>,
     },
     {
@@ -203,6 +204,7 @@ const APPROVETransactionList: FC = () => {
       dataIndex: 'amount',
       key: 'amount',
       sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'amount' && sortedInfo?.order,
       render: (data, row, index) => <>{data ? moneyFormat(data) : '-'}</>,
     },
   ];

@@ -15,7 +15,7 @@ import editSolid from '@iconify-icons/clarity/edit-solid';
 import { SmartFilter } from '../../../components/SmartFilter';
 import { PDFICON } from '../../../components/Icons';
 import FilteringSchema from './FilteringSchema';
-import columns, { pdfCols } from './commonCols';
+import {useCols} from './commonCols';
 
 export const DraftDebitNotes: FC = () => {
   /* HOOKS HERE */
@@ -36,9 +36,11 @@ export const DraftDebitNotes: FC = () => {
     page: 1,
     pageSize: 20,
     query: '',
+    sortid: 'id'
   });
-  const { page, pageSize, query } = creditNoteConfig;
+  const { page, pageSize, sortid, query } = creditNoteConfig;
 
+  const {columns, pdfCols } = useCols();
   /* LOCAL STATE ENDS HERE */
 
   /* API CALLS STACKS GOES HERE */
@@ -51,6 +53,7 @@ export const DraftDebitNotes: FC = () => {
       pageSize,
       IInvoiceType.DEBITNOTE,
       query,
+      sortid
     ],
     getCreditNotes,
     {
@@ -73,6 +76,54 @@ export const DraftDebitNotes: FC = () => {
       setFilteringSchema(schema);
     }
   }, [contactsData, FilteringSchema]);
+
+
+  const onChangePagination = (pagination, filters, sorter: any, extra) => {
+    if(sorter.order === undefined){
+      setCreditNoteConfig({
+        ...creditNoteConfig,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        sortid: 'id'
+      });
+      const route = `/app${ISupportedRoutes.DEBIT_NOTES}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+      history.push(route);
+    }else{
+      if (sorter?.order === 'ascend') {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] > b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        
+        setCreditNoteResponse(prev =>({...prev,  result: userData}))
+      } else {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] < b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        
+        setCreditNoteResponse(prev =>({...prev,  result: userData}))
+      }
+      setCreditNoteConfig({
+        ...creditNoteConfig,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        sortid: sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field,
+      });
+      const route = `/app${ISupportedRoutes.DEBIT_NOTES}?tabIndex=draft&sortid=${
+        sorter && sorter.order === 'descend'
+          ? `-${sorter.field}`
+          : sorter.field
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      history.push(route);
+    }
+  }
 
   /* PAGINATED QUERY TO FETCH CREDIT NOTES WITH PAGINATION */
   /* API CALLS STACKS ENDS HERE */
@@ -151,15 +202,7 @@ export const DraftDebitNotes: FC = () => {
         topbarRightPannel={renderTopbarRight()}
         exportable
         printTitle={'Draft Debit Notes'}
-        onChange={(pagination, filters, sorter: any, extra) => {
-          setCreditNoteConfig({
-            ...creditNoteConfig,
-            page: pagination.current,
-            pageSize: pagination.pageSize,
-          });
-          const route = `/app${ISupportedRoutes.DEBIT_NOTES}?tabIndex=draft&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
-          history.push(route);
-        }}
+        onChange={onChangePagination}
         pagination={{
           pageSize: pageSize,
           position: ['bottomRight'],
