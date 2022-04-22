@@ -16,13 +16,13 @@ export const getAllTransactionsAPI = ({ queryKey }: QueryKey) => {
   const query: string = queryKey[3];
   const status: number = queryKey[4];
   const sortid: string = queryKey[5];
-  let url = `${TRANSACTION.INDEX}?page_size=${pageSize}&page_no=${page}&sort=${sortid}&status=${status}`;
+  let url = `${TRANSACTION.INDEX}?page_size=${pageSize}&page_no=${page}&status=${status}`;
   if (query) {
     url = `${url}&query=${query}`;
   }
-  // if (sortid) {
-  //   url = `${url}&sort=${sortid}`;
-  // }
+  if (sortid && sortid !== null) {
+    url = `${url}&sort=${sortid}`;
+  }
 
   return http.get(url);
 };

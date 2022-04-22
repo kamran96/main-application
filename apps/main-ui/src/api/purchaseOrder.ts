@@ -10,10 +10,16 @@ export const purchaseOrderList = ({ queryKey }: QueryKey) => {
   const page: number = queryKey[3];
   const pageSize: number = queryKey[4];
   const query: string = queryKey[5];
+  const sortid: string = queryKey[6];
   let url = `invoices/purchase-order?page_size=${pageSize}&page_no=${page}&status=${status}&type=${type}`;
   if (query) {
     url = `${url}&query=${query}`;
   }
+
+  if(sortid && sortid!== null){
+    url = `${url}&sort=${sortid}`;
+  }
+
   return http.get(url);
 };
 

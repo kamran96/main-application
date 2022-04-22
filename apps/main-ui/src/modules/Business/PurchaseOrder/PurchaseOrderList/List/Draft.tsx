@@ -24,7 +24,7 @@ import {
   ORDER_TYPE,
 } from '../../../../../modal/invoice';
 import { ISupportedRoutes } from '../../../../../modal/routing';
-import { pdfColsPO, _csvColumns } from './CommonCol';
+import { useCols } from './CommonCol';
 import FilterSchema from './PoFilterSchema';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
 
@@ -46,10 +46,11 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
     query: '',
-    sortid: '',
+    sortid: 'id',
     pageSize: 10,
   });
   const { page, query, sortid, pageSize } = allInvoicesConfig;
+  const {pdfColsPO, _csvColumns} = useCols();
   const { rbac } = useRbac(null);
 
   const [confirmModal, setConfirmModal] = useState(false);
@@ -122,12 +123,64 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
       page,
       pageSize,
       query,
+      sortid
     ],
     purchaseOrderList,
     {
       keepPreviousData: true,
     }
   );
+
+
+  const onChangePagination = (pagination, filters, sorter: any, extra) => {
+    if (sorter.order === undefined) {
+      setAllInvoicesConfig({
+        ...allInvoicesConfig,
+        sortid: 'id',
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+      });
+      const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+      history.push(route);
+    } else {
+      if (sorter?.order === 'ascend') {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] > b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        
+        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+      } else {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] < b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        
+        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+      }
+      setAllInvoicesConfig({
+        ...allInvoicesConfig,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        sortid:
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field,
+      });
+      const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=draft&sortid=${
+        sorter && sorter.order === 'descend'
+          ? `-${sorter.field}`
+          : sorter.field
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      history.push(route);
+    }
+  }
 
   /* ********** METHODS HERE *************** */
   /* ************** ASYNC FUNCTION IS TO  DELETE ORDER ******** */
@@ -249,26 +302,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
         data={result}
         columns={cols}
         loading={isFetching || isLoading}
-        onChange={(pagination, filters, sorter: any, extra) => {
-          if (sorter.order === undefined) {
-            setAllInvoicesConfig({
-              ...allInvoicesConfig,
-              sortid: null,
-              page: pagination.current,
-              pageSize: pagination.pageSize,
-            });
-          } else {
-            setAllInvoicesConfig({
-              ...allInvoicesConfig,
-              page: pagination.current,
-              pageSize: pagination.pageSize,
-              sortid:
-                sorter && sorter.order === 'descend'
-                  ? `-${sorter.field}`
-                  : sorter.field,
-            });
-          }
-        }}
+        onChange={onChangePagination}
         totalItems={pagination && pagination.total}
         pagination={{
           showSizeChanger: true,
