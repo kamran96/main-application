@@ -13,3 +13,11 @@ export const BOLDTEXT = styled.span`
   padding: 0;
   font-weight: 600;
 `;
+
+export const MeduimText = styled.span`
+margin: 0;
+padding: 0;
+font-weight: 600;
+font-size: 13px
+`;
+

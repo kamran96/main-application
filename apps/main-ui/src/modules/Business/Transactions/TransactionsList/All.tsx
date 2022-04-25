@@ -22,6 +22,7 @@ import { TransactionApprovePdf } from '../../../../components/PDFs/TransactionAp
 import { PDFICON } from '../../../../components/Icons';
 import DUMMYLOGO from '../../../../assets/quickbook.png';
 import styled from 'styled-components';
+import { TransactionItem } from '../../../../components/PDFs/TransactionSingleItemPdf';
 
 const APPROVETransactionList: FC = () => {
   const [filterBar, setFilterbar] = useState<boolean>(false);
@@ -253,10 +254,24 @@ const APPROVETransactionList: FC = () => {
         expandable={{
           expandedRowRender: (record, index) => {
             return (
+              <>
+              <PDFDownloadLink
+                  document={
+                    <TransactionItem header={headerprops} resultData={record} />
+                  }
+                >
+                  <div className="flex alignCenter">
+                    <PDFICON className="flex alignCenter mr-5" />
+
+                    <span> Download PDF</span>
+                  </div>
+                </PDFDownloadLink>
+                  <br/>
               <TransactionItemTable
                 allAccounts={accountsResponse}
                 data={record.transactionItems}
               />
+              </>
             );
           },
         }}

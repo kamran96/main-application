@@ -21,6 +21,7 @@ interface IProps {
   hasApproveButton?: boolean;
   hideDeleteButton?: boolean;
   loading?: boolean;
+  hasDownloadPdf?: boolean;
 }
 
 export const PurchaseListTopbar: FC<IProps> = ({
@@ -32,7 +33,8 @@ export const PurchaseListTopbar: FC<IProps> = ({
   isEditable,
   hasApproveButton,
   hideDeleteButton,
-  loading
+  loading,
+  hasDownloadPdf
 }) => {
   return (
     <WrapperPurchaseTopbar className="flex alignCenter justifySpaceBetween">
@@ -101,6 +103,7 @@ export const PurchaseListTopbar: FC<IProps> = ({
           //   Delete
           // </Button>
         )}
+        
         {/* <Button
           disabled={disabled}
           onClick={onEmail}

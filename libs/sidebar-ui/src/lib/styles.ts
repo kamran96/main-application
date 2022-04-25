@@ -107,11 +107,41 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
       transition: 0.3s all ease-in-out;
       color: ${(props: IThemeProps) =>
         props?.theme?.colors?.sidebarDefaultText};
+
+      span svg path {
+        stroke: ${(props: IThemeProps) =>
+          props?.theme?.colors?.sidebarDefaultText};
+      }
+
       &:hover {
         background: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarListActive};
         color: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarListActiveText};
+
+        span svg {
+          fill: #ffffff;
+          stroke: none;
+          transition: 0.3s all ease-in-out;
+
+          path {
+            stroke: #ffffff;
+            transition: 0.3s all ease-in-out;
+          }
+          .BlackSpace {
+            stroke: #272525;
+          }
+          .fillTransparent {
+            fill: transparent;
+          }
+          .BlackFill {
+            fill: #272525 !important;
+          }
+          .ReportColor {
+            stroke: ${(props: IThemeProps) =>
+              props?.theme?.colors?.sidebarListActiveText};
+          }
+        }
       }
     }
     .route_list_item {
@@ -123,11 +153,59 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
         color: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarDefaultText};
 
+        span svg {
+          path {
+            stroke: ${(props: IThemeProps) =>
+              props?.theme?.colors?.sidebarDefaultText};
+          }
+
+          .ItemsIconsColor {
+            fill: ${(props: IThemeProps) =>
+              props?.theme?.theme === 'dark' ? 'transparent' : 'transparent'};
+          }
+
+          .itemStroke {
+            stroke: none;
+          }
+
+          .ItemsFill {
+            fill: ${(props: IThemeProps) =>
+              props?.theme?.theme === 'dark' ? '#C2C2C2' : ''};
+          }
+        }
+
         &:hover {
           background: ${(props: IThemeProps) =>
             props?.theme?.colors?.sidebarListActive};
           color: ${(props: IThemeProps) =>
             props?.theme?.colors?.sidebarListActiveText};
+
+          span svg {
+            fill: #ffffff;
+            transition: 0.3s all ease-in-out;
+
+            path {
+              stroke: #ffffff;
+              transition: 0.3s all ease-in-out;
+            }
+            .BlackSpace {
+              stroke: #272525 !important;
+            }
+            .BlackFill {
+              fill: #272525 !important;
+            }
+            .itemStroke {
+              stroke: none;
+            }
+
+            .fillTransparent {
+              fill: transparent !important;
+            }
+
+            .fillItemColor {
+              fill: #ffffff !important;
+            }
+          }
         }
       }
     }
@@ -139,6 +217,36 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
       a {
         color: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarListActiveText};
+      }
+
+      span svg {
+        fill: #ffffff;
+        transition: 0.3s all ease-in-out;
+
+        path {
+          stroke: #ffffff !important;
+          transition: 0.3s all ease-in-out;
+        }
+        .BlackSpace {
+          stroke: #272525 !important;
+          transition: 0.3s all ease-in-out;
+        }
+        .BlackFill {
+          fill: #272525 !important;
+        }
+        .itemStroke {
+          stroke: none;
+          transition: 0.3s all ease-in-out;
+        }
+
+        .fillTransparent {
+          fill: transparent;
+        }
+
+        .fillItemColor {
+          fill: #ffffff !important;
+          transition: 0.3s all ease-in-out;
+        }
       }
     }
   }
@@ -285,6 +393,7 @@ export const PopupGlobalStyles = createGlobalStyle`
 .open_popover{
   z-index: 1111 !important;
   width: 199px !important;
+  
 }
 
 `;
