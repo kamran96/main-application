@@ -12,6 +12,9 @@ export const PERMISSIONS = {
   TRANSACTIONS_CREATE: 'transactions/create',
   TRANSACTIONS_INDEX: 'transactions/index',
   TRANSACTIONS_SHOW: 'transactions/show',
+  TRANSACTIONS_DELETE: 'transactions/delete',
+  TRANSACTION_DRAFT_APPROVE: 'transactions/draft-approve',
+  TRANSACTION_UPDATE: 'transactions/update',
 
   // users
   USERS_LIST: 'users/list',

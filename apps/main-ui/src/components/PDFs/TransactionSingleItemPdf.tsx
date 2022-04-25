@@ -1,9 +1,9 @@
-import React, { FC, Fragment } from 'react';
-import { ITransactionResult } from '../../modal/transaction';
+import React, { FC } from 'react'
 import { StyleSheet, View, Text, Font } from '@react-pdf/renderer';
 import moneyFormat from '../../utils/moneyFormat';
 import { PdfDocument } from './PdfDocument';
 import { PDFFontWrapper } from './PDFFontWrapper';
+import { ITransactionResult } from '../../modal/transaction';
 import { PDFHeader } from './pdf-header';
 import dayjs from 'dayjs';
 
@@ -21,8 +21,8 @@ interface IPropsHeader {
 }
 
 interface IProps {
-  header: IPropsHeader;
-  resultData: ITransactionResult[];
+    header: IPropsHeader;
+    resultData: ITransactionResult;
 }
 
 const styles = StyleSheet.create({
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     color: '#272727',
-    fontSize: '9px',
+    fontSize: '8px',
     marginHorizontal: '15px',
     borderLeft: '1px solid #F4F4F4',
     borderRight: '1px solid #F4F4F4',
@@ -81,12 +81,22 @@ const styles = StyleSheet.create({
   },
 });
 
-export const TransactionApprovePdf: FC<IProps> = ({ header, resultData }) => {
+export const TransactionItem:FC<IProps> = ({header, resultData}) => {
+    
+    const debit = resultData.transactionItems.filter(
+        (item) => item.transactionType === 10
+      );
+      const credit = resultData.transactionItems.filter(
+        (item) => item.transactionType === 20
+      );
+    
   return (
     <PdfDocument>
-      <PDFFontWrapper>
-        <PDFHeader {...header} />
-        <View style={styles.container}>
+        <PDFFontWrapper>
+            <PDFHeader {...header}/>
+           
+            <View style={styles.container}>
+          
           <View style={styles.tableHeader}>
             <Text style={styles.tableItemOthers}>Date</Text>
             <Text style={styles.tableItemParticular}>Particulars</Text>
@@ -95,18 +105,10 @@ export const TransactionApprovePdf: FC<IProps> = ({ header, resultData }) => {
             <Text style={styles.tableItemOthers}>Credit</Text>
           </View>
 
-          {resultData.map((item, index) => {
-            const debit = item.transactionItems.filter(
-              (item) => item.transactionType === 10
-            );
-            const credit = item.transactionItems.filter(
-              (item) => item.transactionType === 20
-            );
-
-            return (
+                      
               <View style={styles.tableBody}>
                 <Text style={styles.tableItemOthers}>
-                  {dayjs(item.date).format(`MMMM D, YYYY`)}
+                  {dayjs(resultData.date).format(`MMMM D, YYYY`)}
                 </Text>
 
                 <View style={styles.tableItemParticular}>
@@ -125,10 +127,10 @@ export const TransactionApprovePdf: FC<IProps> = ({ header, resultData }) => {
                       </Text>
                     );
                   })}
-                  <Text style={styles.narration}>({item.narration})</Text>
+                  <Text style={styles.narration}>({resultData.narration})</Text>
                 </View>
 
-                <Text style={styles.tableItemOthers}>{item.ref}</Text>
+                <Text style={styles.tableItemOthers}>{resultData.ref}</Text>
 
                 <View style={styles.tableItemOthers}>
                   {debit.map((debitItem) => {
@@ -150,10 +152,9 @@ export const TransactionApprovePdf: FC<IProps> = ({ header, resultData }) => {
                   })}
                 </View>
               </View>
-            );
-          })}
         </View>
-      </PDFFontWrapper>
+
+        </PDFFontWrapper>
     </PdfDocument>
-  );
-};
+   )
+ }
