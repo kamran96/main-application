@@ -111,6 +111,9 @@ export class InvoiceService {
             },
             skip: pn * ps - ps,
             take: ps,
+            order: {
+              [sort_column]: sort_order,
+            },
             relations: ['transactionItems', 'transactionItems.account'],
           });
         } else if (data[i].type === 'compare') {
@@ -123,6 +126,9 @@ export class InvoiceService {
             },
             skip: pn * ps - ps,
             take: ps,
+            order: {
+              [sort_column]: sort_order,
+            },
             relations: ['transactionItems', 'transactionItems.account'],
           });
         } else if (data[i].type === 'date-between') {
@@ -137,6 +143,9 @@ export class InvoiceService {
             },
             skip: pn * ps - ps,
             take: ps,
+            order: {
+              [sort_column]: sort_order,
+            },
             relations: ['transactionItems', 'transactionItems.account'],
           });
         }
