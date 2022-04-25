@@ -144,6 +144,7 @@ export class AccountsService {
             .leftJoin('sa.primaryAccount', 'pa')
             .groupBy('a.id, pa.name, pa.id, sa.id ')
             .offset(pn * ps - ps)
+            .orderBy({ [sort_column]: sort_order })
             .limit(ps)
             .getRawMany();
         }
