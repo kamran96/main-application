@@ -18,6 +18,7 @@ import {
   IContactWithResponse,
 } from '@invyce/interfaces';
 import { ContactDto, ContactIds } from '../dto/contact.dto';
+import { Sorting } from '@invyce/sorting';
 import { CONTACT_CREATED } from '@invyce/send-email';
 
 @Injectable()
@@ -32,11 +33,20 @@ export class ContactService {
     req: IRequest,
     queryData: IPage
   ): Promise<IContactWithResponse> {
-    const { page_size, page_no, query, purpose, type: contactType } = queryData;
+    const {
+      page_size,
+      page_no,
+      query,
+      purpose,
+      sort,
+      type: contactType,
+    } = queryData;
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
 
     let contacts;
+
+    const { sort_column, sort_order } = await Sorting(sort);
 
     if (purpose === 'ALL') {
       contacts = await this.contactModel.find({
@@ -71,6 +81,7 @@ export class ContactService {
               {
                 offset: pn * ps - ps,
                 limit: ps,
+                sort: { [sort_column]: sort_order },
                 customLabels: myCustomLabels,
               }
             );
@@ -88,6 +99,7 @@ export class ContactService {
               {
                 offset: pn * ps - ps,
                 limit: ps,
+                sort: { [sort_column]: sort_order },
                 customLabels: myCustomLabels,
               }
             );
@@ -101,6 +113,7 @@ export class ContactService {
               {
                 offset: pn * ps - ps,
                 limit: ps,
+                sort: { [sort_column]: sort_order },
                 customLabels: myCustomLabels,
               }
             );
@@ -114,6 +127,7 @@ export class ContactService {
               {
                 offset: pn * ps - ps,
                 limit: ps,
+                sort: { [sort_column]: sort_order },
                 customLabels: myCustomLabels,
               }
             );
@@ -127,6 +141,7 @@ export class ContactService {
               {
                 offset: pn * ps - ps,
                 limit: ps,
+                sort: { [sort_column]: sort_order },
                 customLabels: myCustomLabels,
               }
             );
@@ -153,6 +168,7 @@ export class ContactService {
           {
             offset: pn * ps - ps,
             limit: ps,
+            sort: { [sort_column]: sort_order },
             customLabels: myCustomLabels,
           }
         );
