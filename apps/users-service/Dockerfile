@@ -12,6 +12,9 @@ ENV NODE_ENV production
 ARG PORT
 USER node
 
+ARG APP=app
+ARG HOME=/home/node
+
 ENV MONGO_URI=mongodb+srv://contacts:fYnc4.ZPdz378t4@cluster0.hiwqy.mongodb.net/users?retryWrites=true&w=majority \
     GOOGLE_CLIENT_ID=739410132871-45r2feessjs5l5rtbk1kekr5t78aa7ee.apps.googleusercontent.com \
     GOOGLE_CLIENT_SECRET=ckcvOhikVvHBi7BeU7n2YzKc \
