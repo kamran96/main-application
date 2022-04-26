@@ -21,13 +21,14 @@ ENV MONGO_URI=mongodb+srv://contacts:fYnc4.ZPdz378t4@cluster0.hiwqy.mongodb.net/
     JWT_SECRET=alalsdflasjlf343424 \
     PORT=3334
 
+
 WORKDIR /home/node/app
 
 # change permissions to the node_modules folder
 COPY --chown=node:node --from=build /app /home/node/app/node_modules
 COPY --chown=node:node ./dist/apps/users-service /home/node/app
 
-RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express
+RUN yarn add reflect-metadata tslib rxjs @nestjs/platform-express
 
 EXPOSE ${PORT}
 CMD [ "dumb-init", "node", "main.js" ]
