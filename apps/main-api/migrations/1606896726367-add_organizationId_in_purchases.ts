@@ -6,7 +6,8 @@ import {
 } from 'typeorm';
 
 export class addOrganizationIdInPurchases1606896726367
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropColumn('purchases', 'invoiceNumber');
     await queryRunner.dropColumn('purchases', 'type');
@@ -19,7 +20,7 @@ export class addOrganizationIdInPurchases1606896726367
         name: 'orderNumber',
         isNullable: true,
         type: 'varchar',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -28,7 +29,7 @@ export class addOrganizationIdInPurchases1606896726367
         name: 'invoiceType',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -37,7 +38,7 @@ export class addOrganizationIdInPurchases1606896726367
         name: 'organizationId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -47,7 +48,7 @@ export class addOrganizationIdInPurchases1606896726367
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'purchase_items',
@@ -55,7 +56,7 @@ export class addOrganizationIdInPurchases1606896726367
         name: 'organizationId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -65,7 +66,7 @@ export class addOrganizationIdInPurchases1606896726367
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

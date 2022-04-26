@@ -25,7 +25,7 @@ export class creditNoteItems1624964628027 implements MigrationInterface {
           { name: 'updatedAt', type: 'timestamp', default: 'NOW()' },
         ],
       }),
-      true,
+      true
     );
 
     await queryRunner.createForeignKey(
@@ -35,7 +35,7 @@ export class creditNoteItems1624964628027 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'credit_notes',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'credit_note_items',
@@ -44,7 +44,7 @@ export class creditNoteItems1624964628027 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'items',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'credit_note_items',
@@ -53,7 +53,7 @@ export class creditNoteItems1624964628027 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'credit_note_items',
@@ -62,7 +62,7 @@ export class creditNoteItems1624964628027 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'branches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'credit_note_items',
@@ -71,7 +71,7 @@ export class creditNoteItems1624964628027 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'credit_note_items',
@@ -80,7 +80,7 @@ export class creditNoteItems1624964628027 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

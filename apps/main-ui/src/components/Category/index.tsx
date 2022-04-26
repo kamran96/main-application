@@ -1,11 +1,11 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { FC } from "react";
+import React, { FC } from 'react';
 // import Avatar from "react-avatar";
 // import AttributeIcon from "src/assets/images/alignCenter.svg";
 // import AngleRight from "src/assets/images/angle-right.svg";
-import { ICategory } from "../../modal/categories";
-import styled from "styled-components";
-import { Avatar } from "antd";
+import { ICategory } from '../../modal/categories';
+import styled from 'styled-components';
+import { Avatar } from 'antd';
 
 export interface IProps {
   category: ICategory;
@@ -27,12 +27,12 @@ export const CategoryListItem: FC<IProps> = ({
       >
         <div className="CategoryListItems">
           <Avatar size={30}>{category.title}</Avatar>
-          <p className="category-text">{category.title}</p>| {category.id} |{" "}
+          <p className="category-text">{category.title}</p>| {category.id} |{' '}
           {category.parent_id}
         </div>
         <a className="leaf_category">
           {category.is_leaf ? (
-            "icon"
+            'icon'
           ) : (
             // <img
             //   onClick={() => addAttributes(category)}

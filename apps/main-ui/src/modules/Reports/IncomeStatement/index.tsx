@@ -1,7 +1,7 @@
-import { Col, Row } from "antd";
-import React, { FC } from "react";
-import { IncomeStatementList } from "./List";
-import { IncomeStatementWrapper } from "./styled";
+import { Col, Row } from 'antd';
+import React, { FC } from 'react';
+import { IncomeStatementList } from './List';
+import { IncomeStatementWrapper } from './styled';
 
 export const IncomeStatement: FC = () => {
   return (

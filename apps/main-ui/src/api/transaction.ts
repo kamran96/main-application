@@ -32,4 +32,8 @@ export const getSingleTransactionById = ({queryKey}: QueryKey) => {
   const id: number = queryKey[1]
   return http.get(`${TRANSACTION.INDEX}/${id}`)
 }
+
+export const updateTransactionDraftStatus = (userId? : number) =>{
+    return http.put(`accounts/transaction/approve/${userId}`)
+}
     

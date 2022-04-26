@@ -17,6 +17,12 @@ import moneyFormat from '../../../../utils/moneyFormat';
 import { WrapperTransactionCustomBar, WrapperTransactionsList } from './styles';
 import { TransactionItemTable } from './TransactionItemsTable';
 import transactionsFilterSchema from './transactionsFilterSchema';
+import { PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
+import { TransactionApprovePdf } from '../../../../components/PDFs/TransactionApprovePdf';
+import { PDFICON } from '../../../../components/Icons';
+import DUMMYLOGO from '../../../../assets/quickbook.png';
+import styled from 'styled-components';
+import { TransactionItem } from '../../../../components/PDFs/TransactionSingleItemPdf';
 
 const APPROVETransactionList: FC = () => {
   const [filterBar, setFilterbar] = useState<boolean>(false);
@@ -28,9 +34,33 @@ const APPROVETransactionList: FC = () => {
 
   const [filterSchema, setFilterSchema] = useState(transactionsFilterSchema);
 
-  const { routeHistory } = useGlobalContext();
+  const { routeHistory, userDetails } = useGlobalContext();
 
   const { history } = routeHistory;
+
+  const { organization } = userDetails;
+  const {
+    address: organizationAddress,
+    email: organizationEmail,
+    phoneNumber: organizationContact,
+    name: organizationName,
+    website,
+  } = organization;
+
+  const { city, country, postalCode } = organizationAddress;
+
+  const headerprops = {
+    organizationName,
+    city,
+    country,
+    title: 'Journal Entries',
+    organizationContact,
+    organizationEmail,
+    address: '',
+    code: postalCode,
+    logo: DUMMYLOGO,
+    website,
+  };
 
   const [transactionConfig, setTransactionsConfig] = useState({
     page: 1,
@@ -147,6 +177,18 @@ const APPROVETransactionList: FC = () => {
   const renderCustomTopbar = () => {
     return (
       <WrapperTransactionCustomBar>
+        <PDFDownloadLinkWrapper
+          document={
+            <TransactionApprovePdf resultData={result} header={headerprops} />
+          }
+        >
+          <div className="flex alignCenter">
+            <PDFICON className="flex alignCenter mr-5" />
+
+            <span> Download PDF</span>
+          </div>
+        </PDFDownloadLinkWrapper>
+
         <SmartFilter
           onFilter={(encode) => {
             setTransactionsConfig({
@@ -212,10 +254,24 @@ const APPROVETransactionList: FC = () => {
         expandable={{
           expandedRowRender: (record, index) => {
             return (
+              <>
+              <PDFDownloadLink
+                  document={
+                    <TransactionItem header={headerprops} resultData={record} />
+                  }
+                >
+                  <div className="flex alignCenter">
+                    <PDFICON className="flex alignCenter mr-5" />
+
+                    <span> Download PDF</span>
+                  </div>
+                </PDFDownloadLink>
+                  <br/>
               <TransactionItemTable
                 allAccounts={accountsResponse}
                 data={record.transactionItems}
               />
+              </>
             );
           },
         }}
@@ -243,3 +299,18 @@ const APPROVETransactionList: FC = () => {
   );
 };
 export default APPROVETransactionList;
+
+const PDFDownloadLinkWrapper = styled(PDFDownloadLink)`
+  background: #e4e4e4;
+  padding: 5px 5px;
+  border-radius: 2px;
+  margin-right: 8px;
+  color: #333333;
+  border: none;
+  outline: none;
+  transition: 0.4s all ease-in-out;
+  &:hover {
+    background: #143c69;
+    color: #ffff;
+  }
+`;

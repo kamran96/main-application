@@ -52,57 +52,10 @@ export const Customers: FC = () => {
   const { routeHistory, notificationCallback } = useGlobalContext();
   const history = useHistory();
 
-  useEffect(() => {
-    if (routeHistory?.history?.location?.search) {
-      let obj = {};
-      const queryArr = history.location.search.split('?')[1].split('&');
-      queryArr.forEach((item, index) => {
-        const split = item.split('=');
-        obj = { ...obj, [split[0]]: split[1] };
-      });
-
-      setConfig({ ...config, ...obj });
-    }
-  }, [routeHistory]);
-
-  const handleContactsConfig = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      history.push(
-        `/app${ISupportedRoutes.CONTACTS}?tabIndex=customers&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
-      );
-      setConfig({
-        ...config,
-        sortid: null,
-        sortItem: null,
-        page: pagination.current,
-        page_size: pagination.pageSize,
-      });
-    } else {
-      history.push(
-        `/app${ISupportedRoutes.CONTACTS}?tabIndex=customers&sortid=${
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field
-        }&page=${pagination.current}&page_size=${
-          pagination.pageSize
-        }&query=${query}`
-      );
-      setConfig({
-        ...config,
-        sortItem: sorter.field,
-        page: pagination.current,
-        page_size: pagination.pageSize,
-        sortid:
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field,
-      });
-    }
-  };
-
   /* usePagination hook React Query */
   /* this hook fetches contact list against page number and also sorts request data against sort id */
   /* eg. sortid = name (assending) -name (descending) */
+
   const params: any = [
     `contacts-list-customers?page_no=${page}&sort=${sortid}&page_size=${page_size}&type=${IContactTypes.CUSTOMER}&query=${query}`,
     IContactTypes.CUSTOMER,
@@ -111,11 +64,89 @@ export const Customers: FC = () => {
     page_size,
     query,
   ];
+
   const {
     isLoading,
     data: resolvedData,
     isFetching,
   } = useQuery(params, getContacts);
+
+  // useEffect(() => {
+  //   if (routeHistory?.history?.location?.search) {
+  //     let obj = {};
+  //     const queryArr = history.location.search.split('?')[1].split('&');
+  //     queryArr.forEach((item, index) => {
+  //       const split = item.split('=');
+  //       obj = { ...obj, [split[0]]: split[1] };
+  //     });
+
+  //     setConfig({ ...config, ...obj });
+  //   }
+  // }, [routeHistory]);
+
+  const handleContactsConfig = (pagination, filters, sorter: any, extra) => {
+    console.log(sorter, 'sorter');
+
+    if (sorter.order === undefined) {
+      setConfig({
+        ...config,
+        sortid: null,
+        sortItem: null,
+        page: pagination.current,
+        page_size: pagination.pageSize,
+      });
+      history.push(
+        `/app${ISupportedRoutes.CONTACTS}?tabIndex=customers&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+      );
+    } else {
+      //     if(contactsResponse && sorter.order === 'descend'){
+      //       const userData = contactsResponse.sort((a, b) => {
+      //         if(a[sorter?.field] < b[sorter?.field]){
+      //           return 1;
+      //         }else{
+      //           return -1
+      //         }
+      //       });
+      //       setContactResponse(userData)
+      //       // console.log(contactsResponse, "Desc")
+      //     }else{
+      //    const userData = contactsResponse.sort((a, b) => {
+      //      if(a[sorter?.field] > b[sorter?.field]){
+      //        return 1;
+      //      }else{
+      //        return -1
+      //      }
+      //    });
+      //    setContactResponse(userData)
+      //   //  console.log(contactsResponse, "usersData Asc")
+      //  }
+
+      setConfig((prev) => {
+        return {
+          ...prev,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+          sortItem: sorter?.field,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
+        };
+      });
+
+      setTimeout(() => {
+        history.push(
+          `/app${ISupportedRoutes.CONTACTS}?tabIndex=customers&sortid=${
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field
+          }&page=${pagination.current}&page_size=${
+            pagination.pageSize
+          }&query=${query}`
+        );
+      }, 400);
+    }
+  };
 
   /* ComponentDidUpdate hook for updaing contactResponse state when successfully API fetches contact list data */
   useEffect(() => {
@@ -130,6 +161,33 @@ export const Customers: FC = () => {
     }
   }, [resolvedData]);
 
+  useEffect(() => {
+    if (config.sortid !== 'id' && config) {
+      const sorterIdLength = sortid.split('-');
+      if (contactsResponse && sorterIdLength.length >= 2) {
+        const userData = contactsResponse.sort((a, b) => {
+          if (a[sorterIdLength[1]] < b[sorterIdLength[1]]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        setContactResponse(userData);
+        console.log(contactsResponse, 'Desc');
+      } else {
+        const userData = contactsResponse.sort((a, b) => {
+          if (a[sorterIdLength[0]] > b[sorterIdLength[0]]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        setContactResponse(userData);
+        console.log(contactsResponse, 'ASC');
+      }
+    }
+  }, [config]);
+
   /* columns setup antd table */
   const columns: ColumnsType<any> = [
     {
@@ -137,7 +195,6 @@ export const Customers: FC = () => {
       dataIndex: 'name',
       key: 'name',
       sorter: true,
-      showSorterTooltip: true,
       render: (data, row, index) => (
         <Link
           className="contact-name"
@@ -152,20 +209,19 @@ export const Customers: FC = () => {
       dataIndex: 'email',
       key: 'email',
       sorter: true,
-      showSorterTooltip: true,
     },
     {
       title: 'Company Name',
       dataIndex: 'businessName',
       key: 'businessName',
       sorter: true,
-      showSorterTooltip: true,
     },
     {
       title: 'Contact Type',
       dataIndex: 'contactType',
       key: 'contactType',
       render: (data) => (
+        // eslint-disable-next-line react/jsx-no-useless-fragment
         <>
           {data && data === IContactTypes.CUSTOMER
             ? 'Customer'
@@ -189,6 +245,7 @@ export const Customers: FC = () => {
       title: 'Balance',
       dataIndex: 'balance',
       key: 'balance',
+      // eslint-disable-next-line react/jsx-no-useless-fragment
       render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
     },
   ];

@@ -45,6 +45,7 @@ const MenuPopOver: FC<IPopOverProps> = ({ route }) => {
     (i) => i?.route === history?.location?.pathname
   );
 
+
   const content = (
     <PopOverListWrapper className="popover_list ">
       {route?.children?.map((childRoute, index) => {
@@ -68,6 +69,7 @@ const MenuPopOver: FC<IPopOverProps> = ({ route }) => {
     </PopOverListWrapper>
   );
 
+
   return (
     <>
       <PopupGlobalStyles />
@@ -83,8 +85,9 @@ const MenuPopOver: FC<IPopOverProps> = ({ route }) => {
             _activeIndex > -1 ? 'active_route' : ''
           }`}
         >
-          <span className="mr-10 flex alignCenter">
-            <Icon className=" icon fs-16" icon={route?.icon} />
+          <span className="mr-10 flex alignCenter icon">
+            {/* <Icon className=" icon fs-16" icon={route?.icon} /> */}
+            {route?.icon}
           </span>
 
           <span className="route_tag">{route?.tag}</span>
@@ -189,8 +192,9 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                         className="flex alignCenter fs-14"
                         to={parent?.route as string}
                       >
-                        <span className="mr-10 flex alignCenter">
-                          <Icon className=" fs-16  icon" icon={parent?.icon} />
+                        <span className="mr-10 flex alignCenter icon">
+                          {/* <Icon className=" fs-16  icon" icon={parent?.icon} /> */}
+                          {parent?.icon}
                         </span>
                         <span className="route_tag">{parent?.tag}</span>
                       </Link>
@@ -222,11 +226,12 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                       className="flex alignCenter fs-14"
                       to={singleEntryRoute?.route as string}
                     >
-                      <span className="mr-10 flex alignCenter">
-                        <Icon
+                      <span className="mr-10 flex alignCenter icon">
+                        {/* <Icon
                           className=" fs-16  icon"
                           icon={singleEntryRoute?.icon}
-                        />
+                        />*/}
+                        {singleEntryRoute?.icon}
                       </span>
                       <span className="route_tag">{singleEntryRoute?.tag}</span>
                     </Link>

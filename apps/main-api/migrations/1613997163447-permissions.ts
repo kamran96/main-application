@@ -19,7 +19,7 @@ export class permissions1613997163447 implements MigrationInterface {
           { name: 'updatedAt', type: 'timestamp', default: 'NOW()' },
         ],
       }),
-      true,
+      true
     );
   }
 

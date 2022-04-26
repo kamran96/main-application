@@ -24,7 +24,7 @@ export class creditNotes1624963249142 implements MigrationInterface {
           { name: 'updatedAt', type: 'timestamp', default: 'NOW()' },
         ],
       }),
-      true,
+      true
     );
 
     await queryRunner.createForeignKey(
@@ -34,7 +34,7 @@ export class creditNotes1624963249142 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'branches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'credit_notes',
@@ -43,7 +43,7 @@ export class creditNotes1624963249142 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'credit_notes',
@@ -52,7 +52,7 @@ export class creditNotes1624963249142 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'contacts',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'credit_notes',
@@ -61,7 +61,7 @@ export class creditNotes1624963249142 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'invoices',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'credit_notes',
@@ -70,7 +70,7 @@ export class creditNotes1624963249142 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'purchases',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'credit_notes',
@@ -79,7 +79,7 @@ export class creditNotes1624963249142 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'credit_notes',
@@ -88,7 +88,7 @@ export class creditNotes1624963249142 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

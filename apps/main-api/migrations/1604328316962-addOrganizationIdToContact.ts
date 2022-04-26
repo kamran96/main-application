@@ -6,7 +6,8 @@ import {
 } from 'typeorm';
 
 export class addOrganizationIdToContact1604328316962
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropColumn('addresses', 'type');
 
@@ -16,7 +17,7 @@ export class addOrganizationIdToContact1604328316962
         name: 'organizationId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -26,7 +27,7 @@ export class addOrganizationIdToContact1604328316962
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -35,7 +36,7 @@ export class addOrganizationIdToContact1604328316962
         name: 'organizationId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -45,7 +46,7 @@ export class addOrganizationIdToContact1604328316962
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -54,7 +55,7 @@ export class addOrganizationIdToContact1604328316962
         name: 'addressType',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
   }
 

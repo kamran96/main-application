@@ -36,17 +36,11 @@ export class InvoiceItems {
   @Column()
   createdById: number;
 
-  @ManyToOne(
-    type => Invoices,
-    invoice => invoice.id,
-  )
+  @ManyToOne((type) => Invoices, (invoice) => invoice.id)
   @JoinColumn()
   invoice: Invoices;
 
-  @OneToMany(
-    type => Items,
-    item => item.id,
-  )
+  @OneToMany((type) => Items, (item) => item.id)
   @JoinColumn()
   item: Items;
 }

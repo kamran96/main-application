@@ -33,7 +33,7 @@ export class PriceController {
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -42,7 +42,7 @@ export class PriceController {
     try {
       const price = await this.priceService.createOrUpdatePrice(
         PriceDto,
-        param,
+        param
       );
       if (price) {
         return {
@@ -53,7 +53,7 @@ export class PriceController {
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -73,7 +73,7 @@ export class PriceController {
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
-        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR,
+        error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }

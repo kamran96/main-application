@@ -1,10 +1,10 @@
-import Icon from "@iconify/react";
-import React, { FC, ReactElement} from "react";
-import styled from "styled-components";
-import { Color } from "../../modal";
-import convertToRem from "../../utils/convertToRem";
-import threeDotsVertical from "@iconify-icons/bi/three-dots-vertical";
-import { Dropdown, Menu } from "antd";
+import Icon from '@iconify/react';
+import React, { FC, ReactElement } from 'react';
+import styled from 'styled-components';
+import { Color } from '../../modal';
+import convertToRem from '../../utils/convertToRem';
+import threeDotsVertical from '@iconify-icons/bi/three-dots-vertical';
+import { Dropdown, Menu } from 'antd';
 
 interface IProps {
   children?: ReactElement<any>;
@@ -24,7 +24,7 @@ export const MoreActions: FC = ({ children }) => {
         children
       ) : (
         <>
-          {" "}
+          {' '}
           <Menu.Item className="list_item">Archieve</Menu.Item>
           <Menu.Item className="list_item">Send to Email</Menu.Item>
           <Menu.Item className="list_item">Download</Menu.Item>
@@ -39,7 +39,7 @@ export const MoreActions: FC = ({ children }) => {
         style={{
           fontSize: convertToRem(18),
           color: Color.$GRAY_LIGHT,
-          cursor: "pointer",
+          cursor: 'pointer',
         }}
         icon={threeDotsVertical}
       />

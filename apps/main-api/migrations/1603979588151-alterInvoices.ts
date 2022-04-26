@@ -14,7 +14,7 @@ export class alterInvoices1603979588151 implements MigrationInterface {
         name: 'priceType',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -23,7 +23,7 @@ export class alterInvoices1603979588151 implements MigrationInterface {
         name: 'invoiceNumber',
         isNullable: true,
         type: 'varchar',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -32,7 +32,7 @@ export class alterInvoices1603979588151 implements MigrationInterface {
         name: 'invoiceType',
         isNullable: true,
         type: 'varchar',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -42,7 +42,7 @@ export class alterInvoices1603979588151 implements MigrationInterface {
         isNullable: true,
         default: false,
         type: 'boolean',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -51,7 +51,7 @@ export class alterInvoices1603979588151 implements MigrationInterface {
         name: 'isTaxIncluded',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -60,7 +60,7 @@ export class alterInvoices1603979588151 implements MigrationInterface {
         name: 'tax',
         isNullable: true,
         type: 'text',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -69,7 +69,7 @@ export class alterInvoices1603979588151 implements MigrationInterface {
         name: 'currency',
         isNullable: true,
         type: 'varchar',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -78,7 +78,7 @@ export class alterInvoices1603979588151 implements MigrationInterface {
         name: 'unitPrice',
         isNullable: true,
         type: 'float',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -87,7 +87,7 @@ export class alterInvoices1603979588151 implements MigrationInterface {
         name: 'quantity',
         isNullable: true,
         type: 'varchar',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -96,7 +96,7 @@ export class alterInvoices1603979588151 implements MigrationInterface {
         name: 'itemDiscount',
         isNullable: true,
         type: 'varchar',
-      }),
+      })
     );
   }
 

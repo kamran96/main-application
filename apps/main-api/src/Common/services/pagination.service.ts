@@ -52,7 +52,7 @@ export class Pagination {
   `;
       const item = await this.manager.query(
         (sql += `order by ${sort_column} ${sort_order}
-    ${page}`),
+    ${page}`)
       );
 
       pagination.page_total = item.length;

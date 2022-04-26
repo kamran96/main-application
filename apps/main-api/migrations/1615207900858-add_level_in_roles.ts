@@ -8,7 +8,7 @@ export class addLevelInRoles1615207900858 implements MigrationInterface {
         name: 'level',
         type: 'smallint',
         isNullable: true,
-      }),
+      })
     );
   }
 

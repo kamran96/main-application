@@ -26,7 +26,7 @@ export class ItemService {
         page_no,
         sort,
         sql,
-        itemData,
+        itemData
       );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);

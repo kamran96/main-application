@@ -13,7 +13,7 @@ export class addOrganizationId1603794251491 implements MigrationInterface {
         name: 'organizationId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'invoices',
@@ -21,7 +21,7 @@ export class addOrganizationId1603794251491 implements MigrationInterface {
         name: 'organizationId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'invoice_items',
@@ -29,7 +29,7 @@ export class addOrganizationId1603794251491 implements MigrationInterface {
         name: 'organizationId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -39,7 +39,7 @@ export class addOrganizationId1603794251491 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -49,7 +49,7 @@ export class addOrganizationId1603794251491 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -59,7 +59,7 @@ export class addOrganizationId1603794251491 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

@@ -31,14 +31,14 @@ export class TransactionService {
     queryData: IPage
   ): Promise<ITransactionWithResponse> {
     try {
-      const { page_no, page_size, sort, query } = queryData;
+      const { page_no, page_size, sort, status, query } = queryData;
       const ps: number = parseInt(page_size);
       const pn: number = parseInt(page_no);
 
       let transactions;
       const { sort_column, sort_order } = await Sorting(sort);
       const total = await getCustomRepository(TransactionRepository).count({
-        status: 1,
+        status: status || 1,
         organizationId: user.organizationId,
         branchId: user.branchId,
       });
@@ -54,7 +54,7 @@ export class TransactionService {
               TransactionRepository
             ).find({
               where: {
-                status: 1,
+                status: status || 1,
                 organizationId: user.organizationId,
                 [i]: ILike(val),
               },
@@ -67,7 +67,7 @@ export class TransactionService {
               TransactionRepository
             ).find({
               where: {
-                status: 1,
+                status: status || 1,
                 organizationId: user.organizationId,
                 [i]: In(data[i].value),
               },
@@ -82,7 +82,7 @@ export class TransactionService {
               TransactionRepository
             ).find({
               where: {
-                status: 1,
+                status: status || 1,
                 organizationId: user.organizationId,
                 [i]: Between(start_date, end_date),
               },
@@ -105,24 +105,9 @@ export class TransactionService {
           };
         }
       } else {
-        // transactions = await getCustomRepository(TransactionRepository)
-        //   .createQueryBuilder('transaction')
-        //   .where('transaction.status = 1')
-        //   .andWhere('transaction.organizationId = :organizationId', {
-        //     organizationId: user.organizationId,
-        //   })
-        //   .andWhere('transaction.branchId = :branchId', {
-        //     branchId: user.branchId,
-        //   })
-        //   .leftJoinAndSelect('transaction.transactionItems', 'transactionItems')
-        //   .leftJoinAndSelect('transactionItems.account', 'account')
-        //   .orderBy({ 'transaction.date': 'DESC', 'transactionItems.id': 'ASC' })
-        //   .skip(pn * ps - ps)
-        //   .take(ps)
-        //   .getMany();
         transactions = await getCustomRepository(TransactionRepository).find({
           where: {
-            status: 1,
+            status: status || 1,
             organizationId: user.organizationId,
             branchId: user.branchId,
           },
@@ -152,78 +137,183 @@ export class TransactionService {
     }
   }
 
-  async CreateTransaction(
-    transactionDto: TransactionDto,
-    userInfo
-  ): Promise<ITransaction> {
-    const transaction = await getCustomRepository(TransactionRepository).save({
-      date: transactionDto.date,
-      ref: transactionDto.ref,
-      narration: transactionDto.narration,
-      notes: transactionDto.notes,
-      amount: transactionDto.amount,
-      branchId: userInfo.branchId,
-      organizationId: userInfo.organizationId,
-      createdById: userInfo.userId,
-      updatedById: userInfo.userId,
-      status: 1,
+  async CreateTransaction(transactionDto: TransactionDto, userInfo) {
+    if (transactionDto?.isNewRecord === false) {
+      const transaction = await getCustomRepository(
+        TransactionRepository
+      ).findOne({
+        id: transactionDto.id,
+      });
+
+      if (transaction) {
+        await getCustomRepository(TransactionRepository).update(
+          {
+            id: transactionDto.id,
+          },
+          {
+            date: transactionDto.date || transaction.date,
+            ref: transactionDto.ref || transaction.ref,
+            narration: transactionDto.narration || transaction.narration,
+            notes: transactionDto.notes || transaction.notes,
+            amount: transactionDto.amount || transaction.amount,
+            updatedById: userInfo.id,
+            status: transactionDto.status || transaction.status,
+          }
+        );
+
+        await getCustomRepository(TransactionItemRepository).delete({
+          transactionId: transactionDto.id,
+        });
+
+        const { debits, credits } = transactionDto.entries;
+
+        for (const i of debits) {
+          await getCustomRepository(TransactionItemRepository).save({
+            transactionId: transaction.id,
+            amount: i.amount,
+            accountId: i.accountId,
+            description: i.description,
+            branchId: userInfo.branchId,
+            organizationId: userInfo.organizationId,
+            createdById: userInfo.userId,
+            updatedById: userInfo.userId,
+            transactionType: Entries.DEBITS,
+            status: transaction.status,
+          });
+        }
+
+        for (const i of credits) {
+          await getCustomRepository(TransactionItemRepository).save({
+            transactionId: transaction.id,
+            amount: i.amount,
+            description: i.description,
+            accountId: i.accountId,
+            branchId: userInfo.branchId,
+            organizationId: userInfo.organizationId,
+            createdById: userInfo.userId,
+            updatedById: userInfo.userId,
+            transactionType: Entries.CREDITS,
+            status: transaction.status,
+          });
+        }
+
+        return {
+          message: 'Transaction updated successfully',
+          status: true,
+        };
+      } else {
+        throw new HttpException(
+          'Transaction not found',
+          HttpStatus.BAD_REQUEST
+        );
+      }
+    }
+    {
+      const transaction = await getCustomRepository(TransactionRepository).save(
+        {
+          date: transactionDto.date,
+          ref: transactionDto.ref,
+          narration: transactionDto.narration,
+          notes: transactionDto.notes,
+          amount: transactionDto.amount,
+          branchId: userInfo.branchId,
+          organizationId: userInfo.organizationId,
+          createdById: userInfo.userId,
+          updatedById: userInfo.userId,
+          status: transactionDto.status,
+        }
+      );
+
+      const { debits, credits } = transactionDto.entries;
+
+      const arr: ITransactionItem[] = [];
+
+      for (const i of debits) {
+        const transactionItems = await getCustomRepository(
+          TransactionItemRepository
+        ).save({
+          transactionId: transaction.id,
+          amount: i.amount,
+          accountId: i.accountId,
+          description: i.description,
+          branchId: userInfo.branchId,
+          organizationId: userInfo.organizationId,
+          createdById: userInfo.userId,
+          updatedById: userInfo.userId,
+          transactionType: Entries.DEBITS,
+          status: transaction.status,
+        });
+
+        arr.push(transactionItems);
+      }
+
+      for (const i of credits) {
+        const transactionItems = await getCustomRepository(
+          TransactionItemRepository
+        ).save({
+          transactionId: transaction.id,
+          amount: i.amount,
+          description: i.description,
+          accountId: i.accountId,
+          branchId: userInfo.branchId,
+          organizationId: userInfo.organizationId,
+          createdById: userInfo.userId,
+          updatedById: userInfo.userId,
+          transactionType: Entries.CREDITS,
+          status: transaction.status,
+        });
+
+        arr.push(transactionItems);
+      }
+
+      return {
+        ...transaction,
+        transactionItems: arr,
+      };
+    }
+  }
+
+  async ApproveTransaction(transactionId) {
+    const transaction = await getCustomRepository(
+      TransactionRepository
+    ).findOne({
+      id: transactionId,
     });
 
-    const { debits, credits } = transactionDto.entries;
+    if (transaction) {
+      await getCustomRepository(TransactionRepository).update(
+        {
+          id: transactionId,
+        },
+        {
+          status: 1,
+        }
+      );
 
-    const arr: ITransactionItem[] = [];
+      await getCustomRepository(TransactionItemRepository).update(
+        {
+          transactionId: transactionId,
+        },
+        {
+          status: 1,
+        }
+      );
 
-    for (const i of debits) {
-      const transactionItems = await getCustomRepository(
-        TransactionItemRepository
-      ).save({
-        transactionId: transaction.id,
-        amount: i.amount,
-        accountId: i.accountId,
-        description: i.description,
-        branchId: userInfo.branchId,
-        organizationId: userInfo.organizationId,
-        createdById: userInfo.userId,
-        updatedById: userInfo.userId,
-        transactionType: Entries.DEBITS,
-        status: 1,
-      });
-
-      arr.push(transactionItems);
+      return {
+        message: 'Transaction approved successfully',
+        status: true,
+      };
     }
-
-    for (const i of credits) {
-      const transactionItems = await getCustomRepository(
-        TransactionItemRepository
-      ).save({
-        transactionId: transaction.id,
-        amount: i.amount,
-        description: i.description,
-        accountId: i.accountId,
-        branchId: userInfo.branchId,
-        organizationId: userInfo.organizationId,
-        createdById: userInfo.userId,
-        updatedById: userInfo.userId,
-        transactionType: Entries.CREDITS,
-        status: 1,
-      });
-
-      arr.push(transactionItems);
-    }
-
-    return {
-      ...transaction,
-      transactionItems: arr,
-    };
   }
 
   async FindTransactionById(transactionId: number): Promise<ITransaction> {
     const [transaction] = await getCustomRepository(TransactionRepository).find(
       {
-        where: { id: transactionId, status: 1 },
-        relations: ['transactionItems'],
+        where: { id: transactionId },
+        relations: ['transactionItems', 'transactionItems.account'],
       }
     );
+
     return transaction;
   }
 

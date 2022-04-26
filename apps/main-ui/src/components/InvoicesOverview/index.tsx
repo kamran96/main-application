@@ -1,14 +1,14 @@
-import Icon from "@iconify/react";
-import { Select, Tooltip } from "antd";
-import React, { FC } from "react";
-import styled from "styled-components";
-import { Card } from "../Card";
-import { H4 } from "../Typography";
-import { Color, IDashboardSalesOverview } from "../../modal";
-import fileText from "@iconify-icons/feather/file-text";
-import { BoldText } from "../Para/BoldText";
-import { Inflation } from "../Inflation";
-import { kValue } from "../../utils/helperFunctions";
+import Icon from '@iconify/react';
+import { Select, Tooltip } from 'antd';
+import React, { FC } from 'react';
+import styled from 'styled-components';
+import { Card } from '../Card';
+import { H4 } from '../Typography';
+import { Color, IDashboardSalesOverview } from '../../modal';
+import fileText from '@iconify-icons/feather/file-text';
+import { BoldText } from '../Para/BoldText';
+import { Inflation } from '../Inflation';
+import { kValue } from '../../utils/helperFunctions';
 
 const { Option } = Select;
 
@@ -32,14 +32,14 @@ export const InvoicesOverview: FC<IProps> = ({ data }) => {
                 Total Invoices Send
               </H4>
               <div className="flex alignCenter ">
-                <Tooltip placement={"top"} title={data?.totalInvoiceSend}>
+                <Tooltip placement={'top'} title={data?.totalInvoiceSend}>
                   <BoldText className="sales_amount">
                     {kValue(data?.totalInvoiceSend?.toFixed(0))}
                   </BoldText>
                 </Tooltip>
                 <Inflation
                   value={`${data?.invoicePercent?.toFixed(2)} %`}
-                  status={data?.invoicePercent >= 0 ? "up" : "down"}
+                  status={data?.invoicePercent >= 0 ? 'up' : 'down'}
                 />
               </div>
             </div>
@@ -48,10 +48,10 @@ export const InvoicesOverview: FC<IProps> = ({ data }) => {
         <div className="footer">
           <div className="_footer_desc textCenter">
             <p className="m-reset">
-              You have sent{" "}
-              <Tooltip placement={"top"} title={data?.invoiceDifference}>
+              You have sent{' '}
+              <Tooltip placement={'top'} title={data?.invoiceDifference}>
                 {kValue(data?.invoiceDifference?.toFixed(0))}
-              </Tooltip>{" "}
+              </Tooltip>{' '}
               invoices last week
             </p>
           </div>

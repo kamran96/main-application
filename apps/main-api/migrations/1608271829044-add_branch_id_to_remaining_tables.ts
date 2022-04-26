@@ -6,7 +6,8 @@ import {
 } from 'typeorm';
 
 export class addBranchIdToRemainingTables1608271829044
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'addresses',
@@ -14,7 +15,7 @@ export class addBranchIdToRemainingTables1608271829044
         name: 'branchId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'attribute_values',
@@ -22,7 +23,7 @@ export class addBranchIdToRemainingTables1608271829044
         name: 'branchId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'attributes',
@@ -30,7 +31,7 @@ export class addBranchIdToRemainingTables1608271829044
         name: 'branchId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'bank_accounts',
@@ -38,7 +39,7 @@ export class addBranchIdToRemainingTables1608271829044
         name: 'branchId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'categories',
@@ -46,7 +47,7 @@ export class addBranchIdToRemainingTables1608271829044
         name: 'branchId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'invoice_items',
@@ -54,7 +55,7 @@ export class addBranchIdToRemainingTables1608271829044
         name: 'branchId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'purchase_items',
@@ -62,7 +63,7 @@ export class addBranchIdToRemainingTables1608271829044
         name: 'branchId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'addresses',
@@ -70,7 +71,7 @@ export class addBranchIdToRemainingTables1608271829044
         name: 'organizationId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'categories',
@@ -78,7 +79,7 @@ export class addBranchIdToRemainingTables1608271829044
         name: 'organizationId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'categories',
@@ -87,7 +88,7 @@ export class addBranchIdToRemainingTables1608271829044
         referencedColumnNames: ['id'],
         referencedTableName: 'branches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'addresses',
@@ -96,7 +97,7 @@ export class addBranchIdToRemainingTables1608271829044
         referencedColumnNames: ['id'],
         referencedTableName: 'branches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'attribute_values',
@@ -105,7 +106,7 @@ export class addBranchIdToRemainingTables1608271829044
         referencedColumnNames: ['id'],
         referencedTableName: 'branches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'invoice_items',
@@ -114,7 +115,7 @@ export class addBranchIdToRemainingTables1608271829044
         referencedColumnNames: ['id'],
         referencedTableName: 'branches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'purchase_items',
@@ -123,7 +124,7 @@ export class addBranchIdToRemainingTables1608271829044
         referencedColumnNames: ['id'],
         referencedTableName: 'branches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'bank_accounts',
@@ -132,7 +133,7 @@ export class addBranchIdToRemainingTables1608271829044
         referencedColumnNames: ['id'],
         referencedTableName: 'branches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'attributes',
@@ -141,7 +142,7 @@ export class addBranchIdToRemainingTables1608271829044
         referencedColumnNames: ['id'],
         referencedTableName: 'branches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'categories',
@@ -150,7 +151,7 @@ export class addBranchIdToRemainingTables1608271829044
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'addresses',
@@ -159,7 +160,7 @@ export class addBranchIdToRemainingTables1608271829044
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

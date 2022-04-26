@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class addRunningPaymentInPayments1613133193102
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'payments',
@@ -9,7 +10,7 @@ export class addRunningPaymentInPayments1613133193102
         name: 'runningPayment',
         type: 'boolean',
         isNullable: true,
-      }),
+      })
     );
   }
 

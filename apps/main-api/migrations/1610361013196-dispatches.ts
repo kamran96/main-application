@@ -22,7 +22,7 @@ export class dispatches1610361013196 implements MigrationInterface {
           { name: 'updatedAt', type: 'timestamp', default: 'NOW()' },
         ],
       }),
-      true,
+      true
     );
 
     await queryRunner.createForeignKey(
@@ -32,7 +32,7 @@ export class dispatches1610361013196 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'branches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -42,7 +42,7 @@ export class dispatches1610361013196 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -52,7 +52,7 @@ export class dispatches1610361013196 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -62,7 +62,7 @@ export class dispatches1610361013196 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

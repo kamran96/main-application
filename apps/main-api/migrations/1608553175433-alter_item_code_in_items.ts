@@ -10,7 +10,7 @@ export class alterItemCodeInItems1608553175433 implements MigrationInterface {
         name: 'code',
         isNullable: true,
         type: 'varchar',
-      }),
+      })
     );
   }
 

@@ -1,5 +1,5 @@
-import { IThemeProps } from "./../../../hooks/useTheme/themeColors";
-import styled from "styled-components";
+import { IThemeProps } from './../../../hooks/useTheme/themeColors';
+import styled from 'styled-components';
 
 export const WrapperCashActivity = styled.div`
   .cash_flow_table {

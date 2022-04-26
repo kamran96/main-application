@@ -1,6 +1,6 @@
-import styled from "styled-components";
-import { Color } from "../../../modal";
-import convertToRem from "../../../utils/convertToRem";
+import styled from 'styled-components';
+import { Color } from '../../../modal';
+import convertToRem from '../../../utils/convertToRem';
 
 export const ContactListWrapper: any = styled.div`
   .contacts_search {

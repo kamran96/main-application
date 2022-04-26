@@ -1,9 +1,9 @@
-import { Button } from "antd";
-import React from "react";
-import styled from "styled-components";
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { TableCard } from "../TableCard";
-import { H2, P } from "../Typography";
+import { Button } from 'antd';
+import React from 'react';
+import styled from 'styled-components';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { TableCard } from '../TableCard';
+import { H2, P } from '../Typography';
 
 export const PermissionDenied = () => {
   const { routeHistory } = useGlobalContext();

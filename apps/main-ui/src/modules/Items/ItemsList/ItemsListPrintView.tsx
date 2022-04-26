@@ -1,9 +1,9 @@
-import { ColumnsType } from "antd/es/table";
-import React, { FC } from "react";
-import styled from "styled-components";
-import { PrintHeader } from "../../../components/PrintHeader";
-import { IItemsResult } from "../../../modal/items";
-import moneyFormat from "../../../utils/moneyFormat";
+import { ColumnsType } from 'antd/es/table';
+import React, { FC } from 'react';
+import styled from 'styled-components';
+import { PrintHeader } from '../../../components/PrintHeader';
+import { IItemsResult } from '../../../modal/items';
+import moneyFormat from '../../../utils/moneyFormat';
 
 interface IProps {
   columns?: ColumnsType<any>;
@@ -40,8 +40,8 @@ export const ItemsPrintView: FC<IProps> = ({ data }) => {
                   </td>
                   <td>{item.category.title}</td>
                   <td>{item.code}</td>
-                  <td>{purchasePrice ? moneyFormat(purchasePrice) : "-"}</td>
-                  <td>{salesPrice ? moneyFormat(salesPrice) : "-"}</td>
+                  <td>{purchasePrice ? moneyFormat(purchasePrice) : '-'}</td>
+                  <td>{salesPrice ? moneyFormat(salesPrice) : '-'}</td>
                   <td>{item.stock}</td>
                 </tr>
               );

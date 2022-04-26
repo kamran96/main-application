@@ -19,7 +19,7 @@ export class alterRolePermissions1613997589805 implements MigrationInterface {
         name: 'permissionId',
         type: 'int',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -28,7 +28,7 @@ export class alterRolePermissions1613997589805 implements MigrationInterface {
         name: 'description',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -38,7 +38,7 @@ export class alterRolePermissions1613997589805 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'permissions',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -47,7 +47,7 @@ export class alterRolePermissions1613997589805 implements MigrationInterface {
         name: 'parentId',
         type: 'int',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -57,7 +57,7 @@ export class alterRolePermissions1613997589805 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'user_roles',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -66,7 +66,7 @@ export class alterRolePermissions1613997589805 implements MigrationInterface {
         name: 'organizationId',
         type: 'int',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -76,7 +76,7 @@ export class alterRolePermissions1613997589805 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

@@ -25,12 +25,12 @@ import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 import { DivProps, ISupportedRoutes } from '../../../modal';
 import CommandPlatteGlobalStyles from './commandPaletteGlobalStyles';
 import { useEffect, useRef, useState } from 'react';
-import Backbtn from "../../../assets/backBtn.svg";
+import Backbtn from '../../../assets/backBtn.svg';
 
 export const InvyceCmdPalette = () => {
   const { rbac } = useRbac(null);
   const [showClear, setShowClear] = useState(false);
-  const [values, setValues] = useState("");
+  const [values, setValues] = useState('');
 
   const {
     routeHistory,
@@ -366,7 +366,6 @@ export const InvyceCmdPalette = () => {
     );
   };
 
-
   const RenderCommand = (suggestion) => {
     const ele = document?.querySelector('.invyce-modal');
 
@@ -378,17 +377,28 @@ export const InvyceCmdPalette = () => {
     }, [ele]);
 
     const inputEleParent = document.querySelector('.invyce-container');
-    const invyceSuggestionsContainer = document.querySelector('.invyce-suggestionsContainer');
+    const invyceSuggestionsContainer = document.querySelector(
+      '.invyce-suggestionsContainer'
+    );
 
-    useEffect(() =>{
-      if(invyceSuggestionsContainer && invyceSuggestionsContainer !== null && !invyceSuggestionsContainer.children[0].classList.contains("SearchHeader")){
-        const heading = document.createElement("p");
-        heading.innerHTML = "Recent Searches";
-        heading.classList.add("SearchHeader");
-        invyceSuggestionsContainer.insertBefore(heading, invyceSuggestionsContainer.children[0]);
+    useEffect(() => {
+      if (
+        invyceSuggestionsContainer &&
+        invyceSuggestionsContainer !== null &&
+        !invyceSuggestionsContainer.children[0].classList.contains(
+          'SearchHeader'
+        )
+      ) {
+        const heading = document.createElement('p');
+        heading.innerHTML = 'Recent Searches';
+        heading.classList.add('SearchHeader');
+        invyceSuggestionsContainer.insertBefore(
+          heading,
+          invyceSuggestionsContainer.children[0]
+        );
       }
-    }, [invyceSuggestionsContainer])
-    
+    }, [invyceSuggestionsContainer]);
+
     //invyce Container
     useEffect(() => {
       if (showClear && !inputEleParent.children[2]) {
@@ -446,13 +456,13 @@ export const InvyceCmdPalette = () => {
     const types = [];
     sortedCommands.forEach((ty, ti) => {
       if (!types.includes(ty.type)) {
-        types.push(ty.type)
+        types.push(ty.type);
       }
     });
-    
+
     types.forEach((type, typeIndex) => {
       const filtered = sortedCommands.filter((scItem) => scItem.type === type);
-       
+
       const cmdGroup = filtered.map((item, index) => {
         if (filtered.length - 1 === index) {
           return { ...item, lastIndex: true };
@@ -467,8 +477,6 @@ export const InvyceCmdPalette = () => {
     return _commands;
   };
 
-
-   
   return (
     <>
       <CommandPlatteGlobalStyles />
@@ -486,9 +494,9 @@ export const InvyceCmdPalette = () => {
         resetInputOnClose
         theme={theme}
         placeholder="Search in Invoyce"
-        onChange = {(newValue) =>{
+        onChange={(newValue) => {
           newValue ? setShowClear(true) : setShowClear(false);
-        } }
+        }}
       />
     </>
   );
@@ -499,7 +507,8 @@ const Wrapperheader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-around;
-  border-top: 1px solid ${(props: IThemeProps) => props?.theme?.colors?.paletteBorder};
+  border-top: 1px solid ${(props: IThemeProps) =>
+    props?.theme?.colors?.paletteBorder};
 
   h3,
   h5 {
@@ -537,6 +546,4 @@ interface IWrapperCommandsProps extends DivProps {
   isLastindex: boolean;
 }
 
-const WrapperCommands = styled.div<IWrapperCommandsProps>`
-
-`;
+const WrapperCommands = styled.div<IWrapperCommandsProps>``;

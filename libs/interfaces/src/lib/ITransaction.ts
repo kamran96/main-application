@@ -4,6 +4,7 @@ export interface ITransaction extends IBase {
   narration: string;
   ref: string;
   amount: number;
+  notes: string;
   date: Date;
   transactionItems?: ITransactionItem[] | ITransactionItem;
 }

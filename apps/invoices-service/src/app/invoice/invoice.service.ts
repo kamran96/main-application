@@ -181,12 +181,12 @@ export class InvoiceService {
           const balance = balances.find((bal) => bal.id === i.id);
 
           const due_amount =
-            balance.invoice.credit_notes !== 0
-              ? balance.invoice.credits -
-                balance.invoice.credit_notes -
-                balance.invoice.payment
-              : balance.invoice.balance;
-          const paid_amount = balance.invoice.payment;
+            balance?.invoice?.credit_notes !== 0
+              ? balance?.invoice?.credits -
+                balance?.invoice?.credit_notes -
+                balance?.invoice?.payment
+              : balance?.invoice?.balance;
+          const paid_amount = balance?.invoice?.payment;
 
           const payment_status = () => {
             if (paid_amount < due_amount && due_amount < i?.netTotal) {

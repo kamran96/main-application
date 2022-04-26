@@ -1,2 +1,2 @@
 export * from './lib/shared-invyce-theme';
-export * from "./types";
+export * from './types';

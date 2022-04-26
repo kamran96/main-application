@@ -18,7 +18,7 @@ export class alterCodeInAccount1603360269295 implements MigrationInterface {
         name: 'code',
         isNullable: true,
         type: 'varchar',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -27,7 +27,7 @@ export class alterCodeInAccount1603360269295 implements MigrationInterface {
         name: 'secondaryAccountId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -36,7 +36,7 @@ export class alterCodeInAccount1603360269295 implements MigrationInterface {
         name: 'branchId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -45,7 +45,7 @@ export class alterCodeInAccount1603360269295 implements MigrationInterface {
         name: 'organizationId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -54,7 +54,7 @@ export class alterCodeInAccount1603360269295 implements MigrationInterface {
         name: 'organizationId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -64,7 +64,7 @@ export class alterCodeInAccount1603360269295 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'branches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -74,7 +74,7 @@ export class alterCodeInAccount1603360269295 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -84,7 +84,7 @@ export class alterCodeInAccount1603360269295 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -94,7 +94,7 @@ export class alterCodeInAccount1603360269295 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'secondary_accounts',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

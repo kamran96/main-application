@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class addImportedFromForIntegration1622035202590
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'contacts',
@@ -9,7 +10,7 @@ export class addImportedFromForIntegration1622035202590
         name: 'importedFrom',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'contacts',
@@ -17,7 +18,7 @@ export class addImportedFromForIntegration1622035202590
         name: 'importedContactId',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'items',
@@ -25,7 +26,7 @@ export class addImportedFromForIntegration1622035202590
         name: 'importedFrom',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'items',
@@ -33,7 +34,7 @@ export class addImportedFromForIntegration1622035202590
         name: 'importedItemId',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'invoices',
@@ -41,7 +42,7 @@ export class addImportedFromForIntegration1622035202590
         name: 'importedFrom',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'invoices',
@@ -49,7 +50,7 @@ export class addImportedFromForIntegration1622035202590
         name: 'importedInvoiceId',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'purchases',
@@ -57,7 +58,7 @@ export class addImportedFromForIntegration1622035202590
         name: 'importedFrom',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'purchases',
@@ -65,7 +66,7 @@ export class addImportedFromForIntegration1622035202590
         name: 'importedBillId',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'accounts',
@@ -73,7 +74,7 @@ export class addImportedFromForIntegration1622035202590
         name: 'importedFrom',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'accounts',
@@ -81,7 +82,7 @@ export class addImportedFromForIntegration1622035202590
         name: 'importedAccountId',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'payments',
@@ -89,7 +90,7 @@ export class addImportedFromForIntegration1622035202590
         name: 'importedFrom',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'payments',
@@ -97,7 +98,7 @@ export class addImportedFromForIntegration1622035202590
         name: 'importedPaymentId',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
   }
 

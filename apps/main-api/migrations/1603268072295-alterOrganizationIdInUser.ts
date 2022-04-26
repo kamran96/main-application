@@ -6,7 +6,8 @@ import {
 } from 'typeorm';
 
 export class alterOrganizationIdInUser1603268072295
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropColumn('users', 'organizationId');
 
@@ -16,7 +17,7 @@ export class alterOrganizationIdInUser1603268072295
         name: 'organizationId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -26,7 +27,7 @@ export class alterOrganizationIdInUser1603268072295
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 
