@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC } from 'react';
 import { StyleSheet, View, Text, Font } from '@react-pdf/renderer';
 import moneyFormat from '../../utils/moneyFormat';
 import { PdfDocument } from './PdfDocument';
@@ -21,8 +21,8 @@ interface IPropsHeader {
 }
 
 interface IProps {
-    header: IPropsHeader;
-    resultData: ITransactionResult;
+  header: IPropsHeader;
+  resultData: ITransactionResult;
 }
 
 const styles = StyleSheet.create({
@@ -81,22 +81,20 @@ const styles = StyleSheet.create({
   },
 });
 
-export const TransactionItem:FC<IProps> = ({header, resultData}) => {
-    
-    const debit = resultData.transactionItems.filter(
-        (item) => item.transactionType === 10
-      );
-      const credit = resultData.transactionItems.filter(
-        (item) => item.transactionType === 20
-      );
-    
+export const TransactionItem: FC<IProps> = ({ header, resultData }) => {
+  const debit = resultData.transactionItems.filter(
+    (item) => item.transactionType === 10
+  );
+  const credit = resultData.transactionItems.filter(
+    (item) => item.transactionType === 20
+  );
+
   return (
     <PdfDocument>
-        <PDFFontWrapper>
-            <PDFHeader {...header}/>
-           
-            <View style={styles.container}>
-          
+      <PDFFontWrapper>
+        <PDFHeader {...header} />
+
+        <View style={styles.container}>
           <View style={styles.tableHeader}>
             <Text style={styles.tableItemOthers}>Date</Text>
             <Text style={styles.tableItemParticular}>Particulars</Text>
@@ -105,56 +103,54 @@ export const TransactionItem:FC<IProps> = ({header, resultData}) => {
             <Text style={styles.tableItemOthers}>Credit</Text>
           </View>
 
-                      
-              <View style={styles.tableBody}>
-                <Text style={styles.tableItemOthers}>
-                  {dayjs(resultData.date).format(`MMMM D, YYYY`)}
-                </Text>
+          <View style={styles.tableBody}>
+            <Text style={styles.tableItemOthers}>
+              {dayjs(resultData.date).format(`MMMM D, YYYY`)}
+            </Text>
 
-                <View style={styles.tableItemParticular}>
-                  {debit.map((debitItem: any) => {
-                    return (
-                      <Text style={{ padding: '10px 0' }}>
-                        {debitItem?.account?.name}
-                      </Text>
-                    );
-                  })}
-                  {credit.map((creditItem: any) => {
-                    return (
-                      <Text style={styles.itemCredit}>
-                        <Text style={{fontWeight: 'bold'}}> To </Text>{' '}
-                        {creditItem?.account?.name}
-                      </Text>
-                    );
-                  })}
-                  <Text style={styles.narration}>({resultData.narration})</Text>
-                </View>
+            <View style={styles.tableItemParticular}>
+              {debit.map((debitItem: any) => {
+                return (
+                  <Text style={{ padding: '10px 0' }}>
+                    {debitItem?.account?.name}
+                  </Text>
+                );
+              })}
+              {credit.map((creditItem: any) => {
+                return (
+                  <Text style={styles.itemCredit}>
+                    <Text style={{ fontWeight: 'bold' }}> To </Text>{' '}
+                    {creditItem?.account?.name}
+                  </Text>
+                );
+              })}
+              <Text style={styles.narration}>({resultData.narration})</Text>
+            </View>
 
-                <Text style={styles.tableItemOthers}>{resultData.ref}</Text>
+            <Text style={styles.tableItemOthers}>{resultData.ref}</Text>
 
-                <View style={styles.tableItemOthers}>
-                  {debit.map((debitItem) => {
-                    return (
-                      <Text style={{ padding: '10px 0' }}>
-                        {moneyFormat(debitItem?.amount.toFixed(2))}
-                      </Text>
-                    );
-                  })}
-                </View>
+            <View style={styles.tableItemOthers}>
+              {debit.map((debitItem) => {
+                return (
+                  <Text style={{ padding: '10px 0' }}>
+                    {moneyFormat(debitItem?.amount.toFixed(2))}
+                  </Text>
+                );
+              })}
+            </View>
 
-                <View style={styles.tableCredit}>
-                  {credit.map((creditItem) => {
-                    return (
-                      <Text style={{ padding: '10px 0' }}>
-                        {moneyFormat(creditItem?.amount.toFixed(2))}
-                      </Text>
-                    );
-                  })}
-                </View>
-              </View>
+            <View style={styles.tableCredit}>
+              {credit.map((creditItem) => {
+                return (
+                  <Text style={{ padding: '10px 0' }}>
+                    {moneyFormat(creditItem?.amount.toFixed(2))}
+                  </Text>
+                );
+              })}
+            </View>
+          </View>
         </View>
-
-        </PDFFontWrapper>
+      </PDFFontWrapper>
     </PdfDocument>
-   )
- }
+  );
+};

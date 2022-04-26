@@ -40,7 +40,7 @@ export const CommonTopbar: FC<IProps> = ({
     const payload = {
       ids: [...selectedRow],
     };
-   
+
     try {
       await mutateDeleteInvoices(payload, {
         onSuccess: () => {

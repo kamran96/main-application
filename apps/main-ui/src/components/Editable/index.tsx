@@ -83,14 +83,14 @@ export const Editable: FC<IProps> = ({
 
   // if(inputVal && inputVal!== undefined){
   //   const res = inputVal.replace(regex, '')
-  //   console.log(+res)  
+  //   console.log(+res)
   // }
-  
+
   // //  if(inputRef.current){
   // //   const input = inputRef.current;
   // //   console.log(input.blur())
   // //  }
-  
+
   return (
     <ClickOutSide
       initialVal={isEditable}
@@ -129,7 +129,7 @@ export const Editable: FC<IProps> = ({
             <div
               className={`rendered-text ${disabled ? 'disabled' : ''}`}
               onClick={() => setIsEditable(true)}
-              title={inputVal  ? inputVal : placeholder ? placeholder : ''}
+              title={inputVal ? inputVal : placeholder ? placeholder : ''}
             >
               {inputVal ? inputVal : placeholder ? placeholder : 0}
             </div>

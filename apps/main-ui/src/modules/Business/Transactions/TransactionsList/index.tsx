@@ -3,7 +3,7 @@ import { FC, lazy, Suspense, useEffect, useState } from 'react';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { TableTabs, TableTabsContent } from '../../../../components/TableTabs';
 import { FallBackLoader } from '../../../../components/FallBackLoader';
-import {  WrapperTransactionsList } from './styles';
+import { WrapperTransactionsList } from './styles';
 
 export const TransactionsList: FC = () => {
   const APPROVETransactionList = lazy(() => import('./All'));
@@ -13,14 +13,12 @@ export const TransactionsList: FC = () => {
   const { routeHistory } = useGlobalContext();
   const { search } = routeHistory.history.location;
 
-
   useEffect(() => {
     if (!activeTab) {
       setActiveTab('approve');
     }
   }, [activeTab]);
 
-    
   useEffect(() => {
     if (search) {
       const filterTab = search.split('?')[1].split('&')[0].split('=')[1];
@@ -32,9 +30,7 @@ export const TransactionsList: FC = () => {
 
   return (
     <WrapperTransactionsList>
-      <TableTabs
-        defaultkey={`${activeTab}`}
-      >
+      <TableTabs defaultkey={`${activeTab}`}>
         <>
           <TableTabsContent tab="Approve" key="approve">
             <Suspense fallback={<FallBackLoader />}>
@@ -47,9 +43,8 @@ export const TransactionsList: FC = () => {
               <DRAFTTransactionList />
             </Suspense>
           </TableTabsContent>
-          </>
+        </>
       </TableTabs>
-      
     </WrapperTransactionsList>
   );
 };
