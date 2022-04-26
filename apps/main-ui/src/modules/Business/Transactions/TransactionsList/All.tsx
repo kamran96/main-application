@@ -255,7 +255,7 @@ const APPROVETransactionList: FC = () => {
           expandedRowRender: (record, index) => {
             return (
               <>
-              <PDFDownloadLink
+                <PDFDownloadLink
                   document={
                     <TransactionItem header={headerprops} resultData={record} />
                   }
@@ -266,11 +266,11 @@ const APPROVETransactionList: FC = () => {
                     <span> Download PDF</span>
                   </div>
                 </PDFDownloadLink>
-                  <br/>
-              <TransactionItemTable
-                allAccounts={accountsResponse}
-                data={record.transactionItems}
-              />
+                <br />
+                <TransactionItemTable
+                  allAccounts={accountsResponse}
+                  data={record.transactionItems}
+                />
               </>
             );
           },

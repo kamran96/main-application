@@ -327,7 +327,7 @@ const DRAFTTransactionsList: FC = () => {
           expandedRowRender: (record, index) => {
             return (
               <>
-              <PDFDownloadLink
+                <PDFDownloadLink
                   document={
                     <TransactionItem header={headerprops} resultData={record} />
                   }
@@ -338,7 +338,7 @@ const DRAFTTransactionsList: FC = () => {
                     <span> Download PDF</span>
                   </div>
                 </PDFDownloadLink>
-                
+
                 <PurchaseListTopbar
                   hideDeleteButton={!rbac.can(PERMISSIONS.TRANSACTIONS_DELETE)}
                   disabled={false}
