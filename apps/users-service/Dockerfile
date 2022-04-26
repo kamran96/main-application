@@ -2,7 +2,7 @@ FROM node:lts-alpine as build
 
 WORKDIR /app
 COPY ./dist/apps/users-service .
-
+COPY yarn.lock .
 
 FROM node:lts-alpine
 
@@ -26,6 +26,7 @@ WORKDIR /home/node/app
 
 # change permissions to the node_modules folder
 COPY --chown=node:node --from=build /app /home/node/app/node_modules
+COPY --chown=node:node --from=build /app/yarn.lock /home/node/app/yarn.lock
 COPY --chown=node:node ./dist/apps/users-service /home/node/app
 
 RUN yarn add reflect-metadata tslib rxjs @nestjs/platform-express
