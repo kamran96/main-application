@@ -1,9 +1,9 @@
-import React, { FC, ReactElement } from "react";
-import styled from "styled-components";
-import { IThemeProps } from "../../hooks/useTheme/themeColors";
-import { DivProps } from "../../modal";
-import convertToRem from "../../utils/convertToRem";
-import { CommonLoader } from "../FallBackLoader";
+import React, { FC, ReactElement } from 'react';
+import styled from 'styled-components';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
+import { DivProps } from '../../modal';
+import convertToRem from '../../utils/convertToRem';
+import { CommonLoader } from '../FallBackLoader';
 
 interface IProps {
   children?: ReactElement<any> | ReactElement[];
@@ -21,31 +21,31 @@ export const TableCard: FC<IProps> = ({
   refernace,
 }) => {
   let height =
-    typeof minHeight === "number"
-      ? JSON.stringify(minHeight) + "px"
+    typeof minHeight === 'number'
+      ? JSON.stringify(minHeight) + 'px'
       : minHeight;
 
   return (
     <Wrapper className={className} height={height}>
       <div ref={refernace}>{children}</div>
-      <div className={`loader ${loading ? "show" : "hide"}`}>
+      <div className={`loader ${loading ? 'show' : 'hide'}`}>
         <CommonLoader />
       </div>
     </Wrapper>
   );
 };
 
-interface ITableCardWrapper extends DivProps{
-  height: string | number
+interface ITableCardWrapper extends DivProps {
+  height: string | number;
 }
 
- const Wrapper = styled.div<ITableCardWrapper>`
+const Wrapper = styled.div<ITableCardWrapper>`
   background: ${(props: IThemeProps) => props.theme.colors.cardBg};
   box-shadow: 0 0 ${convertToRem(3)} rgba(0, 0, 0, 0.25);
   border-radius: ${convertToRem(4)};
   padding: ${convertToRem(20)} ${convertToRem(20)} ${convertToRem(30)}
     ${convertToRem(20)};
-  min-height: ${(props: any) => (props.height ? props.height : "unset")};
+  min-height: ${(props: any) => (props.height ? props.height : 'unset')};
   position: relative;
   .loader {
     position: absolute;

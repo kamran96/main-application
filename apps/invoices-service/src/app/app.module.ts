@@ -21,16 +21,10 @@ dotenv.config();
       useFactory: async (configService: ConfigService) =>
         ({
           type: 'postgres',
-          host: configService.get('INV_DB_HOST', process.env.INV_DB_HOST),
-          port: configService.get<unknown>(
-            'INV_DB_PORT',
-            process.env.INV_DB_PORT
-          ),
-          username: configService.get('INV_DB_USER', process.env.INV_DB_USER),
-          password: configService.get(
-            'INV_DB_PASSWORD',
-            process.env.INV_DB_PASSWORD
-          ),
+          host: configService.get('DB_HOST', process.env.DB_HOST),
+          port: configService.get<unknown>('DB_PORT', process.env.DB_PORT),
+          username: configService.get('DB_USER', process.env.DB_USER),
+          password: configService.get('DB_PASSWORD', process.env.DB_PASSWORD),
           database: configService.get('INV_DB_NAME', process.env.INV_DB_NAME),
           entities: getMetadataArgsStorage().tables.map((tbl) => tbl.target),
           // ssl: { rejectUnauthorized: false },

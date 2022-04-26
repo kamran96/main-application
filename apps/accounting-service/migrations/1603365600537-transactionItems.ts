@@ -26,7 +26,7 @@ export class transactionItems1603365600537 implements MigrationInterface {
           { name: 'updatedById', type: 'int', isNullable: true },
         ],
       }),
-      true,
+      true
     );
 
     // await queryRunner.createForeignKey(
@@ -38,10 +38,18 @@ export class transactionItems1603365600537 implements MigrationInterface {
     //     onDelete: 'CASCADE',
     //   }),
     // );
-    await queryRunner.createIndex("transaction_items", new TableIndex({
-      name: "accounts_indexes",
-      columnNames: ["branchId", "organizationId","accountId","transactionId"]
-    }));
+    await queryRunner.createIndex(
+      'transaction_items',
+      new TableIndex({
+        name: 'accounts_indexes',
+        columnNames: [
+          'branchId',
+          'organizationId',
+          'accountId',
+          'transactionId',
+        ],
+      })
+    );
 
     // await queryRunner.createForeignKey(
     //   'transaction_items',
@@ -60,7 +68,7 @@ export class transactionItems1603365600537 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'accounts',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -70,7 +78,7 @@ export class transactionItems1603365600537 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'transactions',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

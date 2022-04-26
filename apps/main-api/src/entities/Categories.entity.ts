@@ -27,17 +27,11 @@ export class Categories {
   @Column()
   updatedById: number;
 
-  @OneToOne(
-    type => Branches,
-    branch => branch.id,
-  )
+  @OneToOne((type) => Branches, (branch) => branch.id)
   @JoinColumn()
   branch: Branches;
 
-  @ManyToOne(
-    type => Brands,
-    brand => brand.id,
-  )
+  @ManyToOne((type) => Brands, (brand) => brand.id)
   @JoinColumn()
   brand: Brands;
 }

@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class addRemainingAttributesToPurchases1607674652110
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'purchases',
@@ -9,7 +10,7 @@ export class addRemainingAttributesToPurchases1607674652110
         name: 'isTaxIncluded',
         isNullable: true,
         type: 'float',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'purchases',
@@ -17,7 +18,7 @@ export class addRemainingAttributesToPurchases1607674652110
         name: 'currency',
         isNullable: true,
         type: 'varchar',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'purchase_items',
@@ -25,7 +26,7 @@ export class addRemainingAttributesToPurchases1607674652110
         name: 'total',
         isNullable: true,
         type: 'float',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'purchase_items',
@@ -33,7 +34,7 @@ export class addRemainingAttributesToPurchases1607674652110
         name: 'unitPrice',
         isNullable: true,
         type: 'float',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'purchase_items',
@@ -41,7 +42,7 @@ export class addRemainingAttributesToPurchases1607674652110
         name: 'itemDiscount',
         isNullable: true,
         type: 'varchar',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'purchase_items',
@@ -49,7 +50,7 @@ export class addRemainingAttributesToPurchases1607674652110
         name: 'tax',
         isNullable: true,
         type: 'text',
-      }),
+      })
     );
   }
 

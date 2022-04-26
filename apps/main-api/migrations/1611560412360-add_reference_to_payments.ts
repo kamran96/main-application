@@ -8,7 +8,7 @@ export class addReferenceToPayments1611560412360 implements MigrationInterface {
         name: 'reference',
         type: 'varchar',
         isNullable: true,
-      }),
+      })
     );
   }
 

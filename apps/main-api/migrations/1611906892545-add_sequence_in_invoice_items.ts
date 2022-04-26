@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class addSequenceInInvoiceItems1611906892545
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'invoice_items',
@@ -9,7 +10,7 @@ export class addSequenceInInvoiceItems1611906892545
         name: 'sequence',
         type: 'int',
         isNullable: true,
-      }),
+      })
     );
     await queryRunner.addColumn(
       'purchase_items',
@@ -17,7 +18,7 @@ export class addSequenceInInvoiceItems1611906892545
         name: 'sequence',
         type: 'int',
         isNullable: true,
-      }),
+      })
     );
   }
 

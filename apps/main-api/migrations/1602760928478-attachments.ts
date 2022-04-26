@@ -63,7 +63,7 @@ export class attachments1602760928478 implements MigrationInterface {
           },
         ],
       }),
-      true,
+      true
     );
 
     await queryRunner.createForeignKey(
@@ -73,7 +73,7 @@ export class attachments1602760928478 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -83,7 +83,7 @@ export class attachments1602760928478 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

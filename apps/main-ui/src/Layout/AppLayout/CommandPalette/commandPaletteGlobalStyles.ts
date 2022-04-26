@@ -97,7 +97,8 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
   background: ${(props: IThemeProps) => props?.theme?.colors?.cmdbg};
   color: ${(props: IThemeProps) => props?.theme?.colors?.itmHoverText};
   caret-color: #4b4b4b;
-  border-bottom: 1px solid ${(props: IThemeProps) => props?.theme?.colors?.paletteBorder};
+  border-bottom: 1px solid ${(props: IThemeProps) =>
+    props?.theme?.colors?.paletteBorder};
 }
 
 .invyce-inputOpen {
@@ -105,7 +106,8 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
 
 .invyce-inputFocused {
    border: none;
-   border-bottom: 1px solid ${(props: IThemeProps) => props?.theme?.colors?.paletteBorder};
+   border-bottom: 1px solid ${(props: IThemeProps) =>
+     props?.theme?.colors?.paletteBorder};
 }
 
 .invyce-suggestionsContainer {

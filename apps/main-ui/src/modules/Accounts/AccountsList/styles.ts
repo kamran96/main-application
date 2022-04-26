@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import convertToRem from "../../../utils/convertToRem";
+import styled from 'styled-components';
+import convertToRem from '../../../utils/convertToRem';
 export const AccountsWrapper = styled.div`
   /* .account_name{
   color: #3e3e3c;
@@ -22,9 +22,7 @@ export const AccountsWrapper = styled.div`
     }
   }
 `;
-export const ListWrapper = styled.div`
- 
-`;
+export const ListWrapper = styled.div``;
 export const TableWrapper = styled.div`
   margin-top: 30px;
 `;
@@ -39,7 +37,7 @@ export const SearchBar = styled.div`
 
 export const AccountName = styled.div`
   h3 {
-    font-family: "Roboto";
+    font-family: 'Roboto';
     font-style: normal;
     font-weight: 500;
     font-size: 13px;
@@ -52,7 +50,7 @@ export const AccountName = styled.div`
   }
   p {
     margin: 0;
-    font-family: "Roboto";
+    font-family: 'Roboto';
     font-style: normal;
     font-weight: normal;
     font-size: 11px;

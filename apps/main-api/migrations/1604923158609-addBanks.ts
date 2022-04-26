@@ -15,7 +15,7 @@ export class addBanks1604923158609 implements MigrationInterface {
 
     for (let bank of banks) {
       await queryRunner.query(
-        `insert into banks (name) values ('${bank.name}')`,
+        `insert into banks (name) values ('${bank.name}')`
       );
     }
   }

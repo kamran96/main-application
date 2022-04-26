@@ -1,8 +1,8 @@
-import React, { FC, ReactElement } from "react";
+import React, { FC, ReactElement } from 'react';
 
-import { BoldText } from "../Para/BoldText";
-import { P } from "../Typography";
-import "./print.css";
+import { BoldText } from '../Para/BoldText';
+import { P } from '../Typography';
+import './print.css';
 
 interface IProps {
   children: ReactElement<any>;
@@ -10,24 +10,24 @@ interface IProps {
 
 export const PrintFormat: FC<IProps> = ({ children }) => {
   return (
-    <div className="print_format_wrapper" >
+    <div className="print_format_wrapper">
       <table
-        style={{ borderBottom: "none", width: "100%" }}
+        style={{ borderBottom: 'none', width: '100%' }}
         className="parent_table"
       >
         <tr>
-          <td style={{ width: "100%" }}>{children}</td>
+          <td style={{ width: '100%' }}>{children}</td>
         </tr>
-        <tfoot style={{ border: "none !important" }}>
-          <td style={{ visibility: "hidden" }}>footer</td>
+        <tfoot style={{ border: 'none !important' }}>
+          <td style={{ visibility: 'hidden' }}>footer</td>
         </tfoot>
       </table>
       <div
-        style={{ paddingTop: "8px", paddingBottom: "8px" }}
+        style={{ paddingTop: '8px', paddingBottom: '8px' }}
         className="footer_data _visibleOnPrint"
       >
         <P className="footer_details mr-10">Powered by </P>
-        <BoldText style={{ fontSize: "9px" }}>&nbsp;uConnect Pvt(Ltd)</BoldText>
+        <BoldText style={{ fontSize: '9px' }}>&nbsp;uConnect Pvt(Ltd)</BoldText>
       </div>
     </div>
   );

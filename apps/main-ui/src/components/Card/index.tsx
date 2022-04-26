@@ -1,6 +1,6 @@
-import styled from "styled-components";
-import { IThemeProps } from "../../hooks/useTheme/themeColors";
-import convertToRem from "../../utils/convertToRem";
+import styled from 'styled-components';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
+import convertToRem from '../../utils/convertToRem';
 
 export const Card = styled.div`
   padding: ${convertToRem(12)} ${convertToRem(16)};

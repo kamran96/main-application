@@ -14,6 +14,9 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -26,16 +29,22 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Use Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      
       - name: cache node_modules
         id: cache-node-modules
         uses: actions/cache@v2
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-build-node-modules-cache-${{ hashFiles('**/yarn.lock') }}
-      - name: Use Node ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
+
+      - name: install dependencies
+        if: steps.cache-node-modules.cache-hit != 'true'
+        run: yarn install --prefer-offline
       
       # INSTALL digital ocean cli
       - name: Install doctl
@@ -43,17 +52,13 @@ jobs:
         with:
           token: ${{ secrets.DO_ACCESS_TOKEN }}
 
-      - name: install dependencies
-        if: steps.cache-node-modules.cache-hit != 'true'
-        run: yarn install --prefer-offline
+          # Runs a set of commands using the runners shell
+      - name: build required projects
+        run: NODE_ENV='production' yarn build accounting-service
       
       # docker build item service images
       - name: Build container image
         run: docker build -f $GITHUB_WORKSPACE/apps/accounting-service/Dockerfile -t registry.digitalocean.com/invyce-images/accounting-service:$(echo $GITHUB_SHA | head -c7) .
-
-      # Runs a set of commands using the runners shell
-      - name: build required projects
-        run: NODE_ENV='production' yarn build accounting-service
 
       - name: Add IP address to trusted source (managed database)
         uses: GarreauArthur/manage-digital-ocean-managed-database-trusted-sources-gh-action@main
@@ -66,11 +71,11 @@ jobs:
       - name: run db migrations
         run: yarn run acc_migration_run
         env: 
-          ACC_DB_HOST: 'db-postgresql-sgp1-12041-do-user-4046074-0.b.db.ondigitalocean.com'
-          ACC_DB_PORT: 25060
-          ACC_DB_NAME: 'accounts'
-          ACC_DB_PASSWORD: '0jN4FNuqynhGR7zT'
-          ACC_DB_USER: 'doadmin'
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          ACC_DB_NAME: ${{ secrets.ACC_DB_NAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_USER: ${{ secrets.DB_USER }}
           NODE_ENV: 'production'
 
       - name: Remove IP address to trusted source (managed database)
@@ -91,9 +96,36 @@ jobs:
       - name: Update deployment file
         run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/invyce-images/accounting-service:'${TAG}'|' $GITHUB_WORKSPACE/apps/accounting-service/ops/accounting-deployment.yaml
 
-      - name: Save DigitalOcean kubeconfig with short-lived credentials
-        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 k8s-invyce-app-stg
+         # Install yq
+      - name: Install yq 
+        run: |
+          wget https://github.com/mikefarah/yq/releases/download/v4.12.0/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
+          yq --version
 
-      - name: Deploy to DigitalOcean Kubernetes
-        run: kubectl apply -f $GITHUB_WORKSPACE/apps/accounting-service/ops/accounting-deployment.yaml
+       # Clone git repository with Helm charts, update and push changes
+      - name: Update image tag in Helm git repo 
+        run: | 
+          CONTAINER_IMAGE_TAG="$(echo $GITHUB_SHA | head -c7)"
+          echo New container image tag: $CONTAINER_IMAGE_TAG
+          echo Create temporary folder to clone the repo into...
+          TEMP_FOLDER="$(mktemp -d)" 
+          echo Clone the repository...
+          git clone -b main "https://zeeshooo:${ACCESS_TOKEN}@github.com/invyce/invyce-ops.git" ${TEMP_FOLDER} 
+          cd ${TEMP_FOLDER}/accounts 
+          ls
+          echo Update Helm chart values-dev with new image tag
+          CONTAINER_IMAGE_TAG=$CONTAINER_IMAGE_TAG yq e -i '.image.tag = env(CONTAINER_IMAGE_TAG)' ./values.yaml
+          echo 'Container image tag updated in accounts/values.yaml'
+          cd ../
+          git config user.email "zeeshan@invyce.com"
+          git config user.name "zeeshooo" 
+          git add .  
+          git commit -m "refactor - updated Helm chart values for dev environment with container image - $CONTAINER_IMAGE_TAG" 
+          git push -u origin main
+
+      # - name: Save DigitalOcean kubeconfig with short-lived credentials
+      #   run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 k8s-invyce-app-stg
+
+      # - name: Deploy to DigitalOcean Kubernetes
+      #   run: kubectl apply -f $GITHUB_WORKSPACE/apps/accounting-service/ops/accounting-deployment.yaml
 

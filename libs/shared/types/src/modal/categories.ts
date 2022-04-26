@@ -1,4 +1,4 @@
-import { IBase, IBaseRequest } from "./base";
+import { IBase, IBaseRequest } from './base';
 
 export interface IChildCategory {
   parentId: number;

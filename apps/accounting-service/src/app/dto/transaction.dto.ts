@@ -1,10 +1,13 @@
 export class TransactionDto {
+  id: number;
   narration: string;
   ref: string;
   amount: number;
   date: Date;
   notes: string;
   entries: Entries;
+  status: number;
+  isNewRecord: boolean;
 }
 
 class Entries {

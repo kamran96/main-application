@@ -34,7 +34,7 @@ export class TransactionService {
   async CreateTransaction(transactionDto, userInfo): Promise<any> {
     const transactionRepository = getCustomRepository(TransactionRepository);
     const transactionItemRepository = getCustomRepository(
-      TransactionItemRepository,
+      TransactionItemRepository
     );
 
     const transaction = await transactionRepository.save({

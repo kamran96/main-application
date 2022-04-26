@@ -83,21 +83,19 @@ export const RolesEditorWidget: FC = () => {
     });
   };
 
-
-  const onCloseModal = () =>{
+  const onCloseModal = () => {
     form.resetFields();
     notificationCallback(
       NOTIFICATIONTYPE.SUCCESS,
       `${id ? 'Updated' : 'Created'}`
     );
-    setRbacConfigModal(false)
-  }
+    setRbacConfigModal(false);
+  };
 
   const onCancel = () => {
     form.resetFields();
     setRbacConfigModal(false);
   };
-
 
   return (
     <CommonModal
@@ -119,7 +117,7 @@ export const RolesEditorWidget: FC = () => {
               },
             ]}
           >
-            <Input size="middle" autoComplete='off' />
+            <Input size="middle" autoComplete="off" />
           </Form.Item>
           <FormLabel>Description</FormLabel>
           <Form.Item name="description">

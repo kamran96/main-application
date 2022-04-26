@@ -15,13 +15,17 @@ import {
   InvoiceCreateAPI,
 } from '../../api';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
-import { IErrorMessages, IServerError, NOTIFICATIONTYPE } from '../../modal';
+import {
+  IErrorMessages,
+  IServerError,
+  ISupportedRoutes,
+  NOTIFICATIONTYPE,
+} from '../../modal';
 import { IContactTypes } from '../../modal';
 import { IInvoiceStatus, IInvoiceType, ITaxTypes } from '../../modal/invoice';
-import { IOrganizationType } from '../../modal/organization';
 import { addition } from '../../utils/helperFunctions';
 import moneyFormat from '../../utils/moneyFormat';
-import printDiv, { DownloadPDF } from '../../utils/Print';
+import printDiv from '../../utils/Print';
 import { ConfirmModal } from '../ConfirmModal';
 import { DatePicker } from '../DatePicker';
 import { FormLabel } from '../FormLabel';
@@ -55,9 +59,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
   /* ************ HOOKS *************** */
   /* Component State Hooks */
   const { userDetails } = useGlobalContext();
-  const { organization } = userDetails;
   const history = useHistory();
-  const [issueDate, setIssueDate] = useState(dayjs());
   const [printModal, setPrintModal] = useState(false);
   const [taxType, setTaxType] = useState<ITaxTypes>(ITaxTypes.TAX_INCLUSIVE);
   const [createContactName, setCreateContactName] = useState('');
@@ -73,7 +75,6 @@ const Editor: FC<IProps> = ({ type, id }) => {
     setInvoiceItems,
     deleteIds,
     payment,
-    setPayment,
     AntForm,
     isFetching,
     handleAddRow,
@@ -175,7 +176,8 @@ const Editor: FC<IProps> = ({ type, id }) => {
       }
 
       await muatateCreateInvoice(payload, {
-        onSuccess: () => {
+        onSuccess: (data) => {
+          const { id: invoiceId } = data?.data?.result;
           notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Invoice Created');
           if (value && value.status.print) {
             setPrintModal(true);
@@ -193,6 +195,10 @@ const Editor: FC<IProps> = ({ type, id }) => {
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           });
+
+          history.push(
+            `${ISupportedRoutes?.DASHBOARD_LAYOUT}${ISupportedRoutes?.PURCHASES}/${invoiceId}`
+          );
         },
         onError: (error: IServerError) => {
           if (
@@ -399,10 +405,6 @@ const Editor: FC<IProps> = ({ type, id }) => {
                       rules={[{ required: true, message: 'Required !' }]}
                     >
                       <DatePicker
-                        onChange={(date) => {
-                          setIssueDate(date);
-                          setPayment({ ...payment, dueDate: date });
-                        }}
                         disabledDate={(current) => {
                           return current > dayjs().endOf('day');
                         }}

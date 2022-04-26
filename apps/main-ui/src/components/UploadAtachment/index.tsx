@@ -1,11 +1,11 @@
-import { Upload } from "antd";
-import ImgCrop from "antd-img-crop";
-import React, { SFC, useCallback, useEffect, useState } from "react";
-import styled from "styled-components";
+import { Upload } from 'antd';
+import ImgCrop from 'antd-img-crop';
+import React, { SFC, useCallback, useEffect, useState } from 'react';
+import styled from 'styled-components';
 
-import { useGlobalContext } from "../../hooks/globalContext/globalContext";
-import { IAttachment } from "../../modal";
-import { NodeBaseURL } from "./../../utils/http";
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { IAttachment } from '../../modal';
+import { NodeBaseURL } from './../../utils/http';
 
 interface IProps {
   onUploadSuccess?: (atachmentId: number) => void;
@@ -24,7 +24,7 @@ export const UploadAtachment: SFC<IProps> = ({
       let profilePicture = {
         uid: defaultValue.id,
         name: defaultValue.name,
-        status: "done",
+        status: 'done',
         url: defaultValue.path,
       };
       setFileList([{ ...profilePicture }]);
@@ -80,7 +80,7 @@ export const UploadAtachment: SFC<IProps> = ({
           }}
           action={`${NodeBaseURL}/attachments/attachment`}
         >
-          {fileList.length < 1 && "+ Upload"}
+          {fileList.length < 1 && '+ Upload'}
         </Upload>
       </ImgCrop>
     </WrapperUploadAtachment>

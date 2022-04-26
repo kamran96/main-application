@@ -119,15 +119,9 @@ export class AuthController {
 
   @UseGuards(GlobalAuthGuard)
   @Post('/resend-otp')
-  async resendOtp(@Body() body: SendOtp): Promise<IUserWithResponse> {
+  async resendOtp(@Body() body: SendOtp): Promise<void> {
     try {
-      const user = this.authService.ResendOtp(body);
-
-      if (user) {
-        return {
-          message: 'Successfull',
-        };
-      }
+      return this.authService.ResendOtp(body);
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
@@ -139,23 +133,14 @@ export class AuthController {
   @UseGuards(GlobalAuthGuard)
   @Post('logout')
   async logout(@Res() res: Response): Promise<Response> {
-    // res.setHeader('Set-Cookie', await this.authService.Logout());
-    return await this.authService.Logout(res);
+    return this.authService.Logout(res);
   }
 
   @UseGuards(GlobalAuthGuard)
   @Post('/forget-password')
-  async forgetPassword(
-    @Body() userDto: ForgetPasswordDto
-  ): Promise<IUserWithResponse> {
+  async forgetPassword(@Body() userDto: ForgetPasswordDto) {
     try {
-      const user = this.authService.ForgetPassword(userDto);
-
-      if (user) {
-        return {
-          message: 'Successfull',
-        };
-      }
+      return this.authService.ForgetPassword(userDto);
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
@@ -191,13 +176,13 @@ export class AuthController {
 
   @Post('/google-login')
   async googleLogin(@Body() data, @Res() res: Response) {
-    return await this.authService.GoogleLogin(data, res);
+    return this.authService.GoogleLogin(data, res);
   }
 
   @UseGuards(GlobalAuthGuard)
   @Post('/request-change')
   async changeEmailOtp(@Body() data, @Req() req: IRequest) {
-    return await this.authService.ChangeEmailOtp(data, req.user);
+    return this.authService.ChangeEmailOtp(data, req.user);
   }
 
   @UseGuards(GlobalAuthGuard)
@@ -227,13 +212,13 @@ export class AuthController {
   @UseGuards(GlobalAuthGuard)
   @Post('request-change-verify')
   async requestChangeVerify(@Body() body: SendOtp): Promise<IUserWithResponse> {
-    return await this.authService.RequestChangeVerify(body);
+    return this.authService.RequestChangeVerify(body);
   }
 
   @UseGuards(GlobalAuthGuard)
   @Post('/gen-authenticator')
   async GoogleAuthenticator(): Promise<unknown> {
-    return await this.authService.GenerateGoogleAuthenticatorToken();
+    return this.authService.GenerateGoogleAuthenticatorToken();
   }
 
   @UseGuards(GlobalAuthGuard)

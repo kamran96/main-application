@@ -1,7 +1,7 @@
-import React, { FC } from "react";
+import React, { FC } from 'react';
 
-import { ContactList } from "./ContactList";
-import { WrapperContacts } from "./styles";
+import { ContactList } from './ContactList';
+import { WrapperContacts } from './styles';
 
 export const ContactsContainer: FC = () => {
   return (

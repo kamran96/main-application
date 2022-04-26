@@ -28,17 +28,11 @@ export class AccountGroup {
   @Column()
   updatedById: number;
 
-  @OneToOne(
-    type => Branches,
-    branch => branch.id,
-  )
+  @OneToOne((type) => Branches, (branch) => branch.id)
   @JoinColumn()
   branch: Branches;
 
-  @OneToOne(
-    type => Accounts,
-    account => account.id,
-  )
+  @OneToOne((type) => Accounts, (account) => account.id)
   @JoinColumn()
   account: Accounts;
 }

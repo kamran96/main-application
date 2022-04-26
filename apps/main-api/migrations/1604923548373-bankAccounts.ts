@@ -24,7 +24,7 @@ export class bankAccounts1604923548373 implements MigrationInterface {
           { name: 'updatedAt', type: 'timestamp', default: 'NOW()' },
         ],
       }),
-      true,
+      true
     );
 
     await queryRunner.addColumn(
@@ -33,7 +33,7 @@ export class bankAccounts1604923548373 implements MigrationInterface {
         name: 'bankId',
         isNullable: true,
         type: 'int',
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -43,7 +43,7 @@ export class bankAccounts1604923548373 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'banks',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'payments',
@@ -52,7 +52,7 @@ export class bankAccounts1604923548373 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'banks',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.createForeignKey(
       'bank_accounts',
@@ -61,7 +61,7 @@ export class bankAccounts1604923548373 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'organizations',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 export function useForm(initial, schema, changeAgent = null) {
   const [values, setState] = useState(initial);
@@ -24,18 +24,18 @@ export function useForm(initial, schema, changeAgent = null) {
 
   const changeValue = (key: string, value) => {
     if (key) {
-      if (key.startsWith("push|")) {
+      if (key.startsWith('push|')) {
         // example: key = push|variants, means push value to variants.
-        const [, variable] = key.split("|");
+        const [, variable] = key.split('|');
         const _values = { ...values };
         const _data = _values[variable];
         _data.push(value);
         _values[variable] = _data;
         setState(_values);
-      } else if (key.indexOf("|") > -1) {
+      } else if (key.indexOf('|') > -1) {
         // we've index values
         const _values = { ...values };
-        const [name, _key, index] = key.split("|");
+        const [name, _key, index] = key.split('|');
         const _data = _values[_key];
         const _subject = { ..._data[index] };
         _subject[name] = value;
@@ -52,7 +52,7 @@ export function useForm(initial, schema, changeAgent = null) {
   const onFormChange = (e) => {
     const { name, value, type } = e.target;
     if (name) {
-      if (type === "checkbox") {
+      if (type === 'checkbox') {
         changeValue(name, e.target.checked);
       } else {
         changeValue(name, value);

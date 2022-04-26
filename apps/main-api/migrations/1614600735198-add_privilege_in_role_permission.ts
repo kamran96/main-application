@@ -6,7 +6,8 @@ import {
 } from 'typeorm';
 
 export class addPrivilegeInRolePermission1614600735198
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropColumn('role_permissions', 'privilege');
 
@@ -16,7 +17,7 @@ export class addPrivilegeInRolePermission1614600735198
         name: 'hasPermission',
         isNullable: true,
         type: 'boolean',
-      }),
+      })
     );
 
     await queryRunner.addColumn(
@@ -25,7 +26,7 @@ export class addPrivilegeInRolePermission1614600735198
         name: 'organizationId',
         type: 'int',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -35,7 +36,7 @@ export class addPrivilegeInRolePermission1614600735198
         referencedColumnNames: ['id'],
         referencedTableName: 'branches',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

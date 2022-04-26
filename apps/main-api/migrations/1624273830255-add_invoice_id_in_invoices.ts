@@ -13,7 +13,7 @@ export class addInvoiceIdInInvoices1624273830255 implements MigrationInterface {
         name: 'purchaseId',
         type: 'int',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -23,7 +23,7 @@ export class addInvoiceIdInInvoices1624273830255 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'purchases',
         onDelete: 'CASCADE',
-      }),
+      })
     );
     await queryRunner.addColumn(
       'invoices',
@@ -31,7 +31,7 @@ export class addInvoiceIdInInvoices1624273830255 implements MigrationInterface {
         name: 'invoiceId',
         type: 'int',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -41,7 +41,7 @@ export class addInvoiceIdInInvoices1624273830255 implements MigrationInterface {
         referencedColumnNames: ['id'],
         referencedTableName: 'invoices',
         onDelete: 'CASCADE',
-      }),
+      })
     );
   }
 

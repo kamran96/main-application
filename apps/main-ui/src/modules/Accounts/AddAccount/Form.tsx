@@ -180,7 +180,7 @@ export const AccountsForm: FC = () => {
             <Col span={12}>
               <FormLabel>Code</FormLabel>
               <Form.Item name="code">
-                <Input size="large" type="number" disabled autoComplete="off"  />
+                <Input size="large" type="number" disabled autoComplete="off" />
               </Form.Item>
               <p className="input-info">
                 A unique code/number for this account (limited to 10 characters)

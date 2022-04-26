@@ -1,21 +1,21 @@
-import React, { FC } from "react";
-import styled from "styled-components";
-import { IThemeProps } from "../../hooks/useTheme/themeColors";
-import { Color } from "../../modal";
-import convertToRem from "../../utils/convertToRem";
+import React, { FC } from 'react';
+import styled from 'styled-components';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
+import { Color } from '../../modal';
+import convertToRem from '../../utils/convertToRem';
 
 interface IProps {
-  type?: "form" | "table" | "container" | "normal" | "form-inner";
+  type?: 'form' | 'table' | 'container' | 'normal' | 'form-inner';
   children?: string | React.ReactElement<any> | any;
   onClick?: () => void;
   onMouseOver?: () => void;
-  fontWeight?: "400" | "600" | "500" | "700";
+  fontWeight?: '400' | '600' | '500' | '700';
   color?: string;
   className?: string;
 }
 
 const defaultProps: IProps = {
-  type: "form",
+  type: 'form',
 };
 
 export const Heading: FC<IProps> = ({
@@ -37,17 +37,17 @@ export const Heading: FC<IProps> = ({
     >
       <h2
         className={`heading ${
-          type === "form"
-            ? "headingForm"
-            : type === "container"
-            ? "headingContainer"
-            : type === "table"
-            ? "headingTable"
-            : type === "normal"
-            ? "normal_heading"
-            : type === "form-inner"
-            ? "form-inner"
-            : ""
+          type === 'form'
+            ? 'headingForm'
+            : type === 'container'
+            ? 'headingContainer'
+            : type === 'table'
+            ? 'headingTable'
+            : type === 'normal'
+            ? 'normal_heading'
+            : type === 'form-inner'
+            ? 'form-inner'
+            : ''
         }`}
       >
         {children}
@@ -69,27 +69,27 @@ const HeadingWrapper: any = styled.div`
   .headingForm {
     font-style: normal;
     font-weight: ${(props: any) =>
-      props.fontWeight ? props.fontWeight : "600"};
+      props.fontWeight ? props.fontWeight : '600'};
     font-size: ${convertToRem(22)};
     line-height: ${convertToRem(30)};
   }
   .headingContainer {
     font-style: normal;
     font-weight: ${(props: any) =>
-      props.fontWeight ? props.fontWeight : "500"};
+      props.fontWeight ? props.fontWeight : '500'};
     font-size: ${convertToRem(22)};
   }
 
   .headingTable {
     font-style: normal;
     font-weight: ${(props: any) =>
-      props.fontWeight ? props.fontWeight : "bold"};
+      props.fontWeight ? props.fontWeight : 'bold'};
     font-size: ${convertToRem(28)};
   }
   .normal_heading {
     font-style: normal;
     font-weight: ${(props: any) =>
-      props.fontWeight ? props.fontWeight : "bold"};
+      props.fontWeight ? props.fontWeight : 'bold'};
     font-size: ${convertToRem(14)};
   }
 

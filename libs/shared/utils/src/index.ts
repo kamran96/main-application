@@ -1,2 +1,2 @@
 export * from './lib/shared-utils';
-export * from "./useTheme/index";
+export * from './useTheme/index';
