@@ -17,7 +17,7 @@ ENV MONGO_URI=mongodb+srv://contacts:fYnc4.ZPdz378t4@cluster0.hiwqy.mongodb.net/
     GOOGLE_CLIENT_SECRET=ckcvOhikVvHBi7BeU7n2YzKc \
     JWT_SECRET=alalsdflasjlf343424 \
     PORT=3334 \
-    NODE_ENV=production \
+    NODE_ENV='production' \
     EXPIRES='12'
 
 WORKDIR /home/node/app
