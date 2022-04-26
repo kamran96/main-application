@@ -86,7 +86,7 @@ export const Themes: IThemes = {
     $Primary2: `#1e5b9e`,
     layoutBg: `#efefef`,
     sidebarBg: '#ffff',
-    sidebarListActive: '#F9FCFF',  //sidebar
+    sidebarListActive: '#F9FCFF', //sidebar
     sidebarListActiveText: '#168AF4',
     sidebarDefaultText: 'rgba(62, 62, 60, 0.75)',
     tableRowHover: '#151515',
@@ -137,7 +137,7 @@ export const Themes: IThemes = {
     $CHECK_BOX: '#DEDEDE',
     $Primary2: `#1e5b9e`,
     layoutBg: `#1B1B1B`,
-    sidebarBg: '#1f1f1f',            //sidebar
+    sidebarBg: '#1f1f1f', //sidebar
     sidebarListActiveText: '#e4e4e4',
     sidebarListActive: '#373737',
     sidebarDefaultText: `#C2C2C2`,

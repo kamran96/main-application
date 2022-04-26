@@ -16,7 +16,11 @@ import styled from 'styled-components';
 import { BalanceSheetAPI } from '../../../../api';
 import { ButtonTag } from '../../../../components/ButtonTags';
 import { Heading } from '../../../../components/Heading';
-import { BoldText, BOLDTEXT , MeduimText} from '../../../../components/Para/BoldText';
+import {
+  BoldText,
+  BOLDTEXT,
+  MeduimText,
+} from '../../../../components/Para/BoldText';
 import { PrintFormat } from '../../../../components/PrintFormat';
 import {
   PrintHeaderFormat,
@@ -195,13 +199,14 @@ export const BalanceSheetList: FC = () => {
             <PDFDownloadLinkWrapper
               document={
                 <BalanceSheetPdf
-                  totals={{ 
+                  totals={{
                     totalCredits,
                     totalDebits,
                     closing_credits,
                     closing_debits,
                     opening_credits,
-                    opening_debits, }}
+                    opening_debits,
+                  }}
                   header={headerprops}
                   balanceSheetData={balanceSheetData}
                   searchquery={searchedQueryItem}
@@ -476,10 +481,10 @@ const WrapperBalanceSheetList = styled.div<WrapperBalanceSheetProps>`
       padding-left: 24px;
     }
 
-    table tfoot tr td{
+    table tfoot tr td {
       padding: 10px 10px;
     }
-  
+
     .calculated_groups {
       td {
         border-top: 1px solid

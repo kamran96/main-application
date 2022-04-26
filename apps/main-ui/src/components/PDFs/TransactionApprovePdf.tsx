@@ -120,7 +120,7 @@ export const TransactionApprovePdf: FC<IProps> = ({ header, resultData }) => {
                   {credit.map((creditItem: any) => {
                     return (
                       <Text style={styles.itemCredit}>
-                        <Text style={{fontWeight: 'bold'}}> To </Text>{' '}
+                        <Text style={{ fontWeight: 'bold' }}> To </Text>{' '}
                         {creditItem?.account?.name}
                       </Text>
                     );

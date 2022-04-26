@@ -34,7 +34,7 @@ export const PurchaseListTopbar: FC<IProps> = ({
   hasApproveButton,
   hideDeleteButton,
   loading,
-  hasDownloadPdf
+  hasDownloadPdf,
 }) => {
   return (
     <WrapperPurchaseTopbar className="flex alignCenter justifySpaceBetween">
@@ -66,7 +66,6 @@ export const PurchaseListTopbar: FC<IProps> = ({
             title="Edit"
             size="middle"
             icon={editSolid}
-            
           />
           // <Button
           //   disabled={disabled}
@@ -103,7 +102,7 @@ export const PurchaseListTopbar: FC<IProps> = ({
           //   Delete
           // </Button>
         )}
-        
+
         {/* <Button
           disabled={disabled}
           onClick={onEmail}
