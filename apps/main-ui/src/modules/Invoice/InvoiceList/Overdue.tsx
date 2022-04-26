@@ -23,7 +23,7 @@ import {
   ORDER_TYPE,
 } from '../../../modal/invoice';
 import { ISupportedRoutes } from '../../../modal/routing';
-import { PdfCols, _exportableCols } from './commonCol';
+import { useCols } from './commonCol';
 import InvoicesFilterSchema from './InvoicesFilterSchema';
 
 interface IProps {
@@ -34,7 +34,7 @@ export const OverDueInvoices: FC<IProps> = ({ columns }) => {
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
     query: '',
-    sortid: '',
+    sortid: 'id',
     page_size: 10,
   });
 
@@ -44,6 +44,8 @@ export const OverDueInvoices: FC<IProps> = ({ columns }) => {
   const { history } = routeHistory;
   const [confirmModal, setConfirmModal] = useState(false);
   const { notificationCallback } = useGlobalContext();
+
+  const {PdfCols, _exportableCols} = useCols();
 
   useEffect(() => {
     if (
@@ -107,6 +109,7 @@ export const OverDueInvoices: FC<IProps> = ({ columns }) => {
       page,
       page_size,
       query,
+      sortid
     ],
     getInvoiceListAPI,
     {
@@ -238,13 +241,34 @@ export const OverDueInvoices: FC<IProps> = ({ columns }) => {
           if (sorter.order === undefined) {
             setAllInvoicesConfig({
               ...allInvoicesConfig,
-              sortid: null,
+              sortid: 'id',
               page: pagination.current,
               page_size: pagination.pageSize,
             });
-            const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=due_expired&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+            const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=due_expired&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
             history.push(route);
           } else {
+            if (sorter?.order === 'ascend') {
+              const userData = [...result].sort((a, b) => {
+                if (a[sorter?.field] > b[sorter?.field]) {
+                  return 1;
+                } else {
+                  return -1;
+                }
+              });
+              
+              setAllInvoicesRes(prev =>({...prev,  result: userData}))
+            } else {
+              const userData = [...result].sort((a, b) => {
+                if (a[sorter?.field] < b[sorter?.field]) {
+                  return 1;
+                } else {
+                  return -1;
+                }
+              });
+              
+              setAllInvoicesRes(prev =>({...prev,  result: userData}))
+            }
             setAllInvoicesConfig({
               ...allInvoicesConfig,
               page: pagination.current,
@@ -256,13 +280,13 @@ export const OverDueInvoices: FC<IProps> = ({ columns }) => {
             });
             const route = `/app${
               ISupportedRoutes.INVOICES
-            }?tabIndex=due_expired&sortid=null&page=${
-              pagination.current
-            }&page_size=${pagination.pageSize}&query=${query}&sortid=${
+            }?tabIndex=due_expired&sortid=${
               sorter && sorter.order === 'descend'
                 ? `-${sorter.field}`
                 : sorter.field
-            }`;
+            }&page=${
+              pagination.current
+            }&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
             history.push(route);
           }
         }}

@@ -28,7 +28,7 @@ import {
   ISupportedRoutes,
 } from '../../../../../modal';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
-import { PDFColsBills, _csvExportable } from './CommonCol';
+import { useCols } from './CommonCol';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
 
@@ -60,6 +60,7 @@ export const PaidBills: FC<IProps> = ({ columns, activeTab }) => {
   });
   /* ********* DESTRUCTURING ALL INVOICESCONFIG *************** */
   const { page, query, sortid, page_size } = allInvoicesConfig;
+  const {PDFColsBills, _csvExportable} = useCols();
 
   const [confirmModal, setConfirmModal] = useState(false);
   const { routeHistory } = useGlobalContext();
@@ -129,6 +130,7 @@ export const PaidBills: FC<IProps> = ({ columns, activeTab }) => {
       page,
       page_size,
       query,
+      sortid
     ],
     getPoListAPI,
     {
@@ -255,6 +257,27 @@ export const PaidBills: FC<IProps> = ({ columns, activeTab }) => {
             const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=paid&sortid=null&page=1&page_size=20&sortid=${sortid}`;
             history.push(route);
           } else {
+            if (sorter?.order === 'ascend') {
+              const userData = [...result].sort((a, b) => {
+                if (a[sorter?.field] > b[sorter?.field]) {
+                  return 1;
+                } else {
+                  return -1;
+                }
+              });
+              
+              setAllInvoicesRes(prev =>({...prev,  result: userData}))
+            } else {
+              const userData = [...result].sort((a, b) => {
+                if (a[sorter?.field] < b[sorter?.field]) {
+                  return 1;
+                } else {
+                  return -1;
+                }
+              });
+              
+              setAllInvoicesRes(prev =>({...prev,  result: userData}))
+            }
             setAllInvoicesConfig({
               ...allInvoicesConfig,
               page: pagination.current,
@@ -266,13 +289,13 @@ export const PaidBills: FC<IProps> = ({ columns, activeTab }) => {
             });
             const route = `/app${
               ISupportedRoutes.PURCHASES
-            }?tabIndex=paid&sortid=null&page=${pagination.current}&page_size=${
-              pagination.pageSize
-            }&query=${query}&sortid=${
+            }?tabIndex=paid&sortid=${
               sorter && sorter.order === 'descend'
                 ? `-${sorter.field}`
                 : sorter.field
-            }`;
+            }&page=${pagination.current}&page_size=${
+              pagination.pageSize
+            }&filter=${sorter.order}&query=${query}`;
             history.push(route);
           }
         }}
