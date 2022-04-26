@@ -14,7 +14,11 @@ USER node
 WORKDIR /home/node/app
 COPY ./dist/apps/users-service .
 
+# change permissions to the node_modules folder
+# COPY --chown=node:node . /home/node/app/node_modules
 COPY --chown=node:node ./dist/apps/users-service /home/node/app
+RUN mkdir /home/node/app/node_modules
+
 
 RUN npm install --production
 RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express
