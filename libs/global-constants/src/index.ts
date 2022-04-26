@@ -66,4 +66,5 @@ export enum InvTypes {
   BILL = 'BILL',
   CREDIT_NOTE = 'CN',
   PURCHASE_ORDER = 'PO',
+  QUOTATION = 'Q0',
 }

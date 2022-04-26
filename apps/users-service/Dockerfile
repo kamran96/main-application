@@ -1,12 +1,25 @@
-FROM node:lts-alpine
+# Start from the dependencies image
+FROM node:lts-alpine as build
 WORKDIR /app
-COPY ./dist/apps/users-service .
-ENV PORT=3334
-ENV MONGO_URI=mongodb+srv://contacts:fYnc4.ZPdz378t4@cluster0.hiwqy.mongodb.net/users?retryWrites=true&w=majority
-ENV JWT_SECRET=alalsdflasjlf343424
-ENV EXPIRES=12
-ENV NODE_ENV=production
-EXPOSE ${PORT}
+COPY . .
+
 RUN npm install --production
 RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express
-CMD node ./main.js
+
+FROM node:lts-alpine
+
+
+# Copy your local project to the image's WORKDIR
+
+# add dump-init to avoid nodejs as pid 1
+RUN apk add dumb-init
+ENV NODE_ENV production 
+ARG PORT
+USER node
+WORKDIR /home/node/app
+# change permissions to the node_modules folder
+COPY --chown=node:node --from=build /app/node_modules /home/node/app/node_modules
+COPY --chown=node:node ./dist/apps/users-service /home/node/app
+
+EXPOSE ${PORT}
+CMD [ "dumb-init", "node", "main.js" ]

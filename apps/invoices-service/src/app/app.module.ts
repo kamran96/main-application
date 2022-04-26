@@ -10,6 +10,7 @@ import { Authenticate } from '@invyce/auth-middleware';
 import { BillModule } from './bill/bill.module';
 import { CreditNoteModule } from './credit-note/credit-note.module';
 import { PurchaseOrderModule } from './purchase-order/purchase-order.module';
+import { QuotationModule } from './quotation/quotation.module';
 dotenv.config();
 
 @Module({
@@ -34,6 +35,7 @@ dotenv.config();
     BillModule,
     CreditNoteModule,
     PurchaseOrderModule,
+    QuotationModule,
   ],
   controllers: [AppController],
   providers: [AppService, Authenticate],
