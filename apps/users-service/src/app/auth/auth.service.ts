@@ -237,13 +237,12 @@ export class AuthService {
     const token = this.jwtService.sign(payload);
     // const address = ip.address();
 
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env['NODE' + '_ENV'] === 'production') {
       res
         .cookie('access_token', token, {
           secure: true,
           sameSite: 'none',
           httpOnly: true,
-          // domain: 'localhost',
           path: '/',
           expires: new Date(Moment().add(process.env.EXPIRES, 'h').toDate()),
         })
