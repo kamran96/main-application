@@ -131,7 +131,6 @@ const Editor = () => {
         return { amount: a.amount + b.amount };
       });
 
-
       let payload = {
         isNewRecord: true,
         ...values,
@@ -152,14 +151,14 @@ const Editor = () => {
             onSuccess: () => {
               resetTransactions();
               form.resetFields();
-              if (form.getFieldValue("status") === 2) {
+              if (form.getFieldValue('status') === 2) {
                 [`transactions`]?.forEach((key) => {
                   (queryCache?.invalidateQueries as any)((q) =>
                     q?.queryKey[0]?.toString().startsWith(key)
                   );
                 });
               } else {
-                     [
+                [
                   'accounts',
                   `transactions`,
                   `report-trialbalance`,
@@ -179,9 +178,8 @@ const Editor = () => {
               );
             },
           });
-        }
-        else
-          throw{
+        } else
+          throw {
             status: 501,
             message:
               "The Transaction Amount Are Not Seem's Equal Please Take A Look Again",
