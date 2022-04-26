@@ -15,7 +15,7 @@ import {
   CreateContact,
   JournalEntry,
   Dashboard,
-  DebitNote
+  DebitNote,
 } from '../assets/icons/index';
 
 const root = `/app`;
@@ -25,7 +25,7 @@ export const RoutingSchema: IRoutingSchema = {
       tag: 'Dashboard',
       route: '/app/dashboard',
       children: [],
-      icon:<Dashboard />,
+      icon: <Dashboard />,
     },
     // {
     //   tag: 'Banking',
@@ -35,7 +35,7 @@ export const RoutingSchema: IRoutingSchema = {
     // },
     {
       tag: 'Business',
-      icon: <BussinesIcon/>,
+      icon: <BussinesIcon />,
       children: [
         {
           route: `${root}${ISupportedRoutes.INVOICE_DASHBOARD}`,
@@ -75,7 +75,7 @@ export const RoutingSchema: IRoutingSchema = {
     },
     {
       tag: 'Reports',
-      icon: <ReportIcon/>,
+      icon: <ReportIcon />,
       children: [
         {
           route: `${root}${ISupportedRoutes.TRIAL_BALANCE}`,
@@ -97,7 +97,7 @@ export const RoutingSchema: IRoutingSchema = {
     },
     {
       tag: 'Accounting',
-      icon: <Accounting/>,
+      icon: <Accounting />,
       children: [
         {
           route: `${root}${ISupportedRoutes.ACCOUNTS}`,
@@ -128,7 +128,7 @@ export const RoutingSchema: IRoutingSchema = {
     },
     {
       tag: 'Payments',
-      icon: <Payments/>,
+      icon: <Payments />,
       route: `${root}${ISupportedRoutes.PAYMENTS}`,
       children: [],
       permission: PERMISSIONS.PAYMENTS_INDEX,
@@ -136,7 +136,7 @@ export const RoutingSchema: IRoutingSchema = {
 
     {
       tag: 'Contact',
-      icon: <Contacts/>,
+      icon: <Contacts />,
       route: `${root}${ISupportedRoutes.CONTACTS}`,
       children: [],
       permission: PERMISSIONS.CONTACTS_INDEX,
@@ -145,7 +145,7 @@ export const RoutingSchema: IRoutingSchema = {
       tag: 'Items',
       route: '/app/items',
       children: [],
-      icon: <Items/>,
+      icon: <Items />,
       permission: PERMISSIONS.ITEMS_INDEX,
     },
 
@@ -162,7 +162,7 @@ export const RoutingSchema: IRoutingSchema = {
       tag: 'Dispatching',
       route: `${root}${ISupportedRoutes.DISPATCHING}`,
       children: [],
-      icon: <Items/>,
+      icon: <Items />,
       permission: 'DISABLED', // MAKE ONCE ITS INTEGRATED IT WILL BE ENABLE
     },
   ],
@@ -170,49 +170,49 @@ export const RoutingSchema: IRoutingSchema = {
     {
       route: `${root}${ISupportedRoutes.CREATE_TRANSACTION}`,
       tag: 'Journal Entry',
-      icon: <JournalEntry/>,
+      icon: <JournalEntry />,
       permission: PERMISSIONS.TRANSACTIONS_CREATE,
     },
     {
       route: `${root}${ISupportedRoutes.CREATE_CONTACT}`,
       tag: 'Create Contact',
-      icon: <CreateContact/>,
+      icon: <CreateContact />,
       permission: PERMISSIONS.CONTACTS_CREATE,
     },
     {
       route: root + ISupportedRoutes.CREATE_INVOICE,
       tag: 'Create Invoice',
-      icon: <CreateInvoice/>,
+      icon: <CreateInvoice />,
       permission: PERMISSIONS.INVOICES_CREATE,
     },
 
     {
       route: `${root}${ISupportedRoutes.CREATE_PURCHASE_ORDER}`,
       tag: 'Create PO',
-      icon: <CreatePo/>,
+      icon: <CreatePo />,
       permission: PERMISSIONS.PURCHASE_ORDERS_CREATE,
     },
     {
       route: `${root}${ISupportedRoutes.CREATE_PURCHASE_Entry}`,
       tag: 'Create Bill',
-      icon: <CreateBill/>,
+      icon: <CreateBill />,
     },
 
     {
       route: `${root}${ISupportedRoutes.CREATE_QUOTE}`,
       tag: 'Create Quote',
-      icon: <CreateQuote/>,
+      icon: <CreateQuote />,
       permission: PERMISSIONS.QUOTATIONS_CREATE,
     },
     {
       route: `${root}${ISupportedRoutes.ADD_CREDIT_NOTE}`,
       tag: 'Credit Note',
-      icon: <CreateNote/>,
+      icon: <CreateNote />,
     },
     {
       route: `${root}${ISupportedRoutes.ADD_DEBIT_NOTE}`,
       tag: 'Debit Note',
-      icon: <DebitNote/>,
+      icon: <DebitNote />,
     },
   ],
 };

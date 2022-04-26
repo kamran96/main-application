@@ -11,6 +11,8 @@ import {
   IPage,
   IRequest,
 } from '@invyce/interfaces';
+import { Sorting } from '@invyce/sorting';
+
 import { Price } from '../schemas/price.schema';
 import { ItemCodesDto, ItemDto, ItemIdsDto } from '../dto/item.dto';
 import { ItemLedger } from '../schemas/itemLedger.schema';
@@ -29,9 +31,11 @@ export class ItemService {
     itemData: IBaseUser,
     query: IPage
   ): Promise<IItemWithResponse> {
-    const { page_size, page_no, query: filters, purpose } = query;
+    const { page_size, page_no, query: filters, sort, purpose } = query;
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
+
+    const { sort_column, sort_order } = await Sorting(sort);
 
     let items;
     if (purpose === 'ALL') {
@@ -70,6 +74,7 @@ export class ItemService {
                 offset: pn * ps - ps,
                 populate: 'price',
                 limit: ps,
+                sort: { [sort_column]: sort_order },
                 customLabels: myCustomLabels,
               }
             );
@@ -86,6 +91,7 @@ export class ItemService {
                 offset: pn * ps - ps,
                 populate: 'price',
                 limit: ps,
+                sort: { [sort_column]: sort_order },
                 customLabels: myCustomLabels,
               }
             );
@@ -100,6 +106,7 @@ export class ItemService {
                 offset: pn * ps - ps,
                 populate: 'price',
                 limit: ps,
+                sort: { [sort_column]: sort_order },
                 customLabels: myCustomLabels,
               }
             );
@@ -114,6 +121,7 @@ export class ItemService {
                 offset: pn * ps - ps,
                 populate: 'price',
                 limit: ps,
+                sort: { [sort_column]: sort_order },
                 customLabels: myCustomLabels,
               }
             );
@@ -136,6 +144,7 @@ export class ItemService {
           {
             offset: pn * ps - ps,
             limit: page_size,
+            sort: { [sort_column]: sort_order },
             populate: 'price',
             customLabels: myCustomLabels,
           }

@@ -178,9 +178,7 @@ export const PermissionsLayout: FC = () => {
             <table className="dynamic_table" style={{ width: '100%' }}>
               <thead>
                 <tr>
-                  <th>
-                    Permissions
-                  </th>
+                  <th>Permissions</th>
                   {rolesList.map((item, index) => {
                     return <th key={index}>{item.name}</th>;
                   })}

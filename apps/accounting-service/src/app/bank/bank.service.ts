@@ -6,6 +6,7 @@ import {
   BankRepository,
   SecondaryAccountRepository,
 } from '../repositories';
+import { Sorting } from '@invyce/sorting';
 
 @Injectable()
 export class BankService {
@@ -13,11 +14,17 @@ export class BankService {
     return await getCustomRepository(BankRepository).find();
   }
 
-  async ListBankAccount(user) {
+  async ListBankAccount(user, query) {
+    const { sort } = query;
+    const { sort_column, sort_order } = await Sorting(sort);
+
     return await getCustomRepository(BankAccountRepository).find({
       where: {
         organizationId: user.organizationId,
         // branchId: user.branchId
+      },
+      order: {
+        [sort_column]: sort_order,
       },
       relations: ['bank', 'account'],
     });
@@ -41,8 +48,8 @@ export class BankService {
       take: 1,
     });
 
-    let code = parseInt(account.code);
-    let newCode = code + 1;
+    const code = parseInt(account.code);
+    const newCode = code + 1;
 
     const new_account = await getCustomRepository(AccountRepository).save({
       name: data.name,
