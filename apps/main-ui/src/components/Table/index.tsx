@@ -95,7 +95,6 @@ export const CommonTable: FC<IProps> = ({
 } = defaultProps) => {
   // DYNAMIC IMPORTS
 
-  console.log(data, "tableData")
 
   const TablePDF = lazy(() => import('./exportPDF'));
   const { userDetails } = useGlobalContext();

@@ -21,10 +21,15 @@ export const getInvoiceListAPI = ({ queryKey }: QueryKey) => {
   const page: number = queryKey[4];
   const pageSize: number = queryKey[5];
   const query: string = queryKey[6];
+  const sortid: string = queryKey[7];
   let url = `${INVOICES_API.INDEX}?page_size=${pageSize}&page_no=${page}&invoice_type=${invoice_type}&status=${status}&type=${type}`;
   if (query && query !== null) {
     url = `${url}&query=${query}`;
   }
+  if(sortid && sortid !== null){
+    url = `${url}&sort=${sortid}`
+  }
+  
 
   return http.get(url);
 };
@@ -76,9 +81,14 @@ export const getPoListAPI = ({ queryKey }: QueryKey) => {
   const page: number = queryKey[4];
   const pageSize: number = queryKey[5];
   const query: string = queryKey[6];
+  const sortid: string = queryKey[7];
   let url = `${INVOICES_API.BILL}?page_size=${pageSize}&page_no=${page}&status=${status}&type=${type}`;
   if (query) {
     url = `${url}&query=${query}`;
+  }
+
+  if(sortid){
+    url = `${url}&sort=${sortid}`
   }
   return http.get(url);
 };
@@ -123,9 +133,13 @@ export const getCreditNotes = ({ queryKey }: QueryKey) => {
   const pageSize = queryKey[3] || 10;
   const invoiceType = queryKey[4] || '';
   const query: string = queryKey[5] || '';
+  const sortid: string = queryKey[6] || '';
   let url = `${INVOICES_API.CREDIT_NOTE}?page_size=${pageSize}&page_no=${page}&status=${status}&invoice_type=${invoiceType}`;
   if (query) {
     url = `${url}&query=${query}`;
+  }
+  if(sortid && sortid !== null){
+    url = `${url}&sort=${sortid}`;
   }
   return http.get(url);
 };

@@ -44,7 +44,8 @@ const DRAFTTransactionsList: FC = () => {
   );
   const [filterSchema, setFilterSchema] = useState(transactionsFilterSchema);
   const [confirmModal, setConfirmModal] = useState(false);
-
+  const [sortedInfo, setSortedInfo] = useState(null);
+  
   const { routeHistory, notificationCallback, userDetails } =
     useGlobalContext();
   const { history } = routeHistory;
@@ -63,7 +64,7 @@ const DRAFTTransactionsList: FC = () => {
   const { mutate: updateTransactionStatus, isLoading: isTransactionStatus } =
     useMutation(updateTransactionDraftStatus);
 
-  const { page, query, page_size, status } = transactionConfig;
+  const { page, query,  sortid, page_size, status } = transactionConfig;
 
   const [accountsResponse, setAccountsResponse] = useState<IAccountsResult[]>(
     []
@@ -103,6 +104,28 @@ const DRAFTTransactionsList: FC = () => {
       });
 
       setTransactionsConfig({ ...transactionConfig, ...obj });
+
+      const filterType = history.location.search.split('&');
+      const filterIdType = filterType[1];
+      const filterOrder = filterType[4]?.split("=")[1];
+      
+     
+
+      if(filterIdType?.includes("-")){
+         const fieldName = filterIdType?.split("=")[1].split("-")[1];
+         setSortedInfo({
+           order: filterOrder,
+           columnKey: fieldName
+         });
+      }
+      else{
+        const fieldName = filterIdType?.split("=")[1];
+        setSortedInfo({
+          order: filterOrder,
+          columnKey: fieldName
+        })
+      }
+      
     }
   }, [history]);
 
@@ -113,6 +136,7 @@ const DRAFTTransactionsList: FC = () => {
       page_size,
       query,
       status,
+      sortid,
     ],
     getAllTransactionsAPI,
     {
@@ -219,11 +243,15 @@ const DRAFTTransactionsList: FC = () => {
       title: 'Ref',
       dataIndex: 'ref',
       key: 'ref',
+      sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'ref' && sortedInfo?.order,
     },
     {
       title: 'Date',
       dataIndex: 'date',
       key: 'date',
+      sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'date' && sortedInfo?.order,
       render: (data) => {
         return <>{dayjs(data).format(`MMMM D, YYYY h:mm A`)}</>;
       },
@@ -233,18 +261,24 @@ const DRAFTTransactionsList: FC = () => {
       title: 'Narration',
       dataIndex: 'narration',
       key: 'narration',
+      sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'narration' && sortedInfo?.order,
       render: (data, row, index) => <>{data ? data : '-'}</>,
     },
     {
       title: 'Note',
       dataIndex: 'notes',
       key: 'notes',
+      sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'notes' && sortedInfo?.order,
       render: (data, row, index) => <>{data ? data : '-'}</>,
     },
     {
       title: 'Amount',
       dataIndex: 'amount',
       key: 'amount',
+      sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'amount' && sortedInfo?.order,
       render: (data, row, index) => <>{data ? moneyFormat(data) : '-'}</>,
     },
   ];
@@ -290,9 +324,36 @@ const DRAFTTransactionsList: FC = () => {
         page: pagination.current,
         page_size: pagination.pageSize,
       });
-      const route = `/app${ISupportedRoutes.TRANSACTIONS}?tabIndex=draft&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}`;
+      const route = `/app${ISupportedRoutes.TRANSACTIONS}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}`;
       history.push(route);
     } else {
+      if (sorter?.order === 'ascend') {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] > b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        // setSortedInfo({
+        //   order: sorter?.order,
+        //   columnKey: sorter?.field
+        // })
+        setResponse(prev =>({...prev,  result: userData}))
+      } else {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] < b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        // setSortedInfo({
+        //   order: sorter?.order,
+        //   columnKey: sorter?.field
+        // })
+        setResponse(prev =>({...prev,  result: userData}))
+      }
       setTransactionsConfig({
         ...transactionConfig,
         page: pagination.current,
@@ -303,8 +364,8 @@ const DRAFTTransactionsList: FC = () => {
       const route = `/app${
         ISupportedRoutes.TRANSACTIONS
       }?tabIndex=draft&sortid=${
-        sorter?.order === 'descend' ? -sorter?.field : sorter?.field
-      }&page=${pagination.current}&page_size=${pagination.pageSize}`;
+        sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}`;
       history.push(route);
     }
   };

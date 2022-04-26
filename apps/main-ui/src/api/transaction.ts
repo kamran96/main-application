@@ -1,3 +1,4 @@
+import { number } from 'echarts';
 import { QueryKey } from '../modal';
 import http from '../utils/http';
 
@@ -13,14 +14,15 @@ export const getAllTransactionsAPI = ({ queryKey }: QueryKey) => {
   const page: number = queryKey[1];
   const pageSize: number = queryKey[2];
   const query: string = queryKey[3];
-  const status: number = queryKey[4]
+  const status: number = queryKey[4];
+  const sortid: string = queryKey[5];
   let url = `${TRANSACTION.INDEX}?page_size=${pageSize}&page_no=${page}&status=${status}`;
   if (query) {
     url = `${url}&query=${query}`;
   }
-  // if (sortid) {
-  //   url = `${url}&sort=${sortid}`;
-  // }
+  if (sortid && sortid !== null) {
+    url = `${url}&sort=${sortid}`;
+  }
 
   return http.get(url);
 };

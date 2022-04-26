@@ -26,6 +26,7 @@ import { pdfCols } from './pdfCols';
 export const Suppliers: FC = () => {
   /* HOOKS */
   /* CONTAINER STATES */
+  const [sortedInfo, setsortedInfo] = useState(null);
   const [selectedRow, setSelectedRow] = useState([]);
   const [contactsResponse, setContactResponse] = useState([]);
   const [confirmModal, setConfirmModal] = useState<boolean>(false);
@@ -67,13 +68,32 @@ export const Suppliers: FC = () => {
       });
 
       setConfig({ ...config, ...obj });
+
+      const filterType = history.location.search.split('&');
+      const filterIdType = filterType[1];
+      const filterOrder = filterType[4]?.split("=")[1];
+      
+      if(filterIdType?.includes("-")){
+         const fieldName = filterIdType?.split("=")[1].split("-")[1];
+         setsortedInfo({
+           order: filterOrder,
+           columnKey: fieldName
+         });
+      }
+      else{
+        const fieldName = filterIdType?.split("=")[1];
+        setsortedInfo({
+          order: filterOrder,
+          columnKey: fieldName
+        })
+      }
     }
   }, [routeHistory]);
 
   const handleContactsConfig = (pagination, filters, sorter: any, extra) => {
     if (sorter.order === undefined) {
       history.push(
-        `/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+        `/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`
       );
       setConfig({
         ...config,
@@ -83,15 +103,25 @@ export const Suppliers: FC = () => {
         page_size: pagination.pageSize,
       });
     } else {
-      history.push(
-        `/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers&sortid=${
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field
-        }&page=${pagination.current}&page_size=${
-          pagination.pageSize
-        }&query=${query}`
-      );
+      if (sorter?.order === 'ascend') {
+        const userData = [...contactsResponse].sort((a, b) => {
+          if (a[sorter?.field] > b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        setContactResponse(userData);
+      } else {
+        const userData = [...contactsResponse].sort((a, b) => {
+          if (a[sorter?.field] < b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        setContactResponse(userData)
+      }
       setConfig({
         ...config,
         sortItem: sorter.field,
@@ -102,6 +132,16 @@ export const Suppliers: FC = () => {
             ? `-${sorter.field}`
             : sorter.field,
       });
+
+      history.push(
+        `/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers&sortid=${
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field
+        }&page=${pagination.current}&page_size=${
+          pagination.pageSize
+        }&filter=${sorter.order}&query=${query}`
+      );
     }
   };
 
@@ -144,7 +184,7 @@ export const Suppliers: FC = () => {
       dataIndex: 'name',
       key: 'name',
       sorter: true,
-      showSorterTooltip: true,
+      sortOrder: sortedInfo?.columnKey === 'name' && sortedInfo?.order,
       render: (data, row, index) => (
         <Link
           className="contact-name"
@@ -159,14 +199,14 @@ export const Suppliers: FC = () => {
       dataIndex: 'email',
       key: 'email',
       sorter: true,
-      showSorterTooltip: true,
+      sortOrder: sortedInfo?.columnKey === 'email' && sortedInfo?.order
     },
     {
       title: 'Company Name',
       dataIndex: 'businessName',
       key: 'businessName',
       sorter: true,
-      showSorterTooltip: true,
+      sortOrder: sortedInfo?.columnKey === 'businessName' && sortedInfo?.order,
     },
     {
       title: 'Contact Type',

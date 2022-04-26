@@ -26,6 +26,7 @@ import { pdfCols } from './pdfCols';
 export const Customers: FC = () => {
   /* HOOKS */
   /* CONTAINER STATES */
+  const [sortedInfo, setSortedInfo] = useState(null);
   const [selectedRow, setSelectedRow] = useState([]);
   const [contactsResponse, setContactResponse] = useState([]);
   const [confirmModal, setConfirmModal] = useState<boolean>(false);
@@ -71,22 +72,38 @@ export const Customers: FC = () => {
     isFetching,
   } = useQuery(params, getContacts);
 
-  // useEffect(() => {
-  //   if (routeHistory?.history?.location?.search) {
-  //     let obj = {};
-  //     const queryArr = history.location.search.split('?')[1].split('&');
-  //     queryArr.forEach((item, index) => {
-  //       const split = item.split('=');
-  //       obj = { ...obj, [split[0]]: split[1] };
-  //     });
+  useEffect(() => {
+    if (routeHistory?.history?.location?.search) {
+      let obj = {};
+      const queryArr = history.location.search.split('?')[1].split('&');
+      queryArr.forEach((item, index) => {
+        const split = item.split('=');
+        obj = { ...obj, [split[0]]: split[1] };
+      });
 
-  //     setConfig({ ...config, ...obj });
-  //   }
-  // }, [routeHistory]);
+      setConfig({ ...config, ...obj });
+
+      const filterType = history.location.search.split('&');
+      const filterIdType = filterType[1];
+      const filterOrder = filterType[4]?.split('=')[1];
+
+      if (filterIdType?.includes('-')) {
+        const fieldName = filterIdType?.split('=')[1].split('-')[1];
+        setSortedInfo({
+          order: filterOrder,
+          columnKey: fieldName,
+        });
+      } else {
+        const fieldName = filterIdType?.split('=')[1];
+        setSortedInfo({
+          order: filterOrder,
+          columnKey: fieldName,
+        });
+      }
+    }
+  }, [routeHistory]);
 
   const handleContactsConfig = (pagination, filters, sorter: any, extra) => {
-    console.log(sorter, 'sorter');
-
     if (sorter.order === undefined) {
       setConfig({
         ...config,
@@ -99,52 +116,45 @@ export const Customers: FC = () => {
         `/app${ISupportedRoutes.CONTACTS}?tabIndex=customers&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
       );
     } else {
-      //     if(contactsResponse && sorter.order === 'descend'){
-      //       const userData = contactsResponse.sort((a, b) => {
-      //         if(a[sorter?.field] < b[sorter?.field]){
-      //           return 1;
-      //         }else{
-      //           return -1
-      //         }
-      //       });
-      //       setContactResponse(userData)
-      //       // console.log(contactsResponse, "Desc")
-      //     }else{
-      //    const userData = contactsResponse.sort((a, b) => {
-      //      if(a[sorter?.field] > b[sorter?.field]){
-      //        return 1;
-      //      }else{
-      //        return -1
-      //      }
-      //    });
-      //    setContactResponse(userData)
-      //   //  console.log(contactsResponse, "usersData Asc")
-      //  }
-
-      setConfig((prev) => {
-        return {
-          ...prev,
-          page: pagination.current,
-          page_size: pagination.pageSize,
-          sortItem: sorter?.field,
-          sortid:
-            sorter && sorter.order === 'descend'
-              ? `-${sorter.field}`
-              : sorter.field,
-        };
+      if (sorter?.order === 'ascend') {
+        const userData = [...contactsResponse].sort((a, b) => {
+          if (a[sorter?.field] > b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        setContactResponse(userData);
+      } else {
+        const userData = [...contactsResponse].sort((a, b) => {
+          if (a[sorter?.field] < b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        setContactResponse(userData);
+      }
+      setConfig({
+        ...config,
+        page: pagination.current,
+        page_size: pagination.pageSize,
+        sortItem: sorter?.field,
+        sortid:
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field,
       });
 
-      setTimeout(() => {
-        history.push(
-          `/app${ISupportedRoutes.CONTACTS}?tabIndex=customers&sortid=${
-            sorter && sorter.order === 'descend'
-              ? `-${sorter.field}`
-              : sorter.field
-          }&page=${pagination.current}&page_size=${
-            pagination.pageSize
-          }&query=${query}`
-        );
-      }, 400);
+      history.push(
+        `/app${ISupportedRoutes.CONTACTS}?tabIndex=customers&sortid=${
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field
+        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+          sorter.order
+        }&query=${query}`
+      );
     }
   };
 
@@ -161,33 +171,6 @@ export const Customers: FC = () => {
     }
   }, [resolvedData]);
 
-  useEffect(() => {
-    if (config.sortid !== 'id' && config) {
-      const sorterIdLength = sortid.split('-');
-      if (contactsResponse && sorterIdLength.length >= 2) {
-        const userData = contactsResponse.sort((a, b) => {
-          if (a[sorterIdLength[1]] < b[sorterIdLength[1]]) {
-            return 1;
-          } else {
-            return -1;
-          }
-        });
-        setContactResponse(userData);
-        console.log(contactsResponse, 'Desc');
-      } else {
-        const userData = contactsResponse.sort((a, b) => {
-          if (a[sorterIdLength[0]] > b[sorterIdLength[0]]) {
-            return 1;
-          } else {
-            return -1;
-          }
-        });
-        setContactResponse(userData);
-        console.log(contactsResponse, 'ASC');
-      }
-    }
-  }, [config]);
-
   /* columns setup antd table */
   const columns: ColumnsType<any> = [
     {
@@ -195,6 +178,7 @@ export const Customers: FC = () => {
       dataIndex: 'name',
       key: 'name',
       sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'name' && sortedInfo?.order,
       render: (data, row, index) => (
         <Link
           className="contact-name"
@@ -209,12 +193,14 @@ export const Customers: FC = () => {
       dataIndex: 'email',
       key: 'email',
       sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'email' && sortedInfo?.order,
     },
     {
       title: 'Company Name',
       dataIndex: 'businessName',
       key: 'businessName',
       sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'businessName' && sortedInfo?.order,
     },
     {
       title: 'Contact Type',
