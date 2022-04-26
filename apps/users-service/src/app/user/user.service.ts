@@ -3,6 +3,7 @@ import {
   HttpStatus,
   Inject,
   Injectable,
+  Logger,
   Res,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
@@ -42,6 +43,8 @@ export class UserService {
   ) {}
 
   async ListUsers(user: IBaseUser, query: IPage) {
+    console.log('user called.......');
+    Logger.log('user called.............');
     const { page_size, page_no, filters, purpose } = query;
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);

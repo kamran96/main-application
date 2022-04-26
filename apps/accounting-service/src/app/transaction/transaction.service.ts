@@ -408,7 +408,7 @@ export class TransactionService {
     if (process.env.NODE_ENV === 'development') {
       const header = req.headers?.authorization?.split(' ')[1];
       token = header;
-    } else {
+    } else if (process.env['NODE' + '_ENV'] === 'production') {
       if (!req || !req.cookies) return null;
       token = req.cookies['access_token'];
     }
