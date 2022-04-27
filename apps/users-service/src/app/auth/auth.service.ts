@@ -237,7 +237,7 @@ export class AuthService {
     const token = this.jwtService.sign(payload);
     // const address = ip.address();
 
-    if (process.env['NODE_ENV'] === 'production') {
+    if (process.env['NODE' + '_ENV'] === 'production') {
       res
         .cookie('access_token', token, {
           secure: true,
@@ -251,7 +251,7 @@ export class AuthService {
           status: true,
           result: newUser,
         });
-    } else if (process.env['NODE_ENV'] === 'development') {
+    } else if (process.env['NODE' + '_ENV'] === 'development') {
       res.send({
         users: newUser,
         access_token: token,
