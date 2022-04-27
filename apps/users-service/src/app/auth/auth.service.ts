@@ -237,7 +237,7 @@ export class AuthService {
     const token = this.jwtService.sign(payload);
     // const address = ip.address();
 
-    if (process.env['NODE' + '_ENV'] === 'production') {
+    if (process.env['NODE_ENV'] === 'production') {
       res
         .cookie('access_token', token, {
           secure: true,
