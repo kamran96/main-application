@@ -1,6 +1,6 @@
 import { Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import * as dotenv from 'dotenv';
 
@@ -15,11 +15,14 @@ export class Authenticate extends PassportStrategy(Strategy) {
   constructor() {
     super({
       jwtFromRequest: (req) => {
+        console.log('loging...........');
+        Logger.log('loging...........');
+        Logger.log(process.env.NODE_ENV);
         if (process.env.NODE_ENV === 'development') {
           const header = req.headers?.authorization?.split(' ')[1];
           token = header;
           return header;
-        } else {
+        } else if (process.env['NODE' + '_ENV'] === 'production') {
           if (!req || !req.cookies) return null;
           token = req.cookies['access_token'];
           host = req.headers.host;
@@ -34,6 +37,9 @@ export class Authenticate extends PassportStrategy(Strategy) {
 
   async validate(payload) {
     try {
+      console.log('loging........... here');
+      Logger.log('loging........... here');
+
       const type =
         process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
       const value =
