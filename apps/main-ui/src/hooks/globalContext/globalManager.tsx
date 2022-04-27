@@ -295,7 +295,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   } = useHttp(
     {
       apiOption: {
-        url: `users/user/${userId}`,
+        url: isProductionEnv ? `users/auth/check` : `users/user/${userId}`,
         method: 'GET',
       },
       enabled: !!userId,
