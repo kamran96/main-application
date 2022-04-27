@@ -26,7 +26,7 @@ async function bootstrap() {
 
   // app.use(csurf());
 
-  if (process.env['NODE' + '_ENV'] === 'production') {
+  if (process.env['NODE_ENV'] === 'production') {
     app.setGlobalPrefix('/users');
   }
 

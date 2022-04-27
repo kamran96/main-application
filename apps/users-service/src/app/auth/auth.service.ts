@@ -251,7 +251,7 @@ export class AuthService {
           status: true,
           result: newUser,
         });
-    } else {
+    } else if (process.env['NODE_ENV'] === 'development') {
       res.send({
         users: newUser,
         access_token: token,
