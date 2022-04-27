@@ -8,7 +8,6 @@ FROM node:lts-alpine
 
 # add dump-init to avoid nodejs as pid 1
 RUN apk add dumb-init
-RUN apk add yarn
 ARG PORT
 USER node
 
