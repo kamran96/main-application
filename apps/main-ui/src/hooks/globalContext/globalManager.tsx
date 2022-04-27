@@ -32,7 +32,10 @@ const stylesheets = {
   dark: `https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.12/antd.dark.min.css`,
 };
 
-const isProductionEnv = process.env['NODE' + '_ENV'] === 'production' || false;
+const isProductionEnv = process.env.NODE_ENV === 'production' || false;
+
+console.log('check 1', process.env.NODE_ENV);
+console.log('check 2', process.env['NODE' + '_ENV']);
 
 const AUTH_CHECK_API = isProductionEnv ? CheckAuthAPI : CheckAuthAPIDev;
 
@@ -288,6 +291,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     return auth?.users?.id || null;
   }, [auth?.users?.id]);
 
+
   const {
     isLoading,
     refetch: refetchUser,
@@ -298,7 +302,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         url: isProductionEnv ? `users/auth/check` : `users/user/${userId}`,
         method: 'GET',
       },
-      enabled: !!userId,
+      enabled: !!userId || !!checkAutherized,
       onSuccess: (data) => {
         if (isProductionEnv) {
           setUserDetails(data?.users);
