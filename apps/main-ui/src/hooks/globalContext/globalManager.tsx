@@ -32,7 +32,7 @@ const stylesheets = {
   dark: `https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.12/antd.dark.min.css`,
 };
 
-const isProductionEnv = process.env.NODE_ENV === 'production' || false;
+const isProductionEnv = process.env['NODE' + '_ENV'] === 'production' || false;
 
 const AUTH_CHECK_API = isProductionEnv ? CheckAuthAPI : CheckAuthAPIDev;
 
