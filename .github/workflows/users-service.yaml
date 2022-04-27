@@ -61,7 +61,7 @@ jobs:
       # docker build item service images
       - name: Build container image
         run: docker build -f $GITHUB_WORKSPACE/apps/users-service/Dockerfile -t registry.digitalocean.com/invyce-images/users-service:$(echo $GITHUB_SHA | head -c7) .
-          env: NODE_ENV='production'
+        env: NODE_ENV='production'
 
       #login to digitalocean for 1200 seconds
       - name: Log in to DigitalOcean Container Registry with short-lived credentials
