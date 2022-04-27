@@ -7,9 +7,9 @@ COPY ./dist/apps/main-ui .
 FROM node:lts-alpine
 FROM nginx:alpine
 
-ENV REACT_APP_ENCRIPTION_KEY='@@qW4hdejazkarimhunzai!!isEjoo' \
+ENV NODE_ENV='production' \
+    REACT_APP_ENCRIPTION_KEY='@@qW4hdejazkarimhunzai!!isEjoo' \
     REACT_APP_REGISTER_KEY='@@Inv@&&oldPhunar'\
-    NODE_ENV=production \
     PORT=80
 
 WORKDIR /home/node/app
