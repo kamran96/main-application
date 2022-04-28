@@ -13,7 +13,7 @@ async function bootstrap() {
 
   app.enableCors({ origin: true, credentials: true });
   if (process.env['NODE' + '_ENV'] === 'production') {
-    app.setGlobalPrefix('/attachments');
+    app.setGlobalPrefix('/api/attachments');
   }
   const port = process.env.PORT || 3338;
   await app.listen(port, () => {

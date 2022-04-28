@@ -35,7 +35,7 @@ async function bootstrap() {
   });
 
   if (process.env['NODE' + '_ENV'] === 'production') {
-    app.setGlobalPrefix('/contacts');
+    app.setGlobalPrefix('/api/contacts');
   }
   await app.listen(port, () => {
     const address =

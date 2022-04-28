@@ -94,7 +94,7 @@ jobs:
         run: docker push registry.digitalocean.com/invyce-images/accounting-service:$(echo $GITHUB_SHA | head -c7)
       
       - name: Update deployment file
-        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/invyce-images/accounting-service:'${TAG}'|' $GITHUB_WORKSPACE/apps/accounting-service/ops/accounting-deployment.yaml
+        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/invyce-images/accounting-service:'${TAG}'|' $GITHUB_WORKSPACE/apps/accounting-service/src/main.ts
 
          # Install yq
       - name: Install yq 
@@ -122,10 +122,3 @@ jobs:
           git add .  
           git commit -m "refactor - updated Helm chart values for dev environment with container image - $CONTAINER_IMAGE_TAG" 
           git push -u origin main
-
-      # - name: Save DigitalOcean kubeconfig with short-lived credentials
-      #   run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 k8s-invyce-app-stg
-
-      # - name: Deploy to DigitalOcean Kubernetes
-      #   run: kubectl apply -f $GITHUB_WORKSPACE/apps/accounting-service/ops/accounting-deployment.yaml
-

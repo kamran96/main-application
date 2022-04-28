@@ -1,10 +1,45 @@
 FROM node:lts-alpine
 WORKDIR /app
 COPY ./dist/apps/accounting-service .
-ENV PORT=3336
-ENV JWT_SECRET=alalsdflasjlf343424
-ENV NODE_ENV=production
+
 EXPOSE ${PORT}
 RUN npm install --production
 RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express
 CMD node ./main.js
+
+FROM node:lts-alpine as build
+
+WORKDIR /app
+RUN touch /app/package-lock.json
+COPY ./dist/apps/contacts-service .
+
+FROM node:lts-alpine
+
+# add dump-init to avoid nodejs as pid 1
+RUN apk add dumb-init
+ENV NODE_ENV production
+ARG PORT
+USER node
+
+ENV DB_HOST='db-postgresql-sgp1-12041-do-user-4046074-0.b.db.ondigitalocean.com' \
+    DB_PORT=25060 \
+    ACC_DB_NAME='accounts' \
+    DB_PASSWORD='0jN4FNuqynhGR7zT' \
+    DB_USER='doadmin' \
+    JWT_SECRET=alalsdflasjlf343424 \
+    PORT=3336 \
+    NODE_ENV=production
+
+WORKDIR /home/node/app
+
+# change permissions to the node_modules folder
+COPY --chown=node:node --from=build /app /home/node/app/node_modules
+COPY --chown=node:node --from=build /app/package-lock.json /home/node/app/package-lock.json
+COPY --chown=node:node ./dist/apps/accounting-service /home/node/app
+
+RUN npm install --production
+RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express
+
+EXPOSE ${PORT}
+CMD [ "dumb-init", "node", "main.js" ]
+
