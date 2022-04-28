@@ -711,7 +711,8 @@
             "outputPath": "dist/apps/invoices-service",
             "main": "apps/invoices-service/src/main.ts",
             "tsConfig": "apps/invoices-service/tsconfig.app.json",
-            "assets": ["apps/invoices-service/src/assets"]
+            "assets": ["apps/invoices-service/src/assets"],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {
@@ -723,7 +724,8 @@
                   "replace": "apps/invoices-service/src/environments/environment.ts",
                   "with": "apps/invoices-service/src/environments/environment.prod.ts"
                 }
-              ]
+              ],
+              "generatePackageJson": true
             }
           }
         },
@@ -1145,7 +1147,8 @@
             "outputPath": "dist/apps/payments-service",
             "main": "apps/payments-service/src/main.ts",
             "tsConfig": "apps/payments-service/tsconfig.app.json",
-            "assets": ["apps/payments-service/src/assets"]
+            "assets": ["apps/payments-service/src/assets"],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {
@@ -1157,7 +1160,8 @@
                   "replace": "apps/payments-service/src/environments/environment.ts",
                   "with": "apps/payments-service/src/environments/environment.prod.ts"
                 }
-              ]
+              ],
+              "generatePackageJson": true
             }
           }
         },
