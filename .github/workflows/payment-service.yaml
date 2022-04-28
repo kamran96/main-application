@@ -60,12 +60,12 @@ jobs:
       - name: Build container image
         run: docker build -f $GITHUB_WORKSPACE/apps/payments-service/Dockerfile -t registry.digitalocean.com/invyce-images/payments-service:$(echo $GITHUB_SHA | head -c7) .
 
-      - name: Add IP address to trusted source (managed database)
-        uses: GarreauArthur/manage-digital-ocean-managed-database-trusted-sources-gh-action@main
-        with:
-          action: "add"
-          database_id: ${{ secrets.DATABASE_ID }}
-          digitalocean_token: ${{ secrets.DO_ACCESS_TOKEN }}
+      # - name: Add IP address to trusted source (managed database)
+      #   uses: GarreauArthur/manage-digital-ocean-managed-database-trusted-sources-gh-action@main
+      #   with:
+      #     action: "add"
+      #     database_id: ${{ secrets.DATABASE_ID }}
+      #     digitalocean_token: ${{ secrets.DO_ACCESS_TOKEN }}
 
       # Run database migration
       - name: run db migrations
@@ -73,17 +73,17 @@ jobs:
         env: 
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_PORT: ${{ secrets.DB_PORT }}
-          ACC_DB_NAME: ${{ secrets.PAY_DB_NAME }}
+          ACC_DB_NAME: ${{ secrets.PAYMENT_DB_NAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_USER: ${{ secrets.DB_USER }}
           NODE_ENV: 'production'
 
-      - name: Remove IP address to trusted source (managed database)
-        uses: GarreauArthur/manage-digital-ocean-managed-database-trusted-sources-gh-action@main
-        with:
-          action: "remove"
-          database_id: ${{ secrets.DATABASE_ID }}
-          digitalocean_token: ${{ secrets.DO_ACCESS_TOKEN }}
+      # - name: Remove IP address to trusted source (managed database)
+      #   uses: GarreauArthur/manage-digital-ocean-managed-database-trusted-sources-gh-action@main
+      #   with:
+      #     action: "remove"
+      #     database_id: ${{ secrets.DATABASE_ID }}
+      #     digitalocean_token: ${{ secrets.DO_ACCESS_TOKEN }}
 
       #login to digitalocean for 1200 seconds
       - name: Log in to DigitalOcean Container Registry with short-lived credentials
