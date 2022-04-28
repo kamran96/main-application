@@ -28,7 +28,6 @@ COPY --chown=node:node --from=build /app /home/node/app/node_modules
 COPY --chown=node:node --from=build /app/package-lock.json /home/node/app/package-lock.json
 COPY --chown=node:node ./dist/apps/payments-service /home/node/app
 
-RUN npm install --production
 RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express
 
 EXPOSE ${PORT}
