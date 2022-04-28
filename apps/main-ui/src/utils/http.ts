@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { DecriptionData } from './encription';
 
-const localIP = `https://192.168.1.37`;
+const localIP = `https://localhost`;
 // const localIP = `https://staging.invyce.com`;
 
 let NodeBaseURL = ``;
