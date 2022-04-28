@@ -172,7 +172,7 @@ export const LoginForm: FC = () => {
                   onClick={() =>
                     history?.push(
                       ISupportedRoutes.DEFAULT_LAYOUT +
-                      ISupportedRoutes.FORGOT_PASSWORD
+                        ISupportedRoutes.FORGOT_PASSWORD
                     )
                   }
                 >
@@ -217,7 +217,7 @@ export const LoginForm: FC = () => {
                   onClick={() => {
                     history?.push(
                       ISupportedRoutes?.DEFAULT_LAYOUT +
-                      ISupportedRoutes?.SIGNUP
+                        ISupportedRoutes?.SIGNUP
                     );
                   }}
                 >

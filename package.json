@@ -152,7 +152,7 @@
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "pdfmake": "^0.1.68",
-    "pg": "^8.3.3",
+    "pg": "^8.7.3",
     "postmark": "^2.7.7",
     "process": "^0.11.10",
     "puppeteer": "^5.2.1",

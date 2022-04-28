@@ -32,12 +32,10 @@ const stylesheets = {
   dark: `https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.12/antd.dark.min.css`,
 };
 
-
-const isProductionEnv = (process.env.NODE_ENV === 'production') || true;
-console.log(isProductionEnv, 'check')
-const userCheckApiConfig = (userId) => isProductionEnv ? `users/auth/check` : `users/user/${userId}`
-
-
+const isProductionEnv = process.env.NODE_ENV === 'production' || true;
+console.log(isProductionEnv, 'check');
+const userCheckApiConfig = (userId) =>
+  isProductionEnv ? `users/auth/check` : `users/user/${userId}`;
 
 const AUTH_CHECK_API = isProductionEnv ? CheckAuthAPI : CheckAuthAPIDev;
 
@@ -292,7 +290,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   const userId = useMemo(() => {
     return auth?.users?.id || null;
   }, [auth?.users?.id]);
-
 
   const {
     isLoading,

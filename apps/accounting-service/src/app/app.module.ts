@@ -9,6 +9,7 @@ import { AccountsModule } from './accounts/accounts.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { BankModule } from './bank/bank.module';
 import { ReportModule } from './report/report.module';
+
 dotenv.config();
 
 @Module({
