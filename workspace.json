@@ -923,7 +923,11 @@
           "executor": "@nrwl/web:dev-server",
           "options": {
             "buildTarget": "main-ui:build",
-            "hmr": true
+            "hmr": true,
+            "host": "localhost",
+            "ssl": true,
+            "sslKey": "./certs/localhost.key",
+            "sslCert": "./certs/localhost.crt"
           },
           "configurations": {
             "production": {

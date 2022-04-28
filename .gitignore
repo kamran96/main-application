@@ -8,6 +8,7 @@
 build.pdf
 archive.zip
 .env
+/certs
 
 apps/accounting-service/.env
 apps/attachments-service/.env

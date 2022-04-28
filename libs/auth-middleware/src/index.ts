@@ -15,19 +15,16 @@ export class Authenticate extends PassportStrategy(Strategy) {
   constructor() {
     super({
       jwtFromRequest: (req) => {
-        console.log('loging...........');
-        Logger.log('loging...........');
-        Logger.log(process.env.NODE_ENV);
-        if (process.env.NODE_ENV === 'development') {
-          const header = req.headers?.authorization?.split(' ')[1];
-          token = header;
-          return header;
-        } else if (process.env['NODE' + '_ENV'] === 'production') {
-          if (!req || !req.cookies) return null;
-          token = req.cookies['access_token'];
-          host = req.headers.host;
-          return req.cookies['access_token'];
-        }
+        // if (process.env.NODE_ENV === 'development') {
+        // const header = req.headers?.authorization?.split(' ')[1];
+        // token = header;
+        // return header;
+        // } else if (process.env['NODE' + '_ENV'] === 'production') {
+        if (!req || !req.cookies) return null;
+        token = req.cookies['access_token'];
+        host = req.headers.host;
+        return req.cookies['access_token'];
+        // }
       },
 
       ignoreExpiration: false,
@@ -37,25 +34,22 @@ export class Authenticate extends PassportStrategy(Strategy) {
 
   async validate(payload) {
     try {
-      console.log('loging........... here');
-      Logger.log('loging........... here');
-
-      const type =
-        process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-      const value =
-        process.env.NODE_ENV === 'development'
-          ? `Bearer ${token}`
-          : `access_token=${token}`;
+      // const type =
+      // process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+      // const value =
+      // process.env.NODE_ENV === 'development'
+      // ? `Bearer ${token}`
+      // : `access_token=${token}`;
 
       const user = await axios.post(
-        `http://localhost/users/auth/access-controll`,
+        `https://localhost/users/auth/access-controll`,
         {
           ...payload,
           service: host,
         },
         {
           headers: {
-            [type]: value,
+            cookie: `access_token=${token}`,
           },
         }
       );

@@ -26,7 +26,8 @@ export const LoginForm: FC = () => {
   const onFinish = async (values) => {
     await mutateLogin(values, {
       onSuccess: (data) => {
-        if (process.env.NODE_ENV === 'production') {
+        // eslint-disable-next-line no-constant-condition
+        if (process.env.NODE_ENV === 'production' || true) {
           handleLogin({
             type: ILoginActions.LOGIN,
             payload: { autherization: true },
@@ -87,7 +88,8 @@ export const LoginForm: FC = () => {
       { token },
       {
         onSuccess: (data) => {
-          if (process.env.NODE_ENV === 'production') {
+          // eslint-disable-next-line no-constant-condition
+          if (true || process.env.NODE_ENV === 'production') {
             handleLogin({
               type: ILoginActions.LOGIN,
               payload: { autherization: true },
@@ -170,7 +172,7 @@ export const LoginForm: FC = () => {
                   onClick={() =>
                     history?.push(
                       ISupportedRoutes.DEFAULT_LAYOUT +
-                        ISupportedRoutes.FORGOT_PASSWORD
+                      ISupportedRoutes.FORGOT_PASSWORD
                     )
                   }
                 >
@@ -215,7 +217,7 @@ export const LoginForm: FC = () => {
                   onClick={() => {
                     history?.push(
                       ISupportedRoutes?.DEFAULT_LAYOUT +
-                        ISupportedRoutes?.SIGNUP
+                      ISupportedRoutes?.SIGNUP
                     );
                   }}
                 >

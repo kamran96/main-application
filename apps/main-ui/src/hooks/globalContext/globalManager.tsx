@@ -32,10 +32,12 @@ const stylesheets = {
   dark: `https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.12/antd.dark.min.css`,
 };
 
-const isProductionEnv = process.env.NODE_ENV === 'production' || false;
 
-console.log('check 1', process.env.NODE_ENV);
-console.log('check 2', process.env['NODE' + '_ENV']);
+const isProductionEnv = (process.env.NODE_ENV === 'production') || true;
+console.log(isProductionEnv, 'check')
+const userCheckApiConfig = (userId) => isProductionEnv ? `users/auth/check` : `users/user/${userId}`
+
+
 
 const AUTH_CHECK_API = isProductionEnv ? CheckAuthAPI : CheckAuthAPIDev;
 
@@ -215,7 +217,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   const handleLogin = async (action: IAction) => {
     switch (action.type) {
       case ILoginActions.LOGIN:
-        if (process.env.NODE_ENV === 'production') {
+        if (isProductionEnv) {
           setAutherized(true);
         } else {
           localStorage.setItem('auth', EncriptData(action.payload) as string);
@@ -299,21 +301,16 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   } = useHttp(
     {
       apiOption: {
-        url: isProductionEnv ? `users/auth/check` : `users/user/${userId}`,
+        url: userCheckApiConfig(userId),
         method: 'GET',
       },
       enabled: !!userId || !!checkAutherized,
       onSuccess: (data) => {
-        if (isProductionEnv) {
-          setUserDetails(data?.users);
-          setIsUserLogin(true);
-        } else {
-          const { result } = data;
-          setUserDetails(result);
-          setIsUserLogin(true);
-          if (result?.theme) {
-            setTheme(result?.theme);
-          }
+        const { result } = data;
+        setUserDetails(result);
+        setIsUserLogin(true);
+        if (result?.theme) {
+          setTheme(result?.theme);
         }
       },
       onError: (err: IBaseAPIError) => {

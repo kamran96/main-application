@@ -102,7 +102,7 @@ export class AuthService {
             ? req?.headers?.authorization?.split(' ')[1]
             : req?.cookies?.access_token;
         token.expiresAt = newTime;
-        token.brower = req?.headers['user-agent'];
+        // token.brower = req?.headers?['user-agent'];
         token.ipAddress = ip.address();
         token.userId = userId;
         await token.save();
@@ -237,26 +237,26 @@ export class AuthService {
     const token = this.jwtService.sign(payload);
     // const address = ip.address();
 
-    if (process.env['NODE' + '_ENV'] === 'production') {
-      res
-        .cookie('access_token', token, {
-          secure: true,
-          sameSite: 'none',
-          httpOnly: true,
-          path: '/',
-          expires: new Date(Moment().add(process.env.EXPIRES, 'h').toDate()),
-        })
-        .send({
-          message: 'Login successfully',
-          status: true,
-          result: newUser,
-        });
-    } else if (process.env['NODE' + '_ENV'] === 'development') {
-      res.send({
-        users: newUser,
-        access_token: token,
+    // if (process.env['NODE' + '_ENV'] === 'production') {
+    res
+      .cookie('access_token', token, {
+        secure: true,
+        sameSite: 'none',
+        httpOnly: true,
+        path: '/',
+        expires: new Date(Moment().add(process.env.EXPIRES, 'h').toDate()),
+      })
+      .send({
+        message: 'Login successfully',
+        status: true,
+        result: newUser,
       });
-    }
+    // } else if (process.env['NODE' + '_ENV'] === 'development') {
+    //   res.send({
+    //     users: newUser,
+    //     access_token: token,
+    //   });
+    // }
 
     return user;
   }
@@ -272,6 +272,7 @@ export class AuthService {
 
   async Check(req: IRequest): Promise<ICheckUser> {
     try {
+      console.log('okkkkk');
       const payload: UserLoginDto = {
         username: req.user.username,
       };
