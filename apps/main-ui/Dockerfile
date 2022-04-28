@@ -21,8 +21,8 @@ COPY ./dist/apps/main-ui /home/node/app
 
 # needed this to make React Router work properly 
 # RUN rm /etc/nginx/conf.d/default.conf
-
-COPY nginx/nginx.conf /etc/nginx/conf.d
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE ${PORT}
 CMD ["nginx", "-g", "daemon off;"]
