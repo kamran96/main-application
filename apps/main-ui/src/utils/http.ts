@@ -16,7 +16,7 @@ if (host && host === 'app.invyce.com') {
 } else if (host && host === 'staging.invyce.com') {
   // Staging server endpoints
 
-  NodeBaseURL = `https://staging.invyce.com/`;
+  NodeBaseURL = `https://staging.invyce.com/api/`;
 } else {
   // local development
   NodeBaseURL = localIP; //+ ":8081"
