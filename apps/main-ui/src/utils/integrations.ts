@@ -5,7 +5,6 @@
 import * as Sentry from '@sentry/react';
 import { Integrations } from '@sentry/tracing';
 
-console.log(process.env.NODE_ENV);
 export const sentryInit = () => {
   Sentry.init({
     dsn:
