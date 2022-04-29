@@ -41,7 +41,7 @@ async function bootstrap() {
   // app.use(csurf());
 
   if (process.env['NODE' + '_ENV'] === 'production') {
-    app.setGlobalPrefix('/api/users');
+    app.setGlobalPrefix('/users');
   }
 
   await app.listen(port, () => {

@@ -21,7 +21,7 @@ async function bootstrap() {
 
   console.log(process.env['NODE' + '_ENV']);
   if (process.env['NODE' + '_ENV'] === 'production') {
-    app.setGlobalPrefix('/api/invoices');
+    app.setGlobalPrefix('/invoices');
   }
   await app.listen(port, () => {
     Logger.log('Listening at http://localhost:' + port);
