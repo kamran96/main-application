@@ -26,7 +26,7 @@ async function bootstrap() {
   // const app = await NestFactory.create(AppModule);
 
   if (process.env['NODE' + '_ENV'] === 'production') {
-    app.setGlobalPrefix('/api/email');
+    app.setGlobalPrefix('/email');
   }
 
   const port = process.env.PORT || 3339;
