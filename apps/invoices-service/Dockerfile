@@ -14,7 +14,7 @@ USER node
 
 ENV DB_HOST='db-postgresql-sgp1-12041-do-user-4046074-0.b.db.ondigitalocean.com' \
     DB_PORT=25060 \
-    ACC_DB_NAME='invoices' \
+    INV_DB_NAME='invoices' \
     DB_PASSWORD='0jN4FNuqynhGR7zT' \
     DB_USER='doadmin' \
     JWT_SECRET=alalsdflasjlf343424 \
