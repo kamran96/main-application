@@ -10,7 +10,6 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import * as fs from 'fs';
 import * as path from 'path';
 import { Response } from 'express';
 import { AppService } from './app.service';
@@ -20,6 +19,11 @@ import { IRequest } from '@invyce/interfaces';
 @Controller('attachment')
 export class AppController {
   constructor(private readonly appService: AppService) {}
+
+  @Get('health')
+  async healthCheck(@Res() res: Response) {
+    res.send('OKkkk');
+  }
 
   @UseGuards(GlobalAuthGuard)
   @Get('/:id')
