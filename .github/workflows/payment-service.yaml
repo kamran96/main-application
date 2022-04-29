@@ -69,7 +69,7 @@ jobs:
 
       # Run database migration
       - name: run db migrations
-        run: yarn run acc_migration_run
+        run: yarn run pay_migration_run
         env: 
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_PORT: ${{ secrets.DB_PORT }}
