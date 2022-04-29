@@ -18,7 +18,7 @@ ENV DB_HOST='db-postgresql-sgp1-12041-do-user-4046074-0.b.db.ondigitalocean.com'
     DB_PASSWORD='0jN4FNuqynhGR7zT' \
     DB_USER='doadmin' \
     JWT_SECRET=alalsdflasjlf343424 \
-    PORT=3336 \
+    PORT=3341 \
     NODE_ENV=production
 
 WORKDIR /home/node/app
