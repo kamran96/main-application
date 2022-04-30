@@ -233,8 +233,6 @@ export class AppService {
 
       const contents = await this.pdfData(data, defaultCurrency);
 
-      console.log(contents, 'con');
-
       const tableStylesConfig = {
         th: {
           borderColor: ['#d3d3d3', '#d3d3d3', '#d3d3d3'],

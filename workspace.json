@@ -65,7 +65,8 @@
             "outputPath": "dist/apps/attachments-service",
             "main": "apps/attachments-service/src/main.ts",
             "tsConfig": "apps/attachments-service/tsconfig.app.json",
-            "assets": ["apps/attachments-service/src/assets"]
+            "assets": ["apps/attachments-service/src/assets"],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {
@@ -77,7 +78,8 @@
                   "replace": "apps/attachments-service/src/environments/environment.ts",
                   "with": "apps/attachments-service/src/environments/environment.prod.ts"
                 }
-              ]
+              ],
+              "generatePackageJson": true
             }
           }
         },
