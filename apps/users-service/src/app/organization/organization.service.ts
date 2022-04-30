@@ -31,26 +31,26 @@ export class OrganizationService {
   ) {}
 
   async ListOrganizations(req) {
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
+    // let token;
+    // if (process.env.NODE_ENV === 'development') {
+    // const header = req.headers?.authorization?.split(' ')[1];
+    // token = header;
+    // } else {
+    if (!req || !req.cookies) return null;
+    const token = req?.cookies['access_token'];
+    // }
 
-    const type =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
+    // const type =
+    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    // const value =
+    //   process.env.NODE_ENV === 'development'
+    //     ? `Bearer ${token}`
+    //     : `access_token=${token}`;
 
     const http = axios.create({
-      baseURL: 'http://localhost',
+      baseURL: 'https://localhost',
       headers: {
-        [type]: value,
+        cookie: `access_token=${token}`,
       },
     });
 
@@ -205,8 +205,14 @@ export class OrganizationService {
           branchArr.push(branch);
         }
 
+        if (!req || !req.cookies) return null;
+        const token = req?.cookies['access_token'];
+
         const http = axios.create({
-          baseURL: 'http://localhost',
+          baseURL: 'https://localhost',
+          headers: {
+            cookie: `access_token=${token}`,
+          },
         });
 
         await http.post(`accounts/account/init`, {
@@ -267,29 +273,31 @@ export class OrganizationService {
     organizationId: string,
     req: IRequest
   ): Promise<IOrganization> {
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
+    // let token;
+    // if (process.env.NODE_ENV === 'development') {
+    //   const header = req.headers?.authorization?.split(' ')[1];
+    //   token = header;
+    // } else {
+    //   if (!req || !req.cookies) return null;
+    //   token = req.cookies['access_token'];
+    // }
 
-    const type =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
+    // const type =
+    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    // const value =
+    //   process.env.NODE_ENV === 'development'
+    //     ? `Bearer ${token}`
+    //     : `access_token=${token}`;
+
+    if (!req || !req.cookies) return null;
+    const token = req?.cookies['access_token'];
 
     const http = axios.create({
-      baseURL: 'http://localhost',
+      baseURL: 'https://localhost',
       headers: {
-        [type]: value,
+        cookie: `access_token=${token}`,
       },
     });
-
     const organization = await this.organizationModel
       .findOne({
         _id: organizationId,

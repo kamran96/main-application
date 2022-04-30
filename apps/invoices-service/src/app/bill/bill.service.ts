@@ -22,26 +22,29 @@ export class BillService {
     let sort = queryData.sort;
     sort = sort ? sort : '-id';
 
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
+    // let token;
+    // if (process.env.NODE_ENV === 'development') {
+    //   const header = req.headers?.authorization?.split(' ')[1];
+    //   token = header;
+    // } else {
+    //   if (!req || !req.cookies) return null;
+    //   token = req.cookies['access_token'];
+    // }
 
-    const tokenType =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
+    // const tokenType =
+    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    // const value =
+    //   process.env.NODE_ENV === 'development'
+    //     ? `Bearer ${token}`
+    //     : `access_token=${token}`;
+
+    if (!req || !req.cookies) return null;
+    const token = req?.cookies['access_token'];
 
     const http = axios.create({
-      baseURL: 'http://localhost',
+      baseURL: 'https://localhost',
       headers: {
-        [tokenType]: value,
+        cookie: `access_token=${token}`,
       },
     });
 
@@ -343,26 +346,29 @@ export class BillService {
   }
 
   async CreateBill(dto: BillDto, req: IRequest): Promise<IBill> {
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
+    // let token;
+    // if (process.env.NODE_ENV === 'development') {
+    //   const header = req.headers?.authorization?.split(' ')[1];
+    //   token = header;
+    // } else {
+    //   if (!req || !req.cookies) return null;
+    //   token = req.cookies['access_token'];
+    // }
 
-    const tokenType =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
+    // const tokenType =
+    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    // const value =
+    //   process.env.NODE_ENV === 'development'
+    //     ? `Bearer ${token}`
+    //     : `access_token=${token}`;
+
+    if (!req || !req.cookies) return null;
+    const token = req?.cookies['access_token'];
 
     const http = axios.create({
-      baseURL: 'http://localhost',
+      baseURL: 'https://localhost',
       headers: {
-        [tokenType]: value,
+        cookie: `access_token=${token}`,
       },
     });
 
@@ -689,37 +695,39 @@ export class BillService {
 
     let new_bill;
     if (bill?.contactId) {
-      let token;
-      if (process.env.NODE_ENV === 'development') {
-        const header = req.headers?.authorization?.split(' ')[1];
-        token = header;
-      } else {
-        if (!req || !req.cookies) return null;
-        token = req.cookies['access_token'];
-      }
+      // let token;
+      // if (process.env.NODE_ENV === 'development') {
+      //   const header = req.headers?.authorization?.split(' ')[1];
+      //   token = header;
+      // } else {
+      //   if (!req || !req.cookies) return null;
+      //   token = req.cookies['access_token'];
+      // }
 
-      const type =
-        process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-      const value =
-        process.env.NODE_ENV === 'development'
-          ? `Bearer ${token}`
-          : `access_token=${token}`;
+      // const type =
+      //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+      // const value =
+      //   process.env.NODE_ENV === 'development'
+      //     ? `Bearer ${token}`
+      //     : `access_token=${token}`;
 
       const contactId = bill?.contactId;
       const itemIdsArray = bill?.purchaseItems.map((ids) => ids.itemId);
 
+      if (!req || !req.cookies) return null;
+      const token = req?.cookies['access_token'];
       const contactRequest = {
-        url: `http://localhost/contacts/contact/${contactId}`,
+        url: `https://localhost/contacts/contact/${contactId}`,
         method: 'GET',
         headers: {
-          [type]: value,
+          cookie: `access_token=${token}`,
         },
       };
 
       const http = axios.create({
-        baseURL: 'http://localhost',
+        baseURL: 'https://localhost',
         headers: {
-          [type]: value,
+          cookie: `access_token=${token}`,
         },
       });
 
@@ -783,26 +791,29 @@ export class BillService {
   }
 
   async deleteBill(billIds: BillIdsDto, req: IRequest): Promise<boolean> {
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
+    // let token;
+    // if (process.env.NODE_ENV === 'development') {
+    //   const header = req.headers?.authorization?.split(' ')[1];
+    //   token = header;
+    // } else {
+    //   if (!req || !req.cookies) return null;
+    //   token = req.cookies['access_token'];
+    // }
 
-    const tokenType =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
+    // const tokenType =
+    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    // const value =
+    //   process.env.NODE_ENV === 'development'
+    //     ? `Bearer ${token}`
+    //     : `access_token=${token}`;
+
+    if (!req || !req.cookies) return null;
+    const token = req.cookies['access_token'];
 
     const http = axios.create({
-      baseURL: 'http://localhost',
+      baseURL: 'https://localhost',
       headers: {
-        [tokenType]: value,
+        cookie: `access_token=${token}`,
       },
     });
 
@@ -877,26 +888,29 @@ export class BillService {
    */
 
   async AgedPayables(req: IRequest, query) {
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
+    // let token;
+    // if (process.env.NODE_ENV === 'development') {
+    //   const header = req.headers?.authorization?.split(' ')[1];
+    //   token = header;
+    // } else {
+    //   if (!req || !req.cookies) return null;
+    //   token = req.cookies['access_token'];
+    // }
 
-    const tokenType =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
+    // const tokenType =
+    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    // const value =
+    //   process.env.NODE_ENV === 'development'
+    //     ? `Bearer ${token}`
+    //     : `access_token=${token}`;
+
+    if (!req || !req.cookies) return null;
+    const token = req.cookies['access_token'];
 
     const http = axios.create({
-      baseURL: 'http://localhost',
+      baseURL: 'https://localhost',
       headers: {
-        [tokenType]: value,
+        cookie: `access_token=${token}`,
       },
     });
 

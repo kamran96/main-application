@@ -252,29 +252,32 @@ export class UserService {
 
       let new_obj;
       if (user?.profile?.attachmentId) {
-        let token;
-        if (process.env.NODE_ENV === 'development') {
-          const header = req.headers?.authorization?.split(' ')[1];
-          token = header;
-        } else {
-          if (!req || !req.cookies) return null;
-          token = req.cookies['access_token'];
-        }
+        // let token;
+        // if (process.env.NODE_ENV === 'development') {
+        //   const header = req.headers?.authorization?.split(' ')[1];
+        //   token = header;
+        // } else {
+        //   if (!req || !req.cookies) return null;
+        //   token = req.cookies['access_token'];
+        // }
 
-        const type =
-          process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-        const value =
-          process.env.NODE_ENV === 'development'
-            ? `Bearer ${token}`
-            : `access_token=${token}`;
+        // const type =
+        //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+        // const value =
+        //   process.env.NODE_ENV === 'development'
+        //     ? `Bearer ${token}`
+        //     : `access_token=${token}`;
 
         const attachmentId = user?.profile?.attachmentId;
 
+        if (!req || !req.cookies) return null;
+        const token = req.cookies['access_token'];
+
         const request = {
-          url: `http://localhost/attachments/attachment/${attachmentId}`,
+          url: `https://localhost/attachments/attachment/${attachmentId}`,
           method: 'GET',
           headers: {
-            [type]: value,
+            cookie: `access_token=${token}`,
           },
         };
 

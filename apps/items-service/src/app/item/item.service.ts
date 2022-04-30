@@ -305,29 +305,31 @@ export class ItemService {
   }
 
   async DeleteItem(data: ItemIdsDto, req: IRequest): Promise<void> {
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
+    // let token;
+    // if (process.env.NODE_ENV === 'development') {
+    //   const header = req.headers?.authorization?.split(' ')[1];
+    //   token = header;
+    // } else {
+    //   if (!req || !req.cookies) return null;
+    //   token = req.cookies['access_token'];
+    // }
 
-    const tokenType =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
+    // const tokenType =
+    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
+    // const value =
+    //   process.env.NODE_ENV === 'development'
+    //     ? `Bearer ${token}`
+    //     : `access_token=${token}`;
 
-    const http = await axios.create({
-      baseURL: 'http://localhost',
+    if (!req || !req.cookies) return null;
+    const token = req?.cookies['access_token'];
+
+    const http = axios.create({
+      baseURL: 'https://localhost',
       headers: {
-        [tokenType]: value,
+        cookie: `access_token=${token}`,
       },
     });
-
     for (const i of data.ids) {
       const item = await this.itemModel.findById(i);
       if (item) {
