@@ -71,6 +71,6 @@ export enum InvTypes {
 
 export const Host = (service: string, route: string): string => {
   return process.env['NODE' + '_ENV'] === 'production'
-    ? `http://${service}.default.svc.local/${route}`
+    ? `http://${service}.default.svc.cluster.local/${route}`
     : `https://localhost/${route}`;
 };
