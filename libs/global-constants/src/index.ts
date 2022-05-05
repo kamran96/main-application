@@ -68,3 +68,9 @@ export enum InvTypes {
   PURCHASE_ORDER = 'PO',
   QUOTATION = 'Q0',
 }
+
+export const Host = (service: string, route: string): string => {
+  return process.env['NODE' + '_ENV'] === 'production'
+    ? `http://${service}.default.svc.local/${route}`
+    : `https://localhost/${route}`;
+};

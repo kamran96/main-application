@@ -5,6 +5,7 @@ import { IPrice } from '@invyce/interfaces';
 import { Item } from '../schemas/item.schema';
 import { Price } from '../schemas/price.schema';
 import { PriceDto } from '../dto/price.dto';
+import { Host } from '@invyce/global-constants';
 
 @Injectable()
 export class PriceService {
@@ -18,36 +19,21 @@ export class PriceService {
   }
 
   async CreatePrice(priceDto: PriceDto, req): Promise<IPrice | IPrice[]> {
-    // let token;
-    // if (process.env.NODE_ENV === 'development') {
-    //   const header = req.headers?.authorization?.split(' ')[1];
-    //   token = header;
-    // } else {
-    //   if (!req || !req.cookies) return null;
-    //   token = req.cookies['access_token'];
-    // }
-
-    // const tokenType =
-    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    // const value =
-    //   process.env.NODE_ENV === 'development'
-    //     ? `Bearer ${token}`
-    //     : `access_token=${token}`;
-
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
 
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
-
     // fetch inventory account by its code
-    const { data: accounts } = await http.post(`accounts/account/codes`, {
-      codes: ['15005'],
-    });
+    const { data: accounts } = await axios.post(
+      Host('accounts', 'accounts/account/codes'),
+      {
+        codes: ['15005'],
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     const debitArray = [];
     const creditArray = [];
@@ -105,9 +91,17 @@ export class PriceService {
 
             let transaction;
             if (worth > 0) {
-              const { data } = await http.post('accounts/transaction/api', {
-                transactions: payload,
-              });
+              const { data } = await axios.post(
+                Host('accounts', 'accounts/transaction/api'),
+                {
+                  transactions: payload,
+                },
+                {
+                  headers: {
+                    cookie: `access_token=${token}`,
+                  },
+                }
+              );
               transaction = data;
             }
 
@@ -171,9 +165,17 @@ export class PriceService {
 
           let transaction;
           if (worth > 0) {
-            const { data } = await http.post('accounts/transaction/api', {
-              transactions: payload,
-            });
+            const { data } = await axios.post(
+              Host('accounts', 'accounts/transaction/api'),
+              {
+                transactions: payload,
+              },
+              {
+                headers: {
+                  cookie: `access_token=${token}`,
+                },
+              }
+            );
             transaction = data;
           }
 
