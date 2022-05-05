@@ -41,6 +41,9 @@ export class Authenticate extends PassportStrategy(Strategy) {
       // ? `Bearer ${token}`
       // : `access_token=${token}`;
 
+      console.log(process.env['NODE' + '_ENV'], 'nodeenv');
+      console.log('fetching');
+
       const user = await axios.post(
         process.env['NODE' + '_ENV'] === 'production'
           ? 'http://users.default.svc.cluster.local/users/auth/access-controll'
