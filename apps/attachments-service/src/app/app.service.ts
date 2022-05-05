@@ -8,15 +8,82 @@ import axios from 'axios';
 import * as PdfPrinter from 'pdfmake/src/printer';
 import * as fs from 'fs';
 import * as path from 'path';
+import { formatMoney } from 'accounting-js';
 import * as puppeteer from 'puppeteer';
 import { Attachment } from '../schemas/attachment.schema';
 import { IRequest } from '@invyce/interfaces';
-import {
-  moneyFormatJs,
-  Capitalize,
-  totalDiscountInInvoice,
-} from '@invyce/common';
 import { Host } from '@invyce/global-constants';
+
+const moneyFormatJs = (
+  amount: number | string,
+  currency = {
+    name: 'United States dollar',
+    code: 'USD',
+    symbol: '$',
+    id: null,
+    symbolNative: '$',
+  }
+) => {
+  return formatMoney(amount, {
+    symbol: currency?.symbol,
+    format: '%s %v ',
+  });
+};
+
+const Capitalize = (sentance) => {
+  return sentance
+    ?.split(' ')
+    .map((word, index) => {
+      return word
+        .toLowerCase()
+        .replace(/\w/, (firstLetter) => firstLetter.toUpperCase());
+    })
+    .join(' ');
+};
+
+export const checkisPercentage = (val: string | number) => {
+  const value = typeof val === 'string' ? val : val.toString();
+  const splitedData = value?.split('%');
+  if (splitedData.length === 2) {
+    return {
+      value: splitedData[0],
+      isPercentage: true,
+    };
+  } else {
+    return {
+      value: value ? value : '0',
+      isPercentage: false,
+    };
+  }
+};
+
+const CalculateDiscountPerItem = (value: number, percentage: number) => {
+  return (percentage / 100) * value;
+};
+
+const totalDiscountInInvoice = (array, key, type) => {
+  const discountArray = [];
+  Array.isArray(array) &&
+    array.length &&
+    array.forEach((item) => {
+      const keyItem = (item && item[key]) || '0';
+      const v = checkisPercentage(keyItem);
+      const priceAccessor =
+        type === 'POE' ? item.purchasePrice : item.unitPrice;
+      if (v.isPercentage) {
+        const val = CalculateDiscountPerItem(
+          priceAccessor,
+          parseFloat(v.value)
+        );
+        discountArray.push(val * item.quantity);
+      } else {
+        const val = priceAccessor - priceAccessor + parseFloat(v.value);
+        discountArray.push(val * item.quantity);
+      }
+    });
+
+  return discountArray.length ? discountArray.reduce((a, b) => a + b) : 0;
+};
 
 const promises = fs.promises;
 
