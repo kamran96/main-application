@@ -42,9 +42,9 @@ export class Authenticate extends PassportStrategy(Strategy) {
       // : `access_token=${token}`;
 
       const user = await axios.post(
-        process.env.ssl
+        process.env.SSL === 'true'
           ? `https://localhost/users/auth/access-controll`
-          : 'users/users/auth/access-controll',
+          : 'http://users.default.svc.cluster.local/users/auth/access-controll',
         {
           ...payload,
           service: host,
