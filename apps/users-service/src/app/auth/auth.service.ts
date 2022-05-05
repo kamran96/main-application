@@ -272,7 +272,6 @@ export class AuthService {
 
   async Check(req: IRequest): Promise<ICheckUser> {
     try {
-      console.log('okkkkk');
       const payload: UserLoginDto = {
         username: req.user.username,
       };
