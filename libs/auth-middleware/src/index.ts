@@ -21,9 +21,6 @@ export class Authenticate extends PassportStrategy(Strategy) {
         // return header;
         // } else if (process.env['NODE' + '_ENV'] === 'production') {
 
-        console.log('okkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk');
-        console.log(process.env['NODE' + '_ENV'], 'nodeenv');
-
         if (!req || !req.cookies) return null;
         token = req.cookies['access_token'];
         host = req.headers.host;
@@ -44,9 +41,6 @@ export class Authenticate extends PassportStrategy(Strategy) {
       // process.env.NODE_ENV === 'development'
       // ? `Bearer ${token}`
       // : `access_token=${token}`;
-
-      console.log('fetching');
-
       const user = await axios.post(
         process.env['NODE' + '_ENV'] === 'production'
           ? 'http://users.default.svc.cluster.local/users/auth/access-controll'
