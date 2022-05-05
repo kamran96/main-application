@@ -201,12 +201,12 @@ export class ContactService {
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
 
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
+    // const http = axios.create({
+    //   baseURL: 'https://localhost',
+    //   headers: {
+    //     cookie: `access_token=${token}`,
+    //   },
+    // });
 
     if (contactDto && contactDto.isNewRecord === false) {
       const contact = await this.FindById(contactDto.id);
@@ -283,9 +283,19 @@ export class ContactService {
           contactDto.openingBalance &&
           parseFloat(contactDto.openingBalance) > 0
         ) {
-          const { data } = await http.post('accounts/transaction/api', {
-            transactions: payload,
-          });
+          const { data } = await axios.post(
+            process.env['NODE' + '_ENV'] === 'production'
+              ? `http://accounts.default.svc.local/accounts/transactions/api`
+              : 'accounts/transaction/api',
+            {
+              transactions: payload,
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
+            }
+          );
           transaction = data;
         }
 
@@ -337,12 +347,12 @@ export class ContactService {
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
 
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
+    // const http = axios.create({
+    //   baseURL: 'https://localhost',
+    //   headers: {
+    //     cookie: `access_token=${token}`,
+    //   },
+    // });
 
     const contacts = await this.contactModel.find({
       status: 1,
@@ -355,9 +365,19 @@ export class ContactService {
       type: c.contactType,
     }));
 
-    const { data: payments } = await http.post(`payments/payment/contact`, {
-      ids: mapContactIds,
-    });
+    const { data: payments } = await axios.post(
+      process.env['NODE' + '_ENV'] === 'production'
+        ? 'http://payments.default.svc.cluster.local/payments/payment/contact'
+        : `https://localhost/payments/payment/contact`,
+      {
+        ids: mapContactIds,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     const getBalances = (balance, i) => {
       if (i.type === PaymentModes.BILLS) {
@@ -416,19 +436,26 @@ export class ContactService {
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
 
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
+    // const http = axios.create({
+    //   baseURL: 'https://localhost',
+    //   headers: {
+    //     cookie: `access_token=${token}`,
+    //   },
+    // });
 
     const { page_no, page_size, query: filters, type } = query;
     const contact = await this.contactModel.findById(contactId);
 
     if (type == PaymentModes.BILLS) {
-      const { data: bills } = await http.get(
-        `invoices/bill/contacts/${contactId}`
+      const { data: bills } = await axios.get(
+        process.env['NODE' + '_ENV'] === 'production'
+          ? `http://invoices.default.svc.cluster.local/invoices/bill/contacts/${contactId}`
+          : `https://localhost/invoices/bill/contacts/${contactId}`,
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
       );
 
       if (filters) {
@@ -450,12 +477,26 @@ export class ContactService {
               .add(1, 'day')
               .format('YYYYMMDD');
 
-            const { data: payments } = await http.get(
-              `payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}&type=${i}&start=${start_date}&end=${add_one_day}`
+            const { data: payments } = await axios.get(
+              process.env['NODE' + '_ENV'] === 'production'
+                ? `http://payments.default.svc.local/payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}&type=${i}&start=${start_date}&end=${add_one_day}`
+                : `https://localhost/payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}&type=${i}&start=${start_date}&end=${add_one_day}`,
+              {
+                headers: {
+                  cookie: `access_token=${token}`,
+                },
+              }
             );
 
-            const { data: openingBalance } = await http.get(
-              `payments/payment/opening-balance/${contactId}?start=${start_date}`
+            const { data: openingBalance } = await axios.get(
+              process.env['NODE' + '_ENV'] === 'production'
+                ? `http://payments.default.svc.local/payments/payment/opening-balance/${contactId}?start=${start_date}`
+                : `https://localhost/payments/payment/opening-balance/${contactId}?start=${start_date}`,
+              {
+                headers: {
+                  cookie: `access_token=${token}`,
+                },
+              }
             );
 
             const newLedgerArray = [];
@@ -483,8 +524,15 @@ export class ContactService {
           }
         }
       } else {
-        const { data: payments } = await http.get(
-          `payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}`
+        const { data: payments } = await axios.get(
+          process.env['NODE' + '_ENV'] === 'production'
+            ? `http://payments.default.svc.local/payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}`
+            : `https://localhost/payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}`,
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
         );
 
         const newLedgerArray = [];
@@ -517,8 +565,15 @@ export class ContactService {
         };
       }
     } else if (type == PaymentModes.INVOICES) {
-      const { data: invoices } = await http.get(
-        `invoices/invoice/contacts/${contactId}`
+      const { data: invoices } = await axios.get(
+        process.env['NODE' + '_ENV'] === 'production'
+          ? `http://invoices.default.svc.local/invoices/invoice/contacts/${contactId}`
+          : `https://localhost/invoices/invoice/contacts/${contactId}`,
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
       );
 
       const contact = await this.contactModel.findById(contactId);
@@ -535,12 +590,26 @@ export class ContactService {
               .add(1, 'day')
               .format('YYYYMMDD');
 
-            const { data: payments } = await http.get(
-              `payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}&type=${i}&start=${start_date}&end=${add_one_day}`
+            const { data: payments } = await axios.get(
+              process.env['NODE' + '_ENV'] === 'production'
+                ? `http://payments.default.svc.local/payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}&type=${i}&start=${start_date}&end=${add_one_day}`
+                : `https://localhost/payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}&type=${i}&start=${start_date}&end=${add_one_day}`,
+              {
+                headers: {
+                  cookie: `access_token=${token}`,
+                },
+              }
             );
 
-            const { data: openingBalance } = await http.get(
-              `payments/payment/opening-balance/${contactId}?start=${start_date}`
+            const { data: openingBalance } = await axios.get(
+              process.env['NODE' + '_ENV'] === 'production'
+                ? `http://payment.default.svc.local`
+                : `https://localhost/payments/payment/opening-balance/${contactId}?start=${start_date}`,
+              {
+                headers: {
+                  cookie: `access_token=${token}`,
+                },
+              }
             );
 
             const newLedgerArray = [];
@@ -575,8 +644,15 @@ export class ContactService {
           }
         }
       } else {
-        const { data: payments } = await http.get(
-          `payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}`
+        const { data: payments } = await axios.get(
+          process.env['NODE' + '_ENV'] === 'production'
+            ? `http://payments.default.svc.local/payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}`
+            : `https://localhost/payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}`,
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
         );
 
         const newLedgerArray = [];
@@ -646,12 +722,12 @@ export class ContactService {
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
 
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
+    // const http = axios.create({
+    //   baseURL: 'https://localhost',
+    //   headers: {
+    //     cookie: `access_token=${token}`,
+    //   },
+    // });
 
     for (const i of deletedIds.ids) {
       const contact = await this.contactModel.findById(i);
@@ -665,9 +741,19 @@ export class ContactService {
         );
 
         if (contact?.transactionId) {
-          await http.post(`accounts/transaction/delete`, {
-            ids: [contact.transactionId],
-          });
+          await axios.post(
+            process.env['NODE' + '_ENV'] === 'production'
+              ? `http://accounts.default.svc.local/accounts/transaction/delete`
+              : `https://accounts/transaction/delete`,
+            {
+              ids: [contact.transactionId],
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
+            }
+          );
         }
       }
     }
@@ -705,12 +791,12 @@ export class ContactService {
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
 
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
+    // const http = axios.create({
+    //   baseURL: 'https://localhost',
+    //   headers: {
+    //     cookie: `access_token=${token}`,
+    //   },
+    // });
 
     const transactionArr = [];
     if (data.type === Integrations.XERO) {
@@ -850,8 +936,18 @@ export class ContactService {
       }
     }
 
-    await http.post(`accounts/transaction/add`, {
-      transactions: transactionArr,
-    });
+    await axios.post(
+      process.env['NODE' + '_ENV'] === 'production'
+        ? `http://accounts.default.svc.local/accounts/transaction/add`
+        : `https://localhost/accounts/transaction/add`,
+      {
+        transactions: transactionArr,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
   }
 }
