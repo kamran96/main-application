@@ -20,6 +20,10 @@ export class Authenticate extends PassportStrategy(Strategy) {
         // token = header;
         // return header;
         // } else if (process.env['NODE' + '_ENV'] === 'production') {
+
+        console.log('okkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk');
+        console.log(process.env['NODE' + '_ENV'], 'nodeenv');
+
         if (!req || !req.cookies) return null;
         token = req.cookies['access_token'];
         host = req.headers.host;
@@ -41,7 +45,6 @@ export class Authenticate extends PassportStrategy(Strategy) {
       // ? `Bearer ${token}`
       // : `access_token=${token}`;
 
-      console.log(process.env['NODE' + '_ENV'], 'nodeenv');
       console.log('fetching');
 
       const user = await axios.post(
