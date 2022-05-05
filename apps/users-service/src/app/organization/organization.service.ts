@@ -293,7 +293,7 @@ export class OrganizationService {
     const token = req?.cookies['access_token'];
 
     const http = axios.create({
-      baseURL: 'https://localhost',
+      baseURL: process.env.SSL ? 'https://localhost' : 'organizations',
       headers: {
         cookie: `access_token=${token}`,
       },

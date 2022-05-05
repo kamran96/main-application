@@ -424,7 +424,7 @@ export class TransactionService {
     const token = req?.cookies['access_token'];
 
     const http = axios.create({
-      baseURL: 'https://localhost',
+      baseURL: process.env.SSL ? 'https://localhost' : 'payments',
       headers: {
         cookie: `access_token=${token}`,
       },
