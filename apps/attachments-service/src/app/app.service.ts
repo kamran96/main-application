@@ -16,6 +16,7 @@ import {
   Capitalize,
   totalDiscountInInvoice,
 } from '@invyce/common';
+import { Host } from '@invyce/global-constants';
 
 const promises = fs.promises;
 
@@ -187,31 +188,8 @@ export class AppService {
 
   async GeneratePdf(body, req: IRequest) {
     try {
-      // let token;
-      // if (process.env.NODE_ENV === 'development') {
-      //   const header = req.headers?.authorization?.split(' ')[1];
-      //   token = header;
-      // } else {
-      //   if (!req || !req.cookies) return null;
-      //   token = req.cookies['access_token'];
-      // }
-
-      // const tokenType =
-      //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-      // const value =
-      //   process.env.NODE_ENV === 'development'
-      //     ? `Bearer ${token}`
-      //     : `access_token=${token}`;
-
       if (!req || !req.cookies) return null;
       const token = req?.cookies['access_token'];
-
-      const http = axios.create({
-        baseURL: 'https://localhost',
-        headers: {
-          cookie: `access_token=${token}`,
-        },
-      });
 
       const { data } = body;
 
@@ -224,7 +202,14 @@ export class AppService {
 
       const {
         data: { result },
-      } = await http.get(`users/organization/${req.user.organizationId}`);
+      } = await axios.get(
+        Host('users', `users/organization/${req.user.organizationId}`),
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
 
       const defaultCurrency = result.currency || {
         name: 'United States dollar',
@@ -581,8 +566,6 @@ export class AppService {
           font: 'RobotoSlab',
         },
       };
-
-      console.log(docDefinition, 'def');
 
       const fonts = {
         RobotoSlab: {

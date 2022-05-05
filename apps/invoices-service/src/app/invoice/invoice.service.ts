@@ -25,6 +25,7 @@ import {
 } from '@invyce/interfaces';
 import {
   EntryType,
+  Host,
   Integrations,
   InvTypes,
   PaymentModes,
@@ -57,31 +58,8 @@ export class InvoiceService {
     const { page_no, page_size, invoice_type, type, status, sort, query } =
       queryData;
 
-    // let token;
-    // if (process.env.NODE_ENV === 'development') {
-    //   const header = req.headers?.authorization?.split(' ')[1];
-    //   token = header;
-    // } else {
-    //   if (!req || !req.cookies) return null;
-    //   token = req.cookies['access_token'];
-    // }
-
-    // const tokenType =
-    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    // const value =
-    //   process.env.NODE_ENV === 'development'
-    //     ? `Bearer ${token}`
-    //     : `access_token=${token}`;
-
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
-
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
 
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
@@ -185,10 +163,18 @@ export class InvoiceService {
 
         const mapInvoiceIds = invoices.map((inv) => inv.id);
 
-        const { data: balances } = await http.post(`payments/payment/invoice`, {
-          ids: mapInvoiceIds,
-          type: 'INVOICE',
-        });
+        const { data: balances } = await axios.post(
+          Host('payments', 'payments/payment/invoice'),
+          {
+            ids: mapInvoiceIds,
+            type: 'INVOICE',
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
 
         for (const i of invoices) {
           const balance = balances.find((bal) => bal.id === i.id);
@@ -238,10 +224,18 @@ export class InvoiceService {
 
         const mapInvoiceIds = invoices.map((inv) => inv.id);
 
-        const { data: balances } = await http.post(`payments/payment/invoice`, {
-          ids: mapInvoiceIds,
-          type: 'INVOICE',
-        });
+        const { data: balances } = await axios.post(
+          Host('payments', 'payments/payment/invoice'),
+          {
+            ids: mapInvoiceIds,
+            type: 'INVOICE',
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
 
         for (const i of invoices) {
           const balance = balances.find((bal) => bal.id === i.id);
@@ -293,10 +287,18 @@ export class InvoiceService {
 
         const mapInvoiceIds = invoices.map((inv) => inv.id);
 
-        const { data: balances } = await http.post(`payments/payment/invoice`, {
-          ids: mapInvoiceIds,
-          type: 'INVOICE',
-        });
+        const { data: balances } = await axios.post(
+          Host('payments', 'payments/payment/invoice'),
+          {
+            ids: mapInvoiceIds,
+            type: 'INVOICE',
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
 
         for (const i of invoices) {
           const balance = balances.find((bal) => bal.id === i.id);
@@ -363,10 +365,18 @@ export class InvoiceService {
         return !pos || item != ary[pos - 1];
       });
 
-    const { data: contacts } = await http.post(`contacts/contact/ids`, {
-      ids: newContactIds,
-      type: 1,
-    });
+    const { data: contacts } = await axios.post(
+      Host('contacts', 'contacts/contact/ids'),
+      {
+        ids: newContactIds,
+        type: 1,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     // get distinct userids
     const key = 'createdById';
@@ -374,10 +384,18 @@ export class InvoiceService {
       ...new Map(invoice_arr.map((item) => [item[key], item])).values(),
     ].map((i) => i[key]);
 
-    const { data: users } = await http.post(`users/user/ids`, {
-      ids: mapUniqueUserId,
-      type: 1,
-    });
+    const { data: users } = await axios.post(
+      Host('users', 'users/user/ids'),
+      {
+        ids: mapUniqueUserId,
+        type: 1,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     for (const i of invoice_arr) {
       const contact = contacts.find((c) => c.id === i.contactId);
@@ -423,23 +441,32 @@ export class InvoiceService {
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
 
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
-
     const accountCodesArray = ['15004', '20002', '50001'];
-    const { data: accounts } = await http.post(`accounts/account/codes`, {
-      codes: accountCodesArray,
-    });
+    const { data: accounts } = await axios.post(
+      Host('accounts', 'accounts/account/codes'),
+      {
+        codes: accountCodesArray,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     const mapItemIds = dto.invoice_items.map((ids) => ids.itemId);
 
-    const { data: items } = await http.post(`items/item/ids`, {
-      ids: mapItemIds,
-    });
+    const { data: items } = await axios.post(
+      Host('items', 'items/item/ids'),
+      {
+        ids: mapItemIds,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     const creditsArrray = [];
     const itemLedgerArray = [];
@@ -532,9 +559,17 @@ export class InvoiceService {
         });
 
         if (updatedInvoice.status === Statuses.AUTHORISED) {
-          await http.post(`items/item/manage-inventory`, {
-            payload: itemLedgerArray,
-          });
+          await axios.post(
+            Host('items', 'items/item/manage-inventory'),
+            {
+              payload: itemLedgerArray,
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
+            }
+          );
 
           const debitsArray = [];
           const debit = {
@@ -561,10 +596,15 @@ export class InvoiceService {
             status: updatedInvoice.status,
           };
 
-          const { data: transaction } = await http.post(
-            'accounts/transaction/api',
+          const { data: transaction } = await axios.post(
+            Host('accounts', 'accounts/transaction/api'),
             {
               transactions: payload,
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
             }
           );
 
@@ -589,10 +629,22 @@ export class InvoiceService {
             name: invoiceLink,
           });
 
-          await http.post(`payments/payment/add`, {
-            payments: paymentArr,
+          await axios.post(
+            Host('payments', 'payments/payment/add'),
+            {
+              payments: paymentArr,
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
+            }
+          );
+          await axios.get(Host('contacts', 'contacts/contact/balance'), {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
           });
-          await http.get(`contacts/contact/balance`);
         }
         return updatedInvoice;
       }
@@ -657,9 +709,17 @@ export class InvoiceService {
       }
 
       if (invoice.status === Statuses.AUTHORISED) {
-        await http.post(`items/item/manage-inventory`, {
-          payload: itemLedgerArray,
-        });
+        await axios.post(
+          Host('items', 'items/item/manage-inventory'),
+          {
+            payload: itemLedgerArray,
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
 
         const debitsArray = [];
         const debit = {
@@ -686,10 +746,15 @@ export class InvoiceService {
           status: invoice.status,
         };
 
-        const { data: transaction } = await http.post(
-          'accounts/transaction/api',
+        const { data: transaction } = await axios.post(
+          Host('accounts', 'accounts/transaction/api'),
           {
             transactions: payload,
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
           }
         );
 
@@ -706,9 +771,17 @@ export class InvoiceService {
           },
         ];
 
-        await http.post(`payments/payment/add`, {
-          payments: paymentArr,
-        });
+        await axios.post(
+          Host('payments', `payments/payment/add`),
+          {
+            payments: paymentArr,
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
 
         const invoice_details = [];
         let i = 0;
@@ -726,10 +799,18 @@ export class InvoiceService {
           }
         }
 
-        const { data: contact } = await http.post(`contacts/contact/ids`, {
-          ids: [dto.contactId],
-          type: 1,
-        });
+        const { data: contact } = await axios.post(
+          Host('contacts', `contacts/contact/ids`),
+          {
+            ids: [dto.contactId],
+            type: 1,
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
 
         const email = contact[0].email
           ? contact[0].email
@@ -737,8 +818,8 @@ export class InvoiceService {
           ? dto.email
           : null;
 
-        const { data: attachment } = await http.post(
-          `attachments/attachment/generate-pdf`,
+        const { data: attachment } = await axios.post(
+          Host('attachments', `attachments/attachment/generate-pdf`),
           {
             data: {
               ...dto,
@@ -746,6 +827,11 @@ export class InvoiceService {
               contact: contact[0],
               items,
               type: PdfType.INVOICE,
+            },
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
             },
           }
         );
@@ -765,38 +851,19 @@ export class InvoiceService {
           });
         }
 
-        await http.get(`contacts/contact/balance`);
+        await axios.get(Host('contacts', `contacts/contact/balance`), {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        });
       }
       return invoice;
     }
   }
 
   async GeneratePdfAndSendEamil(data, req) {
-    // let token;
-    // if (process.env.NODE_ENV === 'development') {
-    //   const header = req.headers?.authorization?.split(' ')[1];
-    //   token = header;
-    // } else {
-    //   if (!req || !req.cookies) return null;
-    //   token = req.cookies['access_token'];
-    // }
-
-    // const type =
-    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    // const value =
-    //   process.env.NODE_ENV === 'development'
-    //     ? `Bearer ${token}`
-    //     : `access_token=${token}`;
-
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
-
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
 
     if (data.type === InvTypes.INVOICE) {
       const invoice = await getCustomRepository(InvoiceRepository).findOne({
@@ -813,14 +880,30 @@ export class InvoiceService {
       });
 
       const mapItemIds = invoiceItems.map((ids) => ids.itemId);
-      const { data: items } = await http.post(`items/item/ids`, {
-        ids: mapItemIds,
-      });
+      const { data: items } = await axios.post(
+        Host('items', `items/item/ids`),
+        {
+          ids: mapItemIds,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
 
-      const { data: contact } = await http.post(`contacts/contact/ids`, {
-        ids: [invoice.contactId],
-        type: 1,
-      });
+      const { data: contact } = await axios.post(
+        Host('contacts', `contacts/contact/ids`),
+        {
+          ids: [invoice.contactId],
+          type: 1,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
 
       const invoice_details = [];
       let i = 0;
@@ -838,8 +921,8 @@ export class InvoiceService {
         }
       }
 
-      const { data: attachment } = await http.post(
-        `attachments/attachment/generate-pdf`,
+      const { data: attachment } = await axios.post(
+        Host('attachments', `attachments/attachment/generate-pdf`),
         {
           data: {
             invoice: { ...invoice, invoice_items: invoiceItems },
@@ -847,6 +930,11 @@ export class InvoiceService {
             contact: contact[0],
             items,
             type: PdfType.INVOICE,
+          },
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
           },
         }
       );
@@ -883,14 +971,30 @@ export class InvoiceService {
       });
 
       const mapItemIds = billItems.map((ids) => ids.itemId);
-      const { data: items } = await http.post(`items/item/ids`, {
-        ids: mapItemIds,
-      });
+      const { data: items } = await axios.post(
+        Host('items', `items/item/ids`),
+        {
+          ids: mapItemIds,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
 
-      const { data: contact } = await http.post(`contacts/contact/ids`, {
-        ids: [bill.contactId],
-        type: 1,
-      });
+      const { data: contact } = await axios.post(
+        Host('contacts', `contacts/contact/ids`),
+        {
+          ids: [bill.contactId],
+          type: 1,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
 
       const invoice_details = [];
       let i = 0;
@@ -908,8 +1012,8 @@ export class InvoiceService {
         }
       }
 
-      const { data: attachment } = await http.post(
-        `attachments/attachment/generate-pdf`,
+      const { data: attachment } = await axios.post(
+        Host('attachments', `attachments/attachment/generate-pdf`),
         {
           data: {
             invoice: { ...bill, invoice_items: billItems },
@@ -917,6 +1021,11 @@ export class InvoiceService {
             contact: contact[0],
             items,
             type: PdfType.BILL,
+          },
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
           },
         }
       );
@@ -1056,22 +1165,6 @@ export class InvoiceService {
 
     let new_invoice;
     if (invoice?.contactId) {
-      // let token;
-      // if (process.env.NODE_ENV === 'development') {
-      //   const header = req.headers?.authorization?.split(' ')[1];
-      //   token = header;
-      // } else {
-      //   if (!req || !req.cookies) return null;
-      //   token = req.cookies['access_token'];
-      // }
-
-      // const type =
-      //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-      // const value =
-      //   process.env.NODE_ENV === 'development'
-      //     ? `Bearer ${token}`
-      //     : `access_token=${token}`;
-
       const contactId = invoice?.contactId;
       const itemIdsArray = invoice?.invoiceItems.map((ids) => ids.itemId);
 
@@ -1079,29 +1172,38 @@ export class InvoiceService {
       const token = req.cookies['access_token'];
 
       const contactRequest = {
-        url: `https://localhost/contacts/contact/${contactId}`,
+        url: Host('contacts', `contacts/contact/${contactId}`),
         method: 'GET',
         headers: {
           cookie: `access_token=${token}`,
         },
       };
 
-      const http = axios.create({
-        baseURL: 'https://localhost',
-        headers: {
-          cookie: `access_token=${token}`,
+      const { data: payments } = await axios.post(
+        Host('payments', `payments/payment/invoice`),
+        {
+          ids: [invoiceId],
+          type: 'INVOICE',
         },
-      });
-
-      const { data: payments } = await http.post(`payments/payment/invoice`, {
-        ids: [invoiceId],
-        type: 'INVOICE',
-      });
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
 
       const { data: contact } = await axios(contactRequest as unknown);
-      const { data: items } = await http.post(`items/item/ids`, {
-        ids: itemIdsArray,
-      });
+      const { data: items } = await axios.post(
+        Host('items', `items/item/ids`),
+        {
+          ids: itemIdsArray,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
 
       const balance = payments.find((bal) => parseInt(bal.id) === invoice.id);
 
@@ -1311,31 +1413,9 @@ export class InvoiceService {
     invoiceIds: InvoiceIdsDto,
     req: IRequest
   ): Promise<boolean> {
-    // let token;
-    // if (process.env.NODE_ENV === 'development') {
-    //   const header = req.headers?.authorization?.split(' ')[1];
-    //   token = header;
-    // } else {
-    //   if (!req || !req.cookies) return null;
-    //   token = req.cookies['access_token'];
-    // }
-
-    // const tokenType =
-    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    // const value =
-    //   process.env.NODE_ENV === 'development'
-    //     ? `Bearer ${token}`
-    //     : `access_token=${token}`;
-
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
 
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
     const itemLedgerArray = [];
     const itemArray = [];
     for (const i of invoiceIds.ids) {
@@ -1346,9 +1426,17 @@ export class InvoiceService {
       });
 
       const mapItemIds = invoice_items.map((ids) => ids.itemId);
-      const { data: items } = await http.post(`items/item/ids`, {
-        ids: mapItemIds,
-      });
+      const { data: items } = await axios.post(
+        Host('items', `items/item/ids`),
+        {
+          ids: mapItemIds,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
       itemArray.push(items);
     }
 
@@ -1393,14 +1481,30 @@ export class InvoiceService {
     }
 
     if (itemLedgerArray.length > 0) {
-      await http.post('payments/payment/delete', {
-        ids: invoiceIds.ids,
-        type: PaymentModes.INVOICES,
-      });
+      await axios.post(
+        Host('payments', 'payments/payment/delete'),
+        {
+          ids: invoiceIds.ids,
+          type: PaymentModes.INVOICES,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
 
-      await http.post(`items/item/manage-inventory`, {
-        payload: itemLedgerArray,
-      });
+      await axios.post(
+        Host('items', `items/item/manage-inventory`),
+        {
+          payload: itemLedgerArray,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
     }
 
     return true;
@@ -1493,31 +1597,8 @@ export class InvoiceService {
    */
 
   async PendingPaymentInvoices(req) {
-    // let token;
-    // if (process.env.NODE_ENV === 'development') {
-    //   const header = req.headers?.authorization?.split(' ')[1];
-    //   token = header;
-    // } else {
-    //   if (!req || !req.cookies) return null;
-    //   token = req.cookies['access_token'];
-    // }
-
-    // const tokenType =
-    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    // const value =
-    //   process.env.NODE_ENV === 'development'
-    //     ? `Bearer ${token}`
-    //     : `access_token=${token}`;
-
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
-
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
 
     const invoices = await getCustomRepository(InvoiceRepository).find({
       where: {
@@ -1530,10 +1611,18 @@ export class InvoiceService {
 
     const mapInvoiceIds = invoices.map((inv) => inv.id);
 
-    const { data: balances } = await http.post(`payments/payment/invoice`, {
-      ids: mapInvoiceIds,
-      type: 'INVOICE',
-    });
+    const { data: balances } = await axios.post(
+      Host('payments', `payments/payment/invoice`),
+      {
+        ids: mapInvoiceIds,
+        type: 'INVOICE',
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     const invoice_arr = [];
     for (const i of invoices) {
@@ -1599,31 +1688,8 @@ export class InvoiceService {
    */
 
   async AgedReceivables(req: IRequest, query) {
-    // let token;
-    // if (process.env.NODE_ENV === 'development') {
-    //   const header = req.headers?.authorization?.split(' ')[1];
-    //   token = header;
-    // } else {
-    //   if (!req || !req.cookies) return null;
-    //   token = req.cookies['access_token'];
-    // }
-
-    // const tokenType =
-    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    // const value =
-    //   process.env.NODE_ENV === 'development'
-    //     ? `Bearer ${token}`
-    //     : `access_token=${token}`;
-
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
-
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
 
     const invoices = await getCustomRepository(InvoiceRepository).find({
       where: {
@@ -1636,10 +1702,18 @@ export class InvoiceService {
 
     const mapInvoiceIds = invoices.map((inv) => inv.id);
 
-    const { data: balances } = await http.post(`payments/payment/invoice`, {
-      ids: mapInvoiceIds,
-      type: 'INVOICE',
-    });
+    const { data: balances } = await axios.post(
+      Host('payments', `payments/payment/invoice`),
+      {
+        ids: mapInvoiceIds,
+        type: 'INVOICE',
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     const invoice_arr = [];
     for (const i of invoices) {
@@ -1679,31 +1753,8 @@ export class InvoiceService {
     req: IRequest,
     type: number
   ): Promise<IInvoice[]> {
-    // let token;
-    // if (process.env.NODE_ENV === 'development') {
-    //   const header = req.headers?.authorization?.split(' ')[1];
-    //   token = header;
-    // } else {
-    //   if (!req || !req.cookies) return null;
-    //   token = req.cookies['access_token'];
-    // }
-
-    // const tokenType =
-    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    // const value =
-    //   process.env.NODE_ENV === 'development'
-    //     ? `Bearer ${token}`
-    //     : `access_token=${token}`;
-
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
-
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
 
     const inv_arr = [];
     if (type == PaymentModes.INVOICES) {
@@ -1718,10 +1769,18 @@ export class InvoiceService {
 
       const invoiceIds = invoices?.map((i) => i.id);
       if (invoices.length > 0) {
-        const { data: payments } = await http.post(`payments/payment/invoice`, {
-          ids: invoiceIds,
-          type: 'INVOICE',
-        });
+        const { data: payments } = await axios.post(
+          Host('payments', `payments/payment/invoice`),
+          {
+            ids: invoiceIds,
+            type: 'INVOICE',
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
 
         for (const inv of invoices) {
           const balance = payments.find((pay) => pay.id === inv.id);
@@ -1749,10 +1808,18 @@ export class InvoiceService {
       if (bills.length > 0) {
         const invoiceIds = bills?.map((i) => i.id);
 
-        const { data: payments } = await http.post(`payments/payment/invoice`, {
-          ids: invoiceIds,
-          type: 'BILL',
-        });
+        const { data: payments } = await axios.post(
+          Host('payments', `payments/payment/invoice`),
+          {
+            ids: invoiceIds,
+            type: 'BILL',
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
 
         for (const inv of bills) {
           const balance = payments.find((pay) => pay.id === inv.id);
@@ -1775,41 +1842,26 @@ export class InvoiceService {
   }
 
   async SyncInvoices(data, req: IRequest): Promise<void> {
-    // let token;
-    // if (process.env.NODE_ENV === 'development') {
-    //   const header = req.headers?.authorization?.split(' ')[1];
-    //   token = header;
-    // } else {
-    //   if (!req || !req.cookies) return null;
-    //   token = req.cookies['access_token'];
-    // }
-
-    // const type =
-    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    // const value =
-    //   process.env.NODE_ENV === 'development'
-    //     ? `Bearer ${token}`
-    //     : `access_token=${token}`;
-
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
-
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
 
     const mapContactIds =
       data.type === Integrations.XERO
         ? data.invoices.map((inv) => inv?.contact?.contactID)
         : data.invoices.map((inv) => inv?.CustomerRef?.value);
 
-    const { data: contacts } = await http.post(`contacts/contact/ids`, {
-      ids: mapContactIds,
-      type: 2,
-    });
+    const { data: contacts } = await axios.post(
+      Host('contacts', `contacts/contact/ids`),
+      {
+        ids: mapContactIds,
+        type: 2,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     const newPaymentPayload = [];
     const transactions = [];
@@ -1835,19 +1887,35 @@ export class InvoiceService {
       );
 
       const itemCodesArray = item_arr.flat();
-      const { data: items } = await http.post(`items/item/ids-or-codes`, {
-        payload: itemCodesArray,
-        type: Integrations.XERO,
-      });
+      const { data: items } = await axios.post(
+        Host('items', `items/item/ids-or-codes`),
+        {
+          payload: itemCodesArray,
+          type: Integrations.XERO,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
 
       const new_account_codes = account_arr.flat();
       const concatAccountCodes = new_account_codes.concat(
         mapAccountCodesFromPayments
       );
 
-      const { data: accounts } = await http.post(`accounts/account/codes`, {
-        codes: concatAccountCodes,
-      });
+      const { data: accounts } = await axios.post(
+        Host('accounts', `accounts/account/codes`),
+        {
+          codes: concatAccountCodes,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
 
       const payment_arr = [];
       for (const pay of data.payments) {
@@ -2046,10 +2114,18 @@ export class InvoiceService {
       }
 
       const new_item_ids_array = item_ids_array.flat();
-      const { data: items } = await http.post('items/item/ids-or-codes', {
-        payload: new_item_ids_array,
-        type: Integrations.QUICK_BOOK,
-      });
+      const { data: items } = await axios.post(
+        Host('items', 'items/item/ids-or-codes'),
+        {
+          payload: new_item_ids_array,
+          type: Integrations.QUICK_BOOK,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
 
       for (const inv of data.invoices) {
         const invoice = await getCustomRepository(InvoiceRepository).find({
@@ -2113,16 +2189,32 @@ export class InvoiceService {
     }
 
     if (newPaymentPayload.length > 0) {
-      await http.post(`payments/payment/add`, {
-        payments: newPaymentPayload,
-      });
+      await axios.post(
+        Host('payments', `payments/payment/add`),
+        {
+          payments: newPaymentPayload,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
     }
 
     console.log('sending transaction...');
     if (transactions.length > 0) {
-      await http.post('accounts/transaction/api', {
-        transactions,
-      });
+      await axios.post(
+        Host('accounts', 'accounts/transaction/api'),
+        {
+          transactions,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
     }
   }
 }

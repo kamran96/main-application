@@ -11,7 +11,7 @@ import {
 import * as moment from 'moment';
 import { PaymentRepository } from '../repositories/payment.repository';
 import { Sorting } from '@invyce/sorting';
-import { PaymentModes, EntryType } from '@invyce/global-constants';
+import { PaymentModes, EntryType, Host } from '@invyce/global-constants';
 import {
   IPage,
   IBaseUser,
@@ -128,36 +128,21 @@ export class PaymentService {
    */
   async CreatePayment(data: PaymentDto, req: IRequest): Promise<IPayment> {
     try {
-      // let token;
-      // if (process.env.NODE_ENV === 'development') {
-      //   const header = req.headers?.authorization?.split(' ')[1];
-      //   token = header;
-      // } else {
-      //   if (!req || !req.cookies) return null;
-      //   token = req.cookies['access_token'];
-      // }
-
-      // const type =
-      //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-      // const value =
-      //   process.env.NODE_ENV === 'development'
-      //     ? `Bearer ${token}`
-      //     : `access_token=${token}`;
-
       if (!req || !req.cookies) return null;
       const token = req?.cookies['access_token'];
 
-      const http = axios.create({
-        baseURL: 'https://localhost',
-        headers: {
-          cookie: `access_token=${token}`,
-        },
-      });
-
       const accountCodesArray = ['15001', '15004', '40001'];
-      const { data: accounts } = await http.post(`accounts/account/codes`, {
-        codes: accountCodesArray,
-      });
+      const { data: accounts } = await axios.post(
+        Host('accounts', `accounts/account/codes`),
+        {
+          codes: accountCodesArray,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
 
       if (data?.paymentMode === PaymentModes.BILLS) {
         // for Bills
@@ -187,10 +172,15 @@ export class PaymentService {
             status: 1,
           };
 
-          const { data: transaction } = await http.post(
-            'accounts/transaction/api',
+          const { data: transaction } = await axios.post(
+            Host('accounts', 'accounts/transaction/api'),
             {
               transactions: payload,
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
             }
           );
 
@@ -338,10 +328,15 @@ export class PaymentService {
             .groupBy('"invoiceId"')
             .getRawMany();
 
-          const { data: transaction } = await http.post(
-            'accounts/transaction/api',
+          const { data: transaction } = await axios.post(
+            Host('accounts', 'accounts/transaction/api'),
             {
               transactions: payload,
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
             }
           );
 
@@ -413,10 +408,15 @@ export class PaymentService {
             }
           }
 
-          const { data: invoiceData } = await http.post(
-            'invoices/invoice/ids',
+          const { data: invoiceData } = await axios.post(
+            Host('invoices', 'invoices/invoice/ids'),
             {
               ids: data.invoice_ids,
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
             }
           );
 
@@ -467,7 +467,11 @@ export class PaymentService {
 
       // send payment send email
 
-      await http.get(`contacts/contact/balance`);
+      await axios.get(Host('contacts', `contacts/contact/balance`), {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      });
     } catch (error) {
       throw new HttpException(error.status, HttpStatus.BAD_REQUEST);
     }
@@ -639,31 +643,8 @@ export class PaymentService {
   }
 
   async DeletePaymentAgainstInvoiceOrBillId(data, req) {
-    // let token;
-    // if (process.env.NODE_ENV === 'development') {
-    //   const header = req.headers?.authorization?.split(' ')[1];
-    //   token = header;
-    // } else {
-    //   if (!req || !req.cookies) return null;
-    //   token = req.cookies['access_token'];
-    // }
-
-    // const tokenType =
-    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    // const value =
-    //   process.env.NODE_ENV === 'development'
-    //     ? `Bearer ${token}`
-    //     : `access_token=${token}`;
-
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
-
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
 
     const id = data.type === PaymentModes.INVOICES ? 'invoiceId' : 'billId';
 
@@ -695,10 +676,22 @@ export class PaymentService {
       );
     }
 
-    await http.get(`contacts/contact/balance`);
-    await http.post(`accounts/transaction/delete`, {
-      ids: mapTransactionIds,
+    await axios.get(Host('contacts', `contacts/contact/balance`), {
+      headers: {
+        cookie: `access_token=${token}`,
+      },
     });
+    await axios.post(
+      Host('accounts', `accounts/transaction/delete`),
+      {
+        ids: mapTransactionIds,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
   }
 
   // async AgedPayments(req: IRequest, data, query) {
@@ -753,28 +746,8 @@ export class PaymentService {
   }
 
   async DeletePayment(paymentIds: PaymentIdsDto, req): Promise<boolean> {
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
-
-    const tokenType =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
-
-    const http = axios.create({
-      baseURL: 'http://localhost',
-      headers: {
-        [tokenType]: value,
-      },
-    });
+    if (!req || !req.cookies) return null;
+    const token = req.cookies['access_token'];
 
     const transactionArray = [];
     for (const i of paymentIds.ids) {
@@ -793,12 +766,24 @@ export class PaymentService {
       );
     }
 
-    await http.get(`contacts/contact/balance`);
+    await axios.get(Host('contacts', `contacts/contact/balance`), {
+      headers: {
+        cookie: `access_token=${token}`,
+      },
+    });
     const mapTransactionIds = transactionArray.map((ids) => ids.transactionId);
     if (mapTransactionIds.length > 0) {
-      await http.post(`accounts/transaction/delete`, {
-        ids: mapTransactionIds,
-      });
+      await axios.post(
+        Host('accounts', `accounts/transaction/delete`),
+        {
+          ids: mapTransactionIds,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
     }
 
     return true;

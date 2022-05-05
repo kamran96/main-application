@@ -6,7 +6,12 @@ import { BillItemRepository } from '../repositories/billItem.repository';
 import { Sorting } from '@invyce/sorting';
 import { IPage, IBillWithResponse, IRequest, IBill } from '@invyce/interfaces';
 import { BillDto, BillIdsDto } from '../dto/bill.dto';
-import { EntryType, PaymentModes, Statuses } from '@invyce/global-constants';
+import {
+  EntryType,
+  Host,
+  PaymentModes,
+  Statuses,
+} from '@invyce/global-constants';
 import { ClientProxy } from '@nestjs/microservices';
 import { BILL_UPDATED } from '@invyce/send-email';
 import { CreditNoteRepository } from '../repositories/creditNote.repository';
@@ -22,31 +27,8 @@ export class BillService {
     let sort = queryData.sort;
     sort = sort ? sort : '-id';
 
-    // let token;
-    // if (process.env.NODE_ENV === 'development') {
-    //   const header = req.headers?.authorization?.split(' ')[1];
-    //   token = header;
-    // } else {
-    //   if (!req || !req.cookies) return null;
-    //   token = req.cookies['access_token'];
-    // }
-
-    // const tokenType =
-    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    // const value =
-    //   process.env.NODE_ENV === 'development'
-    //     ? `Bearer ${token}`
-    //     : `access_token=${token}`;
-
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
-
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
 
     let bills;
     const ps: number = parseInt(page_size);
@@ -141,10 +123,18 @@ export class BillService {
           .filter((b) => b.status === Statuses.AUTHORISED)
           .map((bill) => bill.id);
 
-        const { data: balances } = await http.post(`payments/payment/invoice`, {
-          ids: mapBillIds,
-          type: 'BILL',
-        });
+        const { data: balances } = await axios.post(
+          Host('payments', `payments/payment/invoice`),
+          {
+            ids: mapBillIds,
+            type: 'BILL',
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
 
         for (const i of bills) {
           const balance = balances.find((bal) => bal.id === i.id);
@@ -191,10 +181,18 @@ export class BillService {
 
         const mapBillIds = bills.map((bill) => bill.id);
 
-        const { data: balances } = await http.post(`payments/payment/invoice`, {
-          ids: mapBillIds,
-          type: 'BILL',
-        });
+        const { data: balances } = await axios.post(
+          Host('payments', `payments/payment/invoice`),
+          {
+            ids: mapBillIds,
+            type: 'BILL',
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
 
         for (const i of bills) {
           const balance = balances.find((bal) => bal.id === i.id);
@@ -241,10 +239,18 @@ export class BillService {
 
         const mapBillIds = bills.map((bill) => bill.id);
 
-        const { data: balances } = await http.post(`payments/payment/invoice`, {
-          ids: mapBillIds,
-          type: 'BILL',
-        });
+        const { data: balances } = await axios.post(
+          Host('payments', `payments/payment/invoice`),
+          {
+            ids: mapBillIds,
+            type: 'BILL',
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
 
         for (const i of bills) {
           const balance = balances.find((bal) => bal.id === i.id);
@@ -306,10 +312,18 @@ export class BillService {
         return !pos || item != ary[pos - 1];
       });
 
-    const { data: contacts } = await http.post(`contacts/contact/ids`, {
-      ids: newContactIds,
-      type: 1,
-    });
+    const { data: contacts } = await axios.post(
+      Host('contacts', `contacts/contact/ids`),
+      {
+        ids: newContactIds,
+        type: 1,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     // get distinct userids
     const key = 'createdById';
@@ -317,10 +331,18 @@ export class BillService {
       ...new Map(bill_arr.map((item) => [item[key], item])).values(),
     ].map((i) => i[key]);
 
-    const { data: users } = await http.post(`users/user/ids`, {
-      ids: mapUniqueUserId,
-      type: 1,
-    });
+    const { data: users } = await axios.post(
+      Host('users', `users/user/ids`),
+      {
+        ids: mapUniqueUserId,
+        type: 1,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     for (const i of bill_arr) {
       const contact = contacts.find((c) => c.id === i.contactId);
@@ -346,60 +368,38 @@ export class BillService {
   }
 
   async CreateBill(dto: BillDto, req: IRequest): Promise<IBill> {
-    // let token;
-    // if (process.env.NODE_ENV === 'development') {
-    //   const header = req.headers?.authorization?.split(' ')[1];
-    //   token = header;
-    // } else {
-    //   if (!req || !req.cookies) return null;
-    //   token = req.cookies['access_token'];
-    // }
-
-    // const tokenType =
-    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    // const value =
-    //   process.env.NODE_ENV === 'development'
-    //     ? `Bearer ${token}`
-    //     : `access_token=${token}`;
-
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
 
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
-
     const accountCodesArray = ['40001', '55002'];
-    const { data: accounts } = await http.post(`accounts/account/codes`, {
-      codes: accountCodesArray,
-    });
+    const { data: accounts } = await axios.post(
+      Host('accounts', `accounts/account/codes`),
+      {
+        codes: accountCodesArray,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     const mapItemIds = dto.invoice_items.map((ids) => ids.itemId);
-    const { data: items } = await http.post(`items/item/ids`, {
-      ids: mapItemIds,
-    });
+    const { data: items } = await axios.post(
+      Host('items', `items/item/ids`),
+      {
+        ids: mapItemIds,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     const itemLedgerArray = [];
     const debitsArrray = [];
-    const invoice_details = [];
     const billItems = [];
-    // let i = 0;
-    // for (const item of dto.invoice_items) {
-    //   i++;
-    //   if (i < 6) {
-    //     invoice_details.push({
-    //       itemName: await items.find((i) => i.id === item.itemId).name,
-    //       quantity: item.quantity,
-    //       price: item.purchasePrice,
-    //       itemDiscount: item.itemDiscount,
-    //       tax: item.tax,
-    //       total: item.total,
-    //     });
-    //   }
-    // }
 
     if (dto?.isNewRecord === false) {
       const bill: IBill = await getCustomRepository(BillRepository).findOne({
@@ -484,9 +484,17 @@ export class BillService {
         });
 
         if (updatedBill.status === Statuses.AUTHORISED) {
-          await http.post(`items/item/manage-inventory`, {
-            payload: itemLedgerArray,
-          });
+          await axios.post(
+            Host('items', `items/item/manage-inventory`),
+            {
+              payload: itemLedgerArray,
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
+            }
+          );
 
           const creditsArray = [
             {
@@ -504,10 +512,15 @@ export class BillService {
             status: updatedBill.status,
           };
 
-          const { data: transaction } = await http.post(
-            'accounts/transaction/api',
+          const { data: transaction } = await axios.post(
+            Host('accounts', 'accounts/transaction/api'),
             {
               transactions: payload,
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
             }
           );
 
@@ -534,10 +547,22 @@ export class BillService {
             link: billLink,
           });
 
-          await http.post(`payments/payment/add`, {
-            payments: paymentArr,
+          await axios.post(
+            Host('payments', `payments/payment/add`),
+            {
+              payments: paymentArr,
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
+            }
+          );
+          await axios.get(Host('contacts', `contacts/contact/balance`), {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
           });
-          await http.get(`contacts/contact/balance`);
         }
 
         return bill;
@@ -603,9 +628,17 @@ export class BillService {
       }
 
       if (bill.status === Statuses.AUTHORISED) {
-        await http.post(`items/item/manage-inventory`, {
-          payload: itemLedgerArray,
-        });
+        await axios.post(
+          Host('items', `items/item/manage-inventory`),
+          {
+            payload: itemLedgerArray,
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
 
         const creditsArray = [
           {
@@ -623,10 +656,15 @@ export class BillService {
           status: bill.status,
         };
 
-        const { data: transaction } = await http.post(
-          'accounts/transaction/api',
+        const { data: transaction } = await axios.post(
+          Host('accounts', 'accounts/transaction/api'),
           {
             transactions: payload,
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
           }
         );
 
@@ -643,36 +681,22 @@ export class BillService {
           },
         ];
 
-        // const { data: attachment } = await http.post(
-        //   `attachments/attachment/generate-pdf`,
-        //   {
-        //     data: {
-        //       ...dto,
-        //       invoice: { ...bill, invoice_items: billItems },
-        //       contact: contact[0],
-        //       items,
-        //       type: PdfType.BILL,
-        //     },
-        //   }
-        // );
-
-        // await this.emailService.emit(BILL_CREATED, {
-        //   to: contact[0]?.email,
-        //   user_name: contact[0]?.name,
-        //   invoice_number: bill.invoiceNumber,
-        //   issueDate: bill.issueDate,
-        //   gross_total: bill.grossTotal,
-        //   itemDisTotal: bill.discount,
-        //   net_total: bill.netTotal,
-        //   invoice_details,
-        //   download_link: attachment?.path,
-        //   attachment_name: attachment?.name,
-        // });
-
-        await http.post(`payments/payment/add`, {
-          payments: paymentArr,
+        await axios.post(
+          Host('payments', `payments/payment/add`),
+          {
+            payments: paymentArr,
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
+        await axios.get(Host('contacts', `contacts/contact/balance`), {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
         });
-        await http.get(`contacts/contact/balance`);
       }
       return bill;
     }
@@ -695,51 +719,44 @@ export class BillService {
 
     let new_bill;
     if (bill?.contactId) {
-      // let token;
-      // if (process.env.NODE_ENV === 'development') {
-      //   const header = req.headers?.authorization?.split(' ')[1];
-      //   token = header;
-      // } else {
-      //   if (!req || !req.cookies) return null;
-      //   token = req.cookies['access_token'];
-      // }
-
-      // const type =
-      //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-      // const value =
-      //   process.env.NODE_ENV === 'development'
-      //     ? `Bearer ${token}`
-      //     : `access_token=${token}`;
-
       const contactId = bill?.contactId;
       const itemIdsArray = bill?.purchaseItems.map((ids) => ids.itemId);
 
       if (!req || !req.cookies) return null;
       const token = req?.cookies['access_token'];
       const contactRequest = {
-        url: `https://localhost/contacts/contact/${contactId}`,
+        url: Host('contacts', `contacts/contact/${contactId}`),
         method: 'GET',
         headers: {
           cookie: `access_token=${token}`,
         },
       };
 
-      const http = axios.create({
-        baseURL: 'https://localhost',
-        headers: {
-          cookie: `access_token=${token}`,
+      const { data: payments } = await axios.post(
+        Host('payments', `payments/payment/invoice`),
+        {
+          ids: [billId],
+          type: 'BILL',
         },
-      });
-
-      const { data: payments } = await http.post(`payments/payment/invoice`, {
-        ids: [billId],
-        type: 'BILL',
-      });
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
 
       const { data: contact } = await axios(contactRequest as unknown);
-      const { data: items } = await http.post(`items/item/ids`, {
-        ids: itemIdsArray,
-      });
+      const { data: items } = await axios.post(
+        Host('items', `items/item/ids`),
+        {
+          ids: itemIdsArray,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
 
       const balance = payments.find((bal) => parseInt(bal.id) === bill.id);
 
@@ -791,31 +808,8 @@ export class BillService {
   }
 
   async deleteBill(billIds: BillIdsDto, req: IRequest): Promise<boolean> {
-    // let token;
-    // if (process.env.NODE_ENV === 'development') {
-    //   const header = req.headers?.authorization?.split(' ')[1];
-    //   token = header;
-    // } else {
-    //   if (!req || !req.cookies) return null;
-    //   token = req.cookies['access_token'];
-    // }
-
-    // const tokenType =
-    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    // const value =
-    //   process.env.NODE_ENV === 'development'
-    //     ? `Bearer ${token}`
-    //     : `access_token=${token}`;
-
     if (!req || !req.cookies) return null;
     const token = req.cookies['access_token'];
-
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
 
     const itemLedgerArray = [];
     const itemArray = [];
@@ -825,9 +819,17 @@ export class BillService {
       });
 
       const mapItemIds = bill_items.map((ids) => ids.itemId);
-      const { data: items } = await http.post(`items/item/ids`, {
-        ids: mapItemIds,
-      });
+      const { data: items } = await axios.post(
+        Host('items', `items/item/ids`),
+        {
+          ids: mapItemIds,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
       itemArray.push(items);
     }
 
@@ -870,14 +872,30 @@ export class BillService {
     }
 
     if (itemLedgerArray.length > 0) {
-      await http.post('payments/payment/delete', {
-        ids: billIds.ids,
-        type: PaymentModes.BILLS,
-      });
+      await axios.post(
+        Host('payments', 'payments/payment/delete'),
+        {
+          ids: billIds.ids,
+          type: PaymentModes.BILLS,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
 
-      await http.post(`items/item/manage-inventory`, {
-        payload: itemLedgerArray,
-      });
+      await axios.post(
+        Host('items', `items/item/manage-inventory`),
+        {
+          payload: itemLedgerArray,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
     }
 
     return true;
@@ -888,31 +906,8 @@ export class BillService {
    */
 
   async AgedPayables(req: IRequest, query) {
-    // let token;
-    // if (process.env.NODE_ENV === 'development') {
-    //   const header = req.headers?.authorization?.split(' ')[1];
-    //   token = header;
-    // } else {
-    //   if (!req || !req.cookies) return null;
-    //   token = req.cookies['access_token'];
-    // }
-
-    // const tokenType =
-    //   process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    // const value =
-    //   process.env.NODE_ENV === 'development'
-    //     ? `Bearer ${token}`
-    //     : `access_token=${token}`;
-
     if (!req || !req.cookies) return null;
     const token = req.cookies['access_token'];
-
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
 
     const bills = await getCustomRepository(BillRepository).find({
       status: 1,
@@ -923,10 +918,18 @@ export class BillService {
 
     const mapBillIds = bills.map((b) => b.id);
 
-    const { data: balances } = await http.post(`payments/payment/invoice`, {
-      ids: mapBillIds,
-      type: 'BILL',
-    });
+    const { data: balances } = await axios.post(
+      Host('payments', `payments/payment/invoice`),
+      {
+        ids: mapBillIds,
+        type: 'BILL',
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     const bill_arr = [];
     for (const i of bills) {
