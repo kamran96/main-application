@@ -7,7 +7,7 @@ COPY ./dist/apps/users-service .
 FROM node:lts-alpine
 
 # add dump-init to avoid nodejs as pid 1
-RUN apk add dumb-init
+RUN apk add dumb-init curl
 ARG PORT
 USER node
 
