@@ -16,6 +16,7 @@ import * as os from 'os';
 import * as ip from 'ip';
 import * as speakeasy from 'speakeasy';
 import * as qrcode from 'qrcode';
+import axios from 'axios';
 import { Response } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import { User } from '../schemas/user.schema';
@@ -39,6 +40,7 @@ import {
 } from '@invyce/interfaces';
 
 import { SendOtp, UserLoginDto, UserRegisterDto } from '../dto/user.dto';
+import { Host } from '@invyce/global-constants';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -232,12 +234,7 @@ export class AuthService {
       id: newUser.id,
     };
 
-    // when added an organization then return new access_token
-
     const token = this.jwtService.sign(payload);
-    // const address = ip.address();
-
-    // if (process.env['NODE' + '_ENV'] === 'production') {
     res
       .cookie('access_token', token, {
         secure: true,
@@ -249,14 +246,7 @@ export class AuthService {
       .send({
         message: 'Login successfully',
         status: true,
-        result: newUser,
       });
-    // } else if (process.env['NODE' + '_ENV'] === 'development') {
-    //   res.send({
-    //     users: newUser,
-    //     access_token: token,
-    //   });
-    // }
 
     return user;
   }
@@ -270,21 +260,52 @@ export class AuthService {
     });
   }
 
-  async Check(req: IRequest): Promise<ICheckUser> {
+  async Check(req: IRequest) {
     try {
-      const payload: UserLoginDto = {
-        username: req.user.username,
-      };
-      const user: IUser[] = await this.CheckUser(payload);
-      const access_token = req.cookies['access_token'];
+      const user = await this.userModel
+        .findOne({
+          username: req.user.username,
+          status: 1,
+        })
+        .populate('role')
+        .populate('branch')
+        .populate({
+          path: 'organization',
+          model: 'Organization',
+          populate: {
+            path: 'currency',
+            model: 'Currency',
+          },
+        });
 
-      if (user?.length) {
-        return {
-          user: user[0],
-          token: access_token,
+      if (user?.profile?.attachmentId) {
+        const attachmentId = user?.profile?.attachmentId;
+
+        if (!req || !req.cookies) return null;
+        const token = req.cookies['access_token'];
+
+        const request = {
+          url: Host('attachments', `attachments/attachment/${attachmentId}`),
+          method: 'GET',
+          headers: {
+            cookie: `access_token=${token}`,
+          },
         };
+
+        const { data: attachment } = await axios(request as unknown);
+        let new_obj = {};
+
+        if (user?.profile?.attachmentId == attachment.id) {
+          new_obj = {
+            ...user.toObject(),
+            profile: { ...user.profile?.toObject(), attachment },
+          };
+        }
+
+        return new_obj;
+      } else {
+        return user;
       }
-      throw new HttpException('Authentication Failed', HttpStatus.BAD_REQUEST);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

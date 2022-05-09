@@ -212,6 +212,15 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const history = useHistory();
 
+  const ClearLogin = () => {
+    setTheme('light');
+    setIsUserLogin(false);
+    queryCache.clear();
+    setAuth(null);
+    setAutherized(false);
+    localStorage.clear();
+  }
+
   const handleLogin = async (action: IAction) => {
     switch (action.type) {
       case ILoginActions.LOGIN:
@@ -231,9 +240,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
                 NOTIFICATIONTYPE.INFO,
                 'Logout Successfully'
               );
-              setTheme('light');
-              setIsUserLogin(false);
-              queryCache.clear();
+              ClearLogin();
             },
             onError: (err: IBaseAPIError) => {
               if (err?.response?.data.message) {
@@ -251,12 +258,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
           });
         }
 
-        localStorage.clear();
-        setAutherized(false);
-        setTheme('light');
-        setAuth(null);
-        setIsUserLogin(false);
-        queryCache.clear();
 
         break;
       default:
@@ -289,7 +290,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   }, [checkIsAuthSaved]);
 
   const userId = useMemo(() => {
-    return isProductionEnv && checkAutherized ? true : auth?.users?.id || null;
+    return auth?.users?.id || null;
   }, [auth?.users?.id]);
 
   const {
@@ -313,13 +314,13 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
       },
       onError: (err: IBaseAPIError) => {
         if (err?.response?.data?.statusCode === 401) {
-          handleLogin({ type: ILoginActions.LOGOUT });
+          ClearLogin();
         }
         setAutherized(false);
       },
     },
 
-    [userId, checkAutherized]
+    [!!userId, !!checkAutherized]
   );
 
   useEffect(() => {

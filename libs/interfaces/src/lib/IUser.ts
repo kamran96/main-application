@@ -14,7 +14,7 @@ export interface IUser extends IBase {
   role?: IRole;
   organization?: IOrganization;
   branch?: IBranch;
-  profile: IProfile;
+  profile?: IProfile;
 }
 
 export interface IProfile {
@@ -52,7 +52,6 @@ export interface IUserCheck {
   message: string;
   status: boolean;
   result: IUser;
-  token: string;
 }
 
 export interface IUserAccessControlResponse {

@@ -104,7 +104,6 @@ export class AppService {
 
   async fileUpload(req, res): Promise<any> {
     try {
-      console.log(req.headers, 'okkk');
       this.upload(req, res, async (error) => {
         if (error) {
           return res.status(404).json(`Failed to upload image file: ${error}`);
@@ -138,7 +137,6 @@ export class AppService {
       bucket: 'invyce/attachments',
       acl: 'public-read',
       key: function (request, file, cb) {
-        console.log(file, 'fl');
         cb(null, `${Date.now().toString()} - ${file.originalname}`);
       },
     }),
