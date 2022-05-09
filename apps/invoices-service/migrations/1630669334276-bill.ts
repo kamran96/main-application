@@ -31,6 +31,7 @@ export class bill1630669334276 implements MigrationInterface {
           { name: 'status', type: 'int', isNullable: true },
           { name: 'createdAt', type: 'timestamp', default: 'NOW()' },
           { name: 'updatedAt', type: 'timestamp', default: 'NOW()' },
+          { name: 'paymentStatus', type: 'varchar', isNullable: true },
         ],
       }),
       true

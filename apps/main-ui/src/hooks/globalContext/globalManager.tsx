@@ -216,6 +216,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     switch (action.type) {
       case ILoginActions.LOGIN:
         if (isProductionEnv) {
+
           setAutherized(true);
         } else {
           localStorage.setItem('auth', EncriptData(action.payload) as string);
@@ -251,7 +252,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         }
 
         localStorage.clear();
-
+        setAutherized(false);
         setTheme('light');
         setAuth(null);
         setIsUserLogin(false);
@@ -288,7 +289,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   }, [checkIsAuthSaved]);
 
   const userId = useMemo(() => {
-    return auth?.users?.id || null;
+    return isProductionEnv && checkAutherized ? true : auth?.users?.id || null;
   }, [auth?.users?.id]);
 
   const {
@@ -318,7 +319,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
       },
     },
 
-    [!!userId]
+    [userId, checkAutherized]
   );
 
   useEffect(() => {
