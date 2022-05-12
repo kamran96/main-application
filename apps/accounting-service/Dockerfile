@@ -12,15 +12,6 @@ ENV NODE_ENV production
 ARG PORT
 USER node
 
-ENV DB_HOST='db-postgresql-sgp1-12041-do-user-4046074-0.b.db.ondigitalocean.com' \
-    DB_PORT=25060 \
-    ACC_DB_NAME='accounts' \
-    DB_PASSWORD='0jN4FNuqynhGR7zT' \
-    DB_USER='doadmin' \
-    JWT_SECRET=alalsdflasjlf343424 \
-    PORT=3336 \
-    NODE_ENV=production
-
 WORKDIR /home/node/app
 
 # change permissions to the node_modules folder
