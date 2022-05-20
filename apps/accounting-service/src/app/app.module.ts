@@ -18,9 +18,14 @@ let content;
 if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
 
-  const bufferArray = fs.readFileSync(
-    path.join(__dirname, '../../../vault/secrets/db-creds')
-  );
+  const pathToFile = path.join(__dirname, '../../../vault/secrets/db-creds');
+  const pathToFile1 = path.join(__dirname, '../../vault/secrets/db-creds');
+  const pathToFile2 = path.join(__dirname, '../vault/secrets/db-creds');
+  const pathToFile3 = path.join(__dirname, 'vault/secrets/db-creds');
+
+  console.log(pathToFile, pathToFile1, pathToFile2, pathToFile3, 'pathToFile');
+
+  const bufferArray = fs.readFileSync(path.join(pathToFile3));
 
   console.log(bufferArray, 'bufferArray');
   content = bufferArray.toString('utf8');
