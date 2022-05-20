@@ -18,7 +18,7 @@ let content;
 if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
   content = fs.readFileSync(
-    path.join(__dirname, '../../../vault/secrets/db-creds'),
+    path.resolve(__dirname, '../../../vault/secrets/db-creds'),
     { encoding: 'utf8' }
   );
 }
