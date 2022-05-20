@@ -35,26 +35,11 @@ console.log(content, 'content');
       useFactory: async (configService: ConfigService) =>
         ({
           type: 'postgres',
-          host: configService.get(
-            'DB_HOST',
-            process.env.DB_HOST || content.DB_HOST
-          ),
-          port: configService.get<unknown>(
-            'DB_PORT',
-            process.env.DB_PORT || content.DB_PORT
-          ),
-          username: configService.get(
-            'DB_USER',
-            process.env.DB_USER || content.DB_USER
-          ),
-          password: configService.get(
-            'DB_PASSWORD',
-            process.env.DB_PASSWORD || content.DB_PASSWORD
-          ),
-          database: configService.get(
-            'ACC_DB_NAME',
-            process.env.ACC_DB_NAME || content.ACC_DB_NAME
-          ),
+          host: configService.get('DB_HOST', process.env.DB_HOST),
+          port: configService.get<unknown>('DB_PORT', process.env.DB_PORT),
+          username: configService.get('DB_USER', process.env.DB_USER),
+          password: configService.get('DB_PASSWORD', process.env.DB_PASSWORD),
+          database: configService.get('ACC_DB_NAME', process.env.ACC_DB_NAME),
           entities: getMetadataArgsStorage().tables.map((tbl) => tbl.target),
           ssl: { rejectUnauthorized: false },
         } as TypeOrmModuleOptions),
