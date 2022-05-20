@@ -17,9 +17,12 @@ dotenv.config();
 let content;
 if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
-  content = fs.readFileSync(path.join(__dirname, '/vault/secrets/db-creds'));
+  content = fs.readFileSync(
+    path.join(__dirname, '../../../vault/secrets/db-creds')
+  );
 }
 
+console.log(content, 'content');
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
