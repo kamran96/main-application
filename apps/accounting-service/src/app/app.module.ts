@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { getMetadataArgsStorage } from 'typeorm';
+import { getMetadataArgsStorage, SimpleConsoleLogger } from 'typeorm';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -17,15 +17,16 @@ dotenv.config();
 let content;
 if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
-  const pathToFile = path.resolve(__dirname, '../../../vault/secrets/db-creds');
-  console.log(pathToFile, 'pathToFile');
-  const bufferArray = fs.readFileSync(path.resolve(pathToFile));
+
+  const bufferArray = fs.readFileSync(
+    path.join(__dirname, '../../../vault/secrets/db-creds')
+  );
+
   console.log(bufferArray, 'bufferArray');
-  content = bufferArray.toString('utf-8');
+  content = bufferArray.toString('utf8');
 }
 
-console.log('content', content);
-
+console.log(content, 'content');
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
