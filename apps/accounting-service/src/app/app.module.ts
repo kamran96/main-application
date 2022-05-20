@@ -17,10 +17,9 @@ dotenv.config();
 let content;
 if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
-  content = fs.readFileSync(
-    path.resolve(__dirname, '../../../vault/secrets/db-creds'),
-    { encoding: 'utf8' }
-  );
+  const pathToFile = path.resolve(__dirname, '../../../vault/secrets/db-creds');
+  console.log(pathToFile, 'pathToFile');
+  content = fs.readFileSync(path.resolve(pathToFile), { encoding: 'utf8' });
 }
 
 console.log(content, 'content');
