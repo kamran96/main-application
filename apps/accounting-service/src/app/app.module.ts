@@ -14,18 +14,18 @@ import { ReportModule } from './report/report.module';
 
 dotenv.config();
 
-let content;
-if (process.env['NODE' + '_ENV'] === 'production') {
-  // read from a file
+// let content;
+// if (process.env['NODE' + '_ENV'] === 'production') {
+//   // read from a file
 
-  const pathToFile = path.join(__dirname, '../../../vault/secrets/db-creds');
-  const bufferArray = fs.readFileSync(path.join(pathToFile));
+//   const pathToFile = path.join(__dirname, '../../../vault/secrets/db-creds');
+//   const bufferArray = fs.readFileSync(path.join(pathToFile));
 
-  console.log(bufferArray, 'bufferArray');
-  content = bufferArray.toString('utf8');
-}
+//   console.log(bufferArray, 'bufferArray');
+//   content = bufferArray.toString('utf8');
+// }
 
-console.log(content, 'content');
+// console.log(content, 'content');
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
