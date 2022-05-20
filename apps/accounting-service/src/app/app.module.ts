@@ -19,10 +19,13 @@ if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
   const pathToFile = path.resolve(__dirname, '../../../vault/secrets/db-creds');
   console.log(pathToFile, 'pathToFile');
-  content = fs.readFileSync(path.resolve(pathToFile), { encoding: 'utf8' });
+  const bufferArray = fs.readFileSync(path.resolve(pathToFile));
+  console.log(bufferArray, 'bufferArray');
+  content = bufferArray.toString('utf-8');
 }
 
-console.log(content, 'content');
+console.log('content', content);
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
