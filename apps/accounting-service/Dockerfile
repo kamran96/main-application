@@ -7,7 +7,7 @@ COPY ./dist/apps/accounting-service .
 FROM node:lts-alpine
 
 # add dump-init to avoid nodejs as pid 1
-RUN apk add dumb-init jq
+RUN apk add dumb-init
 ENV NODE_ENV production
 ARG PORT
 USER node
