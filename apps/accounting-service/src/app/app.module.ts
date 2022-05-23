@@ -20,7 +20,10 @@ if (process.env['NODE' + '_ENV'] === 'production') {
 
   const pathToFile = path.join(__dirname, '../../../vault/secrets/db-creds');
   content = fs.readFileSync(path.join(pathToFile), 'utf8');
+  console.log(content, 'con');
 }
+
+console.log(content, 'content');
 
 @Module({
   imports: [
