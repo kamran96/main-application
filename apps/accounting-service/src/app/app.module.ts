@@ -22,7 +22,16 @@ if (process.env['NODE' + '_ENV'] === 'production') {
   content = fs.readFileSync(path.join(pathToFile), 'utf8');
 }
 
-console.log(content, 'con');
+console.log(content.DB_HOST, 'host');
+console.log(content.DB_USER, 'user');
+console.log(content.DB_PASSWORD, 'password');
+
+console.log('----------------------------------');
+
+console.log(process.env.DB_HOST, 'host');
+console.log(process.env.DB_USER, 'user');
+console.log(process.env.DB_PASSWORD, 'password');
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
