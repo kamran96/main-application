@@ -19,18 +19,11 @@ if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
 
   const pathToFile = path.join(__dirname, '../../../vault/secrets/db-creds');
-  content = fs.readFileSync(path.join(pathToFile), 'utf8');
+  content = JSON.parse(fs.readFileSync(path.join(pathToFile), 'utf8'));
 }
 
 console.log(typeof content);
-console.log("'" + content + "'", 'content');
-JSON.parse("'" + content + "'");
 console.log(content, 'con');
-
-console.log(content.DB_USER, 'user');
-console.log(content.DB_PASSWORD, 'password');
-
-console.log(typeof content);
 
 @Module({
   imports: [
