@@ -22,15 +22,16 @@ if (process.env['NODE' + '_ENV'] === 'production') {
   content = fs.readFileSync(path.join(pathToFile), 'utf8');
 }
 
-console.log(typeof content);
-console.log(content.DB_HOST, 'host');
+if (content) {
+  console.log(typeof content);
+  JSON.parse(content);
+  console.log(content, 'con');
 
-JSON.parse(content);
-console.log(typeof content);
-console.log(content, 'con');
+  console.log(content.DB_USER, 'user');
+  console.log(content.DB_PASSWORD, 'password');
+}
 
-console.log(content.DB_USER, 'user');
-console.log(content.DB_PASSWORD, 'password');
+console.log(typeof content);
 
 @Module({
   imports: [
