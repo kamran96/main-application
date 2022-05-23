@@ -22,6 +22,8 @@ if (process.env['NODE' + '_ENV'] === 'production') {
   content = fs.readFileSync(path.join(pathToFile), 'utf8');
 }
 
+console.log(content, 'content');
+
 console.log(content.DB_HOST, 'host');
 console.log(content.DB_USER, 'user');
 console.log(content.DB_PASSWORD, 'password');
