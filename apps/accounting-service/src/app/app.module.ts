@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { getMetadataArgsStorage, SimpleConsoleLogger } from 'typeorm';
+import { getMetadataArgsStorage } from 'typeorm';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -19,11 +19,15 @@ if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
 
   const pathToFile = path.join(__dirname, '../../../vault/secrets/db-creds');
-  content = JSON.parse(fs.readFileSync(path.join(pathToFile), 'utf8'));
+  content = fs.readFileSync(path.join(pathToFile), {
+    encoding: 'utf8',
+  });
 }
 
 console.log(typeof content);
 console.log(content, 'con');
+JSON.parse(content);
+console.log(typeof content);
 
 @Module({
   imports: [
