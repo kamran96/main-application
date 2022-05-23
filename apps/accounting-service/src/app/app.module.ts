@@ -24,7 +24,8 @@ if (process.env['NODE' + '_ENV'] === 'production') {
 
 console.log(typeof content);
 console.log(content, 'content');
-JSON.parse(content);
+console.log(`'${content}'`, 'content1');
+JSON.parse(`'${content}'`);
 console.log(content, 'con');
 
 console.log(content.DB_USER, 'user');
