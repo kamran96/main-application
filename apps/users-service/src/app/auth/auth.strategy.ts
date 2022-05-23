@@ -8,7 +8,6 @@ import {
   IUser,
   IUserAccessControlResponse,
 } from '@invyce/interfaces';
-import e = require('express');
 
 let data = {};
 @Injectable()
