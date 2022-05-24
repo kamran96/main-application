@@ -25,7 +25,7 @@ if (process.env['NODE' + '_ENV'] === 'production') {
 }
 
 const withoutLineBreaks = con.replace(/[\r\n]/gm, '');
-const obj = eval(`'{${withoutLineBreaks}}'`);
+const obj = `{${withoutLineBreaks}}`;
 const content = JSON.parse(obj);
 
 @Module({
