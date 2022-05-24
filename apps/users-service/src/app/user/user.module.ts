@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
+import { MQ_HOST } from '@invyce/global-constants';
 import { AuthModule } from '../auth/auth.module';
 import { User, UserSchema } from '../schemas/user.schema';
 import { UserToken, UserTokenSchema } from '../schemas/userToken.schema';
@@ -18,7 +19,7 @@ import { UserService } from './user.service';
         name: 'EMAIL_SERVICE',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://localhost:5672'],
+          urls: [MQ_HOST()],
           queue: 'email_queue',
           queueOptions: {
             durable: false,

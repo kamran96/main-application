@@ -74,3 +74,9 @@ export const Host = (service: string, route: string): string => {
     ? `http://${service}.default.svc.cluster.local/${route}`
     : `https://localhost/${route}`;
 };
+
+export const MQ_HOST = () => {
+  return process.env['NODE' + '_ENV'] === 'production'
+    ? `http://my-release-rabbitmq.rabbit.svc.cluster.local`
+    : 'amqp://localhost:5672';
+};

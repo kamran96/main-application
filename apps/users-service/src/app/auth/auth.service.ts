@@ -32,7 +32,6 @@ import {
 import { UserToken } from '../schemas/userToken.schema';
 import {
   IRequest,
-  ICheckUser,
   IUser,
   IUserAccessControlResponse,
   IVerifyOtp,
