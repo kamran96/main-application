@@ -9,6 +9,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UserToken, UserTokenSchema } from '../schemas/userToken.schema';
 import { AuthStrategy } from './auth.strategy';
+import { MQ_HOST } from '@invyce/global-constants';
 // import { Authenticate } from '@invyce/auth-middleware';
 
 @Module({
@@ -35,7 +36,7 @@ import { AuthStrategy } from './auth.strategy';
         name: 'EMAIL_SERVICE',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://localhost:5672'],
+          urls: [MQ_HOST()],
           queue: 'email_queue',
           queueOptions: {
             durable: false,
