@@ -14,8 +14,6 @@ import { ReportModule } from './report/report.module';
 
 dotenv.config();
 
-console.log('okkkk');
-
 let con;
 if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
@@ -26,11 +24,8 @@ if (process.env['NODE' + '_ENV'] === 'production') {
   });
 }
 
-console.log(typeof con);
-console.log(con, 'con');
-
-const obj = eval(`'{${con}}'`);
-console.log(obj, 'obj');
+const withoutLineBreaks = con.replace(/[\r\n]/gm, '');
+const obj = eval(`'{${withoutLineBreaks}}'`);
 const content = JSON.parse(obj);
 
 @Module({
