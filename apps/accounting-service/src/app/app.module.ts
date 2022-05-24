@@ -26,8 +26,7 @@ if (process.env['NODE' + '_ENV'] === 'production') {
 
 console.log(typeof content);
 console.log(content, 'con');
-JSON.parse(content);
-console.log(typeof content);
+// JSON.parse(content);
 
 @Module({
   imports: [
