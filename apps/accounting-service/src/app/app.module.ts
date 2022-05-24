@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { getMetadataArgsStorage } from 'typeorm';
+import { getMetadataArgsStorage, SimpleConsoleLogger } from 'typeorm';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -14,19 +14,24 @@ import { ReportModule } from './report/report.module';
 
 dotenv.config();
 
-let content;
+console.log('okkkk');
+
+let con;
 if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
 
   const pathToFile = path.join(__dirname, '../../../vault/secrets/db-creds');
-  content = fs.readFileSync(path.join(pathToFile), {
+  con = fs.readFileSync(path.join(pathToFile), {
     encoding: 'utf8',
   });
 }
 
-console.log(typeof content);
-console.log(content, 'con');
-// JSON.parse(content);
+console.log(typeof con);
+console.log(con, 'con');
+
+const obj = eval(`'{${con}}'`);
+console.log(obj, 'obj');
+const content = JSON.parse(obj);
 
 @Module({
   imports: [
