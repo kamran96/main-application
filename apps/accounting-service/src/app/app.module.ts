@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { getMetadataArgsStorage, SimpleConsoleLogger } from 'typeorm';
+import { getMetadataArgsStorage } from 'typeorm';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -14,19 +14,42 @@ import { ReportModule } from './report/report.module';
 
 dotenv.config();
 
-let con;
+let dynamicContentFromVault;
+let staticContentFromVault;
 if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
 
-  const pathToFile = path.join(__dirname, '../../../vault/secrets/db-creds');
-  con = fs.readFileSync(path.join(pathToFile), {
+  const pathToDynamicContent = path.join(
+    __dirname,
+    '../../../vault/secrets/db-creds'
+  );
+  const pathToStaticContent = path.join(
+    __dirname,
+    '../../../vault/secrets/creds'
+  );
+  dynamicContentFromVault = fs.readFileSync(path.join(pathToDynamicContent), {
+    encoding: 'utf8',
+  });
+  staticContentFromVault = fs.readFileSync(path.join(pathToStaticContent), {
     encoding: 'utf8',
   });
 }
 
-const withoutLineBreaks = con.replace(/[\r\n]/gm, '');
-const obj = `{${withoutLineBreaks}}`;
-const content = JSON.parse(obj);
+// dynamic Content
+const dynamicContentWithoutLineBreaks = dynamicContentFromVault.replace(
+  /[\r\n]/gm,
+  ''
+);
+const dynamicContentObj = `{${dynamicContentWithoutLineBreaks}}`;
+const dynamicContent = JSON.parse(dynamicContentObj);
+
+// static Content
+const staticContentWithoutLineBreaks = staticContentFromVault.replace(
+  /[\r\n]/gm,
+  ''
+);
+const staticContentObj = `{${staticContentWithoutLineBreaks}}`;
+const staticContent = JSON.parse(staticContentObj);
 
 @Module({
   imports: [
@@ -38,22 +61,22 @@ const content = JSON.parse(obj);
         ({
           type: 'postgres',
           host:
-            content !== undefined
-              ? content.DB_HOST
+            staticContent !== undefined
+              ? staticContent.DB_HOST
               : configService.get('DB_HOST', process.env.DB_HOST),
           port:
-            content !== undefined
-              ? content.DB_PORT
+            staticContent !== undefined
+              ? staticContent.DB_PORT
               : configService.get<unknown>('DB_PORT', process.env.DB_PORT),
           username:
-            content !== undefined
-              ? content.DB_USER
+            dynamicContent !== undefined
+              ? dynamicContent.DB_USER
               : configService.get('DB_USER', process.env.DB_USER),
-          password: content
-            ? content.DB_PASSWORD
+          password: dynamicContent
+            ? dynamicContent.DB_PASSWORD
             : configService.get('DB_PASSWORD', process.env.DB_PASSWORD),
-          database: content
-            ? content.ACC_DB_NAME
+          database: staticContent
+            ? staticContent.ACC_DB_NAME
             : configService.get('ACC_DB_NAME', process.env.ACC_DB_NAME),
           entities: getMetadataArgsStorage().tables.map((tbl) => tbl.target),
           ssl: { rejectUnauthorized: false },
