@@ -16,7 +16,11 @@ async function bootstrap() {
     {
       transport: Transport.RMQ,
       options: {
-        urls: [MQ_HOST()],
+        urls: [
+          process.env['NODE' + '_ENV'] === 'production'
+            ? `amqp://rabbit-rabbitmq.rabbitmq.svc.cluster.local`
+            : 'amqp://localhost:5672',
+        ],
         queue: 'email_queue',
         queueOptions: {
           durable: false,
