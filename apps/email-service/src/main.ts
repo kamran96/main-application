@@ -10,6 +10,10 @@ import { MQ_HOST } from '@invyce/global-constants';
 
 import { AppModule } from './app/app.module';
 
+console.log(
+  'amqp://user:ECjKUsxejvQHxVbe@rabbit-rabbitmq.default.svc.cluster.local',
+  'host'
+);
 async function bootstrap() {
   const app: any = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
@@ -18,7 +22,7 @@ async function bootstrap() {
       options: {
         urls: [
           process.env['NODE' + '_ENV'] === 'production'
-            ? `amqp://rabbit-rabbitmq.default.svc.cluster.local`
+            ? `amqp://user:ECjKUsxejvQHxVbe@rabbit-rabbitmq.default.svc.cluster.local`
             : 'amqp://localhost:5672',
         ],
         queue: 'email_queue',
