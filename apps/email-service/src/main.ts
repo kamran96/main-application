@@ -18,7 +18,7 @@ async function bootstrap() {
       options: {
         urls: [
           process.env['NODE' + '_ENV'] === 'production'
-            ? `amqp://rabbit-rabbitmq.rabbitmq.svc.cluster.local`
+            ? `amqp://rabbit-rabbitmq.default.svc.cluster.local`
             : 'amqp://localhost:5672',
         ],
         queue: 'email_queue',
