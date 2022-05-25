@@ -10,6 +10,7 @@ import { MQ_HOST } from '@invyce/global-constants';
 
 import { AppModule } from './app/app.module';
 
+console.log(MQ_HOST(), 'host');
 async function bootstrap() {
   const app: any = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
