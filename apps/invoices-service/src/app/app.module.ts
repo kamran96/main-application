@@ -15,8 +15,8 @@ import { PurchaseOrderModule } from './purchase-order/purchase-order.module';
 import { QuotationModule } from './quotation/quotation.module';
 dotenv.config();
 
-let dynamicContentFromVault;
-let staticContentFromVault;
+let dynamicContent;
+let staticContent;
 if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
 
@@ -28,30 +28,35 @@ if (process.env['NODE' + '_ENV'] === 'production') {
     __dirname,
     '../../../vault/secrets/creds'
   );
-  dynamicContentFromVault = fs.readFileSync(path.join(pathToDynamicContent), {
-    encoding: 'utf8',
-  });
-  staticContentFromVault = fs.readFileSync(path.join(pathToStaticContent), {
-    encoding: 'utf8',
-  });
+  const dynamicContentFromVault = fs.readFileSync(
+    path.join(pathToDynamicContent),
+    {
+      encoding: 'utf8',
+    }
+  );
+  const staticContentFromVault = fs.readFileSync(
+    path.join(pathToStaticContent),
+    {
+      encoding: 'utf8',
+    }
+  );
+
+  // dynamic Content
+  const dynamicContentWithoutLineBreaks = dynamicContentFromVault.replace(
+    /[\r\n]/gm,
+    ''
+  );
+  const dynamicContentObj = `{${dynamicContentWithoutLineBreaks}}`;
+  dynamicContent = JSON.parse(dynamicContentObj);
+
+  // static Content
+  const staticContentWithoutLineBreaks = staticContentFromVault.replace(
+    /[\r\n]/gm,
+    ''
+  );
+  const staticContentObj = `{${staticContentWithoutLineBreaks}}`;
+  staticContent = JSON.parse(staticContentObj);
 }
-
-// dynamic Content
-const dynamicContentWithoutLineBreaks = dynamicContentFromVault.replace(
-  /[\r\n]/gm,
-  ''
-);
-const dynamicContentObj = `{${dynamicContentWithoutLineBreaks}}`;
-const dynamicContent = JSON.parse(dynamicContentObj);
-
-// static Content
-const staticContentWithoutLineBreaks = staticContentFromVault.replace(
-  /[\r\n]/gm,
-  ''
-);
-const staticContentObj = `{${staticContentWithoutLineBreaks}}`;
-const staticContent = JSON.parse(staticContentObj);
-
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),

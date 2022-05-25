@@ -135,7 +135,7 @@ export class AuthController {
     return this.authService.Logout(res);
   }
 
-  @UseGuards(GlobalAuthGuard)
+  // @UseGuards(GlobalAuthGuard)
   @Post('/forget-password')
   async forgetPassword(@Body() userDto: ForgetPasswordDto) {
     try {
