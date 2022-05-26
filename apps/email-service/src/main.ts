@@ -22,14 +22,18 @@ async function bootstrap() {
         queueOptions: {
           durable: false,
         },
+        noAck: false,
+        prefetchCount: 1,
       },
     }
   );
 
-  const port = process.env.PORT || 3339;
-  await app.listen(port, () => {
-    Logger.log('Listening at http://localhost:' + port);
-  });
+  await app.listen();
+
+  // const port = process.env.PORT || 3339;
+  // await app.listen(port, () => {
+  //   Logger.log('Listening at http://localhost:' + port);
+  // });
 }
 
 bootstrap();
