@@ -11,6 +11,10 @@ import { MQ_HOST } from '@invyce/global-constants';
 import { AppModule } from './app/app.module';
 
 console.log(MQ_HOST(), 'host');
+console.log(process.env.RABBIT_USERNAME);
+console.log(process.env.RABBIT_PASSWORD);
+console.log('---------------------------');
+
 async function bootstrap() {
   const app: any = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
@@ -28,12 +32,12 @@ async function bootstrap() {
     }
   );
 
-  await app.listen();
+  // await app.listen();
 
-  // const port = process.env.PORT || 3339;
-  // await app.listen(port, () => {
-  //   Logger.log('Listening at http://localhost:' + port);
-  // });
+  const port = process.env.PORT || 3339;
+  await app.listen(port, () => {
+    Logger.log('Listening at http://localhost:' + port);
+  });
 }
 
 bootstrap();
