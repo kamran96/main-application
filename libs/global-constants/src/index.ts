@@ -77,6 +77,6 @@ export const Host = (service: string, route: string): string => {
 
 export const MQ_HOST = () => {
   return process.env['NODE' + '_ENV'] === 'production'
-    ? process.env.RABBIT_HOST
+    ? `amqp://${process.env.RABBIT_USERNAME}:${process.env.RABBIT_PASSWORD}@${process.env.RABBIT_HOST}:${process.env.RABBIT_PORT}`
     : 'amqp://localhost:5672';
 };
