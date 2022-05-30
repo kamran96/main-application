@@ -192,6 +192,7 @@ export const CommonTable: FC<IProps> = ({
 
   /* **************** JSX RETURNING FUNCTIONS **************** */
 
+
   const renderTable = () => {
     return (
       <>
