@@ -151,6 +151,63 @@ export const PaidBills: FC<IProps> = ({ columns, activeTab }) => {
     }
   }, [resolvedData]);
 
+  //handleSorting
+
+  const onChangePagination = (pagination, filters, sorter: any, extra) => {
+    if (sorter.order === undefined) {
+      setAllInvoicesConfig({
+        ...allInvoicesConfig,
+        sortid: null,
+        page: pagination.current,
+        page_size: pagination.pageSize,
+      });
+
+      const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=paid&sortid=null&page=1&page_size=20&sortid=${sortid}`;
+      history.push(route);
+    } else {
+      if (sorter?.order === 'ascend') {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] > b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        
+        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+      } else {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] < b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        
+        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+      }
+      setAllInvoicesConfig({
+        ...allInvoicesConfig,
+        page: pagination.current,
+        page_size: pagination.pageSize,
+        sortid:
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field,
+      });
+      const route = `/app${
+        ISupportedRoutes.PURCHASES
+      }?tabIndex=paid&sortid=${
+        sorter && sorter.order === 'descend'
+          ? `-${sorter.field}`
+          : sorter.field
+      }&page=${pagination.current}&page_size=${
+        pagination.pageSize
+      }&filter=${sorter.order}&query=${query}`;
+      history.push(route);
+    }
+  }
+
   /* DELETE PURCHASE ORDER METHOD */
   const handleDelete = async () => {
     const payload = {
@@ -245,60 +302,7 @@ export const PaidBills: FC<IProps> = ({ columns, activeTab }) => {
         data={result}
         columns={columns}
         loading={isFetching || isLoading}
-        onChange={(pagination, filters, sorter: any, extra) => {
-          if (sorter.order === undefined) {
-            setAllInvoicesConfig({
-              ...allInvoicesConfig,
-              sortid: null,
-              page: pagination.current,
-              page_size: pagination.pageSize,
-            });
-
-            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=paid&sortid=null&page=1&page_size=20&sortid=${sortid}`;
-            history.push(route);
-          } else {
-            if (sorter?.order === 'ascend') {
-              const userData = [...result].sort((a, b) => {
-                if (a[sorter?.field] > b[sorter?.field]) {
-                  return 1;
-                } else {
-                  return -1;
-                }
-              });
-              
-              setAllInvoicesRes(prev =>({...prev,  result: userData}))
-            } else {
-              const userData = [...result].sort((a, b) => {
-                if (a[sorter?.field] < b[sorter?.field]) {
-                  return 1;
-                } else {
-                  return -1;
-                }
-              });
-              
-              setAllInvoicesRes(prev =>({...prev,  result: userData}))
-            }
-            setAllInvoicesConfig({
-              ...allInvoicesConfig,
-              page: pagination.current,
-              page_size: pagination.pageSize,
-              sortid:
-                sorter && sorter.order === 'descend'
-                  ? `-${sorter.field}`
-                  : sorter.field,
-            });
-            const route = `/app${
-              ISupportedRoutes.PURCHASES
-            }?tabIndex=paid&sortid=${
-              sorter && sorter.order === 'descend'
-                ? `-${sorter.field}`
-                : sorter.field
-            }&page=${pagination.current}&page_size=${
-              pagination.pageSize
-            }&filter=${sorter.order}&query=${query}`;
-            history.push(route);
-          }
-        }}
+        onChange={onChangePagination}
         totalItems={pagination?.total}
         pagination={{
           showSizeChanger: true,

@@ -94,16 +94,17 @@ export const PaymentRecievedList: FC = () => {
 
   const handlePaymentConfig = (pagination, filters, sorter: any, extra) => {
     if (sorter.order === undefined) {
-      history.push(
-        `/app${ISupportedRoutes.PAYMENTS}?tabIndex=received&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
-      );
       setConfig({
         ...config,
-        sortid: null,
+        sortid: 'id',
         sortItem: null,
         page: pagination.current,
         page_size: pagination.pageSize,
       });
+      history.push(
+        `/app${ISupportedRoutes.PAYMENTS}?tabIndex=received&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+      );
+      
     } else {
       if (sorter?.order === 'ascend') {
         const userData = [...result].sort((a, b) => {

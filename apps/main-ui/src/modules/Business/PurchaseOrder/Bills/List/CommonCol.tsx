@@ -5,7 +5,6 @@ import { plainToClass } from 'class-transformer';
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-
 import { ISupportedRoutes } from '../../../../../modal';
 import { InvoiceResultClass } from '../../../../../modal/invoice';
 import moneyFormat from '../../../../../utils/moneyFormat';
