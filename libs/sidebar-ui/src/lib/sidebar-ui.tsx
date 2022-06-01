@@ -68,8 +68,6 @@ const MenuPopOver: FC<IPopOverProps> = ({ route }) => {
     </PopOverListWrapper>
   );
 
-  console.log(route.icon, 'route');
-
   return (
     <>
       <PopupGlobalStyles />

@@ -91,7 +91,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
   /* Main Routes Settings */
 
   .routes {
-    height: calc(100vh - 214px);
+    height: calc(100vh - 204px);
     overflow-y: auto;
     overflow-x: hidden;
   }
