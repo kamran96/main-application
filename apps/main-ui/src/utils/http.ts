@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { DecriptionData } from './encription';
 
-const localIP = `http://192.168.1.37`;
+const localIP = `https://localhost`;
+// const localIP = `https://staging.invyce.com`;
 
 let NodeBaseURL = ``;
 const cancelSource = axios.CancelToken.source();
@@ -12,10 +13,10 @@ if (host && host === 'app.invyce.com') {
   // set online server endpoints
 
   NodeBaseURL = `https://api.node.invyce.com/`;
-} else if (host && host === 'dev.app.invyce.com') {
+} else if (host && host !== 'staging.invyce.com') {
   // Staging server endpoints
 
-  NodeBaseURL = `https://dev.api.node.invyce.com/`;
+  NodeBaseURL = `https://api.staging.invyce.com`;
 } else {
   // local development
   NodeBaseURL = localIP; //+ ":8081"

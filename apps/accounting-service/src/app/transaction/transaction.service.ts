@@ -18,7 +18,7 @@ import {
   IRequest,
 } from '@invyce/interfaces';
 import { DeleteTransactionsDto, TransactionDto } from '../dto/transaction.dto';
-import { Entries } from '@invyce/global-constants';
+import { Entries, Host } from '@invyce/global-constants';
 
 const transactionNature = {
   reverse: true,
@@ -60,6 +60,9 @@ export class TransactionService {
               },
               skip: pn * ps - ps,
               take: ps,
+              order: {
+                [sort_column]: sort_order,
+              },
               relations: ['transactionItems', 'transactionItems.account'],
             });
           } else if (data[i].type === 'compare') {
@@ -73,6 +76,9 @@ export class TransactionService {
               },
               skip: pn * ps - ps,
               take: ps,
+              order: {
+                [sort_column]: sort_order,
+              },
               relations: ['transactionItems', 'transactionItems.account'],
             });
           } else if (data[i].type === 'date-between') {
@@ -88,6 +94,9 @@ export class TransactionService {
               },
               skip: pn * ps - ps,
               take: ps,
+              order: {
+                [sort_column]: sort_order,
+              },
               relations: ['transactionItems', 'transactionItems.account'],
             });
           }
@@ -115,7 +124,7 @@ export class TransactionService {
           take: ps,
           relations: ['transactionItems', 'transactionItems.account'],
           order: {
-            date: 'DESC',
+            [sort_column]: sort_order,
           },
         });
 
@@ -395,28 +404,8 @@ export class TransactionService {
   }
 
   async AddTransaction(data, req: IRequest): Promise<void> {
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
-
-    const type =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
-
-    const http = axios.create({
-      baseURL: 'http://localhost',
-      headers: {
-        [type]: value,
-      },
-    });
+    if (!req || !req.cookies) return null;
+    const token = req?.cookies['access_token'];
 
     const paymentArr = [];
     for (const i of data.transactions) {
@@ -469,9 +458,17 @@ export class TransactionService {
       });
     }
 
-    await http.post(`payments/payment/add`, {
-      payments: paymentArr,
-    });
+    await axios.post(
+      Host('payments', 'payments/payment/add'),
+      {
+        payments: paymentArr,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
   }
 
   async CashSummaryReport(user: IBaseUser, query) {

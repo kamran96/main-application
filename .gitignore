@@ -8,6 +8,7 @@
 build.pdf
 archive.zip
 .env
+/certs
 
 apps/accounting-service/.env
 apps/attachments-service/.env
@@ -110,3 +111,5 @@ buck-out/
 node_modules/
 
 apps/mobile-app-e2e/artifacts
+
+.scannerwork/

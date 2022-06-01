@@ -7,6 +7,8 @@ import { useHistory } from 'react-router-dom';
 export const DefaultLayout = (props: RouteConfigComponentProps) => {
   const { isUserLogin, userDetails } = useGlobalContext();
 
+  console.log({ isUserLogin })
+
   const history = useHistory();
 
   if (isUserLogin) {

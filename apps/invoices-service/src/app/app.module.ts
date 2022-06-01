@@ -10,6 +10,7 @@ import { Authenticate } from '@invyce/auth-middleware';
 import { BillModule } from './bill/bill.module';
 import { CreditNoteModule } from './credit-note/credit-note.module';
 import { PurchaseOrderModule } from './purchase-order/purchase-order.module';
+import { QuotationModule } from './quotation/quotation.module';
 dotenv.config();
 
 @Module({
@@ -27,13 +28,14 @@ dotenv.config();
           password: configService.get('DB_PASSWORD', process.env.DB_PASSWORD),
           database: configService.get('INV_DB_NAME', process.env.INV_DB_NAME),
           entities: getMetadataArgsStorage().tables.map((tbl) => tbl.target),
-          // ssl: { rejectUnauthorized: false },
+          ssl: { rejectUnauthorized: false },
         } as TypeOrmModuleOptions),
     }),
     InvoiceModule,
     BillModule,
     CreditNoteModule,
     PurchaseOrderModule,
+    QuotationModule,
   ],
   controllers: [AppController],
   providers: [AppService, Authenticate],

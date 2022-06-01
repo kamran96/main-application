@@ -18,8 +18,6 @@ export const ContactsEditorWidget: FC = () => {
     routeHistory.location &&
     routeHistory.location.pathname.split('/')[3];
 
-    
-
   return (
     <WrapperContactsEditor>
       <Heading type="table">

@@ -32,7 +32,10 @@ const stylesheets = {
   dark: `https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.12/antd.dark.min.css`,
 };
 
-const isProductionEnv = process.env.NODE_ENV === 'production' || false;
+const isProductionEnv = process.env.NODE_ENV === 'production' || true;
+console.log(isProductionEnv, 'check');
+const userCheckApiConfig = (userId) =>
+  isProductionEnv ? `users/auth/check` : `users/user/${userId}`;
 
 const AUTH_CHECK_API = isProductionEnv ? CheckAuthAPI : CheckAuthAPIDev;
 
@@ -209,10 +212,20 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const history = useHistory();
 
+  const ClearLogin = () => {
+    setTheme('light');
+    setIsUserLogin(false);
+    queryCache.clear();
+    setAuth(null);
+    setAutherized(false);
+    localStorage.clear();
+  }
+
   const handleLogin = async (action: IAction) => {
     switch (action.type) {
       case ILoginActions.LOGIN:
-        if (process.env.NODE_ENV === 'production') {
+        if (isProductionEnv) {
+
           setAutherized(true);
         } else {
           localStorage.setItem('auth', EncriptData(action.payload) as string);
@@ -227,9 +240,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
                 NOTIFICATIONTYPE.INFO,
                 'Logout Successfully'
               );
-              setTheme('light');
-              setIsUserLogin(false);
-              queryCache.clear();
+              ClearLogin();
             },
             onError: (err: IBaseAPIError) => {
               if (err?.response?.data.message) {
@@ -247,12 +258,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
           });
         }
 
-        localStorage.clear();
-
-        setTheme('light');
-        setAuth(null);
-        setIsUserLogin(false);
-        queryCache.clear();
 
         break;
       default:
@@ -295,32 +300,27 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   } = useHttp(
     {
       apiOption: {
-        url: `users/user/${userId}`,
+        url: userCheckApiConfig(userId),
         method: 'GET',
       },
-      enabled: !!userId,
+      enabled: !!userId || !!checkAutherized,
       onSuccess: (data) => {
-        if (isProductionEnv) {
-          setUserDetails(data?.users);
-          setIsUserLogin(true);
-        } else {
-          const { result } = data;
-          setUserDetails(result);
-          setIsUserLogin(true);
-          if (result?.theme) {
-            setTheme(result?.theme);
-          }
+        const { result } = data;
+        setUserDetails(result);
+        setIsUserLogin(true);
+        if (result?.theme) {
+          setTheme(result?.theme);
         }
       },
       onError: (err: IBaseAPIError) => {
         if (err?.response?.data?.statusCode === 401) {
-          handleLogin({ type: ILoginActions.LOGOUT });
+          ClearLogin();
         }
         setAutherized(false);
       },
     },
 
-    [!!userId]
+    [!!userId, !!checkAutherized]
   );
 
   useEffect(() => {

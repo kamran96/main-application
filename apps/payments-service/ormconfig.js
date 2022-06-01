@@ -15,5 +15,8 @@ module.exports = {
   cli: {
     migrationsDir: './apps/payments-service/migrations',
   },
-  // ssl: { rejectUnauthorized: false },
+  ssl:
+    process.env.NODE_ENV === 'production'
+      ? { rejectUnauthorized: false }
+      : false,
 };

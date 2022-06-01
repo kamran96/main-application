@@ -12,12 +12,12 @@ import {
   ICreditNoteItem,
   IItem,
   IAccount,
-  IInvoice,
   IRequest,
 } from '@invyce/interfaces';
 import {
   CreditNoteType,
   EntryType,
+  Host,
   PaymentModes,
   Statuses,
 } from '@invyce/global-constants';
@@ -39,28 +39,8 @@ export class CreditNoteService {
   ): Promise<ICreditNoteWithResponse> {
     const { page_no, page_size, invoice_type, status, sort, query } = queryData;
 
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
-
-    const tokenType =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
-
-    const http = axios.create({
-      baseURL: 'http://localhost',
-      headers: {
-        [tokenType]: value,
-      },
-    });
+    if (!req || !req.cookies) return null;
+    const token = req.cookies['access_token'];
 
     let credit_note;
     const ps: number = parseInt(page_size);
@@ -162,10 +142,18 @@ export class CreditNoteService {
         return !pos || item != ary[pos - 1];
       });
 
-    const { data: contacts } = await http.post(`contacts/contact/ids`, {
-      ids: newContactIds,
-      type: 1,
-    });
+    const { data: contacts } = await axios.post(
+      Host('contacts', `contacts/contact/ids`),
+      {
+        ids: newContactIds,
+        type: 1,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     // get distinct userids
     const key = 'createdById';
@@ -173,10 +161,18 @@ export class CreditNoteService {
       ...new Map(credit_note.map((item) => [item[key], item])).values(),
     ].map((i) => i[key]);
 
-    const { data: users } = await http.post(`users/user/ids`, {
-      ids: mapUniqueUserId,
-      type: 1,
-    });
+    const { data: users } = await axios.post(
+      Host('users', `users/user/ids`),
+      {
+        ids: mapUniqueUserId,
+        type: 1,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     for (const i of credit_note) {
       const contact = contacts.find((c) => c.id === i.contactId);
@@ -202,42 +198,35 @@ export class CreditNoteService {
   }
 
   async CreateCreditNote(dto: CreditNoteDto, req: IRequest): Promise<unknown> {
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
-
-    const tokenType =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
-
-    const http = axios.create({
-      baseURL: 'http://localhost',
-      headers: {
-        [tokenType]: value,
-      },
-    });
+    if (!req || !req.cookies) return null;
+    const token = req.cookies['access_token'];
 
     const accountCodesArray = ['15004', '40001'];
-    const { data: accounts } = await http.post<IAccount[]>(
-      `accounts/account/codes`,
+    const { data: accounts } = await axios.post<IAccount[]>(
+      Host('accounts', `accounts/account/codes`),
       {
         codes: accountCodesArray,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
       }
     );
 
     const mapItemIds = dto.invoice_items.map((ids) => ids.itemId);
 
-    const { data: items } = await http.post<IItem[]>(`items/item/ids`, {
-      ids: mapItemIds,
-    });
+    const { data: items } = await axios.post<IItem[]>(
+      Host('items', `items/item/ids`),
+      {
+        ids: mapItemIds,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     const creditsArray = [];
     const debitsArray = [];
@@ -381,9 +370,17 @@ export class CreditNoteService {
         });
 
         if (updatedCreditNote.status === Statuses.AUTHORISED) {
-          await http.post(`items/item/manage-inventory`, {
-            payload: itemLedgerArray,
-          });
+          await axios.post(
+            Host('items', `items/item/manage-inventory`),
+            {
+              payload: itemLedgerArray,
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
+            }
+          );
 
           if (updatedCreditNote.invoiceType === CreditNoteType.ACCRECCREDIT) {
             const credit = {
@@ -415,10 +412,15 @@ export class CreditNoteService {
             status: updatedCreditNote.status,
           };
 
-          const { data: transaction } = await http.post(
-            'accounts/transaction/api',
+          const { data: transaction } = await axios.post(
+            Host('accounts', 'accounts/transaction/api'),
             {
               transactions: payload,
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
             }
           );
 
@@ -451,10 +453,22 @@ export class CreditNoteService {
             },
           ];
 
-          await http.post(`payments/payment/add`, {
-            payments: paymentArr,
+          await axios.post(
+            Host('payments', `payments/payment/add`),
+            {
+              payments: paymentArr,
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
+            }
+          );
+          await axios.get(Host('contacts', `contacts/contact/balance`), {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
           });
-          await http.get(`contacts/contact/balance`);
         }
         return await this.FindById(dto.id, req);
       }
@@ -573,9 +587,17 @@ export class CreditNoteService {
       }
 
       if (credit_note.status === Statuses.AUTHORISED) {
-        await http.post(`items/item/manage-inventory`, {
-          payload: itemLedgerArray,
-        });
+        await axios.post(
+          Host('items', `items/item/manage-inventory`),
+          {
+            payload: itemLedgerArray,
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
 
         if (credit_note.invoiceType === CreditNoteType.ACCRECCREDIT) {
           const credit = {
@@ -605,10 +627,15 @@ export class CreditNoteService {
           status: credit_note.status,
         };
 
-        const { data: transaction } = await http.post(
-          'accounts/transaction/api',
+        const { data: transaction } = await axios.post(
+          Host('accounts', 'accounts/transaction/api'),
           {
             transactions: payload,
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
           }
         );
 
@@ -641,10 +668,22 @@ export class CreditNoteService {
           },
         ];
 
-        await http.post(`payments/payment/add`, {
-          payments: paymentArr,
+        await axios.post(
+          Host('payments', `payments/payment/add`),
+          {
+            payments: paymentArr,
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
+        await axios.get(Host('contacts', `contacts/contact/balance`), {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
         });
-        await http.get(`contacts/contact/balance`);
       }
 
       return await this.FindById(credit_note.id, req);
@@ -664,49 +703,45 @@ export class CreditNoteService {
 
     let new_credit_note;
     if (creditNote?.contactId) {
-      let token;
-      if (process.env.NODE_ENV === 'development') {
-        const header = req.headers?.authorization?.split(' ')[1];
-        token = header;
-      } else {
-        if (!req || !req.cookies) return null;
-        token = req.cookies['access_token'];
-      }
-
-      const type =
-        process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-      const value =
-        process.env.NODE_ENV === 'development'
-          ? `Bearer ${token}`
-          : `access_token=${token}`;
-
       const contactId = creditNote?.contactId;
       const itemIdsArray = creditNote?.creditNoteItems.map((ids) => ids.itemId);
 
+      if (!req || !req.cookies) return null;
+      const token = req.cookies['access_token'];
+
       const contactRequest = {
-        url: `http://localhost/contacts/contact/${contactId}`,
+        url: Host('contacts', `contacts/contact/${contactId}`),
         method: 'GET',
         headers: {
-          [type]: value,
+          cookie: `access_token=${token}`,
         },
       };
 
-      const http = axios.create({
-        baseURL: 'http://localhost',
-        headers: {
-          [type]: value,
+      const { data: payments } = await axios.post(
+        Host('payments', `payments/payment/invoice`),
+        {
+          ids: [creditNoteId],
+          type: 'BILL',
         },
-      });
-
-      const { data: payments } = await http.post(`payments/payment/invoice`, {
-        ids: [creditNoteId],
-        type: 'BILL',
-      });
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
 
       const { data: contact } = await axios(contactRequest as unknown);
-      const { data: items } = await http.post(`items/item/ids`, {
-        ids: itemIdsArray,
-      });
+      const { data: items } = await axios.post(
+        Host('items', `items/item/ids`),
+        {
+          ids: itemIdsArray,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
 
       const balance = payments.find(
         (bal) => parseInt(bal.id) === creditNote.id
@@ -758,28 +793,8 @@ export class CreditNoteService {
   }
 
   async DeleteCreditNote(invoiceIds, req: IRequest) {
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
-
-    const tokenType =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
-
-    const http = axios.create({
-      baseURL: 'http://localhost',
-      headers: {
-        [tokenType]: value,
-      },
-    });
+    if (!req || !req.cookies) return null;
+    const token = req.cookies['access_token'];
 
     const itemLedgerArray = [];
     const itemArray = [];
@@ -794,9 +809,17 @@ export class CreditNoteService {
 
       const mapItemIds = credit_note_items.map((item) => item.itemId);
 
-      const { data: items } = await http.post(`items/item/ids`, {
-        ids: mapItemIds,
-      });
+      const { data: items } = await axios.post(
+        Host('items', `items/item/ids`),
+        {
+          ids: mapItemIds,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
       itemArray.push(items);
     }
 
@@ -853,18 +876,34 @@ export class CreditNoteService {
     }
 
     if (itemLedgerArray.length > 0) {
-      await http.post(`payments/payment/delete`, {
-        ids: targetIds,
-        type: invoiceIds.type,
-        entryType:
-          invoiceIds.type === PaymentModes.INVOICES
-            ? EntryType.CREDITNOTE
-            : EntryType.DEBITNOTE,
-      });
+      await axios.post(
+        Host('payments', `payments/payment/delete`),
+        {
+          ids: targetIds,
+          type: invoiceIds.type,
+          entryType:
+            invoiceIds.type === PaymentModes.INVOICES
+              ? EntryType.CREDITNOTE
+              : EntryType.DEBITNOTE,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
 
-      await http.post(`items/item/manage-inventory`, {
-        payload: itemLedgerArray,
-      });
+      await axios.post(
+        Host('items', `items/item/manage-inventory`),
+        {
+          payload: itemLedgerArray,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
     }
 
     return true;

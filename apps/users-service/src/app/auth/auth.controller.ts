@@ -105,8 +105,7 @@ export class AuthController {
         return {
           message: 'Validated successfully',
           status: true,
-          result: user.user,
-          token: user.token,
+          result: user,
         };
       }
     } catch (error) {

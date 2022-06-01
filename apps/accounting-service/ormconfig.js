@@ -16,5 +16,7 @@ module.exports = {
     migrationsDir: './apps/accounting-service/migrations',
   },
   ssl:
-    process.env.NODE_ENV === 'development' ? {} : { rejectUnauthorized: false },
+    process.env.NODE_ENV === 'production'
+      ? { rejectUnauthorized: false }
+      : false,
 };

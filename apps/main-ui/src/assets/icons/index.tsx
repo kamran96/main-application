@@ -2055,7 +2055,10 @@ export const CreateInvoice = ({ height = 18, width = 18 }) => {
           className="BlackSpace BlackFill ItemsFill"
           d="M22.48 19H21v-1.49a.71.71 0 0 0-1.42 0V19H18a.71.71 0 0 0 0 1.42h1.51V22A.71.71 0 0 0 21 22v-1.56h1.51a.71.71 0 0 0 0-1.42Z"
         />
-        <path className='ItemsFill' d="M28.19 8.06 22 2.43a2.69 2.69 0 0 0-2-.93H4.9a2.94 2.94 0 0 0-2.79 3.07v21.68a2 2 0 0 0 2 2.12h22.13A3 3 0 0 0 29 25.3v-15a3.21 3.21 0 0 0-.81-2.24Zm-.57 17.24a1.55 1.55 0 0 1-1.38 1.7H4.07a.65.65 0 0 1-.54-.7V4.57A1.53 1.53 0 0 1 4.9 2.92H20a1.31 1.31 0 0 1 1 .51l6.24 5.63a1.83 1.83 0 0 1 .43 1.19Z" />
+        <path
+          className="ItemsFill"
+          d="M28.19 8.06 22 2.43a2.69 2.69 0 0 0-2-.93H4.9a2.94 2.94 0 0 0-2.79 3.07v21.68a2 2 0 0 0 2 2.12h22.13A3 3 0 0 0 29 25.3v-15a3.21 3.21 0 0 0-.81-2.24Zm-.57 17.24a1.55 1.55 0 0 1-1.38 1.7H4.07a.65.65 0 0 1-.54-.7V4.57A1.53 1.53 0 0 1 4.9 2.92H20a1.31 1.31 0 0 1 1 .51l6.24 5.63a1.83 1.83 0 0 1 .43 1.19Z"
+        />
         <path
           className="BlackFill BlackSpace ItemsFill"
           d="M15.71 13.09H7.14a.71.71 0 0 1 0-1.42h8.57a.71.71 0 0 1 0 1.42ZM16.21 7.94H7.14a.71.71 0 0 1 0-1.42h9.07a.71.71 0 0 1 0 1.42ZM20.14 14.11a5.62 5.62 0 1 0 5.62 5.62 5.62 5.62 0 0 0-5.62-5.62Zm0 9.71a4.09 4.09 0 1 1 4.09-4.09 4.09 4.09 0 0 1-4.09 4.09Z"
@@ -2081,7 +2084,7 @@ export const CreatePo = ({ height = 20, width = 20 }) => {
         stroke-linejoin="round"
       />
       <path
-      className='fillTransparent'
+        className="fillTransparent"
         d="M3.82812 5.43738C3.88382 4.25471 4.40384 3.13847 5.28005 2.32078C6.15627 1.5031 7.32129 1.04688 8.53292 1.04688C9.74454 1.04688 10.9096 1.5031 11.7858 2.32078C12.662 3.13847 13.182 4.25471 13.2377 5.43738"
         stroke="#272525"
         stroke-linecap="round"
@@ -2254,7 +2257,8 @@ export const DebitNote = ({ height = 18, width = 18 }) => {
       style={{ strokeWidth: '0.1' }}
     >
       <g id="Object">
-        <path className='ItemsIconsColor fillItemColor'
+        <path
+          className="ItemsIconsColor fillItemColor"
           d="M29.74 3.25v20.62a5.29 5.29 0 0 1-5.28 5.28H5.59a4 4 0 0 1-4-4 .75.75 0 0 1 .76-.75H8.1V3.25A2.26 2.26 0 0 1 10.36 1h17.12a2.26 2.26 0 0 1 2.26 2.25Z"
         />
         <path

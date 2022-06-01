@@ -7,6 +7,7 @@ import { Contact } from '../Schemas/contact.schema';
 import {
   Entries,
   EntryType,
+  Host,
   Integrations,
   PaymentModes,
 } from '@invyce/global-constants';
@@ -18,6 +19,7 @@ import {
   IContactWithResponse,
 } from '@invyce/interfaces';
 import { ContactDto, ContactIds } from '../dto/contact.dto';
+import { Sorting } from '@invyce/sorting';
 import { CONTACT_CREATED } from '@invyce/send-email';
 
 @Injectable()
@@ -32,11 +34,20 @@ export class ContactService {
     req: IRequest,
     queryData: IPage
   ): Promise<IContactWithResponse> {
-    const { page_size, page_no, query, purpose, type: contactType } = queryData;
+    const {
+      page_size,
+      page_no,
+      query,
+      purpose,
+      sort,
+      type: contactType,
+    } = queryData;
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
 
     let contacts;
+
+    const { sort_column, sort_order } = await Sorting(sort);
 
     if (purpose === 'ALL') {
       contacts = await this.contactModel.find({
@@ -71,6 +82,7 @@ export class ContactService {
               {
                 offset: pn * ps - ps,
                 limit: ps,
+                sort: { [sort_column]: sort_order },
                 customLabels: myCustomLabels,
               }
             );
@@ -88,6 +100,7 @@ export class ContactService {
               {
                 offset: pn * ps - ps,
                 limit: ps,
+                sort: { [sort_column]: sort_order },
                 customLabels: myCustomLabels,
               }
             );
@@ -101,6 +114,7 @@ export class ContactService {
               {
                 offset: pn * ps - ps,
                 limit: ps,
+                sort: { [sort_column]: sort_order },
                 customLabels: myCustomLabels,
               }
             );
@@ -114,6 +128,7 @@ export class ContactService {
               {
                 offset: pn * ps - ps,
                 limit: ps,
+                sort: { [sort_column]: sort_order },
                 customLabels: myCustomLabels,
               }
             );
@@ -127,6 +142,7 @@ export class ContactService {
               {
                 offset: pn * ps - ps,
                 limit: ps,
+                sort: { [sort_column]: sort_order },
                 customLabels: myCustomLabels,
               }
             );
@@ -153,6 +169,7 @@ export class ContactService {
           {
             offset: pn * ps - ps,
             limit: ps,
+            sort: { [sort_column]: sort_order },
             customLabels: myCustomLabels,
           }
         );
@@ -166,28 +183,8 @@ export class ContactService {
     contactDto: ContactDto,
     req: IRequest
   ): Promise<IContact> {
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
-
-    const tokenType =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
-
-    const http = axios.create({
-      baseURL: 'http://localhost',
-      headers: {
-        [tokenType]: value,
-      },
-    });
+    if (!req || !req.cookies) return null;
+    const token = req?.cookies['access_token'];
 
     if (contactDto && contactDto.isNewRecord === false) {
       const contact = await this.FindById(contactDto.id);
@@ -264,9 +261,17 @@ export class ContactService {
           contactDto.openingBalance &&
           parseFloat(contactDto.openingBalance) > 0
         ) {
-          const { data } = await http.post('accounts/transaction/api', {
-            transactions: payload,
-          });
+          const { data } = await axios.post(
+            Host('accounts', 'accounts/transaction/api'),
+            {
+              transactions: payload,
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
+            }
+          );
           transaction = data;
         }
 
@@ -299,28 +304,8 @@ export class ContactService {
   }
 
   async SyncContactBalances(req: IRequest) {
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
-
-    const type =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
-
-    const http = axios.create({
-      baseURL: 'http://localhost',
-      headers: {
-        [type]: value,
-      },
-    });
+    if (!req || !req.cookies) return null;
+    const token = req?.cookies['access_token'];
 
     const contacts = await this.contactModel.find({
       status: 1,
@@ -333,9 +318,17 @@ export class ContactService {
       type: c.contactType,
     }));
 
-    const { data: payments } = await http.post(`payments/payment/contact`, {
-      ids: mapContactIds,
-    });
+    const { data: payments } = await axios.post(
+      Host('payments', 'payments/payment/contact'),
+      {
+        ids: mapContactIds,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     const getBalances = (balance, i) => {
       if (i.type === PaymentModes.BILLS) {
@@ -375,35 +368,20 @@ export class ContactService {
   }
 
   async Ledger(contactId: string, req: IRequest, query: IPage) {
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
-
-    const tokenType =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
-
-    const http = axios.create({
-      baseURL: 'http://localhost',
-      headers: {
-        [tokenType]: value,
-      },
-    });
+    if (!req || !req.cookies) return null;
+    const token = req?.cookies['access_token'];
 
     const { page_no, page_size, query: filters, type } = query;
     const contact = await this.contactModel.findById(contactId);
 
     if (type == PaymentModes.BILLS) {
-      const { data: bills } = await http.get(
-        `invoices/bill/contacts/${contactId}`
+      const { data: bills } = await axios.get(
+        Host('invoices', 'invoices/bill/contacts/' + contactId),
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
       );
 
       if (filters) {
@@ -425,12 +403,28 @@ export class ContactService {
               .add(1, 'day')
               .format('YYYYMMDD');
 
-            const { data: payments } = await http.get(
-              `payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}&type=${i}&start=${start_date}&end=${add_one_day}`
+            const { data: payments } = await axios.get(
+              Host(
+                'payments',
+                `payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}&type=${i}&start=${start_date}&end=${add_one_day}`
+              ),
+              {
+                headers: {
+                  cookie: `access_token=${token}`,
+                },
+              }
             );
 
-            const { data: openingBalance } = await http.get(
-              `payments/payment/opening-balance/${contactId}?start=${start_date}`
+            const { data: openingBalance } = await axios.get(
+              Host(
+                'payments',
+                `payments/payment/opening-balance/${contactId}?start=${start_date}`
+              ),
+              {
+                headers: {
+                  cookie: `access_token=${token}`,
+                },
+              }
             );
 
             const newLedgerArray = [];
@@ -458,8 +452,16 @@ export class ContactService {
           }
         }
       } else {
-        const { data: payments } = await http.get(
-          `payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}`
+        const { data: payments } = await axios.get(
+          Host(
+            'payments',
+            `payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}`
+          ),
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
         );
 
         const newLedgerArray = [];
@@ -492,8 +494,13 @@ export class ContactService {
         };
       }
     } else if (type == PaymentModes.INVOICES) {
-      const { data: invoices } = await http.get(
-        `invoices/invoice/contacts/${contactId}`
+      const { data: invoices } = await axios.get(
+        Host('invoices', `invoices/invoice/contacts/${contactId}`),
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
       );
 
       const contact = await this.contactModel.findById(contactId);
@@ -510,12 +517,28 @@ export class ContactService {
               .add(1, 'day')
               .format('YYYYMMDD');
 
-            const { data: payments } = await http.get(
-              `payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}&type=${i}&start=${start_date}&end=${add_one_day}`
+            const { data: payments } = await axios.get(
+              Host(
+                'payments',
+                `payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}&type=${i}&start=${start_date}&end=${add_one_day}`
+              ),
+              {
+                headers: {
+                  cookie: `access_token=${token}`,
+                },
+              }
             );
 
-            const { data: openingBalance } = await http.get(
-              `payments/payment/opening-balance/${contactId}?start=${start_date}`
+            const { data: openingBalance } = await axios.get(
+              Host(
+                'payments',
+                `payments/payment/opening-balance/${contactId}?start=${start_date}`
+              ),
+              {
+                headers: {
+                  cookie: `access_token=${token}`,
+                },
+              }
             );
 
             const newLedgerArray = [];
@@ -550,8 +573,16 @@ export class ContactService {
           }
         }
       } else {
-        const { data: payments } = await http.get(
-          `payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}`
+        const { data: payments } = await axios.get(
+          Host(
+            'payments',
+            `payments/payment/contact/${contactId}?page_no=${page_no}&page_size=${page_size}`
+          ),
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
         );
 
         const newLedgerArray = [];
@@ -602,28 +633,8 @@ export class ContactService {
   }
 
   async Remove(deletedIds: ContactIds, req: IRequest): Promise<void> {
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
-
-    const tokenType =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
-
-    const http = axios.create({
-      baseURL: 'http://localhost',
-      headers: {
-        [tokenType]: value,
-      },
-    });
+    if (!req || !req.cookies) return null;
+    const token = req?.cookies['access_token'];
 
     for (const i of deletedIds.ids) {
       const contact = await this.contactModel.findById(i);
@@ -637,9 +648,17 @@ export class ContactService {
         );
 
         if (contact?.transactionId) {
-          await http.post(`accounts/transaction/delete`, {
-            ids: [contact.transactionId],
-          });
+          await axios.post(
+            Host('accounts', 'accounts/transaction/delete'),
+            {
+              ids: [contact.transactionId],
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
+            }
+          );
         }
       }
     }
@@ -658,28 +677,8 @@ export class ContactService {
   }
 
   async SyncContacts(data, req: IRequest): Promise<void> {
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
-
-    const type =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
-
-    const http = axios.create({
-      baseURL: 'http://localhost',
-      headers: {
-        [type]: value,
-      },
-    });
+    if (!req || !req.cookies) return null;
+    const token = req?.cookies['access_token'];
 
     const transactionArr = [];
     if (data.type === Integrations.XERO) {
@@ -819,8 +818,16 @@ export class ContactService {
       }
     }
 
-    await http.post(`accounts/transaction/add`, {
-      transactions: transactionArr,
-    });
+    await axios.post(
+      Host('accounts', `accounts/transaction/add`),
+      {
+        transactions: transactionArr,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
   }
 }

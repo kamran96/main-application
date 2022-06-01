@@ -8,6 +8,7 @@ import styled from 'styled-components';
 
 import { CommonModal } from '../../../components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { InvoiceImportManager } from '../../Invoice/InvoiceImportManager';
 
 interface Idata {
   xero: {
@@ -83,13 +84,21 @@ export const ContactImportWidget: FC = () => {
                 &nbsp;
                 <a>here</a>
               </div>
-              <div className="input">
+              {/* <div className="input">
                 <Icon className="Icon" icon={bxSearchAlt} color="#2395e7" />
                 <label htmlFor="file-upload" className="input-label">
-                  <input type="file" id="file-upload" />
+                 
                   Browse CSV File
                 </label>
-              </div>
+              </div> */}
+              <InvoiceImportManager
+                headers={`Contact,Email,Company Name,Contact Type,Credit Limit,Credit Block Limit,Balance`.split(
+                  ','
+                )}
+                onLoad={(payload) => {
+                  console.log(payload, 'what is payload');
+                }}
+              />
               <div className="text">
                 <p>{state.text}</p>
               </div>
