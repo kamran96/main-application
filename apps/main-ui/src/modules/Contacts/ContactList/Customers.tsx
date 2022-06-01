@@ -23,7 +23,6 @@ import ContactsImport from '../ContactsImport';
 import { useHistory } from 'react-router-dom';
 import { pdfCols } from './pdfCols';
 
-
 export const Customers: FC = () => {
   /* HOOKS */
   /* CONTAINER STATES */
@@ -86,31 +85,26 @@ export const Customers: FC = () => {
 
       const filterType = history.location.search.split('&');
       const filterIdType = filterType[1];
-      const filterOrder = filterType[4]?.split("=")[1];
-      
-      if(filterIdType?.includes("-")){
-         const fieldName = filterIdType?.split("=")[1].split("-")[1];
-         setSortedInfo({
-           order: filterOrder,
-           columnKey: fieldName
-         });
-      }
-      else{
-        const fieldName = filterIdType?.split("=")[1];
+      const filterOrder = filterType[4]?.split('=')[1];
+
+      if (filterIdType?.includes('-')) {
+        const fieldName = filterIdType?.split('=')[1].split('-')[1];
         setSortedInfo({
           order: filterOrder,
-          columnKey: fieldName
-        })
+          columnKey: fieldName,
+        });
+      } else {
+        const fieldName = filterIdType?.split('=')[1];
+        setSortedInfo({
+          order: filterOrder,
+          columnKey: fieldName,
+        });
       }
-      
     }
   }, [routeHistory]);
 
-
-
   const handleContactsConfig = (pagination, filters, sorter: any, extra) => {
     if (sorter.order === undefined) {
-     
       setConfig({
         ...config,
         sortid: null,
@@ -139,7 +133,7 @@ export const Customers: FC = () => {
             return -1;
           }
         });
-        setContactResponse(userData)
+        setContactResponse(userData);
       }
       setConfig({
         ...config,
@@ -157,13 +151,12 @@ export const Customers: FC = () => {
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field
-        }&page=${pagination.current}&page_size=${
-          pagination.pageSize
-        }&filter=${sorter.order}&query=${query}`
+        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+          sorter.order
+        }&query=${query}`
       );
     }
   };
-
 
   /* ComponentDidUpdate hook for updaing contactResponse state when successfully API fetches contact list data */
   useEffect(() => {
