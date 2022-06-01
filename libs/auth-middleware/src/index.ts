@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import * as dotenv from 'dotenv';
+import { Host } from '@invyce/global-constants';
 
 export * from './lib/auth-middleware.module';
 
@@ -15,16 +16,10 @@ export class Authenticate extends PassportStrategy(Strategy) {
   constructor() {
     super({
       jwtFromRequest: (req) => {
-        if (process.env.NODE_ENV === 'development') {
-          const header = req.headers?.authorization?.split(' ')[1];
-          token = header;
-          return header;
-        } else {
-          if (!req || !req.cookies) return null;
-          token = req.cookies['access_token'];
-          host = req.headers.host;
-          return req.cookies['access_token'];
-        }
+        if (!req || !req.cookies) return null;
+        token = req.cookies['access_token'];
+        host = req.headers.host;
+        return req.cookies['access_token'];
       },
 
       ignoreExpiration: false,
@@ -34,22 +29,15 @@ export class Authenticate extends PassportStrategy(Strategy) {
 
   async validate(payload) {
     try {
-      const type =
-        process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-      const value =
-        process.env.NODE_ENV === 'development'
-          ? `Bearer ${token}`
-          : `access_token=${token}`;
-
       const user = await axios.post(
-        `http://localhost/users/auth/access-controll`,
+        Host('users', 'users/auth/access-controll'),
         {
           ...payload,
           service: host,
         },
         {
           headers: {
-            [type]: value,
+            cookie: `access_token=${token}`,
           },
         }
       );
@@ -72,19 +60,3 @@ export class Authenticate extends PassportStrategy(Strategy) {
     }
   }
 }
-
-// export const Http = async () => {
-//   const type =
-//     process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-//   const value =
-//     process.env.NODE_ENV === 'development'
-//       ? `Bearer ${token}`
-//       : `access_token=${token}`;
-
-//   return await axios.create({
-//     baseURL: 'http://localhost',
-//     headers: {
-//       [type]: value,
-//     },
-//   });
-// };

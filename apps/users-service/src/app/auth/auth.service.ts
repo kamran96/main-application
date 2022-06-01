@@ -9,12 +9,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { ClientProxy } from '@nestjs/microservices';
 import * as bcrypt from 'bcryptjs';
+import * as crypto from 'crypto';
 import * as Moment from 'moment';
 import * as queryString from 'query-string';
 import * as os from 'os';
 import * as ip from 'ip';
 import * as speakeasy from 'speakeasy';
 import * as qrcode from 'qrcode';
+import axios from 'axios';
 import { Response } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import { User } from '../schemas/user.schema';
@@ -38,11 +40,17 @@ import {
 } from '@invyce/interfaces';
 
 import { SendOtp, UserLoginDto, UserRegisterDto } from '../dto/user.dto';
+import { Host } from '@invyce/global-constants';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-const generateRandomNDigits = (n) => {
-  return Math.floor(Math.random() * (9 * Math.pow(10, n))) + Math.pow(10, n);
+const generateRandomNDigits = () => {
+  let code = '';
+
+  while (code.length < 6) {
+    code += crypto.randomBytes(3).readUIntBE(0, 3);
+  }
+  return code.slice(0, 6);
 };
 
 const secret = speakeasy.generateSecret({
@@ -80,10 +88,10 @@ export class AuthService {
       const userId = req.user.id;
       const findToken = await this.userTokenModel.findOne({
         userId: userId,
-        code:
-          process.env.NODE_ENV === 'development'
-            ? req?.headers?.authorization?.split(' ')[1]
-            : req?.cookies?.access_token,
+        code: req?.cookies?.access_token,
+        // process.env.NODE_ENV === 'development'
+        // ? req?.headers?.authorization?.split(' ')[1]
+        // : req?.cookies?.access_token,
       });
 
       const newTime = Moment(new Date()).add(12, 'h').format();
@@ -91,12 +99,12 @@ export class AuthService {
 
       if (findToken === null) {
         const token = new this.userTokenModel();
-        token.code =
-          process.env.NODE_ENV === 'development'
-            ? req?.headers?.authorization?.split(' ')[1]
-            : req?.cookies?.access_token;
+        token.code = req?.cookies?.access_token;
+        // process.env.NODE_ENV === 'development'
+        //   ? req?.headers?.authorization?.split(' ')[1]
+        //   : req?.cookies?.access_token;
         token.expiresAt = newTime;
-        token.brower = req?.headers['user-agent'];
+        // token.brower = req?.headers?['user-agent'];
         token.ipAddress = ip.address();
         token.userId = userId;
         await token.save();
@@ -201,7 +209,8 @@ export class AuthService {
     if (!email) {
       const time = Moment(new Date()).add(1, 'h').calendar();
 
-      const generateOtp: number = generateRandomNDigits(4);
+      const generateOtp: string = generateRandomNDigits();
+
       parseInt(generateOtp as unknown as string);
 
       const user_token = new this.userTokenModel();
@@ -225,32 +234,19 @@ export class AuthService {
       id: newUser.id,
     };
 
-    // when added an organization then return new access_token
-
     const token = this.jwtService.sign(payload);
-    // const address = ip.address();
-
-    if (process.env.NODE_ENV === 'production') {
-      res
-        .cookie('access_token', token, {
-          secure: true,
-          sameSite: 'none',
-          httpOnly: true,
-          // domain: 'localhost',
-          path: '/',
-          expires: new Date(Moment().add(process.env.EXPIRES, 'h').toDate()),
-        })
-        .send({
-          message: 'Login successfully',
-          status: true,
-          result: newUser,
-        });
-    } else {
-      res.send({
-        users: newUser,
-        access_token: token,
+    res
+      .cookie('access_token', token, {
+        secure: true,
+        sameSite: 'none',
+        httpOnly: true,
+        path: '/',
+        expires: new Date(Moment().add(process.env.EXPIRES, 'h').toDate()),
+      })
+      .send({
+        message: 'Login successfully',
+        status: true,
       });
-    }
 
     return user;
   }
@@ -264,21 +260,52 @@ export class AuthService {
     });
   }
 
-  async Check(req: IRequest): Promise<ICheckUser> {
+  async Check(req: IRequest) {
     try {
-      const payload: UserLoginDto = {
-        username: req.user.username,
-      };
-      const user: IUser[] = await this.CheckUser(payload);
-      const access_token = req.cookies['access_token'];
+      const user = await this.userModel
+        .findOne({
+          username: req.user.username,
+          status: 1,
+        })
+        .populate('role')
+        .populate('branch')
+        .populate({
+          path: 'organization',
+          model: 'Organization',
+          populate: {
+            path: 'currency',
+            model: 'Currency',
+          },
+        });
 
-      if (user?.length) {
-        return {
-          user: user[0],
-          token: access_token,
+      if (user?.profile?.attachmentId) {
+        const attachmentId = user?.profile?.attachmentId;
+
+        if (!req || !req.cookies) return null;
+        const token = req.cookies['access_token'];
+
+        const request = {
+          url: Host('attachments', `attachments/attachment/${attachmentId}`),
+          method: 'GET',
+          headers: {
+            cookie: `access_token=${token}`,
+          },
         };
+
+        const { data: attachment } = await axios(request as unknown);
+        let new_obj = {};
+
+        if (user?.profile?.attachmentId == attachment.id) {
+          new_obj = {
+            ...user.toObject(),
+            profile: { ...user.profile?.toObject(), attachment },
+          };
+        }
+
+        return new_obj;
+      } else {
+        return user;
       }
-      throw new HttpException('Authentication Failed', HttpStatus.BAD_REQUEST);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -315,7 +342,7 @@ export class AuthService {
 
   async sendVerificationEmail(
     usr = null as SendOtp,
-    generateOtp = null as number,
+    generateOtp = null as string,
     userData = null as IBaseUser
   ): Promise<boolean> {
     const user = await this.userModel.findOne({ email: usr.email });
@@ -399,7 +426,8 @@ export class AuthService {
 
     const user = await this.userModel.findOne({ email: body.email });
 
-    const generateOtp: number = generateRandomNDigits(4);
+    const generateOtp: string = generateRandomNDigits();
+    console.log(generateOtp, 'otp');
     parseInt(generateOtp as unknown as string);
 
     const user_token = new this.userTokenModel();
@@ -416,7 +444,7 @@ export class AuthService {
 
     const user = await this.userModel.findOne({ email: usr.email });
 
-    const generateOtp: number = generateRandomNDigits(4);
+    const generateOtp: string = generateRandomNDigits();
     parseInt(generateOtp as unknown as string);
 
     const user_token = new this.userTokenModel();

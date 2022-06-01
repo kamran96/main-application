@@ -9,6 +9,7 @@ import { AccountsModule } from './accounts/accounts.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { BankModule } from './bank/bank.module';
 import { ReportModule } from './report/report.module';
+
 dotenv.config();
 
 @Module({
@@ -26,7 +27,7 @@ dotenv.config();
           password: configService.get('DB_PASSWORD', process.env.DB_PASSWORD),
           database: configService.get('ACC_DB_NAME', process.env.ACC_DB_NAME),
           entities: getMetadataArgsStorage().tables.map((tbl) => tbl.target),
-          // ssl: { rejectUnauthorized: false },
+          ssl: { rejectUnauthorized: false },
         } as TypeOrmModuleOptions),
     }),
     AccountsModule,

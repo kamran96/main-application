@@ -66,4 +66,11 @@ export enum InvTypes {
   BILL = 'BILL',
   CREDIT_NOTE = 'CN',
   PURCHASE_ORDER = 'PO',
+  QUOTATION = 'Q0',
 }
+
+export const Host = (service: string, route: string): string => {
+  return process.env['NODE' + '_ENV'] === 'production'
+    ? `http://${service}.default.svc.cluster.local/${route}`
+    : `https://localhost/${route}`;
+};

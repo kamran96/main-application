@@ -342,6 +342,7 @@ export const Customers: FC = () => {
             customTopbar={renderCustomTopbar()}
             topbarRightPannel={renderTopbarRight()}
             hasPrint
+            exportable
             data={contactsResponse}
             columns={columns}
             loading={isFetching || isLoading}

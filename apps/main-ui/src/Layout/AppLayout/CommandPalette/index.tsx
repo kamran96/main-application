@@ -24,13 +24,11 @@ import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 import { DivProps, ISupportedRoutes } from '../../../modal';
 import CommandPlatteGlobalStyles from './commandPaletteGlobalStyles';
-import { useEffect, useRef, useState } from 'react';
-import Backbtn from '../../../assets/backBtn.svg';
+import { useEffect, useState } from 'react';
 
 export const InvyceCmdPalette = () => {
   const { rbac } = useRbac(null);
   const [showClear, setShowClear] = useState(false);
-  const [values, setValues] = useState('');
 
   const {
     routeHistory,
@@ -488,12 +486,16 @@ export const InvyceCmdPalette = () => {
         }
         defaultInputValue=""
         commands={commandsList()}
-        hotKeys={['ctrl+shift+p', 'command+shift+p']}
+        hotKeys={['ctrl+k', 'command+k']}
         showSpinnerOnSelect={false}
         closeOnSelect
         resetInputOnClose
         theme={theme}
-        placeholder="Search in Invoyce"
+        placeholder="Search in Invyce"
+        filterSearchQuery={(inputVal) => {
+          console.log(inputVal, 'input value');
+          return inputVal;
+        }}
         onChange={(newValue) => {
           newValue ? setShowClear(true) : setShowClear(false);
         }}
@@ -507,16 +509,15 @@ const Wrapperheader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-around;
-  border-top: 1px solid ${(props: IThemeProps) =>
-    props?.theme?.colors?.paletteBorder};
+  border-top: 1px solid
+    ${(props: IThemeProps) => props?.theme?.colors?.paletteBorder};
 
   h3,
   h5 {
     margin: 0 5px;
-    color: background-color: ${(props: IThemeProps) =>
-      props?.theme?.colors?.itmText};;
+    color: ${(props: IThemeProps) => props?.theme?.colors?.itmText};
     font-size: 16px;
-    paddingleft: 2px;
+    padding-left: 2px;
   }
   .itm {
     background-color: ${(props: IThemeProps) =>

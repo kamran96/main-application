@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import axios from 'axios';
 import { AttributeValue } from '../schemas/attributeValue.schema';
 import { Item } from '../schemas/item.schema';
-import { Integrations } from '@invyce/global-constants';
+import { Host, Integrations } from '@invyce/global-constants';
 import {
   IBaseUser,
   IItem,
@@ -11,6 +11,8 @@ import {
   IPage,
   IRequest,
 } from '@invyce/interfaces';
+import { Sorting } from '@invyce/sorting';
+
 import { Price } from '../schemas/price.schema';
 import { ItemCodesDto, ItemDto, ItemIdsDto } from '../dto/item.dto';
 import { ItemLedger } from '../schemas/itemLedger.schema';
@@ -29,9 +31,11 @@ export class ItemService {
     itemData: IBaseUser,
     query: IPage
   ): Promise<IItemWithResponse> {
-    const { page_size, page_no, query: filters, purpose } = query;
+    const { page_size, page_no, query: filters, sort, purpose } = query;
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
+
+    const { sort_column, sort_order } = await Sorting(sort);
 
     let items;
     if (purpose === 'ALL') {
@@ -70,6 +74,7 @@ export class ItemService {
                 offset: pn * ps - ps,
                 populate: 'price',
                 limit: ps,
+                sort: { [sort_column]: sort_order },
                 customLabels: myCustomLabels,
               }
             );
@@ -86,6 +91,7 @@ export class ItemService {
                 offset: pn * ps - ps,
                 populate: 'price',
                 limit: ps,
+                sort: { [sort_column]: sort_order },
                 customLabels: myCustomLabels,
               }
             );
@@ -100,6 +106,7 @@ export class ItemService {
                 offset: pn * ps - ps,
                 populate: 'price',
                 limit: ps,
+                sort: { [sort_column]: sort_order },
                 customLabels: myCustomLabels,
               }
             );
@@ -114,6 +121,7 @@ export class ItemService {
                 offset: pn * ps - ps,
                 populate: 'price',
                 limit: ps,
+                sort: { [sort_column]: sort_order },
                 customLabels: myCustomLabels,
               }
             );
@@ -136,6 +144,7 @@ export class ItemService {
           {
             offset: pn * ps - ps,
             limit: page_size,
+            sort: { [sort_column]: sort_order },
             populate: 'price',
             customLabels: myCustomLabels,
           }
@@ -296,28 +305,8 @@ export class ItemService {
   }
 
   async DeleteItem(data: ItemIdsDto, req: IRequest): Promise<void> {
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
-
-    const tokenType =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
-
-    const http = await axios.create({
-      baseURL: 'http://localhost',
-      headers: {
-        [tokenType]: value,
-      },
-    });
+    if (!req || !req.cookies) return null;
+    const token = req?.cookies['access_token'];
 
     for (const i of data.ids) {
       const item = await this.itemModel.findById(i);
@@ -331,9 +320,17 @@ export class ItemService {
       }
 
       if (item?.transactionId) {
-        await http.post(`accounts/transaction/delete`, {
-          ids: [item.transactionId],
-        });
+        await axios.post(
+          Host('accounts', 'accounts/transaction/delete'),
+          {
+            ids: [item.transactionId],
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
       }
     }
   }

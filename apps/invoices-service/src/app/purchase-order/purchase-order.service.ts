@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Between, getCustomRepository, ILike, In } from 'typeorm';
 import axios from 'axios';
 import { IPage, IRequest } from '@invyce/interfaces';
@@ -6,34 +6,15 @@ import { PurchaseOrderDto } from '../dto/purchase-order.dto';
 import { PurchaseOrderRepository } from '../repositories/purchaseOrder.repository';
 import { PurchaseOrderItemRepository } from '../repositories/purchaseOrderItem.repository';
 import { Sorting } from '@invyce/sorting';
+import { Host } from '@invyce/global-constants';
 
 @Injectable()
 export class PurchaseOrderService {
   async IndexPO(req: IRequest, queryData: IPage) {
     const { page_no, page_size, status, type, sort, query } = queryData;
 
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
-
-    const tokenType =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
-
-    const http = axios.create({
-      baseURL: 'http://localhost',
-      headers: {
-        [tokenType]: value,
-      },
-    });
+    if (!req || !req.cookies) return null;
+    const token = req?.cookies['access_token'];
 
     let purchaseOrder;
     const ps: number = parseInt(page_size);
@@ -133,10 +114,18 @@ export class PurchaseOrderService {
 
     const newPoArray = [];
     const mapContactIds = purchaseOrder.map((inv) => inv.contactId);
-    const { data: contacts } = await http.post(`contacts/contact/ids`, {
-      ids: mapContactIds,
-      type: 1,
-    });
+    const { data: contacts } = await axios.post(
+      Host('contacts', `contacts/contact/ids`),
+      {
+        ids: mapContactIds,
+        type: 1,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     // get distinct userids
     const key = 'createdById';
@@ -144,10 +133,18 @@ export class PurchaseOrderService {
       ...new Map(purchaseOrder.map((item) => [item[key], item])).values(),
     ].map((i) => i[key]);
 
-    const { data: users } = await http.post(`users/user/ids`, {
-      ids: mapUniqueUserId,
-      type: 1,
-    });
+    const { data: users } = await axios.post(
+      Host('users', `users/user/ids`),
+      {
+        ids: mapUniqueUserId,
+        type: 1,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     for (const i of purchaseOrder) {
       const contact = contacts.find((c) => c.id === i.contactId);
@@ -287,44 +284,32 @@ export class PurchaseOrderService {
 
     const contactId = purchaseOrder?.contactId;
 
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
-
-    const type =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
+    if (!req || !req.cookies) return null;
+    const token = req.cookies['access_token'];
 
     const contactRequest = {
-      url: `http://localhost/contacts/contact/${contactId}`,
+      url: Host('contacts', `contacts/contact/${contactId}`),
       method: 'GET',
       headers: {
-        [type]: value,
+        cookie: `access_token=${token}`,
       },
     };
-
-    const http = axios.create({
-      baseURL: 'http://localhost',
-      headers: {
-        [type]: value,
-      },
-    });
 
     const itemIdsArray = purchaseOrder?.purchaseOrderItems.map(
       (ids) => ids.itemId
     );
 
-    const { data: items } = await http.post(`items/item/ids`, {
-      ids: itemIdsArray,
-    });
+    const { data: items } = await axios.post(
+      Host('items', `items/item/ids`),
+      {
+        ids: itemIdsArray,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
 
     const { data: contact } = await axios(contactRequest as unknown);
 

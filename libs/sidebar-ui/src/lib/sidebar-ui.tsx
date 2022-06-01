@@ -45,7 +45,6 @@ const MenuPopOver: FC<IPopOverProps> = ({ route }) => {
     (i) => i?.route === history?.location?.pathname
   );
 
-
   const content = (
     <PopOverListWrapper className="popover_list ">
       {route?.children?.map((childRoute, index) => {
@@ -68,7 +67,6 @@ const MenuPopOver: FC<IPopOverProps> = ({ route }) => {
       })}
     </PopOverListWrapper>
   );
-
 
   return (
     <>

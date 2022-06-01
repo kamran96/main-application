@@ -15,6 +15,7 @@ import { OrganizationUser } from '../schemas/organizationUser.schema';
 import { User } from '../schemas/user.schema';
 import { ORGANIZATION_CREATED, TRAIL_STARTED } from '@invyce/send-email';
 import { Currency } from '../schemas/currency.schema';
+import { Host } from '@invyce/global-constants';
 
 @Injectable()
 export class OrganizationService {
@@ -31,28 +32,8 @@ export class OrganizationService {
   ) {}
 
   async ListOrganizations(req) {
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
-
-    const type =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
-
-    const http = axios.create({
-      baseURL: 'http://localhost',
-      headers: {
-        [type]: value,
-      },
-    });
+    if (!req || !req.cookies) return null;
+    const token = req?.cookies['access_token'];
 
     const org = await this.organizationUserModel.find({
       userId: { $in: req.user.id },
@@ -68,10 +49,15 @@ export class OrganizationService {
       .populate('branches');
     const mapAttachmentIds = organization.map((i) => i.attachmentId);
 
-    const { data: attachments } = await http.post(
-      `attachments/attachment/ids`,
+    const { data: attachments } = await axios.post(
+      Host('attachments', `attachments/attachment/ids`),
       {
         ids: mapAttachmentIds,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
       }
     );
 
@@ -205,16 +191,23 @@ export class OrganizationService {
           branchArr.push(branch);
         }
 
-        const http = axios.create({
-          baseURL: 'http://localhost',
-        });
+        if (!req || !req.cookies) return null;
+        const token = req?.cookies['access_token'];
 
-        await http.post(`accounts/account/init`, {
-          user: {
-            id: req?.user?.id,
-            organizationId: organization.id,
+        await axios.post(
+          Host('accounts', `accounts/account/init`),
+          {
+            user: {
+              id: req?.user?.id,
+              organizationId: organization.id,
+            },
           },
-        });
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
 
         const roles = await this.rbacService.InsertRoles(organization.id);
         await this.rbacService.InsertRolePermission(organization.id);
@@ -267,28 +260,8 @@ export class OrganizationService {
     organizationId: string,
     req: IRequest
   ): Promise<IOrganization> {
-    let token;
-    if (process.env.NODE_ENV === 'development') {
-      const header = req.headers?.authorization?.split(' ')[1];
-      token = header;
-    } else {
-      if (!req || !req.cookies) return null;
-      token = req.cookies['access_token'];
-    }
-
-    const type =
-      process.env.NODE_ENV === 'development' ? 'Authorization' : 'cookie';
-    const value =
-      process.env.NODE_ENV === 'development'
-        ? `Bearer ${token}`
-        : `access_token=${token}`;
-
-    const http = axios.create({
-      baseURL: 'http://localhost',
-      headers: {
-        [type]: value,
-      },
-    });
+    if (!req || !req.cookies) return null;
+    const token = req?.cookies['access_token'];
 
     const organization = await this.organizationModel
       .findOne({
@@ -299,10 +272,15 @@ export class OrganizationService {
 
     const orgArray = [];
     if (organization.attachmentId !== undefined) {
-      const { data: attachment } = await http.post(
-        `attachments/attachment/ids`,
+      const { data: attachment } = await axios.post(
+        Host('attachments', `attachments/attachment/ids`),
         {
           ids: [organization.attachmentId],
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
         }
       );
       orgArray.push({

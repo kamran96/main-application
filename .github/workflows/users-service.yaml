@@ -71,7 +71,7 @@ jobs:
         run: docker push registry.digitalocean.com/invyce-images/users-service:$(echo $GITHUB_SHA | head -c7)
 
       - name: Update deployment file
-        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/invyce-images/users-service:'${TAG}'|' $GITHUB_WORKSPACE/apps/users-service/ops/users-deployment.yaml
+        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/invyce-images/users-service:'${TAG}'|' $GITHUB_WORKSPACE/apps/users-service/src/main.ts
 
       # Install yq
       - name: Install yq 

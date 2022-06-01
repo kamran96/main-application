@@ -331,6 +331,7 @@ export const Suppliers: FC = () => {
             pdfExportable={{
               columns: pdfCols,
             }}
+            exportable
             customTopbar={renderCustomTopbar()}
             topbarRightPannel={renderTopbarRight()}
             hasPrint

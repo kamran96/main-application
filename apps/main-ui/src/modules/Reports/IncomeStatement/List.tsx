@@ -134,7 +134,6 @@ export const IncomeStatementList: FC = () => {
     return query ? JSON.parse(atob(query)) : query;
   }, [query]);
 
-
   return (
     <WrapperIncomeStatement>
       <TableCard minHeight={590}>
@@ -144,22 +143,22 @@ export const IncomeStatementList: FC = () => {
             <P className="dark-text"></P>
           </div>
           <div className="_disable_print flex alignCenter">
-          <PDFDownloadLinkWrapper
-          document={
-            <IncomeStatementPdf
-          header={headerprops}
-          incomeStatement={incomeStatementData}
-          searchedQueryItem={searchedQueryItem}
-          total={total}
-        />
-          }
-        >
-          <div className="flex alignCenter">
-            <PDFICON className="flex alignCenter mr-5" />
+            <PDFDownloadLinkWrapper
+              document={
+                <IncomeStatementPdf
+                  header={headerprops}
+                  incomeStatement={incomeStatementData}
+                  searchedQueryItem={searchedQueryItem}
+                  total={total}
+                />
+              }
+            >
+              <div className="flex alignCenter">
+                <PDFICON className="flex alignCenter mr-5" />
 
-            <span> Download PDF</span>
-          </div>
-        </PDFDownloadLinkWrapper>
+                <span> Download PDF</span>
+              </div>
+            </PDFDownloadLinkWrapper>
             <ButtonTag
               className="mr-10"
               onClick={onPrint}
@@ -360,7 +359,6 @@ export const IncomeStatementList: FC = () => {
           </PrintFormat>
         </div>
       </TableCard>
-      
     </WrapperIncomeStatement>
   );
 };

@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 export class CsvService {
   constructor() {}
 
-  async importCsv() {
+  async importCsv(body) {
     return 'Hello World!';
   }
 }
