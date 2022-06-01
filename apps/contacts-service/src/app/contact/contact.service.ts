@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as moment from 'moment';
 import { ClientProxy } from '@nestjs/microservices';
 import axios from 'axios';
-import { Contact } from '../Schemas/contact.schema';
+import { Contact, ContactSchema } from '../Schemas/contact.schema';
 import {
   Entries,
   EntryType,
@@ -829,5 +829,12 @@ export class ContactService {
         },
       }
     );
+  }
+
+  async ImportCsv() {
+    console.log('okk');
+    ContactSchema.eachPath(function (path) {
+      console.log(path, 'pa');
+    });
   }
 }

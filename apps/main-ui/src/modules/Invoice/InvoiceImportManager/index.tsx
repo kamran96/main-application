@@ -36,31 +36,14 @@ export const InvoiceImportManager = ({ onLoad, headers }: IProps) => {
     const string = data.replace('\r', '');
     const lbreak = string.split('\n');
     const accessors = lbreak[0].split(',');
+    console.log(accessors, 'accessors');
 
-    if (
-      JSON.stringify(accessors.slice().sort()) ===
-      JSON.stringify(headers.slice().sort())
-    ) {
-      for (let i = 1; i < lbreak.length; i++) {
-        const obj = {};
-        lbreak[i].split(',').forEach((item, index) => {
-          obj[
-            accessors[index]
-              ?.split(' ')
-              .map((key, index) => {
-                if (index === 0) {
-                  return key.toLowerCase();
-                } else {
-                  return key.charAt(0).toUpperCase() + key.slice(1);
-                }
-              })
-              .join('')
-          ] = `${item.replace('\r', '')}`;
-        });
-        csvData.push(obj);
-      }
-    } else {
-      alert('incorrect data');
+    for (let i = 1; i < lbreak.length; i++) {
+      const obj = {};
+      lbreak[i].split(',').forEach((item, index) => {
+        obj[accessors[index]] = `${item.replace('\r', '')}`;
+      });
+      csvData.push(obj);
     }
 
     // lbreak.forEach((res) => {
