@@ -287,6 +287,7 @@ export const Customers: FC = () => {
       <ContactListWrapper>
         <div className="table_container">
           <CommonTable
+            exportable
             pdfExportable={{ columns: pdfCols }}
             printTitle={'Customers List'}
             customTopbar={renderCustomTopbar()}
