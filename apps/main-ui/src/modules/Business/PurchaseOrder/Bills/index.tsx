@@ -10,7 +10,7 @@ import { TableTabs, TableTabsContent } from '../../../../components/TableTabs';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { ISupportedRoutes } from '../../../../modal';
 import AwaitingPurchaseList from './List/AwaitingPayment';
-import { PurchaseOrderColumns } from './List/CommonCol';
+import { useCols } from './List/CommonCol';
 import DueExpiredPurchases from './List/DueExpired';
 import PaidPurchaseEntries from './List/Paid';
 
@@ -22,6 +22,8 @@ export const BillsList: FC = () => {
   const [activeTab, setActiveTab] = useState('');
   const { routeHistory } = useGlobalContext();
   const { search } = routeHistory.history.location;
+  const {PurchaseOrderColumns} = useCols();
+  
   useEffect(() => {
     if (!activeTab) {
       setActiveTab('all');

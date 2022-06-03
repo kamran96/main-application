@@ -24,7 +24,7 @@ export const paymentIndexAPI = ({ queryKey }: QueryKey) => {
   const page_size: number = queryKey[3];
   const query: string = queryKey[4];
   const paymentType: number = queryKey[5];
-  let url = `${PAYMENTS.INDEX}?page_size=${page_size}&page_no=${page}&paymentType=${paymentType}`;
+  let url = `${PAYMENTS.INDEX}?page_size=${page_size}&page_no=${page}&sort=${sortid}&paymentType=${paymentType}`;
   if (query) {
     url = `${url}&query=${query}`;
   }

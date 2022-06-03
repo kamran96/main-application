@@ -8,7 +8,7 @@ import { FallBackLoader } from '../../../../components/FallBackLoader';
 import { TableTabs, TableTabsContent } from '../../../../components/TableTabs';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { ISupportedRoutes } from '../../../../modal/routing';
-import { PurchaseOrderColumns } from './List/CommonCol';
+import { useCols } from './List/CommonCol';
 
 export const PurchaseOrderList: FC = () => {
   /* Dynamic Imports */
@@ -18,6 +18,8 @@ export const PurchaseOrderList: FC = () => {
   const [activeTab, setActiveTab] = useState('');
   const { routeHistory } = useGlobalContext();
   const { search } = routeHistory.history.location;
+  const {PurchaseOrderColumns} = useCols();
+
   useEffect(() => {
     if (!activeTab) {
       setActiveTab('all');

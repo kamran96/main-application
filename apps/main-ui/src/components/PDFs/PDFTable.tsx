@@ -9,6 +9,7 @@ export interface ITableColumns {
   key?: string;
   render?: (data: any, row: any, index: number) => ReactNode;
   width?: number;
+  sorter?: boolean
 }
 
 export interface ITableProps {

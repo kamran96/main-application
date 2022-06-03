@@ -832,9 +832,68 @@ export class ContactService {
   }
 
   async ImportCsv() {
-    console.log('okk');
-    ContactSchema.eachPath(function (path) {
-      console.log(path, 'pa');
+    const contactKeys: any = [];
+    const descriptionKeys: any = {
+      name: 'Please select a field which is related to Name of Contact',
+      email: 'Please select a field which is related to Email of Contact',
+      contactType: 'Please select a field which is related to Contact Type',
+      cnic: 'Please select a field which is related to National Identity of Contact',
+      phoneNumber:
+        'Please select a field which is related to Phone Number of Contact',
+      cellNumber:
+        'Please select a field which is related to Cell Number of Contact',
+      faxNumber:
+        'Please select a field which is related to Fax Number of Contact',
+      skypeName:
+        'Please select a field which is related to Skype Name of Contact',
+      webLink:
+        'Please select a field which is related to Website Link of Contact',
+      creditLimit:
+        'Please select a field which is related to Credit Limit of Contact',
+      creditLimitBlock:
+        'Please select a field which is related to Credit Limit Block of Contact',
+      salesDiscount:
+        'Please select a field which is related to Sales Discount of Contact',
+      balance: 'Please select a field which is related to Balance of Contact',
+      accountNumber:
+        'Please select a field which is related to Account Number of Contact',
+      paymentDaysLimit:
+        'Please select a field which is related to Payment Days Limit of Contact',
+      businessName:
+        'Please select a field which is related to Business Name of Contact',
+    };
+
+    const notRequired = [
+      'updatedAt',
+      'createdAt',
+      'updatedById',
+      'createdById',
+      'status',
+      'organizationId',
+      'branchId',
+      'importedFrom',
+      'importedContactId',
+      '_id',
+      '__v',
+      'hasOpeningBalance',
+      'transactionId',
+      'openingBalance',
+      'addresses',
+    ];
+
+    await ContactSchema.eachPath(function (keyName) {
+      if (!notRequired.includes(keyName)) {
+        const text = keyName;
+        const result = text.replace(/([A-Z])/g, ' $1');
+        const finalResult = result.charAt(0).toUpperCase() + result.slice(1);
+        contactKeys.push({
+          label: finalResult,
+          keyName,
+          description: descriptionKeys[keyName],
+        });
+      }
     });
+
+    return contactKeys;
   }
 }

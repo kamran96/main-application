@@ -15,7 +15,7 @@ import editSolid from '@iconify-icons/clarity/edit-solid';
 import { SmartFilter } from '../../../components/SmartFilter';
 import { PDFICON } from '../../../components/Icons';
 import FilteringSchema from './FilteringSchema';
-import columns, { pdfCols, csvColumns } from './commonCols';
+import { useCols } from './commonCols';
 
 export const AprovedDebitNotes: FC = () => {
   /* HOOKS HERE */
@@ -23,6 +23,8 @@ export const AprovedDebitNotes: FC = () => {
   const { routeHistory } = useGlobalContext();
   const { history } = routeHistory;
   const { location } = history;
+
+  const {columns, pdfCols, csvColumns} = useCols();
 
   /* LOCATL STATES */
   const [{ result, pagination }, setCreditNoteResponse] =
@@ -36,8 +38,9 @@ export const AprovedDebitNotes: FC = () => {
     page: 1,
     pageSize: 20,
     query: '',
+    sortid: 'id'
   });
-  const { page, pageSize, query } = creditNoteConfig;
+  const { page, pageSize, sortid, query } = creditNoteConfig;
 
   /* LOCAL STATE ENDS HERE */
 
@@ -51,6 +54,7 @@ export const AprovedDebitNotes: FC = () => {
       pageSize,
       IInvoiceType.DEBITNOTE,
       query,
+      sortid
     ],
     getCreditNotes,
     {
@@ -73,6 +77,32 @@ export const AprovedDebitNotes: FC = () => {
       setFilteringSchema(schema);
     }
   }, [contactsData, FilteringSchema]);
+
+  const onChangePagination = (pagination, filters, sorter: any, extra) => {
+    if(sorter.order === undefined){
+      setCreditNoteConfig({
+        ...creditNoteConfig,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        sortid: 'id'
+      });
+      const route = `/app${ISupportedRoutes.DEBIT_NOTES}?tabIndex=aproved&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+      history.push(route);
+    }else{
+      setCreditNoteConfig({
+        ...creditNoteConfig,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        sortid: sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field,
+      });
+      const route = `/app${ISupportedRoutes.DEBIT_NOTES}?tabIndex=aproved&sortid=${
+        sorter && sorter.order === 'descend'
+          ? `-${sorter.field}`
+          : sorter.field
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      history.push(route);
+    }
+  }
 
   /* PAGINATED QUERY TO FETCH CREDIT NOTES WITH PAGINATION */
   /* API CALLS STACKS ENDS HERE */
@@ -155,15 +185,7 @@ export const AprovedDebitNotes: FC = () => {
           fields: csvColumns,
         }}
         printTitle={'Processed Debit Notes'}
-        onChange={(pagination, filters, sorter: any, extra) => {
-          setCreditNoteConfig({
-            ...creditNoteConfig,
-            page: pagination.current,
-            pageSize: pagination.pageSize,
-          });
-          const route = `/app${ISupportedRoutes.DEBIT_NOTES}?tabIndex=aproved&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
-          history.push(route);
-        }}
+        onChange={onChangePagination}
         pagination={{
           pageSize: pageSize,
           position: ['bottomRight'],
