@@ -3,12 +3,14 @@ import bxSearchAlt from '@iconify/icons-bx/bx-search-alt';
 import { Icon } from '@iconify/react';
 import { CommonModal } from '../../../components';
 import { useState } from 'react';
+import deleteIcon from '@iconify/icons-carbon/delete';
 interface IProps {
   onLoad: (payload: any, file?: File) => void;
   headers: string[];
 }
 
 export const InvoiceImportManager = ({ onLoad, headers }: IProps) => {
+  const [fileData, setFileData] = useState<File>(null);
   const obj_csv = {
     size: 0,
     dataFile: [],
@@ -19,10 +21,12 @@ export const InvoiceImportManager = ({ onLoad, headers }: IProps) => {
       const reader = new FileReader();
       reader.readAsBinaryString(input.files[0]);
       reader.onload = function (e) {
+        setFileData(input?.files[0]);
         obj_csv.size = e.total;
         obj_csv.dataFile = e.target.result as any;
 
         console.log('what is input', input?.files[0]);
+
         parseData(obj_csv.dataFile, input?.files[0]);
       };
     }
@@ -59,14 +63,29 @@ export const InvoiceImportManager = ({ onLoad, headers }: IProps) => {
   }
   return (
     <InputWrapper>
-      <label className="InputLabel">Choose File</label>
-      <Icon className="Icon" icon={bxSearchAlt} color="#2395e7" />
-      <input
-        type="file"
-        id="upload"
-        onChange={readDocument}
-        className="InputField"
-      />
+      <label className="InputLabel">
+        {fileData ? fileData?.name : 'Choose file'}
+      </label>
+      {!fileData ? (
+        <>
+          <input
+            type="file"
+            id="upload"
+            onChange={readDocument}
+            className="InputField"
+          />
+          <Icon className="Icon" icon={bxSearchAlt} color="#2395e7" />
+        </>
+      ) : (
+        <div
+          onClick={(e) => {
+            e.preventDefault();
+            setFileData(null);
+          }}
+        >
+          <Icon className="Icon" icon={deleteIcon} color="red" />
+        </div>
+      )}
     </InputWrapper>
   );
 };
@@ -95,7 +114,6 @@ const InputWrapper = styled.div`
   .Icon {
     font-size: 1rem;
     position: absolute;
-    left: 8rem;
     top: 14px;
   }
 `;
