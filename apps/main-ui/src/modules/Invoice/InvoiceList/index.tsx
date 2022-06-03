@@ -9,7 +9,7 @@ import { PERMISSIONS } from '../../../components/Rbac/permissions';
 import { TableTabs, TableTabsContent } from '../../../components/TableTabs';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { ISupportedRoutes } from '../../../modal';
-import { InvoiceColumns } from './commonCol';
+import { useCols } from './commonCol';
 import OverDueInvoices from './Overdue';
 
 export const InvoiceList: FC = () => {
@@ -22,7 +22,7 @@ export const InvoiceList: FC = () => {
   const { routeHistory } = useGlobalContext();
   const [activeTab, setActiveTab] = useState('');
   const { search } = routeHistory.history.location;
-
+  const {InvoiceColumns} = useCols();
   useEffect(() => {
     if (!activeTab) {
       setActiveTab('all');

@@ -8,6 +8,12 @@ import styled from 'styled-components';
 
 import { CommonModal } from '../../../components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { InvoiceImportManager } from '../../Invoice/InvoiceImportManager';
+import { useQuery } from 'react-query';
+import { ReactQueryKeys } from '../../../modal';
+import { getContactKeysAPI } from '../../../api';
+import { CompareDataModal } from './CompareDataModal';
+import { Button } from 'antd';
 
 interface Idata {
   xero: {
@@ -23,6 +29,17 @@ interface Idata {
 export const ContactImportWidget: FC = () => {
   const { contactsImportConfig, setContactsImportConfig } = useGlobalContext();
   const { visibility } = contactsImportConfig;
+  const [fileData, setFileData] = useState<File>();
+  const [fileExtractedData, setFileExtractedData] = useState([]);
+  const [compareDataModal, setCompareDataModel] = useState<boolean>(false);
+
+  const { data: contactKeysResponse, isLoading: contactKeysLoading } = useQuery(
+    [ReactQueryKeys],
+    getContactKeysAPI,
+    {
+      enabled: !!compareDataModal,
+    }
+  );
 
   const data: Idata = {
     xero: {
@@ -36,69 +53,102 @@ export const ContactImportWidget: FC = () => {
   };
   const [state, setState] = useState(data?.xero);
   return (
-    <CommonModal
-      visible={visibility}
-      title="Import Contacts"
-      width={800}
-      onCancel={() => {
-        setContactsImportConfig(false, null);
-      }}
-      footer={false}
-    >
-      <WrapperModalContent>
-        <div className="container">
-          <div className="modal-icon">
-            <Icon className="Icon" icon={bookHalf} width="80" color="#2395E7" />
-          </div>
-          <div className="modal-text">
-            <Icon className="Icon" icon={downloadIcon} color="#6D7D88" />
-            <h2>Import from popular cvs formats</h2>
-          </div>
-          <div className="modal-btns">
-            <button
-              className={state?.link === data.xero.link ? 'active' : ''}
-              onClick={() => {
-                state?.link === data.xero.link
-                  ? setState(null)
-                  : setState(data.xero);
-              }}
-            >
-              Xero
-            </button>
-            <button
-              className={state?.link === data.quickbook.link ? 'active' : ''}
-              onClick={() => {
-                state?.link === data.quickbook.link
-                  ? setState(null)
-                  : setState(data.quickbook);
-              }}
-            >
-              Quickbook
-            </button>
-          </div>
-          {state && (
-            <div className="render-content">
-              <div className="download">
-                <h4>{state.link}</h4>
-                &nbsp;
-                <a>here</a>
-              </div>
-              <div className="input">
+    <>
+      <CommonModal
+        visible={visibility}
+        title="Import Contacts"
+        width={800}
+        onCancel={() => {
+          setContactsImportConfig(false, null);
+        }}
+        footer={false}
+      >
+        <WrapperModalContent>
+          <div className="container">
+            <div className="modal-icon">
+              <Icon
+                className="Icon"
+                icon={bookHalf}
+                width="80"
+                color="#2395E7"
+              />
+            </div>
+            <div className="modal-text">
+              <Icon className="Icon" icon={downloadIcon} color="#6D7D88" />
+              <h2>Import from popular cvs formats</h2>
+            </div>
+            <div className="modal-btns">
+              <button
+                className={state?.link === data.xero.link ? 'active' : ''}
+                onClick={() => {
+                  state?.link === data.xero.link
+                    ? setState(null)
+                    : setState(data.xero);
+                }}
+              >
+                Xero
+              </button>
+              <button
+                className={state?.link === data.quickbook.link ? 'active' : ''}
+                onClick={() => {
+                  state?.link === data.quickbook.link
+                    ? setState(null)
+                    : setState(data.quickbook);
+                }}
+              >
+                Quickbook
+              </button>
+            </div>
+            {state && (
+              <div className="render-content">
+                <div className="download">
+                  <h4>{state.link}</h4>
+                  &nbsp;
+                  <a>here</a>
+                </div>
+                {/* <div className="input">
                 <Icon className="Icon" icon={bxSearchAlt} color="#2395e7" />
                 <label htmlFor="file-upload" className="input-label">
-                  <input type="file" id="file-upload" />
+                 
                   Browse CSV File
                 </label>
+              </div> */}
+                <InvoiceImportManager
+                  headers={`Contact,Email,Company Name,Contact Type,Credit Limit,Credit Block Limit,Balance`.split(
+                    ','
+                  )}
+                  onLoad={(payload, file) => {
+                    setFileData(file);
+                    setFileExtractedData(payload);
+                  }}
+                />
+                <div className="text">
+                  <p>{state.text}</p>
+                </div>
+                <Button
+                  size="large"
+                  disabled={!fileData}
+                  onClick={() => {
+                    setCompareDataModel(true);
+                  }}
+                  type="primary"
+                >
+                  Process File
+                </Button>
               </div>
-              <div className="text">
-                <p>{state.text}</p>
-              </div>
-              <button>Process File</button>
-            </div>
-          )}
-        </div>
-      </WrapperModalContent>
-    </CommonModal>
+            )}
+          </div>
+        </WrapperModalContent>
+      </CommonModal>
+      <CompareDataModal
+        documentKeys={
+          fileExtractedData?.length ? Object.keys(fileExtractedData?.[0]) : []
+        }
+        compareKeys={contactKeysResponse?.data || []}
+        onCancel={() => setCompareDataModel(false)}
+        visibility={compareDataModal}
+      />
+    </>
   );
 };
 
@@ -201,11 +251,9 @@ const WrapperModalContent = styled.div`
       letter-spacing: 0.02em;
       color: #ffffff;
       width: 8rem;
-      background: #2395e7;
       border-radius: 4px;
       border: none;
       margin: 0px 0px 0px 15px;
-      padding: 7px 0px;
     }
   }
 `;

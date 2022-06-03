@@ -1,5 +1,10 @@
+import styled from 'styled-components';
+import bxSearchAlt from '@iconify/icons-bx/bx-search-alt';
+import { Icon } from '@iconify/react';
+import { CommonModal } from '../../../components';
+import { useState } from 'react';
 interface IProps {
-  onLoad: (payload: any) => void;
+  onLoad: (payload: any, file?: File) => void;
   headers: string[];
 }
 
@@ -10,14 +15,15 @@ export const InvoiceImportManager = ({ onLoad, headers }: IProps) => {
   };
   function readDocument(e) {
     const input = e.target;
-    if (input.files && input.files[0]) {
+    if (input?.files && input?.files[0]) {
       const reader = new FileReader();
       reader.readAsBinaryString(input.files[0]);
       reader.onload = function (e) {
         obj_csv.size = e.total;
         obj_csv.dataFile = e.target.result as any;
 
-        parseData(obj_csv.dataFile);
+        console.log('what is input', input?.files[0]);
+        parseData(obj_csv.dataFile, input?.files[0]);
       };
     }
   }
@@ -31,7 +37,7 @@ export const InvoiceImportManager = ({ onLoad, headers }: IProps) => {
   // [itemname, amount, price, tax, total]
   // [milk, 1, 1.5, 0.2, 1.7]
 
-  function parseData(data) {
+  function parseData(data, file) {
     const csvData = []; // array of objects
     const string = data.replace('\r', '');
     const lbreak = string.split('\n');
@@ -49,7 +55,47 @@ export const InvoiceImportManager = ({ onLoad, headers }: IProps) => {
     // lbreak.forEach((res) => {
     //   csvData.push(res.split(','));
     // });
-    onLoad(csvData);
+    onLoad(csvData, file);
   }
-  return <input type="file" onChange={readDocument} />;
+  return (
+    <InputWrapper>
+      <label className="InputLabel">Choose File</label>
+      <Icon className="Icon" icon={bxSearchAlt} color="#2395e7" />
+      <input
+        type="file"
+        id="upload"
+        onChange={readDocument}
+        className="InputField"
+      />
+    </InputWrapper>
+  );
 };
+
+const InputWrapper = styled.div`
+  display: flex;
+  position: relative;
+
+  label {
+    display: inline-block;
+    color: #2395e7;
+    padding: 0.5rem;
+    font-family: inherit;
+    border-radius: 0.2rem;
+    cursor: pointer;
+    margin: 0 0 1.5rem 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+  }
+
+  .InputField {
+    position: absolute;
+    opacity: 0;
+  }
+
+  .Icon {
+    font-size: 1rem;
+    position: absolute;
+    left: 8rem;
+    top: 14px;
+  }
+`;

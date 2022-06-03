@@ -34,10 +34,11 @@ interface IProps {
 
 export const AccountsList: FC<IProps> = ({ data }) => {
   const queryCache = useQueryClient();
+  const [sortedInfo, setSortedInfo] = useState(null);
   const [accountsConfig, setAccountConfig] = useState({
     page: 1,
     query: '',
-    sortid: '',
+    sortid: 'id',
     page_size: 20,
   });
   const [confirmModal, setConfirmModal] = useState<boolean>(false);
@@ -66,6 +67,27 @@ export const AccountsList: FC<IProps> = ({ data }) => {
       });
 
       setAccountConfig({ ...accountsConfig, ...obj });
+
+      const filterType = history.location.search.split('&');
+      const filterIdType = filterType[0];
+      const filterOrder = filterType[3]?.split("=")[1];
+      
+     
+
+      if(filterIdType?.includes("-")){
+         const fieldName = filterIdType?.split("=")[1].split("-")[1];
+         setSortedInfo({
+           order: filterOrder,
+           columnKey: fieldName
+         });
+      }
+      else{
+        const fieldName = filterIdType?.split("=")[1];
+        setSortedInfo({
+          order: filterOrder,
+          columnKey: fieldName
+        })
+      }
     }
   }, [routeHistory]);
 
@@ -175,6 +197,8 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         title: 'Account Head',
         dataIndex: 'name',
         key: 'name',
+        sorter: true,
+        sortOrder: sortedInfo?.columnKey === 'name' && sortedInfo?.order,
         render: (data, row, index) => {
           return (
             <Link
@@ -190,30 +214,40 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         title: 'Type',
         dataIndex: 'secondaryName',
         key: 'secondaryName',
+        sorter: true,
+        sortOrder: sortedInfo?.columnKey === 'secondaryName' && sortedInfo?.order,
       },
       {
         width: 100,
         title: 'Tax Rate',
         dataIndex: 'tax_rate',
         key: 'tax_rate',
+        sorter: true,
+        sortOrder: sortedInfo?.columnKey === 'tax_rate' && sortedInfo?.order,
         render: (data) => <>{data ? data : '-'}</>,
       },
       {
         title: 'Total Debits',
         dataIndex: 'total_debits',
         key: 'total_debits',
+        sorter: true,
+        sortOrder: sortedInfo?.columnKey === 'total_debits' && sortedInfo?.order,
         render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
       },
       {
         title: 'Total Credits',
         dataIndex: 'total_credits',
         key: 'total_credits',
+        sorter: true,
+        sortOrder: sortedInfo?.columnKey === 'total_credits' && sortedInfo?.order,
         render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
       },
       {
         title: 'Balance',
         dataIndex: 'balance',
         key: 'balance',
+        sorter: true,
+        sortOrder: sortedInfo?.columnKey === 'balance' && sortedInfo?.order,
         render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
       },
     ],
@@ -287,7 +321,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
   const handleAccountsConfig = (pagination, filters, sorter: any, extra) => {
     if (sorter.order === undefined) {
       history.push(
-        `/app${ISupportedRoutes.ACCOUNTS}?sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+        `/app${ISupportedRoutes.ACCOUNTS}?sortid="id"&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
       );
       setAccountConfig({
         ...accountsConfig,
@@ -303,8 +337,28 @@ export const AccountsList: FC<IProps> = ({ data }) => {
             : sorter.field
         }&page=${pagination.current}&page_size=${
           pagination.pageSize
-        }query=${query}`
+        }&filter=${sorter.order}&query=${query}`
       );
+      if (sorter?.order === 'ascend') {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] > b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        setResponse(prev =>({...prev,  result: userData}))
+      } else {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] < b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+       
+        setResponse(prev =>({...prev,  result: userData}))
+      }
       setAccountConfig({
         ...accountsConfig,
         page: pagination.current,

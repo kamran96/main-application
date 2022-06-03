@@ -109,10 +109,6 @@ export const SidebarUi: FC<SidebarUiProps> = ({
 
   const toggleCached: null | string = localStorage?.getItem('isToggle') || null;
 
-  // routes?.nestedRoutes?.map((parent, index) => {
-  //   console.log(parent, "parents")
-  // })
-
   useEffect(() => {
     if (toggleCached) {
       setSidebarOpen(JSON.parse(toggleCached));

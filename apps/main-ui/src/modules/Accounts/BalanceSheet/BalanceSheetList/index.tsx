@@ -139,25 +139,27 @@ export const BalanceSheetList: FC = () => {
       const { result } = data.data;
 
       setTotals(() => {
-        return result
-          ?.map((item) => {
-            return {
-              ...item?.accounts?.reduce((a, b) => {
-                // debugger;
-                return {
-                  closing_credits: a?.closing_credits + b?.closing_credits,
-                  closing_debits: a?.closing_debits + b?.closing_debits,
-                  opening_credits: a?.opening_credits + b?.opening_credits,
-                  opening_debits: a?.opening_debits + b?.opening_debits,
-                };
-              }),
-              totalCredits:
-                item?.type === ITransactionType?.CREDIT ? item?.balance : 0,
-              totalDebits:
-                item?.type === ITransactionType?.DEBIT ? item?.balance : 0,
-            };
-          })
-          ?.reduce((a, b) => {
+
+        const newRes = result
+        ?.map((item) => {
+          return {
+            ...item?.accounts?.reduce((a, b) => {
+              // debugger;
+              return {
+                closing_credits: a?.closing_credits + b?.closing_credits,
+                closing_debits: a?.closing_debits + b?.closing_debits,
+                opening_credits: a?.opening_credits + b?.opening_credits,
+                opening_debits: a?.opening_debits + b?.opening_debits,
+              };
+            }),
+            totalCredits:
+              item?.type === ITransactionType?.CREDIT ? item?.balance : 0,
+            totalDebits:
+              item?.type === ITransactionType?.DEBIT ? item?.balance : 0,
+          };
+        })
+
+        return newRes?.length &&  newRes?.reduce((a, b) => {
             return {
               totalCredits: a?.totalCredits + b?.totalCredits,
               totalDebits: a?.totalDebits + b?.totalDebits,
@@ -196,7 +198,8 @@ export const BalanceSheetList: FC = () => {
             <P className="dark-text"></P>
           </div>
           <div className="_disable_print flex alignCenter">
-            <PDFDownloadLinkWrapper
+           {balanceSheetData?.length>0 && (
+              <PDFDownloadLinkWrapper
               document={
                 <BalanceSheetPdf
                   totals={{
@@ -219,6 +222,7 @@ export const BalanceSheetList: FC = () => {
                 <span> Download PDF</span>
               </div>
             </PDFDownloadLinkWrapper>
+           )}
             <ButtonTag
               className="mh-10"
               onClick={onPrint}
@@ -401,34 +405,34 @@ export const BalanceSheetList: FC = () => {
                         <>
                           <td>
                             <MeduimText>
-                              {moneyFormat(opening_debits.toFixed(2))}
+                              {moneyFormat(opening_debits.toFixed(2) || 0)}
                             </MeduimText>
                           </td>
                           <td>
                             <MeduimText>
-                              {moneyFormat(opening_credits.toFixed(2))}
+                              {moneyFormat(opening_credits.toFixed(2) || 0)}
                             </MeduimText>
                           </td>
                           <td>
                             <MeduimText>
-                              {moneyFormat(closing_debits.toFixed(2))}
+                              {moneyFormat(closing_debits.toFixed(2) || 0)}
                             </MeduimText>
                           </td>
                           <td>
                             <MeduimText>
-                              {moneyFormat(closing_credits.toFixed(2))}
+                              {moneyFormat(closing_credits.toFixed(2)|| 0)}
                             </MeduimText>
                           </td>
                         </>
                       )}
                       <td className="textCenter">
                         <MeduimText>
-                          {moneyFormat(totalDebits.toFixed(2))}
+                          {moneyFormat(totalDebits?.toFixed(2) || 0)}
                         </MeduimText>
                       </td>
                       <td className="textCenter">
                         <MeduimText>
-                          {moneyFormat(totalCredits.toFixed(2))}
+                          {moneyFormat(totalCredits?.toFixed(2) || 0)}
                         </MeduimText>
                       </td>
                     </tr>
