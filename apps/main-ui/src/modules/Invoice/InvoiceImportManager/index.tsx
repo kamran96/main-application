@@ -24,9 +24,6 @@ export const InvoiceImportManager = ({ onLoad, headers }: IProps) => {
         setFileData(input?.files[0]);
         obj_csv.size = e.total;
         obj_csv.dataFile = e.target.result as any;
-
-        console.log('what is input', input?.files[0]);
-
         parseData(obj_csv.dataFile, input?.files[0]);
       };
     }

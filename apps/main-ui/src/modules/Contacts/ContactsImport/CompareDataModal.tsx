@@ -10,25 +10,143 @@ import { Heading } from '@invyce/shared/components';
 import Paragraph from 'antd/lib/typography/Paragraph';
 import { Icon } from '@iconify/react';
 import questionIcon from '@iconify/icons-fe/question';
-import { Tooltip } from 'antd';
+import { Button, Tooltip } from 'antd';
+import Item from 'antd/lib/list/Item';
+import { Items } from '../../Items';
 
+const a = [
+  {
+    label: 'Account Number',
+    keyName: 'accountNumber',
+    description:
+      'Please select a field which is related to Account Number of Contact',
+  },
+  {
+    label: 'Payment Days Limit',
+    keyName: 'paymentDaysLimit',
+    description:
+      'Please select a field which is related to Payment Days Limit of Contact',
+  },
+  {
+    label: 'Balance',
+    keyName: 'balance',
+    description: 'Please select a field which is related to Balance of Contact',
+  },
+  {
+    label: 'Sales Discount',
+    keyName: 'salesDiscount',
+    description:
+      'Please select a field which is related to Sales Discount of Contact',
+  },
+  {
+    label: 'Credit Limit Block',
+    keyName: 'creditLimitBlock',
+    description:
+      'Please select a field which is related to Credit Limit Block of Contact',
+  },
+  {
+    label: 'Credit Limit',
+    keyName: 'creditLimit',
+    description:
+      'Please select a field which is related to Credit Limit of Contact',
+  },
+  {
+    label: 'Web Link',
+    keyName: 'webLink',
+    description:
+      'Please select a field which is related to Website Link of Contact',
+  },
+  {
+    label: 'Skype Name',
+    keyName: 'skypeName',
+    description:
+      'Please select a field which is related to Skype Name of Contact',
+  },
+  {
+    label: 'Fax Number',
+    keyName: 'faxNumber',
+    description:
+      'Please select a field which is related to Fax Number of Contact',
+  },
+  {
+    label: 'Cell Number',
+    keyName: 'cellNumber',
+    description:
+      'Please select a field which is related to Cell Number of Contact',
+  },
+  {
+    label: 'Phone Number',
+    keyName: 'phoneNumber',
+    description:
+      'Please select a field which is related to Phone Number of Contact',
+  },
+  {
+    label: 'Cnic',
+    keyName: 'cnic',
+    description:
+      'Please select a field which is related to National Identity of Contact',
+  },
+  {
+    label: 'Business Name',
+    keyName: 'businessName',
+    description:
+      'Please select a field which is related to Business Name of Contact',
+  },
+  {
+    label: 'Contact Type',
+    keyName: 'contactType',
+    description: 'Please select a field which is related to Contact Type',
+  },
+  {
+    label: 'Email',
+    keyName: 'email',
+    description: 'Please select a field which is related to Email of Contact',
+  },
+  {
+    label: 'Name',
+    keyName: 'name',
+    description: 'Please select a field which is related to Name of Contact',
+  },
+];
 interface IProps {
   visibility: boolean;
   onCancel: () => void;
-  compareKeys: any[];
+  compareKeys?: any[];
   documentKeys: any[];
+  OnConfrm: () => void;
 }
 export const CompareDataModal: FC<IProps> = ({
   visibility,
   onCancel,
-  compareKeys,
+  compareKeys = a,
   documentKeys,
+  OnConfrm,
 }) => {
   const [compareData, setCompareData] = useState<any>({});
 
-  console.log(compareData, 'check compare data');
+  const res = documentKeys?.filter(
+    (item: any) => Object.keys(compareData).includes(item) === false
+  );
 
-  if (visibility && compareKeys?.length && documentKeys?.length) {
+  console.log(res, 'result');
+  console.log(Object?.keys(compareData).includes('Contact'), 'Obj');
+
+  const handleSelectItem = () => {
+    // return documentKeys
+    //   ?.filter(
+    //     (Items: any) => Object.keys(compareData).includes(Items) === true
+    //   )
+    //   .map((key: any) => {
+    //     return <Option key={key}>{key}</Option>;
+    //   });
+    return documentKeys?.map((key: any) => {
+      return <Option key={key}>{key}</Option>;
+    });
+  };
+
+  console.log(handleSelectItem(), 'handleselction');
+
+  if (visibility && documentKeys?.length) {
     const columns: ColumnsType<any> = [
       {
         title: 'Columns',
@@ -65,9 +183,7 @@ export const CompareDataModal: FC<IProps> = ({
               placeholder="Select Header"
               optionFilterProp="children"
             >
-              {documentKeys.map((key: any) => {
-                return <Option value={key}>{key}</Option>;
-              })}
+              {handleSelectItem()}
             </EditableSelect>
           );
         },
@@ -75,28 +191,38 @@ export const CompareDataModal: FC<IProps> = ({
     ];
 
     return (
-      <CommonModal
-        onCancel={onCancel}
-        visible={visibility}
-        footer={false}
-        width={800}
-      >
-        <CompareDataModalWrapper>
-          <Heading type="form">Compare Data Segments</Heading>
-          <Paragraph className="mt-20">
-            We need your help to understand which Header attributes refers to
-            which property by selecting your header attribute to the following
-            table sections.{' '}
-          </Paragraph>
-          <EditableTable
-            columns={columns as any}
-            data={compareKeys}
-            dragable={() => null}
-          />
-        </CompareDataModalWrapper>
-      </CommonModal>
+      <CompareDataModalWrapper>
+        <Heading type="form">Compare Data Segments</Heading>
+        <Paragraph className="mt-20">
+          We need your help to understand which Header attributes refers to
+          which property by selecting your header attribute to the following
+          table sections.{' '}
+        </Paragraph>
+        <EditableTable
+          columns={columns as any}
+          data={compareKeys}
+          dragable={() => null}
+        />
+        <div className="CnfrmBtn">
+          <Button className="btn" onClick={onCancel}>
+            Back
+          </Button>
+          <Button type="primary" className="btn" onClick={OnConfrm}>
+            Confirm
+          </Button>
+        </div>
+      </CompareDataModalWrapper>
     );
   } else return null;
 };
 
-export const CompareDataModalWrapper = styled.div``;
+export const CompareDataModalWrapper = styled.div`
+  .CnfrmBtn {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  .btn {
+    margin: 5px 4px;
+  }
+`;
