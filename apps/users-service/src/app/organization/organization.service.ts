@@ -147,6 +147,7 @@ export class OrganizationService {
       try {
         // we need to create organization
 
+        console.log('creating organization');
         const organization = new this.organizationModel();
         organization.name = organizationDto.name;
         organization.niche = organizationDto.niche;
@@ -194,6 +195,7 @@ export class OrganizationService {
         if (!req || !req.cookies) return null;
         const token = req?.cookies['access_token'];
 
+        console.log('inserting initial accounts');
         await axios.post(
           Host('accounts', `accounts/account/init`),
           {

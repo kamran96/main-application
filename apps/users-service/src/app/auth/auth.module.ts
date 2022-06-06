@@ -12,7 +12,6 @@ import { AuthStrategy } from './auth.strategy';
 import { MQ_HOST } from '@invyce/global-constants';
 // import { Authenticate } from '@invyce/auth-middleware';
 
-console.log(MQ_HOST(), 'host');
 @Module({
   controllers: [AuthController],
   imports: [
