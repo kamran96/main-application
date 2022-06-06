@@ -12,7 +12,7 @@ ARG PORT
 USER node
 
 ENV NODE_ENV=production \
-    POSTMARK_TOKEN=c2afabc2-c521-4a0f-9957-dbba1be9f943
+    POSTMARK_TOKEN=971be359-e1c4-44b2-bfcc-72df8e1b71f7
 
 WORKDIR /home/node/app
 
