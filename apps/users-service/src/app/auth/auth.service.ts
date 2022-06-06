@@ -541,7 +541,6 @@ export class AuthService {
       operating_system,
     };
 
-    console.log('Sending forgot password request');
     await this.emailService.emit(SEND_FORGOT_PASSWORD, payload);
   }
 
