@@ -4,7 +4,7 @@ import bxSearchAlt from '@iconify/icons-bx/bx-search-alt';
 import { Icon } from '@iconify/react';
 import { FC } from 'react';
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 import { CommonModal } from '../../../components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
@@ -33,6 +33,7 @@ export const ContactImportWidget: FC = () => {
   const [fileExtractedData, setFileExtractedData] = useState([]);
   const [compareDataModal, setCompareDataModel] = useState<boolean>(false);
 
+
   const { data: contactKeysResponse, isLoading: contactKeysLoading } = useQuery(
     [ReactQueryKeys],
     getContactKeysAPI,
@@ -53,18 +54,25 @@ export const ContactImportWidget: FC = () => {
   };
   const [state, setState] = useState(data?.xero);
   return (
-    <>
-      <CommonModal
-        visible={visibility}
-        title="Import Contacts"
-        width={800}
-        onCancel={() => {
-          setContactsImportConfig(false, null);
-        }}
-        footer={false}
-      >
-        <WrapperModalContent>
-          <div className="container">
+    <CommonModal
+      visible={visibility}
+      title="Import Contacts"
+      width={800}
+      onCancel={() => {
+        setContactsImportConfig(false, null);
+      }}
+      footer={false}
+    >
+      <WrapperModalContent>
+          <div
+            className="container"
+            style={{
+              // transform: `${compareDataModal ? 'translateX(-300%)': 'translateX(0)'}`,
+              display: `${
+                compareDataModal ? 'none' : ''
+              }`,
+            }}
+          >
             <div className="modal-icon">
               <Icon
                 className="Icon"
@@ -106,13 +114,6 @@ export const ContactImportWidget: FC = () => {
                   &nbsp;
                   <a>here</a>
                 </div>
-                {/* <div className="input">
-                <Icon className="Icon" icon={bxSearchAlt} color="#2395e7" />
-                <label htmlFor="file-upload" className="input-label">
-                 
-                  Browse CSV File
-                </label>
-              </div> */}
                 <InvoiceImportManager
                   headers={`Contact,Email,Company Name,Contact Type,Credit Limit,Credit Block Limit,Balance`.split(
                     ','
@@ -128,7 +129,8 @@ export const ContactImportWidget: FC = () => {
                 <Button
                   size="large"
                   disabled={!fileData}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e?.preventDefault();
                     setCompareDataModel(true);
                   }}
                   type="primary"
@@ -138,32 +140,38 @@ export const ContactImportWidget: FC = () => {
               </div>
             )}
           </div>
-        </WrapperModalContent>
-      </CommonModal>
-      <CompareDataModal
-        documentKeys={
-          fileExtractedData?.length ? Object.keys(fileExtractedData?.[0]) : []
-        }
-        compareKeys={contactKeysResponse?.data || []}
-        onCancel={() => setCompareDataModel(false)}
-        visibility={compareDataModal}
-      />
-    </>
+          <div className="CompareModal">
+            <CompareDataModal
+              documentKeys={
+                fileExtractedData?.length
+                  ? Object.keys(fileExtractedData?.[0])
+                  : []
+              }
+              // compareKeys={contactKeysResponse?.data || []}
+              onCancel={() => setCompareDataModel(false)}
+              OnConfrm={() => console.log("hello")}
+              visibility={compareDataModal}
+            />
+          </div>
+      </WrapperModalContent>
+    </CommonModal>
   );
 };
 
 export default ContactImportWidget;
 
 const WrapperModalContent = styled.div`
-  height: 651px;
   display: flex;
   align-items: center;
   flex-direction: column;
+  padding-bottom: 1rem;
   .container {
+    transition: 1s ease-in-out;
     width: 350px;
     display: flex;
     align-items: center;
     flex-direction: column;
+    background: white;
   }
   .modal-icon {
     display: flex;
