@@ -185,7 +185,6 @@ const WrapperModalContent = styled.div<ModalWrapper>`
       props?.step === 1 ? 'translateX(100%)' : 'translateX(0)'};
     transition: 0.4s ease-in-out;
     height: 100vh;
-    margin-top: 1rem;
   }
   .modal-icon {
     display: flex;

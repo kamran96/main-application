@@ -152,7 +152,10 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
         transition: 0.3s all ease-in-out;
         color: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarDefaultText};
-
+        .ThreeIconsDiff {
+          fill: ${(props: IThemeProps) =>
+            props?.theme?.colors?.sidebarDefaultText};
+        }
         span svg {
           path {
             stroke: ${(props: IThemeProps) =>
@@ -171,7 +174,6 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
             fill: ${(props: IThemeProps) =>
               props?.theme?.theme === 'dark' ? '#C2C2C2' : ''};
           }
-         
         }
 
         &:hover {
@@ -216,6 +218,11 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
       a {
         color: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarListActiveText};
+
+        .ThreeIconsDiff {
+          fill: ${(props: IThemeProps) =>
+            props?.theme?.theme === 'dark' ? '#C2C2C2 !important' : '#fff'};
+        }
       }
 
       span svg {
