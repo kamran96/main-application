@@ -33,7 +33,6 @@ export const ContactImportWidget: FC = () => {
   const [fileExtractedData, setFileExtractedData] = useState([]);
   const [compareDataModal, setCompareDataModel] = useState<boolean>(false);
 
-
   const { data: contactKeysResponse, isLoading: contactKeysLoading } = useQuery(
     [ReactQueryKeys],
     getContactKeysAPI,
@@ -53,6 +52,7 @@ export const ContactImportWidget: FC = () => {
     },
   };
   const [state, setState] = useState(data?.xero);
+  const [step, setStep] = useState<number>(1);
   return (
     <CommonModal
       visible={visibility}
@@ -63,84 +63,90 @@ export const ContactImportWidget: FC = () => {
       }}
       footer={false}
     >
-      <WrapperModalContent>
+      <WrapperModalContent step={step}>
+        <div
+          className="container"
+          style={{
+            transform: `${
+              compareDataModal ? 'translateX(-300%)' : 'translateX(0)'
+            }`,
+            display: `${
+              compareDataModal ? 'none' : ''
+            }`,
+          }}
+        >
+          <div className="modal-icon">
+            <Icon className="Icon" icon={bookHalf} width="80" color="#2395E7" />
+          </div>
+          <div className="modal-text">
+            <Icon className="Icon" icon={downloadIcon} color="#6D7D88" />
+            <h2>Import from popular cvs formats</h2>
+          </div>
+          <div className="modal-btns">
+            <button
+              className={state?.link === data.xero.link ? 'active' : ''}
+              onClick={() => {
+                state?.link === data.xero.link
+                  ? setState(null)
+                  : setState(data.xero);
+              }}
+            >
+              Xero
+            </button>
+            <button
+              className={state?.link === data.quickbook.link ? 'active' : ''}
+              onClick={() => {
+                state?.link === data.quickbook.link
+                  ? setState(null)
+                  : setState(data.quickbook);
+              }}
+            >
+              Quickbook
+            </button>
+          </div>
+          {state && (
+            <div className="render-content">
+              <div className="download">
+                <h4>{state.link}</h4>
+                &nbsp;
+                <a>here</a>
+              </div>
+              <InvoiceImportManager
+                headers={`Contact,Email,Company Name,Contact Type,Credit Limit,Credit Block Limit,Balance`.split(
+                  ','
+                )}
+                onLoad={(payload, file) => {
+                  setFileData(file);
+                  setFileExtractedData(payload);
+                }}
+              />
+              <div className="text">
+                <p>{state.text}</p>
+              </div>
+              <Button
+                size="large"
+                disabled={!fileData}
+                onClick={(e) => {
+                  e?.preventDefault();
+                  setStep(2);
+                  setCompareDataModel(true);
+                }}
+                type="primary"
+              >
+                Process File
+              </Button>
+            </div>
+          )}
+        </div>
+        {
           <div
-            className="container"
+            className="CompareModal"
             style={{
-              // transform: `${compareDataModal ? 'translateX(-300%)': 'translateX(0)'}`,
-              display: `${
-                compareDataModal ? 'none' : ''
+              transform: `${
+                !compareDataModal ? 'translateX(300%)' : 'translateX(0)'
               }`,
             }}
           >
-            <div className="modal-icon">
-              <Icon
-                className="Icon"
-                icon={bookHalf}
-                width="80"
-                color="#2395E7"
-              />
-            </div>
-            <div className="modal-text">
-              <Icon className="Icon" icon={downloadIcon} color="#6D7D88" />
-              <h2>Import from popular cvs formats</h2>
-            </div>
-            <div className="modal-btns">
-              <button
-                className={state?.link === data.xero.link ? 'active' : ''}
-                onClick={() => {
-                  state?.link === data.xero.link
-                    ? setState(null)
-                    : setState(data.xero);
-                }}
-              >
-                Xero
-              </button>
-              <button
-                className={state?.link === data.quickbook.link ? 'active' : ''}
-                onClick={() => {
-                  state?.link === data.quickbook.link
-                    ? setState(null)
-                    : setState(data.quickbook);
-                }}
-              >
-                Quickbook
-              </button>
-            </div>
-            {state && (
-              <div className="render-content">
-                <div className="download">
-                  <h4>{state.link}</h4>
-                  &nbsp;
-                  <a>here</a>
-                </div>
-                <InvoiceImportManager
-                  headers={`Contact,Email,Company Name,Contact Type,Credit Limit,Credit Block Limit,Balance`.split(
-                    ','
-                  )}
-                  onLoad={(payload, file) => {
-                    setFileData(file);
-                    setFileExtractedData(payload);
-                  }}
-                />
-                <div className="text">
-                  <p>{state.text}</p>
-                </div>
-                <Button
-                  size="large"
-                  disabled={!fileData}
-                  onClick={(e) => {
-                    e?.preventDefault();
-                    setCompareDataModel(true);
-                  }}
-                  type="primary"
-                >
-                  Process File
-                </Button>
-              </div>
-            )}
-          </div>
-          <div className="CompareModal">
             <CompareDataModal
               documentKeys={
                 fileExtractedData?.length
@@ -148,11 +154,15 @@ export const ContactImportWidget: FC = () => {
                   : []
               }
               // compareKeys={contactKeysResponse?.data || []}
-              onCancel={() => setCompareDataModel(false)}
-              OnConfrm={() => console.log("hello")}
+              onCancel={() => {
+                setStep(1);
+                setCompareDataModel(false);
+              }}
+              OnConfrm={() => console.log('hello')}
               visibility={compareDataModal}
             />
           </div>
+        }
       </WrapperModalContent>
     </CommonModal>
   );
@@ -160,14 +170,23 @@ export const ContactImportWidget: FC = () => {
 
 export default ContactImportWidget;
 
-const WrapperModalContent = styled.div`
-  display: flex;
-  align-items: center;
-  flex-direction: column;
+type DivProps = JSX.IntrinsicElements['div'];
+
+interface ModalWrapper extends DivProps {
+  step?: number;
+}
+
+const WrapperModalContent = styled.div<ModalWrapper>`
+  // display: flex;
   padding-bottom: 1rem;
+  overflow: hidden;
+  .CompareModal {
+    transition: 0.9s ease-in-out;
+    background: white;
+  }
   .container {
     transition: 1s ease-in-out;
-    width: 350px;
+    width: 100%;
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -217,6 +236,10 @@ const WrapperModalContent = styled.div`
     }
   }
   .render-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
     .download {
       margin: 0px 0px 44px 15px;
       display: flex;
