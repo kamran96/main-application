@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import axios from 'axios';
@@ -147,7 +153,6 @@ export class OrganizationService {
       try {
         // we need to create organization
 
-        console.log('creating organization');
         const organization = new this.organizationModel();
         organization.name = organizationDto.name;
         organization.niche = organizationDto.niche;
@@ -168,6 +173,8 @@ export class OrganizationService {
         organization.updatedById = req?.user?.id;
         organization.status = 1;
         await organization.save();
+
+        console.log(organization.id);
 
         const organizationUser = new this.organizationUserModel();
         organizationUser.organizationId = organization.id;
@@ -210,6 +217,8 @@ export class OrganizationService {
             },
           }
         );
+
+        console.log('inserted...');
 
         const roles = await this.rbacService.InsertRoles(organization.id);
         await this.rbacService.InsertRolePermission(organization.id);
