@@ -64,17 +64,7 @@ export const ContactImportWidget: FC = () => {
       footer={false}
     >
       <WrapperModalContent step={step}>
-        <div
-          className="container"
-          style={{
-            transform: `${
-              compareDataModal ? 'translateX(-300%)' : 'translateX(0)'
-            }`,
-            display: `${
-              compareDataModal ? 'none' : ''
-            }`,
-          }}
-        >
+        <div className="container">
           <div className="modal-icon">
             <Icon className="Icon" icon={bookHalf} width="80" color="#2395E7" />
           </div>
@@ -125,6 +115,7 @@ export const ContactImportWidget: FC = () => {
               </div>
               <Button
                 size="large"
+                className="btn"
                 disabled={!fileData}
                 onClick={(e) => {
                   e?.preventDefault();
@@ -139,14 +130,7 @@ export const ContactImportWidget: FC = () => {
           )}
         </div>
         {
-          <div
-            className="CompareModal"
-            style={{
-              transform: `${
-                !compareDataModal ? 'translateX(300%)' : 'translateX(0)'
-              }`,
-            }}
-          >
+          <div className="CompareModal">
             <CompareDataModal
               documentKeys={
                 fileExtractedData?.length
@@ -177,20 +161,29 @@ interface ModalWrapper extends DivProps {
 }
 
 const WrapperModalContent = styled.div<ModalWrapper>`
-  // display: flex;
+  display: flex;
   padding-bottom: 1rem;
-  overflow: hidden;
-  .CompareModal {
-    transition: 0.9s ease-in-out;
-    background: white;
-  }
+  overflow-x: hidden;
+  height: 100vh;
+  overflow-y: hidden;
+
   .container {
-    transition: 1s ease-in-out;
-    width: 100%;
+    transition: 0.6s all ease-in-out;
+    width: ${(props: any) => (props?.step === 1 ? '100%' : 0)};
+    opacity: ${(props: any) => (props?.step === 2 ? 0 : 1)};
     display: flex;
     align-items: center;
     flex-direction: column;
-    background: white;
+    transform: ${(props: any) =>
+      props?.step === 2 ? 'translateX(-100%)' : 'translateX(0)'};
+  }
+
+  .CompareModal {
+    width: ${(props: any) => (props?.step === 2 ? '100%' : 0)};
+    opacity: ${(props: any) => (props?.step === 1 ? 0 : 1)};
+    transform: ${(props: any) =>
+      props?.step === 1 ? 'translateX(100%)' : 'translateX(0)'};
+    transition: 0.4s ease-in-out;
   }
   .modal-icon {
     display: flex;
@@ -237,7 +230,7 @@ const WrapperModalContent = styled.div<ModalWrapper>`
   }
   .render-content {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     flex-direction: column;
     .download {
@@ -252,6 +245,10 @@ const WrapperModalContent = styled.div<ModalWrapper>`
       a {
         cursor: pointer;
       }
+    }
+    .btn {
+      margin-left: 90%;
+      margin-top: 2rem;
     }
     .input {
       margin: 0px 0px 8px 15px;

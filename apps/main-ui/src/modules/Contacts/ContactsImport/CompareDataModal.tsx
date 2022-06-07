@@ -202,6 +202,7 @@ export const CompareDataModal: FC<IProps> = ({
           columns={columns as any}
           data={compareKeys}
           dragable={() => null}
+          scrollable={{ offsetY: 500, offsetX: 0 }}
         />
         <div className="CnfrmBtn">
           <Button className="btn" onClick={onCancel}>
