@@ -163,16 +163,16 @@ interface ModalWrapper extends DivProps {
 const WrapperModalContent = styled.div<ModalWrapper>`
   display: flex;
   padding-bottom: 1rem;
-  overflow-x: hidden;
+  overflow: hidden;
   height: 100vh;
-  overflow-y: hidden;
-
+  
   .container {
     transition: 0.6s all ease-in-out;
     width: ${(props: any) => (props?.step === 1 ? '100%' : 0)};
     opacity: ${(props: any) => (props?.step === 2 ? 0 : 1)};
     display: flex;
     align-items: center;
+    min-height: 0;
     flex-direction: column;
     transform: ${(props: any) =>
       props?.step === 2 ? 'translateX(-100%)' : 'translateX(0)'};
@@ -184,6 +184,8 @@ const WrapperModalContent = styled.div<ModalWrapper>`
     transform: ${(props: any) =>
       props?.step === 1 ? 'translateX(100%)' : 'translateX(0)'};
     transition: 0.4s ease-in-out;
+    height: 100vh;
+    margin-top: 1rem;
   }
   .modal-icon {
     display: flex;
