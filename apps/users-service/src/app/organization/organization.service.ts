@@ -22,6 +22,7 @@ import { User } from '../schemas/user.schema';
 import { ORGANIZATION_CREATED, TRAIL_STARTED } from '@invyce/send-email';
 import { Currency } from '../schemas/currency.schema';
 import { Host } from '@invyce/global-constants';
+import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
 
 @Injectable()
 export class OrganizationService {
@@ -200,10 +201,8 @@ export class OrganizationService {
         if (!req || !req.cookies) return null;
         const token = req?.cookies['access_token'];
 
-        console.log(token, 'token');
-
+        console.log(Host('accounts', `accounts/account/init`));
         console.log('inserting initial accounts');
-        console.log(req.user, 'user');
         await axios.post(
           Host('accounts', `accounts/account/init`),
           {
