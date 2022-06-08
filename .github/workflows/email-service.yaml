@@ -14,6 +14,9 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -63,11 +66,25 @@ jobs:
         run: docker push registry.digitalocean.com/invyce-images/email-service:$(echo $GITHUB_SHA | head -c7)
       
       - name: Update deployment file
-        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/invyce-images/email-service:'${TAG}'|' $GITHUB_WORKSPACE/apps/email-service/ops/email-deployment.yaml
+        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/invyce-images/email-service:'${TAG}'|' $GITHUB_WORKSPACE/apps/email-service/src/main.ts
 
-      - name: Save DigitalOcean kubeconfig with short-lived credentials
-        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 invyce-cluster
-
-      - name: Deploy to DigitalOcean Kubernetes
-        run: kubectl apply -f $GITHUB_WORKSPACE/apps/email-service/ops/email-deployment.yaml
-
+      # Clone git repository with Helm charts, update and push changes
+      - name: Update image tag in Helm git repo 
+        run: | 
+          CONTAINER_IMAGE_TAG="$(echo $GITHUB_SHA | head -c7)"
+          echo New container image tag: $CONTAINER_IMAGE_TAG
+          echo Create temporary folder to clone the repo into...
+          TEMP_FOLDER="$(mktemp -d)" 
+          echo Clone the repository...
+          git clone -b main "https://zeeshooo:${ACCESS_TOKEN}@github.com/invyce/invyce-ops.git" ${TEMP_FOLDER} 
+          cd ${TEMP_FOLDER}/rabbit-rabbitmq 
+          ls
+          echo Update Helm chart values-dev with new image tag
+          CONTAINER_IMAGE_TAG=$CONTAINER_IMAGE_TAG yq e -i '.image.tag = env(CONTAINER_IMAGE_TAG)' ./values.yaml
+          echo 'Container image tag updated in rabbit-rabbitmq/values.yaml'
+          cd ../
+          git config user.email "zeeshan@invyce.com"
+          git config user.name "zeeshooo" 
+          git add .  
+          git commit -m "refactor - updated Helm chart values for dev environment with container image - $CONTAINER_IMAGE_TAG" 
+          git push -u origin main

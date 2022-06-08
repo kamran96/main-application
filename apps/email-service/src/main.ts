@@ -6,6 +6,7 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { MQ_HOST } from '@invyce/global-constants';
 
 import { AppModule } from './app/app.module';
 
@@ -15,7 +16,7 @@ async function bootstrap() {
     {
       transport: Transport.RMQ,
       options: {
-        urls: ['amqp://127.0.0.1:5672'],
+        urls: [MQ_HOST()],
         queue: 'email_queue',
         queueOptions: {
           durable: false,
@@ -23,11 +24,8 @@ async function bootstrap() {
       },
     }
   );
-  // const app = await NestFactory.create(AppModule);
 
-  if (process.env['NODE' + '_ENV'] === 'production') {
-    app.setGlobalPrefix('/email');
-  }
+  // await app.listen();
 
   const port = process.env.PORT || 3339;
   await app.listen(port, () => {
