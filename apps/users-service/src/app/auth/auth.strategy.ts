@@ -15,21 +15,11 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
     super({
       jwtFromRequest: (req) => {
-        // if (process.env['NODE' + '_ENV'] === 'development') {
-        //   const header = req.headers?.authorization?.split(' ')[1];
-        //   data = {
-        //     headers: req.headers,
-        //     cookies: null,
-        //   };
-        //   return header;
-        // } else if (process.env['NODE' + '_ENV'] === 'production') {
         if (!req || !req.cookies) return null;
         data = {
           cookies: req.cookies,
-          headers: null,
         };
         return req.cookies['access_token'];
-        // }
       },
       ignoreExpiration: false,
       secretOrKey: process.env.JWT_SECRET,
