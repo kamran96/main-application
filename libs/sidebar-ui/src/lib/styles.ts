@@ -91,7 +91,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
   /* Main Routes Settings */
 
   .routes {
-    height: calc(100vh - 214px);
+    height: calc(100vh - 204px);
     overflow-y: auto;
     overflow-x: hidden;
   }
@@ -152,7 +152,10 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
         transition: 0.3s all ease-in-out;
         color: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarDefaultText};
-
+        .ThreeIconsDiff {
+          fill: ${(props: IThemeProps) =>
+            props?.theme?.colors?.sidebarDefaultText};
+        }
         span svg {
           path {
             stroke: ${(props: IThemeProps) =>
@@ -167,7 +170,6 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
           .itemStroke {
             stroke: none;
           }
-
           .ItemsFill {
             fill: ${(props: IThemeProps) =>
               props?.theme?.theme === 'dark' ? '#C2C2C2' : ''};
@@ -201,7 +203,6 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
             .fillTransparent {
               fill: transparent !important;
             }
-
             .fillItemColor {
               fill: #ffffff !important;
             }
@@ -217,6 +218,11 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
       a {
         color: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarListActiveText};
+
+        .ThreeIconsDiff {
+          fill: ${(props: IThemeProps) =>
+            props?.theme?.theme === 'dark' ? '#C2C2C2 !important' : '#fff'};
+        }
       }
 
       span svg {

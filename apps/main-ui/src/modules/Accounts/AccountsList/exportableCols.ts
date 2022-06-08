@@ -58,12 +58,14 @@ export const pdfColsAccounts: ITableColumns[] = [
     title: 'Total Debits',
     dataIndex: 'total_debits',
     key: 'total_debits',
+    sorter: true,
     render: (data) => (data ? moneyFormat(data) : moneyFormat(0)),
   },
   {
     title: 'Total Credits',
     dataIndex: 'total_credits',
     key: 'total_credits',
+    sorter: true,
     render: (data) => (data ? moneyFormat(data) : moneyFormat(0)),
   },
   {
