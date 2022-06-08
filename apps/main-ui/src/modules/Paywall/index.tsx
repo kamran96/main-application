@@ -89,6 +89,7 @@ export const Paywall: FC = () => {
                 </div>
               </Card>
             </div>
+
             <div className="payment_screen">
               <div className="payment-form">
                 <div className="flex alignCenter payment-heading">

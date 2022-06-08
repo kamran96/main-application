@@ -51,3 +51,6 @@ export const getContactLedger = ({ queryKey }: QueryKey) => {
   }
   return http.get(url);
 };
+
+export const getContactKeysAPI = () =>
+  http?.get(`${ContactServiceAPI.default}/import-csv`);

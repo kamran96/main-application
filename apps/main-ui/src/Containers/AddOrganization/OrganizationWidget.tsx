@@ -73,6 +73,13 @@ export const OrganizationWidget: FC = () => {
     });
   };
 
+  const handleLogout = (e: any) => {
+    e?.preventDefault();
+    handleLogin({
+      type: ILoginActions?.LOGOUT,
+    });
+  };
+
   const prefixSelector = (
     <Form.Item name="prefix" noStyle>
       <Select
@@ -311,6 +318,21 @@ export const OrganizationWidget: FC = () => {
               </Form.Item>
             </Col>
           </Row>
+
+          {process.env.NODE_ENV !== 'production' && (
+            <Row gutter={24}>
+              <Col span={24}>
+                <Button
+                  className="mt-20"
+                  onClick={handleLogout}
+                  type="default"
+                  size="middle"
+                >
+                  Logout
+                </Button>
+              </Col>
+            </Row>
+          )}
         </Form>
       </div>
     </OrganizationWidgetWrapper>

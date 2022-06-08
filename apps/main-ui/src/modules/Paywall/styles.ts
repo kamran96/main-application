@@ -4,7 +4,7 @@ import { CommonModal } from '../../components';
 type DivProps = JSX.IntrinsicElements['div'];
 
 interface WrapperPaywallProps extends DivProps {
-  step?: Number;
+  step?: number;
 }
 
 export const WrapperPaywall = styled.div<WrapperPaywallProps>`

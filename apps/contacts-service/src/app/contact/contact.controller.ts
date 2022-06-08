@@ -66,6 +66,12 @@ export class ContactController {
     }
   }
 
+  @Get('import-csv')
+  // @UseGuards(GlobalAuthGuard)
+  async importCsv(): Promise<any> {
+    return await this.contactService.ImportCsv();
+  }
+
   @Post()
   @UseGuards(GlobalAuthGuard)
   async create(
