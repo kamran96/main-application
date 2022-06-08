@@ -134,7 +134,7 @@ export class AccountsController {
   }
 
   @Post('init')
-  @UseGuards(GlobalAuthGuard)
+  // @UseGuards(GlobalAuthGuard)
   async initAccounts(@Body() data): Promise<void> {
     return await this.accountService.initAccounts(data);
   }
