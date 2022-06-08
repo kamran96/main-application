@@ -254,6 +254,7 @@ export class OrganizationService {
           return await this.authService.Login(users, res);
         }
       } catch (error) {
+        console.log(error, 'error');
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
     }
