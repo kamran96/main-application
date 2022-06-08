@@ -205,7 +205,7 @@ export class OrganizationService {
           {
             user: {
               id: req?.user?.id,
-              organizationId: organization.id,
+              organizationId: organization._id,
             },
           },
           {
@@ -222,11 +222,11 @@ export class OrganizationService {
         const [adminRole] = roles.filter((r) => r.name === 'admin');
 
         if (req?.user?.organizationId !== null) {
-          await this.emailService.emit(ORGANIZATION_CREATED, {
-            org_name: organization.name,
-            user_name: req.user.profile.fullName,
-            to: req.user.email,
-          });
+          // await this.emailService.emit(ORGANIZATION_CREATED, {
+          //   org_name: organization.name,
+          //   user_name: req.user.profile.fullName,
+          //   to: req.user.email,
+          // });
 
           return organization;
         } else {
@@ -243,13 +243,13 @@ export class OrganizationService {
             username: req.user.username,
           });
 
-          const nextSevenDay = moment().add(7, 'days').format('YYYY-MM-DD');
+          // const nextSevenDay = moment().add(7, 'days').format('YYYY-MM-DD');
 
-          await this.emailService.emit(TRAIL_STARTED, {
-            to: req.user.email,
-            user_name: req.user.profile.fullName,
-            next_7_days: nextSevenDay,
-          });
+          // await this.emailService.emit(TRAIL_STARTED, {
+          //   to: req.user.email,
+          //   user_name: req.user.profile.fullName,
+          //   next_7_days: nextSevenDay,
+          // });
 
           return await this.authService.Login(users, res);
         }
