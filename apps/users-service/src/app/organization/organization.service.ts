@@ -1,10 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import axios from 'axios';
@@ -22,7 +16,6 @@ import { User } from '../schemas/user.schema';
 import { ORGANIZATION_CREATED, TRAIL_STARTED } from '@invyce/send-email';
 import { Currency } from '../schemas/currency.schema';
 import { Host } from '@invyce/global-constants';
-import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
 
 @Injectable()
 export class OrganizationService {
@@ -203,6 +196,8 @@ export class OrganizationService {
 
         console.log(Host('accounts', `accounts/account/init`));
         console.log('inserting initial accounts');
+        console.log(req.user.id, organization.id, 'data');
+        console.log(token, 'token');
         await axios.post(
           Host('accounts', `accounts/account/init`),
           {
