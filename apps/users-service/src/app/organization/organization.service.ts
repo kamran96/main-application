@@ -217,7 +217,7 @@ export class OrganizationService {
           const token = req?.cookies['access_token'];
 
           await axios.post(
-            'http://accounts.default.svc.cluster.local/accounts/account/init',
+            Host('accounts', 'accounts/account/init'),
             {
               user: {
                 id: req?.user?.id,
@@ -244,11 +244,6 @@ export class OrganizationService {
             user_name: req.user.profile.fullName,
             next_7_days: nextSevenDay,
           });
-          // await this.reportService.emit(ORGANIZATION_CREATED, {
-          //   ...organization.toObject(),
-          //   userId: req.user.id,
-          //   branchId: branchArr.length > 0 ? branchArr[0].id : null,
-          // });
 
           return await this.authService.Login(users, res);
         }
