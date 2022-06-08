@@ -194,12 +194,8 @@ export class OrganizationService {
         if (!req || !req.cookies) return null;
         const token = req?.cookies['access_token'];
 
-        console.log(Host('accounts', `accounts/account/init`));
-        console.log('inserting initial accounts');
-        console.log(req.user.id, organization.id, 'data');
-        console.log(token, 'token');
         await axios.post(
-          Host('accounts', `accounts/account/init`),
+          'https://accounts.default.svc.cluster.local/accounts/account/init',
           {
             user: {
               id: req?.user?.id,
