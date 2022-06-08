@@ -174,8 +174,6 @@ export class OrganizationService {
         organization.status = 1;
         await organization.save();
 
-        console.log(organization.id);
-
         const organizationUser = new this.organizationUserModel();
         organizationUser.organizationId = organization.id;
         organizationUser.userId = req?.user?.id;
@@ -202,7 +200,10 @@ export class OrganizationService {
         if (!req || !req.cookies) return null;
         const token = req?.cookies['access_token'];
 
+        console.log(token, 'token');
+
         console.log('inserting initial accounts');
+        console.log(req.user, 'user');
         await axios.post(
           Host('accounts', `accounts/account/init`),
           {
