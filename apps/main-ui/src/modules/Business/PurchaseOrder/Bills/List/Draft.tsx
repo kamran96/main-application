@@ -28,7 +28,7 @@ import {
 } from '../../../../../modal';
 import FilterSchema from './PoFilterSchema';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
-import { PDFColsBills, _csvExportable } from './CommonCol';
+import { useCols } from './CommonCol';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
 
@@ -54,6 +54,7 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
     page_size: 10,
   });
   const { page, query, sortid, page_size } = allInvoicesConfig;
+  const {PDFColsBills, _csvExportable} = useCols();
 
   const [confirmModal, setConfirmModal] = useState(false);
   const [{ result, pagination }, setAllInvoicesRes] =
@@ -125,14 +126,68 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
       'ALL',
       page,
       page_size,
-      sortid,
       query,
+      sortid,
     ],
     getPoListAPI,
     {
       keepPreviousData: true,
     }
   );
+
+  const onChangePagination = (pagination, filters, sorter: any, extra) => {
+    if (sorter.order === undefined) {
+      setAllInvoicesConfig({
+        ...allInvoicesConfig,
+        sortid: null,
+        page: pagination.current,
+        page_size: pagination.pageSize,
+      });
+      const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=draft&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}`;
+      history.push(route);
+    } else {
+      if (sorter?.order === 'ascend') {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] > b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        
+        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+      } else {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] < b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        
+        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+      }
+      setAllInvoicesConfig({
+        ...allInvoicesConfig,
+        page: pagination.current,
+        page_size: pagination.pageSize,
+        sortid:
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field,
+      });
+      const route = `/app${
+        ISupportedRoutes.PURCHASES
+      }?tabIndex=draft&sortid=${
+        sorter && sorter.order === 'descend'
+          ? `-${sorter.field}`
+          : sorter.field
+      }&page=${pagination.current}&page_size=${
+        pagination.pageSize
+      }&filter=${sorter.order}&query=${query}`;
+      history.push(route);
+    }
+  }
 
   /* ********** METHODS HERE *************** */
   /* ************** ASYNC FUNCTION IS TO  DELETE ORDER ******** */
@@ -239,38 +294,7 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
         data={result}
         columns={cols}
         loading={isFetching || isLoading}
-        onChange={(pagination, filters, sorter: any, extra) => {
-          if (sorter.order === undefined) {
-            setAllInvoicesConfig({
-              ...allInvoicesConfig,
-              sortid: null,
-              page: pagination.current,
-              page_size: pagination.pageSize,
-            });
-            const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=draft&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}`;
-            history.push(route);
-          } else {
-            setAllInvoicesConfig({
-              ...allInvoicesConfig,
-              page: pagination.current,
-              page_size: pagination.pageSize,
-              sortid:
-                sorter && sorter.order === 'descend'
-                  ? `-${sorter.field}`
-                  : sorter.field,
-            });
-            const route = `/app${
-              ISupportedRoutes.PURCHASES
-            }?tabIndex=draft&sortid=null&page=${pagination.current}&page_size=${
-              pagination.pageSize
-            }&query=${query}&sortid=${
-              sorter && sorter.order === 'descend'
-                ? `-${sorter.field}`
-                : sorter.field
-            }`;
-            history.push(route);
-          }
-        }}
+        onChange={onChangePagination}
         totalItems={pagination && pagination.total}
         pagination={{
           showSizeChanger: true,

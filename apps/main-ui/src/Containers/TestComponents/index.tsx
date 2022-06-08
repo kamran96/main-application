@@ -3,7 +3,7 @@ import { useMutation } from 'react-query';
 
 import { CsvImportAPi } from '../../api';
 // import { Inconvinience } from '../../components/ErrorBoundries/Inconvinience';
-// import { InvoiceImportManager } from '../../modules/Invoice/InvoiceImportManager';
+import { InvoiceImportManager } from '../../modules/Invoice/InvoiceImportManager';
 import {
   Document,
   PDFViewer,
@@ -109,12 +109,13 @@ export const TestComponents: FC = () => {
   ];
 
   return (
-    // <div>test</div>
-    <EditableTable
-      cacheKey={'invoice-data'}
-      dragable={(newData) => setData(newData)}
-      columns={cols}
-      data={data}
+    <InvoiceImportManager
+      headers={`Item Name,Code,Purchase Price,Sale Price,Item Type,Stock,Status`.split(
+        ','
+      )}
+      onLoad={(payload) => {
+        console.log(payload);
+      }}
     />
   );
 };

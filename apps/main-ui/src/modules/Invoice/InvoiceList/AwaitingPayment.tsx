@@ -22,7 +22,7 @@ import {
 } from '../../../modal/invoice';
 import { ISupportedRoutes } from '../../../modal/routing';
 import moneyFormat from '../../../utils/moneyFormat';
-import { PdfCols, _exportableCols } from './commonCol';
+import { useCols} from './commonCol';
 import InvoicesFilterSchema from './InvoicesFilterSchema';
 
 interface IProps {
@@ -33,7 +33,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
     query: '',
-    sortid: '',
+    sortid: 'id',
     pageSize: 10,
   });
 
@@ -54,6 +54,8 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
       result: [],
       pagination: null,
     });
+
+    const {PdfCols, _exportableCols } = useCols();
 
   const { page, query, sortid, pageSize } = allInvoicesConfig;
   const { routeHistory, notificationCallback } = useGlobalContext();
@@ -107,6 +109,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
       page,
       pageSize,
       query,
+      sortid
     ],
     getInvoiceListAPI,
     {
@@ -129,6 +132,61 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
       setAllInvoicesRes({ ...resolvedData.data, result: newResult });
     }
   }, [resolvedData]);
+
+  //HandleSorting
+  const onChangePagination = (pagination, filters, sorter: any, extra) => {
+    if (sorter.order === undefined) {
+      setAllInvoicesConfig({
+        ...allInvoicesConfig,
+        sortid: 'id',
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+      });
+      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=awating_payment&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+      history.push(route);
+    } else {
+      if (sorter?.order === 'ascend') {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] > b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        
+        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+      } else {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] < b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        
+        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+      }
+      setAllInvoicesConfig({
+        ...allInvoicesConfig,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        sortid:
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field,
+      });
+      const route = `/app${
+        ISupportedRoutes.INVOICES
+      }?tabIndex=awating_payment&sortid=${
+        sorter && sorter.order === 'descend'
+          ? `-${sorter.field}`
+          : sorter.field
+      }&page=${
+        pagination.current
+      }&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      history.push(route);
+    }
+  }
 
   const handleDelete = async () => {
     const payload = {
@@ -225,38 +283,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
         data={result}
         columns={cols}
         loading={isFetching || isLoading}
-        onChange={(pagination, filters, sorter: any, extra) => {
-          if (sorter.order === undefined) {
-            setAllInvoicesConfig({
-              ...allInvoicesConfig,
-              sortid: null,
-              page: pagination.current,
-              pageSize: pagination.pageSize,
-            });
-            const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=awating_payment&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
-            history.push(route);
-          } else {
-            setAllInvoicesConfig({
-              ...allInvoicesConfig,
-              page: pagination.current,
-              pageSize: pagination.pageSize,
-              sortid:
-                sorter && sorter.order === 'descend'
-                  ? `-${sorter.field}`
-                  : sorter.field,
-            });
-            const route = `/app${
-              ISupportedRoutes.INVOICES
-            }?tabIndex=awating_payment&sortid=null&page=${
-              pagination.current
-            }&page_size=${pagination.pageSize}&query=${query}&sortid=${
-              sorter && sorter.order === 'descend'
-                ? `-${sorter.field}`
-                : sorter.field
-            }`;
-            history.push(route);
-          }
-        }}
+        onChange={onChangePagination}
         totalItems={pagination && pagination.total}
         pagination={{
           pageSize: pageSize,

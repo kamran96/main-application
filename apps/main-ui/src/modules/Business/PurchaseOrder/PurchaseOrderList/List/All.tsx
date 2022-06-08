@@ -24,7 +24,7 @@ import {
 } from '../../../../../modal';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
 import { purchaseOrderList } from '../../../../../api/purchaseOrder';
-import { pdfColsPO, _csvColumns } from './CommonCol';
+import { useCols } from './CommonCol';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
 
@@ -55,6 +55,7 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
   });
   /* ********* DESTRUCTURING ALL INVOICESCONFIG *************** */
   const { page, query, sortid, pageSize } = allInvoicesConfig;
+  const {pdfColsPO, _csvColumns} = useCols();
 
   const [confirmModal, setConfirmModal] = useState(false);
   const { routeHistory } = useGlobalContext();
@@ -123,12 +124,64 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
       page,
       pageSize,
       query,
+      sortid
     ],
     purchaseOrderList,
     {
       keepPreviousData: true,
     }
   );
+
+  const onChangePagination = (pagination, filters, sorter: any, extra) => {
+    if (sorter.order === undefined) {
+      setAllInvoicesConfig({
+        ...allInvoicesConfig,
+        sortid: null,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+      });
+      const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=all&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+      history.push(route);
+    } else {
+      if (sorter?.order === 'ascend') {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] > b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        
+        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+      } else {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] < b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        
+        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+      }
+      setAllInvoicesConfig({
+        ...allInvoicesConfig,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        sortid:
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field,
+      });
+
+      const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=all&sortid=${
+        sorter && sorter.order === 'descend'
+          ? `-${sorter.field}`
+          : sorter.field
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      history.push(route);
+    }
+  }
 
   /* CONDITIONAL RENDERING LIFE CYCLE HOOK TO UPDATE ALL INVOICES STATE WHEN API CALL IS DONE */
   useEffect(() => {
@@ -238,26 +291,7 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
         data={result}
         columns={cols}
         loading={isFetching || isLoading}
-        onChange={(pagination, filters, sorter: any, extra) => {
-          if (sorter.order === undefined) {
-            setAllInvoicesConfig({
-              ...allInvoicesConfig,
-              sortid: null,
-              page: pagination.current,
-              pageSize: pagination.pageSize,
-            });
-          } else {
-            setAllInvoicesConfig({
-              ...allInvoicesConfig,
-              page: pagination.current,
-              pageSize: pagination.pageSize,
-              sortid:
-                sorter && sorter.order === 'descend'
-                  ? `-${sorter.field}`
-                  : sorter.field,
-            });
-          }
-        }}
+        onChange={onChangePagination}
         totalItems={pagination && pagination.total}
         pagination={{
           showSizeChanger: true,

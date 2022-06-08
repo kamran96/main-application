@@ -21,7 +21,7 @@ export const UploadAtachment: SFC<IProps> = ({
 
   useEffect(() => {
     if (defaultValue) {
-      let profilePicture = {
+      const profilePicture = {
         uid: defaultValue.id,
         name: defaultValue.name,
         status: 'done',

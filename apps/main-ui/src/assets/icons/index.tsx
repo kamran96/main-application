@@ -1454,7 +1454,7 @@ export const InconvinienceIllustration = ({ width = 292, height = 194 }) => {
   );
 };
 
-export const Dashboard = ({ width = 20, height = 20 }) => {
+export const Dashboard = ({ width = 16, height = 16 }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -1485,7 +1485,7 @@ export const Dashboard = ({ width = 20, height = 20 }) => {
   );
 };
 
-export const BussinesIcon = ({ width = 20, height = 20 }) => {
+export const BussinesIcon = ({ width = 18, height = 18 }) => {
   return (
     <svg
       width={width}
@@ -1525,7 +1525,7 @@ export const BussinesIcon = ({ width = 20, height = 20 }) => {
   );
 };
 
-export const ReportIcon = ({ width = 20, height = 20 }) => {
+export const ReportIcon = ({ width = 18, height = 18 }) => {
   return (
     <svg
       width={width}
@@ -1573,7 +1573,7 @@ export const ReportIcon = ({ width = 20, height = 20 }) => {
   );
 };
 
-export const Accounting = ({ width = 20, height = 20 }) => {
+export const Accounting = ({ width = 18, height = 18 }) => {
   return (
     <svg
       width={width}
@@ -1604,7 +1604,7 @@ export const Accounting = ({ width = 20, height = 20 }) => {
   );
 };
 
-export const Payments = ({ width = 20, height = 20 }) => {
+export const Payments = ({ width = 18, height = 18 }) => {
   return (
     <svg
       width={height}
@@ -1653,7 +1653,7 @@ export const Payments = ({ width = 20, height = 20 }) => {
   );
 };
 
-export const Contacts = ({ width = 20, height = 20 }) => {
+export const Contacts = ({ width = 18, height = 18 }) => {
   return (
     <svg
       width={height}
@@ -1678,7 +1678,7 @@ export const Contacts = ({ width = 20, height = 20 }) => {
   );
 };
 
-export const Items = ({ height = 20, width = 20 }) => {
+export const Items = ({ height = 18, width = 18 }) => {
   return (
     <svg
       width={height}
@@ -1711,7 +1711,7 @@ export const Items = ({ height = 20, width = 20 }) => {
   );
 };
 
-export const Categories = ({ width = 20, height = 20 }) => {
+export const Categories = ({ width = 18, height = 18 }) => {
   return (
     <svg
       width={width}
@@ -1748,7 +1748,7 @@ export const Categories = ({ width = 20, height = 20 }) => {
   );
 };
 
-export const Tax = ({ height = 17, width = 17 }) => {
+export const Tax = ({ height = 18, width = 18 }) => {
   return (
     <svg
       width={width}
@@ -1803,7 +1803,7 @@ export const Tax = ({ height = 17, width = 17 }) => {
   );
 };
 
-export const Setting = ({ height = 20, width = 20 }) => {
+export const Setting = ({ height = 18, width = 18 }) => {
   return (
     <svg
       width={width}
@@ -1838,7 +1838,7 @@ export const Setting = ({ height = 20, width = 20 }) => {
   );
 };
 
-export const TotalSale = ({ height = 20, width = 20 }) => {
+export const TotalSale = ({ height = 18, width = 18 }) => {
   return (
     <svg
       width={width}
@@ -1873,7 +1873,7 @@ export const TotalSale = ({ height = 20, width = 20 }) => {
   );
 };
 
-export const TodayInvoice = ({ height = 20, width = 20 }) => {
+export const TodayInvoice = ({ height = 18, width = 18 }) => {
   return (
     <svg
       width={width}
@@ -1908,7 +1908,7 @@ export const TodayInvoice = ({ height = 20, width = 20 }) => {
   );
 };
 
-export const DraftInvoice = ({ height = 20, width = 20 }) => {
+export const DraftInvoice = ({ height = 18, width = 18 }) => {
   return (
     <svg
       width={width}
@@ -1952,7 +1952,7 @@ export const DraftInvoice = ({ height = 20, width = 20 }) => {
   );
 };
 
-export const JournalEntry = ({ height = 20, width = 20 }) => {
+export const JournalEntry = ({ height = 18, width = 18 }) => {
   return (
     <svg
       width={width}
@@ -2000,7 +2000,7 @@ export const JournalEntry = ({ height = 20, width = 20 }) => {
   );
 };
 
-export const CreateContact = ({ height = 20, width = 20 }) => {
+export const CreateContact = ({ height = 18, width = 18 }) => {
   return (
     <svg
       width={width}
@@ -2037,14 +2037,15 @@ export const CreateContact = ({ height = 20, width = 20 }) => {
   );
 };
 
-export const CreateInvoice = ({ height = 20, width = 20 }) => {
+export const CreateInvoice = ({ height = 18, width = 18 }) => {
   return (
     <svg
       width={width}
       height={height}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 30.96 30.24"
-      style={{ strokeWidth: '0.2' }}
+      className='ThreeIconsDiff'
+      style={{ strokeWidth: '0.1' }}
     >
       <g id="Object">
         <path
@@ -2115,15 +2116,16 @@ export const CreatePo = ({ height = 20, width = 20 }) => {
   );
 };
 
-export const CreateBill = ({ height = 20, width = 20 }) => {
+export const CreateBill = ({ height = 18, width = 18 }) => {
   return (
     <svg
       height={height}
       width={width}
       xmlns="http://www.w3.org/2000/svg"
-      fill="#334d6e"
+      fill=""
+      className='ThreeIconsDiff'
       viewBox="0 0 30.96 30.24"
-      style={{ strokeWidth: '0.2' }}
+      style={{ strokeWidth: '0.1' }}
     >
       <g id="Object">
         <path
@@ -2153,7 +2155,7 @@ export const CreateBill = ({ height = 20, width = 20 }) => {
   );
 };
 
-export const CreateQuote = ({ height = 20, width = 20 }) => {
+export const CreateQuote = ({ height = 18, width = 18 }) => {
   return (
     <svg
       width={width}
@@ -2207,7 +2209,7 @@ export const CreateQuote = ({ height = 20, width = 20 }) => {
   );
 };
 
-export const CreateNote = ({ height = 20, width = 20 }) => {
+export const CreateNote = ({ height = 18, width = 18 }) => {
   return (
     <svg
       width={width}
@@ -2247,14 +2249,15 @@ export const CreateNote = ({ height = 20, width = 20 }) => {
   );
 };
 
-export const DebitNote = ({ height = 20, width = 20 }) => {
+export const DebitNote = ({ height = 18, width = 18 }) => {
   return (
     <svg
       height={height}
       width={width}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 30.96 30.24"
-      style={{ strokeWidth: '0.2' }}
+      className='ThreeIconsDiff'
+      style={{ strokeWidth: '0.1' }}
     >
       <g id="Object">
         <path

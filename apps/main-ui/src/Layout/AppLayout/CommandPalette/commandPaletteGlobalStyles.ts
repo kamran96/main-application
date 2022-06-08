@@ -148,6 +148,8 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
   width: ${convertToRem(530)};
   padding: 14px 35px;
   width: 100%;
+  border-left: 3px solid transparent;
+
   
   
   .icons{
