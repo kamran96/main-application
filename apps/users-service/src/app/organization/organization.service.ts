@@ -191,26 +191,6 @@ export class OrganizationService {
           branchArr.push(branch);
         }
 
-        if (!req || !req.cookies) return null;
-        const token = req?.cookies['access_token'];
-
-        await axios.post(
-          'https://accounts.default.svc.cluster.local/accounts/account/init',
-          {
-            user: {
-              id: req?.user?.id,
-              organizationId: organization.id,
-            },
-          },
-          {
-            headers: {
-              cookie: `access_token=${token}`,
-            },
-          }
-        );
-
-        console.log('inserted...');
-
         const roles = await this.rbacService.InsertRoles(organization.id);
         await this.rbacService.InsertRolePermission(organization.id);
         const [adminRole] = roles.filter((r) => r.name === 'admin');
@@ -232,6 +212,26 @@ export class OrganizationService {
               branchId: branchArr.length > 0 ? branchArr[0].id : null,
             }
           );
+
+          if (!req || !req.cookies) return null;
+          const token = req?.cookies['access_token'];
+
+          await axios.post(
+            'http://accounts.default.svc.cluster.local/accounts/account/init',
+            {
+              user: {
+                id: req?.user?.id,
+                organizationId: organization.id,
+              },
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
+            }
+          );
+
+          console.log('inserted...');
 
           const users = await this.authService.CheckUser({
             username: req.user.username,
