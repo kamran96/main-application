@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import axios from 'axios';
@@ -27,8 +33,7 @@ export class OrganizationService {
     @InjectModel(Currency.name) private currencyModel,
     private rbacService: RbacService,
     private authService: AuthService,
-    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy,
-    @Inject('REPORT_SERVICE') private readonly reportService: ClientProxy
+    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy // @Inject('REPORT_SERVICE') private readonly reportService: ClientProxy
   ) {}
 
   async ListOrganizations(req) {
@@ -191,6 +196,27 @@ export class OrganizationService {
           branchArr.push(branch);
         }
 
+        if (!req || !req.cookies) return null;
+        const token = req?.cookies['access_token'];
+
+        Logger.log('inserting accounts...');
+        await axios.post(
+          Host('accounts', 'accounts/account/init'),
+          {
+            user: {
+              id: req?.user?.id,
+              organizationId: organization.id,
+            },
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
+
+        Logger.log('inserted...');
+
         const roles = await this.rbacService.InsertRoles(organization.id);
         await this.rbacService.InsertRolePermission(organization.id);
         const [adminRole] = roles.filter((r) => r.name === 'admin');
@@ -212,26 +238,6 @@ export class OrganizationService {
               branchId: branchArr.length > 0 ? branchArr[0].id : null,
             }
           );
-
-          if (!req || !req.cookies) return null;
-          const token = req?.cookies['access_token'];
-
-          await axios.post(
-            Host('accounts', 'accounts/account/init'),
-            {
-              user: {
-                id: req?.user?.id,
-                organizationId: organization.id,
-              },
-            },
-            {
-              headers: {
-                cookie: `access_token=${token}`,
-              },
-            }
-          );
-
-          console.log('inserted...');
 
           const users = await this.authService.CheckUser({
             username: req.user.username,
