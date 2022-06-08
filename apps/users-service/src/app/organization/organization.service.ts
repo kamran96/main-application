@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import axios from 'axios';
@@ -194,6 +200,10 @@ export class OrganizationService {
         if (!req || !req.cookies) return null;
         const token = req?.cookies['access_token'];
 
+        console.log(token, 'token');
+
+        console.log('inserting initial accounts');
+        console.log(req.user, 'user');
         await axios.post(
           Host('accounts', `accounts/account/init`),
           {
@@ -208,6 +218,8 @@ export class OrganizationService {
             },
           }
         );
+
+        console.log('inserted...');
 
         const roles = await this.rbacService.InsertRoles(organization.id);
         await this.rbacService.InsertRolePermission(organization.id);
