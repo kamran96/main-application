@@ -4,10 +4,16 @@ import bxSearchAlt from '@iconify/icons-bx/bx-search-alt';
 import { Icon } from '@iconify/react';
 import { FC } from 'react';
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 import { CommonModal } from '../../../components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { InvoiceImportManager } from '../../Invoice/InvoiceImportManager';
+import { useQuery } from 'react-query';
+import { ReactQueryKeys } from '../../../modal';
+import { getContactKeysAPI } from '../../../api';
+import { CompareDataModal } from './CompareDataModal';
+import { Button } from 'antd';
 
 interface Idata {
   xero: {
@@ -23,6 +29,17 @@ interface Idata {
 export const ContactImportWidget: FC = () => {
   const { contactsImportConfig, setContactsImportConfig } = useGlobalContext();
   const { visibility } = contactsImportConfig;
+  const [fileData, setFileData] = useState<File>();
+  const [fileExtractedData, setFileExtractedData] = useState([]);
+  const [compareDataModal, setCompareDataModel] = useState<boolean>(false);
+
+  const { data: contactKeysResponse, isLoading: contactKeysLoading } = useQuery(
+    [ReactQueryKeys],
+    getContactKeysAPI,
+    {
+      enabled: !!compareDataModal,
+    }
+  );
 
   const data: Idata = {
     xero: {
@@ -35,6 +52,7 @@ export const ContactImportWidget: FC = () => {
     },
   };
   const [state, setState] = useState(data?.xero);
+  const [step, setStep] = useState<number>(1);
   return (
     <CommonModal
       visible={visibility}
@@ -45,7 +63,7 @@ export const ContactImportWidget: FC = () => {
       }}
       footer={false}
     >
-      <WrapperModalContent>
+      <WrapperModalContent step={step}>
         <div className="container">
           <div className="modal-icon">
             <Icon className="Icon" icon={bookHalf} width="80" color="#2395E7" />
@@ -83,20 +101,52 @@ export const ContactImportWidget: FC = () => {
                 &nbsp;
                 <a>here</a>
               </div>
-              <div className="input">
-                <Icon className="Icon" icon={bxSearchAlt} color="#2395e7" />
-                <label htmlFor="file-upload" className="input-label">
-                  <input type="file" id="file-upload" />
-                  Browse CSV File
-                </label>
-              </div>
+              <InvoiceImportManager
+                headers={`Contact,Email,Company Name,Contact Type,Credit Limit,Credit Block Limit,Balance`.split(
+                  ','
+                )}
+                onLoad={(payload, file) => {
+                  setFileData(file);
+                  setFileExtractedData(payload);
+                }}
+              />
               <div className="text">
                 <p>{state.text}</p>
               </div>
-              <button>Process File</button>
+              <Button
+                size="large"
+                className="btn"
+                disabled={!fileData}
+                onClick={(e) => {
+                  e?.preventDefault();
+                  setStep(2);
+                  setCompareDataModel(true);
+                }}
+                type="primary"
+              >
+                Process File
+              </Button>
             </div>
           )}
         </div>
+        {
+          <div className="CompareModal">
+            <CompareDataModal
+              documentKeys={
+                fileExtractedData?.length
+                  ? Object.keys(fileExtractedData?.[0])
+                  : []
+              }
+              // compareKeys={contactKeysResponse?.data || []}
+              onCancel={() => {
+                setStep(1);
+                setCompareDataModel(false);
+              }}
+              OnConfrm={() => console.log('hello')}
+              visibility={compareDataModal}
+            />
+          </div>
+        }
       </WrapperModalContent>
     </CommonModal>
   );
@@ -104,16 +154,37 @@ export const ContactImportWidget: FC = () => {
 
 export default ContactImportWidget;
 
-const WrapperModalContent = styled.div`
-  height: 651px;
+type DivProps = JSX.IntrinsicElements['div'];
+
+interface ModalWrapper extends DivProps {
+  step?: number;
+}
+
+const WrapperModalContent = styled.div<ModalWrapper>`
   display: flex;
-  align-items: center;
-  flex-direction: column;
+  padding-bottom: 1rem;
+  overflow: hidden;
+  height: 100vh;
+  
   .container {
-    width: 350px;
+    transition: 0.6s all ease-in-out;
+    width: ${(props: any) => (props?.step === 1 ? '100%' : 0)};
+    opacity: ${(props: any) => (props?.step === 2 ? 0 : 1)};
     display: flex;
     align-items: center;
+    min-height: 0;
     flex-direction: column;
+    transform: ${(props: any) =>
+      props?.step === 2 ? 'translateX(-100%)' : 'translateX(0)'};
+  }
+
+  .CompareModal {
+    width: ${(props: any) => (props?.step === 2 ? '100%' : 0)};
+    opacity: ${(props: any) => (props?.step === 1 ? 0 : 1)};
+    transform: ${(props: any) =>
+      props?.step === 1 ? 'translateX(100%)' : 'translateX(0)'};
+    transition: 0.4s ease-in-out;
+    height: 100vh;
   }
   .modal-icon {
     display: flex;
@@ -159,6 +230,10 @@ const WrapperModalContent = styled.div`
     }
   }
   .render-content {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
     .download {
       margin: 0px 0px 44px 15px;
       display: flex;
@@ -171,6 +246,10 @@ const WrapperModalContent = styled.div`
       a {
         cursor: pointer;
       }
+    }
+    .btn {
+      margin-left: 90%;
+      margin-top: 2rem;
     }
     .input {
       margin: 0px 0px 8px 15px;
@@ -201,11 +280,9 @@ const WrapperModalContent = styled.div`
       letter-spacing: 0.02em;
       color: #ffffff;
       width: 8rem;
-      background: #2395e7;
       border-radius: 4px;
       border: none;
       margin: 0px 0px 0px 15px;
-      padding: 7px 0px;
     }
   }
 `;

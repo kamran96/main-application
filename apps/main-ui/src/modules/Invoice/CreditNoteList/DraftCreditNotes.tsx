@@ -25,7 +25,8 @@ import editSolid from '@iconify-icons/clarity/edit-solid';
 import { SmartFilter } from '../../../components/SmartFilter';
 import { PDFICON } from '../../../components/Icons';
 import FilteringSchema from './FilteringSchema';
-import columns, { pdfCols } from './commonCols';
+import { useCols } from './commonCols';
+
 import { useHistory } from 'react-router-dom';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import { ConfirmModal } from '../../../components/ConfirmModal';
@@ -36,6 +37,8 @@ export const DraftCreditNotes: FC = () => {
   const { notificationCallback } = useGlobalContext();
   const history = useHistory();
   const { location } = history;
+  const {columns, pdfCols } = useCols();
+
   const queryCache = useQueryClient();
 
   const [deleteConfirmModal, setDeleteConfirmModal] = useState(false);
@@ -55,8 +58,9 @@ export const DraftCreditNotes: FC = () => {
     page: 1,
     pageSize: 20,
     query: '',
+    sortid: 'id'
   });
-  const { page, pageSize, query } = creditNoteConfig;
+  const { page, pageSize, sortid, query } = creditNoteConfig;
 
   /* LOCAL STATE ENDS HERE */
 
@@ -70,6 +74,7 @@ export const DraftCreditNotes: FC = () => {
       pageSize,
       IInvoiceType.CREDITNOTE,
       query,
+      sortid
     ],
     getCreditNotes,
     {
@@ -81,6 +86,58 @@ export const DraftCreditNotes: FC = () => {
     [`all-contacts`, 'ALL'],
     getAllContacts
   );
+
+
+  const onChangePagination = (pagination, filters, sorter: any, extra) => {
+    if(sorter.order === undefined){
+      setCreditNoteConfig({
+        ...creditNoteConfig,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        sortid: 'id'
+      });
+      const route = `/app${ISupportedRoutes.CREDIT_NOTES}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+      history.push(route);
+    }
+    else{
+
+      if (sorter?.order === 'ascend') {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] > b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        
+        setCreditNoteResponse(prev =>({...prev,  result: userData}))
+      } else {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] < b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        
+        setCreditNoteResponse(prev =>({...prev,  result: userData}))
+      }
+
+      setCreditNoteConfig({
+        ...creditNoteConfig,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        sortid: sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
+      });
+      const route = `/app${ISupportedRoutes.CREDIT_NOTES}?tabIndex=draft&sortid=${
+        sorter && sorter.order === 'descend'
+          ? `-${sorter.field}`
+          : sorter.field
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      history.push(route);
+    }
+  }
+
 
   useEffect(() => {
     if (contactsData?.data?.result) {
@@ -215,15 +272,7 @@ export const DraftCreditNotes: FC = () => {
         topbarRightPannel={renderTopbarRight()}
         exportable
         printTitle={'Credit Notes'}
-        onChange={(pagination, filters, sorter: any, extra) => {
-          setCreditNoteConfig({
-            ...creditNoteConfig,
-            page: pagination.current,
-            pageSize: pagination.pageSize,
-          });
-          const route = `/app${ISupportedRoutes.CREDIT_NOTES}?tabIndex=draft&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
-          history.push(route);
-        }}
+        onChange={onChangePagination}
         pagination={{
           pageSize: pageSize,
           position: ['bottomRight'],

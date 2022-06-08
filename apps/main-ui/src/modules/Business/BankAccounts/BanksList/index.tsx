@@ -7,14 +7,22 @@ import { getBankAccountsList } from '../../../../api/banks';
 import { CommonTable } from '../../../../components/Table';
 import { ACCOUNT_TYPES, ACCOUNT_TYPES_NAMES } from '../../../../modal/accounts';
 import { IBaseAPIError } from '../../../../modal/base';
-import { NOTIFICATIONTYPE } from '../../../../modal';
+import { ISupportedRoutes, NOTIFICATIONTYPE } from '../../../../modal';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { TableCard } from '../../../../components/TableCard';
+import { useHistory } from 'react-router-dom';
 
 export const BanksList: FC = () => {
   const [responseBanks, setResponseBanks] = useState([]);
+  const [sortedInfo, setSortedInfo] = useState(null);
+  const [bankConfig, setBankConfig] = useState({
+    sortid: 'id',
+  });
+
+  const {sortid} = bankConfig;
+
   const { notificationCallback } = useGlobalContext();
-  const { isLoading, data } = useQuery([`banks-list`], getBankAccountsList, {
+  const { isLoading, data } = useQuery([`banks-list`, sortid], getBankAccountsList, {
     onError: (error: IBaseAPIError) => {
       if (
         error &&
@@ -27,6 +35,37 @@ export const BanksList: FC = () => {
       }
     },
   });
+
+  
+
+  const history = useHistory();
+
+  useEffect(() => {
+    if (
+      history &&
+      history.location &&
+      history.location.search
+    ) {
+      const filterType = history.location.search.split('&');
+      const filterIdType = filterType[0];
+      const filterOrder = filterType[1]?.split("=")[1];
+      
+      if(filterIdType?.includes("-")){
+         const fieldName = filterIdType?.split("=")[1].split("-")[1];
+         setSortedInfo({
+           order: filterOrder,
+           columnKey: fieldName
+         });
+      }
+      else{
+        const fieldName = filterIdType?.split("=")[1];
+        setSortedInfo({
+          order: filterOrder,
+          columnKey: fieldName
+        })
+      }
+    }
+  }, [history?.location?.search]);
 
   useEffect(() => {
     if (data && data.data && data.data.result) {
@@ -55,6 +94,52 @@ export const BanksList: FC = () => {
     }
   };
 
+  const handleBankConfig = (pagination, filters, sorter: any, extra) => {
+    if (sorter.order === undefined) {
+      history.push(
+        `/app${ISupportedRoutes.BANK_ACCOUNTS}?sortid="id"`
+      );
+      setBankConfig({
+        sortid: null
+      });
+    } else {
+      history.push(
+        `/app${ISupportedRoutes.BANK_ACCOUNTS}?sortid=${
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field
+        }&filter=${sorter.order}`
+      );
+      if (sorter?.order === 'ascend') {
+        const userData = [...responseBanks].sort((a, b) => {
+          if (a[sorter?.field] > b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        setResponseBanks(userData)
+      } else {
+        const userData = [...responseBanks].sort((a, b) => {
+          if (a[sorter?.field] < b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+       
+        setResponseBanks(userData)
+      }
+      setBankConfig({
+        sortid:
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field,
+      });
+    }
+  };
+
+
   const columns: ColumnsType<any> = [
     {
       title: '#',
@@ -66,16 +151,22 @@ export const BanksList: FC = () => {
       title: 'Bank Name',
       dataIndex: 'name',
       key: 'name',
+      sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'name' && sortedInfo?.order,
     },
     {
       title: 'Account Number',
       dataIndex: 'accountNumber',
       key: 'accountNumber',
+      sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'accountNumber' && sortedInfo?.order,
     },
     {
       title: 'Type',
       dataIndex: 'accountType',
       key: 'accountType',
+      sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'accountType' && sortedInfo?.order,
       render: (data, row, index) => {
         return <>{renderAccountTypeName(data)}</>;
       },
@@ -84,6 +175,8 @@ export const BanksList: FC = () => {
       title: 'Last Updated',
       dataIndex: 'updatedAt',
       key: 'updatedAt',
+      sorter: true,
+      sortOrder: sortedInfo?.columnKey === 'updatedAt' && sortedInfo?.order,
       render: (data, row, index) => {
         return <>{dayjs(data).format('MMMM D, YYYY')}</>;
       },
@@ -98,6 +191,7 @@ export const BanksList: FC = () => {
           columns={columns}
           loading={isLoading}
           pagination={false}
+          onChange={handleBankConfig}
           //    onChange={
           //      handleContactsConfig
           //    }

@@ -26,6 +26,7 @@ import { pdfCols } from './pdfCols';
 export const Customers: FC = () => {
   /* HOOKS */
   /* CONTAINER STATES */
+  const [sortedInfo, setSortedInfo] = useState(null);
   const [selectedRow, setSelectedRow] = useState([]);
   const [contactsResponse, setContactResponse] = useState([]);
   const [confirmModal, setConfirmModal] = useState<boolean>(false);
@@ -52,6 +53,25 @@ export const Customers: FC = () => {
   const { routeHistory, notificationCallback } = useGlobalContext();
   const history = useHistory();
 
+  /* usePagination hook React Query */
+  /* this hook fetches contact list against page number and also sorts request data against sort id */
+  /* eg. sortid = name (assending) -name (descending) */
+
+  const params: any = [
+    `contacts-list-customers?page_no=${page}&sort=${sortid}&page_size=${page_size}&type=${IContactTypes.CUSTOMER}&query=${query}`,
+    IContactTypes.CUSTOMER,
+    page,
+    sortid,
+    page_size,
+    query,
+  ];
+
+  const {
+    isLoading,
+    data: resolvedData,
+    isFetching,
+  } = useQuery(params, getContacts);
+
   useEffect(() => {
     if (routeHistory?.history?.location?.search) {
       let obj = {};
@@ -62,14 +82,29 @@ export const Customers: FC = () => {
       });
 
       setConfig({ ...config, ...obj });
+
+      const filterType = history.location.search.split('&');
+      const filterIdType = filterType[1];
+      const filterOrder = filterType[4]?.split('=')[1];
+
+      if (filterIdType?.includes('-')) {
+        const fieldName = filterIdType?.split('=')[1].split('-')[1];
+        setSortedInfo({
+          order: filterOrder,
+          columnKey: fieldName,
+        });
+      } else {
+        const fieldName = filterIdType?.split('=')[1];
+        setSortedInfo({
+          order: filterOrder,
+          columnKey: fieldName,
+        });
+      }
     }
   }, [routeHistory]);
 
   const handleContactsConfig = (pagination, filters, sorter: any, extra) => {
     if (sorter.order === undefined) {
-      history.push(
-        `/app${ISupportedRoutes.CONTACTS}?tabIndex=customers&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
-      );
       setConfig({
         ...config,
         sortid: null,
@@ -77,45 +112,51 @@ export const Customers: FC = () => {
         page: pagination.current,
         page_size: pagination.pageSize,
       });
-    } else {
       history.push(
-        `/app${ISupportedRoutes.CONTACTS}?tabIndex=customers&sortid=${
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field
-        }&page=${pagination.current}&page_size=${
-          pagination.pageSize
-        }&query=${query}`
+        `/app${ISupportedRoutes.CONTACTS}?tabIndex=customers&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
       );
+    } else {
+      if (sorter?.order === 'ascend') {
+        const userData = [...contactsResponse].sort((a, b) => {
+          if (a[sorter?.field] > b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        setContactResponse(userData);
+      } else {
+        const userData = [...contactsResponse].sort((a, b) => {
+          if (a[sorter?.field] < b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        setContactResponse(userData);
+      }
       setConfig({
         ...config,
-        sortItem: sorter.field,
         page: pagination.current,
         page_size: pagination.pageSize,
+        sortItem: sorter?.field,
         sortid:
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field,
       });
+
+      history.push(
+        `/app${ISupportedRoutes.CONTACTS}?tabIndex=customers&sortid=${
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field
+        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+          sorter.order
+        }&query=${query}`
+      );
     }
   };
-
-  /* usePagination hook React Query */
-  /* this hook fetches contact list against page number and also sorts request data against sort id */
-  /* eg. sortid = name (assending) -name (descending) */
-  const params: any = [
-    `contacts-list-customers?page_no=${page}&sort=${sortid}&page_size=${page_size}&type=${IContactTypes.CUSTOMER}&query=${query}`,
-    IContactTypes.CUSTOMER,
-    page,
-    sortid,
-    page_size,
-    query,
-  ];
-  const {
-    isLoading,
-    data: resolvedData,
-    isFetching,
-  } = useQuery(params, getContacts);
 
   /* ComponentDidUpdate hook for updaing contactResponse state when successfully API fetches contact list data */
   useEffect(() => {
@@ -137,7 +178,7 @@ export const Customers: FC = () => {
       dataIndex: 'name',
       key: 'name',
       sorter: true,
-      showSorterTooltip: true,
+      sortOrder: sortedInfo?.columnKey === 'name' && sortedInfo?.order,
       render: (data, row, index) => (
         <Link
           className="contact-name"
@@ -152,20 +193,21 @@ export const Customers: FC = () => {
       dataIndex: 'email',
       key: 'email',
       sorter: true,
-      showSorterTooltip: true,
+      sortOrder: sortedInfo?.columnKey === 'email' && sortedInfo?.order,
     },
     {
       title: 'Company Name',
       dataIndex: 'businessName',
       key: 'businessName',
       sorter: true,
-      showSorterTooltip: true,
+      sortOrder: sortedInfo?.columnKey === 'businessName' && sortedInfo?.order,
     },
     {
       title: 'Contact Type',
       dataIndex: 'contactType',
       key: 'contactType',
       render: (data) => (
+        // eslint-disable-next-line react/jsx-no-useless-fragment
         <>
           {data && data === IContactTypes.CUSTOMER
             ? 'Customer'
@@ -189,6 +231,7 @@ export const Customers: FC = () => {
       title: 'Balance',
       dataIndex: 'balance',
       key: 'balance',
+      // eslint-disable-next-line react/jsx-no-useless-fragment
       render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
     },
   ];
@@ -287,6 +330,7 @@ export const Customers: FC = () => {
       <ContactListWrapper>
         <div className="table_container">
           <CommonTable
+            exportable
             pdfExportable={{ columns: pdfCols }}
             printTitle={'Customers List'}
             customTopbar={renderCustomTopbar()}

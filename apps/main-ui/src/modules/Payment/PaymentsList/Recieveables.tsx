@@ -94,25 +94,46 @@ export const PaymentRecievedList: FC = () => {
 
   const handlePaymentConfig = (pagination, filters, sorter: any, extra) => {
     if (sorter.order === undefined) {
-      history.push(
-        `/app${ISupportedRoutes.PAYMENTS}?sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
-      );
       setConfig({
         ...config,
-        sortid: null,
+        sortid: 'id',
         sortItem: null,
         page: pagination.current,
         page_size: pagination.pageSize,
       });
-    } else {
       history.push(
-        `/app${ISupportedRoutes.PAYMENTS}?sortid=${
+        `/app${ISupportedRoutes.PAYMENTS}?tabIndex=received&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+      );
+      
+    } else {
+      if (sorter?.order === 'ascend') {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] > b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        setPaymentResponse(prev =>({...prev,  result: userData}))
+      } else {
+        const userData = [...result].sort((a, b) => {
+          if (a[sorter?.field] < b[sorter?.field]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+       
+        setPaymentResponse(prev =>({...prev,  result: userData}))
+      }
+      history.push(
+        `/app${ISupportedRoutes.PAYMENTS}?tabIndex=received&sortid=${
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field
         }&page=${pagination.current}&page_size=${
           pagination.pageSize
-        }&query=${query}`
+        }&filter=${sorter.order}&query=${query}`
       );
       setConfig({
         ...config,

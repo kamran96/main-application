@@ -16,14 +16,25 @@ export const PaymentContainer: FC = () => {
   const { history } = routeHistory;
   const { search } = history.location;
 
+  
+  useEffect(() => {
+    if (!activeTab) {
+      setActiveTab('customers');
+    }
+  }, []);
+
   useEffect(() => {
     if (search) {
-      let filterTab = search.split('?')[1].split('&')[0].split('=')[1];
+      const filterTab = search.split('?')[1].split('&')[0].split('=')[1];
       if (filterTab !== null && filterTab !== 'id') {
-        setActiveTab(filterTab);
+        if (activeTab !== filterTab) {
+          setActiveTab(filterTab);
+        }
       }
     }
   }, [search]);
+
+
   return (
     <WrapperPaymentContainer>
       <Heading type="table">Payments</Heading>
