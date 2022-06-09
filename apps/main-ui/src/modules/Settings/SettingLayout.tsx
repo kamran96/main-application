@@ -96,6 +96,6 @@ const WrapperSettingLayout = styled.div`
   }
 
   .container_render {
-    width: 100%;
+    width: 55vw;
   }
 `;
