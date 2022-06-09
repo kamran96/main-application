@@ -14,11 +14,9 @@ let host;
 @Injectable()
 export class Authenticate extends PassportStrategy(Strategy) {
   constructor() {
-    console.log('calling...');
     super({
       jwtFromRequest: (req) => {
         if (!req || !req.cookies) return null;
-        console.log(req.cookies['access_token'], 'token');
         token = req.cookies['access_token'];
         host = req.headers.host;
         return req.cookies['access_token'];
@@ -30,6 +28,7 @@ export class Authenticate extends PassportStrategy(Strategy) {
   }
 
   async validate(payload) {
+    console.log(payload, 'pay');
     try {
       console.log('calling api...');
       const user = await axios.post(
@@ -58,6 +57,7 @@ export class Authenticate extends PassportStrategy(Strategy) {
         );
       }
     } catch (error) {
+      console.log(error, 'error');
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
