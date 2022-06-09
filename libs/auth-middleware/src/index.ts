@@ -14,9 +14,11 @@ let host;
 @Injectable()
 export class Authenticate extends PassportStrategy(Strategy) {
   constructor() {
+    console.log('calling...');
     super({
       jwtFromRequest: (req) => {
         if (!req || !req.cookies) return null;
+        console.log(req.cookies['access_token'], 'token');
         token = req.cookies['access_token'];
         host = req.headers.host;
         return req.cookies['access_token'];
@@ -29,7 +31,6 @@ export class Authenticate extends PassportStrategy(Strategy) {
 
   async validate(payload) {
     try {
-      console.log('calling...');
       const user = await axios.post(
         Host('users', 'users/auth/access-controll'),
         {
