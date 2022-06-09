@@ -7,14 +7,7 @@ import {
   TransactionRepository,
 } from '../repositories';
 import * as moment from 'moment';
-import {
-  getCustomRepository,
-  ILike,
-  In,
-  Not,
-  Raw,
-  SimpleConsoleLogger,
-} from 'typeorm';
+import { getCustomRepository, ILike, In, Not, Raw } from 'typeorm';
 import { Sorting } from '@invyce/sorting';
 import { Integrations, Entries } from '@invyce/global-constants';
 import {
