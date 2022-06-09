@@ -14,6 +14,8 @@ import { ReactQueryKeys } from '../../../modal';
 import { getContactKeysAPI } from '../../../api';
 import { CompareDataModal } from './CompareDataModal';
 import { Button } from 'antd';
+import { ColumnsType } from 'antd/lib/table';
+import { CommonTable } from '../../../components/Table';
 
 interface Idata {
   xero: {
@@ -29,9 +31,11 @@ interface Idata {
 export const ContactImportWidget: FC = () => {
   const { contactsImportConfig, setContactsImportConfig } = useGlobalContext();
   const { visibility } = contactsImportConfig;
+  const [step, setStep] = useState<number>(1);
   const [fileData, setFileData] = useState<File>();
   const [fileExtractedData, setFileExtractedData] = useState([]);
   const [compareDataModal, setCompareDataModel] = useState<boolean>(false);
+  const [compareData, setCompareData] = useState<any>({});
 
   const { data: contactKeysResponse, isLoading: contactKeysLoading } = useQuery(
     [ReactQueryKeys],
@@ -52,7 +56,48 @@ export const ContactImportWidget: FC = () => {
     },
   };
   const [state, setState] = useState(data?.xero);
-  const [step, setStep] = useState<number>(1);
+
+  let result = [];
+
+  if (compareData) {
+    result = Object.keys(compareData).map((item) => {
+      return compareData[item];
+    });
+  }
+
+  const columns: ColumnsType<any> = result?.map((columnItems: any) => {
+    return { title: columnItems, dataIndex: columnItems?.toLowerCase(), key: columnItems };
+  });
+
+
+  // const dataTableResult = fileExtractedData?.map((item: any, index: number) => {
+  //    const tableItem = Object.keys(item).map((ItemTable) => ItemTable?.split(" ").join(""));
+  //    console.log()
+  // })
+ 
+  const tableData = [
+    {
+      key: '1',
+      name: "ali",
+      email: "ali@invyce.com",
+      contacttype: "test",
+      businessname: "test bus",
+      creditlimitblock: "test credit block",
+      creditlimit: "test Credit",
+      balance: "Balance"
+    },
+    {
+      key: '2',
+      name: "bli",
+      email: "bli@invyce.com",
+      contacttype: "test",
+      businessname: "test bus",
+      creditlimitblock: "test credit block",
+      creditlimit: "test Credit",
+      balance: "Balance"
+    },
+  ]
+
   return (
     <CommonModal
       visible={visibility}
@@ -129,24 +174,42 @@ export const ContactImportWidget: FC = () => {
             </div>
           )}
         </div>
-        {
-          <div className="CompareModal">
-            <CompareDataModal
-              documentKeys={
-                fileExtractedData?.length
-                  ? Object.keys(fileExtractedData?.[0])
-                  : []
-              }
-              // compareKeys={contactKeysResponse?.data || []}
-              onCancel={() => {
-                setStep(1);
-                setCompareDataModel(false);
-              }}
-              OnConfrm={() => console.log('hello')}
-              visibility={compareDataModal}
-            />
+
+        <div className="CompareModal">
+          <CompareDataModal
+            documentKeys={
+              fileExtractedData?.length
+                ? Object.keys(fileExtractedData?.[0])
+                : []
+            }
+            // compareKeys={contactKeysResponse?.data || []}
+            onCancel={() => {
+              setStep(1);
+              setCompareDataModel(false);
+            }}
+            OnConfrm={(data: any) => {
+              setStep(3);
+              setCompareData(data);
+            }}
+            visibility={compareDataModal}
+          />
+        </div>
+
+        <div className="TableWrapper">
+          <CommonTable columns={columns} data={tableData} />
+          <div className="CnfrmBtn">
+            <Button className="btn" onClick={() => setStep(2)}>
+              Back
+            </Button>
+            <Button
+              type="primary"
+              className="btn"
+              onClick={() => console.log('proceed')}
+            >
+              Proceed
+            </Button>
           </div>
-        }
+        </div>
       </WrapperModalContent>
     </CommonModal>
   );
@@ -165,11 +228,11 @@ const WrapperModalContent = styled.div<ModalWrapper>`
   padding-bottom: 1rem;
   overflow: hidden;
   height: 100vh;
-  
+
   .container {
     transition: 0.6s all ease-in-out;
     width: ${(props: any) => (props?.step === 1 ? '100%' : 0)};
-    opacity: ${(props: any) => (props?.step === 2 ? 0 : 1)};
+    opacity: ${(props: any) => (props?.step === 1 ? 1 : 0)};
     display: flex;
     align-items: center;
     min-height: 0;
@@ -180,11 +243,31 @@ const WrapperModalContent = styled.div<ModalWrapper>`
 
   .CompareModal {
     width: ${(props: any) => (props?.step === 2 ? '100%' : 0)};
-    opacity: ${(props: any) => (props?.step === 1 ? 0 : 1)};
+    opacity: ${(props: any) => (props?.step === 2 ? 1 : 0)};
     transform: ${(props: any) =>
-      props?.step === 1 ? 'translateX(100%)' : 'translateX(0)'};
+      props?.step === 2
+        ? 'translateX(0)'
+        : props?.step === 3
+        ? 'translateX(-100%)'
+        : 'translateX(100%)'};
     transition: 0.4s ease-in-out;
     height: 100vh;
+  }
+  .TableWrapper {
+    width: ${(props: any) => (props?.step === 3 ? '100%' : 0)};
+    opacity: ${(props: any) => (props?.step === 3 ? 1 : 0)};
+    transform: ${(props: any) =>
+      props?.step === 3 ? 'translateX(0)' : 'translateX(100%)'};
+    transition: 0.4s ease-in-out;
+
+    .CnfrmBtn {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    .btn {
+      margin: 5px 4px;
+    }
   }
   .modal-icon {
     display: flex;

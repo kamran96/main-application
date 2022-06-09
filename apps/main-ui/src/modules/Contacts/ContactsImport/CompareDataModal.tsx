@@ -11,8 +11,7 @@ import Paragraph from 'antd/lib/typography/Paragraph';
 import { Icon } from '@iconify/react';
 import questionIcon from '@iconify/icons-fe/question';
 import { Button, Tooltip } from 'antd';
-import Item from 'antd/lib/list/Item';
-import { Items } from '../../Items';
+import deleteIcon from '@iconify/icons-carbon/delete';
 
 const a = [
   {
@@ -113,7 +112,7 @@ interface IProps {
   onCancel: () => void;
   compareKeys?: any[];
   documentKeys: any[];
-  OnConfrm: () => void;
+  OnConfrm: (payload: any) => void;
 }
 export const CompareDataModal: FC<IProps> = ({
   visibility,
@@ -123,13 +122,6 @@ export const CompareDataModal: FC<IProps> = ({
   OnConfrm,
 }) => {
   const [compareData, setCompareData] = useState<any>({});
-
-  const res = documentKeys?.filter(
-    (item: any) => Object.keys(compareData).includes(item) === false
-  );
-
-  console.log(res, 'result');
-  console.log(Object?.keys(compareData).includes('Contact'), 'Obj');
 
   const handleSelectItem = () => {
     // return documentKeys
@@ -144,7 +136,7 @@ export const CompareDataModal: FC<IProps> = ({
     });
   };
 
-  console.log(handleSelectItem(), 'handleselction');
+
 
   if (visibility && documentKeys?.length) {
     const columns: ColumnsType<any> = [
@@ -188,6 +180,14 @@ export const CompareDataModal: FC<IProps> = ({
           );
         },
       },
+      {
+        title: 'Action',
+        dataIndex: 'action',
+        key: 'action',
+        render: () => {
+          return <Icon className="Icon" icon={deleteIcon}/>
+        }
+      }
     ];
 
     return (
@@ -208,7 +208,7 @@ export const CompareDataModal: FC<IProps> = ({
           <Button className="btn" onClick={onCancel}>
             Back
           </Button>
-          <Button type="primary" className="btn" onClick={OnConfrm}>
+          <Button type="primary" className="btn" onClick={() =>OnConfrm(compareData)}>
             Confirm
           </Button>
         </div>
@@ -225,5 +225,8 @@ export const CompareDataModalWrapper = styled.div`
   }
   .btn {
     margin: 5px 4px;
+  }
+  .Icon {
+    cursor: pointer;
   }
 `;
