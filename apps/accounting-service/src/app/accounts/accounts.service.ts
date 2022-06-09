@@ -7,7 +7,14 @@ import {
   TransactionRepository,
 } from '../repositories';
 import * as moment from 'moment';
-import { getCustomRepository, ILike, In, Not, Raw } from 'typeorm';
+import {
+  getCustomRepository,
+  ILike,
+  In,
+  Not,
+  Raw,
+  SimpleConsoleLogger,
+} from 'typeorm';
 import { Sorting } from '@invyce/sorting';
 import { Integrations, Entries } from '@invyce/global-constants';
 import {
@@ -162,6 +169,7 @@ export class AccountsService {
         result: accounts,
       };
     } catch (error) {
+      console.log(error, 'err');
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -372,6 +380,13 @@ export class AccountsService {
     }
 
     return newAccountArray;
+  }
+
+  async test() {
+    await getCustomRepository(AccountRepository).save({
+      name: 'test',
+      status: 1,
+    });
   }
 
   async initAccounts(data: IRequest): Promise<void> {

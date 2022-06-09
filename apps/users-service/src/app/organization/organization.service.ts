@@ -205,7 +205,7 @@ export class OrganizationService {
           {
             user: {
               id: req?.user?.id,
-              organizationId: organization._id,
+              organizationId: organization.id,
             },
           },
           {
