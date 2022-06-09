@@ -1,6 +1,6 @@
 import { Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import * as dotenv from 'dotenv';
 import { Host } from '@invyce/global-constants';
@@ -29,6 +29,7 @@ export class Authenticate extends PassportStrategy(Strategy) {
   }
 
   async validate(payload) {
+    Logger.log('validate function called');
     console.log(payload, 'payload');
     const user = await axios.post(
       Host('users', 'users/auth/access-controll'),
