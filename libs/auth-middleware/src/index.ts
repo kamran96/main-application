@@ -45,6 +45,8 @@ export class Authenticate extends PassportStrategy(Strategy) {
         }
       );
 
+      console.log(user?.data?.result, 'user');
+
       if (user?.data?.result?.statusCode === HttpStatus.OK) {
         return user?.data?.result?.user;
       }
