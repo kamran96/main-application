@@ -29,6 +29,7 @@ export class Authenticate extends PassportStrategy(Strategy) {
 
   async validate(payload) {
     try {
+      console.log('calling...');
       const user = await axios.post(
         Host('users', 'users/auth/access-controll'),
         {
