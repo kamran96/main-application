@@ -113,7 +113,7 @@ interface IProps {
   onCancel: () => void;
   compareKeys?: any[];
   documentKeys: any[];
-  OnConfrm: () => void;
+  OnConfrm: (payload: any) => void;
 }
 export const CompareDataModal: FC<IProps> = ({
   visibility,
@@ -123,13 +123,9 @@ export const CompareDataModal: FC<IProps> = ({
   OnConfrm,
 }) => {
   const [compareData, setCompareData] = useState<any>({});
-
   const res = documentKeys?.filter(
     (item: any) => Object.keys(compareData).includes(item) === false
   );
-
-  console.log(res, 'result');
-  console.log(Object?.keys(compareData).includes('Contact'), 'Obj');
 
   const handleSelectItem = () => {
     // return documentKeys
@@ -144,12 +140,10 @@ export const CompareDataModal: FC<IProps> = ({
     });
   };
 
-  console.log(handleSelectItem(), 'handleselction');
-
   if (visibility && documentKeys?.length) {
     const columns: ColumnsType<any> = [
       {
-        title: 'Columns',
+        title: 'Fields from Database',
         dataIndex: 'label',
         key: 'label',
         render: (data, row, index) => {
@@ -165,12 +159,13 @@ export const CompareDataModal: FC<IProps> = ({
       },
 
       {
-        title: 'Compare',
+        title: 'Your Headers from file',
         dataIndex: '',
         key: 'compareData',
         render: (text: string, record: any) => {
           return (
             <EditableSelect
+              allowClear
               style={{ width: '100%' }}
               onChange={(value) => {
                 setCompareData((prevState) => {
@@ -200,14 +195,20 @@ export const CompareDataModal: FC<IProps> = ({
         </Paragraph>
         <EditableTable
           columns={columns as any}
-          data={compareKeys}
+          data={compareKeys.sort((a, b) => a.label.localeCompare(b.label))}
           dragable={() => null}
         />
         <div className="CnfrmBtn">
           <Button className="btn" onClick={onCancel}>
             Back
           </Button>
-          <Button type="primary" className="btn" onClick={OnConfrm}>
+          <Button
+            type="primary"
+            className="btn"
+            onClick={() => {
+              OnConfrm(compareData);
+            }}
+          >
             Confirm
           </Button>
         </div>
