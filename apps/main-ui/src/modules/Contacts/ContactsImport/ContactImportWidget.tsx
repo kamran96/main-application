@@ -9,9 +9,9 @@ import styled, { keyframes } from 'styled-components';
 import { CommonModal } from '../../../components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { InvoiceImportManager } from '../../Invoice/InvoiceImportManager';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { ReactQueryKeys } from '../../../modal';
-import { getContactKeysAPI } from '../../../api';
+import { CsvImportAPi, getContactKeysAPI } from '../../../api';
 import { CompareDataModal } from './CompareDataModal';
 import { Button } from 'antd';
 
@@ -25,6 +25,16 @@ interface Idata {
     text: string;
   };
 }
+const data: Idata = {
+  xero: {
+    link: 'You can download template file',
+    text: 'You’re selected file customers.csv. click process to import contacts from xero file format.',
+  },
+  quickbook: {
+    link: 'You can download template file quik',
+    text: 'You’re selected file customers.csv. click process to import contacts from quickbook file format.',
+  },
+};
 
 export const ContactImportWidget: FC = () => {
   const { contactsImportConfig, setContactsImportConfig } = useGlobalContext();
@@ -32,6 +42,9 @@ export const ContactImportWidget: FC = () => {
   const [fileData, setFileData] = useState<File>();
   const [fileExtractedData, setFileExtractedData] = useState([]);
   const [compareDataModal, setCompareDataModel] = useState<boolean>(false);
+  const { mutate: uploadCsv } = useMutation(CsvImportAPi);
+  const [state, setState] = useState(data?.xero);
+  const [step, setStep] = useState<number>(1);
 
   const { data: contactKeysResponse, isLoading: contactKeysLoading } = useQuery(
     [ReactQueryKeys],
@@ -41,18 +54,14 @@ export const ContactImportWidget: FC = () => {
     }
   );
 
-  const data: Idata = {
-    xero: {
-      link: 'You can download template file',
-      text: 'You’re selected file customers.csv. click process to import contacts from xero file format.',
-    },
-    quickbook: {
-      link: 'You can download template file quik',
-      text: 'You’re selected file customers.csv. click process to import contacts from quickbook file format.',
-    },
+  const onConfirmUpload = async (compareData) => {
+    const formData = new FormData();
+    formData.append('file', fileData);
+    formData.append('compareData', JSON.stringify(compareData));
+
+    await uploadCsv(formData);
   };
-  const [state, setState] = useState(data?.xero);
-  const [step, setStep] = useState<number>(1);
+
   return (
     <CommonModal
       visible={visibility}
@@ -70,9 +79,7 @@ export const ContactImportWidget: FC = () => {
             transform: `${
               compareDataModal ? 'translateX(-300%)' : 'translateX(0)'
             }`,
-            display: `${
-              compareDataModal ? 'none' : ''
-            }`,
+            display: `${compareDataModal ? 'none' : ''}`,
           }}
         >
           <div className="modal-icon">
@@ -153,12 +160,12 @@ export const ContactImportWidget: FC = () => {
                   ? Object.keys(fileExtractedData?.[0])
                   : []
               }
-              // compareKeys={contactKeysResponse?.data || []}
+              compareKeys={contactKeysResponse?.data || []}
               onCancel={() => {
                 setStep(1);
                 setCompareDataModel(false);
               }}
-              OnConfrm={() => console.log('hello')}
+              OnConfrm={onConfirmUpload}
               visibility={compareDataModal}
             />
           </div>
