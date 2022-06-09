@@ -25,6 +25,7 @@ export class Authenticate extends PassportStrategy(Strategy) {
       ignoreExpiration: false,
       secretOrKey: process.env.JWT_SECRET,
     });
+    console.log('ending of constructor...');
   }
 
   async validate(payload) {
