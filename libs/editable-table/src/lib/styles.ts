@@ -53,9 +53,9 @@ export const EditableTableWrapper = styled.div<IWrapperProps>`
       border-bottom: 1px solid
         ${(props: IThemeProps) => props?.theme?.colors?.seprator};
       color: ${(props: IThemeProps) => props?.theme?.colors?.textTd};
-      padding: 13px 16px;
+      padding: 13px 16px; 
       background-color: ${(props: IThemeProps) =>
-        props?.theme?.colors?.td} !important;
+        props?.theme?.colors?.td};
     }
 
     .ant-table-thead > tr > th,
