@@ -85,6 +85,7 @@ export class AuthController {
   @Post('/forget-password')
   async forgetPassword(@Body() userDto: ForgetPasswordDto): Promise<any> {
     try {
+      console.log('forgot password');
       const user: any = this.authService.ForgetPassword(userDto);
 
       if (user) {

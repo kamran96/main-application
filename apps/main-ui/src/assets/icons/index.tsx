@@ -2044,7 +2044,8 @@ export const CreateInvoice = ({ height = 18, width = 18 }) => {
       height={height}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 30.96 30.24"
-      style={{ strokeWidth: '0.2' }}
+      className='ThreeIconsDiff'
+      style={{ strokeWidth: '0.1' }}
     >
       <g id="Object">
         <path
@@ -2121,9 +2122,10 @@ export const CreateBill = ({ height = 18, width = 18 }) => {
       height={height}
       width={width}
       xmlns="http://www.w3.org/2000/svg"
-      fill="#334d6e"
+      fill=""
+      className='ThreeIconsDiff'
       viewBox="0 0 30.96 30.24"
-      style={{ strokeWidth: '0.2' }}
+      style={{ strokeWidth: '0.1' }}
     >
       <g id="Object">
         <path
@@ -2254,6 +2256,7 @@ export const DebitNote = ({ height = 18, width = 18 }) => {
       width={width}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 30.96 30.24"
+      className='ThreeIconsDiff'
       style={{ strokeWidth: '0.1' }}
     >
       <g id="Object">

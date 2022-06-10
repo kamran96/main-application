@@ -85,7 +85,7 @@ export class AccountsService {
         if (query) {
           const filterData = Buffer.from(query, 'base64').toString();
           const data = JSON.parse(filterData);
-          console.log(data, 'filters');
+
           // const data = {
           //   name: {
           //     type: 'search',
@@ -95,7 +95,7 @@ export class AccountsService {
           for (const i in data) {
             if (data[i].type === 'search') {
               const val = data[i].value.toLowerCase();
-              console.log(i, val);
+
               accounts = await getCustomRepository(AccountRepository)
                 .createQueryBuilder('a')
                 .select(
@@ -376,6 +376,7 @@ export class AccountsService {
 
   async initAccounts(data: IRequest): Promise<void> {
     try {
+      console.log('inserting accounts...');
       const { primary, secondary } = await import('../accounts');
       for (const account of primary) {
         const accountModel = {

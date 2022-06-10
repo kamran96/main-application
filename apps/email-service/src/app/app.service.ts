@@ -54,8 +54,6 @@ export class AppService {
   }
 
   async SendForgotPassword(data) {
-    console.log('sending...');
-
     const TemplateModel = {
       product_url: '',
       product_name: 'invyce',
@@ -101,8 +99,6 @@ export class AppService {
   }
 
   async PasswordUpdated(data) {
-    console.log('sending...');
-
     const TemplateModel = {
       user_name: data.user_name,
       link: data.link,
@@ -253,8 +249,6 @@ export class AppService {
   }
 
   async BillCreated(data) {
-    console.log('sending email...');
-
     const dist = path.resolve(data.attachment_name);
     const content = fs.readFileSync(dist);
 
@@ -293,8 +287,6 @@ export class AppService {
   }
 
   async InvoiceCreated(data) {
-    console.log('sending email...');
-
     const dist = path.resolve(data.attachment_name);
     const content = fs.readFileSync(dist);
 
@@ -321,7 +313,6 @@ export class AppService {
   }
 
   async InvoiceUpdated(data) {
-    console.log('sending email...');
     const TemplateModel = { ...data };
 
     const email = await client.sendEmailWithTemplate({
