@@ -227,7 +227,7 @@ const WrapperModalContent = styled.div<ModalWrapper>`
   display: flex;
   padding-bottom: 1rem;
   overflow: hidden;
-  height: 100vh;
+  height: 41rem;
 
   .container {
     transition: 0.6s all ease-in-out;

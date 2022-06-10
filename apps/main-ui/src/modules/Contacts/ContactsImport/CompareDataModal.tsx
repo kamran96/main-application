@@ -136,8 +136,6 @@ export const CompareDataModal: FC<IProps> = ({
     });
   };
 
-
-
   if (visibility && documentKeys?.length) {
     const columns: ColumnsType<any> = [
       {
@@ -185,9 +183,9 @@ export const CompareDataModal: FC<IProps> = ({
         dataIndex: 'action',
         key: 'action',
         render: () => {
-          return <Icon className="Icon" icon={deleteIcon}/>
-        }
-      }
+          return <Icon className="Icon" icon={deleteIcon} />;
+        },
+      },
     ];
 
     return (
@@ -208,7 +206,12 @@ export const CompareDataModal: FC<IProps> = ({
           <Button className="btn" onClick={onCancel}>
             Back
           </Button>
-          <Button type="primary" className="btn" onClick={() =>OnConfrm(compareData)}>
+          <Button
+            type="primary"
+            className="btn"
+            disabled={Object.keys(compareData).length === 0}
+            onClick={() => OnConfrm(compareData)}
+          >
             Confirm
           </Button>
         </div>
