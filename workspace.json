@@ -474,7 +474,8 @@
             "outputPath": "dist/apps/email-service",
             "main": "apps/email-service/src/main.ts",
             "tsConfig": "apps/email-service/tsconfig.app.json",
-            "assets": ["apps/email-service/src/assets"]
+            "assets": ["apps/email-service/src/assets"],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {
@@ -486,7 +487,8 @@
                   "replace": "apps/email-service/src/environments/environment.ts",
                   "with": "apps/email-service/src/environments/environment.prod.ts"
                 }
-              ]
+              ],
+              "generatePackageJson": true
             }
           }
         },

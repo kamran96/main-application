@@ -14,6 +14,8 @@ import { ReactQueryKeys } from '../../../modal';
 import { CsvImportAPi, getContactKeysAPI } from '../../../api';
 import { CompareDataModal } from './CompareDataModal';
 import { Button } from 'antd';
+import { ColumnsType } from 'antd/lib/table';
+import { CommonTable } from '../../../components/Table';
 
 interface Idata {
   xero: {
@@ -39,12 +41,11 @@ const data: Idata = {
 export const ContactImportWidget: FC = () => {
   const { contactsImportConfig, setContactsImportConfig } = useGlobalContext();
   const { visibility } = contactsImportConfig;
+  const [step, setStep] = useState<number>(1);
   const [fileData, setFileData] = useState<File>();
   const [fileExtractedData, setFileExtractedData] = useState([]);
   const [compareDataModal, setCompareDataModel] = useState<boolean>(false);
-  const { mutate: uploadCsv } = useMutation(CsvImportAPi);
-  const [state, setState] = useState(data?.xero);
-  const [step, setStep] = useState<number>(1);
+  const [compareData, setCompareData] = useState<any>({});
 
   const { data: contactKeysResponse, isLoading: contactKeysLoading } = useQuery(
     [ReactQueryKeys],
@@ -54,13 +55,43 @@ export const ContactImportWidget: FC = () => {
     }
   );
 
-  const onConfirmUpload = async (compareData) => {
-    const formData = new FormData();
-    formData.append('file', fileData);
-    formData.append('compareData', JSON.stringify(compareData));
+  console.log(
+    contactKeysResponse,
+    fileExtractedData,
+    compareData,
+    'check what is data'
+  );
 
-    await uploadCsv(formData);
+  // const onConfirmUpload = async (compareData) => {
+  //   const formData = new FormData();
+  //   formData.append('file', fileData);
+  //   formData.append('compareData', JSON.stringify(compareData));
+
+  //   await uploadCsv(formData);
+  // };
+  const [state, setState] = useState(data?.xero);
+
+  const getTitle = (colItem: string) => {
+    if (contactKeysResponse?.data) {
+      const key = compareData[colItem];
+      const [filtered] = contactKeysResponse?.data?.filter(
+        (ckey, cindex) => ckey?.keyName === key
+      );
+      return filtered ? filtered?.label : colItem;
+    } else {
+      return colItem;
+    }
   };
+  const columns: ColumnsType<any> =
+    fileExtractedData?.length > 0
+      ? Object.keys(fileExtractedData[0]).map((item) => {
+          return {
+            title: getTitle(item),
+            dataIndex: item,
+            key: item,
+          };
+        })
+      : [];
 
   return (
     <CommonModal
@@ -73,15 +104,7 @@ export const ContactImportWidget: FC = () => {
       footer={false}
     >
       <WrapperModalContent step={step}>
-        <div
-          className="container"
-          style={{
-            transform: `${
-              compareDataModal ? 'translateX(-300%)' : 'translateX(0)'
-            }`,
-            display: `${compareDataModal ? 'none' : ''}`,
-          }}
-        >
+        <div className="container">
           <div className="modal-icon">
             <Icon className="Icon" icon={bookHalf} width="80" color="#2395E7" />
           </div>
@@ -132,6 +155,7 @@ export const ContactImportWidget: FC = () => {
               </div>
               <Button
                 size="large"
+                className="btn"
                 disabled={!fileData}
                 onClick={(e) => {
                   e?.preventDefault();
@@ -145,31 +169,42 @@ export const ContactImportWidget: FC = () => {
             </div>
           )}
         </div>
-        {
-          <div
-            className="CompareModal"
-            style={{
-              transform: `${
-                !compareDataModal ? 'translateX(300%)' : 'translateX(0)'
-              }`,
+
+        <div className="CompareModal">
+          <CompareDataModal
+            documentKeys={
+              fileExtractedData?.length
+                ? Object.keys(fileExtractedData?.[0])
+                : []
+            }
+            compareKeys={contactKeysResponse?.data || []}
+            onCancel={() => {
+              setStep(1);
+              setCompareDataModel(false);
             }}
-          >
-            <CompareDataModal
-              documentKeys={
-                fileExtractedData?.length
-                  ? Object.keys(fileExtractedData?.[0])
-                  : []
-              }
-              compareKeys={contactKeysResponse?.data || []}
-              onCancel={() => {
-                setStep(1);
-                setCompareDataModel(false);
-              }}
-              OnConfrm={onConfirmUpload}
-              visibility={compareDataModal}
-            />
+            OnConfrm={(data: any) => {
+              setStep(3);
+              setCompareData(data);
+            }}
+            visibility={compareDataModal}
+          />
+        </div>
+
+        <div className="TableWrapper">
+          <CommonTable columns={columns} data={fileExtractedData} />
+          <div className="CnfrmBtn">
+            <Button className="btn" onClick={() => setStep(2)}>
+              Back
+            </Button>
+            <Button
+              type="primary"
+              className="btn"
+              onClick={() => console.log('proceed')}
+            >
+              Proceed
+            </Button>
           </div>
-        }
+        </div>
       </WrapperModalContent>
     </CommonModal>
   );
@@ -184,20 +219,50 @@ interface ModalWrapper extends DivProps {
 }
 
 const WrapperModalContent = styled.div<ModalWrapper>`
-  // display: flex;
+  display: flex;
   padding-bottom: 1rem;
   overflow: hidden;
-  .CompareModal {
-    transition: 0.9s ease-in-out;
-    background: white;
-  }
+  height: 41rem;
+
   .container {
-    transition: 1s ease-in-out;
-    width: 100%;
+    transition: 0.6s all ease-in-out;
+    width: ${(props: any) => (props?.step === 1 ? '100%' : 0)};
+    opacity: ${(props: any) => (props?.step === 1 ? 1 : 0)};
     display: flex;
     align-items: center;
+    min-height: 0;
     flex-direction: column;
-    background: white;
+    transform: ${(props: any) =>
+      props?.step === 2 ? 'translateX(-100%)' : 'translateX(0)'};
+  }
+
+  .CompareModal {
+    width: ${(props: any) => (props?.step === 2 ? '100%' : 0)};
+    opacity: ${(props: any) => (props?.step === 2 ? 1 : 0)};
+    transform: ${(props: any) =>
+      props?.step === 2
+        ? 'translateX(0)'
+        : props?.step === 3
+        ? 'translateX(-100%)'
+        : 'translateX(100%)'};
+    transition: 0.4s ease-in-out;
+    height: 100vh;
+  }
+  .TableWrapper {
+    width: ${(props: any) => (props?.step === 3 ? '100%' : 0)};
+    opacity: ${(props: any) => (props?.step === 3 ? 1 : 0)};
+    transform: ${(props: any) =>
+      props?.step === 3 ? 'translateX(0)' : 'translateX(100%)'};
+    transition: 0.4s ease-in-out;
+
+    .CnfrmBtn {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    .btn {
+      margin: 5px 4px;
+    }
   }
   .modal-icon {
     display: flex;
@@ -244,7 +309,7 @@ const WrapperModalContent = styled.div<ModalWrapper>`
   }
   .render-content {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     flex-direction: column;
     .download {
@@ -259,6 +324,10 @@ const WrapperModalContent = styled.div<ModalWrapper>`
       a {
         cursor: pointer;
       }
+    }
+    .btn {
+      margin-left: 90%;
+      margin-top: 2rem;
     }
     .input {
       margin: 0px 0px 8px 15px;

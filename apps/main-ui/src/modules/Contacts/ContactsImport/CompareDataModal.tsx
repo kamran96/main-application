@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { FC, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { CommonModal } from '../../../components';
 import { ColumnsType } from 'antd/lib/table';
 import { G } from '@react-pdf/renderer';
@@ -11,8 +11,7 @@ import Paragraph from 'antd/lib/typography/Paragraph';
 import { Icon } from '@iconify/react';
 import questionIcon from '@iconify/icons-fe/question';
 import { Button, Tooltip } from 'antd';
-import Item from 'antd/lib/list/Item';
-import { Items } from '../../Items';
+import deleteIcon from '@iconify/icons-carbon/delete';
 
 const a = [
   {
@@ -123,68 +122,85 @@ export const CompareDataModal: FC<IProps> = ({
   OnConfrm,
 }) => {
   const [compareData, setCompareData] = useState<any>({});
-  const res = documentKeys?.filter(
-    (item: any) => Object.keys(compareData).includes(item) === false
+
+  const unUsedDocumentKeys = documentKeys.filter(
+    (key) => !Object.keys(compareData).includes(key)
   );
 
-  const handleSelectItem = () => {
-    // return documentKeys
-    //   ?.filter(
-    //     (Items: any) => Object.keys(compareData).includes(Items) === true
-    //   )
-    //   .map((key: any) => {
-    //     return <Option key={key}>{key}</Option>;
-    //   });
-    return documentKeys?.map((key: any) => {
-      return <Option key={key}>{key}</Option>;
-    });
-  };
-
-  if (visibility && documentKeys?.length) {
-    const columns: ColumnsType<any> = [
-      {
-        title: 'Fields from Database',
-        dataIndex: 'label',
-        key: 'label',
-        render: (data, row, index) => {
-          return (
-            <div className="flex justifySpaceBetween alignCenter">
-              <span>{data}</span>
-              <Tooltip placement="topRight" title={row?.description}>
-                <Icon style={{ width: 20, height: 20 }} icon={questionIcon} />
-              </Tooltip>
-            </div>
-          );
-        },
+  const columns: ColumnsType<any> = [
+    {
+      title: 'Fields from Database',
+      dataIndex: 'label',
+      key: 'label',
+      render: (data, row, index) => {
+        return (
+          <div className="flex justifySpaceBetween alignCenter">
+            <span>{data}</span>
+            <Tooltip placement="topRight" title={row?.description}>
+              <Icon style={{ width: 20, height: 20 }} icon={questionIcon} />
+            </Tooltip>
+          </div>
+        );
       },
+    },
 
-      {
-        title: 'Your Headers from file',
-        dataIndex: '',
-        key: 'compareData',
-        render: (text: string, record: any) => {
-          return (
-            <EditableSelect
-              allowClear
-              style={{ width: '100%' }}
-              onChange={(value) => {
+    {
+      title: 'Your Headers from file',
+      dataIndex: '',
+      key: 'compareData',
+      render: (text: string, record: any, index: any) => {
+        return (
+          <EditableSelect
+            allowClear
+            style={{ width: '100%' }}
+            onChange={(value) => {
+              if (!value) {
+                const stateValue = Object.values(compareData);
+                const stateKeys = Object?.keys(compareData);
+                const indexed = stateValue?.findIndex(
+                  (i) => i === record?.keyName
+                );
+                if (indexed > -1) {
+                  setCompareData((prevState) => {
+                    const state = { ...prevState };
+
+                    delete state[stateKeys[indexed]];
+
+                    return state;
+                  });
+                }
+              } else {
                 setCompareData((prevState) => {
                   const state = { ...prevState };
                   state[value?.value] = record.keyName;
                   return state;
                 });
-              }}
-              showSearch
-              placeholder="Select Header"
-              optionFilterProp="children"
-            >
-              {handleSelectItem()}
-            </EditableSelect>
-          );
-        },
+              }
+            }}
+            showSearch
+            placeholder="Select Header"
+            optionFilterProp="children"
+          >
+            {unUsedDocumentKeys?.map((key: any) => {
+              return <Option key={key}>{key}</Option>;
+            })}
+          </EditableSelect>
+        );
       },
-    ];
+    },
+    {
+      title: 'Action',
+      dataIndex: 'action',
+      key: 'action',
+      render: () => {
+        return <Icon className="Icon" icon={deleteIcon} />;
+      },
+    },
+  ];
 
+  console.log(compareData, 'compareData');
+
+  if (visibility && documentKeys?.length) {
     return (
       <CompareDataModalWrapper>
         <Heading type="form">Compare Data Segments</Heading>
@@ -194,20 +210,27 @@ export const CompareDataModal: FC<IProps> = ({
           table sections.{' '}
         </Paragraph>
         <EditableTable
+          rowClassName={(record, index) => {
+            return Object.values(compareData).includes(record?.keyName)
+              ? 'SelectedItem'
+              : '';
+          }}
+          isMemo={false}
+          customMount={unUsedDocumentKeys?.length}
           columns={columns as any}
           data={compareKeys.sort((a, b) => a.label.localeCompare(b.label))}
           dragable={() => null}
+          scrollable={{ offsetY: 500, offsetX: 0 }}
         />
         <div className="CnfrmBtn">
           <Button className="btn" onClick={onCancel}>
             Back
           </Button>
           <Button
+            disabled={!Object?.keys(compareData).length}
             type="primary"
             className="btn"
-            onClick={() => {
-              OnConfrm(compareData);
-            }}
+            onClick={() => OnConfrm(compareData)}
           >
             Confirm
           </Button>
@@ -225,5 +248,16 @@ export const CompareDataModalWrapper = styled.div`
   }
   .btn {
     margin: 5px 4px;
+  }
+  .Icon {
+    cursor: pointer;
+  }
+  .SelectedItem {
+    td: nth-child(2) {
+      div {
+        background-color: #1e75f1;
+        color: #fff;
+      }
+    }
   }
 `;

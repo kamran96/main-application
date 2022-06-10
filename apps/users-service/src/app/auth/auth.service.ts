@@ -32,7 +32,6 @@ import {
 import { UserToken } from '../schemas/userToken.schema';
 import {
   IRequest,
-  ICheckUser,
   IUser,
   IUserAccessControlResponse,
   IVerifyOtp,
@@ -89,9 +88,6 @@ export class AuthService {
       const findToken = await this.userTokenModel.findOne({
         userId: userId,
         code: req?.cookies?.access_token,
-        // process.env.NODE_ENV === 'development'
-        // ? req?.headers?.authorization?.split(' ')[1]
-        // : req?.cookies?.access_token,
       });
 
       const newTime = Moment(new Date()).add(12, 'h').format();
@@ -100,9 +96,6 @@ export class AuthService {
       if (findToken === null) {
         const token = new this.userTokenModel();
         token.code = req?.cookies?.access_token;
-        // process.env.NODE_ENV === 'development'
-        //   ? req?.headers?.authorization?.split(' ')[1]
-        //   : req?.cookies?.access_token;
         token.expiresAt = newTime;
         // token.brower = req?.headers?['user-agent'];
         token.ipAddress = ip.address();

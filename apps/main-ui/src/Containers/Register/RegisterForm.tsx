@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { Button, Checkbox, Col, Form, Input, Row, Select } from 'antd';
-import { FC, useEffect } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { useMutation } from 'react-query';
 import { Link } from 'react-router-dom';
 
@@ -22,6 +22,7 @@ const { Option } = Select;
 let timeOutTime: any;
 
 export const RegisterForm: FC = () => {
+  const [show, setShow] = useState(true);
   const { mutate: mutateUsernameAvaliable, data: usernameAvaliable } =
     useMutation(userCheckAPI);
   const { mutate: mutateRegister, isLoading } = useMutation(RegisterAPI);
@@ -119,6 +120,7 @@ export const RegisterForm: FC = () => {
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
+
   const prefixSelector = (
     <Form.Item name="prefix" noStyle>
       <Select
@@ -194,7 +196,7 @@ export const RegisterForm: FC = () => {
                       ]}
                     >
                       <Input
-                        placeholder={'eg John'}
+                        placeholder={'e.g John'}
                         size="middle"
                         autoComplete="off"
                       />
@@ -339,7 +341,7 @@ export const RegisterForm: FC = () => {
                       name="agreed"
                       valuePropName="checked"
                     >
-                      <Checkbox>
+                      <Checkbox onChange={() => setShow(!show)}>
                         <span>
                           I have read and agree to the{' '}
                           <a
@@ -381,6 +383,7 @@ export const RegisterForm: FC = () => {
                           loading={isLoading}
                           type="primary"
                           htmlType="submit"
+                          disabled={show}
                         >
                           Create Account
                         </Button>
