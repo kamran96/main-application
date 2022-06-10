@@ -30,7 +30,7 @@ const _EditableListItem = ({
     }
 
     return (
-      <td className="ant-table-cell">
+      <td className="ant-table-cell" style={{backgroundColor: 'red !important'}}>
         {column.render
           ? column.render(row[column.dataIndex], row, index)
           : row[column.dataIndex]}
