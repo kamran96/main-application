@@ -9,9 +9,9 @@ import styled, { keyframes } from 'styled-components';
 import { CommonModal } from '../../../components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { InvoiceImportManager } from '../../Invoice/InvoiceImportManager';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { ReactQueryKeys } from '../../../modal';
-import { getContactKeysAPI } from '../../../api';
+import { CsvImportAPi, getContactKeysAPI } from '../../../api';
 import { CompareDataModal } from './CompareDataModal';
 import { Button } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
@@ -27,6 +27,16 @@ interface Idata {
     text: string;
   };
 }
+const data: Idata = {
+  xero: {
+    link: 'You can download template file',
+    text: 'You’re selected file customers.csv. click process to import contacts from xero file format.',
+  },
+  quickbook: {
+    link: 'You can download template file quik',
+    text: 'You’re selected file customers.csv. click process to import contacts from quickbook file format.',
+  },
+};
 
 export const ContactImportWidget: FC = () => {
   const { contactsImportConfig, setContactsImportConfig } = useGlobalContext();
@@ -45,58 +55,43 @@ export const ContactImportWidget: FC = () => {
     }
   );
 
-  const data: Idata = {
-    xero: {
-      link: 'You can download template file',
-      text: 'You’re selected file customers.csv. click process to import contacts from xero file format.',
-    },
-    quickbook: {
-      link: 'You can download template file quik',
-      text: 'You’re selected file customers.csv. click process to import contacts from quickbook file format.',
-    },
-  };
+  console.log(
+    contactKeysResponse,
+    fileExtractedData,
+    compareData,
+    'check what is data'
+  );
+
+  // const onConfirmUpload = async (compareData) => {
+  //   const formData = new FormData();
+  //   formData.append('file', fileData);
+  //   formData.append('compareData', JSON.stringify(compareData));
+
+  //   await uploadCsv(formData);
+  // };
   const [state, setState] = useState(data?.xero);
 
-  let result = [];
-
-  if (compareData) {
-    result = Object.keys(compareData).map((item) => {
-      return compareData[item];
-    });
-  }
-
-  const columns: ColumnsType<any> = result?.map((columnItems: any) => {
-    return { title: columnItems, dataIndex: columnItems?.toLowerCase(), key: columnItems };
-  });
-
-
-  // const dataTableResult = fileExtractedData?.map((item: any, index: number) => {
-  //    const tableItem = Object.keys(item).map((ItemTable) => ItemTable?.split(" ").join(""));
-  //    console.log()
-  // })
- 
-  const tableData = [
-    {
-      key: '1',
-      name: "ali",
-      email: "ali@invyce.com",
-      contacttype: "test",
-      businessname: "test bus",
-      creditlimitblock: "test credit block",
-      creditlimit: "test Credit",
-      balance: "Balance"
-    },
-    {
-      key: '2',
-      name: "bli",
-      email: "bli@invyce.com",
-      contacttype: "test",
-      businessname: "test bus",
-      creditlimitblock: "test credit block",
-      creditlimit: "test Credit",
-      balance: "Balance"
-    },
-  ]
+  const getTitle = (colItem: string) => {
+    if (contactKeysResponse?.data) {
+      const key = compareData[colItem];
+      const [filtered] = contactKeysResponse?.data?.filter(
+        (ckey, cindex) => ckey?.keyName === key
+      );
+      return filtered ? filtered?.label : colItem;
+    } else {
+      return colItem;
+    }
+  };
+  const columns: ColumnsType<any> =
+    fileExtractedData?.length > 0
+      ? Object.keys(fileExtractedData[0]).map((item) => {
+          return {
+            title: getTitle(item),
+            dataIndex: item,
+            key: item,
+          };
+        })
+      : [];
 
   return (
     <CommonModal
@@ -182,7 +177,7 @@ export const ContactImportWidget: FC = () => {
                 ? Object.keys(fileExtractedData?.[0])
                 : []
             }
-            // compareKeys={contactKeysResponse?.data || []}
+            compareKeys={contactKeysResponse?.data || []}
             onCancel={() => {
               setStep(1);
               setCompareDataModel(false);
@@ -196,7 +191,7 @@ export const ContactImportWidget: FC = () => {
         </div>
 
         <div className="TableWrapper">
-          <CommonTable columns={columns} data={tableData} />
+          <CommonTable columns={columns} data={fileExtractedData} />
           <div className="CnfrmBtn">
             <Button className="btn" onClick={() => setStep(2)}>
               Back

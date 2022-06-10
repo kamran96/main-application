@@ -32,6 +32,7 @@ export interface EditableTableProps {
   resetCache?: boolean;
   customMount?: any;
   rowClassName?: (record: any, index: number) => string;
+  isMemo?: boolean;
 
   // onMoveCard: (data: any[])=>void;
 }
@@ -46,6 +47,7 @@ export function EditableTable({
   resetCache,
   customMount,
   rowClassName,
+  isMemo,
 }: EditableTableProps) {
   const [{ tableColumns, tableData }, setLoadingConfig] = useState<{
     tableColumns: EditableColumnsType[];
@@ -182,6 +184,7 @@ export function EditableTable({
                 columns={tableColumns}
                 customMount={customMount}
                 rowClassName={rowClassName}
+                isMemo={isMemo}
               />
             );
           })}

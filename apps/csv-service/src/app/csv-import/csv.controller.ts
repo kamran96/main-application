@@ -1,4 +1,12 @@
-import { Body, Controller, Get, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  UseGuards,
+  Post,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { CsvService } from './csv.service';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 
@@ -6,10 +14,9 @@ import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 export class CsvController {
   constructor(private csvService: CsvService) {}
 
-  @Get('import')
+  @Post('import')
   @UseGuards(GlobalAuthGuard)
-  async importCsv(@Body() body: any) {
-    console.log(body);
-    return await this.csvService.importCsv();
+  async importCsv(@Req() req: Request, @Res() res: any) {
+    return await this.csvService.importCsv(req, res);
   }
 }
