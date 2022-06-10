@@ -12,6 +12,7 @@ import { Icon } from '@iconify/react';
 import questionIcon from '@iconify/icons-fe/question';
 import { Button, Tooltip } from 'antd';
 import deleteIcon from '@iconify/icons-carbon/delete';
+import { ITheme, IThemeProps } from '@invyce/shared/invyce-theme';
 
 const a = [
   {
@@ -188,14 +189,14 @@ export const CompareDataModal: FC<IProps> = ({
         );
       },
     },
-    {
-      title: 'Action',
-      dataIndex: 'action',
-      key: 'action',
-      render: () => {
-        return <Icon className="Icon" icon={deleteIcon} />;
-      },
-    },
+    // {
+    //   title: 'Action',
+    //   dataIndex: 'action',
+    //   key: 'action',
+    //   render: () => {
+    //     return <Icon className="Icon" icon={deleteIcon} />;
+    //   },
+    // },
   ];
 
   console.log(compareData, 'compareData');
@@ -252,12 +253,13 @@ export const CompareDataModalWrapper = styled.div`
   .Icon {
     cursor: pointer;
   }
-  .SelectedItem {
-    td: nth-child(2) {
-      div {
-        background-color: #1e75f1;
-        color: #fff;
-      }
+  .SelectedItem td {
+    background-color: ${(props: IThemeProps) =>
+      props?.theme?.colors?.$PRIMARY} !important;
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE}!important;
+
+    .rendered-text {
+      color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE}!important;
     }
   }
 `;
