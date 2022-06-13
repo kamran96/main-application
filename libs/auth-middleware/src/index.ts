@@ -24,9 +24,8 @@ export class Authenticate extends PassportStrategy(Strategy) {
       },
 
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET,
+      secretOrKey: 'ASFdfasggewr1243123',
     });
-    console.log(process.env.JWT_SECRET, 'JWT_SECRET');
   }
 
   async validate(payload) {
