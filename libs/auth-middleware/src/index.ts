@@ -26,6 +26,7 @@ export class Authenticate extends PassportStrategy(Strategy) {
       ignoreExpiration: false,
       secretOrKey: 'ASFdfasggewr1243123',
     });
+    console.log('noooooooooooo');
   }
 
   async validate(payload) {
