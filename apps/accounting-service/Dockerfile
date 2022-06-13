@@ -8,8 +8,7 @@ FROM node:lts-alpine
 
 # add dump-init to avoid nodejs as pid 1
 RUN apk add dumb-init
-ENV NODE_ENV production \
-    JWT_SECRET=ASDFGHJKL1234567890
+ENV NODE_ENV production
 
 ARG PORT
 USER node
