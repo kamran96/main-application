@@ -63,6 +63,35 @@ export const DashboardLayout: any = (props: RouteConfigComponentProps) => {
     () => import('../modules/Contacts/ContactsImport/ContactImportWidget')
   );
 
+  const ItemsImportWidget = lazy(
+    () => import('../modules/Items/ItemsImport/ItemsImportWidgets')
+  );
+
+  const PaymentImportWidget = lazy(
+    () => import('../modules/Payment/PaymentsImport/PaymentImportWidget')
+  );
+
+  const AccountsImportWidget = lazy(
+    () =>
+      import(
+        '../modules/Accounts/AccountsList/AccountsImport/AccountsImportWidget'
+      )
+  );
+
+  const TransactionImportWidget = lazy(
+    () =>
+      import(
+        '../modules/Business/Transactions/TransactionsList/importTransactions/TransactionImportWidget'
+      )
+  );
+
+  const BankImportWidget = lazy(
+    () =>
+      import(
+        '../modules/Business/BankAccounts/BanksList/BanksImport/BankImportWidget'
+      )
+  );
+
   const { isUserLogin, userDetails, routeHistory, theme, itemsModalConfig } =
     useGlobalContext();
 
@@ -157,6 +186,21 @@ export const DashboardLayout: any = (props: RouteConfigComponentProps) => {
         </Suspense>
         <Suspense fallback={<div></div>}>
           <ContactsImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <ItemsImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <PaymentImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <AccountsImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <TransactionImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <BankImportWidget />
         </Suspense>
       </DashboardWrapper>
     </ThemeProvider>

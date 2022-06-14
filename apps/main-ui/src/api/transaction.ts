@@ -38,3 +38,6 @@ export const getSingleTransactionById = ({ queryKey }: QueryKey) => {
 export const updateTransactionDraftStatus = (userId?: number) => {
   return http.put(`accounts/transaction/approve/${userId}`);
 };
+
+
+export const getTransactionKeysApi = () => http?.get(`${TRANSACTION.INDEX}/import-csv`) 

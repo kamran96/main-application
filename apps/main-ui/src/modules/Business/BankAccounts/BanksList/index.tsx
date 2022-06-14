@@ -11,6 +11,7 @@ import { ISupportedRoutes, NOTIFICATIONTYPE } from '../../../../modal';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { TableCard } from '../../../../components/TableCard';
 import { useHistory } from 'react-router-dom';
+import { BanksImport } from './BanksImport';
 
 export const BanksList: FC = () => {
   const [responseBanks, setResponseBanks] = useState([]);
@@ -139,6 +140,22 @@ export const BanksList: FC = () => {
     }
   };
 
+  const renderCustomTopbar = () => {
+    return (
+      <div>
+        
+      </div>
+    )
+  }
+
+  const topbarRightPannel = () => {
+    return (
+      <div className="flex alignCenter mb-3">
+        <BanksImport/>
+      </div>
+    );
+  };
+
 
   const columns: ColumnsType<any> = [
     {
@@ -192,18 +209,21 @@ export const BanksList: FC = () => {
           loading={isLoading}
           pagination={false}
           onChange={handleBankConfig}
-          //    onChange={
-          //      handleContactsConfig
-          //    }
-          //    pagination={{
-          //      pageSize: page_size,
-          //      position: ["bottomRight"],
-          //      current: paginationData.page_no,
-          //      total: paginationData.total,
-          //    }}
-          //    hasfooter={true}
-          //    onSelectRow={onSelectedRow}
-          //    enableRowSelection
+          customTopbar={renderCustomTopbar()}
+          exportable
+          topbarRightPannel={topbarRightPannel()}
+            //  onChange={
+            //    handleContactsConfig
+            //  }
+            //  pagination={{
+            //    pageSize: page_size,
+            //    position: ["bottomRight"],
+            //    current: paginationData.page_no,
+            //    total: paginationData.total,
+            //  }}
+            //  hasfooter={true}
+            //  onSelectRow={onSelectedRow}
+            //  enableRowSelection
         />
       </TableCard>
     </WrapperBanksList>

@@ -23,6 +23,7 @@ import { PDFICON } from '../../../../components/Icons';
 import DUMMYLOGO from '../../../../assets/quickbook.png';
 import styled from 'styled-components';
 import { TransactionItem } from '../../../../components/PDFs/TransactionSingleItemPdf';
+import { TransactionImport } from './importTransactions';
 
 const APPROVETransactionList: FC = () => {
   const [sortedInfo, setSortedInfo] = useState(null);
@@ -224,6 +225,8 @@ const APPROVETransactionList: FC = () => {
           </div>
         </PDFDownloadLinkWrapper>
 
+        <TransactionImport/>
+
         <SmartFilter
           onFilter={(encode) => {
             setTransactionsConfig({
@@ -313,7 +316,7 @@ const APPROVETransactionList: FC = () => {
     <WrapperTransactionsList>
       <CommonTable
         expandable={{
-          expandedRowRender: (record, index) => {
+           expandedRowRender: (record, index) => {
             return (
               <>
                 <PDFDownloadLink
