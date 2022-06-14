@@ -14,9 +14,10 @@ let host;
 @Injectable()
 export class Authenticate extends PassportStrategy(Strategy) {
   constructor() {
+    console.log('constructor called');
     super({
       jwtFromRequest: (req) => {
-        console.log('okkkkkkkkkkk');
+        console.log('okkkk...................');
         if (!req || !req.cookies) return null;
         token = req.cookies['access_token'];
         host = req.headers.host;
@@ -26,7 +27,6 @@ export class Authenticate extends PassportStrategy(Strategy) {
       ignoreExpiration: false,
       secretOrKey: 'ASFdfasggewr1243123',
     });
-    console.log('noooooooooooo');
   }
 
   async validate(payload) {
