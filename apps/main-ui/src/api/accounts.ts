@@ -71,3 +71,4 @@ export const getAccountsByTypeAPI = ({ queryKey }: QueryKey) => {
 export const getAccountCodeAPI = (payload?: { id: number }) =>
   http?.post(`accounts/account/code`, payload);
 
+export const getAccountKeysApi = () => http?.get(`${ACCOUNT.INDEX}/import-csv`);

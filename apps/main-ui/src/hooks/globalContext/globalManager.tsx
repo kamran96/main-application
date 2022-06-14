@@ -174,6 +174,34 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
       type: null,
     });
 
+  const [itemsImportconfig, setItemsImportConfig] = useState<IModalsConfig>({
+    visibility: false,
+    type: null,
+  });
+
+  const [paymentsImportConfig, setPaymentsImportConfig] =
+    useState<IModalsConfig>({
+      visibility: false,
+      type: null,
+    });
+
+  const [accountsImportConfig, setAccountsImportConfig] =
+    useState<IModalsConfig>({
+      visibility: false,
+      type: null,
+    });
+
+  const [transactionsImportConfig, setTransactionsImportConfig] =
+    useState<IModalsConfig>({
+      visibility: false,
+      type: null,
+    });
+
+  const [bankImportConfig, setBankImportConfig] = useState<IModalsConfig>({
+    visibility: false,
+    type: null
+  })
+
   const [verifiedModal, setVerifiedModal] = useState(false);
 
   window.addEventListener('offline', (event) => {
@@ -219,13 +247,12 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     setAuth(null);
     setAutherized(false);
     localStorage.clear();
-  }
+  };
 
   const handleLogin = async (action: IAction) => {
     switch (action.type) {
       case ILoginActions.LOGIN:
         if (isProductionEnv) {
-
           setAutherized(true);
         } else {
           localStorage.setItem('auth', EncriptData(action.payload) as string);
@@ -257,7 +284,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
             },
           });
         }
-
 
         break;
       default:
@@ -546,6 +572,26 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         contactsImportConfig,
         setContactsImportConfig: (visibility: boolean, type: IImportType) => {
           setContactsImportConfig({ visibility });
+        },
+        itemsImportconfig,
+        setItemsImportconfig: (visibility: boolean, type: IImportType) => {
+          setItemsImportConfig({ visibility });
+        },
+        paymentsImportConfig,
+        setPaymentsImportConfig: (visibility: boolean, type: IImportType) => {
+          setPaymentsImportConfig({ visibility });
+        },
+        accountsImportConfig,
+        setAccountsImportConfig: (visibility: boolean, type: IImportType) => {
+          setAccountsImportConfig({ visibility });
+        },
+        transactionsImportConfig,
+        setTransactionsImportConfig: (visibility: boolean, type: IImportType) => {
+          setTransactionsImportConfig({ visibility });
+        },
+        bankImportConfig,
+        setBankImportConfig: (visibility: boolean, type: IImportType) => {
+          setBankImportConfig({visibility});
         },
         refetchUser,
         refetchPermissions,

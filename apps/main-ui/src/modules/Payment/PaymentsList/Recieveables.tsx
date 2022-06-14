@@ -21,6 +21,7 @@ import { PDFICON } from '../../../components/Icons';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
 import moneyFormat from '../../../utils/moneyFormat';
+import { PaymentImport } from '../PaymentsImport';
 
 export const PaymentRecievedList: FC = () => {
   const queryCache = useQueryClient();
@@ -181,6 +182,7 @@ export const PaymentRecievedList: FC = () => {
   const renderTopbarRight = () => {
     return (
       <div className="flex alignCenter">
+        <PaymentImport/>
         <ButtonTag
           disabled
           className="mr-10"
