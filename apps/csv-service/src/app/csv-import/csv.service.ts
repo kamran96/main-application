@@ -1,22 +1,40 @@
+import { Integrations } from '@invyce/global-constants';
 import { Injectable } from '@nestjs/common';
+import axios from 'axios';
 import formidable = require('formidable');
 import * as fs from 'fs';
 
+enum Modules {
+  CONTACT = 'contact',
+  ACCOUNTS = 'accounts',
+  INVOICE = 'invoice',
+  PAYMENT = 'payment',
+}
 @Injectable()
 export class CsvService {
   constructor() {}
 
   async importCsv(req, res): Promise<any> {
+    if (!req || !req.cookies) return null;
+    const token = req.cookies['access_token'];
+
+    const http = axios.create({
+      baseURL: 'https://localhost',
+      headers: {
+        cookie: `access_token=${token}`,
+      },
+    });
     let formData = {};
     const csvData = []; // array of objects
 
     const form = formidable({ multiples: true });
-    await form.parse(req, (err, fields, files) => {
+    await form.parse(req, async (err, fields, files) => {
       formData = { fields, files };
       const compareData = JSON.parse(fields.compareData);
       const readStream = fs.readFileSync(files.file?.filepath, {
         encoding: 'utf8',
       });
+      const moduleType = JSON.parse(fields.module);
 
       const string = readStream.replace('\r', '');
       const lbreak = string.split('\n');
@@ -30,14 +48,22 @@ export class CsvService {
         csvData.push(obj);
       }
 
-      console.log(csvData);
+      switch (moduleType) {
+        case Modules.CONTACT:
+          console.log(csvData, 'test');
+          await http.post('/contacts/contact/sync', {
+            contacts: csvData,
+            type: Integrations.CSV_IMPORT,
+          });
+          break;
 
+        default:
+          break;
+      }
       // console.log(readStream, 'readstream', compareData);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ fields, files }, null, 2));
     });
-
-    console.log(formData, 'files and fields');
   }
 
   async readMultipartFormData(req, res): Promise<any> {
