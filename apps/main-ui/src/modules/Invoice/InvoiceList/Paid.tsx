@@ -2,7 +2,7 @@
 import { Button } from 'antd';
 import React, { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
-
+import { InvoiceImports } from './invoiceImports';
 import {
   deleteInvoiceDrafts,
   getAllContacts,
@@ -227,6 +227,7 @@ export const PaidtInvoiceList: FC<IProps> = ({ columns }) => {
   const renderTobarRight = () => {
     return (
       <div className="flex alignCenter">
+        <InvoiceImports/>
         <SmartFilter
           onFilter={(encode) => {
             setAllInvoicesConfig({ ...allInvoicesConfig, query: encode });

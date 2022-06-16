@@ -26,7 +26,7 @@ import AccountsFilterringSchema from './AccountsFilteringSchema';
 import { pdfColsAccounts, _csvColumnsAccount } from './exportableCols';
 import { AccountsWrapper, ListWrapper } from './styles';
 import { IErrorResponse } from '@invyce/shared/types';
-import { AccountsImport } from './AccountsImport';
+import { AccountsImport } from '../AccountsImport';
 
 interface IProps {
   columns: ColumnsType;

@@ -1,8 +1,8 @@
 import React, { FC, useState } from 'react';
 import { ColumnsType } from 'antd/lib/table';
 import { G } from '@react-pdf/renderer';
-import { EditableSelect } from '../../../../../components/Editable';
-import { Option } from '../../../../../components/CommonSelect';
+import { EditableSelect } from '../../../../components/Editable';
+import { Option } from '../../../../components/CommonSelect';
 import { EditableTable } from '@invyce/editable-table';
 import { Heading } from '@invyce/shared/components';
 import Paragraph from 'antd/lib/typography/Paragraph';
@@ -23,94 +23,94 @@ interface IProps {
 
 const a = [
   {
-    label: 'Bank Name',
-    keyName: 'Bank Name',
-    description: 'Please select a field which is related to bank name of Bank',
-  },
-  {
-    label: 'Account Name',
-    keyName: 'accountName',
+    label: 'Invoice Number',
+    keyName: 'invoiceNumber',
     description:
-      'Please select a field which is related to Account name of Bank',
+      'Please select a field which is related to Invoice Number of Invoices',
   },
   {
-    label: 'Type',
-    keyName: 'type',
-    description: 'Please select a field which is related to Type of bank',
-  },
-  {
-    label: 'Last Updated',
-    keyName: 'lastUpdated',
+    label: 'Reference',
+    keyName: 'Reference',
     description:
-      'Please select a field which is related to Last updated of Banek',
+      'Please select a field which is related to Reference of Invoices',
+  },
+  {
+    label: 'Note',
+    keyName: 'note',
+    description: 'Please select a field which is related to Note of Invoices',
+  },
+  {
+    label: 'To',
+    keyName: 'to',
+    description: 'Please select a field which is related to To of Invoices',
   },
   {
     label: 'Date',
     keyName: 'Date',
-    description: 'Please select a field which is related to Date of account',
+    description: 'Please select a field which is related to Date of Invoices',
   },
   {
-    label: 'Total Debits',
-    keyName: 'TotalDebits',
+    label: 'Due Date',
+    keyName: 'dueDate',
     description:
-      'Please select a field which is related to total debits of account',
+      'Please select a field which is related to due Date of Invoices',
   },
   {
     label: 'Web Link',
     keyName: 'webLink',
     description:
-      'Please select a field which is related to Website Link of accounts',
+      'Please select a field which is related to Website Link of Invoices',
   },
   {
     label: 'Skype Name',
     keyName: 'skypeName',
     description:
-      'Please select a field which is related to Skype Name of accounts',
+      'Please select a field which is related to Skype Name of Invoices',
   },
   {
     label: 'Fax Number',
     keyName: 'faxNumber',
     description:
-      'Please select a field which is related to Fax Number of accounts',
+      'Please select a field which is related to Fax Number of Invoices',
   },
   {
     label: 'Cell Number',
     keyName: 'cellNumber',
     description:
-      'Please select a field which is related to Cell Number of accounts',
+      'Please select a field which is related to Cell Number of Invoices',
   },
   {
     label: 'Phone Number',
     keyName: 'phoneNumber',
     description:
-      'Please select a field which is related to Phone Number of accounts',
+      'Please select a field which is related to Phone Number of Invoices',
   },
   {
     label: 'Cnic',
     keyName: 'cnic',
     description:
-      'Please select a field which is related to National Identity of accounts',
+      'Please select a field which is related to National Identity of Invoices',
   },
   {
-    label: 'Total Credits',
-    keyName: 'totalCredits',
+    label: 'Paid Amount',
+    keyName: 'paidAmount',
     description:
-      'Please select a field which is related to total Credits of accounts',
+      'Please select a field which is related to Paid Amount of Invoices',
   },
   {
-    label: 'Payments Mode',
-    keyName: 'paymentsMode',
-    description: 'Please select a field which is related to payments Mode',
+    label: 'Due',
+    keyName: 'Due',
+    description: 'Please select a field which is Due to Invoices',
   },
   {
-    label: 'Balance',
-    keyName: 'balance',
-    description: 'Please select a field which is related to Email of accounts',
+    label: 'Comment',
+    keyName: 'comment',
+    description: 'Please select a field which is related to Email of Invoices',
   },
   {
-    label: 'Contact',
-    keyName: 'contact',
-    description: 'Please select a field which is related to Name of accounts',
+    label: 'Status',
+    keyName: 'Status',
+    description: 'Please select a field which is related to Status of Invoices',
   },
 ];
 
@@ -124,7 +124,7 @@ export const CompareDataModal: FC<IProps> = ({
   const [compareData, setCompareData] = useState<any>({});
 
   const unUsedDocumentKeys = documentKeys.filter(
-    (key) => !Object.keys(compareData).includes(key)
+    (key) => key!== undefined && !Object.keys(compareData).includes(key)
   );
 
   const columns: ColumnsType<any> = [
@@ -182,7 +182,7 @@ export const CompareDataModal: FC<IProps> = ({
             optionFilterProp="children"
           >
             {unUsedDocumentKeys?.map((key: any) => {
-              return <Option key={key}>{key}</Option>;
+                return  <Option key={key}>{key}</Option>;
             })}
           </EditableSelect>
         );

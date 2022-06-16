@@ -31,6 +31,7 @@ import { PurchaseTopbar } from './PurchaseTableTopbar';
 import { useCols } from './CommonCol';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
+import { ImportBill } from '../importBill';
 
 interface IProps {
   columns?: any[];
@@ -246,6 +247,7 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
   const renerTopRightbar = () => {
     return (
       <div className="flex alignCenter">
+        <ImportBill/>
         <SmartFilter
           onFilter={(encode) => {
             setAllInvoicesConfig({

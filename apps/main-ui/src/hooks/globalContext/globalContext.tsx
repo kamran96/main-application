@@ -21,9 +21,14 @@ export type IImportType =
   | 'quotes'
   | 'payments'
   | 'creditNotes'
+  | 'debitNotes'
   | 'items'
   | 'transactions'
   | 'banks'
+  | 'trialBalance'
+  | 'invoices'
+  | 'purchaseOrder'
+  | 'bills'
   | null;
 interface IImportsModalConfig extends IModalsConfig {
   type?: IImportType;
@@ -115,6 +120,20 @@ interface IGlobalContextvalues {
   bankImportConfig: IImportsModalConfig;
   setBankImportConfig: (visibility: boolean, type: IImportType) => void;
   refetchUser: () => void;
+  trialBalanceImportConfig: IImportsModalConfig;
+  setTrialBalanceImportConfig: (visibility: boolean, type: IImportType) => void;
+  invoices: IImportsModalConfig;
+  setInvoices: (visibility: boolean, type: IImportType) => void;
+  creditNote: IImportsModalConfig;
+  setCreditNote: (visibility: boolean, type: IImportType) => void;
+  debitNote: IImportsModalConfig;
+  setDebitNote: (visibilty: boolean, type: IImportType) => void;
+  quotes: IImportsModalConfig;
+  setQuotes: (visibility: boolean, type: IImportType) => void;
+  purchaseOrder: IImportsModalConfig;
+  setPurchaseOrder: (visibility: boolean, type: IImportType) => void;
+  bills: IImportsModalConfig;
+  setBills: (visibility: boolean, type: IImportType) => void;
   refetchPermissions: () => void;
   userAuthenticated: boolean;
 }

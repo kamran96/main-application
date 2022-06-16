@@ -1,6 +1,6 @@
-import { ButtonTag } from '../../../../../components/ButtonTags';
+import { ButtonTag } from '../../../../components/ButtonTags';
 import React, { FC } from 'react';
-import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 
 export const TransactionImport: FC = (props) => {
     const {setTransactionsImportConfig} = useGlobalContext();

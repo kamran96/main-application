@@ -1,15 +1,15 @@
-import { CommonModal } from '../../../../../components';
+import { CommonModal } from '../../../../components';
 import React, { FC, useState } from 'react';
-import { useGlobalContext } from '../../../../../../src/hooks/globalContext/globalContext';
+import { useGlobalContext } from '../../../../../src/hooks/globalContext/globalContext';
 import bookHalf from '@iconify/icons-bi/book-half';
 import { useMutation, useQuery } from 'react-query';
 import { WrapperModalContent } from './style';
 import { Button } from 'antd';
 import Icon from '@iconify/react';
 import downloadIcon from '@iconify/icons-bi/download';
-import { InvoiceImportManager } from '../../../../Invoice/InvoiceImportManager';
-import { ReactQueryKeys } from '../../../../../../src/modal';
-import { getBankKeysApi } from '../../../../../api/banks';
+import { InvoiceImportManager } from '../../../Invoice/InvoiceImportManager';
+import { ReactQueryKeys } from '../../../../../src/modal';
+import { getDebitNotesKeysApi } from '../../../../api';
 import { CompareDataTable } from './CompareDataTable';
 import { CompareDataModal } from './CompareDataModal';
 
@@ -35,9 +35,9 @@ const data: Idata = {
   },
 };
 
-const BankImportWidget: FC = (props) => {
-  const { bankImportConfig, setBankImportConfig } = useGlobalContext();
-  const { visibility } = bankImportConfig;
+const DebitNoteImportWidget: FC = (props) => {
+  const { debitNote, setDebitNote } = useGlobalContext();
+  const { visibility } = debitNote;
   const [step, setStep] = useState<number>(1);
   const [fileData, setFileData] = useState<File>();
   const [fileExtractedData, setFileExtractedData] = useState([]);
@@ -46,8 +46,8 @@ const BankImportWidget: FC = (props) => {
   const [state, setState] = useState(data?.xero);
 
   const { data: itemKeysResponse, isLoading: itemKeysLoading } = useQuery(
-    [ReactQueryKeys.BANK_KEYS],
-    getBankKeysApi,
+    [ReactQueryKeys.DEBITNOTE_KEYS],
+    getDebitNotesKeysApi,
     {
       enabled: !!compareDataModal,
     }
@@ -56,10 +56,10 @@ const BankImportWidget: FC = (props) => {
   return (
     <CommonModal
       visible={visibility}
-      title="Import accounts"
+      title="Import Debit Note"
       width={800}
       onCancel={() => {
-        setBankImportConfig(false, null);
+        setDebitNote(false, null);
       }}
       footer={false}
     >
@@ -102,7 +102,7 @@ const BankImportWidget: FC = (props) => {
                 <a>here</a>
               </div>
               <InvoiceImportManager
-                headers={`Bank Name,Account Name,Type,Last Updated`.split(
+                headers={`Number,Ref,To,Data,Amount,Items,Status`.split(
                   ','
                 )}
                 onLoad={(payload, file) => {
@@ -158,4 +158,4 @@ const BankImportWidget: FC = (props) => {
     </CommonModal>
   );
 };
-export default BankImportWidget;
+export default DebitNoteImportWidget;

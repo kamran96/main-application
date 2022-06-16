@@ -1,17 +1,17 @@
 import { CommonModal } from '../../../../components';
 import React, { FC, useState } from 'react';
-import { useGlobalContext } from '../../../../../src/hooks/globalContext/globalContext';
+import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import bookHalf from '@iconify/icons-bi/book-half';
 import { useMutation, useQuery } from 'react-query';
 import { WrapperModalContent } from './style';
 import { Button } from 'antd';
 import Icon from '@iconify/react';
 import downloadIcon from '@iconify/icons-bi/download';
-import { InvoiceImportManager } from '../../../Invoice/InvoiceImportManager';
 import { CompareDataModal } from './CompareDataModal';
 import { CompareDataTable } from './CompareDataTable';
-import { ReactQueryKeys } from '../../../../../src/modal';
-import { getAccountKeysApi } from '../../../../api/accounts';
+import { ReactQueryKeys } from '../../../../modal';
+import { InvoiceImportManager } from '../../../Invoice/InvoiceImportManager';
+import { getTransactionKeysApi } from '../../../../api';
 
 interface Idata {
   xero: {
@@ -35,9 +35,9 @@ const data: Idata = {
   },
 };
 
-const AccountsImportWidget: FC = (props) => {
-  const { accountsImportConfig, setAccountsImportConfig } = useGlobalContext();
-  const { visibility } = accountsImportConfig;
+const TransactionImportWidget: FC = () => {
+  const { transactionsImportConfig, setTransactionsImportConfig } = useGlobalContext();
+  const { visibility } = transactionsImportConfig;
   const [step, setStep] = useState<number>(1);
   const [fileData, setFileData] = useState<File>();
   const [fileExtractedData, setFileExtractedData] = useState([]);
@@ -46,20 +46,21 @@ const AccountsImportWidget: FC = (props) => {
   const [state, setState] = useState(data?.xero);
 
   const { data: itemKeysResponse, isLoading: itemKeysLoading } = useQuery(
-    [ReactQueryKeys.PAYMENTS_KEYS],
-    getAccountKeysApi,
+    [ReactQueryKeys.TRANSACTION_KEYS],
+    getTransactionKeysApi,
     {
       enabled: !!compareDataModal,
     }
   );
 
+
   return (
     <CommonModal
       visible={visibility}
-      title="Import accounts"
+      title="Import Journal entries"
       width={800}
       onCancel={() => {
-        setAccountsImportConfig(false, null);
+        setTransactionsImportConfig(false, null);
       }}
       footer={false}
     >
@@ -102,7 +103,7 @@ const AccountsImportWidget: FC = (props) => {
                 <a>here</a>
               </div>
               <InvoiceImportManager
-                headers={`Code,Account Head,Type,Tax Rate,Total Debits,Total Credits,Balance`.split(
+                headers={`ID,Ref,Date,Narration,Note,Amount`.split(
                   ','
                 )}
                 onLoad={(payload, file) => {
@@ -158,4 +159,4 @@ const AccountsImportWidget: FC = (props) => {
     </CommonModal>
   );
 };
-export default AccountsImportWidget;
+export default TransactionImportWidget;
