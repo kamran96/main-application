@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { Between, getCustomRepository, ILike, In } from 'typeorm';
 import axios from 'axios';
 import { Sorting } from '@invyce/sorting';
@@ -457,6 +457,8 @@ export class TransactionService {
         transactionId: transaction.id,
       });
     }
+
+    console.log(paymentArr, 'pay');
 
     await axios.post(
       Host('payments', 'payments/payment/add'),

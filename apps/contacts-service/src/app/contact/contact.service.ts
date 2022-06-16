@@ -816,6 +816,38 @@ export class ContactService {
           }
         }
       }
+    } else if (data.type === Integrations.CSV_IMPORT) {
+      console.log(data.contacts, 'what is data now');
+      for (const i of data.contacts) {
+        const contact = new this.contactModel({
+          ...i,
+          createdById: req.user.id,
+          updatedById: req.user.id,
+          organizationId: req.user.organizationId,
+          branchId: req.user.branchId,
+          status: 1,
+        });
+        await contact.save();
+        if (i?.balance > 0) {
+          const { balance } = i;
+          transactionArr.push({
+            balance,
+            contactId: contact.id,
+            ref: 'CSV',
+            narration: 'CSV contact balance',
+            name: 'Cash Receiveable',
+            contactType: i?.contactType === '1' ? 'customer' : 'supplier',
+            transactionType:
+              i?.contactType === '1' ? Entries.DEBITS : Entries.CREDITS,
+            createdAt: contact.createdAt,
+            createdById: req.user.id,
+            updatedById: req.user.id,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            status: 1,
+          });
+        }
+      }
     }
 
     await axios.post(

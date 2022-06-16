@@ -47,6 +47,11 @@ export const ContactImportWidget: FC = () => {
   const [compareDataModal, setCompareDataModel] = useState<boolean>(false);
   const [compareData, setCompareData] = useState<any>({});
 
+  // API callsback Hooks
+
+  const { mutate: uploadCsv, isLoading: uploadingCsv } =
+    useMutation(CsvImportAPi);
+
   const { data: contactKeysResponse, isLoading: contactKeysLoading } = useQuery(
     [ReactQueryKeys],
     getContactKeysAPI,
@@ -62,13 +67,19 @@ export const ContactImportWidget: FC = () => {
     'check what is data'
   );
 
-  // const onConfirmUpload = async (compareData) => {
-  //   const formData = new FormData();
-  //   formData.append('file', fileData);
-  //   formData.append('compareData', JSON.stringify(compareData));
+  const onConfirmUpload = async () => {
+    console.log(compareData, 'compare data');
+    const formData = new FormData();
+    formData.append('file', fileData);
+    formData.append('compareData', JSON.stringify(compareData));
+    formData.append('module', JSON.stringify('contact'));
 
-  //   await uploadCsv(formData);
-  // };
+    await uploadCsv(formData, {
+      onSuccess: (data) => {
+        console.log(data);
+      },
+    });
+  };
   const [state, setState] = useState(data?.xero);
 
   const getTitle = (colItem: string) => {
@@ -199,7 +210,8 @@ export const ContactImportWidget: FC = () => {
             <Button
               type="primary"
               className="btn"
-              onClick={() => console.log('proceed')}
+              onClick={onConfirmUpload}
+              loading={uploadingCsv}
             >
               Proceed
             </Button>
