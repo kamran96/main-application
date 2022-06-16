@@ -26,10 +26,9 @@ export const getInvoiceListAPI = ({ queryKey }: QueryKey) => {
   if (query && query !== null) {
     url = `${url}&query=${query}`;
   }
-  if(sortid && sortid !== null){
-    url = `${url}&sort=${sortid}`
+  if (sortid && sortid !== null) {
+    url = `${url}&sort=${sortid}`;
   }
-  
 
   return http.get(url);
 };
@@ -87,8 +86,8 @@ export const getPoListAPI = ({ queryKey }: QueryKey) => {
     url = `${url}&query=${query}`;
   }
 
-  if(sortid){
-    url = `${url}&sort=${sortid}`
+  if (sortid) {
+    url = `${url}&sort=${sortid}`;
   }
   return http.get(url);
 };
@@ -138,7 +137,7 @@ export const getCreditNotes = ({ queryKey }: QueryKey) => {
   if (query) {
     url = `${url}&query=${query}`;
   }
-  if(sortid && sortid !== null){
+  if (sortid && sortid !== null) {
     url = `${url}&sort=${sortid}`;
   }
   return http.get(url);
@@ -167,3 +166,12 @@ export const EmailInvoiceAPI = (payload: {
   cc: string[];
   bcc: string[];
 }) => http?.post(`invoices/invoice/pdf`, payload);
+
+export const getInvoiceKeysApi = () =>
+  http?.get(`${INVOICES_API.INDEX}/import-csv`);
+
+export const getCreditNotesKeysApi = () =>
+  http?.get(`${INVOICES_API.CREDIT_NOTE}/import-csv`);
+  
+export const getDebitNotesKeysApi = () =>
+  http?.get('invoices/credit-note/import-csv');

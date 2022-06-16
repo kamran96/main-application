@@ -22,6 +22,7 @@ import {
 import { IInvoiceResponse, ORDER_TYPE } from '../../../../modal/invoice';
 import { ISupportedRoutes } from '../../../../modal/routing';
 import { PDFQuotesCols } from './commonCol';
+import { QuoteImport } from '../QuoteImport';
 import QuotesFilters from './QuotesFilters';
 
 interface IProps {
@@ -117,6 +118,24 @@ export const ProcessedQuotations: FC<IProps> = ({ columns }) => {
     });
   };
 
+  const topRightBarPanel = () => {
+    return (
+      <div className="flex flexCenter">
+        <QuoteImport/>
+        <SmartFilter
+          onFilter={(encode) => {
+            setAllInvoicesConfig({ ...allInvoicesConfig, query: encode });
+            const route = `/app${ISupportedRoutes.QUOTE}?tabIndex=processed&sortid=${sortid}&page=1&page_size=${pageSize}&sortid=${sortid}&query=${encode}`;
+            history.push(route);
+          }}
+          onClose={() => setFilterBar(false)}
+          visible={filterBar}
+          formSchema={quotesFilterSchema}
+        />
+      </div>
+    );
+  };
+
   const onSelectedRow = (item) => {
     setSelectedRow(item.selectedRowKeys);
   };
@@ -183,18 +202,7 @@ export const ProcessedQuotations: FC<IProps> = ({ columns }) => {
           />
         }
         hasPrint
-        topbarRightPannel={
-          <SmartFilter
-            onFilter={(encode) => {
-              setAllInvoicesConfig({ ...allInvoicesConfig, query: encode });
-              const route = `/app${ISupportedRoutes.QUOTE}?tabIndex=processed&sortid=${sortid}&page=1&page_size=${pageSize}&sortid=${sortid}&query=${encode}`;
-              history.push(route);
-            }}
-            onClose={() => setFilterBar(false)}
-            visible={filterBar}
-            formSchema={quotesFilterSchema}
-          />
-        }
+        topbarRightPannel={topRightBarPanel()}
         columns={columns}
         loading={isFetching || isLoading}
         onChange={(pagination, filters, sorter: any, extra) => {

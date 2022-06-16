@@ -23,7 +23,7 @@ import { PDFICON } from '../../../../components/Icons';
 import DUMMYLOGO from '../../../../assets/quickbook.png';
 import styled from 'styled-components';
 import { TransactionItem } from '../../../../components/PDFs/TransactionSingleItemPdf';
-import { TransactionImport } from './importTransactions';
+import { TransactionImport } from '../importTransactions';
 
 const APPROVETransactionList: FC = () => {
   const [sortedInfo, setSortedInfo] = useState(null);

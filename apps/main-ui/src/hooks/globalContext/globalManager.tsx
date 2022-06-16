@@ -199,8 +199,44 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const [bankImportConfig, setBankImportConfig] = useState<IModalsConfig>({
     visibility: false,
-    type: null
-  })
+    type: null,
+  });
+
+  const [trialBalanceImportConfig, setTrialBalanceImportConfig] =
+    useState<IModalsConfig>({
+      visibility: false,
+      type: null,
+    });
+
+  const [invoices, setInvoices] = useState<IModalsConfig>({
+    visibility: false,
+    type: null,
+  });
+
+  const [creditNote, setCreditNote] = useState<IModalsConfig>({
+    visibility: false,
+    type: null,
+  });
+
+  const [debitNote, setDebitNote] = useState<IModalsConfig>({
+    visibility: false,
+    type: null,
+  });
+
+  const [quotes, setQuotes] = useState<IModalsConfig>({
+    visibility: false,
+    type: null,
+  });
+
+  const [purchaseOrder, setPurchaseOrder] = useState<IModalsConfig>({
+    visibility: false,
+    type: null,
+  });
+
+  const [bills, setBills] = useState<IModalsConfig>({
+    visibility: false,
+    type: null,
+  });
 
   const [verifiedModal, setVerifiedModal] = useState(false);
 
@@ -586,12 +622,46 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
           setAccountsImportConfig({ visibility });
         },
         transactionsImportConfig,
-        setTransactionsImportConfig: (visibility: boolean, type: IImportType) => {
+        setTransactionsImportConfig: (
+          visibility: boolean,
+          type: IImportType
+        ) => {
           setTransactionsImportConfig({ visibility });
         },
         bankImportConfig,
         setBankImportConfig: (visibility: boolean, type: IImportType) => {
-          setBankImportConfig({visibility});
+          setBankImportConfig({ visibility });
+        },
+        trialBalanceImportConfig,
+        setTrialBalanceImportConfig: (
+          visibility: boolean,
+          type: IImportType
+        ) => {
+          setTrialBalanceImportConfig({ visibility });
+        },
+        invoices,
+        setInvoices: (visibility: boolean, type: IImportType) => {
+          setInvoices({ visibility });
+        },
+        creditNote,
+        setCreditNote: (visibility: boolean, type: IImportType) => {
+          setCreditNote({ visibility });
+        },
+        debitNote,
+        setDebitNote: (visibility: boolean, type: IImportType) => {
+          setDebitNote({ visibility });
+        },
+        quotes,
+        setQuotes: (visibility: boolean, type: IImportType) => {
+          setQuotes({ visibility });
+        },
+        purchaseOrder,
+        setPurchaseOrder: (visibility: boolean, type: IImportType) => {
+          setPurchaseOrder({ visibility });
+        },
+        bills,
+        setBills: (visibility: boolean, type: IImportType) => {
+          setBills({visibility});
         },
         refetchUser,
         refetchPermissions,

@@ -23,9 +23,10 @@ import editSolid from '@iconify-icons/clarity/edit-solid';
 import { SmartFilter } from '../../../components/SmartFilter';
 import FilteringSchema from './FilteringSchema';
 import deleteIcon from '@iconify/icons-carbon/delete';
-import {useCols} from './commonCols';
+import { useCols } from './commonCols';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import { useHistory } from 'react-router-dom';
+import { ImportCreditNote } from './ImportCreditNote';
 
 export const AprovedCreditNotes: FC = () => {
   const queryCache = useQueryClient();
@@ -34,7 +35,7 @@ export const AprovedCreditNotes: FC = () => {
   const { notificationCallback } = useGlobalContext();
   const history = useHistory();
   const { location } = history;
-  const {columns, pdfCols, csvColumns } = useCols();
+  const { columns, pdfCols, csvColumns } = useCols();
 
   /* LOCATL STATES */
   const [{ result, pagination }, setCreditNoteResponse] =
@@ -48,7 +49,7 @@ export const AprovedCreditNotes: FC = () => {
     page: 1,
     pageSize: 20,
     query: '',
-    sortid: 'id'
+    sortid: 'id',
   });
   const [deleteConfirmModal, setDeleteConfirmModal] = useState(false);
 
@@ -68,7 +69,7 @@ export const AprovedCreditNotes: FC = () => {
       pageSize,
       IInvoiceType.CREDITNOTE,
       query,
-      sortid
+      sortid,
     ],
     getCreditNotes,
     {
@@ -122,9 +123,8 @@ export const AprovedCreditNotes: FC = () => {
     setSelectedRow(item.selectedRowKeys);
   };
 
-
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
-    if(sorter.order === undefined){
+    if (sorter.order === undefined) {
       setCreditNoteConfig({
         ...creditNoteConfig,
         page: pagination.current,
@@ -133,8 +133,7 @@ export const AprovedCreditNotes: FC = () => {
       });
       const route = `/app${ISupportedRoutes.CREDIT_NOTES}?tabIndex=aproved&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
       history.push(route);
-    }
-    else{
+    } else {
       if (sorter?.order === 'ascend') {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] > b[sorter?.field]) {
@@ -143,8 +142,8 @@ export const AprovedCreditNotes: FC = () => {
             return -1;
           }
         });
-        
-        setCreditNoteResponse(prev =>({...prev,  result: userData}))
+
+        setCreditNoteResponse((prev) => ({ ...prev, result: userData }));
       } else {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
@@ -153,24 +152,29 @@ export const AprovedCreditNotes: FC = () => {
             return -1;
           }
         });
-        
-        setCreditNoteResponse(prev =>({...prev,  result: userData}))
+
+        setCreditNoteResponse((prev) => ({ ...prev, result: userData }));
       }
       setCreditNoteConfig({
         ...creditNoteConfig,
         page: pagination.current,
-        sortid: sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field,
-        pageSize: pagination.pageSize
+        sortid:
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field,
+        pageSize: pagination.pageSize,
       });
 
-      const route = `/app${ISupportedRoutes.CREDIT_NOTES}?tabIndex=aproved&sortid=${
-        sorter && sorter.order === 'descend'
-          ? `-${sorter.field}`
-          : sorter.field
-      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      const route = `/app${
+        ISupportedRoutes.CREDIT_NOTES
+      }?tabIndex=aproved&sortid=${
+        sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+        sorter.order
+      }&query=${query}`;
       history.push(route);
     }
-  }
+  };
 
   const handleConfirmDelete = async () => {
     await mutateDelete(
@@ -236,6 +240,7 @@ export const AprovedCreditNotes: FC = () => {
   const renderTopbarRight = () => {
     return (
       <div className="flex alignCenter">
+        <ImportCreditNote />
         <SmartFilter
           onFilter={(encode) => {
             const route = `/app${ISupportedRoutes?.CREDIT_NOTES}?tabIndex=aproved&page=1&page_size=20&query=${encode}`;

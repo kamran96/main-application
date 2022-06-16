@@ -1,8 +1,8 @@
 import React, { FC, useState } from 'react';
 import { ColumnsType } from 'antd/lib/table';
 import { G } from '@react-pdf/renderer';
-import { EditableSelect } from '../../../../components/Editable';
-import { Option } from '../../../../components/CommonSelect';
+import { EditableSelect } from '../../../../../components/Editable';
+import { Option } from '../../../../../components/CommonSelect';
 import { EditableTable } from '@invyce/editable-table';
 import { Heading } from '@invyce/shared/components';
 import Paragraph from 'antd/lib/typography/Paragraph';
@@ -23,94 +23,92 @@ interface IProps {
 
 const a = [
   {
-    label: 'Code',
-    keyName: 'code',
-    description: 'Please select a field which is related to code of Account',
+    label: 'ref',
+    keyName: 'ref',
+    description: 'Please select a field which is related to ref of transactions',
   },
   {
-    label: 'Account Head',
-    keyName: 'accountHead',
+    label: 'Narrations',
+    keyName: 'narrations',
     description:
-      'Please select a field which is related to Account Head of Account',
+      'Please select a field which is related to narrations of transactions',
   },
   {
-    label: 'Type',
-    keyName: 'type',
-    description: 'Please select a field which is related to Type of Account',
-  },
-  {
-    label: 'Tax Rate',
-    keyName: 'taxRate',
+    label: 'Note',
+    keyName: 'note',
     description:
-      'Please select a field which is related to Tax Rate of Account',
+      'Please select a field which is related to Note of transactions',
+  },
+  {
+    label: 'Sale Price',
+    keyName: 'salesPrice',
+    description:
+      'Please select a field which is related to Sales Price of transactions',
   },
   {
     label: 'Date',
     keyName: 'Date',
-    description: 'Please select a field which is related to Date of account',
+    description:
+      'Please select a field which is related to Date of transactions',
   },
   {
-    label: 'Total Debits',
-    keyName: 'TotalDebits',
-    description:
-      'Please select a field which is related to total debits of account',
+    label: 'Stock',
+    keyName: 'stock',
+    description: 'Please select a field which is related to Stocks of transactions',
   },
   {
     label: 'Web Link',
     keyName: 'webLink',
     description:
-      'Please select a field which is related to Website Link of accounts',
+      'Please select a field which is related to Website Link of transactions',
   },
   {
     label: 'Skype Name',
     keyName: 'skypeName',
-    description:
-      'Please select a field which is related to Skype Name of accounts',
+    description: 'Please select a field which is related to Skype Name of transactions',
   },
   {
     label: 'Fax Number',
     keyName: 'faxNumber',
-    description:
-      'Please select a field which is related to Fax Number of accounts',
+    description: 'Please select a field which is related to Fax Number of transactions',
   },
   {
     label: 'Cell Number',
     keyName: 'cellNumber',
     description:
-      'Please select a field which is related to Cell Number of accounts',
+      'Please select a field which is related to Cell Number of transactions',
   },
   {
     label: 'Phone Number',
     keyName: 'phoneNumber',
     description:
-      'Please select a field which is related to Phone Number of accounts',
+      'Please select a field which is related to Phone Number of transactions',
   },
   {
     label: 'Cnic',
     keyName: 'cnic',
     description:
-      'Please select a field which is related to National Identity of accounts',
+      'Please select a field which is related to National Identity of transactions',
   },
   {
-    label: 'Total Credits',
-    keyName: 'totalCredits',
-    description:
-      'Please select a field which is related to total Credits of accounts',
+    label: 'payments Name',
+    keyName: 'paymentsName',
+    description: 'Please select a field which is related to payments Name of transactions',
   },
   {
     label: 'Payments Mode',
     keyName: 'paymentsMode',
-    description: 'Please select a field which is related to payments Mode',
+    description: 'Please select a field which is related to transactions',
   },
   {
-    label: 'Balance',
-    keyName: 'balance',
-    description: 'Please select a field which is related to Email of accounts',
+    label: 'Comment',
+    keyName: 'comment',
+    description: 'Please select a field which is related to Email of transactions',
   },
   {
     label: 'Contact',
     keyName: 'contact',
-    description: 'Please select a field which is related to Name of accounts',
+    description: 'Please select a field which is related to Name of transactions',
   },
 ];
 

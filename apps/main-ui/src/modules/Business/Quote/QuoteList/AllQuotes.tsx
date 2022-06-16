@@ -22,6 +22,7 @@ import {
 import { IInvoiceResponse, ORDER_TYPE } from '../../../../modal/invoice';
 import { ISupportedRoutes } from '../../../../modal/routing';
 import { PDFQuotesCols } from './commonCol';
+import { QuoteImport } from '../QuoteImport';
 import QuotesFilters from './QuotesFilters';
 
 interface IProps {
@@ -151,6 +152,24 @@ export const ALLQuotesList: FC<IProps> = ({ columns }) => {
   const { routeHistory, notificationCallback } = useGlobalContext();
   const { history } = routeHistory;
 
+  const topBarRightPanel = () => {
+    return (
+      <div className="flex itemCenter">
+        <QuoteImport/>
+        <SmartFilter
+          onFilter={(encode) => {
+            setAllInvoicesConfig({ ...allInvoicesConfig, query: encode });
+            const route = `/app${ISupportedRoutes.QUOTE}?tabIndex=aproved&sortid=${sortid}&page=1&page_size=${pageSize}&sortid=${sortid}&query=${encode}`;
+            history.push(route);
+          }}
+          onClose={() => setFilterBar(false)}
+          visible={filterBar}
+          formSchema={quotesFilterSchema}
+        />
+      </div>
+    );
+  };
+
   useEffect(() => {
     if (
       routeHistory &&
@@ -183,18 +202,7 @@ export const ALLQuotesList: FC<IProps> = ({ columns }) => {
           />
         }
         hasPrint
-        topbarRightPannel={
-          <SmartFilter
-            onFilter={(encode) => {
-              setAllInvoicesConfig({ ...allInvoicesConfig, query: encode });
-              const route = `/app${ISupportedRoutes.QUOTE}?tabIndex=aproved&sortid=${sortid}&page=1&page_size=${pageSize}&sortid=${sortid}&query=${encode}`;
-              history.push(route);
-            }}
-            onClose={() => setFilterBar(false)}
-            visible={filterBar}
-            formSchema={quotesFilterSchema}
-          />
-        }
+        topbarRightPannel={topBarRightPanel()}
         columns={columns}
         loading={isFetching || isLoading}
         onChange={(pagination, filters, sorter: any, extra) => {
