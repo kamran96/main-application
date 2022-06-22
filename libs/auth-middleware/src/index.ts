@@ -24,7 +24,7 @@ export class Authenticate extends PassportStrategy(Strategy) {
         return req.cookies['access_token'];
       },
 
-      ignoreExpiration: false,
+      ignoreExpiration: true,
       secretOrKey: 'ASFdfasggewr1243123',
     });
   }
