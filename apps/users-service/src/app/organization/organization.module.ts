@@ -15,9 +15,9 @@ import {
   OrganizationUserSchema,
 } from '../schemas/organizationUser.schema';
 import { User, UserSchema } from '../schemas/user.schema';
+import { AuthStrategy } from '../auth/auth.strategy';
 import { OrganizationController } from './organization.controller';
 import { OrganizationService } from './organization.service';
-
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -56,7 +56,7 @@ import { OrganizationService } from './organization.service';
     RbacModule,
     AuthModule,
   ],
-  providers: [OrganizationService],
+  providers: [OrganizationService, AuthStrategy],
   controllers: [OrganizationController],
 })
 export class OrganizationModule {}
