@@ -14,24 +14,20 @@ let host;
 @Injectable()
 export class Authenticate extends PassportStrategy(Strategy) {
   constructor() {
-    console.log('constructor called');
     super({
       jwtFromRequest: (req) => {
-        console.log('okkkk...................');
         if (!req || !req.cookies) return null;
         token = req.cookies['access_token'];
         host = req.headers.host;
         return req.cookies['access_token'];
       },
 
-      ignoreExpiration: true,
-      secretOrKey: 'ASFdfasggewr1243123',
+      ignoreExpiration: false,
+      secretOrKey: 'ASDFGHJKL1234567890',
     });
   }
 
   async validate(payload) {
-    Logger.log('validate function called');
-    console.log(payload, 'payload');
     const user = await axios.post(
       Host('users', 'users/auth/access-controll'),
       {
@@ -44,8 +40,6 @@ export class Authenticate extends PassportStrategy(Strategy) {
         },
       }
     );
-
-    console.log(user?.data?.result.statusCode, 'user');
 
     if (user?.data?.result?.statusCode === HttpStatus.OK) {
       return user?.data?.result?.user;

@@ -37,6 +37,8 @@ export class OrganizationService {
   ) {}
 
   async ListOrganizations(req) {
+    console.log('org...');
+
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
 
@@ -254,7 +256,6 @@ export class OrganizationService {
           return await this.authService.Login(users, res);
         }
       } catch (error) {
-        console.log(error, 'error');
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
     }

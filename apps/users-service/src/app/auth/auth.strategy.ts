@@ -15,6 +15,7 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
     super({
       jwtFromRequest: (req) => {
+        console.log('called');
         if (!req || !req.cookies) return null;
         data = {
           cookies: req.cookies,
@@ -22,11 +23,12 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
         return req.cookies['access_token'];
       },
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET,
+      secretOrKey: 'ASDFGHJKL1234567890',
     });
   }
 
   async validate(payload: IBaseUser): Promise<IUser> {
+    console.log('okkkk');
     try {
       const newData = { ...data, user: payload };
       const user: IUserAccessControlResponse =
