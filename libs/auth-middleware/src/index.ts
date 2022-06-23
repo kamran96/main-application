@@ -22,20 +22,22 @@ if (process.env['NODE' + '_ENV'] === 'production') {
     '../../../vault/secrets/creds'
   );
 
-  const staticContentFromVault = fs.readFileSync(
-    path.join(pathToStaticContent),
-    {
-      encoding: 'utf8',
-    }
-  );
+  if (pathToStaticContent) {
+    const staticContentFromVault = fs.readFileSync(
+      path.join(pathToStaticContent),
+      {
+        encoding: 'utf8',
+      }
+    );
 
-  // static Content
-  const staticContentWithoutLineBreaks = staticContentFromVault.replace(
-    /[\r\n]/gm,
-    ''
-  );
-  const staticContentObj = `{${staticContentWithoutLineBreaks}}`;
-  staticContent = JSON.parse(staticContentObj);
+    // static Content
+    const staticContentWithoutLineBreaks = staticContentFromVault.replace(
+      /[\r\n]/gm,
+      ''
+    );
+    const staticContentObj = `{${staticContentWithoutLineBreaks}}`;
+    staticContent = JSON.parse(staticContentObj);
+  }
 }
 @Injectable()
 export class Authenticate extends PassportStrategy(Strategy) {
