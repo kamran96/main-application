@@ -22,7 +22,8 @@ if (process.env['NODE' + '_ENV'] === 'production') {
     '../../../vault/secrets/creds'
   );
 
-  if (pathToStaticContent) {
+  console.log(pathToStaticContent, 'path');
+  if (pathToStaticContent !== undefined) {
     const staticContentFromVault = fs.readFileSync(
       path.join(pathToStaticContent),
       {
