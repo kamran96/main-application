@@ -384,7 +384,6 @@ export class AccountsService {
 
   async initAccounts(data: IRequest): Promise<void> {
     try {
-      console.log('inserting accounts...');
       const { primary, secondary } = await import('../accounts');
       for (const account of primary) {
         const accountModel = {

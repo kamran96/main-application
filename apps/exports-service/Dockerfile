@@ -15,7 +15,7 @@ USER node
 ENV MONGO_URI=mongodb+srv://contacts:fYnc4.ZPdz378t4@cluster0.hiwqy.mongodb.net/exports?retryWrites=true&w=majority \
     GOOGLE_CLIENT_ID=739410132871-45r2feessjs5l5rtbk1kekr5t78aa7ee.apps.googleusercontent.com \
     GOOGLE_CLIENT_SECRET=ckcvOhikVvHBi7BeU7n2YzKc \
-    JWT_SECRET=alalsdflasjlf343424 \
+    JWT_SECRET=ASDF@#$!@$12346623577fsarwer \
     PORT=3342 \
     NODE_ENV=production
 

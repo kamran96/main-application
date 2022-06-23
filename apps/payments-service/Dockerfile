@@ -17,7 +17,7 @@ ENV DB_HOST='db-postgresql-sgp1-12041-do-user-4046074-0.b.db.ondigitalocean.com'
     PAYMENT_DB_NAME='payments' \
     DB_PASSWORD='0jN4FNuqynhGR7zT' \
     DB_USER='doadmin' \
-    JWT_SECRET=alalsdflasjlf343424 \
+    JWT_SECRET=ASDF@#$!@$12346623577fsarwer \
     PORT=3341 \
     NODE_ENV=production
 

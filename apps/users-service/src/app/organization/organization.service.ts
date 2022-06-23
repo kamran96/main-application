@@ -201,7 +201,6 @@ export class OrganizationService {
         if (!req || !req.cookies) return null;
         const token = req?.cookies['access_token'];
 
-        Logger.log('inserting accounts...');
         await axios.post(
           Host('accounts', 'accounts/account/init'),
           {
@@ -216,8 +215,6 @@ export class OrganizationService {
             },
           }
         );
-
-        Logger.log('inserted...');
 
         const roles = await this.rbacService.InsertRoles(organization.id);
         await this.rbacService.InsertRolePermission(organization.id);
