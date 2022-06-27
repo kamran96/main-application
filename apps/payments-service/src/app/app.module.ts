@@ -88,7 +88,7 @@ if (process.env['NODE' + '_ENV'] === 'production') {
                   process.env.PAYMENT_DB_NAME
                 ),
           entities: getMetadataArgsStorage().tables.map((tbl) => tbl.target),
-          // ssl: { rejectUnauthorized: false },
+          ssl: { rejectUnauthorized: false },
         } as TypeOrmModuleOptions),
     }),
     PaymentModule,
