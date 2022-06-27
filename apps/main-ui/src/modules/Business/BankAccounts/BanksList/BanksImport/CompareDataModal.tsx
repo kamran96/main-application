@@ -1,10 +1,8 @@
-import styled from 'styled-components';
-import { FC, useMemo, useState } from 'react';
-import { CommonModal } from '../../../components';
+import React, { FC, useState } from 'react';
 import { ColumnsType } from 'antd/lib/table';
 import { G } from '@react-pdf/renderer';
-import { EditableSelect } from '../../../components/Editable';
-import { Option } from '../../../components/CommonSelect';
+import { EditableSelect } from '../../../../../components/Editable';
+import { Option } from '../../../../../components/CommonSelect';
 import { EditableTable } from '@invyce/editable-table';
 import { Heading } from '@invyce/shared/components';
 import Paragraph from 'antd/lib/typography/Paragraph';
@@ -12,102 +10,8 @@ import { Icon } from '@iconify/react';
 import questionIcon from '@iconify/icons-fe/question';
 import { Button, Tooltip } from 'antd';
 import deleteIcon from '@iconify/icons-carbon/delete';
+import styled from 'styled-components';
 import { ITheme, IThemeProps } from '@invyce/shared/invyce-theme';
-
-const a = [
-  {
-    label: 'Account Number',
-    keyName: 'accountNumber',
-    description:
-      'Please select a field which is related to Account Number of Contact',
-  },
-  {
-    label: 'Payment Days Limit',
-    keyName: 'paymentDaysLimit',
-    description:
-      'Please select a field which is related to Payment Days Limit of Contact',
-  },
-  {
-    label: 'Balance',
-    keyName: 'balance',
-    description: 'Please select a field which is related to Balance of Contact',
-  },
-  {
-    label: 'Sales Discount',
-    keyName: 'salesDiscount',
-    description:
-      'Please select a field which is related to Sales Discount of Contact',
-  },
-  {
-    label: 'Credit Limit Block',
-    keyName: 'creditLimitBlock',
-    description:
-      'Please select a field which is related to Credit Limit Block of Contact',
-  },
-  {
-    label: 'Credit Limit',
-    keyName: 'creditLimit',
-    description:
-      'Please select a field which is related to Credit Limit of Contact',
-  },
-  {
-    label: 'Web Link',
-    keyName: 'webLink',
-    description:
-      'Please select a field which is related to Website Link of Contact',
-  },
-  {
-    label: 'Skype Name',
-    keyName: 'skypeName',
-    description:
-      'Please select a field which is related to Skype Name of Contact',
-  },
-  {
-    label: 'Fax Number',
-    keyName: 'faxNumber',
-    description:
-      'Please select a field which is related to Fax Number of Contact',
-  },
-  {
-    label: 'Cell Number',
-    keyName: 'cellNumber',
-    description:
-      'Please select a field which is related to Cell Number of Contact',
-  },
-  {
-    label: 'Phone Number',
-    keyName: 'phoneNumber',
-    description:
-      'Please select a field which is related to Phone Number of Contact',
-  },
-  {
-    label: 'Cnic',
-    keyName: 'cnic',
-    description:
-      'Please select a field which is related to National Identity of Contact',
-  },
-  {
-    label: 'Business Name',
-    keyName: 'businessName',
-    description:
-      'Please select a field which is related to Business Name of Contact',
-  },
-  {
-    label: 'Contact Type',
-    keyName: 'contactType',
-    description: 'Please select a field which is related to Contact Type',
-  },
-  {
-    label: 'Email',
-    keyName: 'email',
-    description: 'Please select a field which is related to Email of Contact',
-  },
-  {
-    label: 'Name',
-    keyName: 'name',
-    description: 'Please select a field which is related to Name of Contact',
-  },
-];
 
 interface IProps {
   visibility: boolean;
@@ -116,10 +20,104 @@ interface IProps {
   documentKeys: any[];
   OnConfrm: (payload: any) => void;
 }
+
+const a = [
+  {
+    label: 'Bank Name',
+    keyName: 'Bank Name',
+    description: 'Please select a field which is related to bank name of Bank',
+  },
+  {
+    label: 'Account Name',
+    keyName: 'accountName',
+    description:
+      'Please select a field which is related to Account name of Bank',
+  },
+  {
+    label: 'Type',
+    keyName: 'type',
+    description: 'Please select a field which is related to Type of bank',
+  },
+  {
+    label: 'Last Updated',
+    keyName: 'lastUpdated',
+    description:
+      'Please select a field which is related to Last updated of Banek',
+  },
+  {
+    label: 'Date',
+    keyName: 'Date',
+    description: 'Please select a field which is related to Date of account',
+  },
+  {
+    label: 'Total Debits',
+    keyName: 'TotalDebits',
+    description:
+      'Please select a field which is related to total debits of account',
+  },
+  {
+    label: 'Web Link',
+    keyName: 'webLink',
+    description:
+      'Please select a field which is related to Website Link of accounts',
+  },
+  {
+    label: 'Skype Name',
+    keyName: 'skypeName',
+    description:
+      'Please select a field which is related to Skype Name of accounts',
+  },
+  {
+    label: 'Fax Number',
+    keyName: 'faxNumber',
+    description:
+      'Please select a field which is related to Fax Number of accounts',
+  },
+  {
+    label: 'Cell Number',
+    keyName: 'cellNumber',
+    description:
+      'Please select a field which is related to Cell Number of accounts',
+  },
+  {
+    label: 'Phone Number',
+    keyName: 'phoneNumber',
+    description:
+      'Please select a field which is related to Phone Number of accounts',
+  },
+  {
+    label: 'Cnic',
+    keyName: 'cnic',
+    description:
+      'Please select a field which is related to National Identity of accounts',
+  },
+  {
+    label: 'Total Credits',
+    keyName: 'totalCredits',
+    description:
+      'Please select a field which is related to total Credits of accounts',
+  },
+  {
+    label: 'Payments Mode',
+    keyName: 'paymentsMode',
+    description: 'Please select a field which is related to payments Mode',
+  },
+  {
+    label: 'Balance',
+    keyName: 'balance',
+    description: 'Please select a field which is related to Email of accounts',
+  },
+  {
+    label: 'Contact',
+    keyName: 'contact',
+    description: 'Please select a field which is related to Name of accounts',
+  },
+];
+
 export const CompareDataModal: FC<IProps> = ({
   visibility,
   onCancel,
-  compareKeys,
+  compareKeys = a,
   documentKeys,
   OnConfrm,
 }) => {
@@ -128,8 +126,6 @@ export const CompareDataModal: FC<IProps> = ({
   const unUsedDocumentKeys = documentKeys.filter(
     (key) => !Object.keys(compareData).includes(key)
   );
-
-  console.log(compareData, unUsedDocumentKeys, 'compare');
 
   const columns: ColumnsType<any> = [
     {
@@ -176,13 +172,6 @@ export const CompareDataModal: FC<IProps> = ({
               } else {
                 setCompareData((prevState) => {
                   const state = { ...prevState };
-                  const keyExistingIndex = Object.values(state).findIndex(
-                    (val) => val === record.keyName
-                  );
-                  if (keyExistingIndex > -1) {
-                    delete state[Object.keys(state)[keyExistingIndex]];
-                  }
-
                   state[value?.value] = record.keyName;
                   return state;
                 });
@@ -199,6 +188,14 @@ export const CompareDataModal: FC<IProps> = ({
         );
       },
     },
+    // {
+    //   title: 'Action',
+    //   dataIndex: 'action',
+    //   key: 'action',
+    //   render: () => {
+    //     return <Icon className="Icon" icon={deleteIcon} />;
+    //   },
+    // },
   ];
 
   if (visibility && documentKeys?.length) {
@@ -263,5 +260,3 @@ export const CompareDataModalWrapper = styled.div`
     }
   }
 `;
-
-// .ant-table-tbody > tr > td

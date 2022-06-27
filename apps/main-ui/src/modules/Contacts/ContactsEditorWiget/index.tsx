@@ -13,7 +13,7 @@ import { WrapperContactsEditor } from './styles';
 export const ContactsEditorWidget: FC = () => {
   const { routeHistory } = useGlobalContext();
 
-  let id =
+  const id =
     routeHistory &&
     routeHistory.location &&
     routeHistory.location.pathname.split('/')[3];

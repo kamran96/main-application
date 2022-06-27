@@ -12,7 +12,7 @@ interface IProps {
   size: SizeType;
   title: string;
   icon?: any;
-  onClick?: () => void;
+  onClick?: (payload? : any) => void;
   ref?: Ref<any>;
   disabled?: boolean;
   className?: string;
