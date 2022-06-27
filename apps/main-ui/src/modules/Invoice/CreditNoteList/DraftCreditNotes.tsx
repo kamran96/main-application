@@ -30,6 +30,7 @@ import { useCols } from './commonCols';
 import { useHistory } from 'react-router-dom';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import { ConfirmModal } from '../../../components/ConfirmModal';
+import { ImportCreditNote } from './ImportCreditNote';
 
 export const DraftCreditNotes: FC = () => {
   /* HOOKS HERE */
@@ -245,6 +246,7 @@ export const DraftCreditNotes: FC = () => {
   const renderTopbarRight = () => {
     return (
       <div className="flex alignCenter">
+        <ImportCreditNote/>
         <SmartFilter
           onFilter={(encode) => {
             const route = `/app${ISupportedRoutes?.CREDIT_NOTES}?tabIndex=draft&page=1&page_size=20&query=${encode}`;

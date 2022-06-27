@@ -17,3 +17,5 @@ export const getBillsIndexAPI = (
 
   return http.get(url);
 };
+
+export const getBillsKeysApi = () => http.get('bills/bill//import-csv');

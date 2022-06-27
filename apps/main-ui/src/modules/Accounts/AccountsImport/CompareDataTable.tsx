@@ -1,5 +1,5 @@
+import { CommonTable } from '../../../components/Table';
 import React, { FC } from 'react';
-import { CommonTable } from '../../../../../components/Table';
 import { Button } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 

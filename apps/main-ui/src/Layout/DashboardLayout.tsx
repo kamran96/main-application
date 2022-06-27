@@ -74,21 +74,63 @@ export const DashboardLayout: any = (props: RouteConfigComponentProps) => {
   const AccountsImportWidget = lazy(
     () =>
       import(
-        '../modules/Accounts/AccountsList/AccountsImport/AccountsImportWidget'
+        '../modules/Accounts/AccountsImport/AccountsImportWidget'
       )
   );
 
   const TransactionImportWidget = lazy(
     () =>
       import(
-        '../modules/Business/Transactions/TransactionsList/importTransactions/TransactionImportWidget'
+        '../modules/Business/Transactions/importTransactions/TransactionImportWidget'
       )
   );
 
   const BankImportWidget = lazy(
     () =>
       import(
-        '../modules/Business/BankAccounts/BanksList/BanksImport/BankImportWidget'
+        '../modules/Business/BankAccounts/BanksImport/BankImportWidget'
+      )
+  );
+
+  const InvoiceImportWidget = lazy(
+    () =>
+      import(
+        '../modules/Invoice/InvoiceList/invoiceImports/InvoiceImportWidget'
+      )
+  );
+
+  const CreditNoteImportWidget = lazy(
+    () =>
+      import(
+        '../modules/Invoice/CreditNoteList/ImportCreditNote/CreditNoteImportWidget '
+      )
+  );
+
+  const DebitNoteImportWidget = lazy(
+    () =>
+      import(
+        '../modules/Invoice/DebitNotesList/DebitNoteImport/DebitNoteImportWidget'
+      )
+  );
+
+  const QuoteImportWidget = lazy(
+    () =>
+      import(
+        '../modules/Business/Quote/QuoteImport/QuoteImportWidget'
+      )
+  );
+
+  const PurchaseOrderWidget = lazy(
+    () =>
+      import(
+        '../modules/Business/PurchaseOrder/PurchaseOrderList/PurchaseOrderImport/PurchasesOrderWidget'
+      )
+  );
+
+  const ImportBillWidget = lazy(
+    () =>
+      import(
+        '../modules/Business/PurchaseOrder/Bills/importBill/ImportBillWidget'
       )
   );
 
@@ -201,6 +243,24 @@ export const DashboardLayout: any = (props: RouteConfigComponentProps) => {
         </Suspense>
         <Suspense fallback={<div></div>}>
           <BankImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <InvoiceImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <CreditNoteImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <DebitNoteImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <QuoteImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <PurchaseOrderWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <ImportBillWidget />
         </Suspense>
       </DashboardWrapper>
     </ThemeProvider>
