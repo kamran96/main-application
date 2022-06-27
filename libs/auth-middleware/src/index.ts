@@ -3,8 +3,6 @@ import { PassportStrategy } from '@nestjs/passport';
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import * as dotenv from 'dotenv';
-import * as path from 'path';
-import * as fs from 'fs';
 import { Host } from '@invyce/global-constants';
 
 export * from './lib/auth-middleware.module';
@@ -13,38 +11,12 @@ dotenv.config();
 
 let token;
 let host;
-let staticContent;
-if (process.env['NODE' + '_ENV'] === 'production') {
-  // read from a file
-
-  const pathToStaticContent = path.join(
-    __dirname,
-    '../../../vault/secrets/creds'
-  );
-
-  console.log(pathToStaticContent, 'path');
-  if (pathToStaticContent !== undefined) {
-    const staticContentFromVault = fs.readFileSync(
-      path.join(pathToStaticContent),
-      {
-        encoding: 'utf8',
-      }
-    );
-
-    // static Content
-    const staticContentWithoutLineBreaks = staticContentFromVault.replace(
-      /[\r\n]/gm,
-      ''
-    );
-    const staticContentObj = `{${staticContentWithoutLineBreaks}}`;
-    staticContent = JSON.parse(staticContentObj);
-  }
-}
 @Injectable()
 export class Authenticate extends PassportStrategy(Strategy) {
   constructor() {
     super({
       jwtFromRequest: (req) => {
+        console.log(process.env.JWT_SECRET, 'SECRET');
         if (!req || !req.cookies) return null;
         token = req.cookies['access_token'];
         host = req.headers.host;
@@ -52,7 +24,7 @@ export class Authenticate extends PassportStrategy(Strategy) {
       },
 
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET || staticContent.JWT_SECRET,
+      secretOrKey: process.env.JWT_SECRET,
     });
   }
 
