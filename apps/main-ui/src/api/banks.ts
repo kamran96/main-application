@@ -20,4 +20,4 @@ export const getBankAccountsList = ({ queryKey }: QueryKey) => {
 export const createBankAPI = (payload) =>
   http?.post(`accounts/bank/account`, payload);
 
-export const  getBankKeysApi = () => http?.get(`${BANKS.INDEX}//import-csv`)
+export const  getBankKeysApi = () => http?.get(`${BANKS.INDEX}/import-csv`)

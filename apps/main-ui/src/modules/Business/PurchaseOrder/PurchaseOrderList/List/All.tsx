@@ -27,6 +27,7 @@ import { purchaseOrderList } from '../../../../../api/purchaseOrder';
 import { useCols } from './CommonCol';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
+import { PurchaseOrderImport } from '../PurchaseOrderImport';
 
 interface IProps {
   columns?: any[];
@@ -250,6 +251,7 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
   const renerTopRightbar = () => {
     return (
       <div className="flex alignCenter">
+        <PurchaseOrderImport/>
         <SmartFilter
           onFilter={(encode) => {
             setAllInvoicesConfig({

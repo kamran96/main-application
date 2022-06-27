@@ -11,7 +11,7 @@ import { ISupportedRoutes, NOTIFICATIONTYPE } from '../../../../modal';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { TableCard } from '../../../../components/TableCard';
 import { useHistory } from 'react-router-dom';
-import { BanksImport } from './BanksImport';
+import { BanksImport } from '../BanksImport';
 
 export const BanksList: FC = () => {
   const [responseBanks, setResponseBanks] = useState([]);

@@ -7,6 +7,7 @@ import {
   getAllContacts,
   getInvoiceListAPI,
 } from '../../../api';
+import { InvoiceImports } from './invoiceImports';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import { PDFICON } from '../../../components/Icons';
 import { PurchaseListTopbar } from '../../../components/PurchasesListTopbar';
@@ -185,6 +186,7 @@ export const OverDueInvoices: FC<IProps> = ({ columns }) => {
   const renderTobarRight = () => {
     return (
       <div className="flex alignCenter">
+        <InvoiceImports/>
         <SmartFilter
           onFilter={(encode) => {
             setAllInvoicesConfig({ ...allInvoicesConfig, query: encode });

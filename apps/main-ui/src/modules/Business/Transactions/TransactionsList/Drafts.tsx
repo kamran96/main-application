@@ -32,7 +32,7 @@ import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
 import { PERMISSIONS } from '../../../../components/Rbac/permissions';
 import { useRbac } from '../../../../components/Rbac/useRbac';
 import { TransactionItem } from '../../../../components/PDFs/TransactionSingleItemPdf';
-import { TransactionImport } from './importTransactions';
+import { TransactionImport } from '../importTransactions';
 
 const DRAFTTransactionsList: FC = () => {
   const queryCache = useQueryClient();

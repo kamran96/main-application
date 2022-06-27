@@ -31,6 +31,7 @@ import { PurchaseTopbar } from './PurchaseTableTopbar';
 import { useCols } from './CommonCol';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
+import { ImportBill } from '../importBill';
 
 interface IProps {
   columns?: any[];
@@ -263,6 +264,7 @@ export const DueExpiredBills: FC<IProps> = ({ columns, activeTab }) => {
   const renerTopRightbar = () => {
     return (
       <div className="flex alignCenter">
+        <ImportBill/>
         <SmartFilter
           onFilter={(encode) => {
             setAllInvoicesConfig({
