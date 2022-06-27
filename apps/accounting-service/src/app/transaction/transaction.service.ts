@@ -417,6 +417,8 @@ export class TransactionService {
               organizationId: req.user.organizationId,
             },
           });
+
+          console.log(account, 'what is account');
           return account.id;
         }
       };

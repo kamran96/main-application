@@ -1,19 +1,17 @@
+import { CommonModal } from '../../../../../components';
+import React, { FC, useState } from 'react';
+import { useGlobalContext } from '../../../../../../src/hooks/globalContext/globalContext';
 import bookHalf from '@iconify/icons-bi/book-half';
-import downloadIcon from '@iconify/icons-bi/download';
-import { Icon } from '@iconify/react';
-import { FC } from 'react';
-import { useState } from 'react';
+import { useMutation, useQuery } from 'react-query';
 import { WrapperModalContent } from './style';
-import { CommonModal } from '../../../components';
-import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { InvoiceImportManager } from '../../Invoice/InvoiceImportManager';
-import { useQuery } from 'react-query';
-import { ReactQueryKeys } from '../../../modal';
-import { getContactKeysAPI } from '../../../api';
-import { CompareDataModal } from './CompareDataModal';
 import { Button } from 'antd';
+import Icon from '@iconify/react';
+import downloadIcon from '@iconify/icons-bi/download';
+import { InvoiceImportManager } from '../../../../Invoice/InvoiceImportManager';
+import { ReactQueryKeys } from '../../../../../../src/modal';
+import { getBankKeysApi } from '../../../../../api/banks';
 import { CompareDataTable } from './CompareDataTable';
-import { downloadCSV } from '../../../utils/downloadCSVFile';
+import { CompareDataModal } from './CompareDataModal';
 
 interface Idata {
   xero: {
@@ -25,6 +23,7 @@ interface Idata {
     text: string;
   };
 }
+
 const data: Idata = {
   xero: {
     link: 'You can download template file',
@@ -36,58 +35,31 @@ const data: Idata = {
   },
 };
 
-export const ContactImportWidget: FC = () => {
-  const { contactsImportConfig, setContactsImportConfig } = useGlobalContext();
-  const { visibility } = contactsImportConfig;
+const BankImportWidget: FC = (props) => {
+  const { bankImportConfig, setBankImportConfig } = useGlobalContext();
+  const { visibility } = bankImportConfig;
   const [step, setStep] = useState<number>(1);
   const [fileData, setFileData] = useState<File>();
   const [fileExtractedData, setFileExtractedData] = useState([]);
   const [compareDataModal, setCompareDataModel] = useState<boolean>(false);
   const [compareData, setCompareData] = useState<any>({});
+  const [state, setState] = useState(data?.xero);
 
-  // API callsback Hooks
-
-  const { data: contactKeysResponse, isLoading: contactKeysLoading } = useQuery(
-    [ReactQueryKeys.CONTACTS_KEYS],
-    getContactKeysAPI,
+  const { data: itemKeysResponse, isLoading: itemKeysLoading } = useQuery(
+    [ReactQueryKeys.BANK_KEYS],
+    getBankKeysApi,
     {
       enabled: !!compareDataModal,
     }
   );
 
-  const [state, setState] = useState(data?.xero);
-
-  const onDownloadTemplate = () => {
-    const headers = [
-      [
-        'name',
-        'email',
-        'contactType',
-        'cnic',
-        'phoneNumber',
-        'cellNumber',
-        'faxNumber',
-        'skypeName',
-        'webLink',
-        'creditLimit',
-        'creditLimitBlock',
-        'salesDiscount',
-        'balance',
-        'accountNumber',
-        'paymentDaysLimit',
-        'businessName',
-      ],
-    ];
-    downloadCSV(headers);
-  };
-
   return (
     <CommonModal
       visible={visibility}
-      title="Import Contacts"
-      width={step === 3 ? 1366 : 800}
+      title="Import accounts"
+      width={800}
       onCancel={() => {
-        setContactsImportConfig(false, null);
+        setBankImportConfig(false, null);
       }}
       footer={false}
     >
@@ -127,10 +99,10 @@ export const ContactImportWidget: FC = () => {
               <div className="download">
                 <h4>{state.link}</h4>
                 &nbsp;
-                <a onClick={onDownloadTemplate}>here</a>
+                <a>here</a>
               </div>
               <InvoiceImportManager
-                headers={`Contact,Email,Company Name,Contact Type,Credit Limit,Credit Block Limit,Balance`.split(
+                headers={`Bank Name,Account Name,Type,Last Updated`.split(
                   ','
                 )}
                 onLoad={(payload, file) => {
@@ -157,7 +129,6 @@ export const ContactImportWidget: FC = () => {
             </div>
           )}
         </div>
-
         <div className="CompareModal">
           <CompareDataModal
             documentKeys={
@@ -165,7 +136,7 @@ export const ContactImportWidget: FC = () => {
                 ? Object.keys(fileExtractedData?.[0])
                 : []
             }
-            compareKeys={contactKeysResponse?.data || []}
+            compareKeys={itemKeysResponse?.data || []}
             onCancel={() => {
               setStep(1);
               setCompareDataModel(false);
@@ -177,17 +148,14 @@ export const ContactImportWidget: FC = () => {
             visibility={compareDataModal}
           />
         </div>
-
         <CompareDataTable
-          contactKeysResponse={contactKeysResponse}
-          compareData={compareData}
-          fileExtractedData={fileExtractedData && fileExtractedData}
           setStep={() => setStep(2)}
-          fileData
+          fileExtractedData={fileExtractedData}
+          compareData={compareData}
+          itemKeysResponse={itemKeysResponse}
         />
       </WrapperModalContent>
     </CommonModal>
   );
 };
-
-export default ContactImportWidget;
+export default BankImportWidget;
