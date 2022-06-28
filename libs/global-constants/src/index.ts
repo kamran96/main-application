@@ -3,6 +3,7 @@ export * from './lib/global-constants.module';
 export enum Integrations {
   XERO = 'XE',
   QUICK_BOOK = 'QB',
+  CSV_IMPORT = 'CSV',
 }
 
 export enum PaymentModes {

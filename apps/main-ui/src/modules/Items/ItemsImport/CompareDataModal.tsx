@@ -170,6 +170,13 @@ export const CompareDataModal: FC<IProps> = ({
               } else {
                 setCompareData((prevState) => {
                   const state = { ...prevState };
+                  const keyExistingIndex = Object.values(state).findIndex(
+                    (val) => val === record.keyName
+                  );
+                  if (keyExistingIndex > -1) {
+                    delete state[Object.keys(state)[keyExistingIndex]];
+                  }
+
                   state[value?.value] = record.keyName;
                   return state;
                 });

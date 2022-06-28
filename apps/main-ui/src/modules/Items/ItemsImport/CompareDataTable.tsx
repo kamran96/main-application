@@ -1,13 +1,18 @@
 import { CommonTable } from '../../../components/Table';
 import React, { FC } from 'react';
-import { Button } from 'antd';
+import { Button, Select } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
+import { useMutation, useQuery } from 'react-query';
+import { CsvImportAPi, getAllAccounts } from '../../../api';
+import { IAccountsResult } from '@invyce/shared/types';
 
+const { Option } = Select;
 interface IProps {
   fileExtractedData: any;
   setStep: (payload: any) => void;
   itemKeysResponse: any;
   compareData: any;
+  fileData: any;
 }
 
 export const CompareDataTable: FC<IProps> = ({
@@ -15,7 +20,50 @@ export const CompareDataTable: FC<IProps> = ({
   setStep,
   itemKeysResponse,
   compareData,
+  fileData,
 }) => {
+  const { mutate: uploadCsv, isLoading: uploadingCsv } =
+    useMutation(CsvImportAPi);
+
+  const { data: AllAccounts } = useQuery(
+    [`all-accounts`, 'All'],
+    getAllAccounts
+  );
+
+  const debitedAccounts: IAccountsResult[] =
+  (AllAccounts &&
+    AllAccounts.data &&
+    AllAccounts.data.result &&
+    AllAccounts.data.result.filter(
+      (acc) => acc?.secondaryAccount?.primaryAccount?.name === 'asset'
+    )) ||
+  [];
+const creditedAccounts: IAccountsResult[] =
+  (AllAccounts &&
+    AllAccounts.data &&
+    AllAccounts.data.result &&
+    AllAccounts.data.result.filter(
+      (acc) =>
+        acc?.secondaryAccount?.primaryAccount?.name === 'liability' ||
+        acc?.secondaryAccount?.primaryAccount?.name === 'equity' ||
+        acc?.secondaryAccount?.primaryAccount?.name === 'revenue'
+    )) ||
+  [];
+  
+
+  const onConfirmUpload = async () => {
+    const formData = new FormData();
+    formData.append('file', fileData);
+    formData.append('compareData', JSON.stringify(compareData));
+    formData.append('module', JSON.stringify('contact'));
+
+    await uploadCsv(formData, {
+      onSuccess: (data: any) => {
+        console.log(data);
+      },
+    });
+  };
+
   const getTitle = (colItem: string) => {
     if (itemKeysResponse?.data) {
       const key = compareData[colItem];
@@ -27,9 +75,12 @@ export const CompareDataTable: FC<IProps> = ({
       return colItem;
     }
   };
+
+  console.log(fileExtractedData, 'file extracted data');
+
   const columns: ColumnsType<any> =
     fileExtractedData?.length > 0
-      ? Object.keys(fileExtractedData[0]).map((item) => {
+      ? Object.keys(compareData).map((item) => {
           return {
             title: getTitle(item),
             dataIndex: item,
@@ -45,11 +96,7 @@ export const CompareDataTable: FC<IProps> = ({
         <Button className="btn" onClick={() => setStep(2)}>
           Back
         </Button>
-        <Button
-          type="primary"
-          className="btn"
-          onClick={() => console.log('proceed')}
-        >
+        <Button type="primary" className="btn" onClick={onConfirmUpload}>
           Proceed
         </Button>
       </div>

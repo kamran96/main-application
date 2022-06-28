@@ -721,6 +721,7 @@ export class PaymentService {
   // }
 
   async AddPayment(data, user: IBaseUser): Promise<void> {
+    console.log('okkkk');
     for (const i of data.payments) {
       await getCustomRepository(PaymentRepository).save({
         amount: i?.balance,

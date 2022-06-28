@@ -119,7 +119,7 @@ interface IProps {
 export const CompareDataModal: FC<IProps> = ({
   visibility,
   onCancel,
-  compareKeys = a,
+  compareKeys,
   documentKeys,
   OnConfrm,
 }) => {
@@ -128,6 +128,7 @@ export const CompareDataModal: FC<IProps> = ({
   const unUsedDocumentKeys = documentKeys.filter(
     (key) => !Object.keys(compareData).includes(key)
   );
+
 
   const columns: ColumnsType<any> = [
     {
@@ -174,6 +175,13 @@ export const CompareDataModal: FC<IProps> = ({
               } else {
                 setCompareData((prevState) => {
                   const state = { ...prevState };
+                  const keyExistingIndex = Object.values(state).findIndex(
+                    (val) => val === record.keyName
+                  );
+                  if (keyExistingIndex > -1) {
+                    delete state[Object.keys(state)[keyExistingIndex]];
+                  }
+
                   state[value?.value] = record.keyName;
                   return state;
                 });
@@ -190,14 +198,6 @@ export const CompareDataModal: FC<IProps> = ({
         );
       },
     },
-    // {
-    //   title: 'Action',
-    //   dataIndex: 'action',
-    //   key: 'action',
-    //   render: () => {
-    //     return <Icon className="Icon" icon={deleteIcon} />;
-    //   },
-    // },
   ];
 
   if (visibility && documentKeys?.length) {

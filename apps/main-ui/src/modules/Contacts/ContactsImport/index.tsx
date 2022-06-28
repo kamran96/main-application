@@ -1,6 +1,6 @@
+import React from 'react';
 import { ButtonTag } from '../../../components/ButtonTags';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import React from 'react';
 
 const ContactsImport = () => {
   const { setContactsImportConfig } = useGlobalContext();
