@@ -1,5 +1,4 @@
-import styled from "styled-components";
-
+import styled, { keyframes } from 'styled-components';
 type DivProps = JSX.IntrinsicElements['div'];
 
 interface ModalWrapper extends DivProps {
