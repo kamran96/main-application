@@ -129,7 +129,6 @@ export const CompareDataModal: FC<IProps> = ({
     (key) => !Object.keys(compareData).includes(key)
   );
 
-
   const columns: ColumnsType<any> = [
     {
       title: 'Fields from Database',
@@ -218,7 +217,7 @@ export const CompareDataModal: FC<IProps> = ({
           isMemo={false}
           customMount={unUsedDocumentKeys?.length}
           columns={columns as any}
-          data={a.sort((a, b) => a.label.localeCompare(b.label))}
+          data={compareKeys.sort((a, b) => a.label.localeCompare(b.label))}
           dragable={() => null}
           scrollable={{ offsetY: 500, offsetX: 0 }}
         />

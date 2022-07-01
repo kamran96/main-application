@@ -21,101 +21,10 @@ interface IProps {
   OnConfrm: (payload: any) => void;
 }
 
-const a = [
-  {
-    label: 'Status',
-    keyName: 'Status',
-    description: 'Please select a field which is related to Status of item',
-  },
-  {
-    label: 'Payment Days Limit',
-    keyName: 'paymentDaysLimit',
-    description:
-      'Please select a field which is related to Payment Days Limit of item',
-  },
-  {
-    label: 'Purchase Price',
-    keyName: 'purchasePrice',
-    description:
-      'Please select a field which is related to Purchase Price Name of item',
-  },
-  {
-    label: 'Sale Price',
-    keyName: 'salesPrice',
-    description:
-      'Please select a field which is related to Sales Price of item',
-  },
-  {
-    label: 'Code',
-    keyName: 'Code',
-    description:
-      'Please select a field which is related to Credit Limit Block of item',
-  },
-  {
-    label: 'Stock',
-    keyName: 'stock',
-    description: 'Please select a field which is related to Stocks of item',
-  },
-  {
-    label: 'Web Link',
-    keyName: 'webLink',
-    description:
-      'Please select a field which is related to Website Link of item',
-  },
-  {
-    label: 'Skype Name',
-    keyName: 'skypeName',
-    description: 'Please select a field which is related to Skype Name of item',
-  },
-  {
-    label: 'Fax Number',
-    keyName: 'faxNumber',
-    description: 'Please select a field which is related to Fax Number of item',
-  },
-  {
-    label: 'Cell Number',
-    keyName: 'cellNumber',
-    description:
-      'Please select a field which is related to Cell Number of item',
-  },
-  {
-    label: 'Phone Number',
-    keyName: 'phoneNumber',
-    description:
-      'Please select a field which is related to Phone Number of item',
-  },
-  {
-    label: 'Cnic',
-    keyName: 'cnic',
-    description:
-      'Please select a field which is related to National Identity of item',
-  },
-  {
-    label: 'item Name',
-    keyName: 'itemName',
-    description: 'Please select a field which is related to item Name of item',
-  },
-  {
-    label: 'item Type',
-    keyName: 'itemType',
-    description: 'Please select a field which is related to item Type',
-  },
-  {
-    label: 'Email',
-    keyName: 'email',
-    description: 'Please select a field which is related to Email of item',
-  },
-  {
-    label: 'Name',
-    keyName: 'name',
-    description: 'Please select a field which is related to Name of item',
-  },
-];
-
 export const CompareDataModal: FC<IProps> = ({
   visibility,
   onCancel,
-  compareKeys = a,
+  compareKeys,
   documentKeys,
   OnConfrm,
 }) => {
@@ -221,7 +130,7 @@ export const CompareDataModal: FC<IProps> = ({
           isMemo={false}
           customMount={unUsedDocumentKeys?.length}
           columns={columns as any}
-          data={a.sort((a, b) => a.label.localeCompare(b.label))}
+          data={compareKeys.sort((a, b) => a.label.localeCompare(b.label))}
           dragable={() => null}
           scrollable={{ offsetY: 500, offsetX: 0 }}
         />
