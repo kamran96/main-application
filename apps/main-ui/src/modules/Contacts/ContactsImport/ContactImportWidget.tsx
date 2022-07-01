@@ -183,7 +183,7 @@ export const ContactImportWidget: FC = () => {
           compareData={compareData}
           fileExtractedData={fileExtractedData && fileExtractedData}
           setStep={() => setStep(2)}
-          fileData
+          fileData={fileData}
         />
       </WrapperModalContent>
     </CommonModal>

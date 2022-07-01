@@ -39,6 +39,12 @@ export class ItemController {
     }
   }
 
+  @Get('import-csv')
+  @UseGuards(GlobalAuthGuard)
+  async importCsv(): Promise<any> {
+    return await this.itemService.ImportCSV();
+  }
+
   @Post('ids')
   @UseGuards(GlobalAuthGuard)
   async listItemByIds(@Body() itemDto: ItemIdsDto): Promise<IItem[]> {
