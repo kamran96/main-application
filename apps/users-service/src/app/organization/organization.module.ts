@@ -15,9 +15,9 @@ import {
   OrganizationUserSchema,
 } from '../schemas/organizationUser.schema';
 import { User, UserSchema } from '../schemas/user.schema';
+import { AuthStrategy } from '../auth/auth.strategy';
 import { OrganizationController } from './organization.controller';
 import { OrganizationService } from './organization.service';
-
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -40,23 +40,23 @@ import { OrganizationService } from './organization.service';
         },
       },
     ]),
-    ClientsModule.register([
-      {
-        name: 'REPORT_SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://localhost:5672'],
-          queue: 'report_queue',
-          queueOptions: {
-            durable: false,
-          },
-        },
-      },
-    ]),
+    // ClientsModule.register([
+    //   {
+    //     name: 'REPORT_SERVICE',
+    //     transport: Transport.RMQ,
+    //     options: {
+    //       urls: ['amqp://localhost:5672'],
+    //       queue: 'report_queue',
+    //       queueOptions: {
+    //         durable: false,
+    //       },
+    //     },
+    //   },
+    // ]),
     RbacModule,
     AuthModule,
   ],
-  providers: [OrganizationService],
+  providers: [OrganizationService, AuthStrategy],
   controllers: [OrganizationController],
 })
 export class OrganizationModule {}
