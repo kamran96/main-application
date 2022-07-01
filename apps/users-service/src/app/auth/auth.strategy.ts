@@ -10,11 +10,13 @@ import {
 } from '@invyce/interfaces';
 
 let data = {};
+
 @Injectable()
 export class AuthStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
     super({
       jwtFromRequest: (req) => {
+        console.log(process.env.JWT_SECRET, 'SECRET');
         if (!req || !req.cookies) return null;
         data = {
           cookies: req.cookies,
@@ -27,6 +29,7 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: IBaseUser): Promise<IUser> {
+    console.log('okkkk');
     try {
       const newData = { ...data, user: payload };
       const user: IUserAccessControlResponse =
