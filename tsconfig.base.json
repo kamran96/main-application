@@ -1,0 +1,45 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2019", "es2017", "es7", "es6", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@invyce/auth-middleware": ["libs/auth-middleware/src/index.ts"],
+      "@invyce/common": ["libs/common/src/index.ts"],
+      "@invyce/editable-table": ["libs/editable-table/src/index.ts"],
+      "@invyce/error-boundry": ["libs/error-boundry/src/index.ts"],
+      "@invyce/global-auth-guard": ["libs/global-auth-guard/src/index.ts"],
+      "@invyce/global-constants": ["libs/global-constants/src/index.ts"],
+      "@invyce/interfaces": ["libs/interfaces/src/index.ts"],
+      "@invyce/invyce-persist": ["libs/invyce-persist/src/index.ts"],
+      "@invyce/micro-frontend": ["libs/micro-frontend/src/index.ts"],
+      "@invyce/pdf-table": ["libs/pdf-table/src/index.ts"],
+      "@invyce/pixels-to-rem": ["libs/pixels-to-rem/src/index.ts"],
+      "@invyce/rabbitmq-module": ["libs/rabbitmq-module/src/index.ts"],
+      "@invyce/review/invyce-theme": ["libs/review/invyce-theme/src/index.ts"],
+      "@invyce/send-email": ["libs/send-email/src/index.ts"],
+      "@invyce/shared/components": ["libs/shared/components/src/index.ts"],
+      "@invyce/shared/global-state-manager": [
+        "libs/shared/global-state-manager/src/index.ts"
+      ],
+      "@invyce/shared/invyce-theme": ["libs/shared/invyce-theme/src/index.ts"],
+      "@invyce/shared/types": ["libs/shared/types/src/index.ts"],
+      "@invyce/shared/utils": ["libs/shared/utils/src/index.ts"],
+      "@invyce/sidebar-ui": ["libs/sidebar-ui/src/index.ts"],
+      "@invyce/sorting": ["libs/sorting/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}
