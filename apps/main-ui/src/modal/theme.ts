@@ -1,0 +1,31 @@
+export enum Color {
+  $PRIMARY = '#1890ff',
+  $Secondary = ' #143C69',
+  $BLACK = '#000000',
+  $LIGHT_BLACK = '#272727',
+  $LOGO = '#3D3D3D',
+  $TEXT = '#141414',
+  $GRAY = '#767676',
+  $THEME_RED = '#f75151',
+  $WHITE = '#ffff',
+  $GRAY_LIGHT = '#808080',
+  $SIDEBAR = `rgba(62, 62, 60, 0.75)`,
+  $CHECK_BOX = '#DEDEDE',
+  $Primary2 = `#1e5b9e`,
+}
+
+export enum DarkThemeColor {
+  $PRIMARY = '#1890ff',
+  $Secondary = ' #143C69',
+  $BLACK = '#000000',
+  $LIGHT_BLACK = '#272727',
+  $LOGO = '#3D3D3D',
+  $TEXT = '#141414',
+  $GRAY = '#767676',
+  $THEME_RED = '#f75151',
+  $WHITE = '#ffff',
+  $GRAY_LIGHT = '#808080',
+  $SIDEBAR = `rgba(62, 62, 60, 0.75)`,
+  $CHECK_BOX = '#DEDEDE',
+  $Primary2 = `#1e5b9e`,
+}

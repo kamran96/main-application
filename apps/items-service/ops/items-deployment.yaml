@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: items-app
+spec:
+  selector:
+    matchLabels:
+      app: items-app
+  template:
+    metadata:
+      labels:
+        app: items-app
+    spec:
+      containers:
+      - name: items-app
+        image: <IMAGE>
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3335
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: items-http
+spec:
+  selector:
+    app: items-app
+  ports:
+  - port: 80
+    targetPort: 3335

@@ -1,0 +1,151 @@
+{
+  "npmScope": "invyce",
+  "affected": {
+    "defaultBase": "master"
+  },
+  "implicitDependencies": {
+    "package.json": {
+      "dependencies": "*",
+      "devDependencies": "*"
+    },
+    ".eslintrc.json": "*"
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "@nrwl/nx-cloud",
+      "options": {
+        "cacheableOperations": ["build", "lint", "test", "e2e"],
+        "accessToken": "OTJkMmFkZGItZDgwNC00YzNjLWIwMWEtNzU2ZDdmYzllMDg4fHJlYWQtd3JpdGU="
+      }
+    }
+  },
+  "targetDependencies": {
+    "build": [
+      {
+        "target": "build",
+        "projects": "dependencies"
+      }
+    ]
+  },
+  "projects": {
+    "accounting-service": {
+      "tags": []
+    },
+    "attachments-service": {
+      "tags": []
+    },
+    "auth-middleware": {
+      "tags": []
+    },
+    "bank-reconcilation": {
+      "tags": []
+    },
+    "bank-reconcilation-e2e": {
+      "tags": [],
+      "implicitDependencies": ["bank-reconcilation"]
+    },
+    "common": {
+      "tags": []
+    },
+    "contacts-service": {
+      "tags": []
+    },
+    "csv-service": {
+      "tags": []
+    },
+    "editable-table": {
+      "tags": []
+    },
+    "editable-table-e2e": {
+      "tags": [],
+      "implicitDependencies": ["editable-table"]
+    },
+    "email-service": {
+      "tags": []
+    },
+    "error-boundry": {
+      "tags": []
+    },
+    "exports-service": {
+      "tags": []
+    },
+    "global-auth-guard": {
+      "tags": []
+    },
+    "global-constants": {
+      "tags": []
+    },
+    "integration": {
+      "tags": []
+    },
+    "interfaces": {
+      "tags": []
+    },
+    "invoices-service": {
+      "tags": []
+    },
+    "invyce-persist": {
+      "tags": []
+    },
+    "items-service": {
+      "tags": []
+    },
+    "main-api": {
+      "tags": []
+    },
+    "main-ui": {
+      "tags": []
+    },
+    "main-ui-e2e": {
+      "tags": [],
+      "implicitDependencies": ["main-ui"]
+    },
+    "micro-frontend": {
+      "tags": []
+    },
+    "mobile-app": {
+      "tags": []
+    },
+    "mobile-app-e2e": {
+      "tags": [],
+      "implicitDependencies": ["mobile-app"]
+    },
+    "payments-service": {
+      "tags": []
+    },
+    "pdf-table": {
+      "tags": []
+    },
+    "pixels-to-rem": {
+      "tags": []
+    },
+    "rabbitmq-module": {
+      "tags": []
+    },
+    "reports-service": {
+      "tags": []
+    },
+    "send-email": {},
+    "shared-components": {
+      "tags": []
+    },
+    "shared-invyce-theme": {
+      "tags": []
+    },
+    "shared-types": {
+      "tags": []
+    },
+    "shared-utils": {
+      "tags": []
+    },
+    "sidebar-ui": {
+      "tags": []
+    },
+    "sorting": {
+      "tags": []
+    },
+    "users-service": {
+      "tags": []
+    }
+  }
+}
