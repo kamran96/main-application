@@ -9,6 +9,7 @@ enum Modules {
   ACCOUNTS = 'accounts',
   INVOICE = 'invoice',
   PAYMENT = 'payment',
+  ITEMS = 'items',
 }
 @Injectable()
 export class CsvService {
@@ -56,8 +57,14 @@ export class CsvService {
             type: Integrations.CSV_IMPORT,
           });
           break;
-
-        default:
+        case Modules.ITEMS:
+          // eslint-disable-next-line no-case-declarations
+          const targetAccounts: unknown = JSON.parse(fields.targetAccounts);
+          await http.post('/items/item/sync', {
+            type: Integrations.CSV_IMPORT,
+            items: csvData,
+            targetAccounts: targetAccounts,
+          });
           break;
       }
       // console.log(readStream, 'readstream', compareData);

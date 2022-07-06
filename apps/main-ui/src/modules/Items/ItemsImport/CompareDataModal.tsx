@@ -13,6 +13,73 @@ import deleteIcon from '@iconify/icons-carbon/delete';
 import styled from 'styled-components';
 import { ITheme, IThemeProps } from '@invyce/shared/invyce-theme';
 
+const a = [
+  {
+    label: 'Name',
+    keyName: 'name',
+    description:
+      'Please select a field which is related to Name of Item',
+  },
+  {
+    label: 'Code',
+    keyName: 'code',
+    description:
+      'Please select a field which is related to code of Item',
+  },
+  {
+    label: 'Item Type',
+    keyName: 'itemType',
+    description: 'Please select a field which is related to itemType of Items',
+  },
+  {
+    label: 'Opening Stock',
+    keyName: 'openingStock',
+    description:
+      'Please select a field which is related to Opening Stock of Items',
+  },
+  {
+    label: 'Bar Code',
+    keyName: 'barcode',
+    description:
+      'Please select a field which is related to Bar Code of Items',
+  },
+  {
+    label: 'Description',
+    keyName: 'description',
+    description:
+      'Please select a field which is related to description of Items',
+  },
+  {
+    label: 'Minimum Stock',
+    keyName: 'minimumStock',
+    description:
+      'Please select a field which is related to Minimum Stock of Items',
+  },
+  {
+    label: 'Purchase Price',
+    keyName: 'purchasePrice',
+    description:
+      'Please select a field which is related to Purchase Price of Items',
+  },
+  {
+    label: 'Sale Price',
+    keyName: 'salePrice',
+    description:
+      'Please select a field which is related to salePrice of Items',
+  },
+  {
+    label: 'Tax',
+    keyName: 'tax',
+    description:
+      'Please select a field which is related to tax of Items',
+  },
+  {
+    label: 'discount',
+    keyName: 'Discount',
+    description:
+      'Please select a field which is related to Discount of Contact',
+  }
+];
 interface IProps {
   visibility: boolean;
   onCancel: () => void;
@@ -20,97 +87,6 @@ interface IProps {
   documentKeys: any[];
   OnConfrm: (payload: any) => void;
 }
-
-const a = [
-  {
-    label: 'Status',
-    keyName: 'Status',
-    description: 'Please select a field which is related to Status of item',
-  },
-  {
-    label: 'Payment Days Limit',
-    keyName: 'paymentDaysLimit',
-    description:
-      'Please select a field which is related to Payment Days Limit of item',
-  },
-  {
-    label: 'Purchase Price',
-    keyName: 'purchasePrice',
-    description:
-      'Please select a field which is related to Purchase Price Name of item',
-  },
-  {
-    label: 'Sale Price',
-    keyName: 'salesPrice',
-    description:
-      'Please select a field which is related to Sales Price of item',
-  },
-  {
-    label: 'Code',
-    keyName: 'Code',
-    description:
-      'Please select a field which is related to Credit Limit Block of item',
-  },
-  {
-    label: 'Stock',
-    keyName: 'stock',
-    description: 'Please select a field which is related to Stocks of item',
-  },
-  {
-    label: 'Web Link',
-    keyName: 'webLink',
-    description:
-      'Please select a field which is related to Website Link of item',
-  },
-  {
-    label: 'Skype Name',
-    keyName: 'skypeName',
-    description: 'Please select a field which is related to Skype Name of item',
-  },
-  {
-    label: 'Fax Number',
-    keyName: 'faxNumber',
-    description: 'Please select a field which is related to Fax Number of item',
-  },
-  {
-    label: 'Cell Number',
-    keyName: 'cellNumber',
-    description:
-      'Please select a field which is related to Cell Number of item',
-  },
-  {
-    label: 'Phone Number',
-    keyName: 'phoneNumber',
-    description:
-      'Please select a field which is related to Phone Number of item',
-  },
-  {
-    label: 'Cnic',
-    keyName: 'cnic',
-    description:
-      'Please select a field which is related to National Identity of item',
-  },
-  {
-    label: 'item Name',
-    keyName: 'itemName',
-    description: 'Please select a field which is related to item Name of item',
-  },
-  {
-    label: 'item Type',
-    keyName: 'itemType',
-    description: 'Please select a field which is related to item Type',
-  },
-  {
-    label: 'Email',
-    keyName: 'email',
-    description: 'Please select a field which is related to Email of item',
-  },
-  {
-    label: 'Name',
-    keyName: 'name',
-    description: 'Please select a field which is related to Name of item',
-  },
-];
 
 export const CompareDataModal: FC<IProps> = ({
   visibility,
@@ -221,7 +197,7 @@ export const CompareDataModal: FC<IProps> = ({
           isMemo={false}
           customMount={unUsedDocumentKeys?.length}
           columns={columns as any}
-          data={a.sort((a, b) => a.label.localeCompare(b.label))}
+          data={compareKeys.sort((a, b) => a.label.localeCompare(b.label))}
           dragable={() => null}
           scrollable={{ offsetY: 500, offsetX: 0 }}
         />

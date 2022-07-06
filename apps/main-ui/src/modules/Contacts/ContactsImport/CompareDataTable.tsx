@@ -1,5 +1,5 @@
 import { CommonTable } from '../../../components/Table';
-import React, { FC } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Button, Select } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { useMutation, useQuery } from 'react-query';
@@ -26,6 +26,13 @@ export const CompareDataTable: FC<IProps> = ({
   const { mutate: uploadCsv, isLoading: uploadingCsv } =
     useMutation(CsvImportAPi);
 
+  const [_fileData, _setFileData] = useState([]);
+
+  // useEffect(()=>{
+
+  // },[])
+
+  console.log(fileExtractedData, 'fileExtractedData');
 
   const { data: AllAccounts } = useQuery(
     [`all-accounts`, 'ALL'],
@@ -99,6 +106,7 @@ export const CompareDataTable: FC<IProps> = ({
                   style={{ width: '100%' }}
                   placeholder="Select Item"
                   optionFilterProp="children"
+                  // onChange={() => console.log('hello')}
                 >
                   {debitedAccounts.length &&
                     debitedAccounts.map((acc: IAccountsResult, index) => {
