@@ -13,7 +13,7 @@ if (host && host === 'app.invyce.com') {
   // set online server endpoints
 
   NodeBaseURL = `https://api.node.invyce.com/`;
-} else if (host && host !== 'staging.invyce.com') {
+} else if (host && host === 'staging.invyce.com') {
   // Staging server endpoints
 
   NodeBaseURL = `https://api.staging.invyce.com`;
