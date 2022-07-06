@@ -33,11 +33,12 @@ export class OrganizationService {
     @InjectModel(Currency.name) private currencyModel,
     private rbacService: RbacService,
     private authService: AuthService,
-    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy,
-    @Inject('REPORT_SERVICE') private readonly reportService: ClientProxy
+    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy // @Inject('REPORT_SERVICE') private readonly reportService: ClientProxy
   ) {}
 
   async ListOrganizations(req) {
+    console.log('org...');
+
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
 
@@ -200,12 +201,8 @@ export class OrganizationService {
         if (!req || !req.cookies) return null;
         const token = req?.cookies['access_token'];
 
-        console.log(token, 'token');
-
-        console.log('inserting initial accounts');
-        console.log(req.user, 'user');
         await axios.post(
-          Host('accounts', `accounts/account/init`),
+          Host('accounts', 'accounts/account/init'),
           {
             user: {
               id: req?.user?.id,
@@ -219,18 +216,16 @@ export class OrganizationService {
           }
         );
 
-        console.log('inserted...');
-
         const roles = await this.rbacService.InsertRoles(organization.id);
         await this.rbacService.InsertRolePermission(organization.id);
         const [adminRole] = roles.filter((r) => r.name === 'admin');
 
         if (req?.user?.organizationId !== null) {
-          await this.emailService.emit(ORGANIZATION_CREATED, {
-            org_name: organization.name,
-            user_name: req.user.profile.fullName,
-            to: req.user.email,
-          });
+          // await this.emailService.emit(ORGANIZATION_CREATED, {
+          //   org_name: organization.name,
+          //   user_name: req.user.profile.fullName,
+          //   to: req.user.email,
+          // });
 
           return organization;
         } else {
@@ -247,17 +242,12 @@ export class OrganizationService {
             username: req.user.username,
           });
 
-          const nextSevenDay = moment().add(7, 'days').format('YYYY-MM-DD');
+          // const nextSevenDay = moment().add(7, 'days').format('YYYY-MM-DD');
 
-          await this.emailService.emit(TRAIL_STARTED, {
-            to: req.user.email,
-            user_name: req.user.profile.fullName,
-            next_7_days: nextSevenDay,
-          });
-          // await this.reportService.emit(ORGANIZATION_CREATED, {
-          //   ...organization.toObject(),
-          //   userId: req.user.id,
-          //   branchId: branchArr.length > 0 ? branchArr[0].id : null,
+          // await this.emailService.emit(TRAIL_STARTED, {
+          //   to: req.user.email,
+          //   user_name: req.user.profile.fullName,
+          //   next_7_days: nextSevenDay,
           // });
 
           return await this.authService.Login(users, res);

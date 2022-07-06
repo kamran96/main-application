@@ -162,6 +162,7 @@ export class AccountsService {
         result: accounts,
       };
     } catch (error) {
+      console.log(error, 'err');
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -374,9 +375,15 @@ export class AccountsService {
     return newAccountArray;
   }
 
+  async test() {
+    await getCustomRepository(AccountRepository).save({
+      name: 'test',
+      status: 1,
+    });
+  }
+
   async initAccounts(data: IRequest): Promise<void> {
     try {
-      console.log('inserting accounts...');
       const { primary, secondary } = await import('../accounts');
       for (const account of primary) {
         const accountModel = {
