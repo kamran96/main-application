@@ -22,33 +22,19 @@ export const CompareDataTable: FC<IProps> = ({
   compareData,
   fileData,
 }) => {
+  
   const { mutate: uploadCsv, isLoading: uploadingCsv } =
     useMutation(CsvImportAPi);
 
-  const { data: AllAccounts } = useQuery(
-    [`all-accounts`, 'All'],
-    getAllAccounts
+  const { data: resAllAccounts } = useQuery(
+    [`all-accounts`, `ALL`],
+    getAllAccounts,
   );
-
-  const debitedAccounts: IAccountsResult[] =
-  (AllAccounts &&
-    AllAccounts.data &&
-    AllAccounts.data.result &&
-    AllAccounts.data.result.filter(
-      (acc) => acc?.secondaryAccount?.primaryAccount?.name === 'asset'
-    )) ||
-  [];
-const creditedAccounts: IAccountsResult[] =
-  (AllAccounts &&
-    AllAccounts.data &&
-    AllAccounts.data.result &&
-    AllAccounts.data.result.filter(
-      (acc) =>
-        acc?.secondaryAccount?.primaryAccount?.name === 'liability' ||
-        acc?.secondaryAccount?.primaryAccount?.name === 'equity' ||
-        acc?.secondaryAccount?.primaryAccount?.name === 'revenue'
-    )) ||
-  [];
+  const allLiabilitiesAcc: IAccountsResult[] =
+    resAllAccounts?.data.result.filter(
+      (item: IAccountsResult) =>
+        item?.secondaryAccount?.primaryAccount?.name === 'liability'
+    ) || [];
   
 
   const onConfirmUpload = async () => {
@@ -87,7 +73,34 @@ const creditedAccounts: IAccountsResult[] =
             key: item,
           };
         })
-      : [];
+        .concat([
+          {
+            title: 'Account',
+            dataIndex: '',
+            key: 'Accounts',
+            render: () => (
+              <Select
+              size="middle"
+              showSearch
+              style={{ width: '100%' }}
+              placeholder="Select Account"
+              optionFilterProp="children"
+            >
+              {allLiabilitiesAcc.length &&
+                allLiabilitiesAcc.map(
+                  (acc: IAccountsResult, index: number) => {
+                    return (
+                      <Option key={index} value={acc.id}>
+                        {acc.name}
+                      </Option>
+                    );
+                  }
+                )}
+            </Select>
+            )
+          }
+        ] as any)
+    : [];
 
   return (
     <div className="TableWrapper">

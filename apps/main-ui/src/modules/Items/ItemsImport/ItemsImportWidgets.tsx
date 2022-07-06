@@ -84,7 +84,7 @@ export const ItemsImportWidget: FC = () => {
     <CommonModal
       visible={visibility}
       title="Import Items"
-      width={800}
+      width={step === 3 ? 1366 : 800}
       onCancel={() => {
         setItemsImportconfig(false, null);
       }}
