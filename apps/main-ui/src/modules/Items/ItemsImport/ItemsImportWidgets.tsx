@@ -60,21 +60,17 @@ export const ItemsImportWidget: FC = () => {
   const onDownloadTemplate = () => {
     const headers = [
       [
-        'itemName',
+        'name',
         'code',
-        'purchasePrice',
-        'cnic',
-        'phoneNumber',
-        'cellNumber',
-        'faxNumber',
-        'skypeName',
-        'webLink',
-        'salePrice',
         'itemType',
-        'stock',
-        'status',
-        'accountNumber',
-        'paymentDaysLimit',
+        'openingStock',
+        'barcode',
+        'description',
+        'minimumStock',
+        'purchasePrice',
+        'salePrice',
+        'tax',
+        'discount',
       ],
     ];
     downloadCSV(headers);
@@ -189,6 +185,3 @@ export const ItemsImportWidget: FC = () => {
   );
 };
 export default ItemsImportWidget;
-
-
-
