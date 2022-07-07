@@ -63,6 +63,77 @@ export const DashboardLayout: any = (props: RouteConfigComponentProps) => {
     () => import('../modules/Contacts/ContactsImport/ContactImportWidget')
   );
 
+  const ItemsImportWidget = lazy(
+    () => import('../modules/Items/ItemsImport/ItemsImportWidgets')
+  );
+
+  const PaymentImportWidget = lazy(
+    () => import('../modules/Payment/PaymentsImport/PaymentImportWidget')
+  );
+
+  const AccountsImportWidget = lazy(
+    () =>
+      import(
+        '../modules/Accounts/AccountsImport/AccountsImportWidget'
+      )
+  );
+
+  const TransactionImportWidget = lazy(
+    () =>
+      import(
+        '../modules/Business/Transactions/importTransactions/TransactionImportWidget'
+      )
+  );
+
+  const BankImportWidget = lazy(
+    () =>
+      import(
+        '../modules/Business/BankAccounts/BanksImport/BankImportWidget'
+      )
+  );
+
+  const InvoiceImportWidget = lazy(
+    () =>
+      import(
+        '../modules/Invoice/InvoiceList/invoiceImports/InvoiceImportWidget'
+      )
+  );
+
+  const CreditNoteImportWidget = lazy(
+    () =>
+      import(
+        '../modules/Invoice/CreditNoteList/ImportCreditNote/CreditNoteImportWidget '
+      )
+  );
+
+  const DebitNoteImportWidget = lazy(
+    () =>
+      import(
+        '../modules/Invoice/DebitNotesList/DebitNoteImport/DebitNoteImportWidget'
+      )
+  );
+
+  const QuoteImportWidget = lazy(
+    () =>
+      import(
+        '../modules/Business/Quote/QuoteImport/QuoteImportWidget'
+      )
+  );
+
+  const PurchaseOrderWidget = lazy(
+    () =>
+      import(
+        '../modules/Business/PurchaseOrder/PurchaseOrderList/PurchaseOrderImport/PurchasesOrderWidget'
+      )
+  );
+
+  const ImportBillWidget = lazy(
+    () =>
+      import(
+        '../modules/Business/PurchaseOrder/Bills/importBill/ImportBillWidget'
+      )
+  );
+
   const { isUserLogin, userDetails, routeHistory, theme, itemsModalConfig } =
     useGlobalContext();
 
@@ -157,6 +228,39 @@ export const DashboardLayout: any = (props: RouteConfigComponentProps) => {
         </Suspense>
         <Suspense fallback={<div></div>}>
           <ContactsImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <ItemsImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <PaymentImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <AccountsImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <TransactionImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <BankImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <InvoiceImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <CreditNoteImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <DebitNoteImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <QuoteImportWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <PurchaseOrderWidget />
+        </Suspense>
+        <Suspense fallback={<div></div>}>
+          <ImportBillWidget />
         </Suspense>
       </DashboardWrapper>
     </ThemeProvider>

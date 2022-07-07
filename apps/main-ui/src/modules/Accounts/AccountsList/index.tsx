@@ -26,6 +26,7 @@ import AccountsFilterringSchema from './AccountsFilteringSchema';
 import { pdfColsAccounts, _csvColumnsAccount } from './exportableCols';
 import { AccountsWrapper, ListWrapper } from './styles';
 import { IErrorResponse } from '@invyce/shared/types';
+import { AccountsImport } from '../AccountsImport';
 
 interface IProps {
   columns: ColumnsType;
@@ -70,23 +71,20 @@ export const AccountsList: FC<IProps> = ({ data }) => {
 
       const filterType = history.location.search.split('&');
       const filterIdType = filterType[0];
-      const filterOrder = filterType[3]?.split("=")[1];
-      
-     
+      const filterOrder = filterType[3]?.split('=')[1];
 
-      if(filterIdType?.includes("-")){
-         const fieldName = filterIdType?.split("=")[1].split("-")[1];
-         setSortedInfo({
-           order: filterOrder,
-           columnKey: fieldName
-         });
-      }
-      else{
-        const fieldName = filterIdType?.split("=")[1];
+      if (filterIdType?.includes('-')) {
+        const fieldName = filterIdType?.split('=')[1].split('-')[1];
         setSortedInfo({
           order: filterOrder,
-          columnKey: fieldName
-        })
+          columnKey: fieldName,
+        });
+      } else {
+        const fieldName = filterIdType?.split('=')[1];
+        setSortedInfo({
+          order: filterOrder,
+          columnKey: fieldName,
+        });
       }
     }
   }, [routeHistory]);
@@ -215,7 +213,8 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         dataIndex: 'secondaryName',
         key: 'secondaryName',
         sorter: true,
-        sortOrder: sortedInfo?.columnKey === 'secondaryName' && sortedInfo?.order,
+        sortOrder:
+          sortedInfo?.columnKey === 'secondaryName' && sortedInfo?.order,
       },
       {
         width: 100,
@@ -231,7 +230,8 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         dataIndex: 'total_debits',
         key: 'total_debits',
         sorter: true,
-        sortOrder: sortedInfo?.columnKey === 'total_debits' && sortedInfo?.order,
+        sortOrder:
+          sortedInfo?.columnKey === 'total_debits' && sortedInfo?.order,
         render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
       },
       {
@@ -239,7 +239,8 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         dataIndex: 'total_credits',
         key: 'total_credits',
         sorter: true,
-        sortOrder: sortedInfo?.columnKey === 'total_credits' && sortedInfo?.order,
+        sortOrder:
+          sortedInfo?.columnKey === 'total_credits' && sortedInfo?.order,
         render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
       },
       {
@@ -304,6 +305,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
   const topbarRightPannel = () => {
     return (
       <div className="flex alignCenter">
+        <AccountsImport />
         <SmartFilter
           onFilter={(encode) => {
             setAccountConfig({ ...accountsConfig, query: encode });
@@ -335,9 +337,9 @@ export const AccountsList: FC<IProps> = ({ data }) => {
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field
-        }&page=${pagination.current}&page_size=${
-          pagination.pageSize
-        }&filter=${sorter.order}&query=${query}`
+        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+          sorter.order
+        }&query=${query}`
       );
       if (sorter?.order === 'ascend') {
         const userData = [...result].sort((a, b) => {
@@ -347,7 +349,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
             return -1;
           }
         });
-        setResponse(prev =>({...prev,  result: userData}))
+        setResponse((prev) => ({ ...prev, result: userData }));
       } else {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
@@ -356,8 +358,8 @@ export const AccountsList: FC<IProps> = ({ data }) => {
             return -1;
           }
         });
-       
-        setResponse(prev =>({...prev,  result: userData}))
+
+        setResponse((prev) => ({ ...prev, result: userData }));
       }
       setAccountConfig({
         ...accountsConfig,

@@ -1,6 +1,8 @@
 import { QueryKey } from '../modal';
 import http from '../utils/http';
 
+
+
 export const TrialbalanceAPI = ({ queryKey }: QueryKey) => {
   const query = queryKey[1];
   let URL = `accounts/reports/trial-balance`;
@@ -39,3 +41,5 @@ export const CashActivityStatementAPI = ({ queryKey }: QueryKey) => {
 
   return http.get(URL);
 };
+
+export const TrialbalanceKeysAPI = () => http.get(`accounts/reports/import-csv`)

@@ -12,6 +12,7 @@ export interface EditableListItemProps extends DivProps {
   selectedIndex: number | null;
   customMount: any;
   rowClassName?: (record: any, index: number) => string;
+  isMemo?: boolean;
 }
 
 const _EditableListItem = ({
@@ -30,7 +31,7 @@ const _EditableListItem = ({
     }
 
     return (
-      <td className="ant-table-cell">
+      <td className="ant-table-cell ">
         {column.render
           ? column.render(row[column.dataIndex], row, index)
           : row[column.dataIndex]}
@@ -54,12 +55,19 @@ const _EditableListItem = ({
 export const EditableListItem = memo(
   _EditableListItem,
   (prevprops, nextProps) => {
-    return (
-      JSON.stringify(prevprops.row) === JSON.stringify(nextProps.row) &&
-      JSON.stringify(prevprops.columns) === JSON.stringify(nextProps.columns) &&
-      JSON.stringify(prevprops.rowClassName) ===
-        JSON.stringify(nextProps.rowClassName) &&
-      prevprops?.customMount === nextProps?.customMount
-    );
+    const memo =
+      prevprops?.isMemo === false || nextProps?.isMemo === false ? false : true;
+    if (!memo) {
+      return false;
+    } else {
+      return (
+        JSON.stringify(prevprops.row) === JSON.stringify(nextProps.row) &&
+        JSON.stringify(prevprops.columns) ===
+          JSON.stringify(nextProps.columns) &&
+        JSON.stringify(prevprops.rowClassName) ===
+          JSON.stringify(nextProps.rowClassName) &&
+        prevprops?.customMount === nextProps?.customMount
+      );
+    }
   }
 );

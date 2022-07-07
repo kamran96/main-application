@@ -95,7 +95,6 @@ export const CommonTable: FC<IProps> = ({
 } = defaultProps) => {
   // DYNAMIC IMPORTS
 
-
   const TablePDF = lazy(() => import('./exportPDF'));
   const { userDetails } = useGlobalContext();
   const { organization } = userDetails;
@@ -122,7 +121,6 @@ export const CommonTable: FC<IProps> = ({
 
   /* **************UTILITY CONSTANTS ************ */
   const _newData: any[] = data ? data : (rest?.dataSource as any[]);
-
 
   const _exportableProps: IExportFieldButtonProps = exportableProps?.fields
     ? {
@@ -192,17 +190,16 @@ export const CommonTable: FC<IProps> = ({
 
   /* **************** JSX RETURNING FUNCTIONS **************** */
 
-
   const renderTable = () => {
     return (
       <>
         {customTopbar && (
           <div className={`table_top flex alignCenter ${className}`}>
-            <div className="flex-1 mr-10">{customTopbar}</div>
+            <div className={`flex-1 mr-1`}>{customTopbar}</div>
             <div className="flex alignCenter">
               {exportable && (
                 <div
-                  className={`mr-10 flex alignCenter _exportable_button ${
+                  className={`mr-10 flex alignCenter _exportable_button mb-3 ${
                     _exportableProps?.disabled ? 'disabled ' : ''
                   }`}
                 >
