@@ -7,6 +7,8 @@ import { Currency } from './currency.schema';
 export class Organization {
   @Prop()
   name: string;
+  @Prop({ default: false })
+  isActive: boolean;
   @Prop()
   email: string;
   @Prop()
@@ -21,8 +23,6 @@ export class Organization {
   phoneNumber: string;
   @Prop()
   faxNumber: string;
-  @Prop({ default: false })
-  isActive: boolean;
   @Prop()
   prefix: string;
   @Prop(

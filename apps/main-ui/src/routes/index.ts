@@ -474,13 +474,6 @@ export const routes = (root = '/app'): RouteConfig[] => [
             restricted: true,
             permission: PERMISSIONS.ORGANIZATIONS_INDEX,
           },
-          {
-            path: `${root}${ISupportedRoutes.Organizations}`,
-            component: Organizations,
-            exact: true,
-            restricted: true,
-            permission: PERMISSIONS.ORGANIZATIONS_INDEX,
-          },
 
           /* Dispatching Module */
 
