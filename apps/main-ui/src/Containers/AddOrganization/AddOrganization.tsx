@@ -8,6 +8,7 @@ import { useQueryClient, useMutation, useQuery } from 'react-query';
 import {
   deleteOrganizationAPI,
   getOrganizations,
+  changeOrganizationApi,
 } from '../../api/organizations';
 import { ButtonTag } from '../../components/ButtonTags';
 import { ConfirmModal } from '../../components/ConfirmModal';
@@ -20,7 +21,7 @@ import { AddOrganizationWrapper } from './styled';
 
 export const OrganizationsList: FC = () => {
   const queryCache = useQueryClient();
-  const { setOrganizationConfig, notificationCallback, refetchUser } =
+  const { setOrganizationConfig, notificationCallback, refetchUser, refetchPermissions } =
     useGlobalContext();
   const [{ result }, setResponse] = useState<any>({
     result: [],
@@ -34,13 +35,24 @@ export const OrganizationsList: FC = () => {
 
   const { isLoading, data } = useQuery([`all-organizations`], getOrganizations);
 
-  console.log(data, "organization Data")
+  const { mutate: mutateChangeOrganizationApi, isLoading: ChangeOrganizationLoading } = useMutation(changeOrganizationApi);
 
   useEffect(() => {
     if (data && data.data && data.data.result) {
       setResponse(data.data);
     }
   }, [data]);
+
+  const HandleChangeOrganizagtion = (id) => {
+    mutateChangeOrganizationApi(id, {
+      onSuccess: () => {
+        refetchUser();
+        refetchPermissions();
+        queryCache.clear();
+
+      }
+    })
+  }
 
   const columns: ColumnsType<any> = [
     {
@@ -66,15 +78,15 @@ export const OrganizationsList: FC = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (data, row , index) => (
-          <Button
-          disabled={index === orgaizationActive ? true : false}
+      render: (data, row, index) => (
+        <Button
+          disabled={row?.isActive ? true : false}
           onClick={
-            () => console.log("Item Active", index)
+            () => HandleChangeOrganizagtion(row.id)
           }
-           type="primary" size="middle">
-            Active
-          </Button>
+          type="primary" size="middle">
+          Active
+        </Button>
       ),
     },
   ];
@@ -157,18 +169,18 @@ export const OrganizationsList: FC = () => {
         hasfooter={true}
         enableRowSelection
         onSelectRow={onSelectedRow}
-        // expandable={{
-        //   expandedRowRender: (record, index) => {
-        //     // const childCategories: ITransactionItem[] =
-        //     //   record.transaction_items;
-        //     return (
-        //       <BranchesContainer
-        //         organizationid={record.id}
-        //         branches={record.branches}
-        //       />
-        //     );
-        //   },
-        // }}
+      // expandable={{
+      //   expandedRowRender: (record, index) => {
+      //     // const childCategories: ITransactionItem[] =
+      //     //   record.transaction_items;
+      //     return (
+      //       <BranchesContainer
+      //         organizationid={record.id}
+      //         branches={record.branches}
+      //       />
+      //     );
+      //   },
+      // }}
       />
       <ConfirmModal
         loading={deletingOrganization}

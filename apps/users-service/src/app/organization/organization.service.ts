@@ -36,8 +36,6 @@ export class OrganizationService {
   ) {}
 
   async ListOrganizations(req) {
-    console.log('org...');
-
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
 
@@ -163,6 +161,7 @@ export class OrganizationService {
         organization.packageId = organizationDto.packageId;
         organization.currencyId = organizationDto.currencyId;
         organization.email = organizationDto.email;
+        organization.isActive = true;
         organization.website = organizationDto.website;
         organization.prefix = organizationDto.prefix;
         organization.phoneNumber = organizationDto.phoneNumber;
@@ -265,24 +264,47 @@ export class OrganizationService {
   }
 
   async ChangeOrganization(user: IBaseUser, body, res: Response) {
-    const organization = await this.organizationModel.findById(
-      body.organizationId
-    );
-
-    await this.userModel.updateOne(
-      { _id: user?.id },
-      { isActive: { $exists: true } },
-      { isActive: false },
-      { multi: true }
-    );
+    const organization = await this.organizationModel
+      .findOne({ _id: body.organizationId })
+      .populate('branches');
 
     await this.userModel.updateOne(
       { _id: user?.id },
       {
         organizationId: organization.id,
-        branchId: organization.branchId,
+        branchId: organization.branches[0].id,
       }
     );
+
+    await this.organizationModel.updateOne(
+      { _id: body.organizationId },
+      {
+        isActive: true,
+      }
+    );
+
+    const org = await this.organizationUserModel.find({
+      userId: { $in: user.id },
+    });
+
+    const orgIds = org.map((ids) => ids.organizationId);
+    const organizations = await this.organizationModel.find({
+      _id: { $in: orgIds },
+      status: 1,
+    });
+
+    for (const i of organizations) {
+      const organization = await this.organizationModel.findById(i.id);
+
+      if (organization.id !== body.organizationId) {
+        await this.organizationModel.updateOne(
+          { _id: organization.id },
+          {
+            isActive: false,
+          }
+        );
+      }
+    }
 
     const users = await this.authService.CheckUser({
       username: user.username,
