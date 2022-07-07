@@ -20,8 +20,6 @@ COPY --chown=node:node --from=build /app /home/node/app/node_modules
 COPY --chown=node:node --from=build /app/package-lock.json /home/node/app/package-lock.json
 COPY --chown=node:node ./dist/apps/accounting-service /home/node/app
 
-ENV JWT_SECRET=ASDFGHJKqwerqwr1234567890
-
 # nx has a bug (which isn't picking pg). once it's fixed, we can remove it.
 RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express pg
 
