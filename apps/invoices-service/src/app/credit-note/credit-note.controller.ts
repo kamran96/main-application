@@ -9,10 +9,9 @@ import {
   Put,
   Query,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import { CreditNoteService } from './credit-note.service';
-import { GlobalAuthGuard } from '@invyce/global-auth-guard';
+
 import { CnParamsDto, CreditNoteDto } from '../dto/credit-note.dto';
 import { IRequest, IPage, ICreditNoteWithResponse } from '@invyce/interfaces';
 
@@ -21,7 +20,6 @@ export class CreditNoteController {
   constructor(private creditNoteService: CreditNoteService) {}
 
   @Get()
-  @UseGuards(GlobalAuthGuard)
   async index(
     @Req() req: IRequest,
     @Query() query: IPage
@@ -45,7 +43,6 @@ export class CreditNoteController {
     }
   }
 
-  @UseGuards(GlobalAuthGuard)
   @Post()
   async create(
     @Body() creditNoteDto: CreditNoteDto,
@@ -76,7 +73,6 @@ export class CreditNoteController {
     }
   }
 
-  @UseGuards(GlobalAuthGuard)
   @Get('/:id')
   async show(
     @Param() params: CnParamsDto,
@@ -104,7 +100,6 @@ export class CreditNoteController {
     }
   }
 
-  @UseGuards(GlobalAuthGuard)
   @Put('/delete')
   async delete(@Body() data, @Req() req: IRequest): Promise<unknown> {
     return await this.creditNoteService.DeleteCreditNote(data, req);

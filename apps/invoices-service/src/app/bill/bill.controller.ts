@@ -9,10 +9,9 @@ import {
   Put,
   Query,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import { BillService } from './bill.service';
-import { GlobalAuthGuard } from '@invyce/global-auth-guard';
+
 import {
   BillIdsDto,
   BillDto,
@@ -26,7 +25,6 @@ export class BillController {
   constructor(private billService: BillService) {}
 
   @Get()
-  @UseGuards(GlobalAuthGuard)
   async index(
     @Req() req: IRequest,
     @Query() query: IPage
@@ -51,13 +49,11 @@ export class BillController {
   }
 
   @Post('ids')
-  @UseGuards(GlobalAuthGuard)
   async findByInvoiceIds(@Body() invoiceIds: BillIdsDto): Promise<IBill[]> {
     return await this.billService.FindByBillIds(invoiceIds);
   }
 
   @Get('contacts/:id')
-  @UseGuards(GlobalAuthGuard)
   async findByContactId(
     @Param() contactId: BillContactIdDto
   ): Promise<IBill[]> {
@@ -65,7 +61,6 @@ export class BillController {
   }
 
   @Post()
-  @UseGuards(GlobalAuthGuard)
   async create(
     @Body() billDto: BillDto,
     @Req() req: IRequest
@@ -88,7 +83,6 @@ export class BillController {
     }
   }
 
-  @UseGuards(GlobalAuthGuard)
   @Get('payables')
   async agedPayables(
     @Req() req: IRequest,
@@ -116,7 +110,6 @@ export class BillController {
     }
   }
 
-  @UseGuards(GlobalAuthGuard)
   @Get('/:id')
   async show(
     @Param() params: BillParamsDto,
@@ -145,7 +138,6 @@ export class BillController {
   }
 
   @Put()
-  @UseGuards(GlobalAuthGuard)
   async delete(
     @Body() billIds: BillIdsDto,
     @Req() req: IRequest

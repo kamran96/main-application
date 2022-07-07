@@ -1,14 +1,6 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Query,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req } from '@nestjs/common';
 import { Request } from 'express';
-import { GlobalAuthGuard } from '@invyce/global-auth-guard';
+
 import { BankService } from './bank.service';
 
 @Controller('bank')
@@ -16,7 +8,6 @@ export class BankController {
   constructor(private BankService: BankService) {}
 
   @Get()
-  @UseGuards(GlobalAuthGuard)
   async index() {
     const banks = await this.BankService.ListBanks();
 
@@ -30,7 +21,6 @@ export class BankController {
   }
 
   @Get('account')
-  @UseGuards(GlobalAuthGuard)
   async indexBankAccount(@Req() req: Request, @Query() query) {
     const banks = await this.BankService.ListBankAccount(req.user, query);
 
@@ -44,7 +34,6 @@ export class BankController {
   }
 
   @Post('account')
-  @UseGuards(GlobalAuthGuard)
   async bankAccount(@Body() bankAccountDto, @Req() req: Request) {
     const banks = await this.BankService.CreateBankAccount(
       bankAccountDto,

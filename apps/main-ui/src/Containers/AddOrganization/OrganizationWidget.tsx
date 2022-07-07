@@ -318,7 +318,6 @@ export const OrganizationWidget: FC = () => {
               </Form.Item>
             </Col>
           </Row>
-
           {process.env.NODE_ENV !== 'production' && (
             <Row gutter={24}>
               <Col span={24}>
@@ -326,6 +325,7 @@ export const OrganizationWidget: FC = () => {
                   className="mt-20"
                   onClick={handleLogout}
                   type="default"
+                  danger
                   size="middle"
                 >
                   Logout

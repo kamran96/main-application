@@ -18,7 +18,6 @@ import {
   AccountIdsDto,
   ParamsDto,
 } from '../dto/account.dto';
-import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 import {
   IRequest,
   IPage,
@@ -32,7 +31,6 @@ export class AccountsController {
   constructor(private readonly accountService: AccountsService) {}
 
   @Get()
-  @UseGuards(GlobalAuthGuard)
   async index(
     @Req() req: IRequest,
     @Query() query: IPage
@@ -55,7 +53,6 @@ export class AccountsController {
   }
 
   @Get('type')
-  @UseGuards(GlobalAuthGuard)
   async accountWithType(@Query() { type }, @Req() req: IRequest) {
     const account = await this.accountService.AccountWithType(type, req.user);
     if (account) {
@@ -68,7 +65,6 @@ export class AccountsController {
   }
 
   @Get('/secondary-accounts')
-  @UseGuards(GlobalAuthGuard)
   async secondaryAccounts(
     @Req() req: IRequest
   ): Promise<ISecondaryAccountWithResponse> {
@@ -92,7 +88,6 @@ export class AccountsController {
   }
 
   @Get('balances')
-  @UseGuards(GlobalAuthGuard)
   async GetBalances(@Req() req: IRequest, @Query() query: IPage) {
     const accounts = await this.accountService.GetBalances(req.user, query);
 
@@ -105,7 +100,6 @@ export class AccountsController {
   }
 
   @Post()
-  @UseGuards(GlobalAuthGuard)
   async create(
     @Req() req: IRequest,
     @Body() accountDto: AccountDto
@@ -139,13 +133,11 @@ export class AccountsController {
   }
 
   @Post('init')
-  @UseGuards(GlobalAuthGuard)
   async initAccounts(@Body() data): Promise<void> {
     return await this.accountService.initAccounts(data);
   }
 
   @Get('ledger/:id')
-  @UseGuards(GlobalAuthGuard)
   async AccountLedger(
     @Req() req: IRequest,
     @Query() query: IPage,
@@ -177,7 +169,6 @@ export class AccountsController {
   }
 
   @Get('ledger-updated/:id')
-  @UseGuards(GlobalAuthGuard)
   async AccountLedgerUpdated(
     @Req() req: IRequest,
     @Query() query: IPage,
@@ -209,13 +200,11 @@ export class AccountsController {
   }
 
   @Post('code')
-  @UseGuards(GlobalAuthGuard)
   async AccountCodes(@Req() req: IRequest, @Body() data) {
     return await this.accountService.AccountCodes(req.user, data.id);
   }
 
   @Get('/:id')
-  @UseGuards(GlobalAuthGuard)
   async show(@Param() params): Promise<IAccountWithResponse> {
     try {
       const account = await this.accountService.FindAccountById(params.id);
@@ -235,7 +224,6 @@ export class AccountsController {
     }
   }
 
-  @UseGuards(GlobalAuthGuard)
   @Put()
   async remove(
     @Body() accountDto: AccountIdsDto
@@ -260,7 +248,6 @@ export class AccountsController {
   }
 
   @Post('codes')
-  @UseGuards(GlobalAuthGuard)
   async accountsByCodes(
     @Body() body: AccountCodesDto,
     @Req() req: IRequest
@@ -269,7 +256,6 @@ export class AccountsController {
   }
 
   @Post('sync')
-  @UseGuards(GlobalAuthGuard)
   async syncAccounts(@Body() body, @Req() req: IRequest): Promise<void> {
     return await this.accountService.SyncAccounts(body, req.user);
   }

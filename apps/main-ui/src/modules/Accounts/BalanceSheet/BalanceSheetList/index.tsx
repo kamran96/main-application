@@ -230,6 +230,7 @@ export const BalanceSheetList: FC = () => {
               size="middle"
               icon={printIcon}
             />
+            
             <SmartFilter
               formSchema={FilterSchema}
               onFilter={(query) => {

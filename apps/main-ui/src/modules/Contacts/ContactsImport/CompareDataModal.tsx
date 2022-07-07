@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { FC, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { CommonModal } from '../../../components';
 import { ColumnsType } from 'antd/lib/table';
 import { G } from '@react-pdf/renderer';
@@ -11,8 +11,8 @@ import Paragraph from 'antd/lib/typography/Paragraph';
 import { Icon } from '@iconify/react';
 import questionIcon from '@iconify/icons-fe/question';
 import { Button, Tooltip } from 'antd';
-import Item from 'antd/lib/list/Item';
-import { Items } from '../../Items';
+import deleteIcon from '@iconify/icons-carbon/delete';
+import { ITheme, IThemeProps } from '@invyce/shared/invyce-theme';
 
 const a = [
   {
@@ -108,88 +108,98 @@ const a = [
     description: 'Please select a field which is related to Name of Contact',
   },
 ];
+
 interface IProps {
   visibility: boolean;
   onCancel: () => void;
   compareKeys?: any[];
   documentKeys: any[];
-  OnConfrm: () => void;
+  OnConfrm: (payload: any) => void;
 }
 export const CompareDataModal: FC<IProps> = ({
   visibility,
   onCancel,
-  compareKeys = a,
+  compareKeys,
   documentKeys,
   OnConfrm,
 }) => {
   const [compareData, setCompareData] = useState<any>({});
 
-  const res = documentKeys?.filter(
-    (item: any) => Object.keys(compareData).includes(item) === false
+  const unUsedDocumentKeys = documentKeys.filter(
+    (key) => !Object.keys(compareData).includes(key)
   );
 
-  console.log(res, 'result');
-  console.log(Object?.keys(compareData).includes('Contact'), 'Obj');
-
-  const handleSelectItem = () => {
-    // return documentKeys
-    //   ?.filter(
-    //     (Items: any) => Object.keys(compareData).includes(Items) === true
-    //   )
-    //   .map((key: any) => {
-    //     return <Option key={key}>{key}</Option>;
-    //   });
-    return documentKeys?.map((key: any) => {
-      return <Option key={key}>{key}</Option>;
-    });
-  };
-
-  console.log(handleSelectItem(), 'handleselction');
-
-  if (visibility && documentKeys?.length) {
-    const columns: ColumnsType<any> = [
-      {
-        title: 'Columns',
-        dataIndex: 'label',
-        key: 'label',
-        render: (data, row, index) => {
-          return (
-            <div className="flex justifySpaceBetween alignCenter">
-              <span>{data}</span>
-              <Tooltip placement="topRight" title={row?.description}>
-                <Icon style={{ width: 20, height: 20 }} icon={questionIcon} />
-              </Tooltip>
-            </div>
-          );
-        },
+  const columns: ColumnsType<any> = [
+    {
+      title: 'Fields from Database',
+      dataIndex: 'label',
+      key: 'label',
+      render: (data, row, index) => {
+        return (
+          <div className="flex justifySpaceBetween alignCenter">
+            <span>{data}</span>
+            <Tooltip placement="topRight" title={row?.description}>
+              <Icon style={{ width: 20, height: 20 }} icon={questionIcon} />
+            </Tooltip>
+          </div>
+        );
       },
+    },
 
-      {
-        title: 'Compare',
-        dataIndex: '',
-        key: 'compareData',
-        render: (text: string, record: any) => {
-          return (
-            <EditableSelect
-              style={{ width: '100%' }}
-              onChange={(value) => {
+    {
+      title: 'Your Headers from file',
+      dataIndex: '',
+      key: 'compareData',
+      render: (text: string, record: any, index: any) => {
+        return (
+          <EditableSelect
+            allowClear
+            style={{ width: '100%' }}
+            onChange={(value) => {
+              if (!value) {
+                const stateValue = Object.values(compareData);
+                const stateKeys = Object?.keys(compareData);
+                const indexed = stateValue?.findIndex(
+                  (i) => i === record?.keyName
+                );
+                if (indexed > -1) {
+                  setCompareData((prevState) => {
+                    const state = { ...prevState };
+
+                    delete state[stateKeys[indexed]];
+
+                    return state;
+                  });
+                }
+              } else {
                 setCompareData((prevState) => {
                   const state = { ...prevState };
+                  const keyExistingIndex = Object.values(state).findIndex(
+                    (val) => val === record.keyName
+                  );
+                  if (keyExistingIndex > -1) {
+                    delete state[Object.keys(state)[keyExistingIndex]];
+                  }
+
                   state[value?.value] = record.keyName;
                   return state;
                 });
-              }}
-              showSearch
-              placeholder="Select Header"
-              optionFilterProp="children"
-            >
-              {handleSelectItem()}
-            </EditableSelect>
-          );
-        },
+              }
+            }}
+            showSearch
+            placeholder="Select Header"
+            optionFilterProp="children"
+          >
+            {unUsedDocumentKeys?.map((key: any) => {
+              return <Option key={key}>{key}</Option>;
+            })}
+          </EditableSelect>
+        );
       },
-    ];
+    },
+  ];
 
+  if (visibility && documentKeys?.length) {
     return (
       <CompareDataModalWrapper>
         <Heading type="form">Compare Data Segments</Heading>
@@ -199,8 +209,15 @@ export const CompareDataModal: FC<IProps> = ({
           table sections.{' '}
         </Paragraph>
         <EditableTable
+          rowClassName={(record, index) => {
+            return Object.values(compareData).includes(record?.keyName)
+              ? 'SelectedItem'
+              : '';
+          }}
+          isMemo={false}
+          customMount={unUsedDocumentKeys?.length}
           columns={columns as any}
-          data={compareKeys}
+          data={compareKeys.sort((a, b) => a.label.localeCompare(b.label))}
           dragable={() => null}
           scrollable={{ offsetY: 500, offsetX: 0 }}
         />
@@ -208,7 +225,12 @@ export const CompareDataModal: FC<IProps> = ({
           <Button className="btn" onClick={onCancel}>
             Back
           </Button>
-          <Button type="primary" className="btn" onClick={OnConfrm}>
+          <Button
+            disabled={!Object?.keys(compareData).length}
+            type="primary"
+            className="btn"
+            onClick={() => OnConfrm(compareData)}
+          >
             Confirm
           </Button>
         </div>
@@ -226,4 +248,18 @@ export const CompareDataModalWrapper = styled.div`
   .btn {
     margin: 5px 4px;
   }
+  .Icon {
+    cursor: pointer;
+  }
+  .SelectedItem td {
+    background-color: ${(props: IThemeProps) =>
+      props?.theme?.colors?.$PRIMARY} !important;
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE}!important;
+
+    .rendered-text {
+      color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE}!important;
+    }
+  }
 `;
+
+// .ant-table-tbody > tr > td

@@ -17,6 +17,10 @@ import { Authenticate } from '@invyce/auth-middleware';
     ]),
   ],
   controllers: [AppController],
-  providers: [AppService, Authenticate],
+  providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(route) {
+    route.apply(Authenticate).forRoutes(AppController);
+  }
+}

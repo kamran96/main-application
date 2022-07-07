@@ -26,6 +26,7 @@ import {
 import { ISupportedRoutes } from '../../../../../modal/routing';
 import { useCols } from './CommonCol';
 import FilterSchema from './PoFilterSchema';
+import { PurchaseOrderImport } from '../PurchaseOrderImport';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
 
 interface IProps {
@@ -245,6 +246,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   const renerTopRightbar = () => {
     return (
       <div className="flex alignCenter">
+         <PurchaseOrderImport/>
         <SmartFilter
           onFilter={(encode) => {
             setAllInvoicesConfig({

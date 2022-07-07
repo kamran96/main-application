@@ -16,6 +16,7 @@ import { SmartFilter } from '../../../components/SmartFilter';
 import { PDFICON } from '../../../components/Icons';
 import FilteringSchema from './FilteringSchema';
 import { useCols } from './commonCols';
+import { DebitNoteImport } from './DebitNoteImport';
 
 export const AprovedDebitNotes: FC = () => {
   /* HOOKS HERE */
@@ -154,6 +155,7 @@ export const AprovedDebitNotes: FC = () => {
   const renderTopbarRight = () => {
     return (
       <div className="flex alignCenter">
+        <DebitNoteImport/>
         <SmartFilter
           onFilter={(encode) => {
             const route = `/app${ISupportedRoutes?.DEBIT_NOTES}?tabIndex=aproved&page=1&page_size=20&query=${encode}`;

@@ -31,6 +31,7 @@ import filterSchema from './filterSchema';
 import { PrintColumns, PDFColumns } from './PrintColumns';
 import { ItemsListWrapper } from './styles';
 import packageIcon from '@iconify-icons/feather/package';
+import ItemsImport from '../ItemsImport';
 
 export const ItemsList: FC = () => {
   /* HOOKS */
@@ -87,35 +88,31 @@ export const ItemsList: FC = () => {
         obj = { ...obj, [split[0]]: split[1] };
       });
       setItemsConfig({ ...itemsConfig, ...obj });
-      
+
       const filterType = history.location.search.split('&');
       const filterIdType = filterType[0];
-      const filterOrder = filterType[3]?.split("=")[1];
+      const filterOrder = filterType[3]?.split('=')[1];
 
-      if(filterIdType?.includes("-")){
-         const fieldName = filterIdType?.split("=")[1].split("-")[1];
-         setSortedInfo({
-           order: filterOrder,
-           columnKey: fieldName
-         });
-      }
-      else{
-        const fieldName = filterIdType?.split("=")[1];
+      if (filterIdType?.includes('-')) {
+        const fieldName = filterIdType?.split('=')[1].split('-')[1];
         setSortedInfo({
           order: filterOrder,
-          columnKey: fieldName
-        })
+          columnKey: fieldName,
+        });
+      } else {
+        const fieldName = filterIdType?.split('=')[1];
+        setSortedInfo({
+          order: filterOrder,
+          columnKey: fieldName,
+        });
       }
-      
     }
   }, [history, routeHistory?.location?.search]);
-
 
   const { data: allCategoriesData } = useQuery(
     [`all-categories`],
     getAllCategories
   );
-  
 
   const resolvedCategories: ICategory[] =
     (allCategoriesData &&
@@ -154,10 +151,8 @@ export const ItemsList: FC = () => {
     }
   );
 
-
   const handleItemsConfig = (pagination, filters, sorter: any, extra) => {
     if (sorter.order === undefined) {
-     
       setItemsConfig({
         ...itemsConfig,
         sortid: 'id',
@@ -178,10 +173,10 @@ export const ItemsList: FC = () => {
           }
         });
         setSortedInfo({
-               order: sorter.order,
-               columnKey: sorter.columnKey
-             });
-        setItemsConfig(prev =>({...prev,  result: userData}))
+          order: sorter.order,
+          columnKey: sorter.columnKey,
+        });
+        setItemsConfig((prev) => ({ ...prev, result: userData }));
       } else {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
@@ -192,9 +187,9 @@ export const ItemsList: FC = () => {
         });
         setSortedInfo({
           order: sorter.order,
-          columnKey: sorter.columnKey
+          columnKey: sorter.columnKey,
         });
-        setItemsConfig(prev =>({...prev,  result: userData}))
+        setItemsConfig((prev) => ({ ...prev, result: userData }));
       }
 
       history.push(
@@ -202,20 +197,17 @@ export const ItemsList: FC = () => {
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field
-        }&page=${pagination.current}&page_size=${
-          pagination.pageSize
-        }&filter=${sorter.order}&query=${query}`
+        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+          sorter.order
+        }&query=${query}`
       );
 
       setItemsConfig({
         ...itemsConfig,
-        sortid:
-          sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field,
+        sortid: sorter.order === 'descend' ? `-${sorter.field}` : sorter.field,
       });
     }
-  }
+  };
 
   useEffect(() => {
     if (resolvedData && resolvedData.data && resolvedData.data.result) {
@@ -368,8 +360,9 @@ export const ItemsList: FC = () => {
   const renderTopbarRightPannel = () => {
     return (
       <div className="flex alignCenter justifySpaceBetween">
+        <ItemsImport />
         <ButtonTag
-          className="mr-10"
+          // className="mr-10"
           // disabled={!selectedRow.length || selectedRow.length > 1}
           onClick={() =>
             history?.push(`/app${ISupportedRoutes?.INVENTORY_MANAGEMENT}`)

@@ -88,3 +88,6 @@ export const duplicateItemsAPI = (payload: any) => {
 
 export const StockUpdateAPI = (payload: any) =>
   http?.post(`/items/stock-update`, payload);
+
+export const getItemsKeysApi = () =>
+  http?.get(`${ItemsServiceAPI.default}/import-csv`);

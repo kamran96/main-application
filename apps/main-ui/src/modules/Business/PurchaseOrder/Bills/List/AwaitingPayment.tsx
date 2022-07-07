@@ -32,6 +32,7 @@ import { useCols } from './CommonCol';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
 import moneyFormat from '../../../../../utils/moneyFormat';
+import { ImportBill } from '../importBill';
 
 interface IProps {
   columns?: any[];
@@ -268,6 +269,7 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
   const renerTopRightbar = () => {
     return (
       <div className="flex alignCenter">
+        <ImportBill/>
         <SmartFilter
           onFilter={(encode) => {
             setAllInvoicesConfig({

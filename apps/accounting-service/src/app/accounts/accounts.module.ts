@@ -6,6 +6,10 @@ import { Authenticate } from '@invyce/auth-middleware';
 @Module({
   imports: [],
   controllers: [AccountsController],
-  providers: [AccountsService, Authenticate],
+  providers: [AccountsService],
 })
-export class AccountsModule {}
+export class AccountsModule {
+  configure(route) {
+    route.apply(Authenticate).forRoutes(AccountsController);
+  }
+}

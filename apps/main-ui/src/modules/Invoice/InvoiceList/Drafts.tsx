@@ -2,7 +2,7 @@
 
 import { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
-
+import { InvoiceImports } from './invoiceImports';
 import {
   deleteInvoiceDrafts,
   getAllContacts,
@@ -231,6 +231,7 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
   const renderTobarRight = () => {
     return (
       <div className="flex alignCenter">
+        <InvoiceImports/>
         <SmartFilter
           onFilter={(encode) => {
             const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=draft&sortid=${sortid}&page=1&page_size=20&query=${encode}`;

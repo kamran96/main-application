@@ -38,3 +38,7 @@ interface IPaymentDeletePayload {
 
 export const paymentDeleteAPI = (payload?: IPaymentDeletePayload) =>
   http.put('payments/payment/delete', payload);
+
+
+export const getPaymentKeysApi = () => 
+      http?.get(`${PAYMENTS.INDEX}/import-csv`)

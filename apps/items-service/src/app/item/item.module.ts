@@ -21,6 +21,10 @@ import { ItemLedger, ItemLedgerSchema } from '../schemas/itemLedger.schema';
       { name: ItemLedger.name, schema: ItemLedgerSchema },
     ]),
   ],
-  providers: [ItemService, Authenticate],
+  providers: [ItemService],
 })
-export class ItemModule {}
+export class ItemModule {
+  configure(route) {
+    route.apply(Authenticate).forRoutes(ItemController);
+  }
+}
