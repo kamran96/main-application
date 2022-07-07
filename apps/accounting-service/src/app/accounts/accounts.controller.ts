@@ -9,7 +9,6 @@ import {
   Put,
   Query,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import { AccountsService } from './accounts.service';
 import {
