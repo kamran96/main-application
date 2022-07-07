@@ -20,6 +20,7 @@ export class AppController {
 
   @Get('health')
   async healthCheck(@Res() res: Response) {
+    console.log('okkk');
     res.send('OKkkk');
   }
 
