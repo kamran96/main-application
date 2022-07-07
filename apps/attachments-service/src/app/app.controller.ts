@@ -8,12 +8,10 @@ import {
   Post,
   Req,
   Res,
-  UseGuards,
 } from '@nestjs/common';
 import * as path from 'path';
 import { Response } from 'express';
 import { AppService } from './app.service';
-import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 import { IRequest } from '@invyce/interfaces';
 
 @Controller('attachment')
@@ -25,25 +23,21 @@ export class AppController {
     res.send('OKkkk');
   }
 
-  @UseGuards(GlobalAuthGuard)
   @Get('/:id')
   async show(@Param() params) {
     return await this.appService.FindAttachmentById(params.id);
   }
 
-  @UseGuards(GlobalAuthGuard)
   @Post()
   async create(@Req() req: Request, @Res() res: Response) {
     return await this.appService.fileUpload(req, res);
   }
 
-  @UseGuards(GlobalAuthGuard)
   @Post('ids')
   async ListAttachmentByIds(@Body() body) {
     return await this.appService.attachmentByIds(body);
   }
 
-  @UseGuards(GlobalAuthGuard)
   @Post('create-pdf')
   async init(@Body() body, @Req() req: Request): Promise<any> {
     try {
@@ -60,7 +54,6 @@ export class AppController {
     }
   }
 
-  @UseGuards(GlobalAuthGuard)
   @Post('generate-pdf')
   async generatePdf(@Body() body, @Req() req: IRequest): Promise<any> {
     const pdf = await this.appService.GeneratePdf(body, req);

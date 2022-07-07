@@ -1,17 +1,16 @@
-import {
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import axios from 'axios';
 import { Response } from 'express';
 import * as moment from 'moment';
 import { currencies } from 'currencies.json';
-import { IRequest, IAddress, IOrganization } from '@invyce/interfaces';
+import {
+  IRequest,
+  IAddress,
+  IOrganization,
+  IBaseUser,
+} from '@invyce/interfaces';
 import { AuthService } from '../auth/auth.service';
 import { OrganizationDto } from '../dto/organization.dto';
 import { RbacService } from '../rbac/rbac.service';
@@ -221,11 +220,17 @@ export class OrganizationService {
         const [adminRole] = roles.filter((r) => r.name === 'admin');
 
         if (req?.user?.organizationId !== null) {
-          // await this.emailService.emit(ORGANIZATION_CREATED, {
-          //   org_name: organization.name,
-          //   user_name: req.user.profile.fullName,
-          //   to: req.user.email,
-          // });
+          await this.emailService.emit(ORGANIZATION_CREATED, {
+            org_name: organization.name,
+            user_name: req.user.profile.fullName,
+            to: req.user.email,
+          });
+
+          const branch = new this.branchModel();
+          branch.organizationId = organization._id;
+          await branch.save();
+
+          branchArr.push(branch);
 
           return organization;
         } else {
@@ -238,17 +243,18 @@ export class OrganizationService {
             }
           );
 
+          const nextSevenDay = moment().add(7, 'days').format('YYYY-MM-DD');
+
+          await this.emailService.emit(TRAIL_STARTED, {
+            to: req.user.email,
+            user_name: req.user.profile.fullName,
+            next_7_days: nextSevenDay,
+            sender_name: 'Ehsanullah baig',
+          });
+
           const users = await this.authService.CheckUser({
             username: req.user.username,
           });
-
-          // const nextSevenDay = moment().add(7, 'days').format('YYYY-MM-DD');
-
-          // await this.emailService.emit(TRAIL_STARTED, {
-          //   to: req.user.email,
-          //   user_name: req.user.profile.fullName,
-          //   next_7_days: nextSevenDay,
-          // });
 
           return await this.authService.Login(users, res);
         }
@@ -256,6 +262,33 @@ export class OrganizationService {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
     }
+  }
+
+  async ChangeOrganization(user: IBaseUser, body, res: Response) {
+    const organization = await this.organizationModel.findById(
+      body.organizationId
+    );
+
+    await this.userModel.updateOne(
+      { _id: user?.id },
+      { isActive: { $exists: true } },
+      { isActive: false },
+      { multi: true }
+    );
+
+    await this.userModel.updateOne(
+      { _id: user?.id },
+      {
+        organizationId: organization.id,
+        branchId: organization.branchId,
+      }
+    );
+
+    const users = await this.authService.CheckUser({
+      username: user.username,
+    });
+
+    return await this.authService.Login(users, res);
   }
 
   async ViewOrganization(

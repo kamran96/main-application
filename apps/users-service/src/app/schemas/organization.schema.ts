@@ -21,6 +21,8 @@ export class Organization {
   phoneNumber: string;
   @Prop()
   faxNumber: string;
+  @Prop({ default: false })
+  isActive: boolean;
   @Prop()
   prefix: string;
   @Prop(

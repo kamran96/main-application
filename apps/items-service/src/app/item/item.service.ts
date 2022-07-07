@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import axios from 'axios';
 import { AttributeValue } from '../schemas/attributeValue.schema';
-import { Item } from '../schemas/item.schema';
+import { Item, ItemSchema } from '../schemas/item.schema';
 import { Host, Integrations } from '@invyce/global-constants';
 import {
   IBaseUser,
@@ -13,7 +13,7 @@ import {
 } from '@invyce/interfaces';
 import { Sorting } from '@invyce/sorting';
 
-import { Price } from '../schemas/price.schema';
+import { Price, PriceSchema } from '../schemas/price.schema';
 import { ItemCodesDto, ItemDto, ItemIdsDto } from '../dto/item.dto';
 import { ItemLedger } from '../schemas/itemLedger.schema';
 import { ItemLedgerDetailDto } from '../dto/ItemLedger.dto';
@@ -451,6 +451,85 @@ export class ItemService {
           // }
         }
       }
+    } else if (data.type === Integrations.CSV_IMPORT) {
+      console.log('test');
     }
+  }
+  async ImportCSV() {
+    const itemKeys: any[] = [];
+
+    const notRequired = [
+      'updatedAt',
+      'createdAt',
+      'updatedById',
+      'createdById',
+      'status',
+      'organizationId',
+      'branchId',
+      'importedFrom',
+      'importedContactId',
+      '_id',
+      '__v',
+      'hasOpeningBalance',
+      'transactionId',
+      'openingBalance',
+      'addresses',
+      'hasInventory',
+      'stock',
+      'isActive',
+      'categoryId',
+      'hasCategory',
+      'hasStock',
+      'importedItemId',
+      'itemId',
+      'priceType',
+      'handlingCost',
+      'initialPurchasePrice',
+      'tradeDiscount',
+      'tradePrice',
+      'unitsInCorton',
+      'priceUnit',
+      'accountId',
+    ];
+
+    await ItemSchema.eachPath(function (keyName) {
+      console.log(keyName, 'name');
+      if (!notRequired.includes(keyName)) {
+        const text = keyName;
+        const result = text
+          .replace(/([A-Z])/g, '$1')
+          .replace(/([A-Z][a-z])/g, ' $1')
+          .toLocaleLowerCase()
+          .split(' ')
+          .map((i) => i.charAt(0).toUpperCase() + i.slice(1))
+          .join(' ');
+
+        itemKeys.push({
+          label: result,
+          keyName,
+          description: '',
+        });
+      }
+    });
+    await PriceSchema.eachPath(function (keyName) {
+      if (!notRequired.includes(keyName)) {
+        const text = keyName;
+        const result = text
+          .replace(/([A-Z])/g, '$1')
+          .replace(/([A-Z][a-z])/g, ' $1')
+          .toLocaleLowerCase()
+          .split(' ')
+          .map((i) => i.charAt(0).toUpperCase() + i.slice(1))
+          .join(' ');
+
+        itemKeys.push({
+          label: result,
+          keyName,
+          description: '',
+        });
+      }
+    });
+
+    return itemKeys;
   }
 }

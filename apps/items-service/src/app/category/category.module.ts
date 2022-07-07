@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { Authenticate } from '@invyce/auth-middleware';
 import { Attribute, AttributeSchema } from '../schemas/attribute.schema';
 import { Category, CategorySchema } from '../schemas/category.schema';
 import { CategoryController } from './category.controller';
@@ -15,4 +16,8 @@ import { CategoryService } from './category.service';
   providers: [CategoryService],
   controllers: [CategoryController],
 })
-export class CategoryModule {}
+export class CategoryModule {
+  configure(route) {
+    route.apply(Authenticate).forRoutes(CategoryController);
+  }
+}

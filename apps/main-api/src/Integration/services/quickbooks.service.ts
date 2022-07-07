@@ -88,7 +88,7 @@ export class QuickbooksService {
   }
 
   async test() {
-    let invoice_items: any = [
+    const invoice_items: any = [
       {
         Id: '1',
         LineNum: 1,

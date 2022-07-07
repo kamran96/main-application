@@ -285,6 +285,7 @@ interface IEditableSelectProps {
     value: number | string;
     customizedRender?: ReactNode;
   }[];
+  [key: string]: any;
 }
 
 export const Option = Select.Option;
@@ -304,6 +305,7 @@ export const EditableSelect: FC<IEditableSelectProps> = ({
   value,
   error,
   options,
+  ...rest
 }) => {
   const [isEditable, setIsEditable] = useState(false);
   const [selectValue, setSelectValue] = useState(value);
@@ -334,6 +336,7 @@ export const EditableSelect: FC<IEditableSelectProps> = ({
       <WrapperEditableSelect error={error}>
         {isEditable ? (
           <Select
+            {...rest}
             open={isEditable}
             onFocus={onClick}
             className={className}

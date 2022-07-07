@@ -27,11 +27,14 @@ export const OrganizationsList: FC = () => {
   });
   const [confirmModal, setConfirmModal] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [orgaizationActive, setOrganizationActive] = useState(4);
 
   const { mutate: mutateDeleteOrganizations, isLoading: deletingOrganization } =
     useMutation(deleteOrganizationAPI);
 
   const { isLoading, data } = useQuery([`all-organizations`], getOrganizations);
+
+  console.log(data, "organization Data")
 
   useEffect(() => {
     if (data && data.data && data.data.result) {
@@ -58,6 +61,21 @@ export const OrganizationsList: FC = () => {
       title: 'Address',
       dataIndex: 'residentialAddress',
       key: 'residentialAddress',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (data, row , index) => (
+          <Button
+          disabled={index === orgaizationActive ? true : false}
+          onClick={
+            () => console.log("Item Active", index)
+          }
+           type="primary" size="middle">
+            Active
+          </Button>
+      ),
     },
   ];
 

@@ -5,7 +5,11 @@ import { BankService } from './bank.service';
 
 @Module({
   imports: [],
-  providers: [BankService, Authenticate],
+  providers: [BankService],
   controllers: [BankController],
 })
-export class BankModule {}
+export class BankModule {
+  configure(route) {
+    route.apply(Authenticate).forRoutes(BankController);
+  }
+}

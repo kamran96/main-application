@@ -6,6 +6,10 @@ import { TransactionService } from './transaction.service';
 @Module({
   imports: [],
   controllers: [TransactionController],
-  providers: [TransactionService, Authenticate],
+  providers: [TransactionService],
 })
-export class TransactionModule {}
+export class TransactionModule {
+  configure(route) {
+    route.apply(Authenticate).forRoutes(TransactionController);
+  }
+}

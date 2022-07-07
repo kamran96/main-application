@@ -23,6 +23,7 @@ import {
 import { ISupportedRoutes } from '../../../modal/routing';
 import moneyFormat from '../../../utils/moneyFormat';
 import { useCols} from './commonCol';
+import { InvoiceImports } from './invoiceImports';
 import InvoicesFilterSchema from './InvoicesFilterSchema';
 
 interface IProps {
@@ -220,6 +221,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
   const renderTobarRight = () => {
     return (
       <div className="flex alignCenter">
+        <InvoiceImports/>
         <SmartFilter
           onFilter={(encode) => {
             setAllInvoicesConfig({ ...allInvoicesConfig, query: encode });

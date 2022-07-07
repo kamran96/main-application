@@ -3,7 +3,6 @@ import {
   Controller,
   Post,
   Req,
-  UseGuards,
   HttpException,
   HttpStatus,
   Get,
@@ -12,7 +11,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
-import { GlobalAuthGuard } from '@invyce/global-auth-guard';
+
 import {
   IRequest,
   IPage,
@@ -33,7 +32,6 @@ export class PaymentController {
   constructor(private paymentService: PaymentService) {}
 
   @Get()
-  @UseGuards(GlobalAuthGuard)
   async index(
     @Query() query: IPage,
     @Req() req: IRequest
@@ -51,7 +49,6 @@ export class PaymentController {
   }
 
   @Post('/invoice')
-  @UseGuards(GlobalAuthGuard)
   async getPaymentAgainstInvoice(
     @Body() invoiceIds: PaymentInvoiceDto,
     @Req() req: IRequest
@@ -63,7 +60,6 @@ export class PaymentController {
   }
 
   @Post('/contact')
-  @UseGuards(GlobalAuthGuard)
   async GetPaymentAgainstContactId(
     @Body() contactIds: PaymentContactDto,
     @Req() req: IRequest
@@ -75,7 +71,6 @@ export class PaymentController {
   }
 
   @Get('/opening-balance/:id')
-  @UseGuards(GlobalAuthGuard)
   async getPaymentOpeningBalance(
     @Param() contactIds: PaymentIdDto,
     @Req() req: IRequest,
@@ -89,7 +84,6 @@ export class PaymentController {
   }
 
   @Get('/contact/:id')
-  @UseGuards(GlobalAuthGuard)
   async getPaymentWithBalance(
     @Param() contactIds: PaymentIdDto,
     @Req() req: IRequest,
@@ -103,7 +97,6 @@ export class PaymentController {
   }
 
   @Post()
-  @UseGuards(GlobalAuthGuard)
   async create(
     @Body() data: PaymentDto,
     @Req() req: IRequest
@@ -127,13 +120,11 @@ export class PaymentController {
   }
 
   @Post('add')
-  @UseGuards(GlobalAuthGuard)
   async addPayment(@Body() body, @Req() req: IRequest): Promise<void> {
     return await this.paymentService.AddPayment(body, req.user);
   }
 
   @Post('delete')
-  @UseGuards(GlobalAuthGuard)
   async deletePaymentAgainstInvoiceOrBillId(
     @Body() body: DeletePaymentDto,
     @Req() req: IRequest
@@ -145,7 +136,6 @@ export class PaymentController {
   }
 
   @Put('delete')
-  @UseGuards(GlobalAuthGuard)
   async delete(@Body() body: PaymentIdsDto, @Req() req: Request) {
     const payment = await this.paymentService.DeletePayment(body, req);
 

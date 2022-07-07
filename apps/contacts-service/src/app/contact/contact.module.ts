@@ -39,4 +39,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
   controllers: [ContactController],
   providers: [ContactService, Authenticate],
 })
-export class ContactModule {}
+export class ContactModule {
+  configure(route) {
+    route.apply(Authenticate).forRoutes(ContactController);
+  }
+}

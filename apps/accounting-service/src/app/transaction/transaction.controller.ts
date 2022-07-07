@@ -9,7 +9,6 @@ import {
   Put,
   Query,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import { Request } from 'express';
 import {
@@ -18,7 +17,7 @@ import {
   TransactionDto,
 } from '../dto/transaction.dto';
 import { TransactionService } from './transaction.service';
-import { GlobalAuthGuard } from '@invyce/global-auth-guard';
+
 import {
   IRequest,
   IPage,
@@ -32,7 +31,6 @@ export class TransactionController {
   constructor(private transactionService: TransactionService) {}
 
   @Get()
-  @UseGuards(GlobalAuthGuard)
   async index(
     @Req() req: IRequest,
     @Query() query: IPage
@@ -59,7 +57,6 @@ export class TransactionController {
   }
 
   @Post()
-  @UseGuards(GlobalAuthGuard)
   async create(@Body() transactionDto: TransactionDto, @Req() req: Request) {
     try {
       const transaction = await this.transactionService.CreateTransaction(
@@ -82,7 +79,6 @@ export class TransactionController {
   }
 
   @Get('cash-summary')
-  @UseGuards(GlobalAuthGuard)
   async cashSummary(@Req() req: IRequest, @Query() query) {
     const transaction = await this.transactionService.CashSummaryReport(
       req.user,
@@ -98,7 +94,6 @@ export class TransactionController {
   }
 
   @Get('/:id')
-  @UseGuards(GlobalAuthGuard)
   async show(@Param() params: ParamsDto): Promise<ITransactionWithResponse> {
     try {
       const transaction = await this.transactionService.FindTransactionById(
@@ -122,7 +117,6 @@ export class TransactionController {
   }
 
   @Post('api')
-  @UseGuards(GlobalAuthGuard)
   async trasanctionApi(
     @Body() data: TransactionApiDto,
     @Req() req: IRequest
@@ -134,7 +128,6 @@ export class TransactionController {
   }
 
   @Post('add')
-  @UseGuards(GlobalAuthGuard)
   async addTransaction(
     @Body() data: TransactionApiDto,
     @Req() req: IRequest
@@ -143,13 +136,11 @@ export class TransactionController {
   }
 
   @Put('approve/:id')
-  @UseGuards(GlobalAuthGuard)
   async approveTransaction(@Param() params) {
     return await this.transactionService.ApproveTransaction(params.id);
   }
 
   @Post('delete')
-  @UseGuards(GlobalAuthGuard)
   async deleteJournalEntry(
     @Body() data: DeleteTransactionsDto,
     @Req() req: IRequest
@@ -158,7 +149,6 @@ export class TransactionController {
   }
 
   @Put('delete')
-  @UseGuards(GlobalAuthGuard)
   async deleteDraftTransactions(@Body() data: DeleteTransactionsDto) {
     return await this.transactionService.DeleteTransaction(data);
   }
