@@ -19,6 +19,7 @@ import {
   ISupportedRoutes,
   TRANSACTION_MODE,
 } from '../../../modal';
+import { PaymentImport } from '../PaymentsImport';
 import { useCols } from './CommonCols';
 import filterSchema from './paymentFilterSchema';
 
@@ -201,6 +202,7 @@ export const PaymentPaidList: FC = () => {
   const renderTopbarRight = () => {
     return (
       <div className="flex aliginCenter">
+        <PaymentImport/>
         <ButtonTag
           disabled
           className="mr-10"

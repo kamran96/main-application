@@ -26,6 +26,7 @@ import {
   ORDER_TYPE,
 } from '../../../../../modal';
 import convertToRem from '../../../../../utils/convertToRem';
+import { ImportBill } from '../importBill';
 import {useCols} from './CommonCol';
 import FilterSchema from './PoFilterSchema';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
@@ -261,6 +262,7 @@ export const ALLBillsList: FC<IProps> = ({ columns, activeTab }) => {
   const renerTopRightbar = () => {
     return (
       <div className="flex alignCenter">
+        <ImportBill/>
         <SmartFilter
           onFilter={(encode) => {
             setAllInvoicesConfig({

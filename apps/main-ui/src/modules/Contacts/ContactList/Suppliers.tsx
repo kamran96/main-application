@@ -22,6 +22,7 @@ import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
 import moneyFormat from '../../../utils/moneyFormat';
 import { pdfCols } from './pdfCols';
+import ContactsImport from '../ContactsImport';
 
 export const Suppliers: FC = () => {
   /* HOOKS */
@@ -308,6 +309,8 @@ export const Suppliers: FC = () => {
   const renderTopbarRight = () => {
     return (
       <div className="flex alignCenter">
+        <ContactsImport />
+
         <SmartFilter
           onFilter={(encode) => {
             const route = `/app/contacts?tabIndex=suppliers&sortid=${sortid}&page=1&page_size=20&query=${encode}`;

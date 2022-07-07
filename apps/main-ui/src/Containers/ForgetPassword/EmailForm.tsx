@@ -66,8 +66,8 @@ export const EmailForm: FC = () => {
                   label="Email / Username"
                   name="username"
                   rules={[
-                    { required: true, message: 'Please enter your email' },
-                    { type: 'email' },
+                    { required: true, message: 'Please enter your email/username' },
+                    // { type: 'email' },
                   ]}
                   hasFeedback
                 >

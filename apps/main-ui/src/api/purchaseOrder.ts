@@ -30,3 +30,5 @@ export const getPurchaseOrderByIDAPI = ({ queryKey }: QueryKey) => {
 
 export const purchaseOrderDeleteAPI = (payload?: { ids: number[] }) =>
   http?.put(`invoices/purchase-order`, payload);
+
+  export const purchaseOrderKeysAPI = () => http.get(`invoices/purchase-order/import-csv`)

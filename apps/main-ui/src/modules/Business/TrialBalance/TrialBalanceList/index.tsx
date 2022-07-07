@@ -272,6 +272,7 @@ export const TrialBalanceList: FC = () => {
           }}
           customTopbar={renderTableHeaderLeft()}
           topbarRightPannel={
+            <div className='flex alignCenter'>
             <SmartFilter
               formSchema={FilterSchema}
               onFilter={(q) => {
@@ -281,6 +282,7 @@ export const TrialBalanceList: FC = () => {
                 setConfig({ ...config, query: q });
               }}
             />
+            </div>
           }
           hasPrint
           printTitle={'Trial Balance'}
