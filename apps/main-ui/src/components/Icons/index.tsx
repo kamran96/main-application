@@ -63,3 +63,29 @@ export const PDFICON = ({ width = 20, height = 20, className = '' }) => {
     </span>
   );
 };
+
+export const ThreeDotsIcon = ({ width = 3, height = 12 }) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={width}
+      height={height}
+      viewBox="0 0 3 12"
+      fill="none"
+    >
+      <path
+        d="M1.5 4.5C0.675 4.5 0 5.175 0 6C0 6.825 0.675 7.5 1.5 7.5C2.325 7.5 3 6.825 3 6C3 5.175 2.325 4.5 1.5 4.5ZM1.5 0C0.675 0 0 0.675 0 1.5C0 2.325 0.675 3 1.5 3C2.325 3 3 2.325 3 1.5C3 0.675 2.325 0 1.5 0ZM1.5 9C0.675 9 0 9.675 0 10.5C0 11.325 0.675 12 1.5 12C2.325 12 3 11.325 3 10.5C3 9.675 2.325 9 1.5 9Z"
+        fill="#494949"
+      />
+    </svg>
+  );
+};
+
+export const AddOrganizationIcon = ({width=55, height=55}) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} viewBox="0 0 55 55" fill="none">
+<path d="M27.4998 17.2998V27.4998M27.4998 27.4998V37.6998M27.4998 27.4998H37.6998M27.4998 27.4998H17.2998" stroke="#1890FF" stroke-width="3" stroke-linecap="round"/>
+<path d="M27.5 53C41.5833 53 53 41.5833 53 27.5C53 13.4167 41.5833 2 27.5 2C13.4167 2 2 13.4167 2 27.5C2 41.5833 13.4167 53 27.5 53Z" stroke="#1890FF" stroke-width="3"/>
+</svg>
+  )
+}
