@@ -4,7 +4,6 @@ import { Button } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
-
 import {
   deleteOrganizationAPI,
   getOrganizations,
@@ -16,7 +15,9 @@ import { CommonTable } from '../../components/Table';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { NOTIFICATIONTYPE } from '../../modal';
 import { BranchesContainer } from './Branches';
-import { AddOrganizationWrapper } from './styled';
+import { OrganizationCard } from './OrganizationCard';
+import { AddNewOrganizationWrapper, AddOrganizationWrapper } from './styled';
+import { AddOrganizationIcon } from '../../components/Icons';
 
 export const OrganizationsList: FC = () => {
   const queryCache = useQueryClient();
@@ -27,14 +28,12 @@ export const OrganizationsList: FC = () => {
   });
   const [confirmModal, setConfirmModal] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [orgaizationActive, setOrganizationActive] = useState(4);
+  const [orgaizationActive, setOrganizationActive] = useState(0);
 
   const { mutate: mutateDeleteOrganizations, isLoading: deletingOrganization } =
     useMutation(deleteOrganizationAPI);
 
   const { isLoading, data } = useQuery([`all-organizations`], getOrganizations);
-
-  console.log(data, "organization Data")
 
   useEffect(() => {
     if (data && data.data && data.data.result) {
@@ -66,15 +65,17 @@ export const OrganizationsList: FC = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (data, row , index) => (
-          <Button
+      render: (data, row, index) => (
+        <Button
           disabled={index === orgaizationActive ? true : false}
-          onClick={
-            () => console.log("Item Active", index)
+          onClick={() =>
+            console.log('Item Active', index, 'row', row, 'data', data)
           }
-           type="primary" size="middle">
-            Active
-          </Button>
+          type="primary"
+          size="middle"
+        >
+          Active
+        </Button>
       ),
     },
   ];
@@ -137,15 +138,15 @@ export const OrganizationsList: FC = () => {
     <AddOrganizationWrapper>
       <div className="add_organizations_action flex alignCenter justifySpaceBetween">
         <Heading type="table">Your Organizations</Heading>
-        <Button
+        {/* <Button
           onClick={() => setOrganizationConfig(true)}
           className="ml-10"
           type="primary"
         >
           Add Organization
-        </Button>
+        </Button> */}
       </div>
-      <CommonTable
+      {/* <CommonTable
         customTopbar={renderCustomTopbar()}
         loading={isLoading}
         data={result.map((item, index) => {
@@ -169,7 +170,32 @@ export const OrganizationsList: FC = () => {
         //     );
         //   },
         // }}
-      />
+      /> */}
+      <div className="cardWrapper">
+        {result?.map((organizationItem: any, index: number) => {
+          return (
+            <OrganizationCard
+              key={index}
+              handleDelete={() => setConfirmModal(true)}
+              organization={organizationItem}
+              handleEdit={() => setOrganizationConfig(true, selectedRows[0])}
+            />
+          );
+        })}
+
+        <OrganizationCard
+          handleDelete={() => setConfirmModal(true)}
+          organization={"hello"}
+          handleEdit={() => setOrganizationConfig(true, selectedRows[0])}
+        />
+
+        <AddNewOrganizationWrapper onClick={() => setOrganizationConfig(true)}>
+          <AddOrganizationIcon />
+          <h3>Add Organization</h3>
+          <p>click to Add a new organization here</p>
+        </AddNewOrganizationWrapper>
+      </div>
+
       <ConfirmModal
         loading={deletingOrganization}
         visible={confirmModal}
