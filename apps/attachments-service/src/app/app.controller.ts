@@ -30,7 +30,6 @@ export class AppController {
 
   @Post()
   async create(@Req() req: Request, @Res() res: Response) {
-    console.log('okk');
     return await this.appService.fileUpload(req, res);
   }
 
