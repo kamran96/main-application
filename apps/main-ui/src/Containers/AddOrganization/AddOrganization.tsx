@@ -7,6 +7,7 @@ import { useQueryClient, useMutation, useQuery } from 'react-query';
 import {
   deleteOrganizationAPI,
   getOrganizations,
+  changeOrganizationApi,
 } from '../../api/organizations';
 import { ButtonTag } from '../../components/ButtonTags';
 import { ConfirmModal } from '../../components/ConfirmModal';
@@ -21,8 +22,12 @@ import { AddOrganizationIcon } from '../../components/Icons';
 
 export const OrganizationsList: FC = () => {
   const queryCache = useQueryClient();
-  const { setOrganizationConfig, notificationCallback, refetchUser } =
-    useGlobalContext();
+  const {
+    setOrganizationConfig,
+    notificationCallback,
+    refetchUser,
+    refetchPermissions,
+  } = useGlobalContext();
   const [{ result }, setResponse] = useState<any>({
     result: [],
   });
@@ -35,11 +40,26 @@ export const OrganizationsList: FC = () => {
 
   const { isLoading, data } = useQuery([`all-organizations`], getOrganizations);
 
+  const {
+    mutate: mutateChangeOrganizationApi,
+    isLoading: ChangeOrganizationLoading,
+  } = useMutation(changeOrganizationApi);
+
   useEffect(() => {
     if (data && data.data && data.data.result) {
       setResponse(data.data);
     }
   }, [data]);
+
+  const HandleChangeOrganizagtion = (id) => {
+    mutateChangeOrganizationApi(id, {
+      onSuccess: () => {
+        refetchUser();
+        refetchPermissions();
+        queryCache.clear();
+      },
+    });
+  };
 
   const columns: ColumnsType<any> = [
     {
@@ -67,10 +87,8 @@ export const OrganizationsList: FC = () => {
       key: 'status',
       render: (data, row, index) => (
         <Button
-          disabled={index === orgaizationActive ? true : false}
-          onClick={() =>
-            console.log('Item Active', index, 'row', row, 'data', data)
-          }
+          disabled={row?.isActive ? true : false}
+          onClick={() => HandleChangeOrganizagtion(row.id)}
           type="primary"
           size="middle"
         >
@@ -173,7 +191,6 @@ export const OrganizationsList: FC = () => {
       /> */}
       <div className="cardWrapper">
         {result?.map((organizationItem: any, index: number) => {
-          console.log(organizationItem?.id, "organization")
           return (
             <OrganizationCard
               key={index}
@@ -181,6 +198,9 @@ export const OrganizationsList: FC = () => {
               organization={organizationItem}
               handleEdit={() =>
                 setOrganizationConfig(true, organizationItem?.id)
+              }
+              handleActive={() =>
+                HandleChangeOrganizagtion(organizationItem?.id)
               }
             />
           );

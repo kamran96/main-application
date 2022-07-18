@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { Authenticate } from '@invyce/auth-middleware';
 import { QuotationController } from './quotation.controller';
 import { QuotationService } from './quotation.service';
 
@@ -7,4 +8,8 @@ import { QuotationService } from './quotation.service';
   controllers: [QuotationController],
   providers: [QuotationService],
 })
-export class QuotationModule {}
+export class QuotationModule {
+  configure(route) {
+    route.apply(Authenticate).forRoutes(QuotationController);
+  }
+}

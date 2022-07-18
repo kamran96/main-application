@@ -21,6 +21,10 @@ import { Authenticate } from '@invyce/auth-middleware';
     ]),
   ],
   controllers: [InvoiceController],
-  providers: [InvoiceService, Authenticate],
+  providers: [InvoiceService],
 })
-export class InvoiceModule {}
+export class InvoiceModule {
+  configure(route) {
+    route.apply(Authenticate).forRoutes(InvoiceController);
+  }
+}

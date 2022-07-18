@@ -850,7 +850,6 @@ export class ContactService {
       }
     }
 
-    console.log(transactionArr, 'transactionArr');
     await axios.post(
       Host('accounts', `accounts/transaction/add`),
       {

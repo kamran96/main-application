@@ -9,9 +9,7 @@ import {
   Put,
   Query,
   Req,
-  UseGuards,
 } from '@nestjs/common';
-import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 import {
   AttributeDto,
   CategoryDto,
@@ -31,7 +29,6 @@ export class CategoryController {
   constructor(private categoryService: CategoryService) {}
 
   @Get()
-  @UseGuards(GlobalAuthGuard)
   async index(
     @Req() req: IRequest,
     @Query() query: IPage
@@ -49,7 +46,6 @@ export class CategoryController {
   }
 
   @Post()
-  @UseGuards(GlobalAuthGuard)
   async create(
     @Body() categoryDto: CategoryDto,
     @Req() req: IRequest

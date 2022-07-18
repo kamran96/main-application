@@ -15,12 +15,14 @@ interface IProps {
   organization: any;
   handleDelete: (payload: any) => void;
   handleEdit: (payload: any) => void;
+  handleActive: (payload: any) => void;
 }
 
 export const OrganizationCard: FC<IProps> = ({
   organization,
   handleDelete,
   handleEdit,
+  handleActive,
 }) => {
   const OverlayItems = (
     <Menu style={{ maxWidth: '130px' }}>
@@ -37,7 +39,11 @@ export const OrganizationCard: FC<IProps> = ({
         <Icon icon={editSolid} />
         <span style={{ padding: '12px' }}>Edit</span>
       </Menu.Item>
-      <Menu.Item key="2" disabled={organization?.isActive}>
+      <Menu.Item
+        key="2"
+        // disabled={organization?.isActive}
+        onClick={handleActive}
+      >
         <Icon icon={checkMark} />
         <span style={{ padding: '12px' }}>Active</span>
       </Menu.Item>
