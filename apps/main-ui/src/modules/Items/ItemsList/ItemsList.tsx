@@ -58,6 +58,7 @@ export const ItemsList: FC = () => {
     return result;
   }, [result]);
 
+
   const [selectedRow, setSelectedRow] = useState([]);
   const [confirmModal, setConfirmModal] = useState<boolean>(false);
 
@@ -356,6 +357,7 @@ export const ItemsList: FC = () => {
   const onSelectedRow = (item) => {
     setSelectedRow(item);
   };
+  
 
   const renderTopbarRightPannel = () => {
     return (
