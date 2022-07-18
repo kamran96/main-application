@@ -127,6 +127,7 @@ export const ContactImportWidget: FC = () => {
               <div className="download">
                 <h4>{state.link}</h4>
                 &nbsp;
+                {/* <Button onClick={onDownloadTemplate} type="link">here</Button> */}
                 <a onClick={onDownloadTemplate}>here</a>
               </div>
               <InvoiceImportManager
