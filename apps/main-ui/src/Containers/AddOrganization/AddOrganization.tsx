@@ -173,6 +173,7 @@ export const OrganizationsList: FC = () => {
       /> */}
       <div className="cardWrapper">
         {result?.map((organizationItem: any, index: number) => {
+          console.log(organizationItem?.id, "organization")
           return (
             <OrganizationCard
               key={index}

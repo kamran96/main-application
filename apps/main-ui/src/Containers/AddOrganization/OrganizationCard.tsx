@@ -2,9 +2,9 @@ import React, { FC } from 'react';
 import { Dropdown, Menu } from 'antd';
 import styled from 'styled-components';
 import { ThreeDotsIcon } from '../../components/Icons';
-import quickbook from '../../assets/quickbook.png';
 import { ButtonTag } from '../../components/ButtonTags';
 import deleteIcon from '@iconify/icons-carbon/delete';
+import noImage from '@iconify/icons-carbon/no-image';
 import editSolid from '@iconify/icons-clarity/edit-solid';
 import checkMark from '@iconify/icons-carbon/checkmark-outline';
 import Icon from '@iconify/react';
@@ -67,14 +67,18 @@ export const OrganizationCard: FC<IProps> = ({
         </Dropdown>
       </div>
       <div className="ImageArea">
-        <img
-          src={organization?.logo ? organization?.logo : quickbook}
-          alt="Organization Logo"
-        />
+        {organization?.attachmentId ? (
+          <img
+            src={organization?.attachmentId && organization?.attachment?.path}
+            alt="Organization Logo"
+          />
+        ) : (
+          <Icon icon={noImage} />
+        )}
       </div>
       <div className="OrganizationTypo">
         <H4 className="title">{organization?.name}</H4>
-        <p className="SubTitle">{organization.organizationType}</p>
+        <p className="SubTitle">{organization.niche}</p>
         <p className="Financial">Financial End year </p>
         <p className="Date">{organization.createdAt}</p>
       </div>
@@ -145,6 +149,12 @@ const CardWrapper = styled.div`
     img {
       height: 5rem;
       width: 5rem;
+      border-radius: 50%;
+    }
+
+    svg {
+      height: 5rem;
+      width: 5rem;
     }
   }
   .OrganizationTypo {
@@ -152,12 +162,12 @@ const CardWrapper = styled.div`
   }
 
   .title {
-    color: #000000;
     font-size: 1rem;
   }
   .SubTitle {
     font-size: 12px;
     font-weight: 400;
+    margin: 3px 0;
   }
 
   .Financial {
