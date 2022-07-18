@@ -377,7 +377,8 @@ export class ItemService {
     }
   }
 
-  async SyncItems(data, user: IBaseUser): Promise<void> {
+  async SyncItems(data, req: IRequest): Promise<void> {
+    const { user } = req;
     if (data.type === Integrations.XERO) {
       for (const i of data.items) {
         const items = await this.itemModel.find({
@@ -452,7 +453,109 @@ export class ItemService {
         }
       }
     } else if (data.type === Integrations.CSV_IMPORT) {
-      console.log('test');
+      try {
+        const { items } = data;
+
+        for (let i = 0; i <= items.length; i++) {
+          const {
+            name,
+            description,
+            stock,
+            openingStock,
+            itemType,
+            barcode,
+            code,
+            discount,
+            purchasePrice,
+            salePricee,
+            tax,
+            minimumStock,
+          } = items[i];
+
+          const item = new this.itemModel({
+            name,
+            description,
+            hasInventory: true,
+            stock,
+            itemType: itemType === 'product' ? 1 : 2,
+            code,
+            minimumStock,
+            openingStock,
+            barcode,
+          });
+
+          await item.save();
+
+          const token = req?.cookies['access_token'];
+
+          const { data: accounts } = await axios.post(
+            Host('accounts', 'accounts/account/codes'),
+            {
+              codes: ['15005'],
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
+            }
+          );
+
+          let amount = 0;
+          const accountIndex = data.targetAccounts?.findIndex(
+            (i) => (i.index = i)
+          );
+
+          let transaction;
+          if (openingStock > 0 && accountIndex > -1) {
+            amount = openingStock * purchasePrice;
+
+            if (openingStock > 0) {
+              const debit = {
+                amount,
+                account_id: await accounts[0].value,
+              };
+              const credit = {
+                amount,
+                account_id: data.targetAccounts[accountIndex].id,
+              };
+
+              const payload = {
+                dr: [debit],
+                cr: [credit],
+                type: 'item opening stock',
+                reference: `${item.name} opening stock`,
+                amount,
+                status: 1,
+              };
+              const { data: transactionData } = await axios.post(
+                Host('accounts', 'accounts/transaction/api'),
+                {
+                  transactions: payload,
+                },
+                {
+                  headers: {
+                    cookie: `access_token=${token}`,
+                  },
+                }
+              );
+              transaction = transactionData;
+            }
+          }
+
+          const price = new this.priceModel({
+            purchasePrice,
+            salePricee,
+            discount,
+            tax,
+            itemId: item._id,
+            transactionId: transaction ? transaction.id : null,
+          });
+
+          price.save();
+        }
+      } catch (error) {
+        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      }
     }
   }
   async ImportCSV() {

@@ -13,9 +13,15 @@ enum Modules {
 }
 @Injectable()
 export class CsvService {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor() {}
 
+  getData(): { message: string } {
+    return { message: 'Welcome to contacts!' };
+  }
+
   async importCsv(req, res): Promise<any> {
+    console.log('request');
     if (!req || !req.cookies) return null;
     const token = req.cookies['access_token'];
 
@@ -48,6 +54,8 @@ export class CsvService {
         });
         csvData.push(obj);
       }
+
+      console.log('in here');
 
       switch (moduleType) {
         case Modules.CONTACT:

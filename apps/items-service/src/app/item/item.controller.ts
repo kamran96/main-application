@@ -122,6 +122,6 @@ export class ItemController {
 
   @Post('sync')
   async SyncItems(@Body() body, @Req() req: IRequest): Promise<void> {
-    return await this.itemService.SyncItems(body, req.user);
+    return await this.itemService.SyncItems(body, req);
   }
 }
