@@ -7,7 +7,6 @@
 
 build.pdf
 archive.zip
-.env
 /certs
 /vault
 
@@ -20,6 +19,8 @@ apps/items-service/.env
 apps/payments-service/.env
 apps/reports-service/.env
 apps/users-service/.env
+.env
+
 
 # dependencies
 /node_modules

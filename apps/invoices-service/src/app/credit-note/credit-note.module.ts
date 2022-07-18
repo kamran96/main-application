@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { Authenticate } from '@invyce/auth-middleware';
 
 import { CreditNoteController } from './credit-note.controller';
 import { CreditNoteService } from './credit-note.service';
@@ -23,4 +24,8 @@ import { CreditNoteService } from './credit-note.service';
   controllers: [CreditNoteController],
   providers: [CreditNoteService],
 })
-export class CreditNoteModule {}
+export class CreditNoteModule {
+  configure(route) {
+    route.apply(Authenticate).forRoutes(CreditNoteController);
+  }
+}

@@ -11,7 +11,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { AuthGuard } from '@nestjs/passport';
 import { IRequest, IOrganizationResponse, IBaseUser } from '@invyce/interfaces';
 import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 import { OrganizationDto, OrganizationParams } from '../dto/organization.dto';
@@ -49,7 +48,7 @@ export class OrganizationController {
   async create(
     @Body() organizationDto: OrganizationDto,
     @Req() req: IRequest,
-    @Res() res: Response
+    @Res({ passthrough: true }) res: Response
   ) {
     try {
       const organization =
@@ -74,8 +73,22 @@ export class OrganizationController {
     }
   }
 
+  @Post('change')
+  @UseGuards(GlobalAuthGuard)
+  async changeOrganization(
+    @Req() req: IRequest,
+    @Body() body,
+    @Res() res: Response
+  ) {
+    return await this.organizationService.ChangeOrganization(
+      req.user,
+      body,
+      res
+    );
+  }
+
   @Get(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(GlobalAuthGuard)
   async view(
     @Param() params: OrganizationParams,
     @Req() req: IRequest

@@ -9,10 +9,9 @@ import {
   Put,
   Query,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
-import { GlobalAuthGuard } from '@invyce/global-auth-guard';
+
 import { InvoiceIdsDto, InvoiceDto, ParamsDto } from '../dto/invoice.dto';
 import {
   IInvoice,
@@ -26,7 +25,6 @@ export class InvoiceController {
   constructor(private invoiceService: InvoiceService) {}
 
   @Get()
-  @UseGuards(GlobalAuthGuard)
   async index(
     @Req() req: IRequest,
     @Query() query: IPage
@@ -51,7 +49,6 @@ export class InvoiceController {
   }
 
   @Get('contact/:id')
-  @UseGuards(GlobalAuthGuard)
   async invoiceAgainstContact(
     @Param() params: ParamsDto,
     @Req() req: IRequest,
@@ -78,25 +75,21 @@ export class InvoiceController {
   }
 
   @Get('first-invoice')
-  @UseGuards(GlobalAuthGuard)
   async createFirstInvoice(@Req() req: IRequest) {
     return await this.invoiceService.CreateYourFirstInvoice(req.user);
   }
 
   @Get('pending-invoices')
-  @UseGuards(GlobalAuthGuard)
   async pendingInvoices(@Req() req: IRequest) {
     return await this.invoiceService.PendingPaymentInvoices(req);
   }
 
   @Post('pdf')
-  @UseGuards(GlobalAuthGuard)
   async generatePdfAndSendEmail(@Body() data, @Req() req: IRequest) {
     return await this.invoiceService.GeneratePdfAndSendEamil(data, req);
   }
 
   @Post('ids')
-  @UseGuards(GlobalAuthGuard)
   async findByInvoiceIds(
     @Body() invoiceIds: InvoiceIdsDto
   ): Promise<IInvoice[]> {
@@ -104,7 +97,6 @@ export class InvoiceController {
   }
 
   @Get('contacts/:id')
-  @UseGuards(GlobalAuthGuard)
   async findInvoiceByContactId(
     @Param() invoiceIds: ParamsDto
   ): Promise<IInvoice[]> {
@@ -112,7 +104,6 @@ export class InvoiceController {
   }
 
   @Get('receivables')
-  @UseGuards(GlobalAuthGuard)
   async agedReceivables(@Req() req: IRequest, @Query() query) {
     const invoices = await this.invoiceService.AgedReceivables(req, query);
 
@@ -125,7 +116,6 @@ export class InvoiceController {
     }
   }
 
-  @UseGuards(GlobalAuthGuard)
   @Post()
   async create(
     @Body() invoiceDto: InvoiceDto,
@@ -149,7 +139,6 @@ export class InvoiceController {
     }
   }
 
-  @UseGuards(GlobalAuthGuard)
   @Get('number')
   async getInvoiceNumber(
     @Query() { type },
@@ -177,13 +166,11 @@ export class InvoiceController {
     }
   }
 
-  @UseGuards(GlobalAuthGuard)
   @Put('due-date/:id')
   async changeDueDate(@Param() params, @Body() invoiceDto) {
     return await this.invoiceService.ChangeDueDate(params.id, invoiceDto);
   }
 
-  @UseGuards(GlobalAuthGuard)
   @Get('/:id')
   async show(
     @Param() params,
@@ -213,7 +200,6 @@ export class InvoiceController {
   }
 
   @Put()
-  @UseGuards(GlobalAuthGuard)
   async delete(
     @Body() inoviceIds: InvoiceIdsDto,
     @Req() req: IRequest
@@ -229,7 +215,6 @@ export class InvoiceController {
   }
 
   @Post('sync')
-  @UseGuards(GlobalAuthGuard)
   async SyncInvoices(@Body() body, @Req() req: IRequest): Promise<void> {
     return await this.invoiceService.SyncInvoices(body, req);
   }

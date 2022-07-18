@@ -13,20 +13,20 @@ import {
 } from '@nestjs/common';
 import { ContactDto, ContactIds, ParamsDto } from '../dto/contact.dto';
 import { ContactService } from './contact.service';
-import { GlobalAuthGuard } from '@invyce/global-auth-guard';
 import {
   IRequest,
   IPage,
   IContactWithResponse,
   IContact,
 } from '@invyce/interfaces';
+import { Authenticate } from '@invyce/auth-middleware';
 
+@UseGuards(Authenticate)
 @Controller('contact')
 export class ContactController {
   constructor(private contactService: ContactService) {}
 
   @Get()
-  @UseGuards(GlobalAuthGuard)
   async index(
     @Req() req: IRequest,
     @Query() query: IPage
@@ -44,13 +44,11 @@ export class ContactController {
   }
 
   @Get('balance')
-  @UseGuards(GlobalAuthGuard)
   async bal(@Req() req: IRequest) {
     return await this.contactService.SyncContactBalances(req);
   }
 
   @Get('outstanding-balance')
-  @UseGuards(GlobalAuthGuard)
   async highestOutstandingBalance(@Req() req: IRequest, @Query() query) {
     const contact = await this.contactService.HighestOutstandingBalanceReport(
       req.user,
@@ -67,13 +65,11 @@ export class ContactController {
   }
 
   @Get('import-csv')
-  // @UseGuards(GlobalAuthGuard)
   async importCsv(): Promise<any> {
     return await this.contactService.ImportCsv();
   }
 
   @Post()
-  @UseGuards(GlobalAuthGuard)
   async create(
     @Body() contactDto: ContactDto,
     @Req() req: IRequest
@@ -97,7 +93,6 @@ export class ContactController {
   }
 
   @Get('ledger/:id')
-  @UseGuards(GlobalAuthGuard)
   async ledger(
     @Param() params: ParamsDto,
     @Req() req: IRequest,
@@ -122,7 +117,6 @@ export class ContactController {
   }
 
   @Get('/:id')
-  @UseGuards(GlobalAuthGuard)
   async show(@Param() params: ParamsDto): Promise<IContactWithResponse> {
     const contact = await this.contactService.FindById(params.id);
 
@@ -136,7 +130,6 @@ export class ContactController {
   }
 
   @Put()
-  @UseGuards(GlobalAuthGuard)
   async delete(
     @Body() deletedIds: ContactIds,
     @Req() req: IRequest
@@ -152,13 +145,11 @@ export class ContactController {
   }
 
   @Post('ids')
-  @UseGuards(GlobalAuthGuard)
   async contactByIds(@Body() body: ContactIds): Promise<IContact[]> {
     return await this.contactService.ContactByIds(body);
   }
 
   @Post('sync')
-  @UseGuards(GlobalAuthGuard)
   async syncContacts(@Body() body, @Req() req: IRequest): Promise<void> {
     return await this.contactService.SyncContacts(body, req);
   }

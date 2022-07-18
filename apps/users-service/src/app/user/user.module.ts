@@ -7,6 +7,7 @@ import { User, UserSchema } from '../schemas/user.schema';
 import { UserToken, UserTokenSchema } from '../schemas/userToken.schema';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { AuthStrategy } from '../auth/auth.strategy';
 
 @Module({
   imports: [
@@ -29,7 +30,7 @@ import { UserService } from './user.service';
     ]),
     AuthModule,
   ],
-  providers: [UserService],
+  providers: [UserService, AuthStrategy],
   controllers: [UserController],
 })
 export class UserModule {}

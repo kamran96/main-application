@@ -21,6 +21,10 @@ import { Authenticate } from '@invyce/auth-middleware';
     ]),
   ],
   controllers: [PaymentController],
-  providers: [PaymentService, Authenticate],
+  providers: [PaymentService],
 })
-export class PaymentModule {}
+export class PaymentModule {
+  configure(route) {
+    route.apply(Authenticate).forRoutes(PaymentController);
+  }
+}
