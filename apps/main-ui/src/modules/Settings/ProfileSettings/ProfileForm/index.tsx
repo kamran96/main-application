@@ -15,6 +15,7 @@ import { IAttachment, NOTIFICATIONTYPE } from '../../../../modal';
 import convertToRem from '../../../../utils/convertToRem';
 import phoneCodes from '../../../../utils/phoneCodes';
 import en from '../../../../../../../node_modules/world_countries_lists/data/en/world.json';
+import { isNumber } from '../../../../utils/helperFunctions';
 
 const { Option } = Select;
 
@@ -35,7 +36,6 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
 
   const onFinish = async (values) => {
     const payload = { ...values, attachmentId, userId: id };
-
     await mutateUpdateProfile(payload, {
       onSuccess: () => {
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Updated Successfully');
@@ -61,7 +61,7 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
       <Select
         style={{ width: 100 }}
         showSearch
-        defaultValue={92}
+        defaultValue={+92}
         filterOption={(input, option) => {
           return (
             option?.id?.toLowerCase().includes(input?.toLocaleLowerCase()) ||
