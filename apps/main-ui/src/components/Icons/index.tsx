@@ -81,11 +81,26 @@ export const ThreeDotsIcon = ({ width = 3, height = 12 }) => {
   );
 };
 
-export const AddOrganizationIcon = ({width=55, height=55}) => {
+export const AddOrganizationIcon = ({ width = 55, height = 55 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} viewBox="0 0 55 55" fill="none">
-<path d="M27.4998 17.2998V27.4998M27.4998 27.4998V37.6998M27.4998 27.4998H37.6998M27.4998 27.4998H17.2998" stroke="#1890FF" stroke-width="3" stroke-linecap="round"/>
-<path d="M27.5 53C41.5833 53 53 41.5833 53 27.5C53 13.4167 41.5833 2 27.5 2C13.4167 2 2 13.4167 2 27.5C2 41.5833 13.4167 53 27.5 53Z" stroke="#1890FF" stroke-width="3"/>
-</svg>
-  )
-}
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={width}
+      height={height}
+      viewBox="0 0 55 55"
+      fill="none"
+    >
+      <path
+        d="M27.4998 17.2998V27.4998M27.4998 27.4998V37.6998M27.4998 27.4998H37.6998M27.4998 27.4998H17.2998"
+        stroke="#1890FF"
+        stroke-width="3"
+        stroke-linecap="round"
+      />
+      <path
+        d="M27.5 53C41.5833 53 53 41.5833 53 27.5C53 13.4167 41.5833 2 27.5 2C13.4167 2 2 13.4167 2 27.5C2 41.5833 13.4167 53 27.5 53Z"
+        stroke="#1890FF"
+        stroke-width="3"
+      />
+    </svg>
+  );
+};

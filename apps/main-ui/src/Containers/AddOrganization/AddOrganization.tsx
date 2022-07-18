@@ -103,36 +103,36 @@ export const OrganizationsList: FC = () => {
     });
   };
 
-  const renderCustomTopbar = () => {
-    return (
-      <div className="custom_topbar">
-        <div className="edit">
-          {selectedRows && selectedRows.length > 0 && (
-            <div className="flex alignCenter ">
-              {selectedRows && selectedRows.length === 1 && (
-                <ButtonTag
-                  onClick={() => setOrganizationConfig(true, selectedRows[0])}
-                  disabled={!selectedRows.length || selectedRows.length > 1}
-                  title="Edit"
-                  icon={editSolid}
-                  size={'middle'}
-                />
-              )}
-              <ButtonTag
-                className="mr-10"
-                disabled={!selectedRows.length}
-                onClick={() => setConfirmModal(true)}
-                title="Delete"
-                icon={deleteIcon}
-                size={'middle'}
-              />
-              {/* <MoreActions /> */}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
+  // const renderCustomTopbar = () => {
+  //   return (
+  //     <div className="custom_topbar">
+  //       <div className="edit">
+  //         {selectedRows && selectedRows.length > 0 && (
+  //           <div className="flex alignCenter ">
+  //             {selectedRows && selectedRows.length === 1 && (
+  //               <ButtonTag
+  //                 onClick={() => setOrganizationConfig(true, selectedRows[0])}
+  //                 disabled={!selectedRows.length || selectedRows.length > 1}
+  //                 title="Edit"
+  //                 icon={editSolid}
+  //                 size={'middle'}
+  //               />
+  //             )}
+  //             <ButtonTag
+  //               className="mr-10"
+  //               disabled={!selectedRows.length}
+  //               onClick={() => setConfirmModal(true)}
+  //               title="Delete"
+  //               icon={deleteIcon}
+  //               size={'middle'}
+  //             />
+  //             {/* <MoreActions /> */}
+  //           </div>
+  //         )}
+  //       </div>
+  //     </div>
+  //   );
+  // };
 
   return (
     <AddOrganizationWrapper>
@@ -178,16 +178,12 @@ export const OrganizationsList: FC = () => {
               key={index}
               handleDelete={() => setConfirmModal(true)}
               organization={organizationItem}
-              handleEdit={() => setOrganizationConfig(true, selectedRows[0])}
+              handleEdit={() =>
+                setOrganizationConfig(true, organizationItem?.id)
+              }
             />
           );
         })}
-
-        <OrganizationCard
-          handleDelete={() => setConfirmModal(true)}
-          organization={"hello"}
-          handleEdit={() => setOrganizationConfig(true, selectedRows[0])}
-        />
 
         <AddNewOrganizationWrapper onClick={() => setOrganizationConfig(true)}>
           <AddOrganizationIcon />

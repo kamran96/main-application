@@ -9,7 +9,6 @@ export const AddOrganizationWrapper = styled.div`
   }
   .add_organizations_action {
     padding: 19px 0;
-    border-bottom: 1px solid ${(props: IThemeProps) => props.theme.colors.seprator};
     margin-bottom: 1rem;
   }
 

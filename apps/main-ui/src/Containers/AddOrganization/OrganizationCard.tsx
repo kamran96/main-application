@@ -1,11 +1,12 @@
 import React, { FC } from 'react';
+import { Dropdown, Menu } from 'antd';
 import styled from 'styled-components';
 import { ThreeDotsIcon } from '../../components/Icons';
 import quickbook from '../../assets/quickbook.png';
 import { ButtonTag } from '../../components/ButtonTags';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import editSolid from '@iconify/icons-clarity/edit-solid';
-import { Dropdown, Menu } from 'antd';
+import checkMark from '@iconify/icons-carbon/checkmark-outline';
 import Icon from '@iconify/react';
 import { H4 } from '../../../src/components/Typography';
 import { IThemeProps } from '../../hooks/useTheme/themeColors';
@@ -21,6 +22,28 @@ export const OrganizationCard: FC<IProps> = ({
   handleDelete,
   handleEdit,
 }) => {
+  const OverlayItems = (
+    <Menu style={{ maxWidth: '130px' }}>
+      <Menu.Item
+        key="0"
+        disabled={organization?.isActive}
+        onClick={handleDelete}
+      >
+        <Icon icon={deleteIcon} />
+        <span style={{ padding: '12px' }}>Delete</span>
+      </Menu.Item>
+
+      <Menu.Item key="1" onClick={handleEdit}>
+        <Icon icon={editSolid} />
+        <span style={{ padding: '12px' }}>Edit</span>
+      </Menu.Item>
+      <Menu.Item key="2" disabled={organization?.isActive}>
+        <Icon icon={checkMark} />
+        <span style={{ padding: '12px' }}>Active</span>
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
     <CardWrapper>
       <div className="header">
@@ -37,26 +60,7 @@ export const OrganizationCard: FC<IProps> = ({
             </>
           )}
         </div>
-        <Dropdown
-          overlay={
-            <Menu>
-              <Menu.Item
-                key="0"
-                disabled={organization?.isActive}
-                onClick={handleDelete}
-              >
-                <Icon icon={deleteIcon} /> Delete
-              </Menu.Item>
-              <Menu.Item key="1" onClick={handleEdit}>
-                <Icon icon={editSolid} /> Edit
-              </Menu.Item>
-              <Menu.Item key="2">
-                <Icon icon={editSolid} /> Active
-              </Menu.Item>
-            </Menu>
-          }
-          trigger={['click']}
-        >
+        <Dropdown overlay={OverlayItems} trigger={['click']}>
           <div className="icon">
             <ThreeDotsIcon />
           </div>
@@ -89,7 +93,9 @@ const CardWrapper = styled.div`
   .header {
     display: flex;
     justify-content: space-between;
+    position: relative;
   }
+
   .activeOrg {
     display: flex;
     align-items: center;
@@ -98,6 +104,11 @@ const CardWrapper = styled.div`
 
   .icon {
     cursor: pointer;
+    width: 1rem;
+    height: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .activeStatus {

@@ -12,6 +12,7 @@ import { CompareDataModal } from './CompareDataModal';
 import { CompareDataTable } from './CompareDataTable';
 import { ReactQueryKeys } from '../../../modal';
 import { getAccountKeysApi } from '../../../api/accounts';
+import { downloadCSV } from '../../../utils/downloadCSVFile';
 
 interface Idata {
   xero: {
@@ -52,6 +53,28 @@ const AccountsImportWidget: FC = (props) => {
       enabled: !!compareDataModal,
     }
   );
+
+
+
+  const onDownloadTemplate = () => {
+    const headers = [
+      [
+        'code',
+        'name',
+        'primaryName',
+        'secondaryName',
+        'description',
+        'primaryAccountId',
+        'secondaryAccountId',
+        'taxRate',
+        'totalCredit',
+        'totalDebit',
+        'balance'
+      ],
+    ];
+    downloadCSV(headers);
+  };
+
 
   return (
     <CommonModal
@@ -99,7 +122,7 @@ const AccountsImportWidget: FC = (props) => {
               <div className="download">
                 <h4>{state.link}</h4>
                 &nbsp;
-                <a>here</a>
+                <a onClick={onDownloadTemplate}>here</a>
               </div>
               <InvoiceImportManager
                 headers={`Code,Account Head,Type,Tax Rate,Total Debits,Total Credits,Balance`.split(
