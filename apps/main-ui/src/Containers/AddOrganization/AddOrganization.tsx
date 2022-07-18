@@ -4,7 +4,6 @@ import { Button } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
-
 import {
   deleteOrganizationAPI,
   getOrganizations,
@@ -17,25 +16,34 @@ import { CommonTable } from '../../components/Table';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { NOTIFICATIONTYPE } from '../../modal';
 import { BranchesContainer } from './Branches';
-import { AddOrganizationWrapper } from './styled';
+import { OrganizationCard } from './OrganizationCard';
+import { AddNewOrganizationWrapper, AddOrganizationWrapper } from './styled';
+import { AddOrganizationIcon } from '../../components/Icons';
 
 export const OrganizationsList: FC = () => {
   const queryCache = useQueryClient();
-  const { setOrganizationConfig, notificationCallback, refetchUser, refetchPermissions } =
-    useGlobalContext();
+  const {
+    setOrganizationConfig,
+    notificationCallback,
+    refetchUser,
+    refetchPermissions,
+  } = useGlobalContext();
   const [{ result }, setResponse] = useState<any>({
     result: [],
   });
   const [confirmModal, setConfirmModal] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [orgaizationActive, setOrganizationActive] = useState(4);
+  const [orgaizationActive, setOrganizationActive] = useState(0);
 
   const { mutate: mutateDeleteOrganizations, isLoading: deletingOrganization } =
     useMutation(deleteOrganizationAPI);
 
   const { isLoading, data } = useQuery([`all-organizations`], getOrganizations);
 
-  const { mutate: mutateChangeOrganizationApi, isLoading: ChangeOrganizationLoading } = useMutation(changeOrganizationApi);
+  const {
+    mutate: mutateChangeOrganizationApi,
+    isLoading: ChangeOrganizationLoading,
+  } = useMutation(changeOrganizationApi);
 
   useEffect(() => {
     if (data && data.data && data.data.result) {
@@ -49,10 +57,9 @@ export const OrganizationsList: FC = () => {
         refetchUser();
         refetchPermissions();
         queryCache.clear();
-
-      }
-    })
-  }
+      },
+    });
+  };
 
   const columns: ColumnsType<any> = [
     {
@@ -81,10 +88,10 @@ export const OrganizationsList: FC = () => {
       render: (data, row, index) => (
         <Button
           disabled={row?.isActive ? true : false}
-          onClick={
-            () => HandleChangeOrganizagtion(row.id)
-          }
-          type="primary" size="middle">
+          onClick={() => HandleChangeOrganizagtion(row.id)}
+          type="primary"
+          size="middle"
+        >
           Active
         </Button>
       ),
@@ -114,50 +121,50 @@ export const OrganizationsList: FC = () => {
     });
   };
 
-  const renderCustomTopbar = () => {
-    return (
-      <div className="custom_topbar">
-        <div className="edit">
-          {selectedRows && selectedRows.length > 0 && (
-            <div className="flex alignCenter ">
-              {selectedRows && selectedRows.length === 1 && (
-                <ButtonTag
-                  onClick={() => setOrganizationConfig(true, selectedRows[0])}
-                  disabled={!selectedRows.length || selectedRows.length > 1}
-                  title="Edit"
-                  icon={editSolid}
-                  size={'middle'}
-                />
-              )}
-              <ButtonTag
-                className="mr-10"
-                disabled={!selectedRows.length}
-                onClick={() => setConfirmModal(true)}
-                title="Delete"
-                icon={deleteIcon}
-                size={'middle'}
-              />
-              {/* <MoreActions /> */}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
+  // const renderCustomTopbar = () => {
+  //   return (
+  //     <div className="custom_topbar">
+  //       <div className="edit">
+  //         {selectedRows && selectedRows.length > 0 && (
+  //           <div className="flex alignCenter ">
+  //             {selectedRows && selectedRows.length === 1 && (
+  //               <ButtonTag
+  //                 onClick={() => setOrganizationConfig(true, selectedRows[0])}
+  //                 disabled={!selectedRows.length || selectedRows.length > 1}
+  //                 title="Edit"
+  //                 icon={editSolid}
+  //                 size={'middle'}
+  //               />
+  //             )}
+  //             <ButtonTag
+  //               className="mr-10"
+  //               disabled={!selectedRows.length}
+  //               onClick={() => setConfirmModal(true)}
+  //               title="Delete"
+  //               icon={deleteIcon}
+  //               size={'middle'}
+  //             />
+  //             {/* <MoreActions /> */}
+  //           </div>
+  //         )}
+  //       </div>
+  //     </div>
+  //   );
+  // };
 
   return (
     <AddOrganizationWrapper>
       <div className="add_organizations_action flex alignCenter justifySpaceBetween">
         <Heading type="table">Your Organizations</Heading>
-        <Button
+        {/* <Button
           onClick={() => setOrganizationConfig(true)}
           className="ml-10"
           type="primary"
         >
           Add Organization
-        </Button>
+        </Button> */}
       </div>
-      <CommonTable
+      {/* <CommonTable
         customTopbar={renderCustomTopbar()}
         loading={isLoading}
         data={result.map((item, index) => {
@@ -169,19 +176,43 @@ export const OrganizationsList: FC = () => {
         hasfooter={true}
         enableRowSelection
         onSelectRow={onSelectedRow}
-      // expandable={{
-      //   expandedRowRender: (record, index) => {
-      //     // const childCategories: ITransactionItem[] =
-      //     //   record.transaction_items;
-      //     return (
-      //       <BranchesContainer
-      //         organizationid={record.id}
-      //         branches={record.branches}
-      //       />
-      //     );
-      //   },
-      // }}
-      />
+        // expandable={{
+        //   expandedRowRender: (record, index) => {
+        //     // const childCategories: ITransactionItem[] =
+        //     //   record.transaction_items;
+        //     return (
+        //       <BranchesContainer
+        //         organizationid={record.id}
+        //         branches={record.branches}
+        //       />
+        //     );
+        //   },
+        // }}
+      /> */}
+      <div className="cardWrapper">
+        {result?.map((organizationItem: any, index: number) => {
+          return (
+            <OrganizationCard
+              key={index}
+              handleDelete={() => setConfirmModal(true)}
+              organization={organizationItem}
+              handleEdit={() =>
+                setOrganizationConfig(true, organizationItem?.id)
+              }
+              handleActive={() =>
+                HandleChangeOrganizagtion(organizationItem?.id)
+              }
+            />
+          );
+        })}
+
+        <AddNewOrganizationWrapper onClick={() => setOrganizationConfig(true)}>
+          <AddOrganizationIcon />
+          <h3>Add Organization</h3>
+          <p>click to Add a new organization here</p>
+        </AddNewOrganizationWrapper>
+      </div>
+
       <ConfirmModal
         loading={deletingOrganization}
         visible={confirmModal}

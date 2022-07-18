@@ -21,103 +21,11 @@ interface IProps {
   OnConfrm: (payload: any) => void;
 }
 
-const a = [
-  {
-    label: 'Code',
-    keyName: 'code',
-    description: 'Please select a field which is related to code of Account',
-  },
-  {
-    label: 'Account Head',
-    keyName: 'accountHead',
-    description:
-      'Please select a field which is related to Account Head of Account',
-  },
-  {
-    label: 'Type',
-    keyName: 'type',
-    description: 'Please select a field which is related to Type of Account',
-  },
-  {
-    label: 'Tax Rate',
-    keyName: 'taxRate',
-    description:
-      'Please select a field which is related to Tax Rate of Account',
-  },
-  {
-    label: 'Date',
-    keyName: 'Date',
-    description: 'Please select a field which is related to Date of account',
-  },
-  {
-    label: 'Total Debits',
-    keyName: 'TotalDebits',
-    description:
-      'Please select a field which is related to total debits of account',
-  },
-  {
-    label: 'Web Link',
-    keyName: 'webLink',
-    description:
-      'Please select a field which is related to Website Link of accounts',
-  },
-  {
-    label: 'Skype Name',
-    keyName: 'skypeName',
-    description:
-      'Please select a field which is related to Skype Name of accounts',
-  },
-  {
-    label: 'Fax Number',
-    keyName: 'faxNumber',
-    description:
-      'Please select a field which is related to Fax Number of accounts',
-  },
-  {
-    label: 'Cell Number',
-    keyName: 'cellNumber',
-    description:
-      'Please select a field which is related to Cell Number of accounts',
-  },
-  {
-    label: 'Phone Number',
-    keyName: 'phoneNumber',
-    description:
-      'Please select a field which is related to Phone Number of accounts',
-  },
-  {
-    label: 'Cnic',
-    keyName: 'cnic',
-    description:
-      'Please select a field which is related to National Identity of accounts',
-  },
-  {
-    label: 'Total Credits',
-    keyName: 'totalCredits',
-    description:
-      'Please select a field which is related to total Credits of accounts',
-  },
-  {
-    label: 'Payments Mode',
-    keyName: 'paymentsMode',
-    description: 'Please select a field which is related to payments Mode',
-  },
-  {
-    label: 'Balance',
-    keyName: 'balance',
-    description: 'Please select a field which is related to Email of accounts',
-  },
-  {
-    label: 'Contact',
-    keyName: 'contact',
-    description: 'Please select a field which is related to Name of accounts',
-  },
-];
 
 export const CompareDataModal: FC<IProps> = ({
   visibility,
   onCancel,
-  compareKeys = a,
+  compareKeys,
   documentKeys,
   OnConfrm,
 }) => {
@@ -216,7 +124,7 @@ export const CompareDataModal: FC<IProps> = ({
           isMemo={false}
           customMount={unUsedDocumentKeys?.length}
           columns={columns as any}
-          data={a.sort((a, b) => a.label.localeCompare(b.label))}
+          data={compareKeys.sort((a, b) => a.label.localeCompare(b.label))}
           dragable={() => null}
           scrollable={{ offsetY: 500, offsetX: 0 }}
         />
