@@ -6,7 +6,7 @@ import { AppService } from './app.service';
 import { ContactModule } from './contact/contact.module';
 
 @Module({
-  imports: [MongooseModule.forRoot(process.env.MONGO_URI), ContactModule],
+  imports: [MongooseModule.forRoot(process.env.CONTACT_MONGO_URI), ContactModule],
   controllers: [AppController],
   providers: [AppService],
 })

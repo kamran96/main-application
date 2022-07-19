@@ -6,7 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 @Module({
-  imports: [MongooseModule.forRoot(process.env.MONGO_URI), AttachmentModule],
+  imports: [MongooseModule.forRoot(process.env.ATTACHMENT_MONGO_URI), AttachmentModule],
   controllers: [AppController],
   providers: [AppService],
 })

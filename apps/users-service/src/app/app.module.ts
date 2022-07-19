@@ -11,7 +11,7 @@ import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(process.env.MONGO_URI),
+    MongooseModule.forRoot(process.env.USER_MONGO_URI),
     AuthModule,
     UserModule,
     RbacModule,

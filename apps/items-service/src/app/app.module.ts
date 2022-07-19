@@ -9,7 +9,7 @@ import { PriceModule } from './price/price.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(process.env.MONGO_URI),
+    MongooseModule.forRoot(process.env.ITEM_MONGO_URI),
     ItemModule,
     CategoryModule,
     PriceModule,
