@@ -109,6 +109,8 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
     }
   );
 
+  console.log(data, "data")
+
   const response = plainToClass(
     IInvoiceMutatedResult,
     data?.data
@@ -210,6 +212,9 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
         setEmailModal(true);
         break;
       case IInvoiceActions?.CHANGE_DUE_DATE:
+        response?.invoiceType === 'POE'
+          ? history.push(`/app${ISupportedRoutes.CREATE_BILL}/${id}`)
+          : history.push(`/app${ISupportedRoutes.CREATE_PURCHASE_ORDER}/${id}`);
         break;
 
       case IInvoiceActions?.CREDIT_NOTE:
@@ -330,15 +335,15 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
       key: IInvoiceActions.APPROVE,
     },
 
-    response?.status === 2 &&
-      response?.invoiceType !== 'QO' && {
-        title: 'Proceed',
-        permission:
-          type === IInvoiceType.INVOICE || type === IInvoiceType.CREDITNOTE
-            ? PERMISSIONS?.INVOICES_DRAFT_APPROVE
-            : PERMISSIONS?.PURCHASES_DRAFT_APPROVE,
-        key: IInvoiceActions.PROCEED,
-      },
+    // response?.status === 2 &&
+    //   response?.invoiceType !== 'QO' && {
+    //     title: 'Proceed',
+    //     permission:
+    //       type === IInvoiceType.INVOICE || type === IInvoiceType.CREDITNOTE
+    //         ? PERMISSIONS?.INVOICES_DRAFT_APPROVE
+    //         : PERMISSIONS?.PURCHASES_DRAFT_APPROVE,
+    //     key: IInvoiceActions.PROCEED,
+    //   },
     {
       title: 'Print',
       permission: null,

@@ -355,7 +355,13 @@ export const ItemsForm: FC = () => {
             <FormLabel>Item Name</FormLabel>
             <Form.Item
               name="name"
-              rules={[{ required: true, message: 'Please add item name' }]}
+              rules={[
+                { required: true, message: 'Please add item name' },
+                {
+                  pattern: /^\S/,
+                  message: 'Please add item name',
+                },
+              ]}
             >
               <Input
                 autoComplete="off"
@@ -368,7 +374,13 @@ export const ItemsForm: FC = () => {
             <FormLabel>Item Code</FormLabel>
             <Form.Item
               name="code"
-              rules={[{ required: true, message: 'Please add item code' }]}
+              rules={[
+                { required: true, message: 'Please add item code' },
+                {
+                  pattern: /^\S/,
+                  message: 'Please add item code',
+                },
+              ]}
             >
               <Input autoComplete="off" size="middle" type="text" />
             </Form.Item>
@@ -448,6 +460,10 @@ export const ItemsForm: FC = () => {
                             rules={[
                               {
                                 required: true,
+                                message: 'Minimum stock limit required!',
+                              },
+                              {
+                                pattern: /^\S/,
                                 message: 'Minimum stock limit required!',
                               },
                             ]}

@@ -12,8 +12,9 @@ export const DebitNotesView: FC = () => {
   const { routeHistory } = useGlobalContext();
   const { pathname } = routeHistory.location;
   const invId = pathname.split(
-    `${ISupportedRoutes?.DASHBOARD_LAYOUT}${ISupportedRoutes?.DEBIT_NOTES}`
+    `${ISupportedRoutes?.DASHBOARD_LAYOUT}${ISupportedRoutes?.DEBIT_NOTES}/`
   )[1];
+
   return (
     <WrapperCreditNoteView>
       <BreadCrumbArea>

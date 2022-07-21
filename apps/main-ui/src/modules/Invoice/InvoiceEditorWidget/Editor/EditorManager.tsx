@@ -573,6 +573,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                 </Option>
                 {/* </Rbac> */}
                 {filteredItems().map((item: IItemsResult, mapIndex: number) => {
+                  console.log(item, 'invoice items')
                   return (
                     <Option key={mapIndex} title={item.name} value={item.id}>
                       {item.code} / {item.name}

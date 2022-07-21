@@ -128,15 +128,16 @@ const Editor: FC<IProps> = ({ type, id }) => {
   };
 
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
-  /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   const RouteState: any = history?.location?.state;
   const onFinish = async (value) => {
     const errors = handleCheckValidation();
 
     if (!errors?.length) {
+
       const paymentData = { ...payment };
       delete paymentData.totalAmount;
       delete paymentData.totalDiscount;
+
 
       let payload = {
         ...value,
@@ -174,6 +175,8 @@ const Editor: FC<IProps> = ({ type, id }) => {
         const relation = history?.location?.search?.split('relation=')[1];
         payload.relation = relation;
       }
+
+
 
       await muatateCreateInvoice(payload, {
         onSuccess: (data) => {
@@ -471,7 +474,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
                       <FormLabel>Amount Are</FormLabel>
                       <Form.Item
                         name="isTaxIncluded"
-                        rules={[{ required: false, message: 'Required !' }]}
+                        rules={[{ required: true, message: 'Required !' }]}
                       >
                         <Select
                           size="middle"

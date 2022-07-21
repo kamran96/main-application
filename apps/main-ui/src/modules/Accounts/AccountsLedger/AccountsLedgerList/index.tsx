@@ -61,6 +61,7 @@ export const AccountsLedgerList: FC<IProps> = ({ id, accountName }) => {
     }
   );
 
+
   useEffect(() => {
     if (history?.location?.search) {
       let obj = {};

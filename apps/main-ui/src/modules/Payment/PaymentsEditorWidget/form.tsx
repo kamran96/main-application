@@ -293,7 +293,13 @@ export const PaymentsForm: FC = () => {
           <Col span={12}>
             <FormLabel>Reference</FormLabel>
             <Form.Item
-              rules={[{ required: true, message: 'Reference is required!' }]}
+              rules={[
+                { required: true, message: 'Reference is required!' },
+                {
+                  pattern: /^\S/,
+                  message: 'Please remove Whitespaces ',
+                },
+              ]}
               name="reference"
             >
               <Input
@@ -427,7 +433,13 @@ export const PaymentsForm: FC = () => {
             </div>
             <Form.Item
               name="comment"
-              rules={[{ required: true, message: 'Please specify payment' }]}
+              rules={[
+                { required: true, message: 'Please specify payment' },
+                {
+                  pattern: /^\S/,
+                  message: 'Please remove Whitespaces ',
+                },
+              ]}
             >
               <TextArea rows={3} />
             </Form.Item>
