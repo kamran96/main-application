@@ -151,7 +151,7 @@ export const BanksList: FC = () => {
   const topbarRightPannel = () => {
     return (
       <div className="flex alignCenter mb-3">
-        <BanksImport/>
+        {/* <BanksImport/> */}
       </div>
     );
   };

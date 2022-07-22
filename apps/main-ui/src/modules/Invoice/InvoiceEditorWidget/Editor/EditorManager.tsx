@@ -573,7 +573,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                 </Option>
                 {/* </Rbac> */}
                 {filteredItems().map((item: IItemsResult, mapIndex: number) => {
-                  console.log(item, 'invoice items')
                   return (
                     <Option key={mapIndex} title={item.name} value={item.id}>
                       {item.code} / {item.name}
@@ -659,7 +658,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       const itemDiscount = record.itemDiscount;
                       delete allItems[index]?.quantityError;
 
-                      const costOfGoodAmount = purchasePrice * quantity;
+                      const costOfGoodAmount = purchasePrice * quantity ;
                       const tax = record.tax;
 
                       if (

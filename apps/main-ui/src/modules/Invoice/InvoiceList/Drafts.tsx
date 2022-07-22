@@ -231,7 +231,7 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
   const renderTobarRight = () => {
     return (
       <div className="flex alignCenter">
-        <InvoiceImports/>
+        {/* <InvoiceImports/> */}
         <SmartFilter
           onFilter={(encode) => {
             const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=draft&sortid=${sortid}&page=1&page_size=20&query=${encode}`;

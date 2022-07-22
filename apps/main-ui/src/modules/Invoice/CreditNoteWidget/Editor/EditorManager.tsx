@@ -79,6 +79,9 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
     type: string;
   };
 
+
+  console.log(history, "history")
+
   const [rowsErrors, setRowsErrors] = useState([]);
   const [width] = useWindowSize();
 
@@ -187,15 +190,13 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   }, [AntForm]);
 
   const APICATEGORYSTAKE =
-    relation?.type === IInvoiceType.PURCHASE_ENTRY ||
-    relation?.type === IInvoiceType.PURCHASE_ORDER
+    relation?.type === IInvoiceType.INVOICE
       ? getInvoiceByIDAPI
       : creditNoteViewAPI;
 
   const key =
-    relation?.type === IInvoiceType.PURCHASE_ENTRY ||
-    relation?.type === IInvoiceType.PURCHASE_ORDER
-      ? 'purchaseItems'
+    relation?.type === IInvoiceType.INVOICE 
+      ? 'invoiceItems'
       : 'creditNoteItems';
 
   const { data: invoicesData, isLoading: invoiceLoading } = useQuery(
@@ -333,7 +334,11 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
 
   const getItemWithItemId = (id: number) => {
     if (items && items.length) {
+      console.log(items, "item")
+      console.log(id, "item ite")
       const [filtered] = items.filter((item) => item.id === id);
+
+      console.log(filtered, "filtered")
 
       return filtered;
     } else {
@@ -388,6 +393,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
       className: `select-column`,
 
       render: (value, record, index) => {
+        console.log(value, "value")
         return (
           <EditableSelect
             error={record?.errors?.length && record?.errors?.includes('itemId')}

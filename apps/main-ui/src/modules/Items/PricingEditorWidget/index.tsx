@@ -96,7 +96,6 @@ const PricingEditorWidget: FC = () => {
     }
   };
 
-  console.log(data, "data");
 
   return (
     <CommonModal

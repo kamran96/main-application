@@ -60,7 +60,7 @@ export const ItemsViewContainer: FC = () => {
     ],
     getItemDetail,
     {
-      enabled: id,
+      enabled: !!id,
     }
   );
 

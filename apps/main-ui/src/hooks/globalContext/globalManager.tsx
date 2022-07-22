@@ -112,6 +112,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
       id: null,
     });
 
+    
   const [pricingModalConfig, setPricingModalConfig] = useState<IModalsConfig>({
     visibility: false,
     obj: null,

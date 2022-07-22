@@ -193,6 +193,18 @@ export const PaymentsForm: FC = () => {
     return contacts;
   };
 
+  // console.log(getContactAgaintPaymentType(), 'getContactAgaintPaymentType');
+
+  const getCustomerBalance = () => {
+    const filtered = getContactAgaintPaymentType().filter(
+      (item) => item.id === contact_id
+    );
+
+    return filtered;
+  };
+
+  // console.log(getCustomerBalance(), 'getCustomerBalance');
+
   const handleChangedValue = (changedValues, allValues) => {
     if (changedValues && changedValues.contactId) {
       const { contactId } = changedValues;
@@ -446,6 +458,18 @@ export const PaymentsForm: FC = () => {
           </Col>
           <Col span={9} offset={1}>
             <div className="total_area">
+              {contact_id && (
+                <>
+                  <div className="flex alignItemsEnd justifySpaceBetween mb-10">
+                    <p className="bold default fs-16">Cutsomer Balance</p>
+                    <p className="default fs-16 flex-1 textRight">
+                      {moneyFormat(Math.abs(getCustomerBalance()[0].balance))}
+                    </p>
+                  </div>
+                  <hr className="sep" />
+                </>
+              )}
+
               <div className="flex alignItemsEnd justifySpaceBetween">
                 <p className="bold default fs-16">Total Amount</p>
                 <p className="default fs-16 flex-1 textRight">

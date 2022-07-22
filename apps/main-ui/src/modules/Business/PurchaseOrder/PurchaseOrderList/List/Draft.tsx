@@ -246,7 +246,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   const renerTopRightbar = () => {
     return (
       <div className="flex alignCenter">
-         <PurchaseOrderImport/>
+         {/* <PurchaseOrderImport/> */}
         <SmartFilter
           onFilter={(encode) => {
             setAllInvoicesConfig({
