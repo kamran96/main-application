@@ -7,7 +7,6 @@
 
 build.pdf
 archive.zip
-/certs
 /vault
 
 apps/accounting-service/.env
@@ -24,6 +23,7 @@ apps/users-service/.env
 
 # dependencies
 /node_modules
+node_modules.zip
 
 # IDEs and editors
 /.idea

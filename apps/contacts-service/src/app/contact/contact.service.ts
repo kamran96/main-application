@@ -676,7 +676,7 @@ export class ContactService {
     }
   }
 
-  async SyncContacts(data, req: IRequest): Promise<void> {
+  async SyncContacts(data, req: IRequest): Promise<any> {
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
 
@@ -817,50 +817,105 @@ export class ContactService {
         }
       }
     } else if (data.type === Integrations.CSV_IMPORT) {
-      console.log(data.contacts, 'what is data now');
-      for (const i of data.contacts) {
-        const contact = new this.contactModel({
-          ...i,
-          createdById: req.user.id,
-          updatedById: req.user.id,
-          organizationId: req.user.organizationId,
-          branchId: req.user.branchId,
-          status: 1,
-        });
-        await contact.save();
-        if (i?.balance > 0) {
-          const { balance } = i;
-          transactionArr.push({
-            balance,
-            contactId: contact.id,
-            ref: 'CSV',
-            narration: 'CSV contact balance',
-            name: 'Cash Receiveable',
-            contactType: i?.contactType === '1' ? 'customer' : 'supplier',
-            transactionType:
-              i?.contactType === '1' ? Entries.DEBITS : Entries.CREDITS,
-            createdAt: contact.createdAt,
+      try {
+        console.log('in try loop', data.contacts);
+        data.contacts.forEach(async (item, index) => {
+          const contactDto = {
+            ...item,
             createdById: req.user.id,
             updatedById: req.user.id,
             organizationId: req.user.organizationId,
             branchId: req.user.branchId,
             status: 1,
-          });
-        }
+            contactType: item?.contactType === 'customer' ? 1 : 2,
+            balance: item?.openingBalance,
+          };
+
+          console.log(contactDto, 'dto', index);
+
+          const transactions = data.transactions;
+
+          let transactionRes;
+
+          console.log(transactions);
+          console.log(
+            JSON.parse(contactDto.balance) > 0 &&
+              transactions[`${index}`] !== undefined
+          );
+          console.log(transactions[`${index}`]);
+          const shouldProcessTransaction =
+            JSON.parse(contactDto.balance) > 0 &&
+            transactions[`${index}`] !== undefined;
+
+          if (shouldProcessTransaction) {
+            console.log('in if');
+            const transactionItem = transactions[`${index}`];
+            console.log(transactionItem, 'transaction item');
+            const debit = {
+              account_id: transactionItem.debit,
+              amount: contactDto.balance,
+            };
+            const credit = {
+              account_id: transactionItem.credit,
+              amount: contactDto.balance,
+            };
+
+            const payload = {
+              dr: [debit],
+              cr: [credit],
+              type: 'contact opening balance',
+              reference: `${contactDto.name}'s opening balance`,
+              amount: contactDto.balance,
+              status: 1,
+            };
+            console.log(payload, 'transactions items');
+
+            const { data } = await axios.post(
+              Host('accounts', 'accounts/transaction/api'),
+              {
+                transactions: payload,
+              },
+              {
+                headers: {
+                  cookie: `access_token=${token}`,
+                },
+              }
+            );
+
+            console.log('transaction created');
+
+            transactionRes = data;
+          }
+
+          contactDto.transactionId = transactionRes ? transactionRes?.id : null;
+
+          console.log('problem here', contactDto);
+          const contact = new this.contactModel(contactDto);
+          await contact.save();
+          console.log('saved');
+        });
+      } catch (error) {
+        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
     }
 
-    await axios.post(
-      Host('accounts', `accounts/transaction/add`),
-      {
-        transactions: transactionArr,
-      },
-      {
-        headers: {
-          cookie: `access_token=${token}`,
+    if (transactionArr?.length) {
+      await axios.post(
+        Host('accounts', `accounts/transaction/add`),
+        {
+          transactions: transactionArr,
         },
-      }
-    );
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
+    }
+
+    return {
+      message: 'Success',
+    };
   }
 
   async ImportCsv() {
@@ -886,7 +941,8 @@ export class ContactService {
         'Please select a field which is related to Credit Limit Block of Contact',
       salesDiscount:
         'Please select a field which is related to Sales Discount of Contact',
-      balance: 'Please select a field which is related to Balance of Contact',
+      openingBalance:
+        'Please select a field which is related to Opening Balance of Contact',
       accountNumber:
         'Please select a field which is related to Account Number of Contact',
       paymentDaysLimit:
@@ -909,8 +965,8 @@ export class ContactService {
       '__v',
       'hasOpeningBalance',
       'transactionId',
-      'openingBalance',
       'addresses',
+      'balance',
     ];
 
     await ContactSchema.eachPath(function (keyName) {

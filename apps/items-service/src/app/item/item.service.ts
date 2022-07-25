@@ -377,7 +377,7 @@ export class ItemService {
     }
   }
 
-  async SyncItems(data, req: IRequest): Promise<void> {
+  async SyncItems(data, req: IRequest): Promise<any> {
     const { user } = req;
     if (data.type === Integrations.XERO) {
       for (const i of data.items) {
@@ -453,6 +453,7 @@ export class ItemService {
         }
       }
     } else if (data.type === Integrations.CSV_IMPORT) {
+      console.log('data', data);
       try {
         const { items } = data;
 
@@ -467,7 +468,7 @@ export class ItemService {
             code,
             discount,
             purchasePrice,
-            salePricee,
+            salePrice,
             tax,
             minimumStock,
           } = items[i];
@@ -482,9 +483,18 @@ export class ItemService {
             minimumStock,
             openingStock,
             barcode,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            createdById: req.user.id,
+            updatedById: req.user.id,
+            status: 1,
           });
 
+          console.log('herer');
+
           await item.save();
+
+          console.log('created item');
 
           const token = req?.cookies['access_token'];
 
@@ -500,51 +510,58 @@ export class ItemService {
             }
           );
 
+          console.log(accounts, 'fetched');
+
           let amount = 0;
           const accountIndex = data.targetAccounts?.findIndex(
             (i) => (i.index = i)
           );
 
+          console.log(accountIndex, 'account index');
+
           let transaction;
           if (openingStock > 0 && accountIndex > -1) {
+            console.log('in if');
             amount = openingStock * purchasePrice;
 
-            if (openingStock > 0) {
-              const debit = {
-                amount,
-                account_id: await accounts[0].value,
-              };
-              const credit = {
-                amount,
-                account_id: data.targetAccounts[accountIndex].id,
-              };
+            const debit = {
+              amount,
+              account_id: await accounts[0].id,
+            };
+            const credit = {
+              amount,
+              account_id: data.targetAccounts[accountIndex].value,
+            };
 
-              const payload = {
-                dr: [debit],
-                cr: [credit],
-                type: 'item opening stock',
-                reference: `${item.name} opening stock`,
-                amount,
-                status: 1,
-              };
-              const { data: transactionData } = await axios.post(
-                Host('accounts', 'accounts/transaction/api'),
-                {
-                  transactions: payload,
+            const payload = {
+              dr: [debit],
+              cr: [credit],
+              type: 'item opening stock',
+              reference: `${item.name} opening stock`,
+              amount,
+              status: 1,
+            };
+
+            const { data: transactionData } = await axios.post(
+              Host('accounts', 'accounts/transaction/api'),
+              {
+                transactions: payload,
+              },
+              {
+                headers: {
+                  cookie: `access_token=${token}`,
                 },
-                {
-                  headers: {
-                    cookie: `access_token=${token}`,
-                  },
-                }
-              );
-              transaction = transactionData;
-            }
+              }
+            );
+
+            transaction = transactionData;
           }
+
+          console.log('in pricing now');
 
           const price = new this.priceModel({
             purchasePrice,
-            salePricee,
+            salePricee: salePrice,
             discount,
             tax,
             itemId: item._id,
@@ -553,6 +570,9 @@ export class ItemService {
 
           price.save();
         }
+        return {
+          message: 'success',
+        };
       } catch (error) {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }

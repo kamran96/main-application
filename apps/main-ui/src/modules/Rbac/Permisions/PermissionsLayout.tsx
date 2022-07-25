@@ -20,10 +20,8 @@ import { ISupportedRoutes } from '../../../modal';
 
 export const PermissionsLayout: FC = () => {
   const queryCache = useQueryClient();
-  // const [modulesResult] = useState([]);
   const { routeHistory, refetchPermissions } = useGlobalContext();
   const { history } = routeHistory;
-
   const [permissions, setPermissions] = useState([]);
   const [selectedPermission, setSelectedPermission] = useState(null);
   const [permissionTable, setPermissionsTable] = useState([]);
@@ -189,6 +187,8 @@ export const PermissionsLayout: FC = () => {
                   const indexOfRolePermission = rolesList.findIndex(
                     (i) => i.roleId === item.roleId
                   );
+
+                  console.log(item, "what is index now")
                   return (
                     <tr key={index}>
                       <td>
@@ -211,13 +211,16 @@ export const PermissionsLayout: FC = () => {
                                   : 'fade'
                               }`}
                               onChange={(e) => {
+
                                 const { checked } = e.target;
+                                console.log(checked, "what is checked")
                                 const parents = [];
                                 rolesList.forEach((r, i) => {
                                   if (i < roleIndex) {
                                     parents.push(r.name);
                                   }
                                 });
+
 
                                 const allTableData = [...permissionTable];
                                 allTableData[index] = {
@@ -226,6 +229,7 @@ export const PermissionsLayout: FC = () => {
                                   parents,
                                 };
                                 setPermissionsTable(allTableData);
+
                                 onUpdatePermission(
                                   item.permissionId,
                                   item.rolePermissionId,

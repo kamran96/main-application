@@ -45,6 +45,15 @@ export const ContactImportWidget: FC = () => {
   const [compareDataModal, setCompareDataModel] = useState<boolean>(false);
   const [compareData, setCompareData] = useState<any>({});
 
+  const onResetState = ()=>{
+    setContactsImportConfig(false, null);
+    setStep(1);
+    setFileData(null);
+    setFileExtractedData(null);
+    setCompareDataModel(false);
+    setCompareData({});
+  }
+
   // API callsback Hooks
 
   const { data: contactKeysResponse, isLoading: contactKeysLoading } = useQuery(
@@ -72,7 +81,7 @@ export const ContactImportWidget: FC = () => {
         'creditLimit',
         'creditLimitBlock',
         'salesDiscount',
-        'balance',
+        'openingBalance',
         'accountNumber',
         'paymentDaysLimit',
         'businessName',
@@ -185,6 +194,9 @@ export const ContactImportWidget: FC = () => {
           fileExtractedData={fileExtractedData && fileExtractedData}
           setStep={() => setStep(2)}
           fileData={fileData}
+          onComplete={()=>{
+           onResetState();
+          }}
         />
       </WrapperModalContent>
     </CommonModal>

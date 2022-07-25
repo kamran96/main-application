@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Attachment, AttachmentSchema } from '../schemas/attachment.schema';
+import { Attachment, AttachmentSchema } from '../../schemas/attachment.schema';
 
 import { AppController } from './attachment.controller';
 import { AttachmentService } from './attachment.service';

@@ -1,10 +1,12 @@
 import { CommonTable } from '../../../components/Table';
-import React, { FC, useEffect, useState } from 'react';
+import  { FC, useState } from 'react';
 import { Button, Select } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { CsvImportAPi, getAllAccounts } from '../../../api';
 import { IAccountsResult } from '@invyce/shared/types';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { NOTIFICATIONTYPE } from '../../../modal/notification';
 
 const { Option } = Select;
 
@@ -14,6 +16,7 @@ interface IProps {
   contactKeysResponse: any;
   compareData: any;
   fileData: any;
+  onComplete: ()=> void
 }
 
 export const CompareDataTable: FC<IProps> = ({
@@ -22,22 +25,20 @@ export const CompareDataTable: FC<IProps> = ({
   contactKeysResponse,
   compareData,
   fileData,
+  onComplete
 }) => {
   const { mutate: uploadCsv, isLoading: uploadingCsv } =
     useMutation(CsvImportAPi);
+    const {  notificationCallback } = useGlobalContext();
+  const [transactions, setTransactions] = useState({});
 
   const [_fileData, _setFileData] = useState([]);
-
-  // useEffect(()=>{
-
-  // },[])
-
-  console.log(fileExtractedData, 'fileExtractedData');
 
   const { data: AllAccounts } = useQuery(
     [`all-accounts`, 'ALL'],
     getAllAccounts
   );
+  const queryCache = useQueryClient();
 
   const debitedAccounts: IAccountsResult[] =
     (AllAccounts &&
@@ -64,15 +65,20 @@ export const CompareDataTable: FC<IProps> = ({
     formData.append('file', fileData);
     formData.append('compareData', JSON.stringify(compareData));
     formData.append('module', JSON.stringify('contact'));
+    formData.append('transactions', JSON.stringify(transactions));
 
     await uploadCsv(formData, {
-      onSuccess: (data) => {
-        console.log(data);
+      onSuccess: () => {
+       onComplete();
+       setTransactions({});    
+       notificationCallback(NOTIFICATIONTYPE.SUCCESS, "Successfully Imported Contacts");
+       [`contacts-list`, `all-contacts`, `transactions`].forEach((key) => {
+        (queryCache.invalidateQueries as any)((q) => q.startsWith(key));
+      });
       },
     });
   };
 
-  console.log(contactKeysResponse, 'contact keys');
   const getTitle = (colItem: string) => {
     if (contactKeysResponse?.data) {
       const key = compareData[colItem];
@@ -99,14 +105,18 @@ export const CompareDataTable: FC<IProps> = ({
               title: 'Debit Accounts',
               dataIndex: '',
               key: 'Debit Account',
-              render: () => (
+              render: (data, row, index) => (
                 <Select
                   size="large"
                   showSearch
                   style={{ width: '100%' }}
                   placeholder="Select Item"
                   optionFilterProp="children"
-                  // onChange={() => console.log('hello')}
+                  onChange={(value) => {
+                    setTransactions((prev)=>{
+                      return {...prev, [index]: {...prev[index], debit: value}}
+                    })
+                  }}
                 >
                   {debitedAccounts.length &&
                     debitedAccounts.map((acc: IAccountsResult, index) => {
@@ -123,13 +133,18 @@ export const CompareDataTable: FC<IProps> = ({
               title: 'Credit Accounts',
               dataIndex: '',
               key: 'Debit Account',
-              render: () => (
+              render: (data, row, index) => (
                 <Select
                   size="large"
                   showSearch
                   style={{ width: '100%' }}
                   placeholder="Select Item"
                   optionFilterProp="children"
+                  onChange={(value) => {
+                    setTransactions((prev)=>{
+                      return {...prev, [index]: {...prev[index], credit: value}}
+                    })
+                  }}
                 >
                   {creditedAccounts.length &&
                     creditedAccounts.map((acc: IAccountsResult, index) => {

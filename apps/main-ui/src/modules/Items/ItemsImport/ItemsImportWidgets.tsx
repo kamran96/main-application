@@ -178,7 +178,7 @@ export const ItemsImportWidget: FC = () => {
           fileExtractedData={fileExtractedData}
           compareData={compareData}
           itemKeysResponse={itemKeysResponse}
-          fileData
+          fileData={fileData}
         />
       </WrapperModalContent>
     </CommonModal>

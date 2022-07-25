@@ -1,4 +1,5 @@
 export * from './lib/global-constants.module';
+import axios from 'axios';
 
 export enum Integrations {
   XERO = 'XE',
@@ -80,4 +81,18 @@ export const MQ_HOST = () => {
   return process.env['NODE' + '_ENV'] === 'production'
     ? `amqp://${process.env.RABBIT_USERNAME}:${process.env.RABBIT_PASSWORD}@${process.env.RABBIT_HOST}:${process.env.RABBIT_PORT}`
     : 'amqp://localhost:5672';
+};
+
+
+
+export const useApiCallback = (route: string, ) => {
+  const service = route.split("/")[0];
+  const baseURL =  process.env['NODE' + '_ENV'] === 'production'
+  ? `http://${service}.default.svc.cluster.local/${route}`
+  : `https://localhost/${route}`
+
+  const http = axios.create({
+    baseURL,
+  })
+  return http
 };

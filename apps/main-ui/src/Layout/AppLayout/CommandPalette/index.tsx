@@ -43,7 +43,7 @@ export const InvyceCmdPalette = () => {
 
   const commands = [
     {
-      name: 'Create Invoice',
+      name: 'Invoice > Create',
       command: () => {
         history.push(`/app${ISupportedRoutes.CREATE_INVOICE}`);
       },
@@ -95,7 +95,7 @@ export const InvyceCmdPalette = () => {
       type: 'bussiness',
     },
     {
-      name: 'Create Purchase Order',
+      name: 'Purchase Order > Create',
       command: () => {
         history.push(`/app${ISupportedRoutes.CREATE_PURCHASE_ORDER}`);
       },
@@ -104,7 +104,7 @@ export const InvyceCmdPalette = () => {
       type: 'bussiness',
     },
     {
-      name: 'Purchase Order List > Approved',
+      name: 'Purchase Order > Approved List',
       command: () => {
         history.push(`/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=all`);
       },
@@ -113,7 +113,7 @@ export const InvyceCmdPalette = () => {
       type: 'bussiness',
     },
     {
-      name: 'Purchase Order List > Draft',
+      name: 'Purchase Order > Draft List',
       command: () => {
         history.push(`/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=draft`);
       },
@@ -122,7 +122,7 @@ export const InvyceCmdPalette = () => {
       type: 'bussiness',
     },
     {
-      name: 'Create Purchase Entry',
+      name: 'Bills > Create',
       command: () => {
         history.push(`/app${ISupportedRoutes.CREATE_PURCHASE_Entry}`);
       },
@@ -131,7 +131,7 @@ export const InvyceCmdPalette = () => {
       type: 'bussiness',
     },
     {
-      name: 'Purchases List > Approved',
+      name: 'Bills > Approved List',
       command: () => {
         history.push(`/app${ISupportedRoutes.PURCHASES}?tabIndex=all`);
       },
@@ -140,7 +140,7 @@ export const InvyceCmdPalette = () => {
       type: 'bussiness',
     },
     {
-      name: 'Purchases List > Draft',
+      name: 'Bills > Draft List',
       command: () => {
         history.push(`/app${ISupportedRoutes.PURCHASES}?tabIndex=draft`);
       },
@@ -150,7 +150,7 @@ export const InvyceCmdPalette = () => {
     },
 
     {
-      name: 'Create Quotation',
+      name: 'Quotation > Create',
       command: () => {
         history.push(`/app${ISupportedRoutes.CREATE_QUOTE}`);
       },
@@ -159,7 +159,7 @@ export const InvyceCmdPalette = () => {
       type: 'bussiness',
     },
     {
-      name: 'Create Payment',
+      name: 'Payments > Create',
       command: () => {
         setPaymentsModalConfig(true);
       },
@@ -168,7 +168,25 @@ export const InvyceCmdPalette = () => {
       type: 'bussiness',
     },
     {
-      name: 'Create Role',
+      name: 'Payments > Paid List',
+      command: () => {
+       history.push(`/app${ISupportedRoutes.PAYMENTS}?tabIndex=paid`);
+      },
+      permission: PERMISSIONS.PAYMENTS_INDEX,
+      icon: dollarSign,
+      type: 'bussiness',
+    },
+    {
+      name: 'Payments > Recieved List',
+      command: () => {
+       history.push(`/app${ISupportedRoutes.PAYMENTS}?tabIndex=received`);
+      },
+      permission: PERMISSIONS.PAYMENTS_INDEX,
+      icon: dollarSign,
+      type: 'bussiness',
+    },
+    {
+      name: 'Roles > Create',
       command: () => {
         setRbacConfigModal(true);
       },
@@ -177,7 +195,7 @@ export const InvyceCmdPalette = () => {
       type: 'organization',
     },
     {
-      name: 'Roles',
+      name: 'Roles > List',
       command: () => {
         history.push(`/app${ISupportedRoutes.RBAC}`);
       },
@@ -186,7 +204,7 @@ export const InvyceCmdPalette = () => {
       type: 'organization',
     },
     {
-      name: 'Permissions',
+      name: 'Permissions > List',
       command: () => {
         history.push(`/app${ISupportedRoutes.PERMISSIONS}`);
       },
@@ -204,7 +222,7 @@ export const InvyceCmdPalette = () => {
       type: 'accounting',
     },
     {
-      name: 'Create Account',
+      name: 'Chart of Accounts > Create',
       command: () => {
         setAccountsModalConfig({ visibility: true, id: null });
       },
@@ -213,7 +231,7 @@ export const InvyceCmdPalette = () => {
       type: 'accounting',
     },
     {
-      name: 'Transaction > List',
+      name: 'Transactions > List',
       command: () => {
         history.push(`/app${ISupportedRoutes.TRANSACTIONS}`);
       },
@@ -222,7 +240,7 @@ export const InvyceCmdPalette = () => {
       type: 'accounting',
     },
     {
-      name: 'Create Transaction',
+      name: 'Transactions > Create',
       command: () => {
         history.push(`/app${ISupportedRoutes.CREATE_TRANSACTION}`);
       },
@@ -232,7 +250,7 @@ export const InvyceCmdPalette = () => {
     },
 
     {
-      name: 'Contacts List  > Customers',
+      name: 'Contacts  > Customers List',
       command: () => {
         history.push(`/app${ISupportedRoutes.CONTACTS}?tabIndex=customers`);
       },
@@ -241,7 +259,7 @@ export const InvyceCmdPalette = () => {
       type: 'contacts',
     },
     {
-      name: 'Contacts List  > Suppliers',
+      name: 'Contacts  > Suppliers List',
       command: () => {
         history.push(`/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers`);
       },
@@ -250,7 +268,7 @@ export const InvyceCmdPalette = () => {
       type: 'contacts',
     },
     {
-      name: 'Create Contacts',
+      name: 'Contacts > Create',
       command: () => {
         history.push(`/app${ISupportedRoutes.CREATE_CONTACT}`);
       },
@@ -268,7 +286,7 @@ export const InvyceCmdPalette = () => {
       type: 'users',
     },
     {
-      name: 'Create User',
+      name: 'Users > Create',
       command: () => {
         setUserInviteModal(true);
       },
@@ -277,7 +295,7 @@ export const InvyceCmdPalette = () => {
       type: 'users',
     },
     {
-      name: 'Create Item',
+      name: 'Items > Create',
       command: () => {
         setItemsModalConfig(true);
       },
@@ -286,7 +304,7 @@ export const InvyceCmdPalette = () => {
       type: 'bussiness',
     },
     {
-      name: 'Items > List',
+      name: 'Items > Items List',
       command: () => {
         history.push(`/app${ISupportedRoutes.ITEMS}`);
       },
@@ -295,7 +313,7 @@ export const InvyceCmdPalette = () => {
       type: 'bussiness',
     },
     {
-      name: 'User > Profile Settings',
+      name: 'Settings > Profile Settings',
       command: () => {
         history.push(`/app${ISupportedRoutes.PROFILE_SETTING}`);
       },
@@ -303,7 +321,7 @@ export const InvyceCmdPalette = () => {
       type: 'zsettings',
     },
     {
-      name: 'User > Account Setting',
+      name: 'Settings > Account Setting',
       command: () => {
         history.push(`/app${ISupportedRoutes.ACCOUNT_SETTING}`);
       },
