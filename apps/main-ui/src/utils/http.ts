@@ -9,10 +9,10 @@ const cancelSource = axios.CancelToken.source();
 
 const host = window.location.hostname;
 
-if (host && host === 'app.invyce.com') {
+if (host && host === 'cloud.invyce.com') {
   // set online server endpoints
 
-  NodeBaseURL = `https://api.node.invyce.com/`;
+  NodeBaseURL = `https://api.cloud.invyce.com/`;
 } else if (host && host === 'staging.invyce.com') {
   // Staging server endpoints
 

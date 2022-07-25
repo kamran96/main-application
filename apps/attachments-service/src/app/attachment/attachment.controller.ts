@@ -18,11 +18,6 @@ import { IRequest } from '@invyce/interfaces';
 export class AppController {
   constructor(private readonly attachmentService: AttachmentService) {}
 
-  @Get('health')
-  async healthCheck(@Res() res: Response) {
-    res.send('OKkkk');
-  }
-
   @Get('/:id')
   async show(@Param() params) {
     return await this.attachmentService.FindAttachmentById(params.id);
