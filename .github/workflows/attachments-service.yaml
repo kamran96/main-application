@@ -90,7 +90,7 @@ jobs:
           cd ${TEMP_FOLDER}/attachments/enviroments/prod
           ls
           echo Update Helm chart values-dev with new image tag
-          CONTAINER_IMAGE_TAG=$CONTAINER_IMAGE_TAG yq e -i '.images.newTag = env(CONTAINER_IMAGE_TAG)' ./kustomization.yaml
+          CONTAINER_IMAGE_TAG=$CONTAINER_IMAGE_TAG yq e -i '.images[0].newTag = env(CONTAINER_IMAGE_TAG)' ./kustomization.yaml
           echo 'Container image tag updated in attachments/enviroments/prod/kustomization.yaml'
           cd ../
           git config user.email "zeeshan@invyce.com"
