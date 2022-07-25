@@ -10,7 +10,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { formatMoney } from 'accounting-js';
 import * as puppeteer from 'puppeteer';
-import { Attachment } from '../schemas/attachment.schema';
+import { Attachment } from '../../schemas/attachment.schema';
 import { IRequest } from '@invyce/interfaces';
 import { Host } from '@invyce/global-constants';
 
