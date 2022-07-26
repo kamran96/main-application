@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: contacts-service
+name: attachments-service
 
 # Controls when the workflow will run
 on:
@@ -8,8 +8,8 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'apps/contacts-service'
-      - ".github/workflows/prod/contacts-service.yaml"
+      - 'apps/attachments-service'
+      - ".github/workflows/attachments-service.yaml"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -34,7 +34,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-
+      
       - name: cache node_modules
         id: cache-node-modules
         uses: actions/cache@v2
@@ -46,20 +46,20 @@ jobs:
         if: steps.cache-node-modules.cache-hit != 'true'
         run: yarn install --prefer-offline
 
+      
       # INSTALL digital ocean cli
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DO_ACCESS_TOKEN }}
-  
 
       # Runs a set of commands using the runners shell
       - name: build required projects
-        run: NODE_ENV='production' yarn build contacts-service
+        run: NODE_ENV='production' yarn build attachments-service
       
       # docker build item service images
       - name: Build container image
-        run: docker build -f $GITHUB_WORKSPACE/apps/contacts-service/Dockerfile -t registry.digitalocean.com/invyce-images/contacts-service:$(echo $GITHUB_SHA | head -c7) .
+        run: docker build -f $GITHUB_WORKSPACE/apps/attachments-service/Dockerfile -t registry.digitalocean.com/invyce-images/attachments-service:$(echo $GITHUB_SHA | head -c7) .
 
       #login to digitalocean for 1200 seconds
       - name: Log in to DigitalOcean Container Registry with short-lived credentials
@@ -67,19 +67,19 @@ jobs:
      
       # push image to registry
       - name: Push service image to DigitalOcean Container Registry
-        run: docker push registry.digitalocean.com/invyce-images/contacts-service:$(echo $GITHUB_SHA | head -c7)
+        run: docker push registry.digitalocean.com/invyce-images/attachments-service:$(echo $GITHUB_SHA | head -c7)
       
       - name: Update deployment file
-        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/invyce-images/contacts-service:'${TAG}'|' $GITHUB_WORKSPACE/apps/contacts-service/ops/contacts-deployment.yaml
+        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/invyce-images/attachments-service:'${TAG}'|' $GITHUB_WORKSPACE/apps/attachments-service/src/main.ts
 
-         # Install yq
+      # Install yq
       - name: Install yq 
         run: |
           wget https://github.com/mikefarah/yq/releases/download/v4.12.0/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
           yq --version
 
        # Clone git repository with Helm charts, update and push changes
-      - name: Update image tag in Helm git repo 
+      - name: Update newTag in kustomize git repo 
         run: | 
           CONTAINER_IMAGE_TAG="$(echo $GITHUB_SHA | head -c7)"
           echo New container image newTag: $CONTAINER_IMAGE_TAG
@@ -87,20 +87,14 @@ jobs:
           TEMP_FOLDER="$(mktemp -d)" 
           echo Clone the repository...
           git clone -b main "https://zeeshooo:${ACCESS_TOKEN}@github.com/invyce/invyce-ops.git" ${TEMP_FOLDER} 
-          cd ${TEMP_FOLDER}/contacts/enviroments/prod
+          cd ${TEMP_FOLDER}/attachments/enviroments/prod
           ls
           echo Update kustomize newTag in kustomization.yaml with new image tag
           CONTAINER_IMAGE_TAG=$CONTAINER_IMAGE_TAG yq e -i '.images[0].newTag = env(CONTAINER_IMAGE_TAG)' ./kustomization.yaml
-          echo 'Container image newTag updated in contacts/enviroments/prod/kustomization.yaml'
+          echo 'Container image newTag updated in attachments/enviroments/prod/kustomization.yaml'
           cd ../
           git config user.email "zeeshan@invyce.com"
           git config user.name "zeeshooo" 
           git add .  
           git commit -m "refactor - updated kustomize kustomization.yaml for prod environment with container image - $CONTAINER_IMAGE_TAG" 
           git push -u origin main
-      # - name: Save DigitalOcean kubeconfig with short-lived credentials
-      #   run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 invyce-cluster
-
-      # - name: Deploy to DigitalOcean Kubernetes
-      #   run: kubectl apply -f $GITHUB_WORKSPACE/apps/contacts-service/ops/contacts-deployment.yaml
-
