@@ -188,7 +188,7 @@ export const PermissionsLayout: FC = () => {
                     (i) => i.roleId === item.roleId
                   );
 
-                  console.log(item, "what is index now")
+                  console.log(item, 'what is index now');
                   return (
                     <tr key={index}>
                       <td>
@@ -211,16 +211,14 @@ export const PermissionsLayout: FC = () => {
                                   : 'fade'
                               }`}
                               onChange={(e) => {
-
                                 const { checked } = e.target;
-                                console.log(checked, "what is checked")
+                                console.log(checked, 'what is checked');
                                 const parents = [];
                                 rolesList.forEach((r, i) => {
                                   if (i < roleIndex) {
                                     parents.push(r.name);
                                   }
                                 });
-
 
                                 const allTableData = [...permissionTable];
                                 allTableData[index] = {

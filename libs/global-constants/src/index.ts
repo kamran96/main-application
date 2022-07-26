@@ -72,9 +72,13 @@ export enum InvTypes {
 }
 
 export const Host = (service: string, route: string): string => {
-  return process.env['NODE' + '_ENV'] === 'production'
-    ? `http://${service}.default.svc.cluster.local/${route}`
-    : `https://localhost/${route}`;
+  if (process.env['NODE' + '_ENV'] === 'production') {
+    return `http://${service}.prod.svc.cluster.local/${route}`;
+  } else if (process.env['NODE' + '_ENV'] === 'staging') {
+    return `http://${service}.stage.svc.cluster.local/${route}`;
+  } else {
+    return `https://localhost/${route}`;
+  }
 };
 
 export const MQ_HOST = () => {
@@ -83,16 +87,15 @@ export const MQ_HOST = () => {
     : 'amqp://localhost:5672';
 };
 
-
-
-export const useApiCallback = (route: string, ) => {
-  const service = route.split("/")[0];
-  const baseURL =  process.env['NODE' + '_ENV'] === 'production'
-  ? `http://${service}.default.svc.cluster.local/${route}`
-  : `https://localhost/${route}`
+export const useApiCallback = (route: string) => {
+  const service = route.split('/')[0];
+  const baseURL =
+    process.env['NODE' + '_ENV'] === 'production'
+      ? `http://${service}.default.svc.cluster.local/${route}`
+      : `https://localhost/${route}`;
 
   const http = axios.create({
     baseURL,
-  })
-  return http
+  });
+  return http;
 };

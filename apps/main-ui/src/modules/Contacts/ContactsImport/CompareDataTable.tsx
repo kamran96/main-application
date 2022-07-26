@@ -1,5 +1,5 @@
 import { CommonTable } from '../../../components/Table';
-import  { FC, useState } from 'react';
+import { FC, useState } from 'react';
 import { Button, Select } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -16,7 +16,7 @@ interface IProps {
   contactKeysResponse: any;
   compareData: any;
   fileData: any;
-  onComplete: ()=> void
+  onComplete: () => void;
 }
 
 export const CompareDataTable: FC<IProps> = ({
@@ -25,11 +25,11 @@ export const CompareDataTable: FC<IProps> = ({
   contactKeysResponse,
   compareData,
   fileData,
-  onComplete
+  onComplete,
 }) => {
   const { mutate: uploadCsv, isLoading: uploadingCsv } =
     useMutation(CsvImportAPi);
-    const {  notificationCallback } = useGlobalContext();
+  const { notificationCallback } = useGlobalContext();
   const [transactions, setTransactions] = useState({});
 
   const [_fileData, _setFileData] = useState([]);
@@ -69,12 +69,15 @@ export const CompareDataTable: FC<IProps> = ({
 
     await uploadCsv(formData, {
       onSuccess: () => {
-       onComplete();
-       setTransactions({});    
-       notificationCallback(NOTIFICATIONTYPE.SUCCESS, "Successfully Imported Contacts");
-       [`contacts-list`, `all-contacts`, `transactions`].forEach((key) => {
-        (queryCache.invalidateQueries as any)((q) => q.startsWith(key));
-      });
+        onComplete();
+        setTransactions({});
+        notificationCallback(
+          NOTIFICATIONTYPE.SUCCESS,
+          'Successfully Imported Contacts'
+        );
+        [`contacts-list`, `all-contacts`, `transactions`].forEach((key) => {
+          (queryCache.invalidateQueries as any)((q) => q.startsWith(key));
+        });
       },
     });
   };
@@ -113,9 +116,12 @@ export const CompareDataTable: FC<IProps> = ({
                   placeholder="Select Item"
                   optionFilterProp="children"
                   onChange={(value) => {
-                    setTransactions((prev)=>{
-                      return {...prev, [index]: {...prev[index], debit: value}}
-                    })
+                    setTransactions((prev) => {
+                      return {
+                        ...prev,
+                        [index]: { ...prev[index], debit: value },
+                      };
+                    });
                   }}
                 >
                   {debitedAccounts.length &&
@@ -141,9 +147,12 @@ export const CompareDataTable: FC<IProps> = ({
                   placeholder="Select Item"
                   optionFilterProp="children"
                   onChange={(value) => {
-                    setTransactions((prev)=>{
-                      return {...prev, [index]: {...prev[index], credit: value}}
-                    })
+                    setTransactions((prev) => {
+                      return {
+                        ...prev,
+                        [index]: { ...prev[index], credit: value },
+                      };
+                    });
                   }}
                 >
                   {creditedAccounts.length &&

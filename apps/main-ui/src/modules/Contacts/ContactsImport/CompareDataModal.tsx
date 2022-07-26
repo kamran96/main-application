@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { CommonModal } from '../../../components';
 import { ColumnsType } from 'antd/lib/table';
 import { G } from '@react-pdf/renderer';
@@ -127,28 +127,21 @@ export const CompareDataModal: FC<IProps> = ({
 
   const unUsedDocumentKeys = documentKeys.filter(
     (key) => !Object.keys(compareData).includes(key)
-  
   );
 
-
-
-  useEffect(()=>{
-      if(documentKeys?.length && compareKeys?.length){
-        const _compareData = {};
-        const accessors: string[] = compareKeys.map((i)=> i.keyName);
-      accessors.forEach((i, index)=>{
-        if(documentKeys.includes(i)){
-          _compareData[i]=i;
+  useEffect(() => {
+    if (documentKeys?.length && compareKeys?.length) {
+      const _compareData = {};
+      const accessors: string[] = compareKeys.map((i) => i.keyName);
+      accessors.forEach((i, index) => {
+        if (documentKeys.includes(i)) {
+          _compareData[i] = i;
         }
-
-        
-      })
+      });
 
       setCompareData(_compareData);
-      }
-
-
-  },[documentKeys, compareKeys])
+    }
+  }, [documentKeys, compareKeys]);
 
   const columns: ColumnsType<any> = [
     {
@@ -174,7 +167,11 @@ export const CompareDataModal: FC<IProps> = ({
       render: (text: string, record: any, index: any) => {
         return (
           <EditableSelect
-          value={Object.keys(compareData).includes(record?.keyName)? record.keyName : null}
+            value={
+              Object.keys(compareData).includes(record?.keyName)
+                ? record.keyName
+                : null
+            }
             allowClear
             style={{ width: '100%' }}
             onChange={(value) => {

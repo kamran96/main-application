@@ -45,14 +45,14 @@ export const ContactImportWidget: FC = () => {
   const [compareDataModal, setCompareDataModel] = useState<boolean>(false);
   const [compareData, setCompareData] = useState<any>({});
 
-  const onResetState = ()=>{
+  const onResetState = () => {
     setContactsImportConfig(false, null);
     setStep(1);
     setFileData(null);
     setFileExtractedData(null);
     setCompareDataModel(false);
     setCompareData({});
-  }
+  };
 
   // API callsback Hooks
 
@@ -194,8 +194,8 @@ export const ContactImportWidget: FC = () => {
           fileExtractedData={fileExtractedData && fileExtractedData}
           setStep={() => setStep(2)}
           fileData={fileData}
-          onComplete={()=>{
-           onResetState();
+          onComplete={() => {
+            onResetState();
           }}
         />
       </WrapperModalContent>

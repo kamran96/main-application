@@ -676,7 +676,7 @@ export class ContactService {
     }
   }
 
-  async SyncContacts(data, req: IRequest): Promise<any> {
+  async SyncContacts(data, req: IRequest): Promise<void> {
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
 
@@ -818,7 +818,6 @@ export class ContactService {
       }
     } else if (data.type === Integrations.CSV_IMPORT) {
       try {
-        console.log('in try loop', data.contacts);
         data.contacts.forEach(async (item, index) => {
           const contactDto = {
             ...item,
@@ -831,26 +830,17 @@ export class ContactService {
             balance: item?.openingBalance,
           };
 
-          console.log(contactDto, 'dto', index);
-
           const transactions = data.transactions;
 
           let transactionRes;
 
-          console.log(transactions);
-          console.log(
-            JSON.parse(contactDto.balance) > 0 &&
-              transactions[`${index}`] !== undefined
-          );
-          console.log(transactions[`${index}`]);
           const shouldProcessTransaction =
             JSON.parse(contactDto.balance) > 0 &&
             transactions[`${index}`] !== undefined;
 
           if (shouldProcessTransaction) {
-            console.log('in if');
             const transactionItem = transactions[`${index}`];
-            console.log(transactionItem, 'transaction item');
+
             const debit = {
               account_id: transactionItem.debit,
               amount: contactDto.balance,
@@ -868,7 +858,6 @@ export class ContactService {
               amount: contactDto.balance,
               status: 1,
             };
-            console.log(payload, 'transactions items');
 
             const { data } = await axios.post(
               Host('accounts', 'accounts/transaction/api'),
@@ -882,40 +871,32 @@ export class ContactService {
               }
             );
 
-            console.log('transaction created');
-
             transactionRes = data;
           }
 
           contactDto.transactionId = transactionRes ? transactionRes?.id : null;
-
-          console.log('problem here', contactDto);
           const contact = new this.contactModel(contactDto);
           await contact.save();
-          console.log('saved');
+          return {
+            message: 'success',
+          };
         });
       } catch (error) {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
     }
 
-    if (transactionArr?.length) {
-      await axios.post(
-        Host('accounts', `accounts/transaction/add`),
-        {
-          transactions: transactionArr,
+    await axios.post(
+      Host('accounts', `accounts/transaction/add`),
+      {
+        transactions: transactionArr,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
         },
-        {
-          headers: {
-            cookie: `access_token=${token}`,
-          },
-        }
-      );
-    }
-
-    return {
-      message: 'Success',
-    };
+      }
+    );
   }
 
   async ImportCsv() {

@@ -453,11 +453,9 @@ export class ItemService {
         }
       }
     } else if (data.type === Integrations.CSV_IMPORT) {
-      console.log('data', data);
       try {
         const { items } = data;
-
-        for (let i = 0; i <= items.length; i++) {
+        items.forEach(async (child, index) => {
           const {
             name,
             description,
@@ -471,13 +469,13 @@ export class ItemService {
             salePrice,
             tax,
             minimumStock,
-          } = items[i];
+          } = child;
 
           const item = new this.itemModel({
             name,
             description,
             hasInventory: true,
-            stock,
+            stock: openingStock,
             itemType: itemType === 'product' ? 1 : 2,
             code,
             minimumStock,
@@ -490,11 +488,7 @@ export class ItemService {
             status: 1,
           });
 
-          console.log('herer');
-
           await item.save();
-
-          console.log('created item');
 
           const token = req?.cookies['access_token'];
 
@@ -510,18 +504,13 @@ export class ItemService {
             }
           );
 
-          console.log(accounts, 'fetched');
-
           let amount = 0;
           const accountIndex = data.targetAccounts?.findIndex(
-            (i) => (i.index = i)
+            (i) => (i.index = index)
           );
-
-          console.log(accountIndex, 'account index');
 
           let transaction;
           if (openingStock > 0 && accountIndex > -1) {
-            console.log('in if');
             amount = openingStock * purchasePrice;
 
             const debit = {
@@ -557,11 +546,9 @@ export class ItemService {
             transaction = transactionData;
           }
 
-          console.log('in pricing now');
-
           const price = new this.priceModel({
             purchasePrice,
-            salePricee: salePrice,
+            salePrice,
             discount,
             tax,
             itemId: item._id,
@@ -569,7 +556,8 @@ export class ItemService {
           });
 
           price.save();
-        }
+        });
+
         return {
           message: 'success',
         };
@@ -616,7 +604,6 @@ export class ItemService {
     ];
 
     await ItemSchema.eachPath(function (keyName) {
-      console.log(keyName, 'name');
       if (!notRequired.includes(keyName)) {
         const text = keyName;
         const result = text

@@ -79,7 +79,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
     type: string;
   };
 
-
   const [rowsErrors, setRowsErrors] = useState([]);
   const [width] = useWindowSize();
 

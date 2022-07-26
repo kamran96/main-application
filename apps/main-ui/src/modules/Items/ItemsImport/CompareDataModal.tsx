@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { ColumnsType } from 'antd/lib/table';
 import { G } from '@react-pdf/renderer';
 import { EditableSelect } from '../../../components/Editable';
@@ -17,14 +17,12 @@ const a = [
   {
     label: 'Name',
     keyName: 'name',
-    description:
-      'Please select a field which is related to Name of Item',
+    description: 'Please select a field which is related to Name of Item',
   },
   {
     label: 'Code',
     keyName: 'code',
-    description:
-      'Please select a field which is related to code of Item',
+    description: 'Please select a field which is related to code of Item',
   },
   {
     label: 'Item Type',
@@ -40,8 +38,7 @@ const a = [
   {
     label: 'Bar Code',
     keyName: 'barcode',
-    description:
-      'Please select a field which is related to Bar Code of Items',
+    description: 'Please select a field which is related to Bar Code of Items',
   },
   {
     label: 'Description',
@@ -64,21 +61,19 @@ const a = [
   {
     label: 'Sale Price',
     keyName: 'salePrice',
-    description:
-      'Please select a field which is related to salePrice of Items',
+    description: 'Please select a field which is related to salePrice of Items',
   },
   {
     label: 'Tax',
     keyName: 'tax',
-    description:
-      'Please select a field which is related to tax of Items',
+    description: 'Please select a field which is related to tax of Items',
   },
   {
     label: 'discount',
     keyName: 'Discount',
     description:
       'Please select a field which is related to Discount of Contact',
-  }
+  },
 ];
 interface IProps {
   visibility: boolean;
@@ -100,6 +95,20 @@ export const CompareDataModal: FC<IProps> = ({
   const unUsedDocumentKeys = documentKeys.filter(
     (key) => !Object.keys(compareData).includes(key)
   );
+
+  useEffect(() => {
+    if (documentKeys?.length && compareKeys?.length) {
+      const _compareData = {};
+      const accessors: string[] = compareKeys.map((i) => i.keyName);
+      accessors.forEach((i, index) => {
+        if (documentKeys.includes(i)) {
+          _compareData[i] = i;
+        }
+      });
+
+      setCompareData(_compareData);
+    }
+  }, [documentKeys, compareKeys]);
 
   const columns: ColumnsType<any> = [
     {
@@ -125,6 +134,11 @@ export const CompareDataModal: FC<IProps> = ({
       render: (text: string, record: any, index: any) => {
         return (
           <EditableSelect
+            value={
+              Object.keys(compareData).includes(record?.keyName)
+                ? record.keyName
+                : null
+            }
             allowClear
             style={{ width: '100%' }}
             onChange={(value) => {

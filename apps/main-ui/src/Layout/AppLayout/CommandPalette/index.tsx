@@ -170,7 +170,7 @@ export const InvyceCmdPalette = () => {
     {
       name: 'Payments > Paid List',
       command: () => {
-       history.push(`/app${ISupportedRoutes.PAYMENTS}?tabIndex=paid`);
+        history.push(`/app${ISupportedRoutes.PAYMENTS}?tabIndex=paid`);
       },
       permission: PERMISSIONS.PAYMENTS_INDEX,
       icon: dollarSign,
@@ -179,7 +179,7 @@ export const InvyceCmdPalette = () => {
     {
       name: 'Payments > Recieved List',
       command: () => {
-       history.push(`/app${ISupportedRoutes.PAYMENTS}?tabIndex=received`);
+        history.push(`/app${ISupportedRoutes.PAYMENTS}?tabIndex=received`);
       },
       permission: PERMISSIONS.PAYMENTS_INDEX,
       icon: dollarSign,

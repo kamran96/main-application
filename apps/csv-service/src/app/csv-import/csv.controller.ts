@@ -1,11 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Req,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
 import { CsvService } from './csv.service';
 
 @Controller()
@@ -19,7 +12,6 @@ export class CsvController {
 
   @Post('import')
   async importCsv(@Req() req: Request, @Res() res: any) {
-    console.log('hereajdsoif');
     return await this.csvService.importCsv(req, res);
   }
 }
