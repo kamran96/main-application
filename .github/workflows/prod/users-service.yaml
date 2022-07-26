@@ -99,4 +99,3 @@ jobs:
           git add .  
           git commit -m "refactor - updated kustomize kustomization.yaml for prod environment with container image - $CONTAINER_IMAGE_TAG" 
           git push -u origin main
-
