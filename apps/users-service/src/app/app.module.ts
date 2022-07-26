@@ -39,7 +39,6 @@ if (process.env['NODE' + '_ENV'] !== 'development') {
 
   MONGO_URI = staticContent.MONGO_URI;
 }
-
 console.log(MONGO_URI, 'uri');
 
 @Module({
