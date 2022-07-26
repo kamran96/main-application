@@ -10,20 +10,15 @@ import { OrganizationModule } from './organization/organization.module';
 import { RbacModule } from './rbac/rbac.module';
 import { UserModule } from './user/user.module';
 
-console.log(process.env['NODE' + '_ENV'], 'env');
 let MONGO_URI;
 let jwt_secret;
 if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
 
-  console.log('okkk');
-
   const pathToStaticContent = path.join(
     __dirname,
     '../../../vault/secrets/creds'
   );
-
-  console.log(pathToStaticContent, 'path');
 
   const staticContentFromVault = fs.readFileSync(
     path.join(pathToStaticContent),
@@ -31,8 +26,6 @@ if (process.env['NODE' + '_ENV'] === 'production') {
       encoding: 'utf8',
     }
   );
-
-  console.log(staticContentFromVault, 'vault');
 
   // static Content
   const staticContentWithoutLineBreaks = staticContentFromVault.replace(
