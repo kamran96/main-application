@@ -10,6 +10,7 @@ import { AuthService } from './auth.service';
 import { UserToken, UserTokenSchema } from '../schemas/userToken.schema';
 import { AuthStrategy } from './auth.strategy';
 import { MQ_HOST } from '@invyce/global-constants';
+import { JWT_SECRET } from '../app.module';
 
 @Module({
   controllers: [AuthController],
@@ -20,7 +21,10 @@ import { MQ_HOST } from '@invyce/global-constants';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET'),
+        secret:
+          JWT_SECRET !== undefined
+            ? JWT_SECRET
+            : configService.get('JWT_SECRET'),
         signOptions: {
           expiresIn: process.env.EXPIRES + 'h',
         },

@@ -8,6 +8,7 @@ import {
   IUser,
   IUserAccessControlResponse,
 } from '@invyce/interfaces';
+import { JWT_SECRET } from '../app.module';
 
 let data = {};
 
@@ -23,7 +24,8 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
         return req.cookies['access_token'];
       },
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET,
+      secretOrKey:
+        JWT_SECRET !== undefined ? JWT_SECRET : process.env.JWT_SECRET,
     });
   }
 

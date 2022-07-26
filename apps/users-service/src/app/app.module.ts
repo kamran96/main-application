@@ -12,6 +12,7 @@ import { UserModule } from './user/user.module';
 
 console.log(process.env['NODE' + '_ENV'], 'env');
 let MONGO_URI;
+let jwt_secret;
 if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
 
@@ -40,11 +41,11 @@ if (process.env['NODE' + '_ENV'] === 'production') {
   );
   const staticContentObj = `{${staticContentWithoutLineBreaks}}`;
   const staticContent = JSON.parse(staticContentObj);
-  console.log(staticContent, 'content');
-
   MONGO_URI = staticContent.MONGO_URI;
+  jwt_secret = staticContent.JWT_SECRET;
 }
-console.log(MONGO_URI, 'uri');
+
+export const JWT_SECRET = jwt_secret;
 
 @Module({
   imports: [
