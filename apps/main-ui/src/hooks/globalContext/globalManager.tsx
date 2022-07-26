@@ -112,7 +112,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
       id: null,
     });
 
-    
   const [pricingModalConfig, setPricingModalConfig] = useState<IModalsConfig>({
     visibility: false,
     obj: null,
@@ -662,7 +661,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         },
         bills,
         setBills: (visibility: boolean, type: IImportType) => {
-          setBills({visibility});
+          setBills({ visibility });
         },
         refetchUser,
         refetchPermissions,

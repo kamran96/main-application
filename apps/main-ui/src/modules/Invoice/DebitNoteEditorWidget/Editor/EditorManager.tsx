@@ -476,7 +476,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
               </Option>
               {/* </Rbac> */}
               {items.map((item: IItemsResult, index: number) => {
-                console.log(item, 'item')
                 const usedIds = [];
                 invoiceItems?.forEach((st) => {
                   if (st.itemId !== null) {
