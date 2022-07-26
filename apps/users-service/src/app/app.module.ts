@@ -15,10 +15,14 @@ let MONGO_URI;
 if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
 
+  console.log('okkk');
+
   const pathToStaticContent = path.join(
     __dirname,
     '../../../vault/secrets/creds'
   );
+
+  console.log(pathToStaticContent, 'path');
 
   const staticContentFromVault = fs.readFileSync(
     path.join(pathToStaticContent),
@@ -26,6 +30,8 @@ if (process.env['NODE' + '_ENV'] === 'production') {
       encoding: 'utf8',
     }
   );
+
+  console.log(staticContentFromVault, 'vault');
 
   // static Content
   const staticContentWithoutLineBreaks = staticContentFromVault.replace(
