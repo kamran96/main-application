@@ -32,6 +32,7 @@ import { PrintColumns, PDFColumns } from './PrintColumns';
 import { ItemsListWrapper } from './styles';
 import packageIcon from '@iconify-icons/feather/package';
 import ItemsImport from '../ItemsImport';
+import { ItemsViewContainer } from './ItemView';
 
 export const ItemsList: FC = () => {
   /* HOOKS */
@@ -57,10 +58,12 @@ export const ItemsList: FC = () => {
   const __data = useMemo(() => {
     return result;
   }, [result]);
-
-
   const [selectedRow, setSelectedRow] = useState([]);
   const [confirmModal, setConfirmModal] = useState<boolean>(false);
+  const [showItemDetails, setShowItemsDetails] = useState({
+    visibility: false,
+    id: null,
+  });
 
   const { mutate: mutateDeleteItems, isLoading: isDeletingItem } =
     useMutation(deleteItems);
@@ -278,7 +281,13 @@ export const ItemsList: FC = () => {
       sorter: true,
       sortOrder: sortedInfo?.columnKey === 'name' && sortedInfo?.order,
       render: (data, row, index) => (
-        <Link to={`/app${ISupportedRoutes.ITEMS}/${row.id}`}>{data}</Link>
+        // <Link to={`/app${ISupportedRoutes.ITEMS}/${row.id}`}>{data}</Link>
+        <div
+          onClick={() => setShowItemsDetails({ visibility: true, id: data.id })}
+          style={{ color: '#2395E7', cursor: 'pointer' }}
+        >
+          {data}
+        </div>
       ),
     },
     // {
@@ -357,7 +366,6 @@ export const ItemsList: FC = () => {
   const onSelectedRow = (item) => {
     setSelectedRow(item);
   };
-  
 
   const renderTopbarRightPannel = () => {
     return (
@@ -500,6 +508,12 @@ export const ItemsList: FC = () => {
           rowSelection={{ onChange: onSelectedRow }}
           enableRowSelection
         />
+        {showItemDetails && (
+          <ItemsViewContainer
+            showItemDetails={showItemDetails}
+            setShowItemsDetails={setShowItemsDetails}
+          />
+        )}
         <ConfirmModal
           loading={isDeletingItem}
           visible={confirmModal}
@@ -508,6 +522,7 @@ export const ItemsList: FC = () => {
           type="delete"
           text="Are you sure want to delete selected Item?"
         />
+        setItemsModalConfig
       </div>
     </ItemsListWrapper>
   );

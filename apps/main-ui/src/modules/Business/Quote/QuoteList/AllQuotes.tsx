@@ -155,7 +155,7 @@ export const ALLQuotesList: FC<IProps> = ({ columns }) => {
   const topBarRightPanel = () => {
     return (
       <div className="flex itemCenter">
-        <QuoteImport/>
+        {/* <QuoteImport/> */}
         <SmartFilter
           onFilter={(encode) => {
             setAllInvoicesConfig({ ...allInvoicesConfig, query: encode });

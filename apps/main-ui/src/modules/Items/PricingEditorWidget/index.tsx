@@ -40,6 +40,8 @@ const PricingEditorWidget: FC = () => {
     }
   }, [data, form]);
 
+
+
   const onSubmit = async (values) => {
     let payload = {
       ...values,
@@ -93,6 +95,7 @@ const PricingEditorWidget: FC = () => {
       console.log(error);
     }
   };
+
 
   return (
     <CommonModal

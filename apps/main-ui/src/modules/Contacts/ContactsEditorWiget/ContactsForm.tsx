@@ -18,6 +18,7 @@ import { IAccountsResult } from '../../../modal/accounts';
 import { EnterpriseWrapper } from '../../../components/EnterpriseWrapper';
 import { IOrganizationType } from '../../../modal/organization';
 import Checkbox from 'antd/lib/checkbox/Checkbox';
+import { useLocation } from 'react-router-dom';
 
 const { Option } = Select;
 
@@ -50,6 +51,9 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
       postalCode: '',
     },
   ]);
+
+  const location = useLocation();
+
   /* Use form hook antd */
   const [form] = Form.useForm();
   const queryCache = useQueryClient();
@@ -78,6 +82,16 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
           acc?.secondaryAccount?.primaryAccount?.name === 'revenue'
       )) ||
     [];
+
+  useEffect(() => {
+    if (location?.state && location?.state !== undefined) {
+      if (location?.state === 'customers') {
+        form.setFieldsValue({ contactType: IContactTypes.CUSTOMER });
+      } else if (location?.state === 'suppliers') {
+        form.setFieldsValue({ contactType: IContactTypes.SUPPLIER });
+      }
+    }
+  }, [location?.state]);
 
   const { routeHistory } = useGlobalContext();
   const { history } = routeHistory;
@@ -253,6 +267,10 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               name="businessName"
               rules={[
                 { required: true, message: 'Please provide Company Name' },
+                {
+                  pattern: /^\S/,
+                  message: 'Please remove Whitespaces and provide Company Name',
+                },
               ]}
             >
               <Input placeholder={''} autoComplete="off" size="large" />
@@ -285,6 +303,10 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               rules={[
                 {
                   required: true,
+                  message: 'Please Primay Person',
+                },
+                {
+                  pattern: /^\S/,
                   message: 'Please Primay Person',
                 },
               ]}
@@ -326,6 +348,10 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                   message: 'Mobile Number must be in 11 Characters',
                 },
                 { required: true, message: 'Phone Number is required!' },
+                {
+                  pattern: /^\S/,
+                  message: 'Phone Number is required!',
+                },
               ]}
             >
               <Input
@@ -398,6 +424,10 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                 {
                   max: 13,
                   min: 13,
+                  message: 'Cnic must be in 13 Characters',
+                },
+                {
+                  pattern: /^\S/,
                   message: 'Cnic must be in 13 Characters',
                 },
               ]}
@@ -657,6 +687,10 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                       required: true,
                       message: 'Please provide payment days limit',
                     },
+                    {
+                      pattern: /^\S/,
+                      message: 'Please provide payment days limit',
+                    },
                   ]}
                 >
                   <Input
@@ -678,6 +712,10 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                   rules={[
                     {
                       required: false,
+                      message: 'Please provide Account Number',
+                    },
+                    {
+                      pattern: /^\S/,
                       message: 'Please provide Account Number',
                     },
                   ]}

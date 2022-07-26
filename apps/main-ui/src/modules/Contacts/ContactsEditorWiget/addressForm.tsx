@@ -42,6 +42,10 @@ export const AddressForm: FC<IProps> = ({ onChange, item, index, reset }) => {
             required: true,
             message: 'Please provide postal address',
           },
+          {
+            pattern: /^\S/,
+            message: 'Please provide postal address',
+          },
         ]}
       >
         <Input placeholder={'Address'} size="large" autoComplete="off" />

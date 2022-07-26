@@ -202,7 +202,7 @@ export const PaymentPaidList: FC = () => {
   const renderTopbarRight = () => {
     return (
       <div className="flex aliginCenter">
-        <PaymentImport/>
+        {/* <PaymentImport/> */}
         <ButtonTag
           disabled
           className="mr-10"

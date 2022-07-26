@@ -155,7 +155,7 @@ export const AprovedDebitNotes: FC = () => {
   const renderTopbarRight = () => {
     return (
       <div className="flex alignCenter">
-        <DebitNoteImport/>
+        {/* <DebitNoteImport/> */}
         <SmartFilter
           onFilter={(encode) => {
             const route = `/app${ISupportedRoutes?.DEBIT_NOTES}?tabIndex=aproved&page=1&page_size=20&query=${encode}`;

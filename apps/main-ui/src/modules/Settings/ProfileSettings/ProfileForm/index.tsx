@@ -36,6 +36,7 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
 
   const onFinish = async (values) => {
     const payload = { ...values, attachmentId, userId: id };
+    console.log(values, 'value');
     await mutateUpdateProfile(payload, {
       onSuccess: () => {
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Updated Successfully');
@@ -51,43 +52,44 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
   useEffect(() => {
     if (userDetails?.profile) {
       const { profile } = userDetails;
+      console.log(profile.prefix, "profile")
       form.setFieldsValue({ ...profile, prefix: parseInt(profile?.prefix) });
       setAttachmentData(profile.attachment);
     }
   }, [userDetails, form]);
 
   const prefixSelector = (
-    <Form.Item name="prefix" noStyle>
-      <Select
-        style={{ width: 100 }}
-        showSearch
-        defaultValue={+92}
-        filterOption={(input, option) => {
-          return (
-            option?.id?.toLowerCase().includes(input?.toLocaleLowerCase()) ||
-            option?.title?.toLowerCase().includes(input?.toLocaleLowerCase())
-          );
-        }}
-      >
-        {phoneCodes?.map((country) => {
-          return (
-            <Option
-              value={country?.phoneCode}
-              title={`${country?.phoneCode}`}
-              id={country?.short}
-            >
-              <img
-                className="mr-10"
-                alt="flag"
-                style={{ width: 18, height: 18, verticalAlign: 'sub' }}
-                src={getFlag(country.short)}
-              />
-              <span>+{country?.phoneCode}</span>
-            </Option>
-          );
-        })}
-      </Select>
-    </Form.Item>
+    // <Form.Item name="prefix" noStyle>
+    <Select
+      style={{ width: 100 }}
+      showSearch
+      defaultValue={92}
+      filterOption={(input, option) => {
+        return (
+          option?.id?.toLowerCase().includes(input?.toLocaleLowerCase()) ||
+          option?.title?.toLowerCase().includes(input?.toLocaleLowerCase())
+        );
+      }}
+    >
+      {phoneCodes?.map((country) => {
+        return (
+          <Option
+            value={country?.phoneCode}
+            title={`${country?.phoneCode}`}
+            id={country?.short}
+          >
+            <img
+              className="mr-10"
+              alt="flag"
+              style={{ width: 18, height: 18, verticalAlign: 'sub' }}
+              src={getFlag(country.short)}
+            />
+            <span>+{country?.phoneCode}</span>
+          </Option>
+        );
+      })}
+    </Select>
+    // </Form.Item>
   );
 
   return (
@@ -194,11 +196,11 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
                   ]}
                 >
                   <Input
+                    autoComplete="off"
                     addonBefore={prefixSelector}
                     type="text"
                     placeholder="3188889898"
                     size="middle"
-                    autoComplete="off"
                   />
                 </Form.Item>
               </Col>

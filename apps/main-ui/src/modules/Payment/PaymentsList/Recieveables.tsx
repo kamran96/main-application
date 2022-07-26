@@ -182,7 +182,7 @@ export const PaymentRecievedList: FC = () => {
   const renderTopbarRight = () => {
     return (
       <div className="flex alignCenter">
-        <PaymentImport/>
+        {/* <PaymentImport/> */}
         <ButtonTag
           disabled
           className="mr-10"

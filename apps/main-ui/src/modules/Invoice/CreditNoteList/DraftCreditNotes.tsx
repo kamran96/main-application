@@ -246,7 +246,7 @@ export const DraftCreditNotes: FC = () => {
   const renderTopbarRight = () => {
     return (
       <div className="flex alignCenter">
-        <ImportCreditNote/>
+        {/* <ImportCreditNote/> */}
         <SmartFilter
           onFilter={(encode) => {
             const route = `/app${ISupportedRoutes?.CREDIT_NOTES}?tabIndex=draft&page=1&page_size=20&query=${encode}`;

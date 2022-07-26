@@ -188,6 +188,7 @@ export const AprovedCreditNotes: FC = () => {
             'invoice-view',
             'ledger-contact',
             'all-items',
+            'ACCRECCREDIT'
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) =>
               q?.queryKey[0]?.toString()?.startsWith(`${key}`)
@@ -240,7 +241,7 @@ export const AprovedCreditNotes: FC = () => {
   const renderTopbarRight = () => {
     return (
       <div className="flex alignCenter">
-        <ImportCreditNote />
+        {/* <ImportCreditNote /> */}
         <SmartFilter
           onFilter={(encode) => {
             const route = `/app${ISupportedRoutes?.CREDIT_NOTES}?tabIndex=aproved&page=1&page_size=20&query=${encode}`;

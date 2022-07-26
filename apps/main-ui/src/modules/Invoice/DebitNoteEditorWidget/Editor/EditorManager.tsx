@@ -362,7 +362,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
         []
       : result;
 
-  console.log(invoiceItems, 'items klasjdfoad');
+  // console.log(invoiceItems, 'items klasjdfoad');
 
   const columns: ColumnsType<any> = [
     {

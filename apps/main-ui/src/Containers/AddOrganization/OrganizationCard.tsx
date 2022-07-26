@@ -41,7 +41,7 @@ export const OrganizationCard: FC<IProps> = ({
       </Menu.Item>
       <Menu.Item
         key="2"
-        // disabled={organization?.isActive}
+        disabled={organization?.isActive}
         onClick={handleActive}
       >
         <Icon icon={checkMark} />
@@ -84,9 +84,9 @@ export const OrganizationCard: FC<IProps> = ({
       </div>
       <div className="OrganizationTypo">
         <H4 className="title">{organization?.name}</H4>
-        <p className="SubTitle">{organization.niche}</p>
+        <p className="SubTitle">{organization?.niche}</p>
         <p className="Financial">Financial End year </p>
-        <p className="Date">{organization.createdAt}</p>
+        <p className="Date">{organization?.createdAt}</p>
       </div>
     </CardWrapper>
   );

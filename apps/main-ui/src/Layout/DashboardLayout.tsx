@@ -67,72 +67,72 @@ export const DashboardLayout: any = (props: RouteConfigComponentProps) => {
     () => import('../modules/Items/ItemsImport/ItemsImportWidgets')
   );
 
-  const PaymentImportWidget = lazy(
-    () => import('../modules/Payment/PaymentsImport/PaymentImportWidget')
-  );
+  // const PaymentImportWidget = lazy(
+  //   () => import('../modules/Payment/PaymentsImport/PaymentImportWidget')
+  // );
 
-  const AccountsImportWidget = lazy(
-    () =>
-      import(
-        '../modules/Accounts/AccountsImport/AccountsImportWidget'
-      )
-  );
+  // const AccountsImportWidget = lazy(
+  //   () =>
+  //     import(
+  //       '../modules/Accounts/AccountsImport/AccountsImportWidget'
+  //     )
+  // );
 
-  const TransactionImportWidget = lazy(
-    () =>
-      import(
-        '../modules/Business/Transactions/importTransactions/TransactionImportWidget'
-      )
-  );
+  // const TransactionImportWidget = lazy(
+  //   () =>
+  //     import(
+  //       '../modules/Business/Transactions/importTransactions/TransactionImportWidget'
+  //     )
+  // );
 
-  const BankImportWidget = lazy(
-    () =>
-      import(
-        '../modules/Business/BankAccounts/BanksImport/BankImportWidget'
-      )
-  );
+  // const BankImportWidget = lazy(
+  //   () =>
+  //     import(
+  //       '../modules/Business/BankAccounts/BanksImport/BankImportWidget'
+  //     )
+  // );
 
-  const InvoiceImportWidget = lazy(
-    () =>
-      import(
-        '../modules/Invoice/InvoiceList/invoiceImports/InvoiceImportWidget'
-      )
-  );
+  // const InvoiceImportWidget = lazy(
+  //   () =>
+  //     import(
+  //       '../modules/Invoice/InvoiceList/invoiceImports/InvoiceImportWidget'
+  //     )
+  // );
 
-  const CreditNoteImportWidget = lazy(
-    () =>
-      import(
-        '../modules/Invoice/CreditNoteList/ImportCreditNote/CreditNoteImportWidget '
-      )
-  );
+  // const CreditNoteImportWidget = lazy(
+  //   () =>
+  //     import(
+  //       '../modules/Invoice/CreditNoteList/ImportCreditNote/CreditNoteImportWidget '
+  //     )
+  // );
 
-  const DebitNoteImportWidget = lazy(
-    () =>
-      import(
-        '../modules/Invoice/DebitNotesList/DebitNoteImport/DebitNoteImportWidget'
-      )
-  );
+  // const DebitNoteImportWidget = lazy(
+  //   () =>
+  //     import(
+  //       '../modules/Invoice/DebitNotesList/DebitNoteImport/DebitNoteImportWidget'
+  //     )
+  // );
 
-  const QuoteImportWidget = lazy(
-    () =>
-      import(
-        '../modules/Business/Quote/QuoteImport/QuoteImportWidget'
-      )
-  );
+  // const QuoteImportWidget = lazy(
+  //   () =>
+  //     import(
+  //       '../modules/Business/Quote/QuoteImport/QuoteImportWidget'
+  //     )
+  // );
 
-  const PurchaseOrderWidget = lazy(
-    () =>
-      import(
-        '../modules/Business/PurchaseOrder/PurchaseOrderList/PurchaseOrderImport/PurchasesOrderWidget'
-      )
-  );
+  // const PurchaseOrderWidget = lazy(
+  //   () =>
+  //     import(
+  //       '../modules/Business/PurchaseOrder/PurchaseOrderList/PurchaseOrderImport/PurchasesOrderWidget'
+  //     )
+  // );
 
-  const ImportBillWidget = lazy(
-    () =>
-      import(
-        '../modules/Business/PurchaseOrder/Bills/importBill/ImportBillWidget'
-      )
-  );
+  // const ImportBillWidget = lazy(
+  //   () =>
+  //     import(
+  //       '../modules/Business/PurchaseOrder/Bills/importBill/ImportBillWidget'
+  //     )
+  // );
 
   const { isUserLogin, userDetails, routeHistory, theme, itemsModalConfig } =
     useGlobalContext();
@@ -232,7 +232,7 @@ export const DashboardLayout: any = (props: RouteConfigComponentProps) => {
         <Suspense fallback={<div></div>}>
           <ItemsImportWidget />
         </Suspense>
-        <Suspense fallback={<div></div>}>
+        {/* <Suspense fallback={<div></div>}>
           <PaymentImportWidget />
         </Suspense>
         <Suspense fallback={<div></div>}>
@@ -261,7 +261,7 @@ export const DashboardLayout: any = (props: RouteConfigComponentProps) => {
         </Suspense>
         <Suspense fallback={<div></div>}>
           <ImportBillWidget />
-        </Suspense>
+        </Suspense> */}
       </DashboardWrapper>
     </ThemeProvider>
   );
