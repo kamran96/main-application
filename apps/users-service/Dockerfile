@@ -11,6 +11,8 @@ RUN apk add dumb-init curl
 ARG PORT
 USER node
 
+ENV NODE_ENV=production
+
 WORKDIR /home/node/app
 
 # change permissions to the node_modules folder

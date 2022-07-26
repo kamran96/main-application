@@ -13,7 +13,7 @@ import { UserModule } from './user/user.module';
 console.log(process.env['NODE' + '_ENV'], 'env');
 
 let MONGO_URI;
-if (process.env['NODE' + '_ENV'] !== 'development') {
+if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
 
   const pathToStaticContent = path.join(
