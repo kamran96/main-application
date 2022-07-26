@@ -35,14 +35,9 @@ if (process.env['NODE' + '_ENV'] !== 'development') {
   );
   const staticContentObj = `{${staticContentWithoutLineBreaks}}`;
   const staticContent = JSON.parse(staticContentObj);
+  console.log(staticContent, 'content');
 
-  if (process.env['NODE' + '_ENV'] === 'staging') {
-    console.log('staging');
-    MONGO_URI = staticContent.STAGE_MONGO_URI;
-  } else if (process.env['NODE' + '_ENV'] === 'production') {
-    console.log('production');
-    MONGO_URI = staticContent.MONGO_URI;
-  }
+  MONGO_URI = staticContent.MONGO_URI;
 }
 
 console.log(MONGO_URI, 'uri');
