@@ -11,7 +11,6 @@ import { RbacModule } from './rbac/rbac.module';
 import { UserModule } from './user/user.module';
 
 console.log(process.env['NODE' + '_ENV'], 'env');
-
 let MONGO_URI;
 if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
