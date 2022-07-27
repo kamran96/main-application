@@ -7,8 +7,6 @@ import { AppService } from './app.service';
 import { ContactModule } from './contact/contact.module';
 import { HealthModule } from './health/health.module';
 
-console.log('okkkkkkkkkkkkkkk..........');
-console.log(process.env['NODE' + '_ENV']);
 let MONGO_URI;
 if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
