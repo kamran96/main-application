@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { BranchModule } from './branch/branch.module';
+import { HealthModule } from './health/health.module';
 import { OrganizationModule } from './organization/organization.module';
 import { RbacModule } from './rbac/rbac.module';
 import { UserModule } from './user/user.module';
@@ -48,6 +49,7 @@ export const JWT_SECRET = jwt_secret;
     RbacModule,
     OrganizationModule,
     BranchModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
