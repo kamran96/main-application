@@ -96,16 +96,16 @@ jobs:
           TEMP_FOLDER="$(mktemp -d)" 
           echo Clone the repository...
           git clone -b main "https://zeeshooo:${ACCESS_TOKEN}@github.com/invyce/invyce-ops.git" ${TEMP_FOLDER} 
-          cd ${TEMP_FOLDER}/contacts/enviroments/prod
+          cd ${TEMP_FOLDER}/contacts/enviroments/staging
           ls
           echo Update kustomize newTag in kustomization.yaml with new image tag
           CONTAINER_IMAGE_TAG=$CONTAINER_IMAGE_TAG yq e -i '.images[0].newTag = env(CONTAINER_IMAGE_TAG)' ./kustomization.yaml
-          echo 'Container image newTag updated in contacts/enviroments/prod/kustomization.yaml'
+          echo 'Container image newTag updated in contacts/enviroments/staging/kustomization.yaml'
           cd ../
           git config user.email "zeeshan@invyce.com"
           git config user.name "zeeshooo" 
           git add .  
-          git commit -m "refactor - updated kustomize kustomization.yaml for prod environment with container image - $CONTAINER_IMAGE_TAG" 
+          git commit -m "refactor - updated kustomize kustomization.yaml for staging environment with container image - $CONTAINER_IMAGE_TAG" 
           git push -u origin main
 
   DeployProd:
