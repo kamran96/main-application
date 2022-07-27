@@ -5,6 +5,7 @@ import * as path from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ContactModule } from './contact/contact.module';
+import { HealthModule } from './health/health.module';
 
 console.log('okkkkkkkkkkkkkkk..........');
 console.log(process.env['NODE' + '_ENV']);
@@ -38,6 +39,7 @@ if (process.env['NODE' + '_ENV'] === 'production') {
   imports: [
     MongooseModule.forRoot(process.env.MONGO_URI || MONGO_URI),
     ContactModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -20,7 +20,7 @@ COPY --chown=node:node --from=build /app /home/node/app/node_modules
 COPY --chown=node:node --from=build /app/package-lock.json /home/node/app/package-lock.json
 COPY --chown=node:node ./dist/apps/contacts-service /home/node/app
 
-RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express
+RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express --legacy-peer-deps
 
 EXPOSE ${PORT}
 CMD [ "dumb-init", "node", "main.js" ]
