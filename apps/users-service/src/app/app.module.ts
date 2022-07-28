@@ -13,6 +13,7 @@ import { UserModule } from './user/user.module';
 
 let MONGO_URI;
 let jwt_secret;
+let expires;
 if (process.env['NODE' + '_ENV'] === 'production') {
   // read from a file
 
@@ -37,9 +38,11 @@ if (process.env['NODE' + '_ENV'] === 'production') {
   const staticContent = JSON.parse(staticContentObj);
   MONGO_URI = staticContent.MONGO_URI;
   jwt_secret = staticContent.JWT_SECRET;
+  expires = staticContent.EXPIRES;
 }
 
 export const JWT_SECRET = jwt_secret;
+export const EXPIRES = expires;
 
 @Module({
   imports: [

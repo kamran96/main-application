@@ -10,7 +10,7 @@ import { AuthService } from './auth.service';
 import { UserToken, UserTokenSchema } from '../schemas/userToken.schema';
 import { AuthStrategy } from './auth.strategy';
 import { MQ_HOST } from '@invyce/global-constants';
-import { JWT_SECRET } from '../app.module';
+import { JWT_SECRET, EXPIRES } from '../app.module';
 
 @Module({
   controllers: [AuthController],
@@ -26,7 +26,7 @@ import { JWT_SECRET } from '../app.module';
             ? JWT_SECRET
             : configService.get('JWT_SECRET'),
         signOptions: {
-          expiresIn: process.env.EXPIRES + 'h',
+          expiresIn: EXPIRES || process.env.EXPIRES + 'h',
         },
       }),
     }),
