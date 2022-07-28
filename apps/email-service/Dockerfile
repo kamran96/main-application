@@ -11,7 +11,8 @@ RUN apk add dumb-init
 ARG PORT
 USER node
 
-ENV NODE_ENV=production
+ENV NODE_ENV=production \
+    POSTMARK_TOKEN=971be359-e1c4-44b2-bfcc-72df8e1b71f7
 
 WORKDIR /home/node/app
 
