@@ -80,7 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: staging
-      url: 'https://api.staging.invyce.com/main-ui'
+      url: 'https://staging.invyce.com'
     steps:
       # Install yq
       - name: Install yq
@@ -114,7 +114,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: 'https://api.cloud.invyce.com/main-ui'
+      url: 'https://cloud.invyce.com'
     steps:
       - name: Install yq
         run: |

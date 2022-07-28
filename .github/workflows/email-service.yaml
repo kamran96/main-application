@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: staging
-      url: 'https://api.staging.invyce.com/emails'
+      # url: 'https://api.staging.invyce.com/emails'
     steps:
       # Install yq
       - name: Install yq
@@ -91,11 +91,11 @@ jobs:
           TEMP_FOLDER="$(mktemp -d)"
           echo Clone the repository...
           git clone -b main "https://zeeshooo:${ACCESS_TOKEN}@github.com/invyce/invyce-ops.git" ${TEMP_FOLDER}
-          cd ${TEMP_FOLDER}/emails/enviroments/staging
+          cd ${TEMP_FOLDER}/rabbitmq/enviroments/staging
           ls
           echo Update kustomize newTag in kustomization.yaml with new image tag
           CONTAINER_IMAGE_TAG=$CONTAINER_IMAGE_TAG yq e -i '.images[0].newTag = env(CONTAINER_IMAGE_TAG)' ./kustomization.yaml
-          echo 'Container image newTag updated in emails/enviroments/staging/kustomization.yaml'
+          echo 'Container image newTag updated in rabbitmq/enviroments/staging/kustomization.yaml'
           cd ../
           git config user.email "zeeshan@invyce.com"
           git config user.name "zeeshooo"
@@ -109,7 +109,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: 'https://api.cloud.invyce.com/emails'
+      # url: 'https://api.cloud.invyce.com/emails'
     steps:
       - name: Install yq
         run: |
@@ -124,11 +124,11 @@ jobs:
           TEMP_FOLDER="$(mktemp -d)"
           echo Clone the repository...
           git clone -b main "https://zeeshooo:${ACCESS_TOKEN}@github.com/invyce/invyce-ops.git" ${TEMP_FOLDER}
-          cd ${TEMP_FOLDER}/emails/enviroments/prod
+          cd ${TEMP_FOLDER}/rabbitmq/enviroments/prod
           ls
           echo Update kustomize newTag in kustomization.yaml with new image tag
           CONTAINER_IMAGE_TAG=$CONTAINER_IMAGE_TAG yq e -i '.images[0].newTag = env(CONTAINER_IMAGE_TAG)' ./kustomization.yaml
-          echo 'Container image newTag updated in emails/enviroments/prod/kustomization.yaml'
+          echo 'Container image newTag updated in rabbitmq/enviroments/prod/kustomization.yaml'
           cd ../
           git config user.email "zeeshan@invyce.com"
           git config user.name "zeeshooo"
