@@ -11,9 +11,7 @@ RUN apk add dumb-init
 ARG PORT
 USER node
 
-ENV MONGO_URI=mongodb+srv://contacts:fYnc4.ZPdz378t4@cluster0.hiwqy.mongodb.net/attachments?retryWrites=true&w=majority \
-    PORT=3338 \
-    NODE_ENV=production
+ENV NODE_ENV=production
 
 WORKDIR /home/node/app
 
