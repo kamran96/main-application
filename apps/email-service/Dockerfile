@@ -7,7 +7,7 @@ COPY ./dist/apps/email-service .
 FROM node:lts-alpine
 
 # add dump-init to avoid nodejs as pid 1
-RUN apk add dumb-init curl
+RUN apk add dumb-init
 ARG PORT
 USER node
 
