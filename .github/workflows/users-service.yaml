@@ -49,6 +49,9 @@ jobs:
       name: staging
       url: 'https://api.staging.invyce.com/users'
     steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout
+        uses: actions/checkout@v2
       # docker build item service images
       - name: Build container image
         run: docker build -f $GITHUB_WORKSPACE/apps/users-service/Dockerfile --build-arg NODE_ENV=staging -t registry.digitalocean.com/invyce-images/users-service:$(echo $GITHUB_SHA | head -c7) .
@@ -99,6 +102,9 @@ jobs:
       name: production
       url: 'https://api.cloud.invyce.com/users'
     steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout
+        uses: actions/checkout@v2
       # docker build item service images
       - name: Build container image
         run: docker build -f $GITHUB_WORKSPACE/apps/users-service/Dockerfile --build-arg NODE_ENV=production -t registry.digitalocean.com/invyce-images/users-service:$(echo $GITHUB_SHA | head -c7) .
