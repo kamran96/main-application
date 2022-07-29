@@ -280,15 +280,18 @@ export const ItemsList: FC = () => {
       key: 'name',
       sorter: true,
       sortOrder: sortedInfo?.columnKey === 'name' && sortedInfo?.order,
-      render: (data, row, index) => (
-        // <Link to={`/app${ISupportedRoutes.ITEMS}/${row.id}`}>{data}</Link>
-        <div
-          onClick={() => setShowItemsDetails({ visibility: true, id: data.id })}
-          style={{ color: '#2395E7', cursor: 'pointer' }}
-        >
-          {data}
-        </div>
-      ),
+      render: (data, row, index) => {
+        return (
+          <div
+            onClick={() =>
+              setShowItemsDetails({ visibility: true, id: row.id })
+            }
+            style={{ color: '#2395E7', cursor: 'pointer' }}
+          >
+            {data}
+          </div>
+        );
+      },
     },
     // {
     //   title: 'Category',
@@ -347,7 +350,7 @@ export const ItemsList: FC = () => {
       sorter: true,
       sortOrder: sortedInfo?.columnKey === 'showStock' && sortedInfo?.order,
       render: (data, row, index) => {
-        return data ? data : '-';
+        return data ? data : '0';
       },
     },
 
@@ -522,7 +525,6 @@ export const ItemsList: FC = () => {
           type="delete"
           text="Are you sure want to delete selected Item?"
         />
-        setItemsModalConfig
       </div>
     </ItemsListWrapper>
   );

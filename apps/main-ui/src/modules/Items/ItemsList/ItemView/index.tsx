@@ -1,27 +1,25 @@
-import { Button, Col, Row, Drawer } from 'antd';
+import { Button, Col, Row, Drawer, Space } from 'antd';
 import dayjs from 'dayjs';
 import React, { FC, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { getItemDetail } from '../../../../api';
 import { Card } from '../../../../components/Card';
-import { CustomDateRange } from '../../../../components/DateRange';
-import { Heading } from '../../../../components/Heading';
 import { Seprator } from '../../../../components/Seprator';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { ISupportedRoutes } from '../../../../modal';
-import { IItemViewResponse } from '../../../../modal/items';
+import { IItemViewResponse, IItemViewResult } from '../../../../modal/items';
 import moneyFormat from '../../../../utils/moneyFormat';
 import { SummaryItem } from './SummaryItem';
-import graphDown from '@iconify-icons/bi/graph-down';
-import graphUp from '@iconify-icons/bi/graph-up';
-import bxDollar from '@iconify-icons/bx/bx-dollar';
+import view from '@iconify-icons/carbon/view';
+import boxes from '@iconify-icons/bi/boxes';
 import fileText from '@iconify-icons/feather/file-text';
-import alertOutline from '@iconify-icons/mdi/alert-outline';
-import checkboxMultipleBlankOutline from '@iconify-icons/mdi/checkbox-multiple-blank-outline';
+import InvoiceIcon from '@iconify-icons/mdi/file-document-box-plus';
 import Icon from '@iconify/react';
-import { ItemSalesGraph } from './ItemSalesGraph';
-import { WrapperItemsView } from './SummaryItem/styles';
+import { ItemSalesGraph } from '../ItemsView/ItemSalesGraph';
+import { WrapperItemsView, ItemDrawer } from './SummaryItem/styles';
+import { ItemDetails } from './ItemDetails';
+import { getItemByIDAPI } from '../../../../api/Items';
 
 interface Iprops {
   showItemDetails: any;
@@ -34,16 +32,15 @@ export const ItemsViewContainer: FC<Iprops> = ({
 }) => {
   /* HOOKS HERE */
   const { routeHistory, setItemsModalConfig } = useGlobalContext();
-  const { visibility, itemId } = showItemDetails;
-  const { history } = routeHistory;
+  const { visibility } = showItemDetails;
   const { location } = routeHistory.history;
   const [apiConfig, setApiConfig] = useState({
     id: null,
     start: dayjs(),
     end: dayjs(),
   });
-  const { id, start, end } = apiConfig;
-  const [{ result, message }, setItemDetails] = useState<IItemViewResponse>({
+
+  const [{ result, message }, setItemDetails] = useState<IItemViewResult>({
     result: null,
     message: '',
   });
@@ -56,72 +53,61 @@ export const ItemsViewContainer: FC<Iprops> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
-  const { data: itemDetailData, isLoading: itemDetailFetching } = useQuery(
-    [
-      `item-detail-${id}-startDate=${start}-endDate=${end}`,
-      {
-        id,
-        start,
-        end,
-      },
-    ],
-    getItemDetail,
+  const { data: itemViewResponse } = useQuery(
+    [`item-details-${showItemDetails?.id}`, showItemDetails?.id],
+    getItemByIDAPI,
     {
-      enabled: !!id,
+      enabled: !!showItemDetails?.id,
     }
   );
 
   useEffect(() => {
-    if (itemDetailData && itemDetailData.data && itemDetailData.data.result) {
-      setItemDetails(itemDetailData.data);
+    if (itemViewResponse?.data?.result) {
+      setItemDetails(itemViewResponse?.data);
     }
-  }, [itemDetailData]);
+  }, [itemViewResponse]);
 
+  console.log(result, 'id');
   return (
-    <Drawer
-      title={result?.name}
+    <ItemDrawer
+      title={<span className="capitalize">{result?.name}</span> || ''}
       placement="right"
+      size={'large'}
       onClose={() => setShowItemsDetails({ visibility: false, id: null })}
       visible={visibility}
-      width={600}
-      bodyStyle={{
-        backgroundColor: "#EFEFEF"
-      }}
+      // closable={false}
+      extra={
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            position: 'absolute',
+            top: '15px',
+            right: '4rem',
+            cursor: 'pointer',
+          }}
+        >
+          <Link to={`/app${ISupportedRoutes.ITEMS}/${showItemDetails.id}`}>
+            <Icon icon={view} style={{ color: '#1E75F1' }} /> View More Details
+          </Link>
+        </div>
+      }
     >
       <WrapperItemsView>
-        {/* <Row gutter={10}>
-        <Col
-          className="gutter-row"
-          xxl={{ span: 3 }}
-          xl={{ span: 3 }}
-          lg={{ span: 6 }}
-          md={{ span: 6 }}
-          sm={{ span: 10 }}
-          xs={{ span: 10 }}
-        >
-          <SummaryItem
-            footerDesc="Sum of invoice build"
-            icon_bg="_color"
-            icon={<Icon color="#1f9dff" icon={bxDollar} />}
-            amount={(result && result.quantitystock) || 0}
-          />
-        </Col>
-      </Row> */}
-
         <Row gutter={10}>
           <Col
-            xxl={{ span: 12 }}
-            xl={{ span: 12 }}
+            xxl={{ span: 24 }}
+            xl={{ span: 24 }}
             lg={{ span: 24 }}
             md={{ span: 24 }}
             sm={{ span: 24 }}
             xs={{ span: 24 }}
           >
             <Card className="_itemdetailcard">
-              <div className="flex  justifySpaceBetween">
-                <h4>Item Details</h4>
+              <div className="flex  justifySpaceBetween ml-10">
+                <h3>Overview</h3>
                 <Button
-                  onClick={() => setItemsModalConfig(true, id)}
+                  onClick={() => setItemsModalConfig(true, showItemDetails.id)}
                   type="link"
                   size="small"
                 >
@@ -129,53 +115,67 @@ export const ItemsViewContainer: FC<Iprops> = ({
                 </Button>
               </div>
               <Seprator />
-              <Row gutter={16}>
-                <Col span={7}>
-                  <h3>Title: </h3>
+              <Row gutter={12}>
+                <Col
+                  className="gutter-row"
+                  xxl={{ span: 8 }}
+                  xl={{ span: 8 }}
+                  lg={{ span: 8 }}
+                  md={{ span: 8 }}
+                  sm={{ span: 8 }}
+                  xs={{ span: 8 }}
+                >
+                  <SummaryItem
+                    footerDesc="Total Stock"
+                    icon_bg="_color"
+                    icon={<Icon color="#1f9dff" icon={boxes} />}
+                    amount={(result && result.stock) || 0}
+                    card={'#EAF6FF'}
+                  />
                 </Col>
-                <Col span={15}>
-                  <p>{result && result.name}</p>
+                <Col
+                  className="gutter-row"
+                  xxl={{ span: 8 }}
+                  xl={{ span: 8 }}
+                  lg={{ span: 8 }}
+                  md={{ span: 8 }}
+                  sm={{ span: 8 }}
+                  xs={{ span: 8 }}
+                >
+                  <SummaryItem
+                    footerDesc="Total Purchases"
+                    icon_bg="_color3"
+                    icon={<Icon color="#F19700" icon={InvoiceIcon} />}
+                    amount={moneyFormat(result ? result?.totalBillsAmount : 0)}
+                    card={'#FFF4E2'}
+                  />
                 </Col>
-                <Col span={7}>
-                  <h3>Description: </h3>
-                </Col>
-                <Col span={15}>
-                  <p>{result && result.description}</p>
-                </Col>
-                <Col span={7}>
-                  <h3>Added Date: </h3>
-                </Col>
-                <Col span={15}>
-                  <p>
-                    {result &&
-                      result.addeddate &&
-                      dayjs(result.addeddate).format('DD/MM/YYYY h:mm A')}
-                  </p>
-                </Col>
-                <Col span={7}>
-                  <h3>Category: </h3>
-                </Col>
-                <Col span={15}>
-                  <p>{result && result.category_name}</p>
+                <Col
+                  className="gutter-row"
+                  xxl={{ span: 8 }}
+                  xl={{ span: 8 }}
+                  lg={{ span: 8 }}
+                  md={{ span: 8 }}
+                  sm={{ span: 8 }}
+                  xs={{ span: 8 }}
+                >
+                  <SummaryItem
+                    footerDesc="Total Sales"
+                    icon_bg="_color2"
+                    icon={<Icon color="#43C175" icon={fileText} />}
+                    amount={moneyFormat(
+                      result ? result?.totalInvoicesAmount : 0
+                    )}
+                    card={'#E3FFEE'}
+                  />
                 </Col>
               </Row>
+              <ItemDetails result={result} id={showItemDetails.id} />
+              {/* <ItemSalesGraph id={showItemDetails?.id} /> */}
             </Card>
           </Col>
         </Row>
-
-        <Row gutter={10}>
-          <Col
-            xxl={{ span: 12 }}
-            xl={{ span: 12 }}
-            lg={{ span: 24 }}
-            md={{ span: 24 }}
-            sm={{ span: 24 }}
-            xs={{ span: 24 }}
-          >
-            <ItemSalesGraph id={id} />
-          </Col>
-        </Row>
       </WrapperItemsView>
-    </Drawer>
+    </ItemDrawer>
   );
 };

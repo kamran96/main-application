@@ -77,7 +77,7 @@ export const InvoiceDashboard: FC = () => {
             icon_bg="_color1"
             footerDesc="Draft invoices to process"
             icon={<Icon color="#FFA51F" icon={fileText} />}
-            amount={detailsResult && detailsResult.draft_invoices}
+            amount={(detailsResult && detailsResult.draft_invoices) || 0}
           />
         </Col>
         <Col
@@ -93,7 +93,7 @@ export const InvoiceDashboard: FC = () => {
             icon_bg="_color2"
             footerDesc="Awaiting to approval"
             icon={<Icon color="#1fff79" icon={fileText} />}
-            amount={detailsResult && detailsResult.awaiting_to_approve}
+            amount={(detailsResult && detailsResult.awaiting_to_approve) || 0}
           />
         </Col>
         <Col
@@ -109,7 +109,7 @@ export const InvoiceDashboard: FC = () => {
             icon_bg="_color3"
             footerDesc="yesteday’s invoices"
             icon={<Icon color="#3f1fff" icon={fileText} />}
-            amount={detailsResult && detailsResult.yesterday_sale}
+            amount={(detailsResult && detailsResult.yesterday_sale) || 0}
           />
         </Col>
       </Row>

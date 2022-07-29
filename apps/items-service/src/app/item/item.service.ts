@@ -17,6 +17,10 @@ import { Price, PriceSchema } from '../schemas/price.schema';
 import { ItemCodesDto, ItemDto, ItemIdsDto } from '../dto/item.dto';
 import { ItemLedger } from '../schemas/itemLedger.schema';
 import { ItemLedgerDetailDto } from '../dto/ItemLedger.dto';
+enum IOperationType {
+  DECREASE = 'decrease',
+  INCREASE = 'increase',
+}
 
 @Injectable()
 export class ItemService {
@@ -234,6 +238,8 @@ export class ItemService {
           item.createdById = itemData._id;
           item.updatedById = itemData._id;
           item.status = 1;
+          item.totalBillsAmount = 0;
+          item.totalInvoicesAmount = 0;
           await item.save();
 
           if (itemDto.itemType === 1 && itemDto.attribute_values.length > 0) {
@@ -288,6 +294,7 @@ export class ItemService {
     }
 
     await this.ManageItemStock(data);
+    await this.ManageSalesPurchases(data);
   }
 
   async FindById(itemId: string): Promise<IItem> {
@@ -371,6 +378,45 @@ export class ItemService {
               i.type === 'decrease'
                 ? item.stock + i.value
                 : item.stock - i.value,
+          }
+        );
+      }
+    }
+  }
+
+  async ManageSalesPurchases(data): Promise<void> {
+    const getItem = async (id) => {
+      const item = await this.itemModel.findById(id).populate('price');
+      return item;
+    };
+
+    for (const i of data.payload) {
+      const operation =
+        i.type === IOperationType.DECREASE
+          ? IOperationType.INCREASE
+          : IOperationType.DECREASE;
+      console.log(i, 'invoiceType');
+      if (i.invoiceType === 'bill') {
+        const item = await getItem(i.itemId);
+        await this.itemModel.updateOne(
+          { _id: i.itemId },
+          {
+            totalBillsAmount:
+              operation === IOperationType.INCREASE
+                ? item.totalBillsAmount - i.value * item.price.purchasePrice
+                : item.totalBillsAmount + i.value * item.price.purchasePrice,
+          }
+        );
+      } else if (i.invoiceType === 'invoice') {
+        const item = await getItem(i.itemId);
+        console.log(item);
+        await this.itemModel.updateOne(
+          { _id: i.itemId },
+          {
+            totalInvoicesAmount:
+              operation === IOperationType.INCREASE
+                ? item.totalInvoicesAmount + i.value * item.price.salePrice
+                : item.totalInvoicesAmount - i.value * item.price.salePrice,
           }
         );
       }
@@ -486,6 +532,8 @@ export class ItemService {
             createdById: req.user.id,
             updatedById: req.user.id,
             status: 1,
+            totalBillsAmount: 0,
+            totalInvoicesAmount: 0,
           });
 
           await item.save();

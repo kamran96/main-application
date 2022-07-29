@@ -463,6 +463,7 @@ export class BillService {
               targetId: bill.id,
               type: 'increase',
               action: 'create',
+              invoiceType: 'bill',
             });
           }
 
@@ -616,6 +617,7 @@ export class BillService {
             targetId: bill.id,
             type: 'increase',
             action: 'create',
+            invoiceType: 'bill',
           });
         }
 

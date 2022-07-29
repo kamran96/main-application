@@ -1,33 +1,36 @@
 import { IThemeProps } from '@invyce/shared/invyce-theme';
 import styled from 'styled-components';
-import { Color } from '../../../../../modal';
 import convertToRem from '../../../../../utils/convertToRem';
+import { Drawer } from 'antd';
 
 export const WrapperItemsView = styled.div`
   ._itemviewcard {
-    background: ${Color.$WHITE};
     display: flex;
     flex-direction: column;
     justify-content: space-around;
     margin-bottom: ${convertToRem(16)};
     .item_amount {
-      font-size: ${convertToRem(24)};
-      line-height: ${convertToRem(28)};
-      font-weight: 500;
+      font-size: ${convertToRem(16)};
+      line-height: ${convertToRem(24)};
+      font-weight: 400;
       display: flex;
       justify-content: center;
+      align-items: center;
+      margin: ${convertToRem(7)} 0;
+      color: ${(props: IThemeProps) => props?.theme?.colors?.$TEXT};
     }
   }
+
   ._itemdetailcard {
     min-height: ${convertToRem(272)};
     background: ${(props: IThemeProps) => props?.theme?.colors?.cardBg};
     margin-bottom: ${convertToRem(16)};
-    h3 {
-      margin-left: ${convertToRem(20)};
+    h4 {
+      // margin-left: ${convertToRem(20)};
       margin-bottom: ${convertToRem(23)};
     }
     p {
-      font-size: ${convertToRem(17)};
+      font-size: ${convertToRem(16)};
       margin-bottom: ${convertToRem(23)};
     }
   }
@@ -65,5 +68,11 @@ export const WrapperItemsView = styled.div`
   }
   ._color3 {
     background: rgba(38, 0, 255, 0.212);
+  }
+`;
+
+export const ItemDrawer = styled(Drawer)`
+  .ant-drawer-body {
+    padding-top: 0px;
   }
 `;

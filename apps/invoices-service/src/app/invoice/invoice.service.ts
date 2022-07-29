@@ -680,6 +680,7 @@ export class InvoiceService {
             targetId: invoice.id,
             type: 'decrease',
             action: 'create',
+            invoiceType: 'invoice',
           });
         }
 

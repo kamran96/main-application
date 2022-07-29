@@ -42,7 +42,7 @@ export const getAllItems = ({ queryKey }: QueryKey) => {
 
 export const getItemByIDAPI = ({ queryKey }: QueryKey) => {
   const id: number = queryKey[1];
-  return http.get(`item/${id}`);
+  return http.get(`items/item/${id}`); // item/{id}
 };
 
 export const getPriceByIDAPI = ({ queryKey }: QueryKey) => {
@@ -87,9 +87,7 @@ export const duplicateItemsAPI = (payload: any) => {
 };
 
 export const StockUpdateAPI = (payload: any) =>
- http?.post(`/items/stock-update`, payload);
-
- 
+  http?.post(`/items/stock-update`, payload);
 
 export const getItemsKeysApi = () =>
   http?.get(`${ItemsServiceAPI.default}/import-csv`);

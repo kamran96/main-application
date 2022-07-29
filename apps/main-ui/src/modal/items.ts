@@ -21,6 +21,10 @@ export interface IItemsResponse extends IBaseRequest {
   result?: IItemsResult[];
 }
 
+export interface IItemViewResult extends IBaseRequest {
+  result?: IItemsResult;
+}
+
 export interface IItemsResult extends IBase {
   id?: number;
   name?: string;
@@ -38,6 +42,8 @@ export interface IItemsResult extends IBase {
   category: ICategory;
   stock?: number;
   hasInventory?: boolean;
+  totalBillsAmount: number;
+  totalInvoicesAmount: number;
 }
 
 export class ITemsResult extends IBaseResponse {
