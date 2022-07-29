@@ -84,7 +84,6 @@ export class AuthService {
 
   async AccessControll(req: IRequest): Promise<IUserAccessControlResponse> {
     try {
-      console.log('access controll called...');
       const userId = req.user.id;
       const findToken = await this.userTokenModel.findOne({
         userId: userId,
@@ -112,7 +111,6 @@ export class AuthService {
       }
 
       const user = await this.userModel.findById(userId);
-      console.log(user, 'user');
 
       return {
         user,

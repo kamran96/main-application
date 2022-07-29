@@ -88,6 +88,7 @@ export class OrganizationService {
     req: IRequest,
     res: Response
   ): Promise<unknown> {
+    console.log('organization called');
     const address: IAddress = {
       description: organizationDto.description,
       city: organizationDto.city,
