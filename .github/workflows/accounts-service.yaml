@@ -19,12 +19,13 @@ env:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  DeployStaging:
+    name: Deploy to staging
+    if: github.event.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    environment:
+      name: staging
+      url: 'https://api.staging.invyce.com/accounts'
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
@@ -54,11 +55,11 @@ jobs:
 
           # Runs a set of commands using the runners shell
       - name: build required projects
-        run: NODE_ENV='production' yarn build accounting-service
+        run: yarn build accounting-service
       
       # docker build item service images
       - name: Build container image
-        run: docker build -f $GITHUB_WORKSPACE/apps/accounting-service/Dockerfile -t registry.digitalocean.com/invyce-images/accounting-service:$(echo $GITHUB_SHA | head -c7) .
+        run: docker build -f $GITHUB_WORKSPACE/apps/accounting-service/Dockerfile --build-arg NODE_ENV=staging -t registry.digitalocean.com/invyce-images/accounting-service:$(echo $GITHUB_SHA | head -c7) .
 
       # - name: Add IP address to trusted source (managed database)
       #   uses: GarreauArthur/manage-digital-ocean-managed-database-trusted-sources-gh-action@main
@@ -95,16 +96,6 @@ jobs:
       
       - name: Update deployment file
         run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/invyce-images/accounting-service:'${TAG}'|' $GITHUB_WORKSPACE/apps/accounting-service/src/main.ts
-
-  DeployStaging:
-    name: Deploy to staging
-    if: github.event.ref == 'refs/heads/main'
-    needs: [Build]
-    runs-on: ubuntu-latest
-    environment:
-      name: staging
-      url: 'https://api.staging.invyce.com/accounts'
-    steps:
       # Install yq
       - name: Install yq
         run: |
@@ -139,6 +130,75 @@ jobs:
       name: production
       url: 'https://api.cloud.invyce.com/accounts'
     steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Use Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      
+      - name: cache node_modules
+        id: cache-node-modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-build-node-modules-cache-${{ hashFiles('**/yarn.lock') }}
+
+      - name: install dependencies
+        if: steps.cache-node-modules.cache-hit != 'true'
+        run: yarn install --prefer-offline
+      
+      # INSTALL digital ocean cli
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_ACCESS_TOKEN }}
+
+          # Runs a set of commands using the runners shell
+      - name: build required projects
+        run: NODE_ENV='production' yarn build accounting-service
+      
+      # docker build item service images
+      - name: Build container image
+        run: docker build -f $GITHUB_WORKSPACE/apps/accounting-service/Dockerfile --build-arg NODE_ENV=production -t registry.digitalocean.com/invyce-images/accounting-service:$(echo $GITHUB_SHA | head -c7) .
+
+      # - name: Add IP address to trusted source (managed database)
+      #   uses: GarreauArthur/manage-digital-ocean-managed-database-trusted-sources-gh-action@main
+      #   with:
+      #     action: "add"
+      #     database_id: ${{ secrets.DATABASE_ID }}
+      #     digitalocean_token: ${{ secrets.DO_ACCESS_TOKEN }}
+
+      # Run database migration
+      - name: run db migrations
+        run: yarn run acc_migration_run
+        env: 
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          ACC_DB_NAME: ${{ secrets.ACC_DB_NAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_USER: ${{ secrets.DB_USER }}
+          NODE_ENV: 'production'
+
+      # - name: Remove IP address to trusted source (managed database)
+      #   uses: GarreauArthur/manage-digital-ocean-managed-database-trusted-sources-gh-action@main
+      #   with:
+      #     action: "remove"
+      #     database_id: ${{ secrets.DATABASE_ID }}
+      #     digitalocean_token: ${{ secrets.DO_ACCESS_TOKEN }}
+
+      #login to digitalocean for 1200 seconds
+      - name: Log in to DigitalOcean Container Registry with short-lived credentials
+        run: doctl registry login --expiry-seconds 1200
+     
+      # push image to registry
+      - name: Push service image to DigitalOcean Container Registry
+        run: docker push registry.digitalocean.com/invyce-images/accounting-service:$(echo $GITHUB_SHA | head -c7)
+      
+      - name: Update deployment file
+        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/invyce-images/accounting-service:'${TAG}'|' $GITHUB_WORKSPACE/apps/accounting-service/src/main.ts
       - name: Install yq
         run: |
           wget https://github.com/mikefarah/yq/releases/download/v4.12.0/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq

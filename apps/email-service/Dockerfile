@@ -8,10 +8,11 @@ FROM node:lts-alpine
 
 # add dump-init to avoid nodejs as pid 1
 RUN apk add dumb-init
+ARG NODE_ENV
 ARG PORT
 USER node
 
-ENV NODE_ENV=production \
+ENV NODE_ENV ${NODE_ENV} \
     POSTMARK_TOKEN=971be359-e1c4-44b2-bfcc-72df8e1b71f7
 
 WORKDIR /home/node/app
