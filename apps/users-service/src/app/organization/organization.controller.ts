@@ -51,6 +51,7 @@ export class OrganizationController {
     @Res({ passthrough: true }) res: Response
   ) {
     try {
+      console.log('creating organization');
       const organization =
         await this.organizationService.CreateOrUpdateOrganization(
           organizationDto,

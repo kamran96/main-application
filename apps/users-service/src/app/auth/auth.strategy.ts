@@ -17,6 +17,7 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
     super({
       jwtFromRequest: (req) => {
+        console.log('secret', process.env.JWT_SECRET, JWT_SECRET);
         if (!req || !req.cookies) return null;
         data = {
           cookies: req.cookies,
