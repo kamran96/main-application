@@ -12,8 +12,6 @@ import { AuthStrategy } from './auth.strategy';
 import { MQ_HOST } from '@invyce/global-constants';
 import { JWT_SECRET, EXPIRES } from '../app.module';
 
-console.log('expires', EXPIRES, 'okkkk');
-
 @Module({
   controllers: [AuthController],
   imports: [
