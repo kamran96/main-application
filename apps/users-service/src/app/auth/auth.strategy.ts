@@ -32,6 +32,7 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: IBaseUser): Promise<IUser> {
     try {
+      console.log(payload, 'pay');
       const newData = { ...data, user: payload };
       const user: IUserAccessControlResponse =
         await this.authService.AccessControll(newData as IRequest);
