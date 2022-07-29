@@ -37,7 +37,7 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
         await this.authService.AccessControll(newData as IRequest);
 
       console.log(user.statusCode, 'status');
-      console.log(user.user, 'user here');
+      console.log('---------------------------------');
 
       if (user?.statusCode === HttpStatus.OK) {
         return user?.user;
