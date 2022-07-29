@@ -12,6 +12,8 @@ import { AuthStrategy } from './auth.strategy';
 import { MQ_HOST } from '@invyce/global-constants';
 import { JWT_SECRET, EXPIRES } from '../app.module';
 
+console.log('expires', EXPIRES, 'okkkk');
+
 @Module({
   controllers: [AuthController],
   imports: [
@@ -26,7 +28,7 @@ import { JWT_SECRET, EXPIRES } from '../app.module';
             ? JWT_SECRET
             : configService.get('JWT_SECRET'),
         signOptions: {
-          expiresIn: EXPIRES || process.env.EXPIRES + 'h',
+          expiresIn: EXPIRES ? EXPIRES + 'h' : process.env.EXPIRES + 'h',
         },
       }),
     }),

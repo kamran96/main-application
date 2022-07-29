@@ -41,6 +41,7 @@ if (process.env['NODE' + '_ENV'] === 'production') {
   expires = staticContent.EXPIRES;
 }
 
+console.log(expires, 'expires');
 export const JWT_SECRET = jwt_secret;
 export const EXPIRES = expires;
 
