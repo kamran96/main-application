@@ -231,9 +231,8 @@ export class AuthService {
     res
       .cookie('access_token', token, {
         secure: true,
-        sameSite: 'none',
+        sameSite: 'lax',
         httpOnly: true,
-        path: '/',
         expires: new Date(Moment().add(process.env.EXPIRES, 'h').toDate()),
       })
       .send({
