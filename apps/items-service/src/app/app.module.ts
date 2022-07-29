@@ -10,7 +10,10 @@ import { ItemModule } from './item/item.module';
 import { PriceModule } from './price/price.module';
 
 let MONGO_URI;
-if (process.env['NODE' + '_ENV'] === 'production') {
+if (
+  process.env['NODE' + '_ENV'] === 'production' ||
+  process.env['NODE' + '_ENV'] === 'staging'
+) {
   // read from a file
 
   const pathToStaticContent = path.join(

@@ -14,7 +14,10 @@ import { UserModule } from './user/user.module';
 let MONGO_URI;
 let jwt_secret;
 let expires;
-if (process.env['NODE' + '_ENV'] === 'production') {
+if (
+  process.env['NODE' + '_ENV'] === 'production' ||
+  process.env['NODE' + '_ENV'] === 'staging'
+) {
   // read from a file
 
   const pathToStaticContent = path.join(

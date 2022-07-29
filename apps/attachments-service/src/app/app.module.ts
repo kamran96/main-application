@@ -7,7 +7,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 let MONGO_URI;
-if (process.env['NODE' + '_ENV'] === 'production') {
+if (
+  process.env['NODE' + '_ENV'] === 'production' ||
+  process.env['NODE' + '_ENV'] === 'staging'
+) {
   // read from a file
 
   const pathToStaticContent = path.join(

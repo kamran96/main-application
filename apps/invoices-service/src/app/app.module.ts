@@ -17,7 +17,10 @@ dotenv.config();
 
 let dynamicContent;
 let staticContent;
-if (process.env['NODE' + '_ENV'] === 'production') {
+if (
+  process.env['NODE' + '_ENV'] === 'production' ||
+  process.env['NODE' + '_ENV'] === 'staging'
+) {
   // read from a file
 
   const pathToDynamicContent = path.join(
