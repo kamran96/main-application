@@ -72,10 +72,10 @@ jobs:
       - name: run db migrations
         run: yarn run pay_migration_run
         env: 
-          DB_HOST: ${{ secrets.PROD_DB_HOST }}
+          DB_HOST: ${{ secrets.DB_HOST }}
           DB_PORT: ${{ secrets.DB_PORT }}
           PAYMENT_DB_NAME: ${{ secrets.PAYMENT_DB_NAME }}
-          DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_USER: ${{ secrets.DB_USER }}
           NODE_ENV: 'production'
 
@@ -177,10 +177,10 @@ jobs:
       - name: run db migrations
         run: yarn run pay_migration_run
         env: 
-          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_HOST: ${{ secrets.PROD_DB_HOST }}
           DB_PORT: ${{ secrets.DB_PORT }}
           PAYMENT_DB_NAME: ${{ secrets.PAYMENT_DB_NAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
           DB_USER: ${{ secrets.DB_USER }}
           NODE_ENV: 'production'
 

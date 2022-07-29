@@ -17,7 +17,6 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
     super({
       jwtFromRequest: (req) => {
-        console.log(req.cookies['access_token'], 'cookie');
         if (!req || !req.cookies) return null;
         data = {
           cookies: req.cookies,
@@ -35,9 +34,6 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
       const newData = { ...data, user: payload };
       const user: IUserAccessControlResponse =
         await this.authService.AccessControll(newData as IRequest);
-
-      console.log(user.statusCode, 'status');
-      console.log('---------------------------------');
 
       if (user?.statusCode === HttpStatus.OK) {
         return user?.user;
