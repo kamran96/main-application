@@ -36,7 +36,9 @@ jobs:
       - name: install dependencies
         if: steps.cache-node-modules.cache-hit != 'true'
         run: yarn install --prefer-offline
-     
+      # Runs a set of commands using the runners shell
+      - name: build required projects
+        run: yarn build users-service
       
   DeployStaging:
     name: Deploy to staging
@@ -47,10 +49,7 @@ jobs:
       name: staging
       url: 'https://api.staging.invyce.com/users'
     steps:
-       # Runs a set of commands using the runners shell
-      - name: build required projects
-        run: NODE_ENV=staging yarn build users-service
-         # docker build item service images
+      # docker build item service images
       - name: Build container image
         run: docker build -f $GITHUB_WORKSPACE/apps/users-service/Dockerfile --build-arg NODE_ENV=staging -t registry.digitalocean.com/invyce-images/users-service:$(echo $GITHUB_SHA | head -c7) .
       # INSTALL digital ocean cli
@@ -100,10 +99,7 @@ jobs:
       name: production
       url: 'https://api.cloud.invyce.com/users'
     steps:
-       # Runs a set of commands using the runners shell
-      - name: build required projects
-        run: NODE_ENV=production yarn build users-service
-         # docker build item service images
+      # docker build item service images
       - name: Build container image
         run: docker build -f $GITHUB_WORKSPACE/apps/users-service/Dockerfile --build-arg NODE_ENV=production -t registry.digitalocean.com/invyce-images/users-service:$(echo $GITHUB_SHA | head -c7) .
       # INSTALL digital ocean cli
