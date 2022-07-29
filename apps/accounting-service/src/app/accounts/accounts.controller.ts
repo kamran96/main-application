@@ -133,7 +133,6 @@ export class AccountsController {
 
   @Post('init')
   async initAccounts(@Body() data): Promise<void> {
-    console.log('initailizing....');
     return await this.accountService.initAccounts(data);
   }
 

@@ -21,10 +21,8 @@ let host;
 @Injectable()
 export class Authenticate implements NestMiddleware {
   async use(req: IRequest, res: Response, next: NextFunction) {
-    console.log('auth middleware called...');
     try {
       const token = req.cookies['access_token'];
-      console.log(token, 'access token');
 
       if (!token) {
         return 401;
