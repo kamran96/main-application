@@ -13,17 +13,19 @@ on:
 env:
   ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+jobs: 
+  DeployStaging:
+    name: Deploy to staging
+    if: github.event.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    environment:
+      name: staging
+      url: 'https://api.staging.invyce.com/users'
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Use Node ${{ matrix.node-version }}
+       - name: Use Node ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
@@ -39,19 +41,6 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: build required projects
         run: yarn build users-service
-      
-  DeployStaging:
-    name: Deploy to staging
-    if: github.event.ref == 'refs/heads/main'
-    needs: [Build]
-    runs-on: ubuntu-latest
-    environment:
-      name: staging
-      url: 'https://api.staging.invyce.com/users'
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Checkout
-        uses: actions/checkout@v2
       # docker build item service images
       - name: Build container image
         run: docker build -f $GITHUB_WORKSPACE/apps/users-service/Dockerfile --build-arg NODE_ENV=staging -t registry.digitalocean.com/invyce-images/users-service:$(echo $GITHUB_SHA | head -c7) .
@@ -105,6 +94,22 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
         uses: actions/checkout@v2
+       - name: Use Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: cache node_modules
+        id: cache-node-modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-build-node-modules-cache-${{ hashFiles('**/yarn.lock') }}
+      - name: install dependencies
+        if: steps.cache-node-modules.cache-hit != 'true'
+        run: yarn install --prefer-offline
+      # Runs a set of commands using the runners shell
+      - name: build required projects
+        run: yarn build users-service
       # docker build item service images
       - name: Build container image
         run: docker build -f $GITHUB_WORKSPACE/apps/users-service/Dockerfile --build-arg NODE_ENV=production -t registry.digitalocean.com/invyce-images/users-service:$(echo $GITHUB_SHA | head -c7) .
