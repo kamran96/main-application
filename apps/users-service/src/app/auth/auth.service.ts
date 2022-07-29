@@ -230,10 +230,7 @@ export class AuthService {
     const token = this.jwtService.sign(payload);
     res
       .cookie('access_token', token, {
-        secure: true,
-        sameSite: 'lax',
         httpOnly: true,
-        expires: new Date(Moment().add(process.env.EXPIRES, 'h').toDate()),
       })
       .send({
         message: 'Login successfully',
