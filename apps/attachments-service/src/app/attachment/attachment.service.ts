@@ -513,7 +513,10 @@ export class AttachmentService {
                             style: 'c_name',
                           },
                           {
-                            text: organizationDetails?.phoneNumber || '',
+                            text:
+                              organizationDetails?.phoneNumber !== null
+                                ? organizationDetails.phoneNumber
+                                : 'no phone number available',
                             style: 'address_style',
                           },
                           {
