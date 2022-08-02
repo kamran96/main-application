@@ -73,16 +73,17 @@ export enum InvTypes {
 
 export const Host = (service: string, route: string): string => {
   if (process.env['NODE' + '_ENV'] === 'production') {
-    return `http://${service}.prod.svc.cluster.local/${route}`;
+    return `http://prod-${service}.prod.svc.cluster.local/${route}`;
   } else if (process.env['NODE' + '_ENV'] === 'staging') {
-    return `http://${service}.stage.svc.cluster.local/${route}`;
+    return `http://staging-${service}.stage.svc.cluster.local/${route}`;
   } else {
     return `https://localhost/${route}`;
   }
 };
 
 export const MQ_HOST = () => {
-  return process.env['NODE' + '_ENV'] === 'production'
+  return process.env['NODE' + '_ENV'] === 'production' ||
+    process.env['NODE' + '_ENV'] === 'staging'
     ? `amqp://${process.env.RABBIT_USERNAME}:${process.env.RABBIT_PASSWORD}@${process.env.RABBIT_HOST}:${process.env.RABBIT_PORT}`
     : 'amqp://localhost:5672';
 };

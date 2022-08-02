@@ -395,7 +395,6 @@ export class ItemService {
         i.type === IOperationType.DECREASE
           ? IOperationType.INCREASE
           : IOperationType.DECREASE;
-      console.log(i, 'invoiceType');
       if (i.invoiceType === 'bill') {
         const item = await getItem(i.itemId);
         await this.itemModel.updateOne(
@@ -409,7 +408,6 @@ export class ItemService {
         );
       } else if (i.invoiceType === 'invoice') {
         const item = await getItem(i.itemId);
-        console.log(item);
         await this.itemModel.updateOne(
           { _id: i.itemId },
           {
@@ -505,7 +503,6 @@ export class ItemService {
           const {
             name,
             description,
-            stock,
             openingStock,
             itemType,
             barcode,

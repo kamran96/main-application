@@ -14,7 +14,10 @@ dotenv.config();
 
 let dynamicContent;
 let staticContent;
-if (process.env['NODE' + '_ENV'] === 'production') {
+if (
+  process.env['NODE' + '_ENV'] === 'production' ||
+  process.env['NODE' + '_ENV'] === 'staging'
+) {
   // read from a file
 
   const pathToDynamicContent = path.join(
@@ -88,7 +91,7 @@ if (process.env['NODE' + '_ENV'] === 'production') {
                   process.env.PAYMENT_DB_NAME
                 ),
           entities: getMetadataArgsStorage().tables.map((tbl) => tbl.target),
-          // ssl: { rejectUnauthorized: false },
+          ssl: { rejectUnauthorizedk: false },
         } as TypeOrmModuleOptions),
     }),
     PaymentModule,

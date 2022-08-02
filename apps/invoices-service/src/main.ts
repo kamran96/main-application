@@ -35,7 +35,10 @@ async function bootstrap() {
   });
   app.use(helmet());
 
-  if (process.env['NODE' + '_ENV'] === 'production') {
+  if (
+    process.env['NODE' + '_ENV'] === 'production' ||
+    process.env['NODE' + '_ENV'] === 'staging'
+  ) {
     app.setGlobalPrefix('/invoices');
   }
   await app.listen(port, () => {

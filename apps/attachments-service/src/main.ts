@@ -31,7 +31,10 @@ async function bootstrap() {
     origin: true,
     credentials: true,
   });
-  if (process.env['NODE' + '_ENV'] === 'production') {
+  if (
+    process.env['NODE' + '_ENV'] === 'production' ||
+    process.env['NODE' + '_ENV'] === 'staging'
+  ) {
     app.setGlobalPrefix('/attachments');
   }
   const port = process.env.PORT || 3338;
