@@ -213,9 +213,6 @@ export class AttachmentService {
   }
 
   async pdfData(data, currency) {
-    console.log(data, 'what is data');
-
-    console.log(currency, 'curreency');
     try {
       const newArr = [];
       const heading = [
@@ -248,7 +245,6 @@ export class AttachmentService {
       });
 
       const pdfArr = [...heading, ...newArr];
-      console.log('invoice items maped and returned');
 
       return pdfArr;
     } catch (error) {
@@ -307,7 +303,6 @@ export class AttachmentService {
         organizationDetails = { ...organizationDetails, ...result };
       }
 
-      console.log(organizationDetails, 'org', result);
       const defaultCurrency =
         organizationDetails.currency || organizationDetails?.currency !== null
           ? organizationDetails?.currency
@@ -463,8 +458,6 @@ export class AttachmentService {
       } else {
         logoRender = { ...logoRender, text: 'Logo Here' };
       }
-
-      console.log(logoRender, 'logo render');
 
       const docDefinition = {
         pageMargins: [0, 0, 0, 20],
@@ -704,8 +697,6 @@ export class AttachmentService {
           ),
         },
       };
-
-      console.log('doc def', docDefinition.content);
 
       const printer = new PdfPrinter(fonts);
       const doc = printer.createPdfKitDocument(docDefinition);
