@@ -303,6 +303,8 @@ export class AttachmentService {
         organizationDetails = { ...organizationDetails, ...result };
       }
 
+      console.log(organizationDetails, 'org details');
+
       const defaultCurrency =
         organizationDetails.currency || organizationDetails?.currency !== null
           ? organizationDetails?.currency
@@ -459,6 +461,7 @@ export class AttachmentService {
         logoRender = { ...logoRender, text: 'Logo Here' };
       }
 
+      console.log(logoRender, 'logo details');
       const docDefinition = {
         pageMargins: [0, 0, 0, 20],
         footer: function (currentPage, pageCount) {
@@ -686,6 +689,8 @@ export class AttachmentService {
           font: 'RobotoSlab',
         },
       };
+
+      console.log(docDefinition, 'doc def');
 
       const fonts = {
         RobotoSlab: {
