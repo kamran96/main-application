@@ -303,6 +303,8 @@ export class AttachmentService {
         organizationDetails = { ...organizationDetails, ...result };
       }
 
+      console.log(organizationDetails, 'org details');
+
       const defaultCurrency =
         organizationDetails.currency || organizationDetails?.currency !== null
           ? organizationDetails?.currency
@@ -517,11 +519,17 @@ export class AttachmentService {
                             style: 'address_style',
                           },
                           {
-                            text: organizationDetails?.email || '',
+                            text:
+                              organizationDetails?.email !== null
+                                ? organizationDetails.email
+                                : '',
                             style: 'address_style',
                           },
                           {
-                            text: organizationDetails?.website || '',
+                            text:
+                              organizationDetails?.website !== null
+                                ? organizationDetails.website
+                                : '',
                             style: 'address_style',
                           },
                         ],
@@ -538,18 +546,24 @@ export class AttachmentService {
                         stack: [
                           {
                             text: Capitalize(
-                              organizationDetails?.address?.city || ''
+                              organizationDetails?.address?.city !== null
+                                ? organizationDetails.address.city
+                                : ''
                             ),
                             style: 'address_style',
                           },
                           {
                             text:
-                              organizationDetails?.address?.postalCode || '',
+                              organizationDetails?.address?.postalCode !== null
+                                ? organizationDetails.address.postalCode
+                                : '',
                             style: 'address_style',
                           },
                           {
                             text: Capitalize(
-                              organizationDetails?.address?.country || ''
+                              organizationDetails?.address?.country !== null
+                                ? organizationDetails.address.country
+                                : ''
                             ),
                             style: 'address_style',
                           },

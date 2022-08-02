@@ -88,7 +88,7 @@ if (
             ? staticContent.ACC_DB_NAME
             : configService.get('ACC_DB_NAME', process.env.ACC_DB_NAME),
           entities: getMetadataArgsStorage().tables.map((tbl) => tbl.target),
-          ssl: { rejectUnauthorized: false },
+          // ssl: { rejectUnauthorized: false },
         } as TypeOrmModuleOptions),
     }),
     AccountsModule,
