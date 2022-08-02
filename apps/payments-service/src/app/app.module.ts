@@ -91,7 +91,7 @@ if (
                   process.env.PAYMENT_DB_NAME
                 ),
           entities: getMetadataArgsStorage().tables.map((tbl) => tbl.target),
-          ssl: { rejectUnauthorizedk: false },
+          ssl: { rejectUnauthorized: false },
         } as TypeOrmModuleOptions),
     }),
     PaymentModule,
