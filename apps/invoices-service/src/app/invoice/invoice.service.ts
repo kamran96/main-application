@@ -809,7 +809,6 @@ export class InvoiceService {
           ? dto.email
           : null;
 
-        console.log('generating pdf...');
         const { data: attachment } = await axios.post(
           Host('attachments', `attachments/attachment/generate-pdf`),
           {
@@ -827,8 +826,6 @@ export class InvoiceService {
             },
           }
         );
-
-        console.log('pdf generated...');
 
         if (email) {
           await this.emailService.emit(INVOICE_CREATED, {
