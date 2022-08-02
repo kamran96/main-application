@@ -42,7 +42,7 @@ export const getAllItems = ({ queryKey }: QueryKey) => {
 
 export const getItemByIDAPI = ({ queryKey }: QueryKey) => {
   const id: number = queryKey[1];
-  return http.get(`item/${id}`);
+  return http.get(`items/item/${id}`); // item/{id}
 };
 
 export const getPriceByIDAPI = ({ queryKey }: QueryKey) => {

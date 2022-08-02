@@ -1,7 +1,7 @@
-import React, { FC, useState } from 'react';
+import { FC, useState } from 'react';
 import { CommonModal } from '../../../components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { useMutation, useQuery } from 'react-query';
+import { useQuery } from 'react-query';
 import { WrapperModalContent } from './style';
 import { getItemsKeysApi } from '../../../../src/api';
 import { ReactQueryKeys } from '../../../../src/modal';
@@ -11,8 +11,6 @@ import bookHalf from '@iconify/icons-bi/book-half';
 import downloadIcon from '@iconify/icons-bi/download';
 import { InvoiceImportManager } from '../../Invoice/InvoiceImportManager';
 import { CompareDataModal } from './CompareDataModal';
-import { ColumnsType } from 'antd/lib/table';
-import { CommonTable } from '../../../components/Table';
 import { CompareDataTable } from './CompareDataTable';
 import { downloadCSV } from '../../../utils/downloadCSVFile';
 
@@ -54,6 +52,15 @@ export const ItemsImportWidget: FC = () => {
       enabled: !!compareDataModal,
     }
   );
+
+  const onResetState = () => {
+    setItemsImportconfig(false, null);
+    setStep(1);
+    setFileData(null);
+    setFileExtractedData(null);
+    setCompareDataModel(false);
+    setCompareData({});
+  };
 
   const [state, setState] = useState(data?.xero);
 
@@ -178,7 +185,8 @@ export const ItemsImportWidget: FC = () => {
           fileExtractedData={fileExtractedData}
           compareData={compareData}
           itemKeysResponse={itemKeysResponse}
-          fileData
+          fileData={fileData}
+          onSuccess={onResetState}
         />
       </WrapperModalContent>
     </CommonModal>

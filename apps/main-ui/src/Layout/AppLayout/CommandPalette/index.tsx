@@ -24,6 +24,20 @@ import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 import { DivProps, ISupportedRoutes } from '../../../modal';
 import CommandPlatteGlobalStyles from './commandPaletteGlobalStyles';
+import LogOut from '@iconify-icons/feather/log-out';
+import {
+  DraftInvoice,
+  CreateInvoice,
+  CreatePo,
+  CreateBill,
+  CreateQuote,
+  Payments,
+  Accounting,
+  Contacts,
+  Setting,
+  Items,
+  JournalEntry,
+} from '../../../../src/assets/icons';
 import { useEffect, useState } from 'react';
 
 export const InvyceCmdPalette = () => {
@@ -43,13 +57,13 @@ export const InvyceCmdPalette = () => {
 
   const commands = [
     {
-      name: 'Create Invoice',
+      name: 'Invoice > Create',
       command: () => {
         history.push(`/app${ISupportedRoutes.CREATE_INVOICE}`);
       },
       shortcut: '',
       permission: PERMISSIONS.INVOICES_CREATE,
-      icon: fileText,
+      icon: <CreateInvoice width={15} height={15} />,
       type: 'bussiness',
     },
     {
@@ -59,7 +73,7 @@ export const InvyceCmdPalette = () => {
       },
       shortcut: '',
       permission: PERMISSIONS.INVOICES_INDEX,
-      icon: fileText,
+      icon: <CreateInvoice width={15} height={15} />,
       type: 'bussiness',
     },
     {
@@ -69,7 +83,7 @@ export const InvyceCmdPalette = () => {
       },
       shortcut: '',
       permission: PERMISSIONS.INVOICES_INDEX,
-      icon: fileText,
+      icon: <DraftInvoice width={15} height={15} />,
       type: 'bussiness',
     },
     {
@@ -81,7 +95,7 @@ export const InvyceCmdPalette = () => {
       },
       shortcut: '',
       permission: PERMISSIONS.INVOICES_INDEX,
-      icon: fileText,
+      icon: <DraftInvoice width={15} height={15} />,
       type: 'bussiness',
     },
     {
@@ -91,108 +105,129 @@ export const InvyceCmdPalette = () => {
       },
       shortcut: '',
       permission: PERMISSIONS.INVOICES_INDEX,
-      icon: fileText,
+      icon: <DraftInvoice width={15} height={15} />,
       type: 'bussiness',
     },
     {
-      name: 'Create Purchase Order',
+      name: 'Purchase Order > Create',
       command: () => {
         history.push(`/app${ISupportedRoutes.CREATE_PURCHASE_ORDER}`);
       },
       permission: PERMISSIONS.PURCHASE_ORDERS_CREATE,
-      icon: bookOpen,
+      icon: <CreatePo width={15} height={15} />,
       type: 'bussiness',
     },
     {
-      name: 'Purchase Order List > Approved',
+      name: 'Purchase Order > Approved List',
       command: () => {
         history.push(`/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=all`);
       },
       permission: PERMISSIONS.PURCHASE_ORDERS_INDEX,
-      icon: bookOpen,
+      icon: <CreatePo width={15} height={15} />,
       type: 'bussiness',
     },
     {
-      name: 'Purchase Order List > Draft',
+      name: 'Purchase Order > Draft List',
       command: () => {
         history.push(`/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=draft`);
       },
       permission: PERMISSIONS.PURCHASE_ORDERS_INDEX,
-      icon: bookOpen,
+      icon: <CreatePo width={15} height={15} />,
       type: 'bussiness',
     },
     {
-      name: 'Create Purchase Entry',
+      name: 'Bills > Create',
       command: () => {
         history.push(`/app${ISupportedRoutes.CREATE_PURCHASE_Entry}`);
       },
       permission: PERMISSIONS.PURCHASES_CREATE,
-      icon: shoppingBag,
+      icon: <CreateBill width={15} height={15} />,
       type: 'bussiness',
     },
     {
-      name: 'Purchases List > Approved',
+      name: 'Bills > Approved List',
       command: () => {
         history.push(`/app${ISupportedRoutes.PURCHASES}?tabIndex=all`);
       },
       permission: PERMISSIONS.PURCHASES_INDEX,
-      icon: shoppingBag,
+      icon: <CreateBill width={15} height={15} />,
       type: 'bussiness',
     },
     {
-      name: 'Purchases List > Draft',
+      name: 'Bills > Draft List',
       command: () => {
         history.push(`/app${ISupportedRoutes.PURCHASES}?tabIndex=draft`);
       },
       permission: PERMISSIONS.PURCHASES_INDEX,
-      icon: shoppingBag,
+      icon: <CreateBill width={15} height={15} />,
       type: 'bussiness',
     },
 
     {
-      name: 'Create Quotation',
+      name: 'Quotation > Create',
       command: () => {
         history.push(`/app${ISupportedRoutes.CREATE_QUOTE}`);
       },
       permission: PERMISSIONS.QUOTATIONS_CREATE,
-      icon: fileInvoiceDollar,
+      icon: <CreateQuote width={15} height={15} />,
       type: 'bussiness',
     },
     {
-      name: 'Create Payment',
+      name: 'Payments > Create',
       command: () => {
         setPaymentsModalConfig(true);
       },
       permission: PERMISSIONS.PAYMENTS_CREATE,
-      icon: dollarSign,
+      icon: <Payments width={15} height={15} />,
       type: 'bussiness',
     },
     {
-      name: 'Create Role',
+      name: 'Payments > Paid List',
+      command: () => {
+        history.push(`/app${ISupportedRoutes.PAYMENTS}?tabIndex=paid`);
+      },
+      permission: PERMISSIONS.PAYMENTS_INDEX,
+      icon: <Payments width={15} height={15} />,
+      type: 'bussiness',
+    },
+    {
+      name: 'Payments > Recieved List',
+      command: () => {
+        history.push(`/app${ISupportedRoutes.PAYMENTS}?tabIndex=received`);
+      },
+      permission: PERMISSIONS.PAYMENTS_INDEX,
+      icon: <Payments width={15} height={15} />,
+      type: 'bussiness',
+    },
+    {
+      name: 'Roles > Create',
       command: () => {
         setRbacConfigModal(true);
       },
       permission: PERMISSIONS.PAYMENTS_CREATE,
       icon: userRole,
       type: 'organization',
+      iconify: true,
     },
     {
-      name: 'Roles',
+      name: 'Roles > List',
       command: () => {
         history.push(`/app${ISupportedRoutes.RBAC}`);
       },
       permission: PERMISSIONS.RBAC_ROLE_INDEX,
       icon: userRole,
       type: 'organization',
+      iconify: true,
     },
     {
-      name: 'Permissions',
+      name: 'Permissions > List',
       command: () => {
         history.push(`/app${ISupportedRoutes.PERMISSIONS}`);
       },
       permission: PERMISSIONS.RBAC_ROLE_PERMISSION_UPDATE,
       icon: lockIcon,
       type: 'organization',
+      iconify: true,
     },
     {
       name: 'Chart of Accounts > List',
@@ -200,62 +235,62 @@ export const InvyceCmdPalette = () => {
         history.push(`/app${ISupportedRoutes.ACCOUNTS}`);
       },
       permission: PERMISSIONS.ACCOUNTS_INDEX,
-      icon: analyticsIcon,
+      icon: <Accounting height={15} width={15} />,
       type: 'accounting',
     },
     {
-      name: 'Create Account',
+      name: 'Chart of Accounts > Create',
       command: () => {
         setAccountsModalConfig({ visibility: true, id: null });
       },
       permission: PERMISSIONS.ACCOUNTS_CREATE,
-      icon: analyticsIcon,
+      icon: <Accounting height={15} width={15} />,
       type: 'accounting',
     },
     {
-      name: 'Transaction > List',
+      name: 'Transactions > List',
       command: () => {
         history.push(`/app${ISupportedRoutes.TRANSACTIONS}`);
       },
       permission: PERMISSIONS.TRANSACTIONS_INDEX,
-      icon: filePlus,
+      icon: <JournalEntry height={15} width={15} />,
       type: 'accounting',
     },
     {
-      name: 'Create Transaction',
+      name: 'Transactions > Create',
       command: () => {
         history.push(`/app${ISupportedRoutes.CREATE_TRANSACTION}`);
       },
       permission: PERMISSIONS.TRANSACTIONS_CREATE,
-      icon: filePlus,
+      icon: <JournalEntry height={15} width={15} />,
       type: 'accounting',
     },
 
     {
-      name: 'Contacts List  > Customers',
+      name: 'Contacts  > Customers List',
       command: () => {
         history.push(`/app${ISupportedRoutes.CONTACTS}?tabIndex=customers`);
       },
       permission: PERMISSIONS.CONTACTS_INDEX,
-      icon: bxUser,
+      icon: <Contacts width={15} height={15} />,
       type: 'contacts',
     },
     {
-      name: 'Contacts List  > Suppliers',
+      name: 'Contacts  > Suppliers List',
       command: () => {
         history.push(`/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers`);
       },
       permission: PERMISSIONS.CONTACTS_INDEX,
-      icon: bxUser,
+      icon: <Contacts width={15} height={15} />,
       type: 'contacts',
     },
     {
-      name: 'Create Contacts',
+      name: 'Contacts > Create',
       command: () => {
         history.push(`/app${ISupportedRoutes.CREATE_CONTACT}`);
       },
       permission: PERMISSIONS.CONTACTS_CREATE,
-      icon: bxUser,
+      icon: <Contacts width={15} height={15} />,
       type: 'contacts',
     },
     {
@@ -266,48 +301,50 @@ export const InvyceCmdPalette = () => {
       permission: PERMISSIONS.USERS_LIST,
       icon: usersIcon,
       type: 'users',
+      iconify: true,
     },
     {
-      name: 'Create User',
+      name: 'Users > Create',
       command: () => {
         setUserInviteModal(true);
       },
       permission: PERMISSIONS.USERS_CREATE,
       icon: usersIcon,
       type: 'users',
+      iconify: true,
     },
     {
-      name: 'Create Item',
+      name: 'Items > Create',
       command: () => {
         setItemsModalConfig(true);
       },
       permission: PERMISSIONS.ITEMS_CREATE,
-      icon: shoppingCart,
+      icon: <Items width={15} height={15} />,
       type: 'bussiness',
     },
     {
-      name: 'Items > List',
+      name: 'Items > Items List',
       command: () => {
         history.push(`/app${ISupportedRoutes.ITEMS}`);
       },
       permission: PERMISSIONS.ITEMS_INDEX,
-      icon: shoppingCart,
+      icon: <Items width={15} height={15} />,
       type: 'bussiness',
     },
     {
-      name: 'User > Profile Settings',
+      name: 'Settings > Profile Settings',
       command: () => {
         history.push(`/app${ISupportedRoutes.PROFILE_SETTING}`);
       },
-      icon: settingsIcon,
+      icon: <Setting width={15} height={15} />,
       type: 'zsettings',
     },
     {
-      name: 'User > Account Setting',
+      name: 'Settings > Account Setting',
       command: () => {
         history.push(`/app${ISupportedRoutes.ACCOUNT_SETTING}`);
       },
-      icon: settingsIcon,
+      icon: <Setting width={15} height={15} />,
       type: 'zsettings',
     },
     {
@@ -315,8 +352,9 @@ export const InvyceCmdPalette = () => {
       command: () => {
         handleLogin({ type: ILoginActions.LOGOUT });
       },
-      icon: powerIcon,
+      icon: LogOut,
       type: 'zz',
+      iconify: true,
     },
   ];
 
@@ -415,7 +453,7 @@ export const InvyceCmdPalette = () => {
       }
     }, [inputEleParent]);
 
-    const { icon, name, highlight, type, lastIndex } = suggestion;
+    const { icon, name, highlight, type, lastIndex, iconify } = suggestion;
 
     const highlitedWord = () => {
       return {
@@ -428,7 +466,8 @@ export const InvyceCmdPalette = () => {
         className={`item flex alignCenter`}
       >
         <span className="flex icons alignCenter mr-10">
-          <Icon icon={icon} />
+          {/* <Icon icon={icon} /> */}
+          {iconify ? <Icon icon={icon} /> : icon}
         </span>
         {highlight ? (
           <span dangerouslySetInnerHTML={highlitedWord()}></span>
@@ -547,4 +586,24 @@ interface IWrapperCommandsProps extends DivProps {
   isLastindex: boolean;
 }
 
-const WrapperCommands = styled.div<IWrapperCommandsProps>``;
+const WrapperCommands = styled.div<IWrapperCommandsProps>`
+  svg {
+    path {
+      stroke: ${(props: IThemeProps) =>
+        props?.theme?.colors?.sidebarDefaultText};
+    }
+
+    .ItemsIconsColor {
+      fill: ${(props: IThemeProps) =>
+        props?.theme?.theme === 'dark' ? 'transparent' : 'transparent'};
+    }
+
+    .itemStroke {
+      stroke: none;
+    }
+    .ItemsFill {
+      fill: ${(props: IThemeProps) =>
+        props?.theme?.theme === 'dark' ? '#C2C2C2' : ''};
+    }
+  }
+`;

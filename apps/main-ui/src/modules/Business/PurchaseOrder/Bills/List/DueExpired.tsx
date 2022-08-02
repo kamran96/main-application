@@ -264,7 +264,7 @@ export const DueExpiredBills: FC<IProps> = ({ columns, activeTab }) => {
   const renerTopRightbar = () => {
     return (
       <div className="flex alignCenter">
-        <ImportBill/>
+        {/* <ImportBill/> */}
         <SmartFilter
           onFilter={(encode) => {
             setAllInvoicesConfig({

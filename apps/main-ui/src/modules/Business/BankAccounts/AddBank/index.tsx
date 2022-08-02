@@ -12,6 +12,8 @@ import {
   IErrorResponse,
   NOTIFICATIONTYPE,
 } from '../../../../modal';
+import { number } from 'echarts';
+import { type } from 'os';
 
 const { Option } = Select;
 
@@ -78,7 +80,14 @@ export const AddBankWidget: FC = () => {
               <FormLabel>Bank Name</FormLabel>
               <Form.Item
                 name="name"
-                rules={[{ required: true, message: 'Please add Bank name' }]}
+                rules={[
+                  { required: true, message: 'Please add Bank name' },
+                  { min: 3 },
+                  {
+                    pattern: /^\S/,
+                    message: 'Please add Bank name',
+                  },
+                ]}
               >
                 <Input
                   size="large"
@@ -88,12 +97,21 @@ export const AddBankWidget: FC = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <FormLabel>Account Number</FormLabel>
+              <FormLabel isRequired={true}>Account Number</FormLabel>
               <Form.Item
                 name="accountNumber"
                 rules={[
-                  { required: true, message: 'Please add Account Number' },
+                  { required: true, 
+                    message: 'Please add Account Number' ,
+                    type: 'number',
+                  },
+                  {
+                    // pattern: /[0-9]{4}-?[0-9]{4}-?[0-9]{2}-?[0-9]{10}/,
+                    pattern: /^\S/,
+                    message: 'Please add Account Number',
+                  },
                 ]}
+                normalize={(val?: string) => val?.replace(/\s/g, '') || ''}
               >
                 <Input size="large" autoComplete="off" />
               </Form.Item>

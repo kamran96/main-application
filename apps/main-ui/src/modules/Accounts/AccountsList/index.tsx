@@ -305,7 +305,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
   const topbarRightPannel = () => {
     return (
       <div className="flex alignCenter">
-        <AccountsImport />
+        {/* <AccountsImport /> */}
         <SmartFilter
           onFilter={(encode) => {
             setAccountConfig({ ...accountsConfig, query: encode });

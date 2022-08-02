@@ -170,7 +170,15 @@ export const AccountsForm: FC = () => {
             </Col>
             <Col span={12}>
               <FormLabel>Name</FormLabel>
-              <Form.Item name="name">
+              <Form.Item
+                name="name"
+                rules={[
+                  {
+                    pattern: /^\S/,
+                    message: 'Please add proper Account Name and remove Whitespaces ',
+                  },
+                ]}
+              >
                 <Input autoComplete="off" size="large" />
               </Form.Item>
               <p className="input-info">

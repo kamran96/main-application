@@ -23,6 +23,7 @@ apps/users-service/.env
 
 # dependencies
 /node_modules
+node_modules.zip
 
 # IDEs and editors
 /.idea

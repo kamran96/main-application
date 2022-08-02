@@ -60,7 +60,7 @@ export const ItemsViewContainer: FC = () => {
     ],
     getItemDetail,
     {
-      enabled: id,
+      enabled: !!id,
     }
   );
 
@@ -74,7 +74,7 @@ export const ItemsViewContainer: FC = () => {
     <WrapperItemsView>
       <div className="flex justifySpaceBetween">
         <Heading type="table">{result && result.name}</Heading>
-        <div className="_filter textRight">
+        <div className="_filter textRight mb-10">
           <CustomDateRange
             size="small"
             onChange={(dates) => {

@@ -143,6 +143,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
     // for CRA
     return data.default;
   };
+  
   const prefixSelector = (
     <Form.Item name="prefix" noStyle>
       <Select
@@ -156,11 +157,10 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
           );
         }}
       >
-        {phoneCodes?.map((country, index) => {
+        {phoneCodes?.map((country) => {
           return (
             <Option
-              key={index}
-              value={`${country?.phoneCode}`}
+              value={country?.phoneCode}
               title={`${country?.phoneCode}`}
               id={country?.short}
             >

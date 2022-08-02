@@ -221,7 +221,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
   const renderTobarRight = () => {
     return (
       <div className="flex alignCenter">
-        <InvoiceImports/>
+        {/* <InvoiceImports/> */}
         <SmartFilter
           onFilter={(encode) => {
             setAllInvoicesConfig({ ...allInvoicesConfig, query: encode });

@@ -193,6 +193,18 @@ export const PaymentsForm: FC = () => {
     return contacts;
   };
 
+  // console.log(getContactAgaintPaymentType(), 'getContactAgaintPaymentType');
+
+  const getCustomerBalance = () => {
+    const filtered = getContactAgaintPaymentType().filter(
+      (item) => item.id === contact_id
+    );
+
+    return filtered;
+  };
+
+  // console.log(getCustomerBalance(), 'getCustomerBalance');
+
   const handleChangedValue = (changedValues, allValues) => {
     if (changedValues && changedValues.contactId) {
       const { contactId } = changedValues;
@@ -293,7 +305,13 @@ export const PaymentsForm: FC = () => {
           <Col span={12}>
             <FormLabel>Reference</FormLabel>
             <Form.Item
-              rules={[{ required: true, message: 'Reference is required!' }]}
+              rules={[
+                { required: true, message: 'Reference is required!' },
+                {
+                  pattern: /^\S/,
+                  message: 'Please remove Whitespaces ',
+                },
+              ]}
               name="reference"
             >
               <Input
@@ -427,13 +445,31 @@ export const PaymentsForm: FC = () => {
             </div>
             <Form.Item
               name="comment"
-              rules={[{ required: true, message: 'Please specify payment' }]}
+              rules={[
+                { required: true, message: 'Please specify payment' },
+                {
+                  pattern: /^\S/,
+                  message: 'Please remove Whitespaces ',
+                },
+              ]}
             >
               <TextArea rows={3} />
             </Form.Item>
           </Col>
           <Col span={9} offset={1}>
             <div className="total_area">
+              {contact_id && (
+                <>
+                  <div className="flex alignItemsEnd justifySpaceBetween mb-10">
+                    <p className="bold default fs-16">Cutsomer Balance</p>
+                    <p className="default fs-16 flex-1 textRight">
+                      {moneyFormat(Math.abs(getCustomerBalance()[0].balance))}
+                    </p>
+                  </div>
+                  <hr className="sep" />
+                </>
+              )}
+
               <div className="flex alignItemsEnd justifySpaceBetween">
                 <p className="bold default fs-16">Total Amount</p>
                 <p className="default fs-16 flex-1 textRight">

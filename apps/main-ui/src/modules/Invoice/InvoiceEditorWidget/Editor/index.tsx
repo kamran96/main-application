@@ -153,11 +153,15 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
 
     const errors = handleCheckValidation(invoiceItems);
 
+    console.log(value, "values", errors, "errors");
+
     if (!errors.length) {
       const paymentData = { ...payment };
       delete paymentData.totalAmount;
       delete paymentData.totalDiscount;
 
+      console.log(paymentData, "payments");
+      
       let payload: any = {
         ...value,
         email,

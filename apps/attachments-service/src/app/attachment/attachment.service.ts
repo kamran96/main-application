@@ -213,6 +213,9 @@ export class AttachmentService {
   }
 
   async pdfData(data, currency) {
+    console.log(data, 'what is data');
+
+    console.log(currency, 'curreency');
     try {
       const newArr = [];
       const heading = [
@@ -221,7 +224,6 @@ export class AttachmentService {
         ),
       ];
 
-      console.log(data.invoice_items, 'ite');
       data.invoice_items.forEach((tr, index) => {
         const item = data.items.find((i) => i.id === tr.itemId);
 
@@ -246,6 +248,7 @@ export class AttachmentService {
       });
 
       const pdfArr = [...heading, ...newArr];
+      console.log('invoice items maped and returned');
 
       return pdfArr;
     } catch (error) {
@@ -267,6 +270,28 @@ export class AttachmentService {
         postalCode: data?.contact?.addresses[0]?.postalCode || '',
       };
 
+      let organizationDetails = {
+        currency: {
+          name: 'United States dollar',
+          code: 'USD',
+          symbol: '$',
+          id: null,
+          symbolNative: '$',
+        },
+        attachment: {
+          path: '',
+        },
+        name: '',
+        phoneNumber: '',
+        email: '',
+        website: '',
+        address: {
+          city: '',
+          postalCode: '',
+          country: '',
+        },
+      };
+
       const {
         data: { result },
       } = await axios.get(
@@ -278,13 +303,21 @@ export class AttachmentService {
         }
       );
 
-      const defaultCurrency = result.currency || {
-        name: 'United States dollar',
-        code: 'USD',
-        symbol: '$',
-        id: null,
-        symbolNative: '$',
-      };
+      if (result && result.name) {
+        organizationDetails = { ...organizationDetails, ...result };
+      }
+
+      console.log(organizationDetails, 'org', result);
+      const defaultCurrency =
+        organizationDetails.currency || organizationDetails?.currency !== null
+          ? organizationDetails?.currency
+          : {
+              name: 'United States dollar',
+              code: 'USD',
+              symbol: '$',
+              id: null,
+              symbolNative: '$',
+            };
 
       const contents = await this.pdfData(data, defaultCurrency);
 
@@ -322,16 +355,20 @@ export class AttachmentService {
       ];
 
       const getBase64 = (url) => {
-        return axios
-          .get(url, {
-            responseType: 'arraybuffer',
-          })
-          .then((response) =>
-            Buffer.from(response.data, 'binary').toString('base64')
-          );
+        if (!url) {
+          return url;
+        } else {
+          return axios
+            .get(url, {
+              responseType: 'arraybuffer',
+            })
+            .then((response) =>
+              Buffer.from(response.data, 'binary').toString('base64')
+            );
+        }
       };
 
-      const resp = await getBase64(result.attachment.path);
+      const resp = await getBase64(organizationDetails.attachment.path);
 
       const rows = newRows.filter((item) => item.length !== 0);
 
@@ -416,6 +453,19 @@ export class AttachmentService {
         ],
       ];
 
+      let logoRender: any = {
+        width: 50,
+        margin: [0, 10, 0, 0],
+      };
+
+      if (resp) {
+        logoRender = { ...logoRender, image: `data:image/png;base64,${resp}` };
+      } else {
+        logoRender = { ...logoRender, text: 'Logo Here' };
+      }
+
+      console.log(logoRender, 'logo render');
+
       const docDefinition = {
         pageMargins: [0, 0, 0, 20],
         footer: function (currentPage, pageCount) {
@@ -453,24 +503,29 @@ export class AttachmentService {
                     fillColor: '#F7FBFF',
                     columns: [
                       {
-                        image: `data:image/png;base64,${resp}`,
-                        width: 50,
-                        margin: [0, 10, 0, 0],
+                        ...logoRender,
                       },
                       {
                         margin: [10, 0],
                         stack: [
                           {
-                            text: Capitalize(result?.name ? result?.name : ''),
+                            text: Capitalize(
+                              organizationDetails?.name
+                                ? organizationDetails?.name
+                                : ''
+                            ),
                             style: 'c_name',
                           },
                           {
-                            text: result?.phoneNumber || '',
+                            text: organizationDetails?.phoneNumber || '',
                             style: 'address_style',
                           },
-                          { text: result?.email || '', style: 'address_style' },
                           {
-                            text: result?.website || '',
+                            text: organizationDetails?.email || '',
+                            style: 'address_style',
+                          },
+                          {
+                            text: organizationDetails?.website || '',
                             style: 'address_style',
                           },
                         ],
@@ -486,15 +541,20 @@ export class AttachmentService {
                         alignment: 'right',
                         stack: [
                           {
-                            text: Capitalize(result?.address?.city || ''),
+                            text: Capitalize(
+                              organizationDetails?.address?.city || ''
+                            ),
                             style: 'address_style',
                           },
                           {
-                            text: result?.address?.postalCode || '',
+                            text:
+                              organizationDetails?.address?.postalCode || '',
                             style: 'address_style',
                           },
                           {
-                            text: Capitalize(result?.address?.country || ''),
+                            text: Capitalize(
+                              organizationDetails?.address?.country || ''
+                            ),
                             style: 'address_style',
                           },
                         ],
@@ -644,6 +704,8 @@ export class AttachmentService {
           ),
         },
       };
+
+      console.log('doc def', docDefinition.content);
 
       const printer = new PdfPrinter(fonts);
       const doc = printer.createPdfKitDocument(docDefinition);

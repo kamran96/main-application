@@ -11,7 +11,6 @@ import { OrganizationModule } from './organization/organization.module';
 import { RbacModule } from './rbac/rbac.module';
 import { UserModule } from './user/user.module';
 
-console.log(process.env['NODE' + '_ENV'], 'nodeenv');
 let MONGO_URI;
 let jwt_secret;
 let expires;
@@ -47,7 +46,6 @@ if (
 
 export const JWT_SECRET = jwt_secret;
 export const EXPIRES = expires;
-console.log(JWT_SECRET, EXPIRES, 'noooooooooooooooooo');
 
 @Module({
   imports: [

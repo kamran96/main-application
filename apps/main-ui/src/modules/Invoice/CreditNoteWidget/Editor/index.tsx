@@ -161,11 +161,12 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
           setInvoiceItems([{ ...defaultItems }]);
           [
             'invoices',
-            'transactions?page',
+            'transactions',
             'items?page',
             'invoice-view',
             'ledger-contact',
             'all-items',
+            'ACCRECCREDIT',
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           });

@@ -658,7 +658,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       const itemDiscount = record.itemDiscount;
                       delete allItems[index]?.quantityError;
 
-                      const costOfGoodAmount = purchasePrice * quantity;
+                      const costOfGoodAmount = purchasePrice * quantity ;
                       const tax = record.tax;
 
                       if (

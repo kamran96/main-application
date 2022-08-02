@@ -299,7 +299,7 @@ const DRAFTTransactionsList: FC = () => {
           </div>
         </PDFDownloadLinkWrapper>
 
-        <TransactionImport/>
+        {/* <TransactionImport/> */}
 
         <SmartFilter
           onFilter={(encode) => {

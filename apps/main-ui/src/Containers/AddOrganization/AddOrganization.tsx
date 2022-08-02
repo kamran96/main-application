@@ -61,46 +61,6 @@ export const OrganizationsList: FC = () => {
     });
   };
 
-  const columns: ColumnsType<any> = [
-    {
-      title: '#',
-      dataIndex: '',
-      key: '',
-      width: 50,
-      render: (data, row, index) => <>{index + 1}</>,
-    },
-    { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Niche', dataIndex: 'niche', key: 'niche' },
-    {
-      title: 'Financial Ending',
-      dataIndex: 'financialEnding',
-      key: 'financialEnding',
-    },
-    {
-      title: 'Address',
-      dataIndex: 'residentialAddress',
-      key: 'residentialAddress',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (data, row, index) => (
-        <Button
-          disabled={row?.isActive ? true : false}
-          onClick={() => HandleChangeOrganizagtion(row.id)}
-          type="primary"
-          size="middle"
-        >
-          Active
-        </Button>
-      ),
-    },
-  ];
-
-  const onSelectedRow = (rows) => {
-    setSelectedRows(rows.selectedRowKeys);
-  };
 
   const handleDelete = async () => {
     const payload = {
@@ -121,74 +81,11 @@ export const OrganizationsList: FC = () => {
     });
   };
 
-  // const renderCustomTopbar = () => {
-  //   return (
-  //     <div className="custom_topbar">
-  //       <div className="edit">
-  //         {selectedRows && selectedRows.length > 0 && (
-  //           <div className="flex alignCenter ">
-  //             {selectedRows && selectedRows.length === 1 && (
-  //               <ButtonTag
-  //                 onClick={() => setOrganizationConfig(true, selectedRows[0])}
-  //                 disabled={!selectedRows.length || selectedRows.length > 1}
-  //                 title="Edit"
-  //                 icon={editSolid}
-  //                 size={'middle'}
-  //               />
-  //             )}
-  //             <ButtonTag
-  //               className="mr-10"
-  //               disabled={!selectedRows.length}
-  //               onClick={() => setConfirmModal(true)}
-  //               title="Delete"
-  //               icon={deleteIcon}
-  //               size={'middle'}
-  //             />
-  //             {/* <MoreActions /> */}
-  //           </div>
-  //         )}
-  //       </div>
-  //     </div>
-  //   );
-  // };
-
   return (
     <AddOrganizationWrapper>
       <div className="add_organizations_action flex alignCenter justifySpaceBetween">
         <Heading type="table">Your Organizations</Heading>
-        {/* <Button
-          onClick={() => setOrganizationConfig(true)}
-          className="ml-10"
-          type="primary"
-        >
-          Add Organization
-        </Button> */}
       </div>
-      {/* <CommonTable
-        customTopbar={renderCustomTopbar()}
-        loading={isLoading}
-        data={result.map((item, index) => {
-          return { ...item, key: item.id };
-        })}
-        columns={columns}
-        pagination={false}
-        totalItems={result.length}
-        hasfooter={true}
-        enableRowSelection
-        onSelectRow={onSelectedRow}
-        // expandable={{
-        //   expandedRowRender: (record, index) => {
-        //     // const childCategories: ITransactionItem[] =
-        //     //   record.transaction_items;
-        //     return (
-        //       <BranchesContainer
-        //         organizationid={record.id}
-        //         branches={record.branches}
-        //       />
-        //     );
-        //   },
-        // }}
-      /> */}
       <div className="cardWrapper">
         {result?.map((organizationItem: any, index: number) => {
           return (

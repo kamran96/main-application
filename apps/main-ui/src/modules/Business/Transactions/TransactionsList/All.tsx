@@ -171,7 +171,7 @@ const APPROVETransactionList: FC = () => {
       dataIndex: 'ref',
       key: 'ref',
       sorter: true,
-     sortOrder: sortedInfo?.columnKey === 'ref' && sortedInfo?.order,
+      sortOrder: sortedInfo?.columnKey === 'ref' && sortedInfo?.order,
     },
     {
       title: 'Date',
@@ -225,7 +225,7 @@ const APPROVETransactionList: FC = () => {
           </div>
         </PDFDownloadLinkWrapper>
 
-        <TransactionImport/>
+        {/* <TransactionImport/> */}
 
         <SmartFilter
           onFilter={(encode) => {
@@ -247,7 +247,6 @@ const APPROVETransactionList: FC = () => {
   };
 
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
-    console.log(sorter, "sorter")
     if (sorter.order === undefined) {
       setTransactionsConfig({
         ...transactionConfig,

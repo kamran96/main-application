@@ -661,7 +661,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         },
         bills,
         setBills: (visibility: boolean, type: IImportType) => {
-          setBills({visibility});
+          setBills({ visibility });
         },
         refetchUser,
         refetchPermissions,

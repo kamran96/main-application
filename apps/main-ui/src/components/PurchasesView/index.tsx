@@ -1,4 +1,4 @@
-import { Card, Col, Row, Button, Dropdown, Menu } from 'antd';
+import { Card, Col, Row, Button, Dropdown, Menu, Form, DatePicker } from 'antd';
 import { useEffect, useState } from 'react';
 import { FC } from 'react';
 import styled from 'styled-components';
@@ -48,6 +48,8 @@ import { InvoicePDF } from '../PDFs';
 import DummyLogo from '../../assets/quickbook.png';
 import { plainToClass } from 'class-transformer';
 import { ISupportedRoutes } from '@invyce/shared/types';
+import { CommonModal } from '../../components';
+import { FormLabel } from '../FormLabel';
 interface IProps {
   type?:
     | IInvoiceType.INVOICE
@@ -127,6 +129,7 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
   /* LOCAL STATES */
   const [emailModal, setEmailModal] = useState(false);
   const [tableData, setTableData] = useState<IInvoiceItem[]>([]);
+  const [dueDate, setDueDate] = useState(false);
 
   /* LOCAL STATES ENDS HERE */
 
@@ -210,6 +213,23 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
         setEmailModal(true);
         break;
       case IInvoiceActions?.CHANGE_DUE_DATE:
+        switch (response.invoiceType) {
+          case IInvoiceType.INVOICE:
+            history.push(`/app${ISupportedRoutes.CREATE_INVOICE}/${id}`);
+            break;
+          case IInvoiceType.CREDITNOTE:
+            history.push(`/app${ISupportedRoutes.ADD_CREDIT_NOTE}/${id}`);
+            break;
+          case IInvoiceType.DEBITNOTE:
+            history.push(`/app${ISupportedRoutes.ADD_DEBIT_NOTE}/${id}`);
+            break;
+          case IInvoiceType.PURCHASE_ORDER:
+            history.push(`/app${ISupportedRoutes.CREATE_PURCHASE_ORDER}/${id}`);
+            break;
+          case IInvoiceType.PURCHASE_ENTRY:
+            history.push(`/app${ISupportedRoutes.CREATE_BILL}/${id}`);
+            break;
+        }
         break;
 
       case IInvoiceActions?.CREDIT_NOTE:
@@ -330,15 +350,15 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
       key: IInvoiceActions.APPROVE,
     },
 
-    response?.status === 2 &&
-      response?.invoiceType !== 'QO' && {
-        title: 'Proceed',
-        permission:
-          type === IInvoiceType.INVOICE || type === IInvoiceType.CREDITNOTE
-            ? PERMISSIONS?.INVOICES_DRAFT_APPROVE
-            : PERMISSIONS?.PURCHASES_DRAFT_APPROVE,
-        key: IInvoiceActions.PROCEED,
-      },
+    // response?.status === 2 &&
+    //   response?.invoiceType !== 'QO' && {
+    //     title: 'Proceed',
+    //     permission:
+    //       type === IInvoiceType.INVOICE || type === IInvoiceType.CREDITNOTE
+    //         ? PERMISSIONS?.INVOICES_DRAFT_APPROVE
+    //         : PERMISSIONS?.PURCHASES_DRAFT_APPROVE,
+    //     key: IInvoiceActions.PROCEED,
+    //   },
     {
       title: 'Print',
       permission: null,
@@ -474,7 +494,6 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
           </Col>
         </Row>
       </div>
-
       <Card loading={isLoading}>
         <div className="invoice_topbar">
           <PrintHeaderFormat hasbackgroundColor={false}>
@@ -787,6 +806,38 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
         visibility={emailModal}
         setVisibility={(a) => setEmailModal(a)}
       />
+      {/* <CommonModal
+        visible={dueDate}
+        title="Change Due Date"
+        width={400}
+        onCancel={() => {
+          setDueDate(false);
+        }}
+        footer={
+          <>
+            <Button type="text" onClick={() => setDueDate(false)}>
+              Cancel
+            </Button>
+            <Button type="primary"> Update </Button>
+          </>
+        }
+      >
+        <Form>
+          <FormLabel>Due Date</FormLabel>
+          <Form.Item
+            name="issueDate"
+            rules={[{ required: true, message: 'Required !' }]}
+          >
+            <DatePicker
+              disabledDate={(current) => {
+                return current > dayjs().endOf('day');
+              }}
+              style={{ width: '100%' }}
+              size="middle"
+            />
+          </Form.Item>
+        </Form>
+      </CommonModal> */}
 
       <div className="_visibleOnPrint" ref={printRef}>
         <PrintFormat>

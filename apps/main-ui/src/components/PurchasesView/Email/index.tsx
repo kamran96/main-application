@@ -33,6 +33,7 @@ export const EmailModal: FC<IProps> = ({
   }, [sendingPDF, pdfUploaded]);
 
   const onFinish = (values) => {
+    console.log(values, "email")
     onSendEmail(values);
   };
 

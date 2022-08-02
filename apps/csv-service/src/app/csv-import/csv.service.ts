@@ -1,4 +1,4 @@
-import { Integrations } from '@invyce/global-constants';
+import { Integrations, useApiCallback, Host } from '@invyce/global-constants';
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import formidable = require('formidable');
@@ -21,7 +21,6 @@ export class CsvService {
   }
 
   async importCsv(req, res): Promise<any> {
-    console.log('request');
     if (!req || !req.cookies) return null;
     const token = req.cookies['access_token'];
 
@@ -35,12 +34,17 @@ export class CsvService {
     const csvData = []; // array of objects
 
     const form = formidable({ multiples: true });
+
     await form.parse(req, async (err, fields, files) => {
       formData = { fields, files };
+
+      console.log(files.file, 'what is it');
+
       const compareData = JSON.parse(fields.compareData);
-      const readStream = fs.readFileSync(files.file?.filepath, {
+      const readStream = fs.readFileSync(files.file?.path, {
         encoding: 'utf8',
       });
+
       const moduleType = JSON.parse(fields.module);
 
       const string = readStream.replace('\r', '');
@@ -54,25 +58,34 @@ export class CsvService {
         });
         csvData.push(obj);
       }
-
-      console.log('in here');
-
       switch (moduleType) {
         case Modules.CONTACT:
-          console.log(csvData, 'test');
+          // eslint-disable-next-line no-case-declarations, @typescript-eslint/ban-types
+          const transactions: Object = JSON.parse(fields.transactions);
+          console.log(csvData);
           await http.post('/contacts/contact/sync', {
             contacts: csvData,
             type: Integrations.CSV_IMPORT,
+            transactions,
           });
           break;
         case Modules.ITEMS:
           // eslint-disable-next-line no-case-declarations
           const targetAccounts: unknown = JSON.parse(fields.targetAccounts);
-          await http.post('/items/item/sync', {
-            type: Integrations.CSV_IMPORT,
-            items: csvData,
-            targetAccounts: targetAccounts,
-          });
+
+          await axios.post(
+            Host('items', 'items/item/sync'),
+            {
+              type: Integrations.CSV_IMPORT,
+              items: csvData,
+              targetAccounts: targetAccounts,
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
+            }
+          );
           break;
       }
       // console.log(readStream, 'readstream', compareData);

@@ -1,10 +1,10 @@
 import { CommonTable } from '../../../components/Table';
-import React, { FC, useState } from 'react';
+import { FC, useState } from 'react';
 import { Button, Select } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { CsvImportAPi, getAllAccounts } from '../../../api';
-import { IAccountsResult } from '@invyce/shared/types';
+import { IAccountsResult, NOTIFICATIONTYPE } from '@invyce/shared/types';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 
 const { Option } = Select;
@@ -14,6 +14,7 @@ interface IProps {
   itemKeysResponse: any;
   compareData: any;
   fileData: any;
+  onSuccess: () => void;
 }
 
 export const CompareDataTable: FC<IProps> = ({
@@ -22,15 +23,15 @@ export const CompareDataTable: FC<IProps> = ({
   itemKeysResponse,
   compareData,
   fileData,
+  onSuccess,
 }) => {
   const [targetAccounts, setTargetAccounts] = useState([]);
-
-  console.log(targetAccounts, 'target accouonts');
+  const queryCache = useQueryClient();
 
   const { mutate: uploadCsv, isLoading: uploadingCsv } =
     useMutation(CsvImportAPi);
 
-  const { itemsImportconfig } = useGlobalContext();
+  const { itemsImportconfig, notificationCallback } = useGlobalContext();
 
   const { data: resAllAccounts } = useQuery(
     [`all-accounts`, `ALL`],
@@ -59,7 +60,14 @@ export const CompareDataTable: FC<IProps> = ({
 
     await uploadCsv(formData, {
       onSuccess: (data: any) => {
-        console.log(data);
+        notificationCallback(
+          NOTIFICATIONTYPE.SUCCESS,
+          'Items Imported Successfully'
+        );
+        onSuccess();
+        ['item-id', 'items?page', 'all-items'].forEach((key) => {
+          (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
+        });
       },
     });
   };
