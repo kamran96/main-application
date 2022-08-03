@@ -23,7 +23,7 @@ COPY --chown=node:node ./dist/apps/attachments-service /home/node/app
 COPY --chown=node:node ./apps/attachments-service/src/assets/fonts /home/node/app
 
 
-RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express
+RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express --legacy-peer-deps
 
 EXPOSE ${PORT}
 CMD [ "dumb-init", "node", "main.js" ]
