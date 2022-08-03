@@ -31,7 +31,7 @@ import { ContactLedger } from '../modules/Contacts/ContactLedger';
 import { PaymentContainer } from '../modules/Payment';
 import { BillsEditorWidget } from '../modules/Business/PurchaseOrder/BillsEditorWidget';
 import CategoriesRoot from '../modules/Categories';
-import { ItemsViewContainer } from '../modules/Items/ItemsList/ItemView';
+import { ItemsViewContainer } from '../modules/Items/ItemsList/ItemsView';
 import { DashboardContainer } from '../modules/Dashboard';
 import { InvoiceEditorWidget } from '../modules/Invoice/InvoiceEditorWidget';
 import { InvoiceView } from '../modules/Invoice/InvoiceView';

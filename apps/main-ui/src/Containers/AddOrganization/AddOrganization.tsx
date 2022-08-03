@@ -61,7 +61,6 @@ export const OrganizationsList: FC = () => {
     });
   };
 
-
   const handleDelete = async () => {
     const payload = {
       ids: [...selectedRows],

@@ -22,7 +22,7 @@ export const AddOrganizationWrapper = styled.div`
 
 export const AddNewOrganizationWrapper = styled.div`
   width: 290px;
-  height: 244px;
+  height: 260px;
   background: ${(props: IThemeProps) => props.theme.colors.organizationCard};
   border: 1px dashed #a5d4ff;
   box-shadow: 0px 2px 16px rgba(211, 235, 255, 0.3);

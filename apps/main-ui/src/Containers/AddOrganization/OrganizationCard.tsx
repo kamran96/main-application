@@ -86,7 +86,7 @@ export const OrganizationCard: FC<IProps> = ({
         <H4 className="title">{organization?.name}</H4>
         <p className="SubTitle">{organization?.niche}</p>
         <p className="Financial">Financial End year </p>
-        <p className="Date">{organization?.createdAt}</p>
+        <p className="Date">{organization?.financialEnding}</p>
       </div>
     </CardWrapper>
   );
