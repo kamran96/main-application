@@ -20,6 +20,8 @@ WORKDIR /home/node/app
 COPY --chown=node:node --from=build /app /home/node/app/node_modules
 COPY --chown=node:node --from=build /app/package-lock.json /home/node/app/package-lock.json
 COPY --chown=node:node ./dist/apps/attachments-service /home/node/app
+COPY --chown=node:node ./apps/attachments-service/src/assets/fonts /home/node/app
+
 
 RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express
 

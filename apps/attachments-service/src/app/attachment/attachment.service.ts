@@ -252,7 +252,7 @@ export class AttachmentService {
     }
   }
 
-  async GeneratePdf(body, req: IRequest, res) {
+  async GeneratePdf(body, req: IRequest) {
     try {
       if (!req || !req.cookies) return null;
       const token = req?.cookies['access_token'];
@@ -702,20 +702,32 @@ export class AttachmentService {
         },
       };
 
-      return res.json(docDefinition);
+      let fonts;
+      if (
+        process.env['NODE' + '_ENV'] === 'production' ||
+        process.env['NODE' + '_ENV'] === 'staging'
+      ) {
+        console.log('prod');
+        fonts = {
+          RobotoSlab: {
+            normal: path.resolve('./RobotoSlab-Regular.ttf'),
+            bold: path.resolve('./RobotoSlab-Bold.ttf'),
+          },
+        };
+      } else {
+        fonts = {
+          RobotoSlab: {
+            normal: path.resolve(
+              './apps/attachments-service/src/assets/fonts/RobotoSlab-Regular.ttf'
+            ),
+            bold: path.resolve(
+              './apps/attachments-service/src/assets/fonts/RobotoSlab-Bold.ttf'
+            ),
+          },
+        };
+      }
 
-      const fonts = {
-        RobotoSlab: {
-          normal: path.resolve(
-            './apps/attachments-service/src/assets/fonts/RobotoSlab-Regular.ttf'
-          ),
-          bold: path.resolve(
-            './apps/attachments-service/src/assets/fonts/RobotoSlab-Bold.ttf'
-          ),
-        },
-      };
-
-      const printer = new PdfPrinter();
+      const printer = new PdfPrinter(fonts);
       const doc = printer.createPdfKitDocument(docDefinition);
 
       const pdf = `${data?.type}-${Date.now()}.pdf`;

@@ -427,7 +427,7 @@ export class InvoiceService {
     };
   }
 
-  async CreateInvoice(dto: InvoiceDto, req: IRequest, res): Promise<IInvoice> {
+  async CreateInvoice(dto: InvoiceDto, req: IRequest): Promise<IInvoice> {
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
 
@@ -829,7 +829,6 @@ export class InvoiceService {
         );
 
         console.log('pdf generated...');
-        return res.json(attachment);
 
         if (email) {
           await this.emailService.emit(INVOICE_CREATED, {
