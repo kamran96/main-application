@@ -2,7 +2,7 @@
 
 Website Link [Invyce](https://invyce.com/)
 
-<p style="text-align: center;"><img src="https://invyce.com/wp-content/uploads/2021/05/invyce-logo2.png" width="450"></p>
+<p style="text-align: center;"><img src="https://invyce.com/wp-content/uploads/2021/06/fb-invyce.jpg" width="450"></p>
 
 🔎 **Smart, Accounting and Business Management Tool**
 
