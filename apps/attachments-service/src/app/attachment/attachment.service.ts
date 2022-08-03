@@ -708,10 +708,11 @@ export class AttachmentService {
         process.env['NODE' + '_ENV'] === 'production' ||
         process.env['NODE' + '_ENV'] === 'staging'
       ) {
+        console.log('prod');
         fonts = {
           RobotoSlab: {
-            normal: path.resolve('./RobotoSlab-Regular.ttf'),
-            bold: path.resolve('./RobotoSlab-Bold.ttf'),
+            normal: path.resolve('./assets/fonts/RobotoSlab-Regular.ttf'),
+            bold: path.resolve('./assets/fonts/RobotoSlab-Bold.ttf'),
           },
         };
       } else {
