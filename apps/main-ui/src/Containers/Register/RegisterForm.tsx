@@ -29,7 +29,7 @@ export const RegisterForm: FC = () => {
   const { handleLogin, notificationCallback } = useGlobalContext();
 
   useEffect(() => {
-    form.setFieldsValue({ prefix: 92 });
+    form.setFieldsValue({ prefix: `92` });
   }, []);
 
   const [form] = Form.useForm();
@@ -126,7 +126,7 @@ export const RegisterForm: FC = () => {
       <Select
         style={{ width: 100 }}
         showSearch
-        defaultValue={92}
+        defaultValue={`92`}
         filterOption={(input, option) => {
           return (
             option?.id?.toLowerCase().includes(input?.toLocaleLowerCase()) ||
@@ -137,9 +137,9 @@ export const RegisterForm: FC = () => {
         {phoneCodes?.map((country) => {
           return (
             <Option
-              value={country?.phoneCode}
+              value={`${country?.phoneCode}`}
               title={`${country?.phoneCode}`}
-              id={country?.short}
+              id={`${country?.short}`}
             >
               <img
                 className="mr-10"

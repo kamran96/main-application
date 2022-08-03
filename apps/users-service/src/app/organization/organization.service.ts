@@ -138,11 +138,11 @@ export class OrganizationService {
             _id: organizationDto.id,
           });
 
-          return res.status(201).send({
+          return {
             message: 'Organization updated successfully',
             status: true,
             result: updatedOrg,
-          });
+          };
         }
         throw new HttpException('Invalid Params', HttpStatus.BAD_REQUEST);
       } catch (error) {

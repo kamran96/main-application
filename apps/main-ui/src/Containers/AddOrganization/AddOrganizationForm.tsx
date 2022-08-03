@@ -60,6 +60,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
   useEffect(() => {
     if (data && data.data && data.data.result) {
       const { result } = data.data;
+      console.log(result, "reesult")
       form.setFieldsValue({
         ...result,
         financialEnding: dayjs(result?.financialEnding),
@@ -88,12 +89,11 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
         form.resetFields();
         setOrganizationConfig(false);
         refetchUser();
-        ['all-organizations']?.forEach((key) => {
+        ['all-organizations', `organization`]?.forEach((key) => {
           (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
         });
-        if (id) {
-          queryCache.invalidateQueries(`organization-${id}`);
-        }
+
+
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Created');
         handleClose();
       },
@@ -143,13 +143,12 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
     // for CRA
     return data.default;
   };
-  
+
   const prefixSelector = (
     <Form.Item name="prefix" noStyle>
       <Select
-        style={{ width: 100 }}
+        style={{ width: 120 }}
         showSearch
-        defaultValue={92}
         filterOption={(input, option) => {
           return (
             option?.id?.toLowerCase().includes(input?.toLocaleLowerCase()) ||
@@ -160,9 +159,9 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
         {phoneCodes?.map((country) => {
           return (
             <Option
-              value={country?.phoneCode}
+              value={`${country?.phoneCode}`}
               title={`${country?.phoneCode}`}
-              id={country?.short}
+              id={`${country?.short}`}
             >
               <img
                 className="mr-10"

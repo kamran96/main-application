@@ -259,6 +259,7 @@ export class AttachmentService {
 
       const { data } = body;
 
+      console.log(data, 'data');
       const contact = {
         name: data?.contact?.name || '',
         country: data?.contact?.addresses[0]?.country || '',
@@ -266,6 +267,7 @@ export class AttachmentService {
         postalCode: data?.contact?.addresses[0]?.postalCode || '',
       };
 
+      console.log(contact, 'contact');
       let organizationDetails = {
         currency: {
           name: 'United States dollar',
@@ -460,7 +462,6 @@ export class AttachmentService {
       } else {
         logoRender = { ...logoRender, text: 'Logo Here' };
       }
-      console.log(logoRender, 'logo reader');
 
       const docDefinition = {
         pageMargins: [0, 0, 0, 20],
@@ -704,8 +705,6 @@ export class AttachmentService {
           font: 'RobotoSlab',
         },
       };
-
-      console.log(docDefinition, 'docdef');
 
       const fonts = {
         RobotoSlab: {
