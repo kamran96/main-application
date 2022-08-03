@@ -702,6 +702,8 @@ export class AttachmentService {
         },
       };
 
+      console.log('okkkkkkkkkkkk');
+
       let fonts;
       if (
         process.env['NODE' + '_ENV'] === 'production' ||
@@ -726,6 +728,8 @@ export class AttachmentService {
           },
         };
       }
+
+      console.log(fonts);
 
       const printer = new PdfPrinter(fonts);
       const doc = printer.createPdfKitDocument(docDefinition);

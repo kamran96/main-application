@@ -31,6 +31,9 @@ async function bootstrap() {
     origin: true,
     credentials: true,
   });
+
+  console.log(process.env['NODE' + '_ENV'], 'environment');
+
   if (
     process.env['NODE' + '_ENV'] === 'production' ||
     process.env['NODE' + '_ENV'] === 'staging'
