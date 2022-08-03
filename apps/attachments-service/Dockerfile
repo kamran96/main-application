@@ -22,6 +22,8 @@ COPY --chown=node:node --from=build /app/package-lock.json /home/node/app/packag
 COPY --chown=node:node ./dist/apps/attachments-service /home/node/app
 COPY --chown=node:node ./apps/attachments-service/src/assets/fonts /home/node/app
 
+RUN chown -R node:node /home/node/app
+
 
 RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express --legacy-peer-deps
 

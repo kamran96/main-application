@@ -703,14 +703,11 @@ export class AttachmentService {
         },
       };
 
-      console.log('okkkkkkkkkkkk');
-
       let fonts;
       if (
         process.env['NODE' + '_ENV'] === 'production' ||
         process.env['NODE' + '_ENV'] === 'staging'
       ) {
-        console.log('prod');
         fonts = {
           RobotoSlab: {
             normal: path.resolve('./RobotoSlab-Regular.ttf'),
