@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { HealthModule } from './health/health.module';
 
 let MONGO_URI;
 if (
@@ -39,6 +40,7 @@ if (
   imports: [
     MongooseModule.forRoot(process.env.MONGO_URI || MONGO_URI),
     AttachmentModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
