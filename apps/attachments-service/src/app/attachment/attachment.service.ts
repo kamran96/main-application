@@ -254,6 +254,7 @@ export class AttachmentService {
 
   async GeneratePdf(body, req: IRequest) {
     try {
+      console.log('okkkk');
       if (!req || !req.cookies) return null;
       const token = req?.cookies['access_token'];
 

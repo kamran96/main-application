@@ -810,6 +810,7 @@ export class InvoiceService {
           : null;
 
         console.log('generating pdf...');
+        console.log(Host('attachments', `attachments/attachment/generate-pdf`));
         const { data: attachment } = await axios.post(
           Host('attachments', `attachments/attachment/generate-pdf`),
           {
