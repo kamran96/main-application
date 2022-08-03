@@ -4,6 +4,7 @@ WORKDIR /app
 RUN touch /app/package-lock.json
 COPY ./dist/apps/attachments-service .
 
+
 FROM node:lts-alpine
 
 # add dump-init to avoid nodejs as pid 1
@@ -20,9 +21,7 @@ WORKDIR /home/node/app
 COPY --chown=node:node --from=build /app /home/node/app/node_modules
 COPY --chown=node:node --from=build /app/package-lock.json /home/node/app/package-lock.json
 COPY --chown=node:node ./dist/apps/attachments-service /home/node/app
-
-RUN mkdir -p /home/node/app/generaeted
-RUN chmod -R 777 /home/node/app/generaeted
+COPY --chown=node:node ./generated /home/node/app/generated
 
 RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express --legacy-peer-deps
 
