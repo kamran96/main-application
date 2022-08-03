@@ -460,6 +460,7 @@ export class AttachmentService {
       } else {
         logoRender = { ...logoRender, text: 'Logo Here' };
       }
+      console.log(logoRender, 'logo reader');
 
       const docDefinition = {
         pageMargins: [0, 0, 0, 20],
@@ -703,6 +704,8 @@ export class AttachmentService {
           font: 'RobotoSlab',
         },
       };
+
+      console.log(docDefinition, 'docdef');
 
       const fonts = {
         RobotoSlab: {
