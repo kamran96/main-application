@@ -9,11 +9,10 @@ FROM node:lts-alpine
 # add dump-init to avoid nodejs as pid 1
 RUN apk add dumb-init
 ARG PORT
+ARG NODE_ENV
 USER node
 
-ENV MONGO_URI=mongodb+srv://contacts:fYnc4.ZPdz378t4@cluster0.hiwqy.mongodb.net/attachments?retryWrites=true&w=majority \
-    PORT=3338 \
-    NODE_ENV=production
+ENV NODE_ENV ${NODE_ENV}
 
 WORKDIR /home/node/app
 

@@ -16,7 +16,10 @@ async function bootstrap() {
     credentials: true,
   });
 
-  if (process.env['NODE' + '_ENV'] === 'production') {
+  if (
+    process.env['NODE' + '_ENV'] === 'production' ||
+    process.env['NODE' + '_ENV'] === 'staging'
+  ) {
     app.setGlobalPrefix('/integrations');
   }
   await app.listen(port, () => {

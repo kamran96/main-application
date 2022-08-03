@@ -8,9 +8,11 @@ FROM node:lts-alpine
 
 # add dump-init to avoid nodejs as pid 1
 RUN apk add dumb-init
-ENV NODE_ENV production
+ARG NODE_ENV
 ARG PORT
 USER node
+
+ENV NODE_ENV ${NODE_ENV}
 
 WORKDIR /home/node/app
 

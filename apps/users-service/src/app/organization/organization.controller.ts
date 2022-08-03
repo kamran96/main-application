@@ -48,7 +48,7 @@ export class OrganizationController {
   async create(
     @Body() organizationDto: OrganizationDto,
     @Req() req: IRequest,
-    @Res({ passthrough: true }) res: Response
+    @Res() res: Response
   ) {
     try {
       const organization =

@@ -37,7 +37,10 @@ async function bootstrap() {
   app.use(cookieParser());
   app.use(helmet());
 
-  if (process.env['NODE' + '_ENV'] === 'production') {
+  if (
+    process.env['NODE' + '_ENV'] === 'production' ||
+    process.env['NODE' + '_ENV'] === 'staging'
+  ) {
     app.setGlobalPrefix('/payments');
   }
 
