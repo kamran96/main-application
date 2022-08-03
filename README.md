@@ -14,7 +14,7 @@ Website Link [Invyce](https://invyce.com/)
 - **Project Setup**
   - `yarn install`
 - **Run Projects**
-  - `yarn nx serve <project name> ` || `nx serve <project name> if you've installed nx as global`
+  - `yarn nx serve <project name> ` || `nx serve <project name>` if you've installed nx as global
 
 ## For MACBOOK M1 users only:
  
