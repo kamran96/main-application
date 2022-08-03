@@ -259,7 +259,6 @@ export class AttachmentService {
 
       const { data } = body;
 
-      console.log(data, 'data');
       const contact = {
         name: data?.contact?.name || '',
         country: data?.contact?.addresses[0]?.country || '',
@@ -267,7 +266,6 @@ export class AttachmentService {
         postalCode: data?.contact?.addresses[0]?.postalCode || '',
       };
 
-      console.log(contact, 'contact');
       let organizationDetails = {
         currency: {
           name: 'United States dollar',
@@ -304,8 +302,6 @@ export class AttachmentService {
       if (result && result.name) {
         organizationDetails = { ...organizationDetails, ...result };
       }
-
-      console.log(organizationDetails, 'org details');
 
       const defaultCurrency =
         organizationDetails.currency || organizationDetails?.currency !== null
@@ -701,9 +697,9 @@ export class AttachmentService {
             color: '#6f6f84',
           },
         },
-        defaultStyle: {
-          font: 'RobotoSlab',
-        },
+        // defaultStyle: {
+        //   font: 'RobotoSlab',
+        // },
       };
 
       const fonts = {
@@ -717,7 +713,9 @@ export class AttachmentService {
         },
       };
 
-      const printer = new PdfPrinter(fonts);
+      console.log(docDefinition, 'doc def');
+
+      const printer = new PdfPrinter();
       const doc = printer.createPdfKitDocument(docDefinition);
 
       const pdf = `${data?.type}-${Date.now()}.pdf`;

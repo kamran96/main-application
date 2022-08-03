@@ -88,7 +88,6 @@ export class OrganizationService {
     req: IRequest,
     res: Response
   ): Promise<unknown> {
-    console.log('organization called...');
     const address: IAddress = {
       description: organizationDto.description,
       city: organizationDto.city,
@@ -138,11 +137,11 @@ export class OrganizationService {
             _id: organizationDto.id,
           });
 
-          return {
+          return res.status(201).json({
             message: 'Organization updated successfully',
             status: true,
             result: updatedOrg,
-          };
+          });
         }
         throw new HttpException('Invalid Params', HttpStatus.BAD_REQUEST);
       } catch (error) {
@@ -204,8 +203,6 @@ export class OrganizationService {
         if (!req || !req.cookies) return null;
         const token = req?.cookies['access_token'];
 
-        console.log(Host('accounts', 'accounts/account/init'), 'host');
-
         await axios.post(
           Host('accounts', 'accounts/account/init'),
           {
@@ -238,7 +235,11 @@ export class OrganizationService {
 
           branchArr.push(branch);
 
-          return organization;
+          return res.status(201).json({
+            message: 'Organization created successfully',
+            status: true,
+            result: organization,
+          });
         } else {
           await this.userModel.updateOne(
             { _id: req?.user?.id },
