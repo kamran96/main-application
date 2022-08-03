@@ -252,7 +252,7 @@ export class AttachmentService {
     }
   }
 
-  async GeneratePdf(body, req: IRequest) {
+  async GeneratePdf(body, req: IRequest, res) {
     try {
       if (!req || !req.cookies) return null;
       const token = req?.cookies['access_token'];
@@ -697,10 +697,12 @@ export class AttachmentService {
             color: '#6f6f84',
           },
         },
-        // defaultStyle: {
-        //   font: 'RobotoSlab',
-        // },
+        defaultStyle: {
+          font: 'RobotoSlab',
+        },
       };
+
+      return res.json(docDefinition);
 
       const fonts = {
         RobotoSlab: {
@@ -712,8 +714,6 @@ export class AttachmentService {
           ),
         },
       };
-
-      console.log(docDefinition, 'doc def');
 
       const printer = new PdfPrinter();
       const doc = printer.createPdfKitDocument(docDefinition);

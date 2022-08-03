@@ -9,6 +9,7 @@ import {
   Put,
   Query,
   Req,
+  Res,
 } from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
 
@@ -19,6 +20,7 @@ import {
   IPage,
   IRequest,
 } from '@invyce/interfaces';
+import { Response } from 'express';
 
 @Controller('invoice')
 export class InvoiceController {
@@ -119,10 +121,15 @@ export class InvoiceController {
   @Post()
   async create(
     @Body() invoiceDto: InvoiceDto,
-    @Req() req: IRequest
+    @Req() req: IRequest,
+    @Res() res: Response
   ): Promise<IInvoiceWithResponse> {
     try {
-      const invoice = await this.invoiceService.CreateInvoice(invoiceDto, req);
+      const invoice = await this.invoiceService.CreateInvoice(
+        invoiceDto,
+        req,
+        res
+      );
 
       if (invoice) {
         return {
