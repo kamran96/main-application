@@ -52,8 +52,10 @@ export class AppController {
   @Post('generate-pdf')
   async generatePdf(@Body() body, @Req() req: IRequest): Promise<any> {
     const pdf = await this.attachmentService.GeneratePdf(body, req);
+    console.log(pdf, 'pdf');
 
-    const dist = path.resolve(pdf);
+    const dist = path.resolve('generated');
+    console.log(dist);
 
     return await this.attachmentService.uploadPdf(dist, pdf, req);
   }

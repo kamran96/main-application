@@ -179,7 +179,7 @@ export class AttachmentService {
 
   async uploadPdf(location, pdf, req) {
     try {
-      const data = await fs.createReadStream(location);
+      const data = await fs.createReadStream(location + '/' + pdf);
 
       const params = {
         Bucket: 'invyce/attachments',
@@ -201,7 +201,7 @@ export class AttachmentService {
       await attachment.save();
 
       setTimeout(() => {
-        promises.unlink(pdf).then(() => {
+        promises.unlink(location + '/' + pdf).then(() => {
           console.log('File deleted successfully');
         });
       }, 10000);
@@ -254,7 +254,6 @@ export class AttachmentService {
 
   async GeneratePdf(body, req: IRequest) {
     try {
-      console.log('okkkk');
       if (!req || !req.cookies) return null;
       const token = req?.cookies['access_token'];
 
@@ -708,7 +707,6 @@ export class AttachmentService {
         process.env['NODE' + '_ENV'] === 'production' ||
         process.env['NODE' + '_ENV'] === 'staging'
       ) {
-        console.log('prod');
         fonts = {
           RobotoSlab: {
             normal: path.resolve('./assets/fonts/RobotoSlab-Regular.ttf'),
@@ -728,14 +726,14 @@ export class AttachmentService {
         };
       }
 
-      console.log(fonts);
-
       const printer = new PdfPrinter(fonts);
       const doc = printer.createPdfKitDocument(docDefinition);
 
-      const pdf = `${data?.type}-${Date.now()}.pdf`;
-      doc.pipe(await fs.createWriteStream(pdf));
+      const pdf = `/${data?.type}-${Date.now()}.pdf`;
+      const pdfPath = path.resolve('generated');
+      console.log(pdfPath, 'path');
 
+      doc.pipe(await fs.createWriteStream(pdfPath + pdf));
       doc.end();
 
       return pdf;

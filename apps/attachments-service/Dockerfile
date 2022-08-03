@@ -21,6 +21,8 @@ COPY --chown=node:node --from=build /app /home/node/app/node_modules
 COPY --chown=node:node --from=build /app/package-lock.json /home/node/app/package-lock.json
 COPY --chown=node:node ./dist/apps/attachments-service /home/node/app
 
+RUN mkdir -p /home/node/app/generaeted
+RUN chmod -R 777 /home/node/app/generaeted
 
 RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express --legacy-peer-deps
 
