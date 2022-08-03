@@ -1,23 +1,40 @@
 # Invyce
 
-This project was generated using [Nx](https://nx.dev).
+Website Link [Invyce](https://invyce.com/)
 
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
+<p style="text-align: center;"><img src="https://invyce.com/wp-content/uploads/2021/06/fb-invyce.jpg" ></p>
 
-🔎 **Smart, Extensible Build Framework**
+🔎 **Smart, Accounting and Business Management Tool**
 
-## Adding capabilities to your workspace
+## Quick Guide to Setup Project
 
-Nx supports many plugins which add capabilities for developing different types of applications and different tools.
 
-These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
+- [Nx](https://nx.dev/getting-started/nx-setup)
+  - `npm install nx -g`
+- **Project Setup**
+  - `yarn install`
+- **Run Projects**
+  - `yarn nx serve <project name> ` || `nx serve <project name>` if you've installed nx as global
 
-Below are our core plugins:
+## For MACBOOK M1 users only:
+ 
+ If you found `node-gyp : building` issue then follow these steps:
+
+- `npm install node-gyp -g`  --> [Documentation-node-gyp](https://www.npmjs.com/package/node-gyp)
+- `npm audit fix --force`
+  Open the terminal as an administrator
+  Go to your project folder and run:
+- `npm config set node_gyp`
+- `npm config set msvs_version 2022`
+- `yarn install`
+
+
+
+
+## Below are our core plugins if you want to implement in NX project
 
 - [React](https://reactjs.org)
-  - `npm install --save-dev @nrwl/react`
-- Web (no framework frontends)
-  - `npm install --save-dev @nrwl/web`
+  - `npm install --save-dev @nrwl/angular`
 - [Angular](https://angular.io)
   - `npm install --save-dev @nrwl/angular`
 - [Nest](https://nestjs.com)
@@ -29,7 +46,7 @@ Below are our core plugins:
 
 There are also many [community plugins](https://nx.dev/community) you could add.
 
-## Generate an application
+## Generate an application 
 
 Run `nx g @nrwl/react:app my-app` to generate an application.
 
