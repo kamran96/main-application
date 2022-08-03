@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Res,
+} from '@nestjs/common';
 import {
   Between,
   getCustomRepository,
@@ -2187,7 +2193,6 @@ export class InvoiceService {
       );
     }
 
-    console.log('sending transaction...');
     if (transactions.length > 0) {
       await axios.post(
         Host('accounts', 'accounts/transaction/api'),

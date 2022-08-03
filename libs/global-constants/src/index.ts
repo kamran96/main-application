@@ -72,7 +72,6 @@ export enum InvTypes {
 }
 
 export const Host = (service: string, route: string): string => {
-  console.log(process.env['NODE' + '_ENV'], 'env');
   if (process.env['NODE' + '_ENV'] === 'production') {
     return `http://prod-${service}.prod.svc.cluster.local/${route}`;
   } else if (process.env['NODE' + '_ENV'] === 'staging') {
