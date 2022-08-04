@@ -115,3 +115,7 @@ node_modules/
 apps/mobile-app-e2e/artifacts
 
 .scannerwork/
+
+
+## NODE GYP FILE
+binding.gyp

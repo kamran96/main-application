@@ -28,6 +28,30 @@ Website Link [Invyce](https://invyce.com/)
 - `npm config set msvs_version 2022`
 - `yarn install`
 
+Create a file named `binding.gyp` in the rood and paste this code
+
+```
+
+{
+  'targets': [
+    {
+      'target_name': 'bindings',
+      'sources': [ 'bindings.node' ],
+      'cflags!': [ '-fno-exceptions' ], 
+      'cflags_cc!': [ '-fno-exceptions' ],
+      'conditions': [
+        ['OS=="mac"', {
+          'xcode_settings': {
+            'GCC_ENABLE_CPP_EXCEPTIONS': 'YES'
+          }
+        }]
+      ]
+    }
+  ]
+}
+
+```
+
 
 
 
