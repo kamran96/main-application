@@ -28,7 +28,7 @@ Website Link [Invyce](https://invyce.com/)
 - `npm config set msvs_version 2022`
 - `yarn install`
 
-Create a file named `building.gyp` in the rood and paste this code
+Create a file named `binding.gyp` in the rood and paste this code
 
 ```
 
