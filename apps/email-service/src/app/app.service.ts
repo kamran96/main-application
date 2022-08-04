@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as postmark from 'postmark';
 import * as path from 'path';
 import * as fs from 'fs';
+console.log(process.env.POSTMARK_TOKEN, 'token');
 const client = new postmark.ServerClient(process.env.POSTMARK_TOKEN);
 
 @Injectable()
