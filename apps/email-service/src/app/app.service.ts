@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as postmark from 'postmark';
 import * as path from 'path';
 import * as fs from 'fs';
+import axios from 'axios';
 
 const client = new postmark.ServerClient(process.env.POSTMARK_TOKEN);
 
@@ -288,21 +289,28 @@ export class AppService {
   }
 
   async InvoiceCreated(data) {
-    const location = data.location;
+    const getBase64 = async (url) => {
+      if (!url) {
+        return url;
+      } else {
+        return axios
+          .get(url, {
+            responseType: 'arraybuffer',
+          })
+          .then((response) =>
+            Buffer.from(response.data, 'binary').toString('base64')
+          );
+      }
+    };
 
-    console.log('working on it...');
-    const dist = path.resolve(location + '/' + data.attachment_name);
-    const content = fs.readFileSync(dist);
-
-    console.log('okkk');
     delete data.location;
 
     const TemplateModel = { ...data };
     const payload = {
       Name: data.attachment_name,
       ContentType: 'text/pain',
-      Content: Buffer.from(content).toString('base64'),
-      ContentID: location + '/' + data.attachment_name,
+      Content: await getBase64(data.download_link),
+      ContentID: data.download_link,
     };
 
     setTimeout(async () => {

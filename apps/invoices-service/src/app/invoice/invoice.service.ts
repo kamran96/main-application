@@ -831,7 +831,6 @@ export class InvoiceService {
             gross_total: invoice.grossTotal,
             itemDisTotal: invoice.discount,
             net_total: invoice.netTotal,
-            location: path.resolve('generated'),
             invoice_details,
             download_link: attachment?.path || null,
             attachment_name: attachment?.name || null,
