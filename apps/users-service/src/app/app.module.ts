@@ -49,7 +49,7 @@ export const EXPIRES = expires;
 
 @Module({
   imports: [
-    MongooseModule.forRoot(process.env.MONGO_URI || MONGO_URI),
+    MongooseModule.forRoot(process.env.USER_MONGO_URI || MONGO_URI),
     AuthModule,
     UserModule,
     RbacModule,

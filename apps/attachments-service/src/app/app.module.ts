@@ -38,7 +38,7 @@ if (
 
 @Module({
   imports: [
-    MongooseModule.forRoot(process.env.MONGO_URI || MONGO_URI),
+    MongooseModule.forRoot(process.env.ATTACHMENT_MONGO_URI || MONGO_URI),
     AttachmentModule,
     HealthModule,
   ],

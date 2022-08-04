@@ -191,7 +191,7 @@ export class AttachmentService {
       const upload = await s3.upload(params).promise();
 
       const attachment = new this.attachmentModel({
-        name: pdf,
+        name: location + '/' + pdf,
         path: upload.Location,
         createdById: req.user.id,
         updatedById: req.user.id,
