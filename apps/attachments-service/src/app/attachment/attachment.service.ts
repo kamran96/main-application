@@ -191,7 +191,7 @@ export class AttachmentService {
       const upload = await s3.upload(params).promise();
 
       const attachment = new this.attachmentModel({
-        name: location + '/' + pdf,
+        name: pdf,
         path: upload.Location,
         createdById: req.user.id,
         updatedById: req.user.id,
@@ -729,11 +729,10 @@ export class AttachmentService {
       const printer = new PdfPrinter(fonts);
       const doc = printer.createPdfKitDocument(docDefinition);
 
-      const pdf = `/${data?.type}-${Date.now()}.pdf`;
+      const pdf = `${data?.type}-${Date.now()}.pdf`;
       const pdfPath = path.resolve('generated');
-      console.log(pdfPath, 'path');
 
-      doc.pipe(await fs.createWriteStream(pdfPath + pdf));
+      doc.pipe(await fs.createWriteStream(pdfPath + '/' + pdf));
       doc.end();
 
       return pdf;

@@ -1,10 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  Res,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
   Between,
   getCustomRepository,
@@ -13,6 +7,7 @@ import {
   LessThan,
   Not,
 } from 'typeorm';
+import * as path from 'path';
 import axios from 'axios';
 import * as dotenv from 'dotenv';
 import * as moment from 'moment';
@@ -809,8 +804,6 @@ export class InvoiceService {
           ? dto.email
           : null;
 
-        console.log('generating pdf...');
-        console.log(Host('attachments', `attachments/attachment/generate-pdf`));
         const { data: attachment } = await axios.post(
           Host('attachments', `attachments/attachment/generate-pdf`),
           {
@@ -829,8 +822,6 @@ export class InvoiceService {
           }
         );
 
-        console.log('pdf generated...');
-
         if (email) {
           await this.emailService.emit(INVOICE_CREATED, {
             to: email,
@@ -840,6 +831,7 @@ export class InvoiceService {
             gross_total: invoice.grossTotal,
             itemDisTotal: invoice.discount,
             net_total: invoice.netTotal,
+            location: path.resolve('generated'),
             invoice_details,
             download_link: attachment?.path || null,
             attachment_name: attachment?.name || null,

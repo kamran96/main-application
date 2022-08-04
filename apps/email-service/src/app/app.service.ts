@@ -287,15 +287,19 @@ export class AppService {
   }
 
   async InvoiceCreated(data) {
-    const dist = path.resolve(data.attachment_name);
+    const location = data.location;
+
+    const dist = path.resolve(location + '/' + data.attachment_name);
     const content = fs.readFileSync(dist);
+
+    delete data.location;
 
     const TemplateModel = { ...data };
     const payload = {
       Name: data.attachment_name,
       ContentType: 'text/pain',
       Content: Buffer.from(content).toString('base64'),
-      ContentID: data.attachment_name,
+      ContentID: location + data.attachment_name,
     };
 
     setTimeout(async () => {
