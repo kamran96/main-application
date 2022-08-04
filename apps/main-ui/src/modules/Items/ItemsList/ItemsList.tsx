@@ -32,7 +32,7 @@ import { PrintColumns, PDFColumns } from './PrintColumns';
 import { ItemsListWrapper } from './styles';
 import packageIcon from '@iconify-icons/feather/package';
 import ItemsImport from '../ItemsImport';
-import { ItemsViewContainer } from './ItemView';
+import { ItemsViewContainer } from './ItemDrawerView';
 
 export const ItemsList: FC = () => {
   /* HOOKS */
