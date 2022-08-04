@@ -290,9 +290,11 @@ export class AppService {
   async InvoiceCreated(data) {
     const location = data.location;
 
+    console.log('working on it...');
     const dist = path.resolve(location + '/' + data.attachment_name);
     const content = fs.readFileSync(dist);
 
+    console.log('okkk');
     delete data.location;
 
     const TemplateModel = { ...data };
@@ -300,7 +302,7 @@ export class AppService {
       Name: data.attachment_name,
       ContentType: 'text/pain',
       Content: Buffer.from(content).toString('base64'),
-      ContentID: location + data.attachment_name,
+      ContentID: location + '/' + data.attachment_name,
     };
 
     setTimeout(async () => {
