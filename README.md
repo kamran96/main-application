@@ -29,7 +29,10 @@ Website Link [Invyce](https://invyce.com/)
 - `yarn install`
 
 Create a file named `building.gyp` in the rood and paste this code
-`{
+
+```
+
+{
   'targets': [
     {
       'target_name': 'bindings',
@@ -45,7 +48,9 @@ Create a file named `building.gyp` in the rood and paste this code
       ]
     }
   ]
-}`
+}
+
+```
 
 
 
