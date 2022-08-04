@@ -118,4 +118,4 @@ apps/mobile-app-e2e/artifacts
 
 
 ## NODE GYP FILE
-building.gyp
+binding.gyp
