@@ -204,7 +204,7 @@ export class AttachmentService {
         promises.unlink(location + '/' + pdf).then(() => {
           console.log('File deleted successfully');
         });
-      }, 10000);
+      }, 30000);
 
       return attachment;
     } catch (error) {
