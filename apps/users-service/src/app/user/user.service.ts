@@ -31,12 +31,14 @@ import {
   PASSWORD_UPDATED,
   SEND_FORGOT_PASSWORD,
 } from '@invyce/send-email';
+import { Branch } from '../schemas/branch.schema';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private userModel,
     @InjectModel(UserToken.name) private userToken,
+    @InjectModel(Branch.name) private branchModel,
     @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy,
 
     private authService: AuthService
@@ -294,7 +296,7 @@ export class UserService {
 
       if (dbUser.length === 0) {
         insertedUser = {
-          username: user.username,
+          username: user.username || '',
           email: user.email,
           password: '',
 
@@ -302,7 +304,7 @@ export class UserService {
           branchId: user.branchId,
           fullName: user.fullname,
           country: user.country,
-          isVerified: true,
+          isVerified: false,
           phoneNumber: user.phoneNumber,
         };
         await this.authService.AddUser(insertedUser, userData, 'email');
@@ -335,6 +337,8 @@ export class UserService {
           .populate('role')
           .populate('organization')
           .populate('branch');
+
+        console.log(user, 'user here');
 
         if (user?.isVerified === true && user?.username !== null) {
           throw new HttpException(
@@ -369,17 +373,24 @@ export class UserService {
         jobTitle,
         cnic,
         website,
+        username,
         location,
         bio,
       } = userDto;
 
       const userId = params.id;
       const user = await this.userModel.findById(userId);
+      const branch = await this.branchModel.findOne({
+        organizationId: user.organizationId,
+      });
+
       await this.userModel.updateOne(
         { _id: userId },
         {
           password: password ? await bcrypt.hashSync(password) : user.password,
+          username,
           isVerified: true,
+          branchId: branch.id,
           $set: {
             'profile.fullName': fullname || user?.profile?.fullName,
             'profile.country': country || user?.profile?.country,

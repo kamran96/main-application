@@ -237,13 +237,6 @@ export const JoinUser: FC = () => {
               <Input disabled size="middle" autoComplete="off" />
             </Form.Item>
             <Form.Item
-              label="Branch"
-              name="branch"
-              rules={[{ required: true, message: 'email is required!' }]}
-            >
-              <Input disabled size="middle" autoComplete="off" />
-            </Form.Item>
-            <Form.Item
               label="Phone Number"
               name="phoneNumber"
               rules={[{ required: true, message: 'phone number is required!' }]}

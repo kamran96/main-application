@@ -187,7 +187,7 @@ export class AuthService {
     user.email = authDto.email;
     user.password =
       authDto.password !== '' ? bcrypt.hashSync(authDto.password) : null;
-    user.organizationId = userData?.organizationId || null;
+    user.organizationId = userData.organizationId || null;
     user.branchId = authDto.branchId || null;
     user.roleId = authDto.roleId || null;
     user.prefix = authDto.prefix;

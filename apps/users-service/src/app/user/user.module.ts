@@ -8,12 +8,14 @@ import { UserToken, UserTokenSchema } from '../schemas/userToken.schema';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { AuthStrategy } from '../auth/auth.strategy';
+import { Branch, BranchSchema } from '../schemas/branch.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: UserToken.name, schema: UserTokenSchema },
+      { name: Branch.name, schema: BranchSchema },
     ]),
     ClientsModule.register([
       {
