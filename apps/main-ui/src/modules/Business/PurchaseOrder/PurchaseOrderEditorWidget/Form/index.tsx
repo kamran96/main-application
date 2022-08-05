@@ -382,13 +382,13 @@ const Editor: FC<IProps> = ({ id }) => {
                 </div>
               </Col>
               <div className="mt-10 actions textRight flex alignCenter justifyFlexEnd ">
-                <Form.Item
+                {/* <Form.Item
                   className="mr-10"
                   name="email_pdf"
                   valuePropName="checked"
                 >
                   <Checkbox>Send to Email</Checkbox>
-                </Form.Item>
+                </Form.Item> */}
                 <Form.Item name="status">
                   <Button
                     onClick={() => {
