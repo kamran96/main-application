@@ -727,7 +727,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                   />
                 </Form.Item>
               </Col>
-              <Col span={24}>
+              {/* <Col span={24}>
                 <FormLabel isRequired={true}>Select Bank</FormLabel>
                 <Form.Item name="bankId">
                   <Select
@@ -747,7 +747,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                     })}
                   </Select>
                 </Form.Item>
-              </Col>
+              </Col> */}
             </Row>
           </Col>
         </Row>
