@@ -147,6 +147,7 @@ export const AccountsForm: FC = () => {
                 }}
               >
                 <Select
+                  disabled={id ? true : false}
                   loading={isLoading}
                   size="large"
                   showSearch
@@ -175,7 +176,8 @@ export const AccountsForm: FC = () => {
                 rules={[
                   {
                     pattern: /^\S/,
-                    message: 'Please add proper Account Name and remove Whitespaces ',
+                    message:
+                      'Please add proper Account Name and remove Whitespaces ',
                   },
                 ]}
               >
@@ -198,6 +200,7 @@ export const AccountsForm: FC = () => {
               <FormLabel>Tax</FormLabel>
               <Form.Item name="taxRate">
                 <Select
+                  disabled={id ? true : false}
                   size="large"
                   showSearch
                   style={{ width: '100%' }}

@@ -87,9 +87,9 @@ export const ItemsViewContainer: FC<Iprops> = ({
             cursor: 'pointer',
           }}
         >
-          <Link to={`/app${ISupportedRoutes.ITEMS}/${showItemDetails.id}`}>
+          {/* <Link to={`/app${ISupportedRoutes.ITEMS}/${showItemDetails.id}`}>
             <Icon icon={view} style={{ color: '#1E75F1' }} /> View More Details
-          </Link>
+          </Link> */}
         </div>
       }
     >
@@ -146,7 +146,9 @@ export const ItemsViewContainer: FC<Iprops> = ({
                     footerDesc="Total Purchases"
                     icon_bg="_color3"
                     icon={<Icon color="#F19700" icon={InvoiceIcon} />}
-                    amount={moneyFormat(result ? result?.totalBillsAmount : 0)}
+                    amount={moneyFormat(
+                      result?.totalBillsAmount ? result?.totalBillsAmount : 0
+                    )}
                     card={'#FFF4E2'}
                   />
                 </Col>
@@ -164,7 +166,9 @@ export const ItemsViewContainer: FC<Iprops> = ({
                     icon_bg="_color2"
                     icon={<Icon color="#43C175" icon={fileText} />}
                     amount={moneyFormat(
-                      result ? result?.totalInvoicesAmount : 0
+                      result?.totalInvoicesAmount
+                        ? result?.totalInvoicesAmount
+                        : 0
                     )}
                     card={'#E3FFEE'}
                   />
