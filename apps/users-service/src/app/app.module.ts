@@ -14,6 +14,7 @@ import { UserModule } from './user/user.module';
 let MONGO_URI;
 let jwt_secret;
 let expires;
+let base_url;
 if (
   process.env['NODE' + '_ENV'] === 'production' ||
   process.env['NODE' + '_ENV'] === 'staging'
@@ -42,10 +43,12 @@ if (
   MONGO_URI = staticContent.MONGO_URI;
   jwt_secret = staticContent.JWT_SECRET;
   expires = staticContent.EXPIRES;
+  base_url = staticContent.BASE_URL;
 }
 
 export const JWT_SECRET = jwt_secret;
 export const EXPIRES = expires;
+export const BASE_URL = base_url;
 
 @Module({
   imports: [

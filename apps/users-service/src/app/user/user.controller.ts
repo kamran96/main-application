@@ -215,7 +215,6 @@ export class UserController {
   }
 
   @Put('/update-invited-user/:id')
-  @UseGuards(GlobalAuthGuard)
   async updateVerifiedUser(
     @Body() userDto: InvitedUserDetailDto,
     @Param() params: ParamsDto,

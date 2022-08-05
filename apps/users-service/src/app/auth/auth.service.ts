@@ -40,6 +40,7 @@ import {
 
 import { SendOtp, UserLoginDto, UserRegisterDto } from '../dto/user.dto';
 import { Host } from '@invyce/global-constants';
+import { BASE_URL } from '../app.module';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -186,7 +187,7 @@ export class AuthService {
     user.email = authDto.email;
     user.password =
       authDto.password !== '' ? bcrypt.hashSync(authDto.password) : null;
-    user.organizationId = userData?.organizationId || null;
+    user.organizationId = userData.organizationId || null;
     user.branchId = authDto.branchId || null;
     user.roleId = authDto.roleId || null;
     user.prefix = authDto.prefix;
@@ -416,7 +417,6 @@ export class AuthService {
     const user = await this.userModel.findOne({ email: body.email });
 
     const generateOtp: string = generateRandomNDigits();
-    console.log(generateOtp, 'otp');
     parseInt(generateOtp as unknown as string);
 
     const user_token = new this.userTokenModel();
@@ -478,7 +478,7 @@ export class AuthService {
     code: string,
     userData: IBaseUser
   ): Promise<void> {
-    const baseUrl = 'http://localhost:4200';
+    const baseUrl = process.env.BASE_URL || BASE_URL;
     const _code = { code };
     const a = `${baseUrl}/page/join-user?${queryString.stringify(_code)}`;
 
