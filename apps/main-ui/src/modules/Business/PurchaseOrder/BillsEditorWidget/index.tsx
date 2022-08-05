@@ -11,11 +11,7 @@ import { useGlobalContext } from '../../../../hooks/globalContext/globalContext'
 export const BillsEditorWidget: FC = () => {
   const { routeHistory } = useGlobalContext();
   const { location } = routeHistory;
-  console.log(
-    location,
-    `/app/${ISupportedRoutes.CREATE_PURCHASE_Entry}/`,
-    'location'
-  );
+
   const id =
     location &&
     location.pathname.split(
@@ -71,7 +67,7 @@ export const BillsEditorWidget: FC = () => {
 
   return (
     <WrapperBillsEditor>
-      <Heading>Create Bill</Heading>
+      <Heading type="form">Create Bill</Heading>
       <BreadCrumbArea>
         <Breadcrumb>
           <Breadcrumb.Item>

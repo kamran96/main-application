@@ -755,27 +755,32 @@ export const PurchaseManager: FC<IProps> = ({
               clearTimeout(setStateTimeOut);
 
               setTimeout(() => {
-                const allItems = [...invoiceItems];
                 const purchasePrice = value;
-                const costOfGoodAmount =
-                  purchasePrice * allItems[index].quantity;
-                const total =
-                  calculateInvoice(purchasePrice, record.tax, '0') *
-                  record.quantity;
 
-                const indexed =
-                  allItems[index].errors?.indexOf('purchasePrice');
-                if (indexed !== -1) {
-                  allItems[index]?.errors?.splice(indexed, 1);
-                }
+                setInvoiceItems((prev) => {
+                  const allItems = [...prev];
 
-                allItems[index] = {
-                  ...allItems[index],
-                  purchasePrice,
-                  total,
-                  costOfGoodAmount,
-                };
-                setInvoiceItems(allItems);
+                  const costOfGoodAmount =
+                    purchasePrice * allItems[index].quantity;
+                  const total =
+                    calculateInvoice(purchasePrice, record.tax, '0') *
+                    record.quantity;
+
+                  const indexed =
+                    allItems[index].errors?.indexOf('purchasePrice');
+                  if (indexed !== -1) {
+                    allItems[index]?.errors?.splice(indexed, 1);
+                  }
+
+                  allItems[index] = {
+                    ...allItems[index],
+                    purchasePrice,
+                    total,
+                    costOfGoodAmount,
+                  };
+
+                  return allItems;
+                });
               }, 500);
             }}
             type="number"

@@ -20,9 +20,7 @@ export const ContactsEditorWidget: FC = () => {
 
   return (
     <WrapperContactsEditor>
-      <Heading type="table">
-        {id ? 'Update Contact' : 'Create New Contact'}
-      </Heading>
+      <Heading>{id ? 'Update Contact' : 'Create New Contact'}</Heading>
       <BreadCrumbArea>
         <Breadcrumb>
           <Breadcrumb.Item>

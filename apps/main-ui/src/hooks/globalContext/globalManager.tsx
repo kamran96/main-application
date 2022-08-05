@@ -33,7 +33,6 @@ const stylesheets = {
 };
 
 const isProductionEnv = process.env.NODE_ENV === 'production' || true;
-console.log(isProductionEnv, 'check');
 const userCheckApiConfig = (userId) =>
   isProductionEnv ? `users/auth/check` : `users/user/${userId}`;
 
