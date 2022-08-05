@@ -87,9 +87,9 @@ export const ItemsViewContainer: FC<Iprops> = ({
             cursor: 'pointer',
           }}
         >
-          <Link to={`/app${ISupportedRoutes.ITEMS}/${showItemDetails.id}`}>
+          {/* <Link to={`/app${ISupportedRoutes.ITEMS}/${showItemDetails.id}`}>
             <Icon icon={view} style={{ color: '#1E75F1' }} /> View More Details
-          </Link>
+          </Link> */}
         </div>
       }
     >

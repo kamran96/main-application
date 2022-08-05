@@ -67,7 +67,7 @@ export const BillsEditorWidget: FC = () => {
 
   return (
     <WrapperBillsEditor>
-      <Heading type="form">Create Bill</Heading>
+      <Heading>Create Bill</Heading>
       <BreadCrumbArea>
         <Breadcrumb>
           <Breadcrumb.Item>

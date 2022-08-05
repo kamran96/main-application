@@ -29,8 +29,8 @@ export const ItemDetails: FC<IProps> = ({ result, id }) => {
         <Col span={7}>
           <h4>Item Name: </h4>
         </Col>
-        <Col span={15}>
-          <Link to={`/app${ISupportedRoutes.ITEMS}/${id}`}>{result?.name}</Link>
+        <Col span={15} className="capitalize">
+          {result?.name}
         </Col>
         <Col span={7}>
           <h4>Item Purcahse Price: </h4>
@@ -48,12 +48,7 @@ export const ItemDetails: FC<IProps> = ({ result, id }) => {
           <h4>Description: </h4>
         </Col>
         <Col span={15}>
-          <p>
-            {result?.description} Lorem, ipsum dolor sit amet consectetur
-            adipisicing elit. Reiciendis commodi maiores, id voluptas molestias
-            vitae minima quidem quae voluptatibus aperiam fugiat voluptates quos
-            officiis nihil praesentium provident laborum explicabo in!
-          </p>
+          <p>{result?.description}</p>
         </Col>
         <Col span={7}>
           <h4>Added Date: </h4>
