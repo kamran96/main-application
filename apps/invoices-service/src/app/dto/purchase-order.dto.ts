@@ -10,6 +10,7 @@ export class PurchaseOrderDto {
   currency: number;
   netTotal: number;
   date: string;
+  email: string;
   invoiceType: string;
   directTax: number;
   indirectTax: number;

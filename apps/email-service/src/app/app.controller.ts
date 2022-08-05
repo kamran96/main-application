@@ -23,6 +23,7 @@ import {
   DID_NOT_SEND_INVOICE_IN_LAST_7_DAYS,
   BILL_UPDATED,
   CHANGE_PASSWORD_OTP,
+  PO_CREATED,
 } from '@invyce/send-email';
 
 @Controller()
@@ -150,6 +151,14 @@ export class AppController {
     Logger.log(data);
 
     await this.appService.InvoiceCreated(data);
+  }
+
+  @MessagePattern(PO_CREATED)
+  async poCreated(@Payload() data: any) {
+    Logger.log('Data is received.');
+    Logger.log(data);
+
+    await this.appService.POCreated(data);
   }
 
   @MessagePattern(INVOICE_UPDATED)

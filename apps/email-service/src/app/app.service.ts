@@ -288,6 +288,45 @@ export class AppService {
     console.log(email, 'email successfully.');
   }
 
+  async POCreated(data) {
+    const getBase64 = async (url) => {
+      if (!url) {
+        return url;
+      } else {
+        return axios
+          .get(url, {
+            responseType: 'arraybuffer',
+          })
+          .then((response) =>
+            Buffer.from(response.data, 'binary').toString('base64')
+          );
+      }
+    };
+
+    delete data.location;
+
+    const TemplateModel = { ...data };
+    const payload = {
+      Name: data.attachment_name,
+      ContentType: 'text/pain',
+      Content: await getBase64(data.download_link),
+      ContentID: data.download_link,
+    };
+
+    setTimeout(async () => {
+      const email = await client.sendEmailWithTemplate({
+        From: 'no-reply@invyce.com',
+        To: data.to,
+        TemplateAlias: 'purchase-order-template',
+        TemplateModel: TemplateModel,
+        Attachments: [payload],
+        Cc: data.cc,
+        Bcc: data.bcc,
+      });
+      console.log(email, 'email successfully.');
+    }, 5000);
+  }
+
   async InvoiceCreated(data) {
     const getBase64 = async (url) => {
       if (!url) {

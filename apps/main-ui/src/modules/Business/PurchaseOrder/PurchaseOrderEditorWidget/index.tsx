@@ -15,7 +15,7 @@ export const PurchaseOrderEditorWidget: FC = () => {
 
   return (
     <WrapperWidget>
-      <Heading>Create Purchase Order</Heading>
+      <Heading type='form'>Create Purchase Order</Heading>
       <BreadCrumbArea>
         <Breadcrumb>
           <Breadcrumb.Item>

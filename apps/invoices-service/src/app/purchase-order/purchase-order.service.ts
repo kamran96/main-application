@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Between, getCustomRepository, ILike, In } from 'typeorm';
 import axios from 'axios';
 import { IPage, IRequest } from '@invyce/interfaces';
@@ -6,10 +6,17 @@ import { PurchaseOrderDto } from '../dto/purchase-order.dto';
 import { PurchaseOrderRepository } from '../repositories/purchaseOrder.repository';
 import { PurchaseOrderItemRepository } from '../repositories/purchaseOrderItem.repository';
 import { Sorting } from '@invyce/sorting';
-import { Host } from '@invyce/global-constants';
+import { Host, PdfType, Statuses } from '@invyce/global-constants';
+import { ClientProxy } from '@nestjs/microservices';
+import { PO_CREATED } from '@invyce/send-email';
+import moment = require('moment');
 
 @Injectable()
 export class PurchaseOrderService {
+  constructor(
+    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy
+  ) {}
+
   async IndexPO(req: IRequest, queryData: IPage) {
     const { page_no, page_size, status, type, sort, query } = queryData;
 
@@ -170,6 +177,23 @@ export class PurchaseOrderService {
   }
 
   async CreatePurchaseOrder(poDto: PurchaseOrderDto, req: IRequest) {
+    if (!req || !req.cookies) return null;
+    const token = req?.cookies['access_token'];
+
+    const mapItemIds = poDto.invoice_items.map((ids) => ids.itemId);
+
+    const { data: items } = await axios.post(
+      Host('items', 'items/item/ids'),
+      {
+        ids: mapItemIds,
+      },
+      {
+        headers: {
+          cookie: `access_token=${token}`,
+        },
+      }
+    );
+
     if (poDto?.isNewRecord === false) {
       // update
       const purchaseOrder = await getCustomRepository(
@@ -253,8 +277,11 @@ export class PurchaseOrderService {
         status: poDto.status,
       });
 
+      const invoiceItems = [];
       for (const item of poDto.invoice_items) {
-        await getCustomRepository(PurchaseOrderItemRepository).save({
+        const poItem = await getCustomRepository(
+          PurchaseOrderItemRepository
+        ).save({
           itemId: item.itemId,
           purchaseOrderId: po.id,
           accountId: item.accountId,
@@ -267,8 +294,80 @@ export class PurchaseOrderService {
           total: item.total,
           status: poDto.status,
         });
+        invoiceItems.push(poItem);
       }
-      return this.FindById(po.id, req);
+
+      // if (po.status === Statuses.AUTHORISED) {
+      const { data: contact } = await axios.post(
+        Host('contacts', `contacts/contact/ids`),
+        {
+          ids: [poDto.contactId],
+          type: 1,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
+
+      const { data: attachment } = await axios.post(
+        Host('attachments', `attachments/attachment/generate-pdf`),
+        {
+          data: {
+            ...poDto,
+            invoice: { ...po, invoice_items: invoiceItems },
+            contact: contact[0],
+            items,
+            type: PdfType.PO,
+          },
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
+
+      console.log(attachment, 'attachment');
+
+      const email = contact[0].email
+        ? contact[0].email
+        : poDto.email
+        ? poDto.email
+        : null;
+
+      const invoice_details = [];
+      let i = 0;
+      for (const item of poDto.invoice_items) {
+        i++;
+        if (i < 6) {
+          invoice_details.push({
+            itemName: await items.find((i) => i.id === item.itemId).name,
+            quantity: item.quantity,
+            description: item.description,
+          });
+        }
+      }
+
+      await this.emailService.emit(PO_CREATED, {
+        to: email,
+        user_name: contact[0]?.name || null,
+        contact: req.user.profile.fullName,
+        created_time: moment(po.createdAt).format('Dd, M, yyy'),
+        purchaseOrder: po.invoiceNumber,
+        comment: po.comment,
+        issueDate: po.issueDate,
+        dueDate: po.dueDate,
+        reference: po.reference,
+        gross_total: po.grossTotal,
+        net_total: po.netTotal,
+        invoice_details,
+        download_link: attachment?.path || null,
+        attachment_name: attachment?.name || null,
+      });
+      return po;
+      // }
     }
   }
 

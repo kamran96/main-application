@@ -20,7 +20,7 @@ export const ContactsEditorWidget: FC = () => {
 
   return (
     <WrapperContactsEditor>
-      <Heading type="table">
+      <Heading type="form">
         {id ? 'Update Contact' : 'Create New Contact'}
       </Heading>
       <BreadCrumbArea>

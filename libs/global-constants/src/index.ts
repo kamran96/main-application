@@ -61,6 +61,7 @@ export enum PdfType {
   CREDIT_NOTE = 'credit-note',
   DEBIT_NOTE = 'debit-note',
   BILL = 'bill',
+  PO = 'PO',
 }
 
 export enum InvTypes {
