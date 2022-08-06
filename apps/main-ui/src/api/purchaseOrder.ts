@@ -5,6 +5,7 @@ export const CreatePurchaseOrderAPI = (payload?: any) =>
   http.post('invoices/purchase-order', payload);
 
 export const purchaseOrderList = ({ queryKey }: QueryKey) => {
+  console.log(queryKey, 'check');
   const type = queryKey[1];
   const status: string | number = queryKey[2];
   const page: number = queryKey[3];
@@ -16,7 +17,7 @@ export const purchaseOrderList = ({ queryKey }: QueryKey) => {
     url = `${url}&query=${query}`;
   }
 
-  if(sortid && sortid!== null){
+  if (sortid && sortid !== null) {
     url = `${url}&sort=${sortid}`;
   }
 
@@ -31,4 +32,5 @@ export const getPurchaseOrderByIDAPI = ({ queryKey }: QueryKey) => {
 export const purchaseOrderDeleteAPI = (payload?: { ids: number[] }) =>
   http?.put(`invoices/purchase-order`, payload);
 
-  export const purchaseOrderKeysAPI = () => http.get(`invoices/purchase-order/import-csv`)
+export const purchaseOrderKeysAPI = () =>
+  http.get(`invoices/purchase-order/import-csv`);

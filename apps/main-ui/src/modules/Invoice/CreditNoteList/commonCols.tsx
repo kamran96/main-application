@@ -17,7 +17,7 @@ export const useCols = () => {
       const filterIdType = filterType[1];
       const filterOrder = filterType[4]?.split('=')[1];
 
-      console.log(filterType)
+      console.log(filterType);
 
       if (filterIdType?.includes('-')) {
         const fieldName = filterIdType?.split('=')[1].split('-')[1];
@@ -43,7 +43,9 @@ export const useCols = () => {
       sorter: true,
       sortOrder: sortedInfo?.columnKey === 'invoiceNumber' && sortedInfo?.order,
       render: (data, row) => (
-        <Link to={`/app${ISupportedRoutes.CREDIT_NOTES}/${row?.id}`}>{data}</Link>
+        <Link to={`/app${ISupportedRoutes.CREDIT_NOTES}/${row?.id}`}>
+          {data}
+        </Link>
       ),
     },
     {
@@ -73,7 +75,7 @@ export const useCols = () => {
         <>{data ? dayJs(data).format('MMMM D, YYYY h:mm A') : '-'}</>
       ),
     },
-  
+
     {
       title: 'Amount',
       dataIndex: 'netTotal',
@@ -81,15 +83,15 @@ export const useCols = () => {
       sorter: true,
       sortOrder: sortedInfo?.columnKey === 'netTotal' && sortedInfo?.order,
     },
-  
+
     {
       title: 'Items',
       dataIndex: 'creditNoteItems',
       key: 'creditNoteItems',
-      sorter: true,
-      sortOrder: sortedInfo?.columnKey === 'creditNoteItems' && sortedInfo?.order,
       render: (data) => (
-        <>{data?.length > 1 ? `${data?.length} items` : `${data?.length} item`}</>
+        <>
+          {data?.length > 1 ? `${data?.length} items` : `${data?.length} item`}
+        </>
       ),
     },
     {
@@ -101,8 +103,8 @@ export const useCols = () => {
       render: (data) => (data === 1 ? 'Aproved' : 'Draft'),
     },
   ];
-  
-   const csvColumns: ITableExportFields = {
+
+  const csvColumns: ITableExportFields = {
     invoiceNumber: 'Invoice Numbber',
     reference: 'Reference',
     contact: {
@@ -125,8 +127,8 @@ export const useCols = () => {
       },
     },
   };
-  
-   const pdfCols: ColumnsType<any> = [
+
+  const pdfCols: ColumnsType<any> = [
     {
       title: 'Number',
       dataIndex: 'invoiceNumber',
@@ -149,15 +151,16 @@ export const useCols = () => {
       title: 'Data',
       dataIndex: 'issueDate',
       key: 'issueDate',
-      render: (data) => (data ? dayJs(data).format('MMMM D, YYYY h:mm A') : '-'),
+      render: (data) =>
+        data ? dayJs(data).format('MMMM D, YYYY h:mm A') : '-',
     },
-  
+
     {
       title: 'Amount',
       dataIndex: 'netTotal',
       key: 'netTotal',
     },
-  
+
     {
       title: 'Items',
       dataIndex: 'credit_note_items',
@@ -172,8 +175,6 @@ export const useCols = () => {
       render: (data) => (data === 1 ? 'Aproved' : 'Draft'),
     },
   ];
-  
-  return {pdfCols, csvColumns, columns}
-  
-}
 
+  return { pdfCols, csvColumns, columns };
+};
