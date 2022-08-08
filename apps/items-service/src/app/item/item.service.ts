@@ -402,8 +402,10 @@ export class ItemService {
           {
             totalBillsAmount:
               operation === IOperationType.INCREASE
-                ? item.totalBillsAmount - i.value * item.price.purchasePrice
-                : item.totalBillsAmount + i.value * item.price.purchasePrice,
+                ? item.totalBillsAmount ||
+                  0 - i.value * item.price.purchasePrice
+                : item.totalBillsAmount ||
+                  0 + i.value * item.price.purchasePrice,
           }
         );
       } else if (i.invoiceType === 'invoice') {
@@ -413,8 +415,9 @@ export class ItemService {
           {
             totalInvoicesAmount:
               operation === IOperationType.INCREASE
-                ? item.totalInvoicesAmount + i.value * item.price.salePrice
-                : item.totalInvoicesAmount - i.value * item.price.salePrice,
+                ? item.totalInvoicesAmount || 0 + i.value * item.price.salePrice
+                : item.totalInvoicesAmount ||
+                  0 - i.value * item.price.salePrice,
           }
         );
       }

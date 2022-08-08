@@ -754,7 +754,7 @@ export const PurchaseManager: FC<IProps> = ({
             onChange={(value) => {
               clearTimeout(setStateTimeOut);
 
-              setTimeout(() => {
+              setStateTimeOut = setTimeout(() => {
                 const purchasePrice = value;
 
                 setInvoiceItems((prev) => {
