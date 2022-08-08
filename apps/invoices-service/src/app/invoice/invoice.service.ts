@@ -522,6 +522,10 @@ export class InvoiceService {
               targetId: invoice.id,
               type: 'decrease',
               action: 'create',
+              price:
+                typeof item.unitPrice === 'string'
+                  ? parseFloat(item.unitPrice)
+                  : item.unitPrice,
             });
           }
 
@@ -682,6 +686,10 @@ export class InvoiceService {
             type: 'decrease',
             action: 'create',
             invoiceType: 'invoice',
+            price:
+              typeof item.unitPrice === 'string'
+                ? parseFloat(item.unitPrice)
+                : item.unitPrice,
           });
         }
 
@@ -1460,6 +1468,11 @@ export class InvoiceService {
               targetId: i,
               type: 'decrease',
               action: 'delete',
+              invoiceType: 'invoice',
+              price:
+                typeof j.unitPrice === 'string'
+                  ? parseFloat(j.unitPrice)
+                  : j.unitPrice,
             });
           }
         }

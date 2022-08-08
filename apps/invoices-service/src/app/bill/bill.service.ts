@@ -465,6 +465,10 @@ export class BillService {
               type: 'increase',
               action: 'create',
               invoiceType: 'bill',
+              price:
+                typeof item?.purchasePrice === 'string'
+                  ? parseFloat(item.purchasePrice)
+                  : item.purchasePrice,
             });
           }
 
@@ -629,6 +633,10 @@ export class BillService {
             type: 'increase',
             action: 'create',
             invoiceType: 'bill',
+            price:
+              typeof item?.purchasePrice === 'string'
+                ? parseFloat(item.purchasePrice)
+                : item.purchasePrice,
           });
         }
 
@@ -879,6 +887,11 @@ export class BillService {
               targetId: i,
               type: 'increase',
               action: 'delete',
+              invoiceType: 'bill',
+              price:
+                typeof j?.purchasePrice === 'string'
+                  ? parseFloat(j?.purchasePrice)
+                  : j?.purchasePrice,
             });
           }
         }

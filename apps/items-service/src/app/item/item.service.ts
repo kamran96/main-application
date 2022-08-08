@@ -294,6 +294,8 @@ export class ItemService {
     }
 
     await this.ManageItemStock(data);
+
+    console.log('is here');
     await this.ManageSalesPurchases(data);
   }
 
@@ -385,43 +387,64 @@ export class ItemService {
   }
 
   async ManageSalesPurchases(data): Promise<void> {
+    console.log('is here too');
     const getItem = async (id) => {
       const item = await this.itemModel.findById(id).populate('price');
       return item;
     };
 
-    for (const i of data.payload) {
-      const operation =
-        i.type === IOperationType.DECREASE
-          ? IOperationType.INCREASE
-          : IOperationType.DECREASE;
+    console.log('396');
+
+    const getNewValue = (previousPrice, change, action) => {
+      console.log(previousPrice, change, action);
+      if (action === 'create') {
+        return previousPrice + change;
+      } else if (action === 'delete') {
+        return previousPrice - change;
+      }
+    };
+
+    console.log(data.payload, 'paylaod');
+
+    data?.payload?.forEach(async (i) => {
       if (i.invoiceType === 'bill') {
         const item = await getItem(i.itemId);
+        const price = i?.price || item?.price?.purchasePrice;
+        const previousAmount = item?.totalBillsAmount || 0;
+        console.log('i', 413);
+        const newValue = await getNewValue(
+          previousAmount,
+          price * i?.value,
+          i.action
+        );
+
+        console.log('422', newValue);
+
         await this.itemModel.updateOne(
           { _id: i.itemId },
           {
-            totalBillsAmount:
-              operation === IOperationType.INCREASE
-                ? item.totalBillsAmount ||
-                  0 - i.value * item.price.purchasePrice
-                : item.totalBillsAmount ||
-                  0 + i.value * item.price.purchasePrice,
+            totalBillsAmount: newValue,
           }
         );
       } else if (i.invoiceType === 'invoice') {
         const item = await getItem(i.itemId);
+        const price = i?.price || item?.price?.salePrice;
+
+        console.log(price, 'price in invoice', data?.payload);
+        const previousAmount = item?.totalInvoicesAmount || 0;
+
         await this.itemModel.updateOne(
           { _id: i.itemId },
           {
-            totalInvoicesAmount:
-              operation === IOperationType.INCREASE
-                ? item.totalInvoicesAmount || 0 + i.value * item.price.salePrice
-                : item.totalInvoicesAmount ||
-                  0 - i.value * item.price.salePrice,
+            totalInvoicesAmount: getNewValue(
+              previousAmount,
+              price * i?.value,
+              i.action
+            ),
           }
         );
       }
-    }
+    });
   }
 
   async SyncItems(data, req: IRequest): Promise<any> {
