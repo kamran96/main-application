@@ -39,7 +39,7 @@ import {
 } from '@invyce/interfaces';
 
 import { SendOtp, UserLoginDto, UserRegisterDto } from '../dto/user.dto';
-import { Host } from '@invyce/global-constants';
+import { Host, toTitleCase } from '@invyce/global-constants';
 import { BASE_URL } from '../app.module';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -187,7 +187,7 @@ export class AuthService {
     user.email = authDto.email;
     user.password =
       authDto.password !== '' ? bcrypt.hashSync(authDto.password) : null;
-    user.organizationId = userData.organizationId || null;
+    user.organizationId = userData ? userData.organizationId : null;
     user.branchId = authDto.branchId || null;
     user.roleId = authDto.roleId || null;
     user.prefix = authDto.prefix;
@@ -484,10 +484,11 @@ export class AuthService {
 
     // info(`Decoded generated for user ${queryString.parse(_code)}`);
 
+    const name = user.email.split('@')[0];
     const payload = {
       to: user.email,
-      user_name: user?.profile?.fullName,
-      name: userData.profile.fullName,
+      user_name: toTitleCase(name),
+      name: toTitleCase(userData.profile.fullName),
       action_url: a,
     };
 

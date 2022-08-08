@@ -6,7 +6,7 @@ import { PurchaseOrderDto } from '../dto/purchase-order.dto';
 import { PurchaseOrderRepository } from '../repositories/purchaseOrder.repository';
 import { PurchaseOrderItemRepository } from '../repositories/purchaseOrderItem.repository';
 import { Sorting } from '@invyce/sorting';
-import { Host, PdfType, Statuses } from '@invyce/global-constants';
+import { Host, PdfType, toTitleCase } from '@invyce/global-constants';
 import { ClientProxy } from '@nestjs/microservices';
 import { PO_CREATED } from '@invyce/send-email';
 import moment = require('moment');
@@ -352,12 +352,12 @@ export class PurchaseOrderService {
 
       await this.emailService.emit(PO_CREATED, {
         to: email,
-        user_name: contact[0]?.name || null,
-        contact: req.user.profile.fullName,
-        created_time: moment(po.createdAt).format('Dd, M, yyy'),
+        user_name: toTitleCase(contact[0]?.name) || null,
+        contact: toTitleCase(req.user.profile.fullName),
+        created_time: moment(po.createdAt).format('MMM Do YY'),
         purchaseOrder: po.invoiceNumber,
         comment: po.comment,
-        issueDate: po.issueDate,
+        issueDate: moment(po.issueDate).format('MMMM Do YYYY, h:mm:ss a'),
         dueDate: po.dueDate,
         reference: po.reference,
         gross_total: po.grossTotal,

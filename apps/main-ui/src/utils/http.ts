@@ -28,8 +28,6 @@ const http = axios.create({
   cancelToken: cancelSource.token,
 });
 
-console.log('okkkk');
-
 // const requestHandler = res => {
 //   if (
 //     res.headers["content-type"] &&
