@@ -7,7 +7,7 @@ import {
   LessThan,
   Not,
 } from 'typeorm';
-import * as path from 'path';
+import { ClientProxy } from '@nestjs/microservices';
 import axios from 'axios';
 import * as dotenv from 'dotenv';
 import * as moment from 'moment';
@@ -32,11 +32,11 @@ import {
   PaymentModes,
   PdfType,
   Statuses,
+  ToTitleCase,
   XeroTypes,
 } from '@invyce/global-constants';
 import { BillItemRepository } from '../repositories/billItem.repository';
 import { InvoiceDto, InvoiceIdsDto } from '../dto/invoice.dto';
-import { ClientProxy } from '@nestjs/microservices';
 import {
   INVOICE_CREATED,
   INVOICE_UPDATED,
@@ -609,7 +609,7 @@ export class InvoiceService {
 
           await this.emailService.emit(INVOICE_UPDATED, {
             to: req?.user?.email,
-            user_name: req?.user?.profile?.fullName,
+            user_name: ToTitleCase(req?.user?.profile?.fullName),
             invoice_number: invoice?.invoiceNumber,
             name: invoiceLink,
           });

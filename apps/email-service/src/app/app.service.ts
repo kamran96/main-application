@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as postmark from 'postmark';
 import * as path from 'path';
 import * as fs from 'fs';
-import axios from 'axios';
+import { GetBase64 } from '@invyce/global-constants';
 
 const client = new postmark.ServerClient(process.env.POSTMARK_TOKEN);
 
@@ -289,27 +289,11 @@ export class AppService {
   }
 
   async POCreated(data) {
-    const getBase64 = async (url) => {
-      if (!url) {
-        return url;
-      } else {
-        return axios
-          .get(url, {
-            responseType: 'arraybuffer',
-          })
-          .then((response) =>
-            Buffer.from(response.data, 'binary').toString('base64')
-          );
-      }
-    };
-
-    delete data.location;
-
     const TemplateModel = { ...data };
     const payload = {
       Name: data.attachment_name,
       ContentType: 'text/pain',
-      Content: await getBase64(data.download_link),
+      Content: await GetBase64(data.download_link),
       ContentID: data.download_link,
     };
 
@@ -328,27 +312,13 @@ export class AppService {
   }
 
   async InvoiceCreated(data) {
-    const getBase64 = async (url) => {
-      if (!url) {
-        return url;
-      } else {
-        return axios
-          .get(url, {
-            responseType: 'arraybuffer',
-          })
-          .then((response) =>
-            Buffer.from(response.data, 'binary').toString('base64')
-          );
-      }
-    };
-
     delete data.location;
 
     const TemplateModel = { ...data };
     const payload = {
       Name: data.attachment_name,
       ContentType: 'text/pain',
-      Content: await getBase64(data.download_link),
+      Content: await GetBase64(data.download_link),
       ContentID: data.download_link,
     };
 

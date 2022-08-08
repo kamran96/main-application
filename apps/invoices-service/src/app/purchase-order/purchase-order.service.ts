@@ -1,15 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Between, getCustomRepository, ILike, In } from 'typeorm';
+import { ClientProxy } from '@nestjs/microservices';
 import axios from 'axios';
+import * as moment from 'moment';
 import { IPage, IRequest } from '@invyce/interfaces';
 import { PurchaseOrderDto } from '../dto/purchase-order.dto';
 import { PurchaseOrderRepository } from '../repositories/purchaseOrder.repository';
 import { PurchaseOrderItemRepository } from '../repositories/purchaseOrderItem.repository';
 import { Sorting } from '@invyce/sorting';
-import { Host, PdfType, toTitleCase } from '@invyce/global-constants';
-import { ClientProxy } from '@nestjs/microservices';
+import { Host, PdfType, ToTitleCase } from '@invyce/global-constants';
 import { PO_CREATED } from '@invyce/send-email';
-import moment = require('moment');
 
 @Injectable()
 export class PurchaseOrderService {
@@ -297,7 +297,6 @@ export class PurchaseOrderService {
         invoiceItems.push(poItem);
       }
 
-      // if (po.status === Statuses.AUTHORISED) {
       const { data: contact } = await axios.post(
         Host('contacts', `contacts/contact/ids`),
         {
@@ -329,8 +328,6 @@ export class PurchaseOrderService {
         }
       );
 
-      console.log(attachment, 'attachment');
-
       const email = contact[0].email
         ? contact[0].email
         : poDto.email
@@ -352,8 +349,8 @@ export class PurchaseOrderService {
 
       await this.emailService.emit(PO_CREATED, {
         to: email,
-        user_name: toTitleCase(contact[0]?.name) || null,
-        contact: toTitleCase(req.user.profile.fullName),
+        user_name: ToTitleCase(contact[0]?.name) || null,
+        contact: ToTitleCase(req.user.profile.fullName),
         created_time: moment(po.createdAt).format('MMM Do YY'),
         purchaseOrder: po.invoiceNumber,
         comment: po.comment,
@@ -367,7 +364,6 @@ export class PurchaseOrderService {
         attachment_name: attachment?.name || null,
       });
       return po;
-      // }
     }
   }
 

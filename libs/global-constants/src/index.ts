@@ -102,8 +102,22 @@ export const useApiCallback = (route: string) => {
   return http;
 };
 
-export const toTitleCase = (str) =>
+export const ToTitleCase = (str) =>
   str.replace(
     /\w\S*/g,
     (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
   );
+
+export const GetBase64 = async (url) => {
+  if (!url) {
+    return url;
+  } else {
+    return axios
+      .get(url, {
+        responseType: 'arraybuffer',
+      })
+      .then((response) =>
+        Buffer.from(response.data, 'binary').toString('base64')
+      );
+  }
+};
