@@ -44,7 +44,7 @@ export const BillsEditorWidget: FC = () => {
       message: 'Item is Requred to Proceed invoice',
     },
     tax: {
-      require: true,
+      require: false,
       message: 'Item is Requred to Proceed invoice',
     },
     total: {
@@ -67,7 +67,7 @@ export const BillsEditorWidget: FC = () => {
 
   return (
     <WrapperBillsEditor>
-      <Heading type='form'>Create Bill</Heading>
+      <Heading type="form">Create Bill</Heading>
       <BreadCrumbArea>
         <Breadcrumb>
           <Breadcrumb.Item>

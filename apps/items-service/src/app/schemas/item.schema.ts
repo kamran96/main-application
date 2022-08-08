@@ -51,9 +51,9 @@ export class Item {
   createdAt: string;
   @Prop({ type: Date, default: Date.now })
   updatedAt: string;
-  @Prop()
+  @Prop({ default: 0 })
   totalBillsAmount: number;
-  @Prop()
+  @Prop({ default: 0 })
   totalInvoicesAmount: number;
 }
 
