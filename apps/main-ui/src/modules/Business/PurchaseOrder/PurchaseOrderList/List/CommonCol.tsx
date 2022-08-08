@@ -6,8 +6,7 @@ import { Link, useHistory } from 'react-router-dom';
 import { ISupportedRoutes } from '../../../../../modal';
 import moneyFormat from '../../../../../utils/moneyFormat';
 
-export const useCols  = () => {
-
+export const useCols = () => {
   const [sortedInfo, setSortedInfo] = useState(null);
   const history = useHistory();
 
@@ -16,7 +15,6 @@ export const useCols  = () => {
       const filterType = history?.location?.search.split('&');
       const filterIdType = filterType[1];
       const filterOrder = filterType[4]?.split('=')[1];
-
 
       if (filterIdType?.includes('-')) {
         const fieldName = filterIdType?.split('=')[1].split('-')[1];
@@ -33,8 +31,8 @@ export const useCols  = () => {
       }
     }
   }, [history?.location?.search]);
-  
-   const PurchaseOrderColumns: ColumnsType<any> = [
+
+  const PurchaseOrderColumns: ColumnsType<any> = [
     {
       title: 'Order No#',
       dataIndex: 'invoiceNumber',
@@ -87,7 +85,7 @@ export const useCols  = () => {
       sortOrder: sortedInfo?.columnKey === 'contact' && sortedInfo?.order,
       render: (data, row, index) => <>{data ? data.name : '-'}</>,
     },
-  
+
     {
       title: 'Date Raised',
       dataIndex: 'issueDate',
@@ -112,15 +110,12 @@ export const useCols  = () => {
       title: 'Items',
       dataIndex: 'purchaseOrderItems',
       key: 'purchaseOrderItems',
-      sorter: true,
-      sortOrder: sortedInfo?.columnKey === 'purchaseOrderItems' && sortedInfo?.order,
-      render: (data: any[]) => (
-        <>{data.length === 1 ? `${data.length} Item` : `${data.length} Items`}</>
-      ),
+      render: (data: any[]) =>
+        data.length === 1 ? `${data.length} Item` : `${data.length} Items`,
     },
   ];
-  
-   const pdfColsPO: ColumnsType<any> = [
+
+  const pdfColsPO: ColumnsType<any> = [
     {
       title: 'Order No#',
       dataIndex: 'invoiceNumber',
@@ -149,7 +144,7 @@ export const useCols  = () => {
       key: 'contact',
       render: (data, row, index) => (data ? data.name : '-'),
     },
-  
+
     {
       title: 'Date Raised',
       dataIndex: 'issueDate',
@@ -171,8 +166,8 @@ export const useCols  = () => {
     //     data?.length === 1 ? `${data?.length} Item` : `${data?.length} Items`,
     // },
   ];
-  
-   const _csvColumns: ITableExportFields = {
+
+  const _csvColumns: ITableExportFields = {
     invoiceNumber: 'Order Number',
     reference: 'Reference',
     comment: 'Comment',
@@ -201,6 +196,6 @@ export const useCols  = () => {
       },
     },
   };
-  
-  return {PurchaseOrderColumns, _csvColumns, pdfColsPO}
-}
+
+  return { PurchaseOrderColumns, _csvColumns, pdfColsPO };
+};

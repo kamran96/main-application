@@ -50,8 +50,11 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
     sortid: 'id',
     pageSize: 10,
   });
+
+  console.log(allInvoicesConfig, 'what is it');
   const { page, query, sortid, pageSize } = allInvoicesConfig;
-  const {pdfColsPO, _csvColumns} = useCols();
+
+  const { pdfColsPO, _csvColumns } = useCols();
   const { rbac } = useRbac(null);
 
   const [confirmModal, setConfirmModal] = useState(false);
@@ -91,14 +94,10 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   /* GLOBAL MANAGER CONTEXT API */
   const { routeHistory, notificationCallback } = useGlobalContext();
   const { history } = routeHistory;
+  const { search } = history.location;
 
   useEffect(() => {
-    if (
-      routeHistory &&
-      routeHistory.history &&
-      routeHistory.history.location &&
-      routeHistory.history.location.search
-    ) {
+    if (routeHistory?.history?.location?.search) {
       let obj = {};
       const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
@@ -108,7 +107,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
 
       setAllInvoicesConfig({ ...allInvoicesConfig, ...obj });
     }
-  }, [routeHistory, history]);
+  }, [search]);
   /*  ////////////// - METHODS HERE - \\\\\\\\\\\\ */
 
   /* ********* PAGINATED QUERY FOR FETCHING DRAFT ORDERS *************** */
@@ -124,14 +123,13 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
       page,
       pageSize,
       query,
-      sortid
+      sortid,
     ],
     purchaseOrderList,
     {
       keepPreviousData: true,
     }
   );
-
 
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
     if (sorter.order === undefined) {
@@ -152,8 +150,8 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
             return -1;
           }
         });
-        
-        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+
+        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
       } else {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
@@ -162,8 +160,8 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
             return -1;
           }
         });
-        
-        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+
+        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
       }
       setAllInvoicesConfig({
         ...allInvoicesConfig,
@@ -174,14 +172,16 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
             ? `-${sorter.field}`
             : sorter.field,
       });
-      const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=draft&sortid=${
-        sorter && sorter.order === 'descend'
-          ? `-${sorter.field}`
-          : sorter.field
-      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      const route = `/app${
+        ISupportedRoutes.PURCHASE_ORDER
+      }?tabIndex=draft&sortid=${
+        sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+        sorter.order
+      }&query=${query}`;
       history.push(route);
     }
-  }
+  };
 
   /* ********** METHODS HERE *************** */
   /* ************** ASYNC FUNCTION IS TO  DELETE ORDER ******** */
@@ -246,7 +246,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   const renerTopRightbar = () => {
     return (
       <div className="flex alignCenter">
-         {/* <PurchaseOrderImport/> */}
+        {/* <PurchaseOrderImport/> */}
         <SmartFilter
           onFilter={(encode) => {
             setAllInvoicesConfig({
@@ -311,7 +311,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
           pageSizeOptions: ['10', '20', '50', '100'],
           pageSize: pageSize,
           position: ['bottomRight'],
-          current: page,
+          current: typeof page === 'string' ? parseInt(page) : page,
           total: pagination && pagination.total,
         }}
         hasfooter={true}
