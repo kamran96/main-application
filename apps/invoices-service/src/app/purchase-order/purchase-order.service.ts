@@ -246,7 +246,7 @@ export class PurchaseOrderService {
           sequence: item.sequence,
           tax: item.tax,
           total: item.total,
-          status: poDto.status,
+          // status: poDto.status,
         });
       }
 
@@ -292,7 +292,7 @@ export class PurchaseOrderService {
           sequence: item.sequence,
           tax: item.tax,
           total: item.total,
-          status: poDto.status,
+          // status: poDto.status,
         });
         invoiceItems.push(poItem);
       }

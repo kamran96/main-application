@@ -16,6 +16,7 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 import { BILL_UPDATED } from '@invyce/send-email';
 import { CreditNoteRepository } from '../repositories/creditNote.repository';
+import { PurchaseOrderRepository } from '../repositories/purchaseOrder.repository';
 
 @Injectable()
 export class BillService {
@@ -571,6 +572,16 @@ export class BillService {
       }
       throw new HttpException('Bill not found', HttpStatus.BAD_REQUEST);
     } else {
+      if (dto.id) {
+        await getCustomRepository(PurchaseOrderRepository).update(
+          {
+            id: dto.id,
+          },
+          {
+            status: 1,
+          }
+        );
+      }
       const bill = await getCustomRepository(BillRepository).save({
         contactId: dto.contactId,
         reference: dto.reference,
