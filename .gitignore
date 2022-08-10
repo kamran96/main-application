@@ -7,7 +7,6 @@
 
 build.pdf
 archive.zip
-/certs
 /vault
 
 apps/accounting-service/.env
@@ -24,6 +23,7 @@ apps/users-service/.env
 
 # dependencies
 /node_modules
+node_modules.zip
 
 # IDEs and editors
 /.idea
@@ -115,3 +115,7 @@ node_modules/
 apps/mobile-app-e2e/artifacts
 
 .scannerwork/
+
+
+## NODE GYP FILE
+binding.gyp

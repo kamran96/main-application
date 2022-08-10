@@ -40,7 +40,10 @@ async function bootstrap() {
 
   // app.use(csurf());
 
-  if (process.env['NODE' + '_ENV'] === 'production') {
+  if (
+    process.env['NODE' + '_ENV'] === 'production' ||
+    process.env['NODE' + '_ENV'] === 'staging'
+  ) {
     app.setGlobalPrefix('/users');
   }
 

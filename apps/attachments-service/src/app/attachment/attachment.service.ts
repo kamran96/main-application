@@ -10,9 +10,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { formatMoney } from 'accounting-js';
 import * as puppeteer from 'puppeteer';
-import { Attachment } from '../schemas/attachment.schema';
+import { Attachment } from '../../schemas/attachment.schema';
 import { IRequest } from '@invyce/interfaces';
-import { Host } from '@invyce/global-constants';
+import { Host, PdfType } from '@invyce/global-constants';
 
 const moneyFormatJs = (
   amount: number | string,
@@ -26,7 +26,7 @@ const moneyFormatJs = (
 ) => {
   return formatMoney(amount, {
     symbol: currency?.symbol,
-    format: '%s %v ',
+    format: '%s%v ',
   });
 };
 
@@ -179,7 +179,7 @@ export class AttachmentService {
 
   async uploadPdf(location, pdf, req) {
     try {
-      const data = await fs.createReadStream(location);
+      const data = await fs.createReadStream(location + '/' + pdf);
 
       const params = {
         Bucket: 'invyce/attachments',
@@ -201,7 +201,7 @@ export class AttachmentService {
       await attachment.save();
 
       setTimeout(() => {
-        promises.unlink(pdf).then(() => {
+        promises.unlink(location + '/' + pdf).then(() => {
           console.log('File deleted successfully');
         });
       }, 10000);
@@ -212,36 +212,49 @@ export class AttachmentService {
     }
   }
 
-  async pdfData(data, currency) {
+  async pdfData(data, currency, tableHeaders) {
     try {
       const newArr = [];
-      const heading = [
-        ['#', 'item', 'quantity', 'unit price', 'discount', 'tax', 'total'].map(
-          (i) => i.toUpperCase()
-        ),
-      ];
+      const headers = tableHeaders.map((i) => i.label.toUpperCase());
+      const heading = [headers];
 
-      console.log(data.invoice_items, 'ite');
       data.invoice_items.forEach((tr, index) => {
         const item = data.items.find((i) => i.id === tr.itemId);
 
-        heading.push([
-          index + 1,
-          item?.name ? item?.name : '',
-          tr.quantity,
-          tr.unitPrice,
-          tr.itemDiscount,
-          tr.tax,
-          tr.total,
-        ]);
+        const rowData = tableHeaders.map((i) => {
+          if (i.accessor === '#') {
+            return index + 1;
+          } else if (i.accessor === 'item') {
+            return item.name;
+          } else {
+            return tr[i.accessor];
+          }
+        });
+
+        heading.push([...rowData]);
+
+        let obj: any = {};
+
+        tableHeaders.forEach((head) => {
+          if (['unitPrice', 'total', 'tax'].includes(head.accessor)) {
+            obj = {
+              ...obj,
+              [head.label]: tr[head.accessor]
+                ? moneyFormatJs(tr[head.accessor], currency || 'USD')
+                : '',
+            };
+          } else if (head.accessor === 'item') {
+            obj = { ...obj, [head.label]: item.name };
+          } else if (headers.accessor === '#') {
+            obj = { ...obj, [head.label]: index + 1 };
+          } else {
+            obj = { ...obj, [head.label]: tr[head.accessor] };
+          }
+        });
+
         newArr.push({
           sno: index + 1,
-          item: item?.name ? item?.name : '',
-          quantity: tr.quantity,
-          unitPrice: moneyFormatJs(tr.unitPrice, currency || 'USD'),
-          discount: tr.itemDiscount,
-          saleTax: tr.tax,
-          total: moneyFormatJs(tr.total, currency || 'USD'),
+          ...obj,
         });
       });
 
@@ -267,6 +280,28 @@ export class AttachmentService {
         postalCode: data?.contact?.addresses[0]?.postalCode || '',
       };
 
+      let organizationDetails = {
+        currency: {
+          name: 'United States dollar',
+          code: 'USD',
+          symbol: '$',
+          id: null,
+          symbolNative: '$',
+        },
+        attachment: {
+          path: '',
+        },
+        name: '',
+        phoneNumber: '',
+        email: '',
+        website: '',
+        address: {
+          city: '',
+          postalCode: '',
+          country: '',
+        },
+      };
+
       const {
         data: { result },
       } = await axios.get(
@@ -278,15 +313,73 @@ export class AttachmentService {
         }
       );
 
-      const defaultCurrency = result.currency || {
-        name: 'United States dollar',
-        code: 'USD',
-        symbol: '$',
-        id: null,
-        symbolNative: '$',
-      };
+      if (result && result.name) {
+        organizationDetails = { ...organizationDetails, ...result };
+      }
 
-      const contents = await this.pdfData(data, defaultCurrency);
+      const defaultCurrency =
+        organizationDetails.currency || organizationDetails?.currency !== null
+          ? organizationDetails?.currency
+          : {
+              name: 'United States dollar',
+              code: 'USD',
+              symbol: '$',
+              id: null,
+              symbolNative: '$',
+            };
+
+      const accessors =
+        data.type === PdfType.PO
+          ? [
+              {
+                accessor: '#', // for serial number this # will be always accessor
+                label: '#',
+              },
+              {
+                accessor: 'item',
+                label: 'item',
+              },
+              {
+                accessor: 'quantity',
+                label: 'quantity',
+              },
+              {
+                accessor: 'description',
+                label: 'description',
+              },
+            ]
+          : [
+              {
+                accessor: '#',
+                label: '#',
+              },
+              {
+                accessor: 'item',
+                label: 'item',
+              },
+              {
+                accessor: 'quantity',
+                label: 'quantity',
+              },
+              {
+                accessor: 'unitPrice',
+                label: 'Unit Price',
+              },
+              {
+                accessor: 'itemDiscount',
+                label: 'discount',
+              },
+              {
+                accessor: 'tax',
+                label: 'tax',
+              },
+              {
+                accessor: 'total',
+                label: 'total',
+              },
+            ];
+
+      const contents = await this.pdfData(data, defaultCurrency, accessors);
 
       const tableStylesConfig = {
         th: {
@@ -322,16 +415,20 @@ export class AttachmentService {
       ];
 
       const getBase64 = (url) => {
-        return axios
-          .get(url, {
-            responseType: 'arraybuffer',
-          })
-          .then((response) =>
-            Buffer.from(response.data, 'binary').toString('base64')
-          );
+        if (!url) {
+          return url;
+        } else {
+          return axios
+            .get(url, {
+              responseType: 'arraybuffer',
+            })
+            .then((response) =>
+              Buffer.from(response.data, 'binary').toString('base64')
+            );
+        }
       };
 
-      const resp = await getBase64(result.attachment.path);
+      const resp = await getBase64(organizationDetails.attachment.path);
 
       const rows = newRows.filter((item) => item.length !== 0);
 
@@ -355,66 +452,147 @@ export class AttachmentService {
           )) ||
         0;
 
-      const calculations = [
-        [
-          { text: 'Subtotal', bold: true, fontSize: 10 },
-          {
-            text: moneyFormatJs(data?.invoice?.grossTotal, defaultCurrency),
-            fontSize: 10,
-            alignment: 'right',
-          },
-        ],
-        [
-          { text: 'Items Discount', bold: true, fontSize: 10 },
-          {
-            text: moneyFormatJs(itemsDiscount),
-            fontSize: 10,
-            alignment: 'right',
-          },
-        ],
-        [
-          { text: 'Invoice Discount', bold: true, fontSize: 10 },
-          {
-            text: moneyFormatJs(invoiceDiscount, defaultCurrency),
-            fontSize: 10,
-            alignment: 'right',
-          },
-        ],
-        [
-          { text: 'Tax Rates ', bold: true, fontSize: 10 },
-          {
-            text: moneyFormatJs(totalTax, defaultCurrency),
-            fontSize: 10,
-            alignment: 'right',
-          },
-        ],
-        [
-          {
-            canvas: [
-              {
-                type: 'rect',
-                x: 0,
-                y: 0,
-                w: 148,
-                h: 0,
-                lineWidth: 1,
-                lineColor: 'black',
-              },
-            ],
-          },
-          {},
-        ],
-        [
-          { text: 'Total', bold: true, fontSize: 12.4, margin: [0, 3] },
-          {
-            text: moneyFormatJs(data?.invoice?.netTotal, defaultCurrency),
-            fontSize: 12.4,
-            alignment: 'right',
-            margin: [0, 3],
-            bold: true,
-          },
-        ],
+      const getCalculation = () => {
+        return [
+          [
+            { text: 'Subtotal', bold: true, fontSize: 10 },
+            {
+              text: moneyFormatJs(data?.invoice?.grossTotal, defaultCurrency),
+              fontSize: 10,
+              alignment: 'right',
+            },
+          ],
+          [
+            { text: 'Items Discount', bold: true, fontSize: 10 },
+            {
+              text: moneyFormatJs(itemsDiscount),
+              fontSize: 10,
+              alignment: 'right',
+            },
+          ],
+          [
+            { text: 'Invoice Discount', bold: true, fontSize: 10 },
+            {
+              text: moneyFormatJs(invoiceDiscount, defaultCurrency),
+              fontSize: 10,
+              alignment: 'right',
+            },
+          ],
+          [
+            { text: 'Tax Rates ', bold: true, fontSize: 10 },
+            {
+              text: moneyFormatJs(totalTax, defaultCurrency),
+              fontSize: 10,
+              alignment: 'right',
+            },
+          ],
+          [
+            {
+              canvas: [
+                {
+                  type: 'rect',
+                  x: 0,
+                  y: 0,
+                  w: 148,
+                  h: 0,
+                  lineWidth: 1,
+                  lineColor: 'black',
+                },
+              ],
+            },
+            {},
+          ],
+          [
+            { text: 'Total', bold: true, fontSize: 12.4, margin: [0, 3] },
+            {
+              text: moneyFormatJs(data?.invoice?.netTotal, defaultCurrency),
+              fontSize: 12.4,
+              alignment: 'right',
+              margin: [0, 3],
+              bold: true,
+            },
+          ],
+        ];
+      };
+
+      const poCols = [
+        {
+          margin: [15, 15],
+          stack: [
+            {
+              text: 'Note',
+              style: 'data',
+            },
+            {
+              text: data.comment || '',
+              style: 'address_style',
+            },
+          ],
+        },
       ];
+
+      const invoiceCols = [
+        {},
+        {
+          // alignment: 'right',
+          width: '40%',
+          margin: [15, 15],
+          layout: 'noBorders',
+
+          table: {
+            widths: ['60%', '*'],
+            body: getCalculation(),
+          },
+        },
+      ];
+
+      const calculationInfoColumn =
+        data.type === PdfType.PO ? poCols : invoiceCols;
+
+      const showTotalInfoAreaStack =
+        data.type === PdfType.INVOICE
+          ? [
+              {
+                text: `Invoice of ${defaultCurrency?.code || ''}`,
+                alignment: 'right',
+                style: 'label',
+              },
+              {
+                text: moneyFormatJs(
+                  data?.invoice?.netTotal || '',
+                  defaultCurrency
+                ),
+                color: '#143c69',
+                bold: true,
+                fontSize: 20,
+                alignment: 'right',
+              },
+              { text: 'Due Date', alignment: 'right', style: 'label' },
+              {
+                text: moment(data?.invoice?.dueDate || '').format('MM/DD/YYYY'),
+                alignment: 'right',
+                style: 'data',
+              },
+            ]
+          : [
+              { text: 'Due Date', alignment: 'right', style: 'label' },
+              {
+                text: moment(data?.invoice?.dueDate || '').format('MM/DD/YYYY'),
+                alignment: 'right',
+                style: 'data',
+              },
+            ];
+
+      let logoRender: any = {
+        width: 50,
+        margin: [0, 10, 0, 0],
+      };
+
+      if (resp) {
+        logoRender = { ...logoRender, image: `data:image/png;base64,${resp}` };
+      } else {
+        logoRender = { ...logoRender, text: 'Logo Here' };
+      }
 
       const docDefinition = {
         pageMargins: [0, 0, 0, 20],
@@ -453,24 +631,38 @@ export class AttachmentService {
                     fillColor: '#F7FBFF',
                     columns: [
                       {
-                        image: `data:image/png;base64,${resp}`,
-                        width: 50,
-                        margin: [0, 10, 0, 0],
+                        ...logoRender,
                       },
                       {
                         margin: [10, 0],
                         stack: [
                           {
-                            text: Capitalize(result?.name ? result?.name : ''),
+                            text: Capitalize(
+                              organizationDetails?.name
+                                ? organizationDetails?.name
+                                : ''
+                            ),
                             style: 'c_name',
                           },
                           {
-                            text: result?.phoneNumber || '',
+                            text:
+                              organizationDetails?.phoneNumber !== null
+                                ? organizationDetails.phoneNumber
+                                : 'no phone number available',
                             style: 'address_style',
                           },
-                          { text: result?.email || '', style: 'address_style' },
                           {
-                            text: result?.website || '',
+                            text:
+                              organizationDetails?.email !== null
+                                ? organizationDetails.email
+                                : '',
+                            style: 'address_style',
+                          },
+                          {
+                            text:
+                              organizationDetails?.website !== null
+                                ? organizationDetails.website
+                                : '',
                             style: 'address_style',
                           },
                         ],
@@ -486,15 +678,25 @@ export class AttachmentService {
                         alignment: 'right',
                         stack: [
                           {
-                            text: Capitalize(result?.address?.city || ''),
+                            text: Capitalize(
+                              organizationDetails?.address?.city
+                                ? organizationDetails?.address?.city
+                                : ''
+                            ),
                             style: 'address_style',
                           },
                           {
-                            text: result?.address?.postalCode || '',
+                            text: organizationDetails?.address?.postalCode
+                              ? organizationDetails?.address?.postalCode
+                              : '',
                             style: 'address_style',
                           },
                           {
-                            text: Capitalize(result?.address?.country || ''),
+                            text: Capitalize(
+                              organizationDetails?.address?.country
+                                ? organizationDetails?.address?.country
+                                : ''
+                            ),
                             style: 'address_style',
                           },
                         ],
@@ -545,31 +747,7 @@ export class AttachmentService {
                 ],
               },
               {
-                stack: [
-                  {
-                    text: `Invoice of ${defaultCurrency?.code || ''}`,
-                    alignment: 'right',
-                    style: 'label',
-                  },
-                  {
-                    text: moneyFormatJs(
-                      data?.invoice?.netTotal || '',
-                      defaultCurrency
-                    ),
-                    color: '#143c69',
-                    bold: true,
-                    fontSize: 20,
-                    alignment: 'right',
-                  },
-                  { text: 'Due Date', alignment: 'right', style: 'label' },
-                  {
-                    text: moment(data?.invoice?.dueDate || '').format(
-                      'MM/DD/YYYY'
-                    ),
-                    alignment: 'right',
-                    style: 'data',
-                  },
-                ],
+                stack: showTotalInfoAreaStack,
               },
             ],
           },
@@ -578,7 +756,10 @@ export class AttachmentService {
 
             //   layout: 'lightHorizontalLines', // optional
             table: {
-              widths: ['5%', '*', '14%', '14%', '14%', '14%', '14%'],
+              widths:
+                data.type === PdfType.INVOICE
+                  ? ['5%', '*', '14%', '14%', '14%', '14%', '14%']
+                  : ['5%', '*', '14%', '*'],
 
               //  widths: ['10%', '*' , '100%'],
               // headers are automatically repeated if the table spans over multiple pages
@@ -589,20 +770,7 @@ export class AttachmentService {
           },
 
           {
-            columns: [
-              {},
-              {
-                // alignment: 'right',
-                width: '40%',
-                margin: [15, 15],
-                layout: 'noBorders',
-
-                table: {
-                  widths: ['60%', '*'],
-                  body: calculations,
-                },
-              },
-            ],
+            columns: calculationInfoColumn,
           },
         ],
 
@@ -634,23 +802,37 @@ export class AttachmentService {
         },
       };
 
-      const fonts = {
-        RobotoSlab: {
-          normal: path.resolve(
-            './apps/attachments-service/src/assets/fonts/RobotoSlab-Regular.ttf'
-          ),
-          bold: path.resolve(
-            './apps/attachments-service/src/assets/fonts/RobotoSlab-Bold.ttf'
-          ),
-        },
-      };
+      let fonts;
+      if (
+        process.env['NODE' + '_ENV'] === 'production' ||
+        process.env['NODE' + '_ENV'] === 'staging'
+      ) {
+        fonts = {
+          RobotoSlab: {
+            normal: path.resolve('./assets/fonts/RobotoSlab-Regular.ttf'),
+            bold: path.resolve('./assets/fonts/RobotoSlab-Bold.ttf'),
+          },
+        };
+      } else {
+        fonts = {
+          RobotoSlab: {
+            normal: path.resolve(
+              './apps/attachments-service/src/assets/fonts/RobotoSlab-Regular.ttf'
+            ),
+            bold: path.resolve(
+              './apps/attachments-service/src/assets/fonts/RobotoSlab-Bold.ttf'
+            ),
+          },
+        };
+      }
 
       const printer = new PdfPrinter(fonts);
       const doc = printer.createPdfKitDocument(docDefinition);
 
       const pdf = `${data?.type}-${Date.now()}.pdf`;
-      doc.pipe(await fs.createWriteStream(pdf));
+      const pdfPath = path.resolve('generated');
 
+      doc.pipe(await fs.createWriteStream(pdfPath + '/' + pdf));
       doc.end();
 
       return pdf;

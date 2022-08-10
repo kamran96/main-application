@@ -18,14 +18,14 @@ export class User {
   theme: string;
   @Prop({ default: false })
   twoFactorEnabled: boolean;
-  @Prop()
-  terms: boolean;
-  @Prop()
-  marketing: boolean;
   @Prop({ default: false })
   isVerified: boolean;
   @Prop({ default: false })
   rememberMe: boolean;
+  @Prop()
+  terms: boolean;
+  @Prop()
+  marketing: boolean;
   @Prop(
     raw({
       fullName: String,

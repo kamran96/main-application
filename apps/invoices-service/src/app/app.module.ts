@@ -17,7 +17,10 @@ dotenv.config();
 
 let dynamicContent;
 let staticContent;
-if (process.env['NODE' + '_ENV'] === 'production') {
+if (
+  process.env['NODE' + '_ENV'] === 'production' ||
+  process.env['NODE' + '_ENV'] === 'staging'
+) {
   // read from a file
 
   const pathToDynamicContent = path.join(
@@ -87,7 +90,11 @@ if (process.env['NODE' + '_ENV'] === 'production') {
               ? staticContent.INV_DB_NAME
               : configService.get('INV_DB_NAME', process.env.INV_DB_NAME),
           entities: getMetadataArgsStorage().tables.map((tbl) => tbl.target),
-          ssl: { rejectUnauthorized: false },
+          ssl:
+            process.env['NODE' + '_ENV'] === 'production' ||
+            process.env['NODE' + '_ENV'] === 'staging'
+              ? { rejectUnauthorized: false }
+              : false,
         } as TypeOrmModuleOptions),
     }),
     InvoiceModule,

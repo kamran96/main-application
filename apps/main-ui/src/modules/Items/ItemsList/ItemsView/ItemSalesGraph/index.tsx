@@ -118,7 +118,7 @@ export const ItemSalesGraph: FC<IProps> = ({ id }) => {
       <Card className="_salesitemcard">
         <div className="flex justifySpaceBetween">
           <h4>Sales by Item</h4>
-          <P style={{ color: `#6e6e6d` }}>Last 7 days</P>
+          {/* <P style={{ color: `#6e6e6d` }}>Last 7 days</P> */}
           {/* <CustomDateRange
             size="small"
             onChange={(dates) => {

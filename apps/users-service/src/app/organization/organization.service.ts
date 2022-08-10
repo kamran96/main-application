@@ -137,7 +137,7 @@ export class OrganizationService {
             _id: organizationDto.id,
           });
 
-          return res.status(201).send({
+          return res.status(201).json({
             message: 'Organization updated successfully',
             status: true,
             result: updatedOrg,
@@ -151,6 +151,10 @@ export class OrganizationService {
       try {
         // we need to create organization
 
+        const organizations = await this.organizationUserModel.find({
+          userId: req.user.id,
+        });
+
         const organization = new this.organizationModel();
         organization.name = organizationDto.name;
         organization.niche = organizationDto.niche;
@@ -161,7 +165,7 @@ export class OrganizationService {
         organization.packageId = organizationDto.packageId;
         organization.currencyId = organizationDto.currencyId;
         organization.email = organizationDto.email;
-        organization.isActive = true;
+        organization.isActive = organizations.length === 0 ? true : false;
         organization.website = organizationDto.website;
         organization.prefix = organizationDto.prefix;
         organization.phoneNumber = organizationDto.phoneNumber;
@@ -231,7 +235,11 @@ export class OrganizationService {
 
           branchArr.push(branch);
 
-          return organization;
+          return res.status(201).json({
+            message: 'Organization created successfully',
+            status: true,
+            result: organization,
+          });
         } else {
           await this.userModel.updateOne(
             { _id: req?.user?.id },

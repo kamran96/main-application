@@ -18,11 +18,6 @@ import { IRequest } from '@invyce/interfaces';
 export class AppController {
   constructor(private readonly attachmentService: AttachmentService) {}
 
-  @Get('health')
-  async healthCheck(@Res() res: Response) {
-    res.send('OKkkk');
-  }
-
   @Get('/:id')
   async show(@Param() params) {
     return await this.attachmentService.FindAttachmentById(params.id);
@@ -58,7 +53,7 @@ export class AppController {
   async generatePdf(@Body() body, @Req() req: IRequest): Promise<any> {
     const pdf = await this.attachmentService.GeneratePdf(body, req);
 
-    const dist = path.resolve(pdf);
+    const dist = path.resolve('generated');
 
     return await this.attachmentService.uploadPdf(dist, pdf, req);
   }

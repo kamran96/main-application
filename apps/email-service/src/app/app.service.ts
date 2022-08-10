@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import * as postmark from 'postmark';
 import * as path from 'path';
 import * as fs from 'fs';
+import { GetBase64 } from '@invyce/global-constants';
+
 const client = new postmark.ServerClient(process.env.POSTMARK_TOKEN);
 
 @Injectable()
@@ -286,15 +288,35 @@ export class AppService {
     console.log(email, 'email successfully.');
   }
 
-  async InvoiceCreated(data) {
-    const dist = path.resolve(data.attachment_name);
-    const content = fs.readFileSync(dist);
-
+  async POCreated(data) {
     const TemplateModel = { ...data };
     const payload = {
       Name: data.attachment_name,
       ContentType: 'text/pain',
-      Content: Buffer.from(content).toString('base64'),
+      Content: await GetBase64(data.download_link),
+      ContentID: data.attachment_name,
+    };
+
+    setTimeout(async () => {
+      const email = await client.sendEmailWithTemplate({
+        From: 'no-reply@invyce.com',
+        To: data.to,
+        TemplateAlias: 'purchase-order-template',
+        TemplateModel: TemplateModel,
+        Attachments: [payload],
+        Cc: data.cc ? data?.cc?.toString() : '',
+        Bcc: data.bcc ? data?.bcc?.toString() : '',
+      });
+      console.log(email, 'email successfully.');
+    }, 5000);
+  }
+
+  async InvoiceCreated(data) {
+    const TemplateModel = { ...data };
+    const payload = {
+      Name: data.attachment_name,
+      ContentType: 'text/pain',
+      Content: await GetBase64(data.download_link),
       ContentID: data.attachment_name,
     };
 
@@ -305,8 +327,8 @@ export class AppService {
         TemplateAlias: 'invoice-has-been-created',
         TemplateModel: TemplateModel,
         Attachments: [payload],
-        Cc: data.cc,
-        Bcc: data.bcc,
+        Cc: data.cc ? data?.cc?.toString() : '',
+        Bcc: data.bcc ? data?.bcc?.toString() : '',
       });
       console.log(email, 'email successfully.');
     }, 5000);

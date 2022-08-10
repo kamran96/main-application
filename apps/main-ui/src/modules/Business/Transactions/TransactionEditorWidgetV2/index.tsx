@@ -200,6 +200,10 @@ const Editor = () => {
   // JSX RENDER
   return (
     <>
+      <div className="mb-10">
+        <Heading type="form">Journal Entry</Heading>
+      </div>
+
       <BreadCrumbArea>
         <Breadcrumb>
           <Breadcrumb.Item>
@@ -211,9 +215,7 @@ const Editor = () => {
         </Breadcrumb>
       </BreadCrumbArea>
 
-      <div className="mb-10">
-        <Heading type="table">Journal Entry</Heading>
-      </div>
+
       <Card>
         <Wrapper>
           <Form onFinish={onFinish} layout="vertical" form={form}>

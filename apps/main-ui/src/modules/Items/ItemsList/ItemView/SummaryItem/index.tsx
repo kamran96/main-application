@@ -1,5 +1,6 @@
-import { Card } from 'antd';
-import React, { FC, ReactElement } from 'react';
+// import { Card } from 'antd';
+import { Card } from '../../../../../components/Card';
+import React, { FC, ReactElement, useEffect } from 'react';
 import styled from 'styled-components';
 import { BoldText } from '../../../../../components/Para/BoldText';
 import convertToRem from '../../../../../utils/convertToRem';
@@ -10,6 +11,7 @@ interface IProps {
   footerDesc: string;
   icon: ReactElement<any>;
   icon_bg: any;
+  card?: any;
 }
 
 export const SummaryItem: FC<IProps> = ({
@@ -17,10 +19,14 @@ export const SummaryItem: FC<IProps> = ({
   footerDesc,
   icon,
   icon_bg,
+  card,
 }) => {
   return (
     <WrapperSummaryItem>
-      <Card className="_itemviewcard">
+      <Card
+        className={`_itemviewcard`}
+        style={{ background: card, height: '140px' }}
+      >
         <div className="content_area">
           <div className="item_result flex justifyCenter">
             <div className={`${icon_bg}  icon flex alignCenter justifyCenter`}>
@@ -28,7 +34,7 @@ export const SummaryItem: FC<IProps> = ({
             </div>
           </div>
         </div>
-        <BoldText className="item_amount">{amount}</BoldText>
+        <BoldText className="item_amount">{amount} </BoldText>
         <div className="footer">
           <div className="_footer_desc textCenter">
             <p className="m-reset">{footerDesc}</p>
@@ -41,15 +47,18 @@ export const SummaryItem: FC<IProps> = ({
 
 const WrapperSummaryItem = styled.div`
   .item_result {
-    margin: ${convertToRem(21)} 0;
+    margin: ${convertToRem(18)} 0;
     .icon {
-      width: ${convertToRem(49)};
-      height: ${convertToRem(49)};
+      width: ${convertToRem(35)};
+      height: ${convertToRem(35)};
       border-radius: 50%;
       i {
-        font-size: ${convertToRem(27)};
+        font-size: ${convertToRem(20)};
         color: #1f9dff;
       }
     }
+  }
+  .footer {
+    padding: 0 0 ${convertToRem(15)} 0;
   }
 `;

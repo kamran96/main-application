@@ -17,6 +17,10 @@ import { Price, PriceSchema } from '../schemas/price.schema';
 import { ItemCodesDto, ItemDto, ItemIdsDto } from '../dto/item.dto';
 import { ItemLedger } from '../schemas/itemLedger.schema';
 import { ItemLedgerDetailDto } from '../dto/ItemLedger.dto';
+enum IOperationType {
+  DECREASE = 'decrease',
+  INCREASE = 'increase',
+}
 
 @Injectable()
 export class ItemService {
@@ -234,6 +238,8 @@ export class ItemService {
           item.createdById = itemData._id;
           item.updatedById = itemData._id;
           item.status = 1;
+          item.totalBillsAmount = 0;
+          item.totalInvoicesAmount = 0;
           await item.save();
 
           if (itemDto.itemType === 1 && itemDto.attribute_values.length > 0) {
@@ -288,6 +294,9 @@ export class ItemService {
     }
 
     await this.ManageItemStock(data);
+
+    console.log('is here');
+    await this.ManageSalesPurchases(data);
   }
 
   async FindById(itemId: string): Promise<IItem> {
@@ -377,7 +386,68 @@ export class ItemService {
     }
   }
 
-  async SyncItems(data, req: IRequest): Promise<void> {
+  async ManageSalesPurchases(data): Promise<void> {
+    console.log('is here too');
+    const getItem = async (id) => {
+      const item = await this.itemModel.findById(id).populate('price');
+      return item;
+    };
+
+    console.log('396');
+
+    const getNewValue = (previousPrice, change, action) => {
+      console.log(previousPrice, change, action);
+      if (action === 'create') {
+        return previousPrice + change;
+      } else if (action === 'delete') {
+        return previousPrice - change;
+      }
+    };
+
+    console.log(data.payload, 'paylaod');
+
+    data?.payload?.forEach(async (i) => {
+      if (i.invoiceType === 'bill') {
+        const item = await getItem(i.itemId);
+        const price = i?.price || item?.price?.purchasePrice;
+        const previousAmount = item?.totalBillsAmount || 0;
+        console.log('i', 413);
+        const newValue = await getNewValue(
+          previousAmount,
+          price * i?.value,
+          i.action
+        );
+
+        console.log('422', newValue);
+
+        await this.itemModel.updateOne(
+          { _id: i.itemId },
+          {
+            totalBillsAmount: newValue,
+          }
+        );
+      } else if (i.invoiceType === 'invoice') {
+        const item = await getItem(i.itemId);
+        const price = i?.price || item?.price?.salePrice;
+
+        console.log(price, 'price in invoice', data?.payload);
+        const previousAmount = item?.totalInvoicesAmount || 0;
+
+        await this.itemModel.updateOne(
+          { _id: i.itemId },
+          {
+            totalInvoicesAmount: getNewValue(
+              previousAmount,
+              price * i?.value,
+              i.action
+            ),
+          }
+        );
+      }
+    });
+  }
+
+  async SyncItems(data, req: IRequest): Promise<any> {
     const { user } = req;
     if (data.type === Integrations.XERO) {
       for (const i of data.items) {
@@ -455,33 +525,38 @@ export class ItemService {
     } else if (data.type === Integrations.CSV_IMPORT) {
       try {
         const { items } = data;
-
-        for (let i = 0; i <= items.length; i++) {
+        items.forEach(async (child, index) => {
           const {
             name,
             description,
-            stock,
             openingStock,
             itemType,
             barcode,
             code,
             discount,
             purchasePrice,
-            salePricee,
+            salePrice,
             tax,
             minimumStock,
-          } = items[i];
+          } = child;
 
           const item = new this.itemModel({
             name,
             description,
             hasInventory: true,
-            stock,
+            stock: openingStock,
             itemType: itemType === 'product' ? 1 : 2,
             code,
             minimumStock,
             openingStock,
             barcode,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            createdById: req.user.id,
+            updatedById: req.user.id,
+            status: 1,
+            totalBillsAmount: 0,
+            totalInvoicesAmount: 0,
           });
 
           await item.save();
@@ -502,49 +577,49 @@ export class ItemService {
 
           let amount = 0;
           const accountIndex = data.targetAccounts?.findIndex(
-            (i) => (i.index = i)
+            (i) => (i.index = index)
           );
 
           let transaction;
           if (openingStock > 0 && accountIndex > -1) {
             amount = openingStock * purchasePrice;
 
-            if (openingStock > 0) {
-              const debit = {
-                amount,
-                account_id: await accounts[0].value,
-              };
-              const credit = {
-                amount,
-                account_id: data.targetAccounts[accountIndex].id,
-              };
+            const debit = {
+              amount,
+              account_id: await accounts[0].id,
+            };
+            const credit = {
+              amount,
+              account_id: data.targetAccounts[accountIndex].value,
+            };
 
-              const payload = {
-                dr: [debit],
-                cr: [credit],
-                type: 'item opening stock',
-                reference: `${item.name} opening stock`,
-                amount,
-                status: 1,
-              };
-              const { data: transactionData } = await axios.post(
-                Host('accounts', 'accounts/transaction/api'),
-                {
-                  transactions: payload,
+            const payload = {
+              dr: [debit],
+              cr: [credit],
+              type: 'item opening stock',
+              reference: `${item.name} opening stock`,
+              amount,
+              status: 1,
+            };
+
+            const { data: transactionData } = await axios.post(
+              Host('accounts', 'accounts/transaction/api'),
+              {
+                transactions: payload,
+              },
+              {
+                headers: {
+                  cookie: `access_token=${token}`,
                 },
-                {
-                  headers: {
-                    cookie: `access_token=${token}`,
-                  },
-                }
-              );
-              transaction = transactionData;
-            }
+              }
+            );
+
+            transaction = transactionData;
           }
 
           const price = new this.priceModel({
             purchasePrice,
-            salePricee,
+            salePrice,
             discount,
             tax,
             itemId: item._id,
@@ -552,7 +627,11 @@ export class ItemService {
           });
 
           price.save();
-        }
+        });
+
+        return {
+          message: 'success',
+        };
       } catch (error) {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
@@ -596,7 +675,6 @@ export class ItemService {
     ];
 
     await ItemSchema.eachPath(function (keyName) {
-      console.log(keyName, 'name');
       if (!notRequired.includes(keyName)) {
         const text = keyName;
         const result = text

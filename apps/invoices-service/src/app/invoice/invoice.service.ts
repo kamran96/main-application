@@ -7,6 +7,7 @@ import {
   LessThan,
   Not,
 } from 'typeorm';
+import { ClientProxy } from '@nestjs/microservices';
 import axios from 'axios';
 import * as dotenv from 'dotenv';
 import * as moment from 'moment';
@@ -31,18 +32,20 @@ import {
   PaymentModes,
   PdfType,
   Statuses,
+  ToTitleCase,
   XeroTypes,
 } from '@invyce/global-constants';
 import { BillItemRepository } from '../repositories/billItem.repository';
 import { InvoiceDto, InvoiceIdsDto } from '../dto/invoice.dto';
-import { ClientProxy } from '@nestjs/microservices';
 import {
   INVOICE_CREATED,
   INVOICE_UPDATED,
+  PO_CREATED,
   SEND_FORGOT_PASSWORD,
 } from '@invyce/send-email';
 import { PurchaseOrderRepository } from '../repositories/purchaseOrder.repository';
 import { QuotationRepository } from '../repositories/quotation.repository';
+import { PurchaseOrderItemRepository } from '../repositories/purchaseOrderItem.repository';
 
 dotenv.config();
 
@@ -521,6 +524,10 @@ export class InvoiceService {
               targetId: invoice.id,
               type: 'decrease',
               action: 'create',
+              price:
+                typeof item.unitPrice === 'string'
+                  ? parseFloat(item.unitPrice)
+                  : item.unitPrice,
             });
           }
 
@@ -608,7 +615,7 @@ export class InvoiceService {
 
           await this.emailService.emit(INVOICE_UPDATED, {
             to: req?.user?.email,
-            user_name: req?.user?.profile?.fullName,
+            user_name: ToTitleCase(req?.user?.profile?.fullName),
             invoice_number: invoice?.invoiceNumber,
             name: invoiceLink,
           });
@@ -680,6 +687,11 @@ export class InvoiceService {
             targetId: invoice.id,
             type: 'decrease',
             action: 'create',
+            invoiceType: 'invoice',
+            price:
+              typeof item.unitPrice === 'string'
+                ? parseFloat(item.unitPrice)
+                : item.unitPrice,
           });
         }
 
@@ -823,9 +835,11 @@ export class InvoiceService {
         if (email) {
           await this.emailService.emit(INVOICE_CREATED, {
             to: email,
-            user_name: contact[0]?.name || null,
+            user_name: ToTitleCase(contact[0]?.name) || null,
             invoice_number: invoice.invoiceNumber,
-            issueDate: invoice.issueDate,
+            issueDate: moment(invoice.issueDate).format(
+              'MMMM Do YYYY, h:mm:ss a'
+            ),
             gross_total: invoice.grossTotal,
             itemDisTotal: invoice.discount,
             net_total: invoice.netTotal,
@@ -925,15 +939,16 @@ export class InvoiceService {
 
       await this.emailService.emit(INVOICE_CREATED, {
         to: data.email,
-        user_name: contact[0]?.name || null,
+        user_name: ToTitleCase(contact[0]?.name) || null,
         invoice_number: invoice.invoiceNumber,
-        issueDate: invoice.issueDate,
+        issueDate: moment(invoice.issueDate).format('MMMM Do YYYY, h:mm:ss a'),
         gross_total: invoice.grossTotal,
         itemDisTotal: invoice.discount,
         net_total: invoice.netTotal,
         invoice_details,
         download_link: attachment?.path || null,
         attachment_name: attachment?.name || null,
+
         cc: data.cc,
         bcc: data.bcc,
       });
@@ -1031,6 +1046,101 @@ export class InvoiceService {
 
       return {
         message: 'Bill sent successfully.',
+        status: true,
+      };
+    } else if (data.type === PdfType.PO) {
+      const po = await getCustomRepository(PurchaseOrderRepository).findOne({
+        id: data.id,
+        status: 1,
+      });
+
+      const poItems = await getCustomRepository(
+        PurchaseOrderItemRepository
+      ).find({
+        where: {
+          purchaseOrderId: po.id,
+        },
+      });
+
+      const mapItemIds = poItems.map((ids) => ids.itemId);
+
+      const { data: items } = await axios.post(
+        Host('items', `items/item/ids`),
+        {
+          ids: mapItemIds,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
+
+      const { data: contact } = await axios.post(
+        Host('contacts', `contacts/contact/ids`),
+        {
+          ids: [po.contactId],
+          type: 1,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
+
+      const invoice_details = [];
+      let i = 0;
+      for (const item of poItems) {
+        i++;
+        if (i < 6) {
+          invoice_details.push({
+            itemName: await items.find((i) => i.id === item.itemId).name,
+            quantity: item.quantity,
+            description: item.description,
+          });
+        }
+      }
+
+      const { data: attachment } = await axios.post(
+        Host('attachments', `attachments/attachment/generate-pdf`),
+        {
+          data: {
+            invoice: { ...po, invoice_items: poItems },
+            invoice_items: poItems,
+            contact: contact[0],
+            items,
+            type: PdfType.PO,
+          },
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
+
+      await this.emailService.emit(PO_CREATED, {
+        to: contact[0].email || null,
+        user_name: ToTitleCase(contact[0]?.name) || null,
+        contact: ToTitleCase(req.user.profile.fullName),
+        created_time: moment(po.createdAt).format('MMM Do YY'),
+        purchaseOrder: po.invoiceNumber,
+        comment: po.comment,
+        issueDate: moment(po.issueDate).format('MMMM Do YYYY, h:mm:ss a'),
+        dueDate: po.dueDate,
+        reference: po.reference,
+        gross_total: po.grossTotal,
+        net_total: po.netTotal,
+        invoice_details,
+        download_link: attachment?.path || null,
+        attachment_name: attachment?.name || null,
+        cc: data.cc,
+        bcc: data.bcc,
+      });
+
+      return {
+        message: 'Purchase order sent successfully.',
         status: true,
       };
     }
@@ -1458,6 +1568,11 @@ export class InvoiceService {
               targetId: i,
               type: 'decrease',
               action: 'delete',
+              invoiceType: 'invoice',
+              price:
+                typeof j.unitPrice === 'string'
+                  ? parseFloat(j.unitPrice)
+                  : j.unitPrice,
             });
           }
         }
@@ -2186,7 +2301,6 @@ export class InvoiceService {
       );
     }
 
-    console.log('sending transaction...');
     if (transactions.length > 0) {
       await axios.post(
         Host('accounts', 'accounts/transaction/api'),

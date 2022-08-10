@@ -7,4 +7,5 @@ export const Card = styled.div`
   border-radius: 4px;
   width: 100%;
   background: ${(props: IThemeProps) => props?.theme?.colors?.sidebarBg};
+  color: ${(props: IThemeProps) => props?.theme?.colors?.$TEXT};
 `;

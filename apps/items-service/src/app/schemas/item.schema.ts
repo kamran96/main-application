@@ -51,6 +51,10 @@ export class Item {
   createdAt: string;
   @Prop({ type: Date, default: Date.now })
   updatedAt: string;
+  @Prop({ default: 0 })
+  totalBillsAmount: number;
+  @Prop({ default: 0 })
+  totalInvoicesAmount: number;
 }
 
 export const ItemSchema = SchemaFactory.createForClass(Item);

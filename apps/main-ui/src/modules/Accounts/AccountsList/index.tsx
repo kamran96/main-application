@@ -12,7 +12,6 @@ import {
 } from '../../../api/accounts';
 import { ButtonTag } from '../../../components/ButtonTags';
 import { ConfirmModal } from '../../../components/ConfirmModal';
-import { PDFICON } from '../../../components/Icons';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
 import { SmartFilter } from '../../../components/SmartFilter';
@@ -223,7 +222,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         key: 'tax_rate',
         sorter: true,
         sortOrder: sortedInfo?.columnKey === 'tax_rate' && sortedInfo?.order,
-        render: (data) => <>{data ? data : '-'}</>,
+        render: (data) => (data ? data : '-'),
       },
       {
         title: 'Total Debits',
@@ -232,7 +231,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         sorter: true,
         sortOrder:
           sortedInfo?.columnKey === 'total_debits' && sortedInfo?.order,
-        render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
+        render: (data) => (data ? moneyFormat(data) : moneyFormat(0)),
       },
       {
         title: 'Total Credits',
@@ -241,7 +240,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         sorter: true,
         sortOrder:
           sortedInfo?.columnKey === 'total_credits' && sortedInfo?.order,
-        render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
+        render: (data) => (data ? moneyFormat(data) : moneyFormat(0)),
       },
       {
         title: 'Balance',
@@ -249,22 +248,14 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         key: 'balance',
         sorter: true,
         sortOrder: sortedInfo?.columnKey === 'balance' && sortedInfo?.order,
-        render: (data) => <>{data ? moneyFormat(data) : moneyFormat(0)}</>,
+        render: (data) => (data ? moneyFormat(data) : moneyFormat(0)),
       },
     ],
     [resolvedData]
   );
 
   const onSelectedRow = (item) => {
-    const lastIndex = item?.selectedRows?.length - 1;
-
-    if (lastIndex >= 0) {
-      if (!item?.selectedRows[lastIndex]?.isSystemAccount) {
-        setSelectedRow(item.selectedRowKeys);
-      }
-    } else {
-      setSelectedRow(item?.selectedRowKeys);
-    }
+    setSelectedRow(item?.selectedRowKeys);
   };
 
   const renderCustomTopbar = () => {
@@ -406,9 +397,6 @@ export const AccountsList: FC<IProps> = ({ data }) => {
           }}
           hasfooter={true}
           onSelectRow={onSelectedRow}
-          rowSelection={{
-            selectedRowKeys: selectedRow,
-          }}
           enableRowSelection
         />
       </ListWrapper>

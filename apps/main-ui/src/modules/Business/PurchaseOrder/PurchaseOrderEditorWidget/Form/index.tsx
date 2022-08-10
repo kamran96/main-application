@@ -382,15 +382,16 @@ const Editor: FC<IProps> = ({ id }) => {
                 </div>
               </Col>
               <div className="mt-10 actions textRight flex alignCenter justifyFlexEnd ">
-                <Form.Item
+                {/* <Form.Item
                   className="mr-10"
                   name="email_pdf"
                   valuePropName="checked"
                 >
                   <Checkbox>Send to Email</Checkbox>
-                </Form.Item>
+                </Form.Item> */}
                 <Form.Item name="status">
                   <Button
+                    disabled={creatingPurchaseOrder}
                     onClick={() => {
                       antForm.setFieldsValue({
                         status: {
@@ -400,10 +401,7 @@ const Editor: FC<IProps> = ({ id }) => {
                       });
                       setStatus(2);
                     }}
-                    loading={
-                      creatingPurchaseOrder &&
-                      antForm.getFieldValue(status)?.type === 1
-                    }
+                    loading={creatingPurchaseOrder}
                     type="default"
                     size="middle"
                     className="mr-10"
@@ -412,6 +410,7 @@ const Editor: FC<IProps> = ({ id }) => {
                     Save
                   </Button>
                   <Button
+                    disabled={creatingPurchaseOrder}
                     onClick={() => {
                       antForm.setFieldsValue({
                         status: {
@@ -421,10 +420,7 @@ const Editor: FC<IProps> = ({ id }) => {
                       });
                       setStatus(2);
                     }}
-                    loading={
-                      creatingPurchaseOrder &&
-                      antForm.getFieldValue(status)?.type === 2
-                    }
+                    loading={creatingPurchaseOrder}
                     type="primary"
                     size="middle"
                     className="mr-10"

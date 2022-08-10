@@ -132,12 +132,12 @@ const Editor: FC<IProps> = ({ type, id }) => {
   const onFinish = async (value) => {
     const errors = handleCheckValidation();
 
-    if (!errors?.length) {
+    console.log(errors, 'check errors');
 
+    if (!errors?.length) {
       const paymentData = { ...payment };
       delete paymentData.totalAmount;
       delete paymentData.totalDiscount;
-
 
       let payload = {
         ...value,
@@ -175,8 +175,6 @@ const Editor: FC<IProps> = ({ type, id }) => {
         const relation = history?.location?.search?.split('relation=')[1];
         payload.relation = relation;
       }
-
-
 
       await muatateCreateInvoice(payload, {
         onSuccess: (data) => {

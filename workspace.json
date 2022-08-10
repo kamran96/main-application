@@ -65,7 +65,14 @@
             "outputPath": "dist/apps/attachments-service",
             "main": "apps/attachments-service/src/main.ts",
             "tsConfig": "apps/attachments-service/tsconfig.app.json",
-            "assets": ["apps/attachments-service/src/assets"],
+            "assets": [
+              "apps/attachments-service/src/assets/fonts",
+              {
+                "input": "apps/attachments-service/src/assets/fonts",
+                "glob": "RobotoSlab-Regular.ttf",
+                "output": "./src"
+              }
+            ],
             "generatePackageJson": true
           },
           "configurations": {

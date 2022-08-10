@@ -285,6 +285,7 @@ export const PurchaseManager: FC<IProps> = ({
             tax,
             total,
             quantity,
+            accountId: item?.accountId || defaultAccount?.id
           });
         });
 
@@ -405,13 +406,13 @@ export const PurchaseManager: FC<IProps> = ({
   const items: IItemsResult[] =
     type === IInvoiceType.INVOICE
       ? (result.length > 0 &&
-          result.filter(
-            (item) =>
-              item.price &&
-              item.price.purchasePrice !== null &&
-              item.price.salePrice !== null
-          )) ||
-        []
+        result.filter(
+          (item) =>
+            item.price &&
+            item.price.purchasePrice !== null &&
+            item.price.salePrice !== null
+        )) ||
+      []
       : result;
 
   const handleCheckValidation = () => {
@@ -475,22 +476,19 @@ export const PurchaseManager: FC<IProps> = ({
         return (
           <EditableSelect
             error={record?.errors?.includes('itemId')}
-            className={`border-less-select ${
-              index === invoiceItems.length - 1 ? 'scrollIntoView' : ''
-            }`}
+            className={`border-less-select ${index === invoiceItems.length - 1 ? 'scrollIntoView' : ''
+              }`}
             loading={itemsLoading}
             size="middle"
             value={{
               value: value !== null ? value : '',
-              label: `${
-                value !== null && items.length
-                  ? items &&
-                    getItemWithItemId(value) &&
-                    `${getItemWithItemId(value).code} / ${
-                      getItemWithItemId(value).name
-                    }`
-                  : 'Select Item'
-              }`,
+              label: `${value !== null && items.length
+                ? items &&
+                getItemWithItemId(value) &&
+                `${getItemWithItemId(value).code} / ${getItemWithItemId(value).name
+                }`
+                : 'Select Item'
+                }`,
             }}
             labelInValue={true}
             showSearch
@@ -754,28 +752,33 @@ export const PurchaseManager: FC<IProps> = ({
             onChange={(value) => {
               clearTimeout(setStateTimeOut);
 
-              setTimeout(() => {
-                const allItems = [...invoiceItems];
+              setStateTimeOut = setTimeout(() => {
                 const purchasePrice = value;
-                const costOfGoodAmount =
-                  purchasePrice * allItems[index].quantity;
-                const total =
-                  calculateInvoice(purchasePrice, record.tax, '0') *
-                  record.quantity;
 
-                const indexed =
-                  allItems[index].errors?.indexOf('purchasePrice');
-                if (indexed !== -1) {
-                  allItems[index]?.errors?.splice(indexed, 1);
-                }
+                setInvoiceItems((prev) => {
+                  const allItems = [...prev];
 
-                allItems[index] = {
-                  ...allItems[index],
-                  purchasePrice,
-                  total,
-                  costOfGoodAmount,
-                };
-                setInvoiceItems(allItems);
+                  const costOfGoodAmount =
+                    purchasePrice * allItems[index].quantity;
+                  const total =
+                    calculateInvoice(purchasePrice, record.tax, '0') *
+                    record.quantity;
+
+                  const indexed =
+                    allItems[index].errors?.indexOf('purchasePrice');
+                  if (indexed !== -1) {
+                    allItems[index]?.errors?.splice(indexed, 1);
+                  }
+
+                  allItems[index] = {
+                    ...allItems[index],
+                    purchasePrice,
+                    total,
+                    costOfGoodAmount,
+                  };
+
+                  return allItems;
+                });
               }, 500);
             }}
             type="number"
@@ -787,60 +790,60 @@ export const PurchaseManager: FC<IProps> = ({
     },
     enableAccountColumn
       ? {
-          title: 'Account',
-          dataIndex: 'accountId',
-          width: width > 1500 ? 220 : 150,
-          render: (value, row, index) => {
-            return (
-              <EditableSelect
-                error={row?.errors?.includes('accountId')}
-                className={`border-less-select`}
-                value={{
-                  value: value !== null ? value : '',
-                  label:
-                    (accountsList?.length && getAccountNameByID(value)) ||
-                    'Select Account',
-                }}
-                labelInValue={true}
-                loading={accountsLoading}
-                size="middle"
-                showSearch
-                style={{ width: '100%' }}
-                placeholder="Select Account"
-                optionFilterProp="children"
-                onChange={(val) => {
-                  setInvoiceItems((prev) => {
-                    const allItems = [...prev];
-                    const indexed =
-                      allItems[index].errors?.indexOf('accountId');
-                    if (indexed !== -1 && allItems[index].errors?.length) {
-                      allItems[index].errors.splice(indexed, 1);
-                    }
-                    allItems[index] = {
-                      ...allItems[index],
-                      accountId: val.value,
-                    };
+        title: 'Account',
+        dataIndex: 'accountId',
+        width: width > 1500 ? 220 : 150,
+        render: (value, row, index) => {
+          return (
+            <EditableSelect
+              error={row?.errors?.includes('accountId')}
+              className={`border-less-select`}
+              value={{
+                value: value !== null ? value : '',
+                label:
+                  (accountsList?.length && getAccountNameByID(value)) ||
+                  'Select Account',
+              }}
+              labelInValue={true}
+              loading={accountsLoading}
+              size="middle"
+              showSearch
+              style={{ width: '100%' }}
+              placeholder="Select Account"
+              optionFilterProp="children"
+              onChange={(val) => {
+                setInvoiceItems((prev) => {
+                  const allItems = [...prev];
+                  const indexed =
+                    allItems[index].errors?.indexOf('accountId');
+                  if (indexed !== -1 && allItems[index].errors?.length) {
+                    allItems[index].errors.splice(indexed, 1);
+                  }
+                  allItems[index] = {
+                    ...allItems[index],
+                    accountId: val.value,
+                  };
 
-                    return allItems;
-                  });
-                }}
-              >
-                <>
-                  {accountsList.map((acc: IAccountsResult, index: number) => {
-                    return (
-                      <Option key={index} value={acc.id}>
-                        {acc.name}
-                      </Option>
-                    );
-                  })}
-                </>
-              </EditableSelect>
-            );
-          },
-        }
-      : {
-          width: 0,
+                  return allItems;
+                });
+              }}
+            >
+              <>
+                {accountsList.map((acc: IAccountsResult, index: number) => {
+                  return (
+                    <Option key={index} value={acc.id}>
+                      {acc.name}
+                    </Option>
+                  );
+                })}
+              </>
+            </EditableSelect>
+          );
         },
+      }
+      : {
+        width: 0,
+      },
     {
       title: 'Tax',
       dataIndex: 'tax',

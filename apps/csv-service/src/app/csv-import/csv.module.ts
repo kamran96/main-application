@@ -6,6 +6,10 @@ import { CsvService } from './csv.service';
 @Module({
   imports: [],
   controllers: [CsvController],
-  providers: [CsvService, Authenticate],
+  providers: [CsvService],
 })
-export class CsvModule {}
+export class CsvModule {
+  configure(route) {
+    route.apply(Authenticate).forRoutes(CsvController);
+  }
+}
