@@ -191,7 +191,7 @@ export class AuthService {
     user.branchId = authDto.branchId || null;
     user.roleId = authDto.roleId || null;
     user.prefix = authDto.prefix;
-    user.isVerified = authDto.isVerified;
+    user.isVerified = authDto?.isVerified ? authDto?.isVerified : false;
     user.profile = updatedProfile;
     user.terms = authDto.terms;
     user.marketing = authDto.marketing;
