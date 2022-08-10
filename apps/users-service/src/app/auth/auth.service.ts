@@ -47,10 +47,10 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const generateRandomNDigits = () => {
   let code = '';
 
-  while (code.length < 6) {
+  while (code.length < 5) {
     code += crypto.randomBytes(3).readUIntBE(0, 3);
   }
-  return code.slice(0, 6);
+  return code.slice(0, 5);
 };
 
 const secret = speakeasy.generateSecret({

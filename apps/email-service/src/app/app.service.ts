@@ -294,7 +294,7 @@ export class AppService {
       Name: data.attachment_name,
       ContentType: 'text/pain',
       Content: await GetBase64(data.download_link),
-      ContentID: data.download_link,
+      ContentID: data.attachment_name,
     };
 
     setTimeout(async () => {
@@ -304,22 +304,20 @@ export class AppService {
         TemplateAlias: 'purchase-order-template',
         TemplateModel: TemplateModel,
         Attachments: [payload],
-        Cc: data.cc,
-        Bcc: data.bcc,
+        Cc: data.cc ? data?.cc?.toString() : '',
+        Bcc: data.bcc ? data?.bcc?.toString() : '',
       });
       console.log(email, 'email successfully.');
     }, 5000);
   }
 
   async InvoiceCreated(data) {
-    delete data.location;
-
     const TemplateModel = { ...data };
     const payload = {
       Name: data.attachment_name,
       ContentType: 'text/pain',
       Content: await GetBase64(data.download_link),
-      ContentID: data.download_link,
+      ContentID: data.attachment_name,
     };
 
     setTimeout(async () => {
@@ -329,8 +327,8 @@ export class AppService {
         TemplateAlias: 'invoice-has-been-created',
         TemplateModel: TemplateModel,
         Attachments: [payload],
-        Cc: data.cc,
-        Bcc: data.bcc,
+        Cc: data.cc ? data?.cc?.toString() : '',
+        Bcc: data.bcc ? data?.bcc?.toString() : '',
       });
       console.log(email, 'email successfully.');
     }, 5000);
