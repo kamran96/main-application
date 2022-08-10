@@ -14,6 +14,6 @@ export default function (amount: number | string) {
 
   return formatMoney(amount, {
     symbol: currency?.symbolNative,
-    format: '%s %v ',
+    format: '%s%v ',
   });
 }

@@ -21,8 +21,10 @@ DEFS_Debug := \
 
 # Flags passed to all source files.
 CFLAGS_Debug := \
-	-fPIC \
-	-pthread \
+	-O0 \
+	-gdwarf-2 \
+	-mmacosx-version-min=10.13 \
+	-arch x86_64 \
 	-Wall \
 	-Wextra \
 	-Wno-unused-parameter \
@@ -39,13 +41,13 @@ CFLAGS_CC_Debug := \
 	-std=gnu++1y
 
 INCS_Debug := \
-	-I/home/brong/.cache/node-gyp/14.19.3/include/node \
-	-I/home/brong/.cache/node-gyp/14.19.3/src \
-	-I/home/brong/.cache/node-gyp/14.19.3/deps/openssl/config \
-	-I/home/brong/.cache/node-gyp/14.19.3/deps/openssl/openssl/include \
-	-I/home/brong/.cache/node-gyp/14.19.3/deps/uv/include \
-	-I/home/brong/.cache/node-gyp/14.19.3/deps/zlib \
-	-I/home/brong/.cache/node-gyp/14.19.3/deps/v8/include
+	-I/Users/a/Library/Caches/node-gyp/16.15.0/include/node \
+	-I/Users/a/Library/Caches/node-gyp/16.15.0/src \
+	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/openssl/config \
+	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/openssl/openssl/include \
+	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/uv/include \
+	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/zlib \
+	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/v8/include
 
 DEFS_Release := \
 	'-DNODE_GYP_MODULE_NAME=bindings' \
@@ -63,8 +65,10 @@ DEFS_Release := \
 
 # Flags passed to all source files.
 CFLAGS_Release := \
-	-fPIC \
-	-pthread \
+	-O3 \
+	-gdwarf-2 \
+	-mmacosx-version-min=10.13 \
+	-arch x86_64 \
 	-Wall \
 	-Wextra \
 	-Wno-unused-parameter \
@@ -81,13 +85,13 @@ CFLAGS_CC_Release := \
 	-std=gnu++1y
 
 INCS_Release := \
-	-I/home/brong/.cache/node-gyp/14.19.3/include/node \
-	-I/home/brong/.cache/node-gyp/14.19.3/src \
-	-I/home/brong/.cache/node-gyp/14.19.3/deps/openssl/config \
-	-I/home/brong/.cache/node-gyp/14.19.3/deps/openssl/openssl/include \
-	-I/home/brong/.cache/node-gyp/14.19.3/deps/uv/include \
-	-I/home/brong/.cache/node-gyp/14.19.3/deps/zlib \
-	-I/home/brong/.cache/node-gyp/14.19.3/deps/v8/include
+	-I/Users/a/Library/Caches/node-gyp/16.15.0/include/node \
+	-I/Users/a/Library/Caches/node-gyp/16.15.0/src \
+	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/openssl/config \
+	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/openssl/openssl/include \
+	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/uv/include \
+	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/zlib \
+	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/v8/include
 
 OBJS :=
 
@@ -97,14 +101,28 @@ all_deps += $(OBJS)
 
 ### Rules for final target.
 LDFLAGS_Debug := \
-	-pthread \
-	-rdynamic \
-	-m64
+	-undefined dynamic_lookup \
+	-Wl,-search_paths_first \
+	-mmacosx-version-min=10.13 \
+	-arch x86_64 \
+	-L$(builddir) \
+	-stdlib=libc++
+
+LIBTOOLFLAGS_Debug := \
+	-undefined dynamic_lookup \
+	-Wl,-search_paths_first
 
 LDFLAGS_Release := \
-	-pthread \
-	-rdynamic \
-	-m64
+	-undefined dynamic_lookup \
+	-Wl,-search_paths_first \
+	-mmacosx-version-min=10.13 \
+	-arch x86_64 \
+	-L$(builddir) \
+	-stdlib=libc++
+
+LIBTOOLFLAGS_Release := \
+	-undefined dynamic_lookup \
+	-Wl,-search_paths_first
 
 LIBS :=
 

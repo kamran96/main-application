@@ -40,7 +40,7 @@ if (
 
 @Module({
   imports: [
-    MongooseModule.forRoot(process.env.MONGO_URI || MONGO_URI),
+    MongooseModule.forRoot(process.env.ITEM_MONGO_URI || MONGO_URI),
     ItemModule,
     CategoryModule,
     PriceModule,
