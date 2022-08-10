@@ -46,7 +46,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   const [confirmModal, setConfirmModal] = useState(false);
   const { notificationCallback } = useGlobalContext();
 
-  const {PdfCols, _exportableCols} = useCols();
+  const { PdfCols, _exportableCols } = useCols();
 
   useEffect(() => {
     if (routeHistory?.history?.location?.search) {
@@ -128,22 +128,25 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
       setAllInvoicesRes({ ...resolvedData.data, result: newResult });
     }
   }, [resolvedData]);
-  
+
   //handleChangePaginations
 
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
-    console.log(sorter, "sorter")
-    if (sorter.order === undefined) {
+    if (sorter.order === 'false') {
+
       setAllInvoicesConfig({
         ...allInvoicesConfig,
         sortid: 'id',
         page: pagination.current,
         page_size: pagination.pageSize,
       });
+
       const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
       history.push(route);
     } else {
       if (sorter?.order === 'ascend') {
+
+
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] > b[sorter?.field]) {
             return 1;
@@ -151,9 +154,10 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
             return -1;
           }
         });
-        
-        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+
+        setAllInvoicesRes(prev => ({ ...prev, result: userData }))
       } else {
+
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
             return 1;
@@ -161,8 +165,8 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
             return -1;
           }
         });
-        
-        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+
+        setAllInvoicesRes(prev => ({ ...prev, result: userData }))
       }
       setAllInvoicesConfig({
         ...allInvoicesConfig,
@@ -171,17 +175,14 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
         sortid:
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
-            : sorter.field,
+            : sorter.order === 'asceend' ? sorter.field : 'id',
       });
-      const route = `/app${
-        ISupportedRoutes.INVOICES
-      }?tabIndex=all&sortid=${
-        sorter && sorter.order === 'descend'
-          ? `-${sorter.field}`
-          : sorter.field
-      }&page=${pagination.current}&page_size=${
-        pagination.pageSize
-      }&filter=${sorter.order}&query=${query}`;
+      const route = `/app${ISupportedRoutes.INVOICES
+        }?tabIndex=all&sortid=${sorter && sorter.order === 'descend'
+          ? `-${sorter.field} `
+          : sorter.order === 'ascend' ? sorter.field : 'id'
+        }&page=${pagination.current}&page_size=${pagination.pageSize
+        }&filter=${sorter.order}&query=${query}`;
       history.push(route);
     }
   }

@@ -387,6 +387,8 @@ export class InvoiceService {
       ...new Map(invoice_arr.map((item) => [item[key], item])).values(),
     ].map((i) => i[key]);
 
+    console.log(mapUniqueUserId, 'userids');
+
     const { data: users } = await axios.post(
       Host('users', 'users/user/ids'),
       {
