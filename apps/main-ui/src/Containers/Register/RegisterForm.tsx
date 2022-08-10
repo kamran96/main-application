@@ -242,11 +242,11 @@ export const RegisterForm: FC = () => {
                           message: 'Please add your email',
                         },
 
-                        // {
-                        //   validator: (rule, value, callback) => {
-                        //     checkUsernameAvaliable({ email: value }, callback);
-                        //   },
-                        // },
+                        {
+                          validator: (rule, value, callback) => {
+                            checkUsernameAvaliable({ email: value }, callback);
+                          },
+                        },
                       ]}
                       hasFeedback
                     >
