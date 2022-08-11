@@ -335,7 +335,6 @@ export const EditableSelect: FC<IEditableSelectProps> = ({
     >
       <WrapperEditableSelect error={error}>
         {isEditable ? (
-          <Form.Item rules={[{ required: false, message: 'Required !' }]}>
           <Select
             {...rest}
             open={isEditable}
@@ -370,7 +369,6 @@ export const EditableSelect: FC<IEditableSelectProps> = ({
                 })
               : children}
           </Select>
-          </Form.Item>
         ) : (
           <div
             title={renderValue()}

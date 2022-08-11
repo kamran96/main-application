@@ -692,7 +692,7 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
                     <td>{moneyFormat(response?.grossTotal)}</td>
                   </tr>
                   {type !== IInvoiceType.PURCHASE_ORDER &&
-                  type !== IInvoiceType.BILL ? (
+                  type !== IInvoiceType.BILL ?(
                     <>
                       <tr>
                         <th>Items Discount</th>

@@ -437,27 +437,6 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                       {GrossTotal ? moneyFormat(GrossTotal) : moneyFormat(0)}
                     </p>
                   </Col>
-
-                  <Col className="flex alignCenter" span={12}>
-                    <p className="bold">Invoice Discount</p>
-                  </Col>
-                  <Col span={12}>
-                    <div className="flex alignCenter justifyFlexEnd">
-                      <Form.Item name="invoiceDiscount">
-                        <InputNumber
-                          onChange={(val) => {
-                            const value = val;
-                            clearTimeout(debounce);
-
-                            debounce = setTimeout(() => {
-                              setInvoiceDiscount(value);
-                            }, 400);
-                          }}
-                          size="middle"
-                        />
-                      </Form.Item>
-                    </div>
-                  </Col>
                   <Col span={24}>
                     <Seprator />
                   </Col>

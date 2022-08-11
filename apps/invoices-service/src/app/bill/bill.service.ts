@@ -720,6 +720,20 @@ export class BillService {
           },
         });
       }
+
+      console.log(mapItemIds, 'items');
+      await axios.post(
+        Host('items', 'items/price/bill'),
+        {
+          itemIds: mapItemIds,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
+
       return bill;
     }
   }

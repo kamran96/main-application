@@ -32,6 +32,8 @@ export class Price {
   itemId: Item;
   @Prop()
   initialPurchasePrice: number;
+  @Prop({ default: false })
+  hasBills: boolean;
 }
 
 export const PriceSchema = SchemaFactory.createForClass(Price);

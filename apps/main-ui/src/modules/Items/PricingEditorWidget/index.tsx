@@ -80,8 +80,7 @@ const PricingEditorWidget: FC = () => {
         onSuccess: () => {
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
-            `Price is ${
-              obj.action === 'UPDATE' ? 'Updated' : 'Created'
+            `Price is ${obj.action === 'UPDATE' ? 'Updated' : 'Created'
             } sucessfully`
           );
           form.resetFields();
@@ -95,6 +94,7 @@ const PricingEditorWidget: FC = () => {
       console.log(error);
     }
   };
+
 
 
   return (
@@ -142,7 +142,7 @@ const PricingEditorWidget: FC = () => {
                 ]}
               >
                 <Input
-                  disabled={data?.data?.hasPurchases}
+                  disabled={data?.data?.result?.hasBills === true}
                   placeholder={'eg: milk, match'}
                   size="middle"
                   type="number"

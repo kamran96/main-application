@@ -374,7 +374,7 @@ export const ItemsList: FC = () => {
     return (
       <div className="flex alignCenter justifySpaceBetween">
         <ItemsImport />
-        <ButtonTag
+        {/* <ButtonTag
           // className="mr-10"
           // disabled={!selectedRow.length || selectedRow.length > 1}
           onClick={() =>
@@ -383,7 +383,7 @@ export const ItemsList: FC = () => {
           title="Manage Inventory"
           icon={packageIcon}
           size="middle"
-        />
+        /> */}
         <SmartFilter
           onFilter={(encode) => {
             const route = `/app/items?sortid=${sortid}&page=1&page_size=20&query=${encode}`;

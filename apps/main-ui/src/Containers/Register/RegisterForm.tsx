@@ -120,7 +120,7 @@ export const RegisterForm: FC = () => {
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
-
+  
   const prefixSelector = (
     <Form.Item name="prefix" noStyle>
       <Select
@@ -246,11 +246,11 @@ export const RegisterForm: FC = () => {
                           message: 'Please add your email',
                         },
 
-                        // {
-                        //   validator: (rule, value, callback) => {
-                        //     checkUsernameAvaliable({ email: value }, callback);
-                        //   },
-                        // },
+                        {
+                          validator: (rule, value, callback) => {
+                            checkUsernameAvaliable({ email: value }, callback);
+                          },
+                        },
                       ]}
                       hasFeedback
                     >

@@ -441,7 +441,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                     </p>
                   </Col>
 
-                  <Col className="flex alignCenter" span={12}>
+                  {/* <Col className="flex alignCenter" span={12}>
                     <p className="bold">Invoice Discount</p>
                   </Col>
                   <Col span={12}>
@@ -460,7 +460,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                         />
                       </Form.Item>
                     </div>
-                  </Col>
+                  </Col> */}
                   <Col span={24}>
                     <Seprator />
                   </Col>
