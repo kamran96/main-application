@@ -28,6 +28,11 @@ export const RegisterForm: FC = () => {
   const { mutate: mutateRegister, isLoading } = useMutation(RegisterAPI);
   const { handleLogin, notificationCallback } = useGlobalContext();
 
+  const [avaliablity, setAvaliablity] = useState({
+    username: false,
+    email: false,
+  });
+
   useEffect(() => {
     form.setFieldsValue({ prefix: `92` });
   }, []);
@@ -35,6 +40,7 @@ export const RegisterForm: FC = () => {
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
+    console.log('is here');
     try {
       await mutateRegister(values, {
         onSuccess: (data) => {
@@ -70,7 +76,7 @@ export const RegisterForm: FC = () => {
     }
   };
 
-  const checkUsernameAvaliable = (payload, callback) => {
+  const checkUsernameAvaliable = async (payload, callback) => {
     const request = payload;
     clearTimeout(timeOutTime);
     timeOutTime = setTimeout(async () => {
@@ -81,6 +87,8 @@ export const RegisterForm: FC = () => {
             if (!data?.data?.available) {
               callback(data?.data?.message);
             } else {
+              const accessor = Object.keys(request)[0];
+              setAvaliablity({ ...avaliablity, [accessor]: true });
               callback();
             }
           },
@@ -88,24 +96,6 @@ export const RegisterForm: FC = () => {
       );
     }, 400);
   };
-  // const checkEmailAvaliable = (payload, callback) => {
-  //   const request = payload;
-  //   clearTimeout(timeOutTime);
-  //   timeOutTime = setTimeout(async () => {
-  //     await mutateUsernameAvaliable(
-  //       { ...request },
-  //       {
-  //         onSuccess: (data) => {
-  //           if (!data?.data?.available) {
-  //             callback(data?.data?.message);
-  //           } else {
-  //             callback();
-  //           }
-  //         },
-  //       }
-  //     );
-  //   }, 400);
-  // };
 
   const getFlag = (short: string) => {
     const data = require(`world_countries_lists/flags/24x24/${short.toLowerCase()}.png`);
@@ -182,6 +172,7 @@ export const RegisterForm: FC = () => {
                 onFinishFailed={onFinishFailed}
                 layout="vertical"
                 form={form}
+                validateTrigger={'onChange'}
               >
                 <Row gutter={24}>
                   <Col span={12}>
@@ -210,17 +201,29 @@ export const RegisterForm: FC = () => {
                       rules={[
                         { required: true, message: 'Username required' },
                         {
-                          validator: (rule, value, callback) => {
-                            checkUsernameAvaliable(
-                              { username: value },
-                              callback
-                            );
-                          },
+                          patter: /^[a-zA-Z0-9_-]+$/,
+                          message: 'Remove unnecessary characters',
                         },
-                      ]}
+                      ].concat(
+                        avaliablity?.username
+                          ? []
+                          : [
+                              {
+                                validator: (rule, value, callback) => {
+                                  checkUsernameAvaliable(
+                                    { username: value },
+                                    callback
+                                  );
+                                },
+                              } as any,
+                            ]
+                      )}
                       hasFeedback
                     >
                       <Input
+                        onChange={() => {
+                          setAvaliablity({ ...avaliablity, username: false });
+                        }}
                         placeholder="e.g John"
                         size="middle"
                         autoComplete="off"
@@ -233,21 +236,35 @@ export const RegisterForm: FC = () => {
                       name="email"
                       label="Email"
                       validateFirst="parallel"
+                      shouldUpdate
+                      // rules={[
+                      //   {
+                      //     type: 'email',
+                      //   },
+                      //   {
+                      //     required: true,
+                      //     message: 'Please add your email',
+                      //   },
+                      // ]}
                       rules={[
+                        { required: true, message: 'Please add your ' },
                         {
                           type: 'email',
-                        },
-                        {
-                          required: true,
-                          message: 'Please add your email',
-                        },
-
-                        {
-                          validator: (rule, value, callback) => {
-                            checkUsernameAvaliable({ email: value }, callback);
-                          },
-                        },
-                      ]}
+                        } as any,
+                      ].concat(
+                        avaliablity?.username
+                          ? []
+                          : [
+                              {
+                                validator: (rule, value, callback) => {
+                                  checkUsernameAvaliable(
+                                    { username: value },
+                                    callback
+                                  );
+                                },
+                              } as any,
+                            ]
+                      )}
                       hasFeedback
                     >
                       <Input
@@ -414,14 +431,14 @@ const RegisterFormWrapper = styled.div`
   align-item: center;
   height: 100vh;
 
-  @media(max-height:589px){
+  @media (max-height: 589px) {
     justify-content: space-between;
-    height: auto: !important;
+    height: auto !important;
     padding-top: 40px;
   }
 
-  .ant-form-item-explain, .ant-form-item-extra{
+  .ant-form-item-explain,
+  .ant-form-item-extra {
     color: red !important;
   }
- 
 `;
