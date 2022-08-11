@@ -174,14 +174,14 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
         sortid:
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
-            : sorter.field,
+            : sorter.order === 'ascend' ? sorter.field : 'id',
       });
       const route = `/app${
         ISupportedRoutes.INVOICES
       }?tabIndex=draft&sortid=${
         sorter && sorter.order === 'descend'
           ? `-${sorter.field}`
-          : sorter.field
+          : sorter.order === 'ascend' ? sorter.field : 'id'
       }&page=${
         pagination.current
       }&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;

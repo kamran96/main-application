@@ -210,6 +210,10 @@ export const RegisterForm: FC = () => {
                       rules={[
                         { required: true, message: 'Username required' },
                         {
+                          pattern:/^[a-zA-Z0-9_-]+$/,  
+                          message: `Remove unnecessary characters`
+                       },
+                        {
                           validator: (rule, value, callback) => {
                             checkUsernameAvaliable(
                               { username: value },
@@ -416,7 +420,7 @@ const RegisterFormWrapper = styled.div`
 
   @media(max-height:589px){
     justify-content: space-between;
-    height: auto: !important;
+    height: auto !important;
     padding-top: 40px;
   }
 

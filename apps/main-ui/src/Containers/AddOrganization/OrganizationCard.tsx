@@ -94,6 +94,7 @@ export const OrganizationCard: FC<IProps> = ({
 
 const CardWrapper = styled.div`
   min-width: 290px;
+  height: 260px;
   background: ${(props: IThemeProps) => props.theme.colors.cardBg};
   border: 1px solid #dff0ff;
   border-radius: 8px;
