@@ -93,9 +93,8 @@ export const PaymentsForm: FC = () => {
 
   const { paymentsModalConfig, setPaymentsModalConfig } = useGlobalContext();
   const onFinish = async (values) => {
-    console.log(values, 'values');
 
-    return false;
+    // return false;
     const paid_invyces = _invoiceData.map(
       (invyce: IInvoiceItem, index: number) => {
         return invyce.id;
@@ -239,7 +238,7 @@ export const PaymentsForm: FC = () => {
         onFinishFailed={onFinishFailed}
         form={form}
         onValuesChange={handleChangedValue}
-        // onValuesChange={handleChangedValue}
+      // onValuesChange={handleChangedValue}
       >
         <Row gutter={24}>
           <Col span={12}>
@@ -394,11 +393,10 @@ export const PaymentsForm: FC = () => {
           </Col>
           <Col span={24}>
             <div
-              className={`pv-10 ${
-                contact_id && !formData.runningPayment
+              className={`pv-10 ${contact_id && !formData.runningPayment
                   ? 'table_visible'
                   : `table_disable`
-              }`}
+                }`}
             >
               <CommonTable
                 data={!contact_id ? [] : _invoiceData}

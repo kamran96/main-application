@@ -93,24 +93,24 @@ const APPROVETransactionList: FC = () => {
       const filterType = history.location.search.split('&');
       const filterIdType = filterType[1];
       const filterOrder = filterType[4]?.split("=")[1];
-      
-     
 
-      if(filterIdType?.includes("-")){
-         const fieldName = filterIdType?.split("=")[1].split("-")[1];
-         setSortedInfo({
-           order: filterOrder,
-           columnKey: fieldName
-         });
+
+
+      if (filterIdType?.includes("-")) {
+        const fieldName = filterIdType?.split("=")[1].split("-")[1];
+        setSortedInfo({
+          order: filterOrder,
+          columnKey: fieldName
+        });
       }
-      else{
+      else {
         const fieldName = filterIdType?.split("=")[1];
         setSortedInfo({
           order: filterOrder,
           columnKey: fieldName
         })
       }
-      
+
     }
   }, [history]);
 
@@ -269,7 +269,7 @@ const APPROVETransactionList: FC = () => {
         //   order: sorter?.order,
         //   columnKey: sorter?.field
         // })
-        setResponse(prev =>({...prev,  result: userData}))
+        setResponse(prev => ({ ...prev, result: userData }))
       } else {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
@@ -282,7 +282,7 @@ const APPROVETransactionList: FC = () => {
         //   order: sorter?.order,
         //   columnKey: sorter?.field
         // })
-        setResponse(prev =>({...prev,  result: userData}))
+        setResponse(prev => ({ ...prev, result: userData }))
       }
       setTransactionsConfig({
         ...transactionConfig,
@@ -291,11 +291,9 @@ const APPROVETransactionList: FC = () => {
         sortid:
           sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field,
       });
-      const route = `/app${
-        ISupportedRoutes.TRANSACTIONS
-      }?tabIndex=approve&sortid=${
-        sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field
-      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}`;
+      const route = `/app${ISupportedRoutes.TRANSACTIONS
+        }?tabIndex=approve&sortid=${sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field
+        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}`;
       history.push(route);
     }
   };
@@ -315,7 +313,7 @@ const APPROVETransactionList: FC = () => {
     <WrapperTransactionsList>
       <CommonTable
         expandable={{
-           expandedRowRender: (record, index) => {
+          expandedRowRender: (record, index) => {
             return (
               <>
                 <PDFDownloadLink
@@ -377,3 +375,5 @@ const PDFDownloadLinkWrapper = styled(PDFDownloadLink)`
     color: #ffff;
   }
 `;
+
+

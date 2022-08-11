@@ -172,13 +172,10 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
             ? `-${sorter.field}`
             : sorter.field,
       });
-      const route = `/app${
-        ISupportedRoutes.PURCHASE_ORDER
-      }?tabIndex=draft&sortid=${
-        sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
-      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-        sorter.order
-      }&query=${query}`;
+      const route = `/app${ISupportedRoutes.PURCHASE_ORDER
+        }?tabIndex=draft&sortid=${sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
+        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order
+        }&query=${query}`;
       history.push(route);
     }
   };
@@ -240,7 +237,8 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
     title: 'Created By',
     dataIndex: 'owner',
     key: 'owner',
-    render: (data) => <p className="capitalize">{data?.profile?.fullName}</p>,
+    sorter: false,
+    render: (data) => <span className="capitalize">{data?.profile?.fullName}</span>,
   });
 
   const renerTopRightbar = () => {

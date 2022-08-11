@@ -134,6 +134,7 @@ export const routes = (root = '/app'): RouteConfig[] => [
           {
             path: `${root}/dashboard`,
             component: DashboardContainer,
+            exact: true,
           },
           {
             path: `${root}${ISupportedRoutes.CONTACTS}`,
