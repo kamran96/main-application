@@ -13,6 +13,7 @@ import {
 import { InvoicePDF } from '../../components/PDFs';
 import { EditableTable } from '@invyce/editable-table';
 import { Editable } from '../../components/Editable';
+import { moneyFormatJs } from '@invyce/common';
 
 const columns = [
   {
@@ -108,14 +109,5 @@ export const TestComponents: FC = () => {
     },
   ];
 
-  return (
-    <InvoiceImportManager
-      headers={`Item Name,Code,Purchase Price,Sale Price,Item Type,Stock,Status`.split(
-        ','
-      )}
-      onLoad={(payload) => {
-        console.log(payload);
-      }}
-    />
-  );
+  return <>Testing {moneyFormatJs(-20)}</>;
 };
