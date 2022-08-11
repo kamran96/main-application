@@ -249,10 +249,15 @@ export const PurchaseManager: FC<IProps> = ({
 
   /* Component did update hook to update InvoiceItems when API getInvoiceByIDAPI successfully returns */
   useEffect(() => {
-    if (invoicesData && invoicesData.data && invoicesData.data.result) {
+    if (invoicesData?.data?.result) {
       const { result } = invoicesData.data;
       // const { payment } = result;
       const { adjustment: discount } = result;
+
+      const invoiceNumber =
+        routeState?.relation === IInvoiceType.PURCHASE_ORDER
+          ? invoiceNumberData?.data?.result
+          : result.invoiceNumber;
 
       const invoiceDiscount = discount;
       setInvoiceDiscount(invoiceDiscount);
@@ -261,6 +266,7 @@ export const PurchaseManager: FC<IProps> = ({
         dueDate: dayjs(result.dueDate),
         issueDate: dayjs(result.issueDate),
         invoiceDiscount,
+        invoiceNumber,
       });
 
       const resolvedData = plainToClass(
@@ -285,7 +291,7 @@ export const PurchaseManager: FC<IProps> = ({
             tax,
             total,
             quantity,
-            accountId: item?.accountId || defaultAccount?.id
+            accountId: item?.accountId || defaultAccount?.id,
           });
         });
 
@@ -315,22 +321,15 @@ export const PurchaseManager: FC<IProps> = ({
   }, [invoiceNumberData, AntForm]);
 
   const contactResult: IContactType[] =
-    (data &&
-      data.data &&
-      data.data.result &&
-      data.data.result.filter((cnt: IContactType) => {
-        if (type === IInvoiceType.PURCHASE_ENTRY) {
-          return cnt.contactType === IContactTypes.SUPPLIER;
-        } else if (
-          type === IInvoiceType.INVOICE ||
-          type === IInvoiceType.QUOTE
-        ) {
-          return cnt.contactType === IContactTypes.CUSTOMER;
-        } else {
-          return cnt;
-        }
-      })) ||
-    [];
+    data?.data?.result?.filter((cnt: IContactType) => {
+      if (type === IInvoiceType.PURCHASE_ENTRY) {
+        return cnt.contactType === IContactTypes.SUPPLIER;
+      } else if (type === IInvoiceType.INVOICE || type === IInvoiceType.QUOTE) {
+        return cnt.contactType === IContactTypes.CUSTOMER;
+      } else {
+        return cnt;
+      }
+    }) || [];
 
   const getSubTotal = useCallback(() => {
     let subTotal = 0;
@@ -406,13 +405,13 @@ export const PurchaseManager: FC<IProps> = ({
   const items: IItemsResult[] =
     type === IInvoiceType.INVOICE
       ? (result.length > 0 &&
-        result.filter(
-          (item) =>
-            item.price &&
-            item.price.purchasePrice !== null &&
-            item.price.salePrice !== null
-        )) ||
-      []
+          result.filter(
+            (item) =>
+              item.price &&
+              item.price.purchasePrice !== null &&
+              item.price.salePrice !== null
+          )) ||
+        []
       : result;
 
   const handleCheckValidation = () => {
@@ -476,19 +475,22 @@ export const PurchaseManager: FC<IProps> = ({
         return (
           <EditableSelect
             error={record?.errors?.includes('itemId')}
-            className={`border-less-select ${index === invoiceItems.length - 1 ? 'scrollIntoView' : ''
-              }`}
+            className={`border-less-select ${
+              index === invoiceItems.length - 1 ? 'scrollIntoView' : ''
+            }`}
             loading={itemsLoading}
             size="middle"
             value={{
               value: value !== null ? value : '',
-              label: `${value !== null && items.length
-                ? items &&
-                getItemWithItemId(value) &&
-                `${getItemWithItemId(value).code} / ${getItemWithItemId(value).name
-                }`
-                : 'Select Item'
-                }`,
+              label: `${
+                value !== null && items.length
+                  ? items &&
+                    getItemWithItemId(value) &&
+                    `${getItemWithItemId(value).code} / ${
+                      getItemWithItemId(value).name
+                    }`
+                  : 'Select Item'
+              }`,
             }}
             labelInValue={true}
             showSearch
@@ -790,60 +792,60 @@ export const PurchaseManager: FC<IProps> = ({
     },
     enableAccountColumn
       ? {
-        title: 'Account',
-        dataIndex: 'accountId',
-        width: width > 1500 ? 220 : 150,
-        render: (value, row, index) => {
-          return (
-            <EditableSelect
-              error={row?.errors?.includes('accountId')}
-              className={`border-less-select`}
-              value={{
-                value: value !== null ? value : '',
-                label:
-                  (accountsList?.length && getAccountNameByID(value)) ||
-                  'Select Account',
-              }}
-              labelInValue={true}
-              loading={accountsLoading}
-              size="middle"
-              showSearch
-              style={{ width: '100%' }}
-              placeholder="Select Account"
-              optionFilterProp="children"
-              onChange={(val) => {
-                setInvoiceItems((prev) => {
-                  const allItems = [...prev];
-                  const indexed =
-                    allItems[index].errors?.indexOf('accountId');
-                  if (indexed !== -1 && allItems[index].errors?.length) {
-                    allItems[index].errors.splice(indexed, 1);
-                  }
-                  allItems[index] = {
-                    ...allItems[index],
-                    accountId: val.value,
-                  };
+          title: 'Account',
+          dataIndex: 'accountId',
+          width: width > 1500 ? 220 : 150,
+          render: (value, row, index) => {
+            return (
+              <EditableSelect
+                error={row?.errors?.includes('accountId')}
+                className={`border-less-select`}
+                value={{
+                  value: value !== null ? value : '',
+                  label:
+                    (accountsList?.length && getAccountNameByID(value)) ||
+                    'Select Account',
+                }}
+                labelInValue={true}
+                loading={accountsLoading}
+                size="middle"
+                showSearch
+                style={{ width: '100%' }}
+                placeholder="Select Account"
+                optionFilterProp="children"
+                onChange={(val) => {
+                  setInvoiceItems((prev) => {
+                    const allItems = [...prev];
+                    const indexed =
+                      allItems[index].errors?.indexOf('accountId');
+                    if (indexed !== -1 && allItems[index].errors?.length) {
+                      allItems[index].errors.splice(indexed, 1);
+                    }
+                    allItems[index] = {
+                      ...allItems[index],
+                      accountId: val.value,
+                    };
 
-                  return allItems;
-                });
-              }}
-            >
-              <>
-                {accountsList.map((acc: IAccountsResult, index: number) => {
-                  return (
-                    <Option key={index} value={acc.id}>
-                      {acc.name}
-                    </Option>
-                  );
-                })}
-              </>
-            </EditableSelect>
-          );
-        },
-      }
+                    return allItems;
+                  });
+                }}
+              >
+                <>
+                  {accountsList.map((acc: IAccountsResult, index: number) => {
+                    return (
+                      <Option key={index} value={acc.id}>
+                        {acc.name}
+                      </Option>
+                    );
+                  })}
+                </>
+              </EditableSelect>
+            );
+          },
+        }
       : {
-        width: 0,
-      },
+          width: 0,
+        },
     {
       title: 'Tax',
       dataIndex: 'tax',

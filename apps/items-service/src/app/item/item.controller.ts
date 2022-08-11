@@ -11,7 +11,13 @@ import {
   Query,
   Put,
 } from '@nestjs/common';
-import { ItemCodesDto, ItemDto, ItemIdsDto, ParamsDto } from '../dto/item.dto';
+import {
+  CodeValidateDto,
+  ItemCodesDto,
+  ItemDto,
+  ItemIdsDto,
+  ParamsDto,
+} from '../dto/item.dto';
 import { ItemService } from './item.service';
 import { IRequest, IPage, IItemWithResponse, IItem } from '@invyce/interfaces';
 import { ItemLedgerDetailDto } from '../dto/ItemLedger.dto';
@@ -42,6 +48,14 @@ export class ItemController {
   @Get('import-csv')
   async importCsv(): Promise<any> {
     return await this.itemService.ImportCSV();
+  }
+
+  @Post('code-validate')
+  async validateCode(
+    @Body() validateDto: CodeValidateDto,
+    @Req() req: IRequest
+  ): Promise<any> {
+    return await this.itemService.GetItemCode(validateDto.code, req.user);
   }
 
   @Post('ids')
