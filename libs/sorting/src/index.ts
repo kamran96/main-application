@@ -2,7 +2,7 @@ export * from './lib/sorting.module';
 
 export const Sorting = async (sort) => {
   let sort_column, sort_order;
-  if (sort == '' || sort === undefined || sort === null) {
+  if (sort === null || sort === '' || sort === undefined || sort === 'null') {
     sort_column = 'id';
     sort_order = '';
   } else if (sort.startsWith('-')) {
