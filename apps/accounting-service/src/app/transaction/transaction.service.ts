@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { Between, getCustomRepository, ILike, In } from 'typeorm';
+import { Between, getCustomRepository, ILike, In, Like, Raw } from 'typeorm';
 import axios from 'axios';
 import { Sorting } from '@invyce/sorting';
 
@@ -32,6 +32,7 @@ export class TransactionService {
   ): Promise<ITransactionWithResponse> {
     try {
       const { page_no, page_size, sort, status, query } = queryData;
+
       const ps: number = parseInt(page_size);
       const pn: number = parseInt(page_no);
 
@@ -49,14 +50,15 @@ export class TransactionService {
 
         for (const i in data) {
           if (data[i].type === 'search') {
-            const val = data[i].value?.split('%')[1];
+            const val = data[i].value?.split('%')[1].toLowerCase();
+
             transactions = await getCustomRepository(
               TransactionRepository
             ).find({
               where: {
                 status: status || 1,
                 organizationId: user.organizationId,
-                [i]: ILike(val),
+                [i]: Raw((alias) => `LOWER(${alias}) ILike '%${val}%'`),
               },
               skip: pn * ps - ps,
               take: ps,
@@ -418,7 +420,6 @@ export class TransactionService {
             },
           });
 
-          console.log(account, 'what is account');
           return account.id;
         }
       };
@@ -459,8 +460,6 @@ export class TransactionService {
         transactionId: transaction.id,
       });
     }
-
-    console.log(paymentArr, 'pay');
 
     await axios.post(
       Host('payments', 'payments/payment/add'),

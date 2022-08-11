@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Between, getCustomRepository, ILike, In } from 'typeorm';
+import { Between, getCustomRepository, ILike, In, Raw } from 'typeorm';
 import { ClientProxy } from '@nestjs/microservices';
 import axios from 'axios';
 import * as moment from 'moment';
@@ -49,7 +49,7 @@ export class PurchaseOrderService {
               status: 1,
               branchId: req.user.branchId,
               organizationId: req.user.organizationId,
-              [i]: ILike(val),
+              [i]: Raw((alias) => `LOWER(${alias}) ILike '%${val}%'`),
             },
             skip: pn * ps - ps,
             take: ps,
