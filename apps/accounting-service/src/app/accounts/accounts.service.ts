@@ -104,9 +104,8 @@ export class AccountsService {
                 )
                 .where({
                   organizationId: user.organizationId,
-                  [i]: ILike(val),
+                  [i]: Raw((alias) => `LOWER(${alias}) ILike '%${val}%'`),
                 })
-                // .andWhere(`lower(a.${i}) like :${i}`, { i: val })
                 .leftJoin('a.secondaryAccount', 'sa')
                 .leftJoin('sa.primaryAccount', 'pa')
                 .offset(pn * ps - ps)

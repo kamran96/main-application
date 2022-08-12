@@ -24,7 +24,7 @@ CFLAGS_Debug := \
 	-O0 \
 	-gdwarf-2 \
 	-mmacosx-version-min=10.13 \
-	-arch x86_64 \
+	-arch arm64 \
 	-Wall \
 	-Wextra \
 	-Wno-unused-parameter \
@@ -41,13 +41,13 @@ CFLAGS_CC_Debug := \
 	-std=gnu++1y
 
 INCS_Debug := \
-	-I/Users/a/Library/Caches/node-gyp/16.15.0/include/node \
-	-I/Users/a/Library/Caches/node-gyp/16.15.0/src \
-	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/openssl/config \
-	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/openssl/openssl/include \
-	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/uv/include \
-	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/zlib \
-	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/v8/include
+	-I/Users/i-focus/Library/Caches/node-gyp/16.16.0/include/node \
+	-I/Users/i-focus/Library/Caches/node-gyp/16.16.0/src \
+	-I/Users/i-focus/Library/Caches/node-gyp/16.16.0/deps/openssl/config \
+	-I/Users/i-focus/Library/Caches/node-gyp/16.16.0/deps/openssl/openssl/include \
+	-I/Users/i-focus/Library/Caches/node-gyp/16.16.0/deps/uv/include \
+	-I/Users/i-focus/Library/Caches/node-gyp/16.16.0/deps/zlib \
+	-I/Users/i-focus/Library/Caches/node-gyp/16.16.0/deps/v8/include
 
 DEFS_Release := \
 	'-DNODE_GYP_MODULE_NAME=bindings' \
@@ -68,7 +68,7 @@ CFLAGS_Release := \
 	-O3 \
 	-gdwarf-2 \
 	-mmacosx-version-min=10.13 \
-	-arch x86_64 \
+	-arch arm64 \
 	-Wall \
 	-Wextra \
 	-Wno-unused-parameter \
@@ -85,13 +85,13 @@ CFLAGS_CC_Release := \
 	-std=gnu++1y
 
 INCS_Release := \
-	-I/Users/a/Library/Caches/node-gyp/16.15.0/include/node \
-	-I/Users/a/Library/Caches/node-gyp/16.15.0/src \
-	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/openssl/config \
-	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/openssl/openssl/include \
-	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/uv/include \
-	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/zlib \
-	-I/Users/a/Library/Caches/node-gyp/16.15.0/deps/v8/include
+	-I/Users/i-focus/Library/Caches/node-gyp/16.16.0/include/node \
+	-I/Users/i-focus/Library/Caches/node-gyp/16.16.0/src \
+	-I/Users/i-focus/Library/Caches/node-gyp/16.16.0/deps/openssl/config \
+	-I/Users/i-focus/Library/Caches/node-gyp/16.16.0/deps/openssl/openssl/include \
+	-I/Users/i-focus/Library/Caches/node-gyp/16.16.0/deps/uv/include \
+	-I/Users/i-focus/Library/Caches/node-gyp/16.16.0/deps/zlib \
+	-I/Users/i-focus/Library/Caches/node-gyp/16.16.0/deps/v8/include
 
 OBJS :=
 
@@ -104,7 +104,7 @@ LDFLAGS_Debug := \
 	-undefined dynamic_lookup \
 	-Wl,-search_paths_first \
 	-mmacosx-version-min=10.13 \
-	-arch x86_64 \
+	-arch arm64 \
 	-L$(builddir) \
 	-stdlib=libc++
 
@@ -116,7 +116,7 @@ LDFLAGS_Release := \
 	-undefined dynamic_lookup \
 	-Wl,-search_paths_first \
 	-mmacosx-version-min=10.13 \
-	-arch x86_64 \
+	-arch arm64 \
 	-L$(builddir) \
 	-stdlib=libc++
 

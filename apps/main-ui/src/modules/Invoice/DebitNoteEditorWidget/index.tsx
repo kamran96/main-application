@@ -17,7 +17,7 @@ export const DebitNoteEditorWidget: FC = () => {
 
   return (
     <>
-      <Heading>Debit Note</Heading>
+      <Heading type='form'>Debit Note</Heading>
       <BreadCrumbArea>
         <Breadcrumb>
           <Breadcrumb.Item>

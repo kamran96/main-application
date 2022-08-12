@@ -377,11 +377,11 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
       permission: null,
       key: IInvoiceActions.EMAIL,
     },
-    {
-      title: 'Change Due Date',
-      permission: PERMISSIONS?.INVOICES_CREATE,
-      key: IInvoiceActions.CHANGE_DUE_DATE,
-    },
+    // {
+    //   title: 'Change Due Date',
+    //   permission: PERMISSIONS?.INVOICES_CREATE,
+    //   key: IInvoiceActions.CHANGE_DUE_DATE,
+    // },
   ];
   const { organization } = userDetails;
   const {

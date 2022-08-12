@@ -91,3 +91,6 @@ export const StockUpdateAPI = (payload: any) =>
 
 export const getItemsKeysApi = () =>
   http?.get(`${ItemsServiceAPI.default}/import-csv`);
+
+export const validateItemCodeAPI = (payload: string) =>
+  http?.post(`${ItemsServiceAPI.default}/code-validate`, payload);

@@ -25,6 +25,7 @@ import {
 import { IInvoiceItem, IInvoiceResult } from '../../../modal/invoice';
 import moneyFormat from '../../../utils/moneyFormat';
 import Columns from './columns';
+import { async } from 'rxjs';
 
 const { Option } = Select;
 
@@ -92,6 +93,8 @@ export const PaymentsForm: FC = () => {
 
   const { paymentsModalConfig, setPaymentsModalConfig } = useGlobalContext();
   const onFinish = async (values) => {
+
+    // return false;
     const paid_invyces = _invoiceData.map(
       (invyce: IInvoiceItem, index: number) => {
         return invyce.id;
@@ -235,7 +238,7 @@ export const PaymentsForm: FC = () => {
         onFinishFailed={onFinishFailed}
         form={form}
         onValuesChange={handleChangedValue}
-        // onValuesChange={handleChangedValue}
+      // onValuesChange={handleChangedValue}
       >
         <Row gutter={24}>
           <Col span={12}>
@@ -390,11 +393,10 @@ export const PaymentsForm: FC = () => {
           </Col>
           <Col span={24}>
             <div
-              className={`pv-10 ${
-                contact_id && !formData.runningPayment
+              className={`pv-10 ${contact_id && !formData.runningPayment
                   ? 'table_visible'
                   : `table_disable`
-              }`}
+                }`}
             >
               <CommonTable
                 data={!contact_id ? [] : _invoiceData}
@@ -463,7 +465,9 @@ export const PaymentsForm: FC = () => {
                   <div className="flex alignItemsEnd justifySpaceBetween mb-10">
                     <p className="bold default fs-16">Cutsomer Balance</p>
                     <p className="default fs-16 flex-1 textRight">
-                      {moneyFormat(Math.abs(getCustomerBalance()[0].balance))}
+                      {moneyFormat(
+                        Math.abs(getCustomerBalance()[0]?.balance || 0)
+                      )}
                     </p>
                   </div>
                   <hr className="sep" />
@@ -495,6 +499,13 @@ export const PaymentsForm: FC = () => {
                     {
                       required: true,
                       message: 'Amount is required',
+                    },
+                    {
+                      validator: async (rule, value) => {
+                        if (value === 0) {
+                          throw new Error(`Value should be greater than 0`);
+                        }
+                      },
                     },
                     {
                       validator: async (rule, value, callback) => {

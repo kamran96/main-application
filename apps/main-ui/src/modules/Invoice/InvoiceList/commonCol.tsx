@@ -118,8 +118,6 @@ export const useCols = () => {
       title: 'Items',
       dataIndex: 'invoiceItems',
       key: 'invoiceItems',
-      sorter: true,
-      sortOrder: sortedInfo?.columnKey === 'invoiceItems' && sortedInfo?.order,
       render: (data: any[]) =>
         data.length === 1 ? `${data.length} Item` : `${data.length} Items`,
     },

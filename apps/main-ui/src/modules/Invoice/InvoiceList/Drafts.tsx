@@ -54,7 +54,7 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
     });
 
 
-    const {PdfCols, _exportableCols} = useCols();
+  const { PdfCols, _exportableCols } = useCols();
 
   const { mutate: mutateDeleteOrders, isLoading: isDeletingInvoice } =
     useMutation(deleteInvoiceDrafts);
@@ -154,8 +154,8 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
             return -1;
           }
         });
-        
-        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+
+        setAllInvoicesRes(prev => ({ ...prev, result: userData }))
       } else {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
@@ -164,8 +164,8 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
             return -1;
           }
         });
-        
-        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+
+        setAllInvoicesRes(prev => ({ ...prev, result: userData }))
       }
       setAllInvoicesConfig({
         ...allInvoicesConfig,
@@ -174,17 +174,14 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
         sortid:
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
-            : sorter.field,
+            : sorter.order === 'asceend' ? sorter.field : 'id',
       });
-      const route = `/app${
-        ISupportedRoutes.INVOICES
-      }?tabIndex=draft&sortid=${
-        sorter && sorter.order === 'descend'
+      const route = `/app${ISupportedRoutes.INVOICES
+        }?tabIndex=draft&sortid=${sorter && sorter.order === 'descend'
           ? `-${sorter.field}`
-          : sorter.field
-      }&page=${
-        pagination.current
-      }&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+          : sorter.order === 'asceend' ? sorter.field : 'id'
+        }&page=${pagination.current
+        }&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
       history.push(route);
     }
   }

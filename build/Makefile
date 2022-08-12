@@ -308,8 +308,8 @@ ifeq ($(strip $(foreach prefix,$(NO_LOAD),\
 endif
 
 quiet_cmd_regen_makefile = ACTION Regenerating $@
-cmd_regen_makefile = cd $(srcdir); /Users/a/Desktop/Projects/invyce/node_modules/node-gyp/gyp/gyp_main.py -fmake --ignore-environment "-Dlibrary=shared_library" "-Dvisibility=default" "-Dnode_root_dir=/Users/a/Library/Caches/node-gyp/16.15.0" "-Dnode_gyp_dir=/Users/a/Desktop/Projects/invyce/node_modules/node-gyp" "-Dnode_lib_file=/Users/a/Library/Caches/node-gyp/16.15.0/<(target_arch)/node.lib" "-Dmodule_root_dir=/Users/a/Desktop/Projects/invyce" "-Dnode_engine=v8" "--depth=." "-Goutput_dir=." "--generator-output=build" -I/Users/a/Desktop/Projects/invyce/build/config.gypi -I/Users/a/Desktop/Projects/invyce/node_modules/node-gyp/addon.gypi -I/Users/a/Library/Caches/node-gyp/16.15.0/include/node/common.gypi "--toplevel-dir=." binding.gyp
-Makefile: $(srcdir)/node_modules/node-gyp/addon.gypi $(srcdir)/binding.gyp $(srcdir)/../../../Library/Caches/node-gyp/16.15.0/include/node/common.gypi $(srcdir)/build/config.gypi
+cmd_regen_makefile = cd $(srcdir); /Users/i-focus/Documents/projects/main-application/node_modules/node-gyp/gyp/gyp_main.py -fmake --ignore-environment "-Dlibrary=shared_library" "-Dvisibility=default" "-Dnode_root_dir=/Users/i-focus/Library/Caches/node-gyp/16.16.0" "-Dnode_gyp_dir=/Users/i-focus/Documents/projects/main-application/node_modules/node-gyp" "-Dnode_lib_file=/Users/i-focus/Library/Caches/node-gyp/16.16.0/<(target_arch)/node.lib" "-Dmodule_root_dir=/Users/i-focus/Documents/projects/main-application" "-Dnode_engine=v8" "--depth=." "-Goutput_dir=." "--generator-output=build" -I/Users/i-focus/Documents/projects/main-application/build/config.gypi -I/Users/i-focus/Documents/projects/main-application/node_modules/node-gyp/addon.gypi -I/Users/i-focus/Library/Caches/node-gyp/16.16.0/include/node/common.gypi "--toplevel-dir=." binding.gyp
+Makefile: $(srcdir)/binding.gyp $(srcdir)/node_modules/node-gyp/addon.gypi $(srcdir)/../../../Library/Caches/node-gyp/16.16.0/include/node/common.gypi $(srcdir)/build/config.gypi
 	$(call do_cmd,regen_makefile)
 
 # "all" is a concatenation of the "all" targets from all the included

@@ -5,14 +5,15 @@
 
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import * as cookieParser from 'cookie-parser';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as cookieParser from 'cookie-parser';
 
 import { AppModule } from './app/app.module';
 
 async function bootstrap() {
   const ssl = process.env.SSL === 'true' ? true : false;
+  console.log(ssl);
   let httpsOptions = null;
   if (ssl) {
     const keyPath = process.env.SSL_KEY_PATH || '../../../certs/localhost.key';
@@ -25,21 +26,21 @@ async function bootstrap() {
   }
 
   const app = await NestFactory.create(AppModule, { httpsOptions });
+  const port = process.env.PORT || 3342;
+  const hostname = process.env.HOSTNAME || 'localhost';
 
   app.use(cookieParser());
   app.enableCors({
     origin: true,
     credentials: true,
   });
+
   if (
     process.env['NODE' + '_ENV'] === 'production' ||
     process.env['NODE' + '_ENV'] === 'staging'
   ) {
     app.setGlobalPrefix('/exports');
   }
-  const port = process.env.PORT || 3342;
-  const hostname = process.env.HOSTNAME || 'localhost';
-
   await app.listen(port, () => {
     const address =
       'http' + (ssl ? 's' : '') + '://' + hostname + ':' + port + '/';

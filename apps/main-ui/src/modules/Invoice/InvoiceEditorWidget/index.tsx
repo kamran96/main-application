@@ -16,7 +16,7 @@ export const InvoiceEditorWidget: FC = () => {
 
   return (
     <WrapperInvoiceWidget>
-      <Heading>New Invoice</Heading>
+      <Heading type='form'>New Invoice</Heading>
       <BreadCrumbArea>
         <Breadcrumb>
           <Breadcrumb.Item>

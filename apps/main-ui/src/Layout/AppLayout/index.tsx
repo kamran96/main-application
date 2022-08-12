@@ -123,15 +123,15 @@ export const AppLayout: FC<IProps> = ({ children }) => {
                 </p>
               </div>
             )}
-            {/* <ErrorBoundary
+            <ErrorBoundary
               errorComponent={
                 <div className="ph-20 pv-20">
                   <Inconvinience />
                 </div>
               }
-            > */}
-            <main className="content">{children}</main>
-            {/* </ErrorBoundary> */}
+            >
+              <main className="content">{children}</main>
+            </ErrorBoundary>
           </ContentArea>
         </section>
       ) : (

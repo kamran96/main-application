@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as postmark from 'postmark';
 import * as path from 'path';
 import * as fs from 'fs';
-import axios from 'axios';
+import { GetBase64 } from '@invyce/global-constants';
 
 const client = new postmark.ServerClient(process.env.POSTMARK_TOKEN);
 
@@ -288,29 +288,36 @@ export class AppService {
     console.log(email, 'email successfully.');
   }
 
-  async InvoiceCreated(data) {
-    const getBase64 = async (url) => {
-      if (!url) {
-        return url;
-      } else {
-        return axios
-          .get(url, {
-            responseType: 'arraybuffer',
-          })
-          .then((response) =>
-            Buffer.from(response.data, 'binary').toString('base64')
-          );
-      }
-    };
-
-    delete data.location;
-
+  async POCreated(data) {
     const TemplateModel = { ...data };
     const payload = {
       Name: data.attachment_name,
       ContentType: 'text/pain',
-      Content: await getBase64(data.download_link),
-      ContentID: data.download_link,
+      Content: await GetBase64(data.download_link),
+      ContentID: data.attachment_name,
+    };
+
+    setTimeout(async () => {
+      const email = await client.sendEmailWithTemplate({
+        From: 'no-reply@invyce.com',
+        To: data.to,
+        TemplateAlias: 'purchase-order-template',
+        TemplateModel: TemplateModel,
+        Attachments: [payload],
+        Cc: data.cc ? data?.cc?.toString() : '',
+        Bcc: data.bcc ? data?.bcc?.toString() : '',
+      });
+      console.log(email, 'email successfully.');
+    }, 5000);
+  }
+
+  async InvoiceCreated(data) {
+    const TemplateModel = { ...data };
+    const payload = {
+      Name: data.attachment_name,
+      ContentType: 'text/pain',
+      Content: await GetBase64(data.download_link),
+      ContentID: data.attachment_name,
     };
 
     setTimeout(async () => {
@@ -320,8 +327,8 @@ export class AppService {
         TemplateAlias: 'invoice-has-been-created',
         TemplateModel: TemplateModel,
         Attachments: [payload],
-        Cc: data.cc,
-        Bcc: data.bcc,
+        Cc: data.cc ? data?.cc?.toString() : '',
+        Bcc: data.bcc ? data?.bcc?.toString() : '',
       });
       console.log(email, 'email successfully.');
     }, 5000);

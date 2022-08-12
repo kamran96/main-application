@@ -61,6 +61,7 @@ export enum PdfType {
   CREDIT_NOTE = 'credit-note',
   DEBIT_NOTE = 'debit-note',
   BILL = 'bill',
+  PO = 'PO',
 }
 
 export enum InvTypes {
@@ -75,7 +76,7 @@ export const Host = (service: string, route: string): string => {
   if (process.env['NODE' + '_ENV'] === 'production') {
     return `http://prod-${service}.prod.svc.cluster.local/${route}`;
   } else if (process.env['NODE' + '_ENV'] === 'staging') {
-    return `http://staging-${service}.stage.svc.cluster.local/${route}`;
+    return `http://staging-${service}.staging.svc.cluster.local/${route}`;
   } else {
     return `https://localhost/${route}`;
   }
@@ -92,11 +93,33 @@ export const useApiCallback = (route: string) => {
   const service = route.split('/')[0];
   const baseURL =
     process.env['NODE' + '_ENV'] === 'production'
-      ? `http://${service}.default.svc.cluster.local/${route}`
+      ? `http://prod-${service}.prod.svc.cluster.local/${route}`
+      : process.env['NODE' + '_ENV'] === 'staging'
+      ? `http://staging-${service}.staging.svc.cluster.local/${route}`
       : `https://localhost/${route}`;
 
   const http = axios.create({
     baseURL,
   });
   return http;
+};
+
+export const ToTitleCase = (str) =>
+  str.replace(
+    /\w\S*/g,
+    (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+  );
+
+export const GetBase64 = async (url) => {
+  if (!url) {
+    return url;
+  } else {
+    return axios
+      .get(url, {
+        responseType: 'arraybuffer',
+      })
+      .then((response) =>
+        Buffer.from(response.data, 'binary').toString('base64')
+      );
+  }
 };

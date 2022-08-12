@@ -203,4 +203,18 @@ export class PriceService {
       }
     }
   }
+
+  async HasBills(data) {
+    console.log('creating bill', data);
+
+    for (const i of data.itemIds) {
+      await this.priceModel.updateOne(
+        { itemId: i },
+        {
+          hasBills: true,
+        }
+      );
+    }
+    return true;
+  }
 }

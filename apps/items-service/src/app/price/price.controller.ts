@@ -9,7 +9,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { IPriceWithResponse } from '@invyce/interfaces';
+import { IPriceWithResponse, IRequest } from '@invyce/interfaces';
 import { ParamsDto } from '../dto/item.dto';
 import { PriceDto } from '../dto/price.dto';
 import { PriceService } from './price.service';
@@ -59,5 +59,10 @@ export class PriceController {
         error.status ? error.status : HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  @Post('bill')
+  async hasBills(@Body() body) {
+    return await this.priceService.HasBills(body);
   }
 }

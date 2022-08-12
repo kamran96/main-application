@@ -14,10 +14,10 @@ describe('AppController', () => {
   });
 
   describe('getData', () => {
-    it('should return "Welcome to exports-service!"', () => {
+    it('should return "Welcome to csv-service!"', () => {
       const appController = app.get<AppController>(AppController);
       expect(appController.getData()).toEqual({
-        message: 'Welcome to exports-service!',
+        message: 'Welcome to csv-service!',
       });
     });
   });

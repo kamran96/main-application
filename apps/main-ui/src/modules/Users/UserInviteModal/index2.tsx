@@ -216,7 +216,7 @@ const UserInviteModal2: FC = () => {
                 size="middle"
                 htmlType="submit"
               >
-                Add Users
+                Add User
               </Button>
             </div>
           </Form.Item>

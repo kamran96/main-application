@@ -15,7 +15,7 @@ export const CreditNoteEditorWidget: FC = () => {
 
   return (
     <>
-      <Heading>Credit Note</Heading>
+      <Heading type='form'>Credit Note</Heading>
       <BreadCrumbArea>
         <Breadcrumb>
           <Breadcrumb.Item>

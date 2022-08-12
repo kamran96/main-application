@@ -37,10 +37,10 @@ export const RoutingSchema: IRoutingSchema = {
       tag: 'Business',
       icon: <BussinesIcon />,
       children: [
-        {
-          route: `${root}${ISupportedRoutes.INVOICE_DASHBOARD}`,
-          tag: 'Invoice Dashboard',
-        },
+        // {
+        //   route: `${root}${ISupportedRoutes.INVOICE_DASHBOARD}`,
+        //   tag: 'Invoice Dashboard',
+        // },
         {
           route: `${root}${ISupportedRoutes.INVOICES}`,
           tag: 'Invoices',
@@ -56,11 +56,11 @@ export const RoutingSchema: IRoutingSchema = {
           tag: 'Debit Notes',
           permission: PERMISSIONS.INVOICES_INDEX,
         },
-        {
-          route: '/app/quotes',
-          tag: 'Quotes',
-          permission: PERMISSIONS.QUOTATIONS_INDEX,
-        },
+        // {
+        //   route: '/app/quotes',
+        //   tag: 'Quotes',
+        //   permission: PERMISSIONS.QUOTATIONS_INDEX,
+        // },
         {
           route: `${root}${ISupportedRoutes.PURCHASE_ORDER}`,
           tag: 'Purchase Order',
@@ -89,10 +89,10 @@ export const RoutingSchema: IRoutingSchema = {
           route: `${root}${ISupportedRoutes.INCOME_STATEMENT}`,
           tag: 'Income Statement',
         },
-        {
-          route: `${root}${ISupportedRoutes.CASH_ACTIVITY_REPORT}`,
-          tag: 'Cash Activity Report',
-        },
+        // {
+        //   route: `${root}${ISupportedRoutes.CASH_ACTIVITY_REPORT}`,
+        //   tag: 'Cash Activity Report',
+        // },
       ],
     },
     {
@@ -198,12 +198,12 @@ export const RoutingSchema: IRoutingSchema = {
       icon: <CreateBill />,
     },
 
-    {
-      route: `${root}${ISupportedRoutes.CREATE_QUOTE}`,
-      tag: 'Create Quote',
-      icon: <CreateQuote />,
-      permission: PERMISSIONS.QUOTATIONS_CREATE,
-    },
+    // {
+    //   route: `${root}${ISupportedRoutes.CREATE_QUOTE}`,
+    //   tag: 'Create Quote',
+    //   icon: <CreateQuote />,
+    //   permission: PERMISSIONS.QUOTATIONS_CREATE,
+    // },
     {
       route: `${root}${ISupportedRoutes.ADD_CREDIT_NOTE}`,
       tag: 'Credit Note',

@@ -249,10 +249,15 @@ export const PurchaseManager: FC<IProps> = ({
 
   /* Component did update hook to update InvoiceItems when API getInvoiceByIDAPI successfully returns */
   useEffect(() => {
-    if (invoicesData && invoicesData.data && invoicesData.data.result) {
+    if (invoicesData?.data?.result) {
       const { result } = invoicesData.data;
       // const { payment } = result;
       const { adjustment: discount } = result;
+
+      const invoiceNumber =
+        routeState?.relation === IInvoiceType.PURCHASE_ORDER
+          ? invoiceNumberData?.data?.result
+          : result.invoiceNumber;
 
       const invoiceDiscount = discount;
       setInvoiceDiscount(invoiceDiscount);
@@ -261,6 +266,7 @@ export const PurchaseManager: FC<IProps> = ({
         dueDate: dayjs(result.dueDate),
         issueDate: dayjs(result.issueDate),
         invoiceDiscount,
+        invoiceNumber,
       });
 
       const resolvedData = plainToClass(
@@ -285,6 +291,7 @@ export const PurchaseManager: FC<IProps> = ({
             tax,
             total,
             quantity,
+            accountId: item?.accountId || defaultAccount?.id,
           });
         });
 
@@ -314,22 +321,15 @@ export const PurchaseManager: FC<IProps> = ({
   }, [invoiceNumberData, AntForm]);
 
   const contactResult: IContactType[] =
-    (data &&
-      data.data &&
-      data.data.result &&
-      data.data.result.filter((cnt: IContactType) => {
-        if (type === IInvoiceType.PURCHASE_ENTRY) {
-          return cnt.contactType === IContactTypes.SUPPLIER;
-        } else if (
-          type === IInvoiceType.INVOICE ||
-          type === IInvoiceType.QUOTE
-        ) {
-          return cnt.contactType === IContactTypes.CUSTOMER;
-        } else {
-          return cnt;
-        }
-      })) ||
-    [];
+    data?.data?.result?.filter((cnt: IContactType) => {
+      if (type === IInvoiceType.PURCHASE_ENTRY) {
+        return cnt.contactType === IContactTypes.SUPPLIER;
+      } else if (type === IInvoiceType.INVOICE || type === IInvoiceType.QUOTE) {
+        return cnt.contactType === IContactTypes.CUSTOMER;
+      } else {
+        return cnt;
+      }
+    }) || [];
 
   const getSubTotal = useCallback(() => {
     let subTotal = 0;
@@ -754,28 +754,33 @@ export const PurchaseManager: FC<IProps> = ({
             onChange={(value) => {
               clearTimeout(setStateTimeOut);
 
-              setTimeout(() => {
-                const allItems = [...invoiceItems];
+              setStateTimeOut = setTimeout(() => {
                 const purchasePrice = value;
-                const costOfGoodAmount =
-                  purchasePrice * allItems[index].quantity;
-                const total =
-                  calculateInvoice(purchasePrice, record.tax, '0') *
-                  record.quantity;
 
-                const indexed =
-                  allItems[index].errors?.indexOf('purchasePrice');
-                if (indexed !== -1) {
-                  allItems[index]?.errors?.splice(indexed, 1);
-                }
+                setInvoiceItems((prev) => {
+                  const allItems = [...prev];
 
-                allItems[index] = {
-                  ...allItems[index],
-                  purchasePrice,
-                  total,
-                  costOfGoodAmount,
-                };
-                setInvoiceItems(allItems);
+                  const costOfGoodAmount =
+                    purchasePrice * allItems[index].quantity;
+                  const total =
+                    calculateInvoice(purchasePrice, record.tax, '0') *
+                    record.quantity;
+
+                  const indexed =
+                    allItems[index].errors?.indexOf('purchasePrice');
+                  if (indexed !== -1) {
+                    allItems[index]?.errors?.splice(indexed, 1);
+                  }
+
+                  allItems[index] = {
+                    ...allItems[index],
+                    purchasePrice,
+                    total,
+                    costOfGoodAmount,
+                  };
+
+                  return allItems;
+                });
               }, 500);
             }}
             type="number"

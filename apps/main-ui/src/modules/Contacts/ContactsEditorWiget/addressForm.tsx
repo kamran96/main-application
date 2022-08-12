@@ -32,7 +32,7 @@ export const AddressForm: FC<IProps> = ({ onChange, item, index, reset }) => {
         onChange(values);
       }}
     >
-      <FormLabel isRequired={true}>
+      <FormLabel isRequired={item.addressType === 1 ? true : false}>
         {item.addressType === 1 ? 'Postal Address' : 'Street Address'}
       </FormLabel>
       <Form.Item

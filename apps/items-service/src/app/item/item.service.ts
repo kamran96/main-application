@@ -294,6 +294,7 @@ export class ItemService {
     }
 
     await this.ManageItemStock(data);
+
     await this.ManageSalesPurchases(data);
   }
 
@@ -390,34 +391,72 @@ export class ItemService {
       return item;
     };
 
-    for (const i of data.payload) {
-      const operation =
-        i.type === IOperationType.DECREASE
-          ? IOperationType.INCREASE
-          : IOperationType.DECREASE;
+    const getNewValue = (previousPrice, change, action) => {
+      if (action === 'create') {
+        return previousPrice + change;
+      } else if (action === 'delete') {
+        return previousPrice - change;
+      }
+    };
+
+    data?.payload?.forEach(async (i) => {
       if (i.invoiceType === 'bill') {
         const item = await getItem(i.itemId);
+        const price = i?.price || item?.price?.purchasePrice;
+        const previousAmount = item?.totalBillsAmount || 0;
+
+        const newValue = await getNewValue(
+          previousAmount,
+          price * i?.value,
+          i.action
+        );
+
         await this.itemModel.updateOne(
           { _id: i.itemId },
           {
-            totalBillsAmount:
-              operation === IOperationType.INCREASE
-                ? item.totalBillsAmount - i.value * item.price.purchasePrice
-                : item.totalBillsAmount + i.value * item.price.purchasePrice,
+            totalBillsAmount: newValue,
           }
         );
       } else if (i.invoiceType === 'invoice') {
         const item = await getItem(i.itemId);
+        const price = i?.price || item?.price?.salePrice;
+
+        const previousAmount = item?.totalInvoicesAmount || 0;
+
         await this.itemModel.updateOne(
           { _id: i.itemId },
           {
-            totalInvoicesAmount:
-              operation === IOperationType.INCREASE
-                ? item.totalInvoicesAmount + i.value * item.price.salePrice
-                : item.totalInvoicesAmount - i.value * item.price.salePrice,
+            totalInvoicesAmount: getNewValue(
+              previousAmount,
+              price * i?.value,
+              i.action
+            ),
           }
         );
       }
+    });
+  }
+
+  async GetItemCode(code: string, user: IBaseUser): Promise<any> {
+    const item = await this.itemModel.find({
+      organizationId: user.organizationId,
+      branchId: user.branchId,
+      code: code,
+      status: 1,
+    });
+
+    if (item.length > 0) {
+      return {
+        message: 'Item Code aready exist',
+        statusCode: HttpStatus.BAD_REQUEST,
+        status: false,
+      };
+    } else {
+      return {
+        message: 'Item Code is available',
+        statusCode: HttpStatus.OK,
+        status: true,
+      };
     }
   }
 

@@ -1,5 +1,12 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { Between, getCustomRepository, ILike, In, LessThan } from 'typeorm';
+import {
+  Between,
+  getCustomRepository,
+  ILike,
+  In,
+  LessThan,
+  Raw,
+} from 'typeorm';
 import axios from 'axios';
 import { BillRepository } from '../repositories/bill.repository';
 import { BillItemRepository } from '../repositories/billItem.repository';
@@ -16,6 +23,7 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 import { BILL_UPDATED } from '@invyce/send-email';
 import { CreditNoteRepository } from '../repositories/creditNote.repository';
+import { PurchaseOrderRepository } from '../repositories/purchaseOrder.repository';
 
 @Injectable()
 export class BillService {
@@ -50,18 +58,18 @@ export class BillService {
 
       for (const i in data) {
         if (data[i].type === 'search') {
-          const val = data[i].value?.split('%')[1];
-          // const lower = val.toLowerCase();
+          const val = data[i].value?.split('%')[1].toLowerCase();
+
           bills = await getCustomRepository(BillRepository).find({
             where: {
               status: 1,
               branchId: req.user.branchId,
               organizationId: req.user.organizationId,
-              [i]: ILike(val),
+              [i]: Raw((alias) => `LOWER(${alias}) ILike '%${val}%'`),
             },
             skip: pn * ps - ps,
             take: ps,
-            relations: ['purchaseItems', 'purchaseItems.account'],
+            relations: ['purchaseItems'],
           });
         } else if (data[i].type === 'compare') {
           bills = await getCustomRepository(BillRepository).find({
@@ -73,7 +81,7 @@ export class BillService {
             },
             skip: pn * ps - ps,
             take: ps,
-            relations: ['purchaseItems', 'purchaseItems.account'],
+            relations: ['purchaseItems'],
           });
         } else if (data[i].type === 'date-between') {
           const start_date = data[i].value[0];
@@ -87,7 +95,7 @@ export class BillService {
             },
             skip: pn * ps - ps,
             take: ps,
-            relations: ['purchaseItems', 'purchaseItems.account'],
+            relations: ['purchaseItems'],
           });
         }
 
@@ -464,6 +472,10 @@ export class BillService {
               type: 'increase',
               action: 'create',
               invoiceType: 'bill',
+              price:
+                typeof item?.purchasePrice === 'string'
+                  ? parseFloat(item.purchasePrice)
+                  : item.purchasePrice,
             });
           }
 
@@ -571,6 +583,16 @@ export class BillService {
       }
       throw new HttpException('Bill not found', HttpStatus.BAD_REQUEST);
     } else {
+      if (dto.id) {
+        await getCustomRepository(PurchaseOrderRepository).update(
+          {
+            id: dto.id,
+          },
+          {
+            status: 1,
+          }
+        );
+      }
       const bill = await getCustomRepository(BillRepository).save({
         contactId: dto.contactId,
         reference: dto.reference,
@@ -618,6 +640,10 @@ export class BillService {
             type: 'increase',
             action: 'create',
             invoiceType: 'bill',
+            price:
+              typeof item?.purchasePrice === 'string'
+                ? parseFloat(item.purchasePrice)
+                : item.purchasePrice,
           });
         }
 
@@ -701,6 +727,20 @@ export class BillService {
           },
         });
       }
+
+      console.log(mapItemIds, 'items');
+      await axios.post(
+        Host('items', 'items/price/bill'),
+        {
+          itemIds: mapItemIds,
+        },
+        {
+          headers: {
+            cookie: `access_token=${token}`,
+          },
+        }
+      );
+
       return bill;
     }
   }
@@ -868,6 +908,11 @@ export class BillService {
               targetId: i,
               type: 'increase',
               action: 'delete',
+              invoiceType: 'bill',
+              price:
+                typeof j?.purchasePrice === 'string'
+                  ? parseFloat(j?.purchasePrice)
+                  : j?.purchasePrice,
             });
           }
         }

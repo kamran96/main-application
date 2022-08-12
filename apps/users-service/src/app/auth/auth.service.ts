@@ -39,17 +39,18 @@ import {
 } from '@invyce/interfaces';
 
 import { SendOtp, UserLoginDto, UserRegisterDto } from '../dto/user.dto';
-import { Host } from '@invyce/global-constants';
+import { Host, ToTitleCase } from '@invyce/global-constants';
+import { BASE_URL } from '../app.module';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const generateRandomNDigits = () => {
   let code = '';
 
-  while (code.length < 6) {
+  while (code.length < 5) {
     code += crypto.randomBytes(3).readUIntBE(0, 3);
   }
-  return code.slice(0, 6);
+  return code.slice(0, 5);
 };
 
 const secret = speakeasy.generateSecret({
@@ -186,11 +187,11 @@ export class AuthService {
     user.email = authDto.email;
     user.password =
       authDto.password !== '' ? bcrypt.hashSync(authDto.password) : null;
-    user.organizationId = userData?.organizationId || null;
+    user.organizationId = userData ? userData.organizationId : null;
     user.branchId = authDto.branchId || null;
     user.roleId = authDto.roleId || null;
     user.prefix = authDto.prefix;
-    user.isVerified = authDto.isVerified;
+    user.isVerified = authDto?.isVerified ? authDto?.isVerified : false;
     user.profile = updatedProfile;
     user.terms = authDto.terms;
     user.marketing = authDto.marketing;
@@ -416,7 +417,6 @@ export class AuthService {
     const user = await this.userModel.findOne({ email: body.email });
 
     const generateOtp: string = generateRandomNDigits();
-    console.log(generateOtp, 'otp');
     parseInt(generateOtp as unknown as string);
 
     const user_token = new this.userTokenModel();
@@ -478,16 +478,17 @@ export class AuthService {
     code: string,
     userData: IBaseUser
   ): Promise<void> {
-    const baseUrl = 'http://localhost:4200';
+    const baseUrl = process.env.BASE_URL || BASE_URL;
     const _code = { code };
     const a = `${baseUrl}/page/join-user?${queryString.stringify(_code)}`;
 
     // info(`Decoded generated for user ${queryString.parse(_code)}`);
 
+    const name = user.email.split('@')[0];
     const payload = {
       to: user.email,
-      user_name: user?.profile?.fullName,
-      name: userData.profile.fullName,
+      user_name: ToTitleCase(name),
+      name: ToTitleCase(userData.profile.fullName),
       action_url: a,
     };
 
