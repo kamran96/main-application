@@ -9,9 +9,10 @@ DEFS_Debug := \
 	'-DV8_DEPRECATION_WARNINGS=1' \
 	'-DV8_DEPRECATION_WARNINGS' \
 	'-DV8_IMMINENT_DEPRECATION_WARNINGS' \
+	'-D_GLIBCXX_USE_CXX11_ABI=1' \
+	'-D_DARWIN_USE_64_BIT_INODE=1' \
 	'-D_LARGEFILE_SOURCE' \
 	'-D_FILE_OFFSET_BITS=64' \
-	'-D__STDC_FORMAT_MACROS' \
 	'-DOPENSSL_NO_PINSHARED' \
 	'-DOPENSSL_THREADS' \
 	'-DBUILDING_NODE_EXTENSION' \
@@ -26,19 +27,26 @@ CFLAGS_Debug := \
 	-mmacosx-version-min=10.13 \
 	-arch arm64 \
 	-Wall \
-	-Wextra \
-	-Wno-unused-parameter \
-	-m64 \
-	-g \
-	-O0
+	-Wendif-labels \
+	-W \
+	-Wno-unused-parameter
 
 # Flags passed to only C files.
-CFLAGS_C_Debug :=
+CFLAGS_C_Debug := \
+	-fno-strict-aliasing
 
 # Flags passed to only C++ files.
 CFLAGS_CC_Debug := \
+	-std=gnu++14 \
+	-stdlib=libc++ \
 	-fno-rtti \
-	-std=gnu++1y
+	-fno-strict-aliasing
+
+# Flags passed to only ObjC files.
+CFLAGS_OBJC_Debug :=
+
+# Flags passed to only ObjC++ files.
+CFLAGS_OBJCC_Debug :=
 
 INCS_Debug := \
 	-I/Users/i-focus/Library/Caches/node-gyp/16.16.0/include/node \
@@ -56,9 +64,10 @@ DEFS_Release := \
 	'-DV8_DEPRECATION_WARNINGS=1' \
 	'-DV8_DEPRECATION_WARNINGS' \
 	'-DV8_IMMINENT_DEPRECATION_WARNINGS' \
+	'-D_GLIBCXX_USE_CXX11_ABI=1' \
+	'-D_DARWIN_USE_64_BIT_INODE=1' \
 	'-D_LARGEFILE_SOURCE' \
 	'-D_FILE_OFFSET_BITS=64' \
-	'-D__STDC_FORMAT_MACROS' \
 	'-DOPENSSL_NO_PINSHARED' \
 	'-DOPENSSL_THREADS' \
 	'-DBUILDING_NODE_EXTENSION'
@@ -70,19 +79,26 @@ CFLAGS_Release := \
 	-mmacosx-version-min=10.13 \
 	-arch arm64 \
 	-Wall \
-	-Wextra \
-	-Wno-unused-parameter \
-	-m64 \
-	-O3 \
-	-fno-omit-frame-pointer
+	-Wendif-labels \
+	-W \
+	-Wno-unused-parameter
 
 # Flags passed to only C files.
-CFLAGS_C_Release :=
+CFLAGS_C_Release := \
+	-fno-strict-aliasing
 
 # Flags passed to only C++ files.
 CFLAGS_CC_Release := \
+	-std=gnu++14 \
+	-stdlib=libc++ \
 	-fno-rtti \
-	-std=gnu++1y
+	-fno-strict-aliasing
+
+# Flags passed to only ObjC files.
+CFLAGS_OBJC_Release :=
+
+# Flags passed to only ObjC++ files.
+CFLAGS_OBJCC_Release :=
 
 INCS_Release := \
 	-I/Users/i-focus/Library/Caches/node-gyp/16.16.0/include/node \
@@ -126,26 +142,21 @@ LIBTOOLFLAGS_Release := \
 
 LIBS :=
 
-$(obj).target/bindings.node: GYP_LDFLAGS := $(LDFLAGS_$(BUILDTYPE))
-$(obj).target/bindings.node: LIBS := $(LIBS)
-$(obj).target/bindings.node: TOOLSET := $(TOOLSET)
-$(obj).target/bindings.node:  FORCE_DO_CMD
+$(builddir)/bindings.node: GYP_LDFLAGS := $(LDFLAGS_$(BUILDTYPE))
+$(builddir)/bindings.node: LIBS := $(LIBS)
+$(builddir)/bindings.node: GYP_LIBTOOLFLAGS := $(LIBTOOLFLAGS_$(BUILDTYPE))
+$(builddir)/bindings.node: TOOLSET := $(TOOLSET)
+$(builddir)/bindings.node:  FORCE_DO_CMD
 	$(call do_cmd,solink_module)
 
-all_deps += $(obj).target/bindings.node
+all_deps += $(builddir)/bindings.node
 # Add target alias
 .PHONY: bindings
 bindings: $(builddir)/bindings.node
 
-# Copy this to the executable output path.
-$(builddir)/bindings.node: TOOLSET := $(TOOLSET)
-$(builddir)/bindings.node: $(obj).target/bindings.node FORCE_DO_CMD
-	$(call do_cmd,copy)
-
-all_deps += $(builddir)/bindings.node
 # Short alias for building this executable.
 .PHONY: bindings.node
-bindings.node: $(obj).target/bindings.node $(builddir)/bindings.node
+bindings.node: $(builddir)/bindings.node
 
 # Add executable to "all" target.
 .PHONY: all
