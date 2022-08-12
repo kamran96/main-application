@@ -76,7 +76,7 @@ export const Host = (service: string, route: string): string => {
   if (process.env['NODE' + '_ENV'] === 'production') {
     return `http://prod-${service}.prod.svc.cluster.local/${route}`;
   } else if (process.env['NODE' + '_ENV'] === 'staging') {
-    return `http://staging-${service}.stage.svc.cluster.local/${route}`;
+    return `http://staging-${service}.staging.svc.cluster.local/${route}`;
   } else {
     return `https://localhost/${route}`;
   }

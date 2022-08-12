@@ -40,6 +40,8 @@ async function bootstrap() {
 
   // app.use(csurf());
 
+  console.log(process.env['NODE' + '_ENV'], 'env');
+
   if (
     process.env['NODE' + '_ENV'] === 'production' ||
     process.env['NODE' + '_ENV'] === 'staging'
