@@ -12,6 +12,7 @@ import { IBaseAPIError } from '../../modal/base';
 import { HeadingTemplate1 } from '../../components/HeadingTemplates';
 import { BOLDTEXT } from '../../components/Para/BoldText';
 import GoogleLogin from 'react-google-login';
+import { Seprator } from '../../components/Seprator';
 
 export const LoginForm: FC = () => {
   const { mutate: mutateLogin, isLoading: logginIn } = useMutation(LoginAPI);
@@ -162,7 +163,7 @@ export const LoginForm: FC = () => {
               >
                 <Input.Password size="large" autoComplete="off" />
               </Form.Item>
-              <div className="actions-wrapper mv-10">
+              <div className="actions-wrapper mb-10">
                 {/* <Form.Item name="remember_me" valuePropName="checked">
                   <Checkbox>Remember Me</Checkbox>
                 </Form.Item> */}
@@ -206,14 +207,16 @@ export const LoginForm: FC = () => {
                   cookiePolicy={'single_host_origin'}
                 />
               </Form.Item>
-              <h5 className="textCenter mt-10">
-                <BOLDTEXT>OR</BOLDTEXT>
+              <h5 className="orArea textCenter  mb-20 mt-20">
+                <Seprator />
+                <BOLDTEXT className='ml-10 mr-10'>OR</BOLDTEXT>
+                <Seprator />
               </h5>
               <Form.Item className="m-reset">
                 <Button
                   style={{ width: '100%' }}
                   type="default"
-                  size="middle"
+                  size="large"
                   onClick={() => {
                     history?.push(
                       ISupportedRoutes?.DEFAULT_LAYOUT +
@@ -252,8 +255,8 @@ export const LoginFormWrapper = styled.div`
   justify-content: center;
   .actions-wrapper {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: flex-end;
     button {
       padding: 0;
     }
@@ -271,6 +274,19 @@ export const LoginFormWrapper = styled.div`
   .google-signin {
     justify-content: center;
     width: 100%;
-    box-shadow: 0px 2px 5px 1px #e4e4e4 !important;
+    box-shadow: 0px 0px 0px 0px #e4e4e4 !important;
+    border: 1px solid #d9d9d9 !important;
+  }
+  .m-reset {
+    button {
+      font-size: 1rem;
+      text-align: center;
+    }
+  }
+
+  .orArea {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 `;

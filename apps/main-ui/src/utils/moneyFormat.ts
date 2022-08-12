@@ -13,17 +13,17 @@ export default function (amount: number | string) {
   };
 
   const valueToFormat =
-    typeof amount === 'string' ? parseFloat(amount) : amount;
+  typeof amount === 'string' ? parseFloat(amount) : amount;
 
-  if (valueToFormat < 0) {
-    return formatMoney(amount, {
-      symbol: currency?.symbolNative,
-      format: '%s(%v) ',
-    });
-  } else {
-    return formatMoney(amount, {
-      symbol: currency?.symbolNative,
-      format: '%s%v ',
-    });
-  }
+if (valueToFormat < 0) {
+  return formatMoney(amount, {
+    symbol: currency?.symbolNative,
+    format: '%s(%v) ',
+  });
+} else {
+  return formatMoney(amount, {
+    symbol: currency?.symbolNative,
+    format: '%s%v ',
+  });
+}
 }
