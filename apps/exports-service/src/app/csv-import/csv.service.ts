@@ -16,20 +16,10 @@ export class CsvService {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor() {}
 
-  getData(): { message: string } {
-    return { message: 'Welcome to contacts!' };
-  }
-
   async importCsv(req, res): Promise<any> {
     if (!req || !req.cookies) return null;
     const token = req.cookies['access_token'];
 
-    const http = axios.create({
-      baseURL: 'https://localhost',
-      headers: {
-        cookie: `access_token=${token}`,
-      },
-    });
     let formData = {};
     const csvData = []; // array of objects
 
@@ -63,11 +53,19 @@ export class CsvService {
           // eslint-disable-next-line no-case-declarations, @typescript-eslint/ban-types
           const transactions: Object = JSON.parse(fields.transactions);
           console.log(csvData);
-          await http.post('/contacts/contact/sync', {
-            contacts: csvData,
-            type: Integrations.CSV_IMPORT,
-            transactions,
-          });
+          await axios.post(
+            Host('contacts', 'contacts/contact/sync'),
+            {
+              contacts: csvData,
+              type: Integrations.CSV_IMPORT,
+              transactions,
+            },
+            {
+              headers: {
+                cookie: `access_token=${token}`,
+              },
+            }
+          );
           break;
         case Modules.ITEMS:
           // eslint-disable-next-line no-case-declarations
