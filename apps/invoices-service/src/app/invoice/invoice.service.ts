@@ -6,6 +6,7 @@ import {
   In,
   LessThan,
   Not,
+  Raw,
 } from 'typeorm';
 import { ClientProxy } from '@nestjs/microservices';
 import axios from 'axios';
@@ -84,21 +85,21 @@ export class InvoiceService {
 
       for (const i in data) {
         if (data[i].type === 'search') {
-          const val = data[i].value?.split('%')[1];
-          // const lower = val.toLowerCase();
+          const val = data[i].value?.split('%')[1].toLowerCase();
+
           invoices = await getCustomRepository(InvoiceRepository).find({
             where: {
               status: 1,
               branchId: req.user.branchId,
               organizationId: req.user.organizationId,
-              [i]: ILike(val),
+              [i]: Raw((alias) => `LOWER(${alias}) ILike '%${val}%'`),
             },
             skip: pn * ps - ps,
             take: ps,
             order: {
               [sort_column]: sort_order,
             },
-            relations: ['transactionItems', 'transactionItems.account'],
+            relations: ['invoiceItems'],
           });
         } else if (data[i].type === 'compare') {
           invoices = await getCustomRepository(InvoiceRepository).find({
@@ -113,7 +114,7 @@ export class InvoiceService {
             order: {
               [sort_column]: sort_order,
             },
-            relations: ['transactionItems', 'transactionItems.account'],
+            relations: ['invoiceItems'],
           });
         } else if (data[i].type === 'date-between') {
           const start_date = data[i].value[0];
@@ -130,7 +131,7 @@ export class InvoiceService {
             order: {
               [sort_column]: sort_order,
             },
-            relations: ['transactionItems', 'transactionItems.account'],
+            relations: ['invoiceItems'],
           });
         }
 

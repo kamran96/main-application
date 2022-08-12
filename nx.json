@@ -50,9 +50,6 @@
     "contacts-service": {
       "tags": []
     },
-    "csv-service": {
-      "tags": []
-    },
     "editable-table": {
       "tags": []
     },

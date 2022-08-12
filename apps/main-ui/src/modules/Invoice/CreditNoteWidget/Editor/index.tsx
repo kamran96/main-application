@@ -453,7 +453,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                     <div className="flex alignCenter justifyFlexEnd">
                       <Form.Item name="invoiceDiscount">
                         <InputNumber
-                          onChange={(val) => {
+                           onChange={(val) => {
                             const value = val;
                             clearTimeout(debounce);
 

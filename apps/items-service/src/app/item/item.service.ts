@@ -437,6 +437,29 @@ export class ItemService {
     });
   }
 
+  async GetItemCode(code: string, user: IBaseUser): Promise<any> {
+    const item = await this.itemModel.find({
+      organizationId: user.organizationId,
+      branchId: user.branchId,
+      code: code,
+      status: 1,
+    });
+
+    if (item.length > 0) {
+      return {
+        message: 'Item Code aready exist',
+        statusCode: HttpStatus.BAD_REQUEST,
+        status: false,
+      };
+    } else {
+      return {
+        message: 'Item Code is available',
+        statusCode: HttpStatus.OK,
+        status: true,
+      };
+    }
+  }
+
   async SyncItems(data, req: IRequest): Promise<any> {
     const { user } = req;
     if (data.type === Integrations.XERO) {

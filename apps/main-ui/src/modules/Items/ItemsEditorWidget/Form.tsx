@@ -30,14 +30,19 @@ import { ICategory, IVariants } from '../../../modal/categories';
 import { ITEM_TYPE } from '../../../modal/items';
 import convertToRem from '../../../utils/convertToRem';
 import { DynamicForm } from './DynamicForm';
+import { validateItemCodeAPI } from '../../../api/Items';
 
 const { Option } = Select;
+
+let clearTime: any;
 
 export const ItemsForm: FC = () => {
   /* HOOKS */
   const queryCache = useQueryClient();
   const [formData, setFormData] = useState({});
   const [attribute_values, setAttriValue] = useState([]);
+  const { mutate: mutateValidateCode, isLoading: isValidating } =
+    useMutation(validateItemCodeAPI);
 
   /* Mutations */
   const { mutate: mutateItems, isLoading: itemCreating } =
@@ -92,6 +97,25 @@ export const ItemsForm: FC = () => {
       setAttriValue(totalVariants);
     }
   }, [catId]);
+
+  const checkCodeAvaliable = async (payload, callback) => {
+    const request = payload;
+    clearTimeout(clearTime);
+    clearTime = setTimeout(async () => {
+      await mutateValidateCode(
+        { ...request },
+        {
+          onSuccess: (data) => {
+            if (!data?.data?.status) {
+              callback(data?.data?.message);
+            } else {
+              callback();
+            }
+          },
+        }
+      );
+    }, 400);
+  };
 
   /*Query hook for  Fetching single contact against ID */
   const { data } = useQuery([`item-id=${id}`, id], fetchSingleItem, {
@@ -374,11 +398,17 @@ export const ItemsForm: FC = () => {
             <FormLabel>Item Code</FormLabel>
             <Form.Item
               name="code"
+              hasFeedback
               rules={[
                 { required: true, message: 'Please add item code' },
                 {
                   pattern: /^\S/,
                   message: 'Please add item code',
+                },
+                {
+                  validator: (rule, value, callback) => {
+                    checkCodeAvaliable({ code: value }, callback);
+                  },
                 },
               ]}
             >

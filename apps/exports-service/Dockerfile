@@ -8,15 +8,11 @@ FROM node:lts-alpine
 
 # add dump-init to avoid nodejs as pid 1
 RUN apk add dumb-init
-ENV NODE_ENV production
 ARG PORT
+ARG NODE_ENV
 USER node
 
-ENV MONGO_URI=mongodb+srv://contacts:fYnc4.ZPdz378t4@cluster0.hiwqy.mongodb.net/exports?retryWrites=true&w=majority \
-    GOOGLE_CLIENT_ID=739410132871-45r2feessjs5l5rtbk1kekr5t78aa7ee.apps.googleusercontent.com \
-    GOOGLE_CLIENT_SECRET=ckcvOhikVvHBi7BeU7n2YzKc \
-    PORT=3342 \
-    NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /home/node/app
 
@@ -25,8 +21,7 @@ COPY --chown=node:node --from=build /app /home/node/app/node_modules
 COPY --chown=node:node --from=build /app/package-lock.json /home/node/app/package-lock.json
 COPY --chown=node:node ./dist/apps/exports-service /home/node/app
 
-RUN npm install --production
-RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express
+RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express --legacy-peer-deps
 
 EXPOSE ${PORT}
 CMD [ "dumb-init", "node", "main.js" ]

@@ -12,8 +12,18 @@ export default function (amount: number | string) {
     id: null,
   };
 
+  const valueToFormat =
+  typeof amount === 'string' ? parseFloat(amount) : amount;
+
+if (valueToFormat < 0) {
   return formatMoney(amount, {
     symbol: currency?.symbolNative,
-    format: '%s%v',
+    format: '%s(%v) ',
   });
+} else {
+  return formatMoney(amount, {
+    symbol: currency?.symbolNative,
+    format: '%s%v ',
+  });
+}
 }

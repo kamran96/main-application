@@ -65,3 +65,7 @@ export class ItemCodesDto {
 export class ParamsDto {
   id: string;
 }
+
+export class CodeValidateDto {
+  code: string;
+}

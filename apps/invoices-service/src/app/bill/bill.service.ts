@@ -1,5 +1,12 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { Between, getCustomRepository, ILike, In, LessThan } from 'typeorm';
+import {
+  Between,
+  getCustomRepository,
+  ILike,
+  In,
+  LessThan,
+  Raw,
+} from 'typeorm';
 import axios from 'axios';
 import { BillRepository } from '../repositories/bill.repository';
 import { BillItemRepository } from '../repositories/billItem.repository';
@@ -51,18 +58,18 @@ export class BillService {
 
       for (const i in data) {
         if (data[i].type === 'search') {
-          const val = data[i].value?.split('%')[1];
-          // const lower = val.toLowerCase();
+          const val = data[i].value?.split('%')[1].toLowerCase();
+
           bills = await getCustomRepository(BillRepository).find({
             where: {
               status: 1,
               branchId: req.user.branchId,
               organizationId: req.user.organizationId,
-              [i]: ILike(val),
+              [i]: Raw((alias) => `LOWER(${alias}) ILike '%${val}%'`),
             },
             skip: pn * ps - ps,
             take: ps,
-            relations: ['purchaseItems', 'purchaseItems.account'],
+            relations: ['purchaseItems'],
           });
         } else if (data[i].type === 'compare') {
           bills = await getCustomRepository(BillRepository).find({
@@ -74,7 +81,7 @@ export class BillService {
             },
             skip: pn * ps - ps,
             take: ps,
-            relations: ['purchaseItems', 'purchaseItems.account'],
+            relations: ['purchaseItems'],
           });
         } else if (data[i].type === 'date-between') {
           const start_date = data[i].value[0];
@@ -88,7 +95,7 @@ export class BillService {
             },
             skip: pn * ps - ps,
             take: ps,
-            relations: ['purchaseItems', 'purchaseItems.account'],
+            relations: ['purchaseItems'],
           });
         }
 

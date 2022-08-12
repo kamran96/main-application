@@ -310,56 +310,6 @@
         }
       }
     },
-    "csv-service": {
-      "root": "apps/csv-service",
-      "sourceRoot": "apps/csv-service/src",
-      "projectType": "application",
-      "targets": {
-        "build": {
-          "executor": "@nrwl/node:build",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "outputPath": "dist/apps/csv-service",
-            "main": "apps/csv-service/src/main.ts",
-            "tsConfig": "apps/csv-service/tsconfig.app.json",
-            "assets": ["apps/csv-service/src/assets"]
-          },
-          "configurations": {
-            "production": {
-              "optimization": true,
-              "extractLicenses": true,
-              "inspect": false,
-              "fileReplacements": [
-                {
-                  "replace": "apps/csv-service/src/environments/environment.ts",
-                  "with": "apps/csv-service/src/environments/environment.prod.ts"
-                }
-              ]
-            }
-          }
-        },
-        "serve": {
-          "executor": "@nrwl/node:execute",
-          "options": {
-            "buildTarget": "csv-service:build"
-          }
-        },
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["apps/csv-service/**/*.ts"]
-          }
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/csv-service"],
-          "options": {
-            "jestConfig": "apps/csv-service/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
     "editable-table": {
       "root": "libs/editable-table",
       "sourceRoot": "libs/editable-table/src",
@@ -568,10 +518,10 @@
                   "replace": "apps/exports-service/src/environments/environment.ts",
                   "with": "apps/exports-service/src/environments/environment.prod.ts"
                 }
-              ],
-              "generatePackageJson": true
+              ]
             }
-          }
+          },
+          "generatePackageJson": true
         },
         "serve": {
           "executor": "@nrwl/node:execute",

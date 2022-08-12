@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { Between, getCustomRepository, ILike, In } from 'typeorm';
+import { Between, getCustomRepository, ILike, In, Raw } from 'typeorm';
 import axios from 'axios';
 import * as moment from 'moment';
 import { Sorting } from '@invyce/sorting';
@@ -60,19 +60,19 @@ export class CreditNoteService {
 
       for (const i in data) {
         if (data[i].type === 'search') {
-          const val = data[i].value?.split('%')[1];
-          // const lower = val.toLowerCase();
+          const val = data[i].value?.split('%')[1].toLowerCase();
+
           credit_note = await getCustomRepository(CreditNoteRepository).find({
             where: {
               status: status,
               branchId: req.user.branchId,
               organizationId: req.user.organizationId,
               invoiceType: invoice_type,
-              [i]: ILike(val),
+              [i]: Raw((alias) => `LOWER(${alias}) ILike '%${val}%'`),
             },
             skip: pn * ps - ps,
             take: ps,
-            // relations: ['creditNoteItems', 'creditNoteItems.account'],
+            relations: ['creditNoteItems'],
           });
         } else if (data[i].type === 'compare') {
           credit_note = await getCustomRepository(CreditNoteRepository).find({
@@ -85,7 +85,7 @@ export class CreditNoteService {
             },
             skip: pn * ps - ps,
             take: ps,
-            // relations: ['creditNoteItems', 'creditNoteItems.account'],
+            relations: ['creditNoteItems'],
           });
         } else if (data[i].type === 'date-between') {
           const start_date = data[i].value[0];
@@ -100,7 +100,7 @@ export class CreditNoteService {
             },
             skip: pn * ps - ps,
             take: ps,
-            // relations: ['creditNoteItems', 'creditNoteItems.account'],
+            relations: ['creditNoteItems'],
           });
         }
 
