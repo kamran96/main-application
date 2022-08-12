@@ -110,10 +110,15 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
       setInvoiceItems(val);
     });
 
+    console.log(error, "error",  value, "value")
+
     if (!error?.length) {
       const [filteredContact] = contactResult?.filter(
         (i) => i.id === value?.contactId
       );
+
+      console.log(filteredContact, "filterredContact")
+
       let payload: any = {
         ...value,
         status: value.status.status,
