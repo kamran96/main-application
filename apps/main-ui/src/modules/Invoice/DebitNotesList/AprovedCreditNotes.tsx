@@ -73,7 +73,7 @@ export const AprovedDebitNotes: FC = () => {
       const { result } = contactsData.data;
       const schema = FilteringSchema;
       schema.contactId.value = result.filter(
-        (item) => item.contactType === IContactTypes.CUSTOMER
+        (item) => item.contactType === IContactTypes.SUPPLIER
       );
       setFilteringSchema(schema);
     }

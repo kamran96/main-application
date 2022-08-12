@@ -110,7 +110,7 @@ export const RegisterForm: FC = () => {
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
-
+  
   const prefixSelector = (
     <Form.Item name="prefix" noStyle>
       <Select

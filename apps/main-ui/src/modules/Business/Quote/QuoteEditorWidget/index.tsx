@@ -79,7 +79,7 @@ export const QuoteEditorWidget: FC = () => {
           <Breadcrumb.Item>
             <Link to={`/app${ISupportedRoutes.QUOTE}`}>Quotes</Link>
           </Breadcrumb.Item>
-          <Breadcrumb.Item>New Quuote</Breadcrumb.Item>
+          <Breadcrumb.Item>New Quote</Breadcrumb.Item>
         </Breadcrumb>
       </BreadCrumbArea>
       <TableCard>

@@ -472,7 +472,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
                       <FormLabel>Amount Are</FormLabel>
                       <Form.Item
                         name="isTaxIncluded"
-                        rules={[{ required: true, message: 'Required !' }]}
+                        rules={[{ required: false, message: 'Required!' }]}
                       >
                         <Select
                           size="middle"
@@ -602,7 +602,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
                     </p>
                   </Col>
 
-                  <Col className="flex alignCenter" span={12}>
+                  {/* <Col className="flex alignCenter" span={12}>
                     <p className="bold">Adjustments</p>
                   </Col>
                   <Col span={12}>
@@ -621,7 +621,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
                         />
                       </Form.Item>
                     </div>
-                  </Col>
+                  </Col> */}
                   <Col span={24}>
                     <Seprator />
                   </Col>

@@ -17,6 +17,7 @@ export const useCols = () => {
     if (history?.location?.search) {
       const filterType = history.location.search.split('&');
       const filterIdType = filterType[1];
+
       const filterOrder = filterType[4]?.split('=')[1];
 
       if (filterIdType?.includes('-')) {
@@ -34,6 +35,8 @@ export const useCols = () => {
       }
     }
   }, [history?.location?.search]);
+
+  console.log(sortedInfo?.columnKey, "sortedInfo?.columnKey", sortedInfo?.order, "sortedInfo Order");
 
   const InvoiceColumns: ColumnsType<any> = [
     {

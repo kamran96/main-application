@@ -174,14 +174,17 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
         sortid:
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
-            : sorter.order === 'asceend' ? sorter.field : 'id',
+            : sorter?.order === 'ascend' ? sorter.field : 'id',
       });
-      const route = `/app${ISupportedRoutes.INVOICES
-        }?tabIndex=awating_payment&sortid=${sorter && sorter.order === 'descend'
-          ? `-${sorter.field}`
-          : sorter.order === 'asceend' ? sorter.field : 'id'
-        }&page=${pagination.current
-        }&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=awating_payment&sortid=${
+        sorter && sorter?.order === 'descend'
+          ? `-${sorter?.field}`
+          : sorter?.order === 'ascend'
+          ? sorter.field
+          : 'id'
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+        sorter?.order
+      }&query=${query}`;
       history.push(route);
     }
   }

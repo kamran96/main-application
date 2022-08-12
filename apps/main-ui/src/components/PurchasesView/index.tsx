@@ -692,23 +692,26 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
                     <td>{moneyFormat(response?.grossTotal)}</td>
                   </tr>
                   {type !== IInvoiceType.PURCHASE_ORDER &&
-                  type !== IInvoiceType.BILL ? (
-                    <>
-                      <tr>
+                    type !== IInvoiceType.BILL &&
+                    type !== IInvoiceType.CREDITNOTE &&
+                    (
+                        <>
+                          {/* <tr>
                         <th>Items Discount</th>
                         <td>{response && moneyFormat(itemsDiscount)}</td>
-                      </tr>
-                      <tr>
-                        <th>Invoice Discount</th>
-                        <td>{response && moneyFormat(invoiceDiscount)}</td>
-                      </tr>
-                    </>
-                  ) : (
-                    <tr>
-                      <th>Adjustments</th>
-                      <td>{response && moneyFormat(response?.adjustment)}</td>
-                    </tr>
-                  )}
+                      </tr> */}
+                          <tr>
+                            <th>Invoice Discount</th>
+                            <td>{response && moneyFormat(invoiceDiscount)}</td>
+                          </tr>
+                        </>
+                        // ) : (
+                        //   <tr>
+                        //     <th>Adjustments</th>
+                        //     <td>{response && moneyFormat(response?.adjustment)}</td>
+                        //   </tr>
+                        // )
+                      )}
                   <tr>
                     <th>Tax Rate</th>
                     <td>{response && moneyFormat(TotalTax)}</td>
@@ -806,39 +809,6 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
         visibility={emailModal}
         setVisibility={(a) => setEmailModal(a)}
       />
-      {/* <CommonModal
-        visible={dueDate}
-        title="Change Due Date"
-        width={400}
-        onCancel={() => {
-          setDueDate(false);
-        }}
-        footer={
-          <>
-            <Button type="text" onClick={() => setDueDate(false)}>
-              Cancel
-            </Button>
-            <Button type="primary"> Update </Button>
-          </>
-        }
-      >
-        <Form>
-          <FormLabel>Due Date</FormLabel>
-          <Form.Item
-            name="issueDate"
-            rules={[{ required: true, message: 'Required !' }]}
-          >
-            <DatePicker
-              disabledDate={(current) => {
-                return current > dayjs().endOf('day');
-              }}
-              style={{ width: '100%' }}
-              size="middle"
-            />
-          </Form.Item>
-        </Form>
-      </CommonModal> */}
-
       <div className="_visibleOnPrint" ref={printRef}>
         <PrintFormat>
           <PrintViewPurchaseWidget
