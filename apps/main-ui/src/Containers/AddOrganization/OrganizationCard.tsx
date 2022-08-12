@@ -96,7 +96,7 @@ const CardWrapper = styled.div`
   min-width: 290px;
   height: 260px;
   background: ${(props: IThemeProps) => props.theme.colors.cardBg};
-  border: 1px solid #dff0ff;
+  border: 1px solid ${(props: IThemeProps) => props.theme.colors.organizationCard};
   border-radius: 8px;
   margin: 12px;
   padding: 6px 16px;
