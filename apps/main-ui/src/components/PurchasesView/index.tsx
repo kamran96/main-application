@@ -55,7 +55,8 @@ interface IProps {
     | IInvoiceType.INVOICE
     | IInvoiceType.PURCHASE_ORDER
     | IInvoiceType.BILL
-    | IInvoiceType.CREDITNOTE;
+    | IInvoiceType.CREDITNOTE
+    | IInvoiceType.DEBITNOTE;
   id?: number | string;
   onApprove?: (payload?: any) => void;
 }
@@ -111,10 +112,14 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
     }
   );
 
+  console.log(data, "data")
+
+  
   const response = plainToClass(
     IInvoiceMutatedResult,
     data?.data
   )?.getConstructedResult();
+
 
   const { mutate: mutateApprove, isLoading: approving } =
     useMutation(APISTAKE_APPROVED);
@@ -470,9 +475,9 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
       ? 'Purchase Order'
       : type === IInvoiceType.CREDITNOTE
       ? 'Credit Note'
-      : type === IInvoiceType.QUOTE
-      ? 'Quote'
-      : 'Debit Note';
+      : type === IInvoiceType.DEBITNOTE
+      ? 'Debit Note'
+      : 'Quote';
 
   return (
     <WrapperNewPurchaseView>
