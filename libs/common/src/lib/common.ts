@@ -21,7 +21,7 @@ export const getCountryById = (id: number) => {
 };
 
 export const moneyFormatJs = (
-  amount: number | string,
+  amount: number | string = 0,
   currency: ICurrency = {
     name: 'United States dollar',
     code: 'USD',
@@ -30,10 +30,20 @@ export const moneyFormatJs = (
     symbolNative: '$',
   }
 ) => {
-  return formatMoney(amount, {
-    symbol: currency?.symbol,
-    format: '%s %v ',
-  });
+  const valueToFormat =
+    typeof amount === 'string' ? parseFloat(amount) : amount;
+
+  if (valueToFormat < 0) {
+    return formatMoney(amount, {
+      symbol: currency?.symbol,
+      format: '%s(%v) ',
+    });
+  } else {
+    return formatMoney(amount, {
+      symbol: currency?.symbol,
+      format: '%s%v ',
+    });
+  }
 };
 
 export const Capitalize = (sentance) => {
