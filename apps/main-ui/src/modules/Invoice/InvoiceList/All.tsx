@@ -175,15 +175,15 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
         sortid:
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
-            : sorter.order === 'asceend' ? sorter.field : 'id',
+            : sorter?.order === 'asceend' ? sorter.field : 'id',
       });
       const route = `/app${ISupportedRoutes.INVOICES
-        }?tabIndex=all&sortid=${sorter && sorter.order === 'descend'
-          ? `-${sorter.field} `
-          : sorter.order === 'ascend' ? sorter.field : 'id'
-        }&page=${pagination.current}&page_size=${pagination.pageSize
-        }&filter=${sorter.order}&query=${query}`;
-      history.push(route);
+      }?tabIndex=all&sortid=${sorter && sorter?.order === 'descend'
+        ? `-${sorter?.field}`
+        : sorter?.order === 'ascend' ? sorter.field : 'id'
+      }&page=${pagination.current
+      }&page_size=${pagination.pageSize}&filter=${sorter?.order}&query=${query}`;
+    history.push(route);
     }
   }
 

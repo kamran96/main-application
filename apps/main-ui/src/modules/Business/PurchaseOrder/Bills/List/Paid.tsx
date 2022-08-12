@@ -296,8 +296,8 @@ export const PaidBills: FC<IProps> = ({ columns, activeTab }) => {
         topbarRightPannel={renerTopRightbar()}
         customTopbar={
           <PurchaseTopbar
-            onDelete={() => setConfirmModal(true)}
-            isAbleToDelete={rbac.can(PERMISSIONS.PURCHASES_DELETE)}
+            // onDelete={() => setConfirmModal(true)}
+            isAbleToDelete={false}
             disabled={!selectedRow.length}
           />
         }

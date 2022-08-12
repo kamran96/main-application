@@ -110,7 +110,7 @@ export const OverDueInvoices: FC<IProps> = ({ columns }) => {
       page,
       page_size,
       query,
-      sortid
+      sortid,
     ],
     getInvoiceListAPI,
     {
@@ -259,7 +259,7 @@ export const OverDueInvoices: FC<IProps> = ({ columns }) => {
                 }
               });
 
-              setAllInvoicesRes(prev => ({ ...prev, result: userData }))
+              setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
             } else {
               const userData = [...result].sort((a, b) => {
                 if (a[sorter?.field] < b[sorter?.field]) {
@@ -269,7 +269,7 @@ export const OverDueInvoices: FC<IProps> = ({ columns }) => {
                 }
               });
 
-              setAllInvoicesRes(prev => ({ ...prev, result: userData }))
+              setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
             }
             setAllInvoicesConfig({
               ...allInvoicesConfig,
@@ -278,14 +278,21 @@ export const OverDueInvoices: FC<IProps> = ({ columns }) => {
               sortid:
                 sorter && sorter.order === 'descend'
                   ? `-${sorter.field}`
-                  : sorter.order === 'asceend' ? sorter.field : 'id',
+                  : sorter.order === 'asceend'
+                  ? sorter.field
+                  : 'id',
             });
-            const route = `/app${ISupportedRoutes.INVOICES
-              }?tabIndex=due_expired&sortid=${sorter && sorter.order === 'descend'
-                ? `-${sorter.field}`
-                : sorter.order === 'asceend' ? sorter.field : 'id'
-              }&page=${pagination.current
-              }&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+            const route = `/app${
+              ISupportedRoutes.INVOICES
+            }?tabIndex=due_expired&sortid=${
+              sorter && sorter?.order === 'descend'
+                ? `-${sorter?.field}`
+                : sorter?.order === 'ascend'
+                ? sorter.field
+                : 'id'
+            }&page=${pagination.current}&page_size=${
+              pagination.pageSize
+            }&filter=${sorter?.order}&query=${query}`;
             history.push(route);
           }
         }}
