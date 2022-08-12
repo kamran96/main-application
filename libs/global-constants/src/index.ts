@@ -93,7 +93,9 @@ export const useApiCallback = (route: string) => {
   const service = route.split('/')[0];
   const baseURL =
     process.env['NODE' + '_ENV'] === 'production'
-      ? `http://${service}.default.svc.cluster.local/${route}`
+      ? `http://prod-${service}.prod.svc.cluster.local/${route}`
+      : process.env['NODE' + '_ENV'] === 'staging'
+      ? `http://staging-${service}.staging.svc.cluster.local/${route}`
       : `https://localhost/${route}`;
 
   const http = axios.create({

@@ -14,10 +14,8 @@ describe('AppService', () => {
   });
 
   describe('getData', () => {
-    it('should return "Welcome to exports-service!"', () => {
-      expect(service.getData()).toEqual({
-        message: 'Welcome to exports-service!',
-      });
+    it('should return "Welcome to csv-service!"', () => {
+      expect(service.getData()).toEqual({ message: 'Welcome to csv-service!' });
     });
   });
 });
