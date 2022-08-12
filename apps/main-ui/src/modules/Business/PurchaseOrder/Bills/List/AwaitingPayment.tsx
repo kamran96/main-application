@@ -304,7 +304,7 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
         customTopbar={
           <PurchaseTopbar
             onDelete={() => setConfirmModal(true)}
-            isAbleToDelete={rbac.can(PERMISSIONS.PURCHASES_DELETE)}
+            isAbleToDelete={false}
             disabled={!selectedRow.length}
           />
         }

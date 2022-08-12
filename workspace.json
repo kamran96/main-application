@@ -505,7 +505,8 @@
             "outputPath": "dist/apps/exports-service",
             "main": "apps/exports-service/src/main.ts",
             "tsConfig": "apps/exports-service/tsconfig.app.json",
-            "assets": ["apps/exports-service/src/assets"]
+            "assets": ["apps/exports-service/src/assets"],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {
@@ -519,7 +520,8 @@
                 }
               ]
             }
-          }
+          },
+          "generatePackageJson": true
         },
         "serve": {
           "executor": "@nrwl/node:execute",
