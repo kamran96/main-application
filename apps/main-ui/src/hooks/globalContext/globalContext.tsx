@@ -82,7 +82,12 @@ interface IGlobalContextvalues {
     branchId?: number
   ) => void;
   paymentsModalConfig?: IModalsConfig;
-  setPaymentsModalConfig?: (visibility: boolean, id?: number) => void;
+  setPaymentsModalConfig?: (
+    visibility: boolean,
+    id?: number,
+    type?: 'payable' | 'receivable',
+    orders?: string[] | number[]
+  ) => void;
   categoryModalConfig?: IModalsConfig;
   setCategoryModalConfig?: (
     visibility: boolean,

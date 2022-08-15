@@ -205,7 +205,7 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
     // console.log(payload, "payload");
     await mutateDeleteOrders(payload, {
       onSuccess: () => {
-        ['invoices', 'transactions?page', 'items?page', 'invoice-view'].forEach(
+        ['invoices', 'transactions?page', 'items-list', 'invoice-view'].forEach(
           (key) => {
             (queryCache.invalidateQueries as any)((q) =>
               q.queryKey[0].toString().startsWith(key)

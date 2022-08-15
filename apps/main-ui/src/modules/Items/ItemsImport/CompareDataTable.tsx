@@ -65,7 +65,7 @@ export const CompareDataTable: FC<IProps> = ({
           'Items Imported Successfully'
         );
         onSuccess();
-        ['item-id', 'items?page', 'all-items'].forEach((key) => {
+        ['item-id', 'items-list', 'all-items'].forEach((key) => {
           (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
         });
       },

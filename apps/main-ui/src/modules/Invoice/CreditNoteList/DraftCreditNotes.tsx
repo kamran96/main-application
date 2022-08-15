@@ -38,7 +38,7 @@ export const DraftCreditNotes: FC = () => {
   const { notificationCallback } = useGlobalContext();
   const history = useHistory();
   const { location } = history;
-  const {columns, pdfCols } = useCols();
+  const { columns, pdfCols } = useCols();
 
   const queryCache = useQueryClient();
 
@@ -59,7 +59,7 @@ export const DraftCreditNotes: FC = () => {
     page: 1,
     pageSize: 20,
     query: '',
-    sortid: 'id'
+    sortid: 'id',
   });
   const { page, pageSize, sortid, query } = creditNoteConfig;
 
@@ -75,7 +75,7 @@ export const DraftCreditNotes: FC = () => {
       pageSize,
       IInvoiceType.CREDITNOTE,
       query,
-      sortid
+      sortid,
     ],
     getCreditNotes,
     {
@@ -88,20 +88,17 @@ export const DraftCreditNotes: FC = () => {
     getAllContacts
   );
 
-
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
-    if(sorter.order === undefined){
+    if (sorter.order === undefined) {
       setCreditNoteConfig({
         ...creditNoteConfig,
         page: pagination.current,
         pageSize: pagination.pageSize,
-        sortid: 'id'
+        sortid: 'id',
       });
       const route = `/app${ISupportedRoutes.CREDIT_NOTES}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
       history.push(route);
-    }
-    else{
-
+    } else {
       if (sorter?.order === 'ascend') {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] > b[sorter?.field]) {
@@ -110,8 +107,8 @@ export const DraftCreditNotes: FC = () => {
             return -1;
           }
         });
-        
-        setCreditNoteResponse(prev =>({...prev,  result: userData}))
+
+        setCreditNoteResponse((prev) => ({ ...prev, result: userData }));
       } else {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
@@ -120,25 +117,29 @@ export const DraftCreditNotes: FC = () => {
             return -1;
           }
         });
-        
-        setCreditNoteResponse(prev =>({...prev,  result: userData}))
+
+        setCreditNoteResponse((prev) => ({ ...prev, result: userData }));
       }
 
       setCreditNoteConfig({
         ...creditNoteConfig,
         page: pagination.current,
         pageSize: pagination.pageSize,
-        sortid: sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
+        sortid:
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field,
       });
-      const route = `/app${ISupportedRoutes.CREDIT_NOTES}?tabIndex=draft&sortid=${
-        sorter && sorter.order === 'descend'
-          ? `-${sorter.field}`
-          : sorter.field
-      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      const route = `/app${
+        ISupportedRoutes.CREDIT_NOTES
+      }?tabIndex=draft&sortid=${
+        sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+        sorter.order
+      }&query=${query}`;
       history.push(route);
     }
-  }
-
+  };
 
   useEffect(() => {
     if (contactsData?.data?.result) {
@@ -189,7 +190,7 @@ export const DraftCreditNotes: FC = () => {
           [
             'invoices',
             'transactions',
-            'items?page',
+            'items-list',
             'invoice-view',
             'ledger-contact',
             'all-items',

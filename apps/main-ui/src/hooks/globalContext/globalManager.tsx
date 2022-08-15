@@ -124,6 +124,8 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     {
       id: null,
       visibility: false,
+      type: 'payable',
+      orders: [],
     }
   );
   const [branchModalConfig, setBranchModalConfig] = useState<IModalsConfig>({
@@ -532,8 +534,13 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         paymentsModalConfig: useMemo(() => {
           return paymentsModalConfig;
         }, [paymentsModalConfig]),
-        setPaymentsModalConfig: (visibility: boolean, id: number = null) => {
-          setPaymentsModalConfig({ visibility, id });
+        setPaymentsModalConfig: (
+          visibility: boolean,
+          id: number = null,
+          type = 'payable',
+          orders: []
+        ) => {
+          setPaymentsModalConfig({ visibility, id, type, orders });
         },
         categoryModalConfig: useMemo(() => {
           return categoryModalConfig;

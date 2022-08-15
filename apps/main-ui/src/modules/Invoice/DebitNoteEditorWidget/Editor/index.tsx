@@ -110,7 +110,6 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
       setInvoiceItems(val);
     });
 
-
     if (!error?.length) {
       let payload: any = {
         ...value,
@@ -159,7 +158,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
           [
             'invoices',
             'transactions?page',
-            'items?page',
+            'items-list',
             'invoice-view',
             'ledger-contact',
             'all-items',

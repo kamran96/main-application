@@ -147,7 +147,7 @@ export const OverDueInvoices: FC<IProps> = ({ columns }) => {
         [
           'invoices',
           'transactions',
-          'items?page',
+          'items-list',
           'invoice-view',
           'ledger-contact',
           'all-items',

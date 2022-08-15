@@ -189,7 +189,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
           [
             'invoices',
             'transactions?page',
-            'items?page',
+            'items-list',
             'invoice-view',
             'ledger-contact',
             'all-items',

@@ -40,11 +40,19 @@ export const PaymentsForm: FC = () => {
   const [amountPaid, setAmountPaid] = useState<any>(0);
   const { mutate: mutatePayment, isLoading: paymentMutateLoading } =
     useMutation(paymentCreateAPI);
-  const { notificationCallback, routeHistory } = useGlobalContext();
+  const {
+    notificationCallback,
+    routeHistory,
+    paymentsModalConfig,
+    setPaymentsModalConfig,
+  } = useGlobalContext();
+  const { type, orders } = paymentsModalConfig;
   const { history } = routeHistory;
 
+  console.log(paymentsModalConfig, 'config');
+
   useEffect(() => {
-    if (history && history.location && history.location.search) {
+    if (history?.location?.search) {
       const type = history.location.search.split('=')[1];
       if (type === 'received') {
         setFormData({ ...formData, paymentMode: TRANSACTION_MODE.RECEIVABLES });
@@ -90,10 +98,7 @@ export const PaymentsForm: FC = () => {
   const paid = amountPaid ? amountPaid : 0;
 
   const remainingTotal = Math.abs(balance) - paid;
-
-  const { paymentsModalConfig, setPaymentsModalConfig } = useGlobalContext();
   const onFinish = async (values) => {
-
     // return false;
     const paid_invyces = _invoiceData.map(
       (invyce: IInvoiceItem, index: number) => {
@@ -238,7 +243,7 @@ export const PaymentsForm: FC = () => {
         onFinishFailed={onFinishFailed}
         form={form}
         onValuesChange={handleChangedValue}
-      // onValuesChange={handleChangedValue}
+        // onValuesChange={handleChangedValue}
       >
         <Row gutter={24}>
           <Col span={12}>
@@ -393,10 +398,11 @@ export const PaymentsForm: FC = () => {
           </Col>
           <Col span={24}>
             <div
-              className={`pv-10 ${contact_id && !formData.runningPayment
+              className={`pv-10 ${
+                contact_id && !formData.runningPayment
                   ? 'table_visible'
                   : `table_disable`
-                }`}
+              }`}
             >
               <CommonTable
                 data={!contact_id ? [] : _invoiceData}
