@@ -9,6 +9,7 @@ const cancelSource = axios.CancelToken.source();
 
 const host = window.location.hostname;
 
+
 if (host && host === 'cloud.invyce.com') {
   // set online server endpoints
 

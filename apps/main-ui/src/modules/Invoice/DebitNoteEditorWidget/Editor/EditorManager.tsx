@@ -62,7 +62,7 @@ export const usePurchaseWidget: any = () => useContext(PurchaseContext);
 
 interface IProps {
   children?: ReactElement<any>;
-  type?: 'CN';
+  type?: 'DN';
   id?: number | string;
   onSubmit?: (payload: any) => void;
 }

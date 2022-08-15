@@ -112,14 +112,12 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
     }
   );
 
-  console.log(data, "data")
 
-  
+
   const response = plainToClass(
     IInvoiceMutatedResult,
     data?.data
   )?.getConstructedResult();
-
 
   const { mutate: mutateApprove, isLoading: approving } =
     useMutation(APISTAKE_APPROVED);
@@ -344,6 +342,8 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
     },
   ];
 
+ 
+
   const _options: IInvoiceOptions[] = [
     (response?.invoiceType === IInvoiceType.PURCHASE_ORDER ||
       response?.invoiceType === IInvoiceType.QUOTE) && {
@@ -371,12 +371,13 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
     },
 
     (response?.invoiceType === IInvoiceType?.PURCHASE_ENTRY ||
-      response?.invoiceType === IInvoiceType?.INVOICE) && {
-      title: 'Add Credit note',
+      response?.invoiceType === IInvoiceType?.INVOICE) &&
+      {
+      title: response?.invoiceType===IInvoiceType.PURCHASE_ENTRY ? 'Add Debit note' : 'Add Credit note',
       permission: PERMISSIONS?.INVOICES_CREATE,
       key: IInvoiceActions.CREDIT_NOTE,
     },
-
+    
     {
       title: 'Email',
       permission: null,
@@ -699,24 +700,12 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
                   {type !== IInvoiceType.PURCHASE_ORDER &&
                     type !== IInvoiceType.BILL &&
                     type !== IInvoiceType.CREDITNOTE &&
-                    (
-                        <>
-                          {/* <tr>
-                        <th>Items Discount</th>
-                        <td>{response && moneyFormat(itemsDiscount)}</td>
-                      </tr> */}
-                          <tr>
-                            <th>Invoice Discount</th>
-                            <td>{response && moneyFormat(invoiceDiscount)}</td>
-                          </tr>
-                        </>
-                        // ) : (
-                        //   <tr>
-                        //     <th>Adjustments</th>
-                        //     <td>{response && moneyFormat(response?.adjustment)}</td>
-                        //   </tr>
-                        // )
-                      )}
+                    type !== IInvoiceType.DEBITNOTE && (
+                      <tr>
+                        <th>Invoice Discount</th>
+                        <td>{response && moneyFormat(invoiceDiscount)}</td>
+                      </tr>
+                    )}
                   <tr>
                     <th>Tax Rate</th>
                     <td>{response && moneyFormat(TotalTax)}</td>
@@ -772,43 +761,6 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
           )}
         </Row>
       </Card>
-      {/* <CommonModal
-        footer={false}
-        onCancel={() => setPaymentModal(false)}
-        visible={paymentModal}
-      >
-        <Payment
-          initialValues={{
-            ...payment,
-            totalAmount: response && response.netTotal,
-            totalDiscount: response && response.discount,
-          }}
-          reset={false}
-          onChange={(payload) => setPayment(payload)}
-        />
-        <div className="mv-10 pb-10 textRight">
-          <Button
-            className="mr-10"
-            type="primary"
-            ghost
-            size="middle"
-            onClick={() => {
-              setPaymentModal(false);
-              setPayment({ ...defaultStates });
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            loading={approving}
-            onClick={handleApprove}
-            type="primary"
-            size="middle"
-          >
-            Payment Proceed
-          </Button>
-        </div>
-      </CommonModal> */}
       <EmailModal
         onSendEmail={onEmail}
         visibility={emailModal}
@@ -1051,4 +1003,6 @@ const WrapperNewPurchaseView = styled.div`
   div.ant-table-body {
     overflow-x: hidden;
   }
+
+
 `;

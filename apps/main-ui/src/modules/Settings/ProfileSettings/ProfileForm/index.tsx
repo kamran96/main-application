@@ -145,7 +145,7 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
                 <FormLabel>Country</FormLabel>
                 <Form.Item name="country" rules={[{ required: true }]}>
                   <Select
-                    size="middle"
+                    size="large"
                     showSearch
                     style={{ width: '100%' }}
                     placeholder="Select a Country"
@@ -200,7 +200,7 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
                     addonBefore={prefixSelector}
                     type="text"
                     placeholder="3188889898"
-                    size="middle"
+                    size="large"
                   />
                 </Form.Item>
               </Col>

@@ -45,7 +45,7 @@ enum ISUBMITTYPE {
 }
 
 interface IProps {
-  type?: 'CN';
+  type?: 'DN';
   id?: number | string;
   onSubmit?: (payload: any) => void;
 }
