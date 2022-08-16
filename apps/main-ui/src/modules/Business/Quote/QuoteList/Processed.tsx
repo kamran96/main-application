@@ -86,7 +86,7 @@ export const ProcessedQuotations: FC<IProps> = ({ columns }) => {
         [
           'invoices-quoutes',
           'transactions',
-          'items?page',
+          'items-list',
           'invoice-view',
           'ledger-contact',
           'all-items',

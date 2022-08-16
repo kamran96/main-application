@@ -13,6 +13,13 @@ interface IProps {
 }
 
 export const ItemDetails: FC<IProps> = ({ result, id }) => {
+  const TruncateString = (str: string, length: number) => {
+    if (str.length > length) {
+      return str.substring(0, length) + '...';
+    }
+    return str + '.';
+  };
+
   return (
     <Card className="_itemdetailcard">
       <div className="flex">
@@ -24,37 +31,37 @@ export const ItemDetails: FC<IProps> = ({ result, id }) => {
           <h4>Item Code: </h4>
         </Col>
         <Col span={15}>
-          <p>{result?.code}</p>
+          <h4>{result?.code}</h4>
         </Col>
         <Col span={7}>
           <h4>Item Name: </h4>
         </Col>
         <Col span={15} className="capitalize">
-          {result?.name}
+          <h4> {result?.name}</h4>
         </Col>
         <Col span={7}>
           <h4>Item Purcahse Price: </h4>
         </Col>
         <Col span={15}>
-          <p>{moneyFormat(result?.price?.purchasePrice)}</p>
+          <h4>{moneyFormat(result?.price?.purchasePrice)}</h4>
         </Col>
         <Col span={7}>
           <h4>Item Sale Price: </h4>
         </Col>
         <Col span={15}>
-          <p>{moneyFormat(result?.price?.salePrice)}</p>
+          <h4>{moneyFormat(result?.price?.salePrice)}</h4>
         </Col>
         <Col span={7}>
           <h4>Description: </h4>
         </Col>
         <Col span={15}>
-          <p>{result?.description}</p>
+          <h4>{TruncateString(result?.description, 70)}</h4>
         </Col>
         <Col span={7}>
           <h4>Added Date: </h4>
         </Col>
         <Col span={15}>
-          <p>{dayjs(result?.createdAt).format('DD/MM/YYYY h:mm A')}</p>
+          <h4>{dayjs(result?.createdAt).format('DD/MM/YYYY h:mm A')}</h4>
         </Col>
       </Row>
       <Seprator />

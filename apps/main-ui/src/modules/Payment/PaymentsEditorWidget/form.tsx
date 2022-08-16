@@ -25,7 +25,6 @@ import {
 import { IInvoiceItem, IInvoiceResult } from '../../../modal/invoice';
 import moneyFormat from '../../../utils/moneyFormat';
 import Columns from './columns';
-import { async } from 'rxjs';
 
 const { Option } = Select;
 
@@ -40,11 +39,18 @@ export const PaymentsForm: FC = () => {
   const [amountPaid, setAmountPaid] = useState<any>(0);
   const { mutate: mutatePayment, isLoading: paymentMutateLoading } =
     useMutation(paymentCreateAPI);
-  const { notificationCallback, routeHistory } = useGlobalContext();
+  const {
+    notificationCallback,
+    routeHistory,
+    paymentsModalConfig,
+    setPaymentsModalConfig,
+  } = useGlobalContext();
   const { history } = routeHistory;
 
+  const { contactId, type, orders } = paymentsModalConfig;
+
   useEffect(() => {
-    if (history && history.location && history.location.search) {
+    if (history?.location?.search) {
       const type = history.location.search.split('=')[1];
       if (type === 'received') {
         setFormData({ ...formData, paymentMode: TRANSACTION_MODE.RECEIVABLES });
@@ -82,6 +88,55 @@ export const PaymentsForm: FC = () => {
     };
   }, []);
 
+  // useEffect(() => {
+
+  //   if (type === 'receivable') {
+  //     setFormData({
+  //       ...formData,
+  //       paymentMode: TRANSACTION_MODE.RECEIVABLES,
+  //       contactId: contactId,
+  //     });
+  //     form.setFieldsValue({
+  //       paymentMode: TRANSACTION_MODE.RECEIVABLES,
+  //       contactId: contactId,
+  //     });
+  //     setContactId(contactId);
+  //   } else {
+  //     setFormData({
+  //       ...formData,
+  //       paymentMode: TRANSACTION_MODE.PAYABLES,
+  //       contactId: contactId,
+  //     });
+  //     form.setFieldsValue({
+  //       paymentMode: TRANSACTION_MODE.PAYABLES,
+  //       contactId: contactId,
+  //     });
+  //   }
+  // }, [paymentsModalConfig?.contactId]);
+
+  useEffect(() => {
+    if (type && contactId && orders) {
+      form.setFieldsValue({
+        paymentMode:
+          type === 'payable'
+            ? TRANSACTION_MODE.PAYABLES
+            : TRANSACTION_MODE.RECEIVABLES,
+        contactId: contactId,
+      });
+      setFormData(() => {
+        setContactId(contactId);
+        return {
+          ...formData,
+          paymentMode:
+            type === 'payable'
+              ? TRANSACTION_MODE.PAYABLES
+              : TRANSACTION_MODE.RECEIVABLES,
+          contactId: contactId,
+        };
+      });
+    }
+  }, [type, contactId, orders]);
+
   const { balance } = (_invoiceData.length &&
     _invoiceData.reduce((a, b) => {
       return { balance: a.balance + b.balance };
@@ -90,10 +145,7 @@ export const PaymentsForm: FC = () => {
   const paid = amountPaid ? amountPaid : 0;
 
   const remainingTotal = Math.abs(balance) - paid;
-
-  const { paymentsModalConfig, setPaymentsModalConfig } = useGlobalContext();
   const onFinish = async (values) => {
-
     // return false;
     const paid_invyces = _invoiceData.map(
       (invyce: IInvoiceItem, index: number) => {
@@ -171,6 +223,15 @@ export const PaymentsForm: FC = () => {
     }
   );
 
+  useEffect(() => {
+    if (orders?.length && type && _contactInvoices?.data?.result) {
+      const { result } = _contactInvoices.data;
+      const filtered = result?.filter((invoice) => invoice.id === orders[0]);
+
+      _setInvoiceData(filtered);
+    }
+  }, [_contactInvoices, type, orders]);
+
   const contactInvoices: IInvoiceResult[] =
     _contactInvoices?.data?.result || [];
 
@@ -238,7 +299,7 @@ export const PaymentsForm: FC = () => {
         onFinishFailed={onFinishFailed}
         form={form}
         onValuesChange={handleChangedValue}
-      // onValuesChange={handleChangedValue}
+        // onValuesChange={handleChangedValue}
       >
         <Row gutter={24}>
           <Col span={12}>
@@ -341,7 +402,7 @@ export const PaymentsForm: FC = () => {
                 optionFilterProp="children"
               >
                 {[
-                  { value: PaymentType.BANK, name: 'Bank' },
+                  // { value: PaymentType.BANK, name: 'Bank' },
                   { value: PaymentType.CASH, name: 'Cash' },
                 ].map((type, index) => {
                   return (
@@ -393,10 +454,11 @@ export const PaymentsForm: FC = () => {
           </Col>
           <Col span={24}>
             <div
-              className={`pv-10 ${contact_id && !formData.runningPayment
+              className={`pv-10 ${
+                contact_id && !formData.runningPayment
                   ? 'table_visible'
                   : `table_disable`
-                }`}
+              }`}
             >
               <CommonTable
                 data={!contact_id ? [] : _invoiceData}

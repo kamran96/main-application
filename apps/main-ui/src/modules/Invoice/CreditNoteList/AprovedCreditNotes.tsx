@@ -184,11 +184,11 @@ export const AprovedCreditNotes: FC = () => {
           [
             'invoices',
             'transactions',
-            'items?page',
+            'items-list',
             'invoice-view',
             'ledger-contact',
             'all-items',
-            'ACCRECCREDIT'
+            'ACCRECCREDIT',
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) =>
               q?.queryKey[0]?.toString()?.startsWith(`${key}`)
