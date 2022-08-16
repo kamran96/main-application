@@ -76,6 +76,10 @@ export const RegisterForm: FC = () => {
     }
   };
 
+  const setDangerousHTML = (html) => {
+    return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  };
+
   const checkUsernameAvaliable = async (payload, callback) => {
     const request = payload;
     clearTimeout(timeOutTime);
@@ -85,7 +89,7 @@ export const RegisterForm: FC = () => {
         {
           onSuccess: (data) => {
             if (!data?.data?.available) {
-              callback(data?.data?.message);
+              callback(setDangerousHTML(data?.data?.message));
             } else {
               const accessor = Object.keys(request)[0];
               setAvaliablity({ ...avaliablity, [accessor]: true });
@@ -258,7 +262,7 @@ export const RegisterForm: FC = () => {
                               {
                                 validator: (rule, value, callback) => {
                                   checkUsernameAvaliable(
-                                    { username: value },
+                                    { email: value },
                                     callback
                                   );
                                 },

@@ -55,7 +55,7 @@ export class ItemController {
     @Body() validateDto: CodeValidateDto,
     @Req() req: IRequest
   ): Promise<any> {
-    return await this.itemService.GetItemCode(validateDto.code, req.user);
+    return await this.itemService.GetItemCode(validateDto, req.user);
   }
 
   @Post('ids')

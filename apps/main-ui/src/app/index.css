@@ -256,6 +256,11 @@ h6 {
 .capitalize {
   text-transform: capitalize;
 }
+.clr-dark {
+  color: #2b2b2b;
+}
+
+
 
 /* ant design overide */
 

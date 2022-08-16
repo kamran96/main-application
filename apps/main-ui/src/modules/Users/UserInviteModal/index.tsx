@@ -1,7 +1,7 @@
 import { PlusOutlined } from '@ant-design/icons';
 import trash2 from '@iconify-icons/feather/trash-2';
 import { Icon } from '@iconify/react';
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import {
   useQueryClient,
   useMutation,
@@ -18,10 +18,15 @@ import {
   IErrorMessages,
   NOTIFICATIONTYPE,
 } from '../../../modal';
-import { getALLBranches, inviteUserAPI } from './../../../api/users';
+import {
+  getALLBranches,
+  inviteUserAPI,
+  userCheckAPI,
+} from './../../../api/users';
 import { IThemeProps } from '@invyce/shared/invyce-theme';
 
 const { Option } = Select;
+let timeOutTime: any;
 
 export const UserInviteModal: FC = () => {
   const { userInviteModal, setUserInviteModal, notificationCallback } =
@@ -37,6 +42,13 @@ export const UserInviteModal: FC = () => {
 
   const { mutate: mutateInviteUser, isLoading: invitingUser } =
     useMutation(inviteUserAPI);
+
+  const { mutate: mutateUsernameAvaliable, data: usernameAvaliable } =
+    useMutation(userCheckAPI);
+  const [avaliablity, setAvaliablity] = useState({
+    username: false,
+    email: false,
+  });
 
   // const { data, isLoading: branchesLoading } = useQuery(
   //   [`all-branches`],
@@ -87,6 +99,31 @@ export const UserInviteModal: FC = () => {
     });
   };
 
+  const setDangerousHTML = (html) => {
+    return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  };
+
+  const checkUsernameAvaliable = async (payload, callback) => {
+    const request = payload;
+    clearTimeout(timeOutTime);
+    timeOutTime = setTimeout(async () => {
+      await mutateUsernameAvaliable(
+        { ...request },
+        {
+          onSuccess: (data) => {
+            if (!data?.data?.available) {
+              callback(setDangerousHTML(data?.data?.message));
+            } else {
+              const accessor = Object.keys(request)[0];
+              setAvaliablity({ ...avaliablity, [accessor]: true });
+              callback();
+            }
+          },
+        }
+      );
+    }, 400);
+  };
+
   return (
     <CommonModal
       visible={userInviteModal}
@@ -131,6 +168,14 @@ export const UserInviteModal: FC = () => {
                             rules={[
                               { required: true, message: 'Email is required!' },
                               { type: 'email', message: 'Email is invalid' },
+                              {
+                                validator: (rule, value, callback) => {
+                                  checkUsernameAvaliable(
+                                    { email: value },
+                                    callback
+                                  );
+                                },
+                              },
                             ]}
                           >
                             <Input

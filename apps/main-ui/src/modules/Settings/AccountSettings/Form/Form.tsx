@@ -30,6 +30,7 @@ import dayjs from 'dayjs';
 import { invycePersist } from '@invyce/invyce-persist';
 import { updateToken } from '../../../../utils/http';
 import { CommonModal } from '../../../../components';
+import { userCheckAPI } from '../../../../api/users';
 
 const defaultState = {
   email: false,
@@ -80,10 +81,44 @@ export const AccountsSettingsForm: FC = () => {
 
   const [form] = Form.useForm();
   // const [verified, setVerified] = useState(false);
+  const [avaliablity, setAvaliablity] = useState({
+    email: true,
+  });
+
   const [verifyModal, setVerifyModal] = useState({
     visibility: false,
     type: null,
   });
+
+  let timeOutTime: any;
+  const setDangerousHTML = (html) => {
+    return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  };
+
+  const { mutate: mutateUsernameAvaliable, data: usernameAvaliable } =
+    useMutation(userCheckAPI);
+
+  const checkUsernameAvaliable = async (payload, callback) => {
+    const request = payload;
+    clearTimeout(timeOutTime);
+    timeOutTime = setTimeout(async () => {
+      await mutateUsernameAvaliable(
+        { ...request },
+        {
+          onSuccess: (data) => {
+            if (!data?.data?.available) {
+              callback(setDangerousHTML(data?.data?.message));
+              setAvaliablity({ email: false });
+            } else {
+              const accessor = Object.keys(request)[0];
+              setAvaliablity({ ...avaliablity, [accessor]: true });
+              callback();
+            }
+          },
+        }
+      );
+    }, 400);
+  };
 
   const getVerifiedStatus = (type) => {
     const data = invycePersist().get(`${type}-request`, 'cookie');
@@ -105,6 +140,18 @@ export const AccountsSettingsForm: FC = () => {
     });
   };
 
+  const resetCookie = (type: 'email' | 'password') => {
+    invycePersist().resetData(`${type}-request`, 'cookie');
+  };
+
+  const resetVerifyEmail = () => {
+    resetCookie('email');
+    resetVerifyingOPT();
+    setEditable((prev) => {
+      return { ...prev, email: null };
+    });
+  };
+
   const checkVerifyCode = async (otp, type) => {
     verifyOTP(
       { otp },
@@ -113,22 +160,31 @@ export const AccountsSettingsForm: FC = () => {
           setEditable({ ...defaultState, [type]: true });
           setVerifyModal({ visibility: false, type: null });
           invycePersist().resetData(`${type}-request`, 'cookie');
+          setOtpValue('');
         },
       }
     );
   };
 
   const updateFormItem = async (formItem) => {
-    await updateSetting(
-      { ...formItem },
-      {
-        onSuccess: async (data) => {
-          await updateToken(data?.data?.access_token);
-          refetchUser();
-          setEditable(defaultState);
-        },
-      }
-    );
+    if (formItem.email !== email) {
+      await updateSetting(
+        { ...formItem },
+        {
+          onSuccess: async (data) => {
+            await updateToken(data?.data?.access_token);
+            refetchUser();
+            setEditable(defaultState);
+          },
+
+          onError: (error) => {
+            console.log(error, 'error');
+          },
+        }
+      );
+    } else {
+      setEditable(defaultState);
+    }
   };
 
   const geterateQRCode = async () => {
@@ -148,6 +204,8 @@ export const AccountsSettingsForm: FC = () => {
     );
   };
 
+  console.log(avaliablity, 'ava');
+
   return (
     <WrapperSettingsForm>
       <Form form={form}>
@@ -155,7 +213,18 @@ export const AccountsSettingsForm: FC = () => {
         <div className="flex">
           <Form.Item
             style={{ width: 300 }}
-            rules={[{ type: 'email' }]}
+            rules={[
+              { type: 'email' },
+              {
+                validator: (rule, value, callback) => {
+                  if (value === email) {
+                    callback();
+                  } else {
+                    checkUsernameAvaliable({ email: value }, callback);
+                  }
+                },
+              },
+            ]}
             name="email"
             shouldUpdate
           >
@@ -175,6 +244,7 @@ export const AccountsSettingsForm: FC = () => {
             }
             size="middle"
             type="link"
+            disabled={form.getFieldValue('email') === email && editable?.email}
           >
             {editable?.email
               ? 'Change'
@@ -182,6 +252,16 @@ export const AccountsSettingsForm: FC = () => {
               ? 'Verify'
               : 'Request Change'}
           </Button>
+          {editable?.email && (
+            <Button onClick={resetVerifyEmail} type="link" danger>
+              Cancel
+            </Button>
+          )}
+          {getVerifiedStatus('email') && (
+            <Button onClick={resetVerifyEmail} type="link" danger>
+              Cancel
+            </Button>
+          )}
         </div>
         <FormLabel>Password</FormLabel>
         <div className="flex">
@@ -203,6 +283,11 @@ export const AccountsSettingsForm: FC = () => {
               size="middle"
             />
           </Form.Item>
+          {console.log(
+            form.getFieldValue('email'),
+            'form.getFieldValue',
+            email
+          )}
           <Button
             onClick={() =>
               editable?.password
