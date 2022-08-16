@@ -12,9 +12,11 @@ import { ReactElement, useState } from 'react';
 import { AppLogoWithoutText, InyvceDarkTextIcon } from './applogo';
 import sidebarCollapse24 from '@iconify/icons-octicon/sidebar-collapse-24';
 import LogOut from '@iconify-icons/feather/log-out';
+import Setting from '@iconify-icons/feather/settings'
 import Sun from '@iconify-icons/feather/sun';
 import Moon from '@iconify-icons/feather/moon';
 import { UserOutlined } from '@ant-design/icons';
+
 /* eslint-disable-next-line */
 
 export interface IActiveUserInfo {
@@ -241,7 +243,7 @@ export const SidebarUi: FC<SidebarUiProps> = ({
       </div>
       <div className="sidebar_bottom">
         <li
-          className={`route_list_item theme_changer flex alignCenter pointer mv-4   
+          className={`route_list_item theme_changer flex alignCenter pointer    
                     `}
         >
           <Button
@@ -261,8 +263,24 @@ export const SidebarUi: FC<SidebarUiProps> = ({
           </Button>
         </li>
         <li
+          onClick={() => history.push({
+            pathname: `/app/settings/profile-settings`,
+            state: {
+              from: history.location.pathname,
+            },
+          })}
+          className={`route_list_item flex alignCenter pointer    
+                    `}
+        >
+          <span className="mr-10 flex alignCenter">
+            <Icon className=" fs-16  icon" icon={Setting} />
+          </span>
+          <span className="route_tag">Setting</span>
+        </li>
+
+        <li
           onClick={onLogOut}
-          className={`route_list_item flex alignCenter pointer mv-4   
+          className={`route_list_item flex alignCenter pointer   
                     `}
         >
           <span className="mr-10 flex alignCenter">

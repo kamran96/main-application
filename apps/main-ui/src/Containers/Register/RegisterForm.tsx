@@ -40,7 +40,6 @@ export const RegisterForm: FC = () => {
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
-    console.log('is here');
     try {
       await mutateRegister(values, {
         onSuccess: (data) => {

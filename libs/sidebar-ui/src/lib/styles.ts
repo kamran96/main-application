@@ -91,7 +91,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
   /* Main Routes Settings */
 
   .routes {
-    height: calc(100vh - 204px);
+    height: calc(100vh - 226px);
     overflow-y: auto;
     overflow-x: hidden;
   }
@@ -118,28 +118,33 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
           props?.theme?.colors?.sidebarListActive};
         color: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarListActiveText};
+           transition: 0.2s all ease-in-out;
 
         span svg {
           fill: #ffffff;
           stroke: none;
-          transition: 0.3s all ease-in-out;
+          transition: 0.2s all ease-in-out;
 
           path {
             stroke: #ffffff;
-            transition: 0.3s all ease-in-out;
+            transition: 0.2s all ease-in-out;
           }
           .BlackSpace {
             stroke: #272525;
+            transition: 0.2s all ease-in-out;
           }
           .fillTransparent {
             fill: transparent;
+            transition: 0.2s all ease-in-out;
           }
           .BlackFill {
             fill: #272525 !important;
+            transition: 0.2s all ease-in-out;
           }
           .ReportColor {
             stroke: ${(props: IThemeProps) =>
               props?.theme?.colors?.sidebarListActiveText};
+              transition: 0.2s all ease-in-out;
           }
         }
       }
@@ -181,6 +186,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
             props?.theme?.colors?.sidebarListActive};
           color: ${(props: IThemeProps) =>
             props?.theme?.colors?.sidebarListActiveText};
+             transition: 0.2s all ease-in-out;
 
           span svg {
             fill: #ffffff;
@@ -188,23 +194,28 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
 
             path {
               stroke: #ffffff;
-              transition: 0.3s all ease-in-out;
+              transition: 0.2s all ease-in-out;
             }
             .BlackSpace {
               stroke: #272525 !important;
+              transition: 0.2s all ease-in-out;
             }
             .BlackFill {
               fill: #272525 !important;
+              transition: 0.2s all ease-in-out;
             }
             .itemStroke {
               stroke: none;
+              transition: 0.2s all ease-in-out;
             }
 
             .fillTransparent {
               fill: transparent !important;
+              transition: 0.2s all ease-in-out;
             }
             .fillItemColor {
               fill: #ffffff !important;
+              transition: 0.2s all ease-in-out;
             }
           }
         }
@@ -227,31 +238,32 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
 
       span svg {
         fill: #ffffff;
-        transition: 0.3s all ease-in-out;
+        transition: 0.2s all ease-in-out;
 
         path {
           stroke: #ffffff !important;
-          transition: 0.3s all ease-in-out;
+          transition: 0.2s all ease-in-out;
         }
         .BlackSpace {
           stroke: #272525 !important;
-          transition: 0.3s all ease-in-out;
+          transition: 0.2s all ease-in-out;
         }
         .BlackFill {
           fill: #272525 !important;
         }
         .itemStroke {
           stroke: none;
-          transition: 0.3s all ease-in-out;
+          transition: 0.2s all ease-in-out;
         }
 
         .fillTransparent {
           fill: transparent;
+          transition: 0.2s all ease-in-out;
         }
 
         .fillItemColor {
           fill: #ffffff !important;
-          transition: 0.3s all ease-in-out;
+          transition: 0.2s all ease-in-out;
         }
       }
     }
@@ -289,9 +301,8 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
     left: 0;
   }
   .sidebar_bottom .route_list_item {
-    padding: 6px 24px;
-
-    min-height: 34px;
+    padding: 4px 24px;
+    min-height: 32px;
     max-width: 100%;
     transition: 0.3s all ease-in-out;
     color: ${(props: IThemeProps) => props?.theme?.colors?.sidebarDefaultText};

@@ -49,6 +49,8 @@ export const findInvoiceByID = ({ queryKey }: QueryKey) => {
 
   let url = ``;
 
+  console.log(type, 'type', queryKey[2], 'queryKey[1]');
+
   switch (type) {
     case IInvoiceType.INVOICE:
       url = `${INVOICES_API.INDEX}/${id}`;
@@ -59,7 +61,10 @@ export const findInvoiceByID = ({ queryKey }: QueryKey) => {
     case IInvoiceType.BILL:
       url = `${INVOICES_API.BILL}/${id}`;
       break;
-    case IInvoiceType.CREDITNOTE || IInvoiceType.DEBITNOTE:
+    case IInvoiceType.DEBITNOTE:
+      url = `${INVOICES_API.CREDIT_NOTE}/${id}`;
+      break;
+    case IInvoiceType.CREDITNOTE:
       url = `${INVOICES_API.CREDIT_NOTE}/${id}`;
       break;
     default:
@@ -172,6 +177,6 @@ export const getInvoiceKeysApi = () =>
 
 export const getCreditNotesKeysApi = () =>
   http?.get(`${INVOICES_API.CREDIT_NOTE}/import-csv`);
-  
+
 export const getDebitNotesKeysApi = () =>
   http?.get('invoices/credit-note/import-csv');

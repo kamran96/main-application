@@ -100,6 +100,7 @@ const CardWrapper = styled.div`
   border-radius: 8px;
   margin: 12px;
   padding: 6px 16px;
+  height: 260px;
 
   .header {
     display: flex;

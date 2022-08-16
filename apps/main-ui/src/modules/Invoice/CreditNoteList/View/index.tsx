@@ -11,7 +11,7 @@ import { useGlobalContext } from '../../../../hooks/globalContext/globalContext'
 export const CreditNoteView: FC = () => {
   const { routeHistory } = useGlobalContext();
   const { pathname } = routeHistory.location;
-  let invId = pathname.split('app/credit-notes/')[1];
+  const invId = pathname.split('app/credit-notes/')[1];
   return (
     <WrapperCreditNoteView>
       <BreadCrumbArea>
