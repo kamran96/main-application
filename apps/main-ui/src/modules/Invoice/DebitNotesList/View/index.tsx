@@ -15,6 +15,7 @@ export const DebitNotesView: FC = () => {
     `${ISupportedRoutes?.DASHBOARD_LAYOUT}${ISupportedRoutes?.DEBIT_NOTES}/`
   )[1];
 
+
   return (
     <WrapperCreditNoteView>
       <BreadCrumbArea>
@@ -26,7 +27,7 @@ export const DebitNotesView: FC = () => {
         </Breadcrumb>
       </BreadCrumbArea>
 
-      <PurchasesView type={IInvoiceType.CREDITNOTE} id={invId} />
+      <PurchasesView type={IInvoiceType.DEBITNOTE} id={invId} />
     </WrapperCreditNoteView>
   );
 };

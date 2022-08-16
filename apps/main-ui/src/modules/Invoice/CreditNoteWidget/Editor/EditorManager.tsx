@@ -187,6 +187,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
     AntForm.setFieldsValue(defaultFormData);
   }, [AntForm]);
 
+  console.log(relation, "what is relation")
+
   const APICATEGORYSTAKE =
     relation?.type === IInvoiceType.INVOICE
       ? getInvoiceByIDAPI

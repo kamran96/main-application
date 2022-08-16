@@ -26,7 +26,7 @@ export const DebitNoteEditorWidget: FC = () => {
           <Breadcrumb.Item>Debit Note</Breadcrumb.Item>
         </Breadcrumb>
       </BreadCrumbArea>
-      <DebitNoteEditor id={id} type="CN" />
+      <DebitNoteEditor id={id} type="DN" />
     </>
   );
 };
