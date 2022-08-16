@@ -57,6 +57,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   const [invoiceFiltersSchema, setInvoiceFilterSchema] =
     useState(InvoicesFilterSchema);
   const [selectedRow, setSelectedRow] = useState([]);
+  const [selectedContact, setSelectedContact] = useState(null);
 
   const [filterBar, setFilterBar] = useState<boolean>(false);
 
@@ -106,6 +107,10 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
 
   const onSelectedRow = (item) => {
     setSelectedRow(item.selectedRowKeys);
+    if (item?.selectedRows?.length === 1) {
+      console.log('in if');
+      setSelectedContact(item?.selectedRows?.[0]?.contactId);
+    }
   };
 
   useEffect(() => {
@@ -238,7 +243,11 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
           <ButtonTag
             disabled={selectedRow.length > 1}
             onClick={() => {
-              setPaymentsModalConfig(true, null, 'receivable', selectedRow);
+              setPaymentsModalConfig(true, null, {
+                contactId: selectedContact,
+                type: 'receivable',
+                orders: selectedRow,
+              });
             }}
             className="ml-5s"
             title="Create Payment"

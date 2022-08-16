@@ -8,7 +8,7 @@ import convertToRem from '../../../utils/convertToRem';
 import { Color } from '../../../modal';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import { ColumnsType } from 'antd/lib/table';
-import { IInvoiceResult } from 'apps/main-ui/src/modal/invoice';
+import { IInvoiceResult } from '../../../modal/invoice';
 const { Option } = Select;
 
 export default function (
@@ -18,7 +18,7 @@ export default function (
 ) {
   const getContactInvById = (id: number | string) => {
     if (contactInvoices && contactInvoices.length) {
-      let [filtered] = contactInvoices.filter((inv) => inv.id === id);
+      const [filtered] = contactInvoices.filter((inv) => inv.id === id);
       return filtered;
     } else {
       return null;
@@ -58,7 +58,7 @@ export default function (
                 (item) => item.id === itemObj.value
               );
 
-              let allData = [...state];
+              const allData = [...state];
               allData[index] = filtered;
               setState(allData);
             }}
@@ -69,7 +69,7 @@ export default function (
           >
             {contactInvoices.length > 0 &&
               contactInvoices.map((item: IInvoiceResult, index: number) => {
-                let usedIds = [];
+                const usedIds = [];
                 state.forEach((st) => {
                   if (st.id !== null) {
                     usedIds.push(st.id);
@@ -150,7 +150,7 @@ export default function (
         return (
           <i
             onClick={() => {
-              let allItems = [...state];
+              const allItems = [...state];
               allItems.splice(index, 1);
               setState(allItems);
             }}

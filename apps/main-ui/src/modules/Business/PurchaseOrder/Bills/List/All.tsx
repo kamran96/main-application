@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* THIS PAGE BELONGS TO ALL PURCHASES ORDERS TAB */
+import { ButtonTag } from '../../../../../components/ButtonTags';
 import { FC, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import styled from 'styled-components';
@@ -34,7 +35,7 @@ export const ALLBillsList: FC<IProps> = ({ columns, activeTab }) => {
   const queryCache = useQueryClient();
 
   /* ****** Global Context ******* */
-  const { notificationCallback } = useGlobalContext();
+  const { notificationCallback, setPaymentsModalConfig } = useGlobalContext();
 
   /*  ********** COMPONENT STATE HOOKS  *********** */
   const [filterBar, setFilterbar] = useState(false);
@@ -51,6 +52,7 @@ export const ALLBillsList: FC<IProps> = ({ columns, activeTab }) => {
   const { routeHistory } = useGlobalContext();
   const { history } = routeHistory;
   const [selectedRow, setSelectedRow] = useState([]);
+  const [selectedContact, setSelectedContact] = useState(null);
   const [filteringSchema, setFilteringSchema] = useState(FilterSchema);
 
   /*Query hook for  Fetching all accounts against ID */
@@ -195,6 +197,7 @@ export const ALLBillsList: FC<IProps> = ({ columns, activeTab }) => {
   /* METHOD TO UPDATE SELECTED ROW OF TABLE */
   const onSelectedRow = (item) => {
     setSelectedRow(item.selectedRowKeys);
+    setSelectedContact(item?.selectedRows?.[0]?.contactId);
   };
 
   const cols = [...columns];
@@ -235,10 +238,25 @@ export const ALLBillsList: FC<IProps> = ({ columns, activeTab }) => {
         hasPrint
         topbarRightPannel={renerTopRightbar()}
         customTopbar={
-          <PurchaseTopbar
-            isAbleToDelete={false}
-            disabled={!selectedRow.length}
-          />
+          <div className="flex alignCenter">
+            <PurchaseTopbar
+              isAbleToDelete={false}
+              disabled={!selectedRow.length}
+            />
+            <ButtonTag
+              disabled={selectedRow.length > 1}
+              onClick={() => {
+                setPaymentsModalConfig(true, null, {
+                  contactId: selectedContact,
+                  type: 'payable',
+                  orders: selectedRow,
+                });
+              }}
+              className="ml-5s"
+              title="Create Payment"
+              size="middle"
+            />
+          </div>
         }
         data={result}
         columns={cols}

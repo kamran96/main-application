@@ -25,7 +25,6 @@ import {
 import { IInvoiceItem, IInvoiceResult } from '../../../modal/invoice';
 import moneyFormat from '../../../utils/moneyFormat';
 import Columns from './columns';
-import { async } from 'rxjs';
 
 const { Option } = Select;
 
@@ -46,10 +45,9 @@ export const PaymentsForm: FC = () => {
     paymentsModalConfig,
     setPaymentsModalConfig,
   } = useGlobalContext();
-  const { type, orders } = paymentsModalConfig;
   const { history } = routeHistory;
 
-  console.log(paymentsModalConfig, 'config');
+  const { contactId, type, orders } = paymentsModalConfig;
 
   useEffect(() => {
     if (history?.location?.search) {
@@ -89,6 +87,55 @@ export const PaymentsForm: FC = () => {
       form.resetFields();
     };
   }, []);
+
+  // useEffect(() => {
+
+  //   if (type === 'receivable') {
+  //     setFormData({
+  //       ...formData,
+  //       paymentMode: TRANSACTION_MODE.RECEIVABLES,
+  //       contactId: contactId,
+  //     });
+  //     form.setFieldsValue({
+  //       paymentMode: TRANSACTION_MODE.RECEIVABLES,
+  //       contactId: contactId,
+  //     });
+  //     setContactId(contactId);
+  //   } else {
+  //     setFormData({
+  //       ...formData,
+  //       paymentMode: TRANSACTION_MODE.PAYABLES,
+  //       contactId: contactId,
+  //     });
+  //     form.setFieldsValue({
+  //       paymentMode: TRANSACTION_MODE.PAYABLES,
+  //       contactId: contactId,
+  //     });
+  //   }
+  // }, [paymentsModalConfig?.contactId]);
+
+  useEffect(() => {
+    if (type && contactId && orders) {
+      form.setFieldsValue({
+        paymentMode:
+          type === 'payable'
+            ? TRANSACTION_MODE.PAYABLES
+            : TRANSACTION_MODE.RECEIVABLES,
+        contactId: contactId,
+      });
+      setFormData(() => {
+        setContactId(contactId);
+        return {
+          ...formData,
+          paymentMode:
+            type === 'payable'
+              ? TRANSACTION_MODE.PAYABLES
+              : TRANSACTION_MODE.RECEIVABLES,
+          contactId: contactId,
+        };
+      });
+    }
+  }, [type, contactId, orders]);
 
   const { balance } = (_invoiceData.length &&
     _invoiceData.reduce((a, b) => {
@@ -175,6 +222,15 @@ export const PaymentsForm: FC = () => {
       enabled: !!contact_id && !!paymentModeSelected,
     }
   );
+
+  useEffect(() => {
+    if (orders?.length && type && _contactInvoices?.data?.result) {
+      const { result } = _contactInvoices.data;
+      const filtered = result?.filter((invoice) => invoice.id === orders[0]);
+
+      _setInvoiceData(filtered);
+    }
+  }, [_contactInvoices, type, orders]);
 
   const contactInvoices: IInvoiceResult[] =
     _contactInvoices?.data?.result || [];
@@ -346,7 +402,7 @@ export const PaymentsForm: FC = () => {
                 optionFilterProp="children"
               >
                 {[
-                  { value: PaymentType.BANK, name: 'Bank' },
+                  // { value: PaymentType.BANK, name: 'Bank' },
                   { value: PaymentType.CASH, name: 'Cash' },
                 ].map((type, index) => {
                   return (

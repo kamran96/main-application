@@ -4,6 +4,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
+import { MultiCompiler } from 'webpack';
 
 import {
   CheckAuthAPI,
@@ -22,7 +23,7 @@ import { IAuth, IUser } from '../../modal/auth';
 import { IRolePermissions } from '../../modal/rbac';
 import { DecriptionData, EncriptData } from '../../utils/encription';
 import { useTheme } from '../useTheme';
-import { globalContext, IImportType } from './globalContext';
+import { globalContext, IImportType, IPaymentsModal } from './globalContext';
 import { useHttp } from './useHttp';
 
 type Theme = 'light' | 'dark';
@@ -120,14 +121,14 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     id: null,
     visibility: false,
   });
-  const [paymentsModalConfig, setPaymentsModalConfig] = useState<IModalsConfig>(
-    {
+  const [paymentsModalConfig, setPaymentsModalConfig] =
+    useState<IPaymentsModal>({
       id: null,
       visibility: false,
       type: 'payable',
       orders: [],
-    }
-  );
+      contactId: null,
+    });
   const [branchModalConfig, setBranchModalConfig] = useState<IModalsConfig>({
     id: null,
     visibility: false,
@@ -537,10 +538,19 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         setPaymentsModalConfig: (
           visibility: boolean,
           id: number = null,
-          type = 'payable',
-          orders: []
+          config?: {
+            type?: 'payable' | 'receivable';
+            orders?: string[] | number[];
+            contactId?: number;
+          }
         ) => {
-          setPaymentsModalConfig({ visibility, id, type, orders });
+          const _config = {
+            type: config?.type || 'payable',
+            orders: config?.orders || [],
+            contactId: config?.contactId || null,
+          };
+
+          setPaymentsModalConfig({ visibility, id, ..._config });
         },
         categoryModalConfig: useMemo(() => {
           return categoryModalConfig;

@@ -36,8 +36,6 @@ export const useCols = () => {
     }
   }, [history?.location?.search]);
 
-  console.log(sortedInfo?.columnKey, "sortedInfo?.columnKey", sortedInfo?.order, "sortedInfo Order");
-
   const InvoiceColumns: ColumnsType<any> = [
     {
       title: 'Number',

@@ -25,7 +25,11 @@ export const LoginForm: FC = () => {
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
-    await mutateLogin(values, {
+    console.log(values, 'values');
+    const { username, password } = values;
+    const payload = { username: username.replace(/\s/g, ''), password };
+
+    await mutateLogin(payload, {
       onSuccess: (data) => {
         // eslint-disable-next-line no-constant-condition
         if (process.env.NODE_ENV === 'production' || true) {
@@ -209,7 +213,7 @@ export const LoginForm: FC = () => {
               </Form.Item>
               <h5 className="orArea textCenter  mb-20 mt-20">
                 <Seprator />
-                <BOLDTEXT className='ml-10 mr-10'>OR</BOLDTEXT>
+                <BOLDTEXT className="ml-10 mr-10">OR</BOLDTEXT>
                 <Seprator />
               </h5>
               <Form.Item className="m-reset">

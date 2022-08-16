@@ -273,7 +273,7 @@ export const ItemsList: FC = () => {
         return (
           <div
             onClick={() =>
-              setShowItemsDetails({ visibility: true, id: row.id })
+              setShowItemsDetails({ visibility: true, id: row?.id })
             }
             style={{ color: '#2395E7', cursor: 'pointer' }}
           >
