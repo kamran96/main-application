@@ -338,8 +338,6 @@ export class UserService {
           .populate('organization')
           .populate('branch');
 
-        console.log(user, 'user here');
-
         if (user?.isVerified === true && user?.username !== null) {
           throw new HttpException(
             'User aleady registered please contact your admin.',

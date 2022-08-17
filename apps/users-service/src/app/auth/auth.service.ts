@@ -232,12 +232,14 @@ export class AuthService {
     const token = this.jwtService.sign(payload);
 
     if (process.env['DEVELOPMENT']) {
+      Logger.log('Set cookie for development environment');
+
       res
         .cookie('access_token', token, {
           secure: true,
-          sameSite: 'none',
+          sameSite: 'lax',
           httpOnly: true,
-          path: '/',
+          // path: '/',
           // expires: new Date(Moment().add(process.env.EXPIRES, 'h').toDate()),
         })
         .send({
@@ -245,6 +247,7 @@ export class AuthService {
           status: true,
         });
     } else {
+      Logger.log('Set cookie for production environment');
       res
         .cookie('access_token', token, {
           httpOnly: true,
