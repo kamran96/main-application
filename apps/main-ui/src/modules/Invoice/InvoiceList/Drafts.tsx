@@ -53,7 +53,6 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
       pagination: null,
     });
 
-
   const { PdfCols, _exportableCols } = useCols();
 
   const { mutate: mutateDeleteOrders, isLoading: isDeletingInvoice } =
@@ -75,7 +74,7 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
       page,
       page_size,
       query,
-      sortid
+      sortid,
     ],
     getInvoiceListAPI,
     {
@@ -155,7 +154,7 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
           }
         });
 
-        setAllInvoicesRes(prev => ({ ...prev, result: userData }))
+        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
       } else {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
@@ -165,7 +164,7 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
           }
         });
 
-        setAllInvoicesRes(prev => ({ ...prev, result: userData }))
+        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
       }
       setAllInvoicesConfig({
         ...allInvoicesConfig,
@@ -174,17 +173,23 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
         sortid:
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
-            : sorter.order === 'asceend' ? sorter.field : 'id',
+            : sorter.order === 'asceend'
+            ? sorter.field
+            : 'id',
       });
-      const route = `/app${ISupportedRoutes.INVOICES
-        }?tabIndex=draft&sortid=${sorter && sorter.order === 'descend'
-          ? `-${sorter.field}`
-          : sorter.order === 'asceend' ? sorter.field : 'id'
-        }&page=${pagination.current
-        }&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+
+      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=draft&sortid=${
+        sorter && sorter?.order === 'descend'
+          ? `-${sorter?.field}`
+          : sorter?.order === 'ascend'
+          ? sorter.field
+          : 'id'
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+        sorter?.order
+      }&query=${query}`;
       history.push(route);
     }
-  }
+  };
 
   /* Columns are overided to add  actions column in table */
 
@@ -200,7 +205,7 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
     // console.log(payload, "payload");
     await mutateDeleteOrders(payload, {
       onSuccess: () => {
-        ['invoices', 'transactions?page', 'items?page', 'invoice-view'].forEach(
+        ['invoices', 'transactions?page', 'items-list', 'invoice-view'].forEach(
           (key) => {
             (queryCache.invalidateQueries as any)((q) =>
               q.queryKey[0].toString().startsWith(key)

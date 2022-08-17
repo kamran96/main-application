@@ -40,7 +40,6 @@ export const RegisterForm: FC = () => {
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
-    console.log('is here');
     try {
       await mutateRegister(values, {
         onSuccess: (data) => {
@@ -188,7 +187,7 @@ export const RegisterForm: FC = () => {
                     >
                       <Input
                         placeholder={'e.g John'}
-                        size="middle"
+                        size="large"
                         autoComplete="off"
                       />
                     </Form.Item>
@@ -201,7 +200,7 @@ export const RegisterForm: FC = () => {
                       rules={[
                         { required: true, message: 'Username required' },
                         {
-                          patter: /^[a-zA-Z0-9_-]+$/,
+                          pattern: /^[a-zA-Z0-9_-]+$/,
                           message: 'Remove unnecessary characters',
                         },
                       ].concat(
@@ -225,7 +224,7 @@ export const RegisterForm: FC = () => {
                           setAvaliablity({ ...avaliablity, username: false });
                         }}
                         placeholder="e.g John"
-                        size="middle"
+                        size="large"
                         autoComplete="off"
                       />
                     </Form.Item>
@@ -269,7 +268,7 @@ export const RegisterForm: FC = () => {
                     >
                       <Input
                         placeholder="e.g someone@example.com"
-                        size="middle"
+                        size="large"
                         autoComplete="off"
                       />
                     </Form.Item>
@@ -281,7 +280,7 @@ export const RegisterForm: FC = () => {
                       label="Country"
                     >
                       <Select
-                        size="middle"
+                        size="large"
                         showSearch
                         style={{ width: '100%' }}
                         placeholder="Select a Country"
@@ -329,7 +328,7 @@ export const RegisterForm: FC = () => {
                         addonBefore={prefixSelector}
                         type="text"
                         placeholder="3188889898"
-                        size="middle"
+                        size="large"
                       />
                     </Form.Item>
                   </Col>
@@ -348,7 +347,7 @@ export const RegisterForm: FC = () => {
                       ]}
                       hasFeedback
                     >
-                      <Input.Password autoComplete="off" size="middle" />
+                      <Input.Password autoComplete="off" size="large" />
                     </Form.Item>
                   </Col>
 
@@ -401,6 +400,7 @@ export const RegisterForm: FC = () => {
                           type="primary"
                           htmlType="submit"
                           disabled={show}
+                          size="large"
                         >
                           Create Account
                         </Button>

@@ -46,7 +46,6 @@ export const Requires = {
     message: 'Item is Requred to Proceed invoice',
     condition: (value) => value > 0,
   },
-
   itemDiscount: {
     require: true,
     message: 'Item is Requred to Proceed invoice',

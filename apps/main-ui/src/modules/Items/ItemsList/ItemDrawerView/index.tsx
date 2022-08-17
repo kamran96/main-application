@@ -67,7 +67,6 @@ export const ItemsViewContainer: FC<Iprops> = ({
     }
   }, [itemViewResponse]);
 
-  console.log(result, 'id');
   return (
     <ItemDrawer
       title={<span className="capitalize">{result?.name}</span> || ''}

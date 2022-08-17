@@ -7,7 +7,6 @@ import { ColumnsType } from 'antd/lib/table';
 import { plainToClass } from 'class-transformer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
-import { Link } from 'react-router-dom';
 import { deleteItems, getAllCategories, getItemsList } from '../../../api';
 import { ButtonTag } from '../../../components/ButtonTags';
 import { ConfirmModal } from '../../../components/ConfirmModal';
@@ -32,7 +31,7 @@ import { PrintColumns, PDFColumns } from './PrintColumns';
 import { ItemsListWrapper } from './styles';
 import packageIcon from '@iconify-icons/feather/package';
 import ItemsImport from '../ItemsImport';
-import { ItemsViewContainer } from './ItemView';
+import { ItemsViewContainer } from './ItemDrawerView';
 
 export const ItemsList: FC = () => {
   /* HOOKS */
@@ -140,20 +139,10 @@ export const ItemsList: FC = () => {
     isLoading,
     data: resolvedData,
     isFetching,
-  } = useQuery(
-    [
-      `items?page=${page}&query=${query}&sortId=${sortid}&page_size=${pageSize}`,
-      page,
-      sortid,
-      query,
-      pageSize,
-    ],
-    getItemsList,
-    {
-      cacheTime: Infinity,
-      keepPreviousData: true,
-    }
-  );
+  } = useQuery([`items-list`, page, sortid, query, pageSize], getItemsList, {
+    cacheTime: Infinity,
+    keepPreviousData: true,
+  });
 
   const handleItemsConfig = (pagination, filters, sorter: any, extra) => {
     if (sorter.order === undefined) {
@@ -253,7 +242,7 @@ export const ItemsList: FC = () => {
             NOTIFICATIONTYPE.SUCCESS,
             'Item Deleted Successfully'
           );
-          ['all-items', 'items?page'].forEach((key) => {
+          ['all-items', 'items-list'].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           });
           setConfirmModal(false);
@@ -284,7 +273,7 @@ export const ItemsList: FC = () => {
         return (
           <div
             onClick={() =>
-              setShowItemsDetails({ visibility: true, id: row.id })
+              setShowItemsDetails({ visibility: true, id: row?.id })
             }
             style={{ color: '#2395E7', cursor: 'pointer' }}
           >
@@ -374,7 +363,7 @@ export const ItemsList: FC = () => {
     return (
       <div className="flex alignCenter justifySpaceBetween">
         <ItemsImport />
-        <ButtonTag
+        {/* <ButtonTag
           // className="mr-10"
           // disabled={!selectedRow.length || selectedRow.length > 1}
           onClick={() =>
@@ -383,7 +372,7 @@ export const ItemsList: FC = () => {
           title="Manage Inventory"
           icon={packageIcon}
           size="middle"
-        />
+        /> */}
         <SmartFilter
           onFilter={(encode) => {
             const route = `/app/items?sortid=${sortid}&page=1&page_size=20&query=${encode}`;

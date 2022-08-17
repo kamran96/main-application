@@ -125,7 +125,7 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
       page,
       pageSize,
       query,
-      sortid
+      sortid,
     ],
     purchaseOrderList,
     {
@@ -153,7 +153,7 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
           }
         });
 
-        setAllInvoicesRes(prev => ({ ...prev, result: userData }))
+        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
       } else {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
@@ -163,7 +163,7 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
           }
         });
 
-        setAllInvoicesRes(prev => ({ ...prev, result: userData }))
+        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
       }
       setAllInvoicesConfig({
         ...allInvoicesConfig,
@@ -175,13 +175,16 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
             : sorter.field,
       });
 
-      const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=all&sortid=${sorter && sorter.order === 'descend'
-        ? `-${sorter.field}`
-        : sorter.field
-        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      const route = `/app${
+        ISupportedRoutes.PURCHASE_ORDER
+      }?tabIndex=all&sortid=${
+        sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+        sorter.order
+      }&query=${query}`;
       history.push(route);
     }
-  }
+  };
 
   /* CONDITIONAL RENDERING LIFE CYCLE HOOK TO UPDATE ALL INVOICES STATE WHEN API CALL IS DONE */
   useEffect(() => {
@@ -208,7 +211,7 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
         [
           'invoices',
           'transactions',
-          'items?page',
+          'items-list',
           'invoice-view',
           'ledger-contact',
           'all-items',
@@ -245,7 +248,9 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
     dataIndex: 'owner',
     key: 'owner',
     sorter: false,
-    render: (data) => <span className="capitalize">{data?.profile?.fullName}</span>,
+    render: (data) => (
+      <span className="capitalize">{data?.profile?.fullName}</span>
+    ),
   });
 
   const renerTopRightbar = () => {

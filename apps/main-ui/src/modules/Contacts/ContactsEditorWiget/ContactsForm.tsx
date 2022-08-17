@@ -19,6 +19,8 @@ import { EnterpriseWrapper } from '../../../components/EnterpriseWrapper';
 import { IOrganizationType } from '../../../modal/organization';
 import Checkbox from 'antd/lib/checkbox/Checkbox';
 import { useLocation } from 'react-router-dom';
+import en from 'world_countries_lists/data/en/world.json';
+import phoneCodes from '../../../utils/phoneCodes';
 
 const { Option } = Select;
 
@@ -137,6 +139,51 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
       }
     }
   }, [data, id, form]);
+
+  const getFlag = (short: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const data = require(`world_countries_lists/flags/24x24/${short.toLowerCase()}.png`);
+    // for dumi
+    if (typeof data === 'string') {
+      return data;
+    }
+    // for CRA
+    return data.default;
+  };
+
+  const prefixSelector = (
+    <Form.Item name="prefix" noStyle>
+      <Select
+        style={{ width: 100 }}
+        showSearch
+        defaultValue={`92`}
+        filterOption={(input, option) => {
+          return (
+            option?.id?.toLowerCase().includes(input?.toLocaleLowerCase()) ||
+            option?.title?.toLowerCase().includes(input?.toLocaleLowerCase())
+          );
+        }}
+      >
+        {phoneCodes?.map((country) => {
+          return (
+            <Option
+              value={`${country?.phoneCode}`}
+              title={`${country?.phoneCode}`}
+              id={`${country?.short}`}
+            >
+              <img
+                className="mr-10"
+                alt="flag"
+                style={{ width: 18, height: 18, verticalAlign: 'sub' }}
+                src={getFlag(country.short)}
+              />
+              <span>+{country?.phoneCode}</span>
+            </Option>
+          );
+        })}
+      </Select>
+    </Form.Item>
+  );
 
   /* HOOKS ENDS HERE */
 
@@ -343,22 +390,18 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
               name="cellNumber"
               rules={[
                 {
-                  max: 11,
-                  min: 11,
-                  message: 'Mobile Number must be in 11 Characters',
+                  required: false,
+                  message: 'Please add your last name',
                 },
-                { required: true, message: 'Phone Number is required!' },
-                {
-                  pattern: /^\S/,
-                  message: 'Phone Number is required!',
-                },
+                { max: 12, min: 4 },
               ]}
             >
               <Input
-                style={{ width: '100%' }}
-                placeholder={'0310XXXXXXX'}
-                size="large"
                 autoComplete="off"
+                addonBefore={prefixSelector}
+                type="text"
+                placeholder="3188889898"
+                size="large"
               />
             </Form.Item>
           </Col>
@@ -417,27 +460,37 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <FormLabel>CNIC</FormLabel>
-            <Form.Item
-              name="cnic"
-              rules={[
-                {
-                  max: 13,
-                  min: 13,
-                  message: 'Cnic must be in 13 Characters',
-                },
-                {
-                  pattern: /^\S/,
-                  message: 'Cnic must be in 13 Characters',
-                },
-              ]}
-            >
-              <Input
-                style={{ width: '100%' }}
+            <FormLabel isRequired={true}>Country</FormLabel>
+            <Form.Item name="country" rules={[{ required: true }]}>
+              <Select
                 size="large"
-                placeholder={'Your CNIC without (-) eg: 7150112547851'}
-                autoComplete="off"
-              />
+                showSearch
+                style={{ width: '100%' }}
+                placeholder="Select a Country"
+                filterOption={(input, option) => {
+                  return option?.title
+                    ?.toLowerCase()
+                    .includes(input?.toLocaleLowerCase());
+                }}
+              >
+                {en?.map((country) => {
+                  return (
+                    <Option title={country?.name} value={country?.name}>
+                      <img
+                        className="mr-10"
+                        alt="flag"
+                        style={{
+                          width: 18,
+                          height: 18,
+                          verticalAlign: 'sub',
+                        }}
+                        src={getFlag(country.alpha2)}
+                      />
+                      <span>{country?.name}</span>
+                    </Option>
+                  );
+                })}
+              </Select>
             </Form.Item>
           </Col>
           <Col span={24}>

@@ -80,8 +80,6 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   };
 
 
-  console.log(history, "history")
-
   const [rowsErrors, setRowsErrors] = useState([]);
   const [width] = useWindowSize();
 
@@ -110,7 +108,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
 
   const accountsList: IAccountsResult[] = accountsData?.data?.result || [];
 
-  const defaultAccountCode = '15001';
+  const defaultAccountCode = '50001';
 
   const [defaultAccount] = accountsList.filter(
     (i) => i.code === defaultAccountCode
@@ -188,6 +186,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   useEffect(() => {
     AntForm.setFieldsValue(defaultFormData);
   }, [AntForm]);
+
+  console.log(relation, "what is relation")
 
   const APICATEGORYSTAKE =
     relation?.type === IInvoiceType.INVOICE
@@ -334,12 +334,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
 
   const getItemWithItemId = (id: number) => {
     if (items && items.length) {
-      console.log(items, "item")
-      console.log(id, "item ite")
       const [filtered] = items.filter((item) => item.id === id);
-
-      console.log(filtered, "filtered")
-
       return filtered;
     } else {
       return null;
@@ -657,63 +652,63 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
       },
     },
     enableAccountColumn
-      ? {
-          title: 'Account',
-          dataIndex: 'accountId',
-          width: width > 1500 ? 220 : 150,
-          render: (value, row, index) => {
-            return (
-              <EditableSelect
-                error={
-                  row?.errors?.length && row?.errors?.includes('accountId')
-                }
-                className={`border-less-select contacttype-${IContactTypes.SUPPLIER}`}
-                value={{
-                  value: value !== null ? value : '',
-                  label:
-                    (accountsList?.length && getAccountNameByID(value)) ||
-                    'Select Account',
-                }}
-                labelInValue={true}
-                loading={accountsLoading}
-                size="middle"
-                showSearch
-                style={{ width: '100%' }}
-                placeholder="Select Account"
-                optionFilterProp="children"
-                onChange={(val) => {
-                  setInvoiceItems((prev) => {
-                    const allItems = [...prev];
+    ? {
+        title: 'Account',
+        dataIndex: 'accountId',
+        width: width > 1500 ? 220 : 150,
+        render: (value, row, index) => {
+          return (
+            <EditableSelect
+              error={
+                row?.errors?.length && row?.errors?.includes('accountId')
+              }
+              className={`border-less-select contacttype-${IContactTypes.CUSTOMER}`}
+              value={{
+                value: value !== null ? value : '',
+                label:
+                  (accountsList?.length && getAccountNameByID(value)) ||
+                  'Select Account',
+              }}
+              labelInValue={true}
+              loading={accountsLoading}
+              size="middle"
+              showSearch
+              style={{ width: '100%' }}
+              placeholder="Select Account"
+              optionFilterProp="children"
+              onChange={(val) => {
+                setInvoiceItems((prev) => {
+                  const allItems = [...prev];
 
-                    allItems[index] = {
-                      ...allItems[index],
-                      accountId: val.value,
-                      errors: RemovedErrors(
-                        allItems[index].errors,
-                        'accountId'
-                      ),
-                    };
+                  allItems[index] = {
+                    ...allItems[index],
+                    accountId: val.value,
+                    errors: RemovedErrors(
+                      allItems[index].errors,
+                      'accountId'
+                    ),
+                  };
 
-                    return allItems;
-                  });
-                }}
-              >
-                <>
-                  {accountsList.map((acc: IAccountsResult, index: number) => {
-                    return (
-                      <Option key={index} value={acc.id}>
-                        {acc.name}
-                      </Option>
-                    );
-                  })}
-                </>
-              </EditableSelect>
-            );
-          },
-        }
-      : {
-          width: 0,
+                  return allItems;
+                });
+              }}
+            >
+              <>
+                {accountsList.map((acc: IAccountsResult, index: number) => {
+                  return (
+                    <Option key={index} value={acc.id}>
+                      {acc.name}
+                    </Option>
+                  );
+                })}
+              </>
+            </EditableSelect>
+          );
         },
+      }
+    : {
+        width: 0,
+      },
     {
       title: 'Tax',
       dataIndex: 'tax',

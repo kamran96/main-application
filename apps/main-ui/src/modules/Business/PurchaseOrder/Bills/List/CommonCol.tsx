@@ -202,7 +202,7 @@ export const useCols = () => {
       key: '',
       render: (data, row, index) => {
         const rowData = plainToClass(InvoiceResultClass, row);
-        return row && rowData.getStatus();
+        return rowData.getStatus();
       },
     },
   ];

@@ -163,7 +163,6 @@ export class InvoiceResultClass {
     let itemStatus = `Pending`;
     if (this.paid_amount) {
       const paidAmount = Math.abs(this.paid_amount);
-
       if (this.netTotal - paidAmount === this.netTotal) {
         itemStatus = `Pending`;
       } else if (this.netTotal === paidAmount) {

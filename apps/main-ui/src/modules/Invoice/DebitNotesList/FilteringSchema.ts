@@ -3,7 +3,7 @@ import { FilterType } from '../../../modal';
 export default {
   contactId: {
     type: FilterType.LIST_IDS,
-    label: 'Customer',
+    label: 'Supplier',
     value: [],
   },
   reference: {
@@ -14,12 +14,12 @@ export default {
   },
   issueDate: {
     type: FilterType.DATE_BETWEEN,
-    label: 'Credit Note Date',
+    label: 'Debit Note Date',
     value: '',
   },
   invoiceNumber: {
     type: FilterType.SEARCH,
-    label: 'Credit Note Number',
+    label: 'Debit Note Number',
     value: '',
     isFullSearch: false,
   },

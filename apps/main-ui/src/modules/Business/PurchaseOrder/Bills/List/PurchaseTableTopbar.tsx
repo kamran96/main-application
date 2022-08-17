@@ -5,9 +5,10 @@ import Icon from '@iconify/react';
 import { Button } from 'antd';
 import React, { FC, ReactElement } from 'react';
 import styled from 'styled-components';
-
+import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import { PDFICON } from '../../../../../components/Icons';
 import { Color } from '../../../../../modal';
+import { ButtonTag } from '../../../../../components/ButtonTags';
 
 interface IProps {
   disabled?: boolean;
@@ -32,6 +33,7 @@ export const PurchaseTopbar: FC<IProps> = ({
   hasApproveButton,
   isAbleToDelete = true,
 }) => {
+  const { setPaymentsModalConfig } = useGlobalContext();
   return (
     <WrapperPurchaseTopbar className="flex alignCenter justifySpaceBetween">
       <div className="flex alignCenter _quick_access">

@@ -61,7 +61,7 @@ export const DueExpiredBills: FC<IProps> = ({ columns, activeTab }) => {
   });
   /* ********* DESTRUCTURING ALL INVOICESCONFIG *************** */
   const { page, query, sortid, page_size } = allInvoicesConfig;
-  const {PDFColsBills, _csvExportable} = useCols();
+  const { PDFColsBills, _csvExportable } = useCols();
 
   const [confirmModal, setConfirmModal] = useState(false);
   const { routeHistory } = useGlobalContext();
@@ -131,7 +131,7 @@ export const DueExpiredBills: FC<IProps> = ({ columns, activeTab }) => {
       page,
       page_size,
       query,
-      sortid
+      sortid,
     ],
     getPoListAPI,
     {
@@ -173,8 +173,8 @@ export const DueExpiredBills: FC<IProps> = ({ columns, activeTab }) => {
             return -1;
           }
         });
-        
-        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+
+        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
       } else {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
@@ -183,8 +183,8 @@ export const DueExpiredBills: FC<IProps> = ({ columns, activeTab }) => {
             return -1;
           }
         });
-        
-        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+
+        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
       }
 
       setAllInvoicesConfig({
@@ -199,15 +199,13 @@ export const DueExpiredBills: FC<IProps> = ({ columns, activeTab }) => {
       const route = `/app${
         ISupportedRoutes.PURCHASES
       }?tabIndex=due_expired&sortid=${
-        sorter && sorter.order === 'descend'
-          ? `-${sorter.field}`
-          : sorter.field
-      }&page=${
-        pagination.current
-      }&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+        sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+        sorter.order
+      }&query=${query}`;
       history.push(route);
     }
-  }
+  };
 
   /* DELETE PURCHASE ORDER METHOD */
   const handleDelete = async () => {
@@ -224,7 +222,7 @@ export const DueExpiredBills: FC<IProps> = ({ columns, activeTab }) => {
           [
             'invoices',
             'transactions',
-            'items?page',
+            'items-list',
             'invoice-view',
             'ledger-contact',
             'all-items',
@@ -298,8 +296,8 @@ export const DueExpiredBills: FC<IProps> = ({ columns, activeTab }) => {
         topbarRightPannel={renerTopRightbar()}
         customTopbar={
           <PurchaseTopbar
-            onDelete={() => setConfirmModal(true)}
-            isAbleToDelete={rbac.can(PERMISSIONS.PURCHASES_DELETE)}
+            // onDelete={() => setConfirmModal(true)}
+            isAbleToDelete={false}
             disabled={!selectedRow.length}
           />
         }

@@ -70,6 +70,10 @@ export const ItemsViewContainer: FC = () => {
     }
   }, [itemDetailData]);
 
+  function truncate(source, size) {
+    return source.length > size ? source.slice(0, size - 1) + '…' : source;
+  }
+
   return (
     <WrapperItemsView>
       <div className="flex justifySpaceBetween">
@@ -101,7 +105,7 @@ export const ItemsViewContainer: FC = () => {
             footerDesc="Sum of invoice build"
             icon_bg="_color"
             icon={<Icon color="#1f9dff" icon={bxDollar} />}
-            amount={(result && result.quantitystock) || 0}
+            amount={(result.quantitystock && result.quantitystock) || 0}
           />
         </Col>
 
@@ -118,7 +122,9 @@ export const ItemsViewContainer: FC = () => {
             icon_bg="_color1"
             footerDesc="Sum of Purchase made"
             icon={<Icon color="#fbce30" icon={bxDollar} />}
-            amount={moneyFormat(result ? result.purchaseamount : 0)}
+            amount={moneyFormat(
+              result.purchaseamount ? result.purchaseamount : 0
+            )}
           />
         </Col>
         <Col
@@ -150,7 +156,7 @@ export const ItemsViewContainer: FC = () => {
             icon_bg="_color3"
             footerDesc="Total Sales"
             icon={<Icon color="#3f1fff" icon={bxDollar} />}
-            amount={moneyFormat(result ? result.saleamount : 0)}
+            amount={moneyFormat(result.saleamount ? result.saleamount : 0)}
           />
         </Col>
       </Row>
@@ -186,7 +192,9 @@ export const ItemsViewContainer: FC = () => {
                 <h3>Description: </h3>
               </Col>
               <Col span={15}>
-                <p>{result && result.description}</p>
+                <p>
+                  {result?.description && truncate(result.description, 120)}
+                </p>
               </Col>
               <Col span={7}>
                 <h3>Added Date: </h3>

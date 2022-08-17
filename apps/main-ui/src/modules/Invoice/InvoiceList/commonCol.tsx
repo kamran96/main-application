@@ -17,6 +17,7 @@ export const useCols = () => {
     if (history?.location?.search) {
       const filterType = history.location.search.split('&');
       const filterIdType = filterType[1];
+
       const filterOrder = filterType[4]?.split('=')[1];
 
       if (filterIdType?.includes('-')) {

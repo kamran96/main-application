@@ -110,10 +110,15 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
       setInvoiceItems(val);
     });
 
+    console.log(error, 'error', value, 'value');
+
     if (!error?.length) {
       const [filteredContact] = contactResult?.filter(
         (i) => i.id === value?.contactId
       );
+
+      console.log(filteredContact, 'filterredContact');
+
       let payload: any = {
         ...value,
         status: value.status.status,
@@ -162,7 +167,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
           [
             'invoices',
             'transactions',
-            'items?page',
+            'items-list',
             'invoice-view',
             'ledger-contact',
             'all-items',
@@ -441,14 +446,14 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                     </p>
                   </Col>
 
-                  <Col className="flex alignCenter" span={12}>
+                  {/* <Col className="flex alignCenter" span={12}>
                     <p className="bold">Invoice Discount</p>
                   </Col>
                   <Col span={12}>
                     <div className="flex alignCenter justifyFlexEnd">
                       <Form.Item name="invoiceDiscount">
                         <InputNumber
-                          onChange={(val) => {
+                           onChange={(val) => {
                             const value = val;
                             clearTimeout(debounce);
 
@@ -460,7 +465,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                         />
                       </Form.Item>
                     </div>
-                  </Col>
+                  </Col> */}
                   <Col span={24}>
                     <Seprator />
                   </Col>

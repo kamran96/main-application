@@ -14,6 +14,12 @@ interface IModalsConfig {
   [key: string]: any;
 }
 
+export interface IPaymentsModal extends IModalsConfig {
+  type?: 'payable' | 'receivable';
+  orders?: string[] | number[];
+  contactId?: number;
+}
+
 export type IImportType =
   | 'accounts'
   | 'contacts'
@@ -81,8 +87,16 @@ interface IGlobalContextvalues {
     id?: number,
     branchId?: number
   ) => void;
-  paymentsModalConfig?: IModalsConfig;
-  setPaymentsModalConfig?: (visibility: boolean, id?: number) => void;
+  paymentsModalConfig?: IPaymentsModal;
+  setPaymentsModalConfig?: (
+    visibility: boolean,
+    id?: number,
+    config?: {
+      type?: 'payable' | 'receivable';
+      orders?: string[] | number[];
+      contactId?: number;
+    }
+  ) => void;
   categoryModalConfig?: IModalsConfig;
   setCategoryModalConfig?: (
     visibility: boolean,

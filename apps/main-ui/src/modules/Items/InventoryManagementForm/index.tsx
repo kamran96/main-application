@@ -322,7 +322,7 @@ export const ManageInventoryForm: FC = () => {
               NOTIFICATIONTYPE?.SUCCESS,
               'Updated Stocks Successfully'
             );
-            [`all-items`, 'items?page', `transactions?page`]?.forEach((key) => {
+            [`all-items`, 'items-list', `transactions?page`]?.forEach((key) => {
               (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
             });
             resetForm();

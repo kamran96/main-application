@@ -281,10 +281,10 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
           <PurchaseTopbar
             disabled={!selectedRow.length}
             isEditable={selectedRow.length === 1}
-            isAbleToDelete={rbac.can(PERMISSIONS.PURCHASES_DELETE)}
-            onDelete={() => {
-              setConfirmModal(true);
-            }}
+            isAbleToDelete={false}
+            // onDelete={() => {
+            //   setConfirmModal(true);
+            // }}
             onEdit={() => {
               const id = selectedRow[0];
               history.push(

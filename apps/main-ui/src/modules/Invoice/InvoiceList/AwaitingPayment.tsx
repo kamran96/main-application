@@ -110,7 +110,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
       page,
       pageSize,
       query,
-      sortid
+      sortid,
     ],
     getInvoiceListAPI,
     {
@@ -155,7 +155,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
           }
         });
 
-        setAllInvoicesRes(prev => ({ ...prev, result: userData }))
+        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
       } else {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
@@ -165,7 +165,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
           }
         });
 
-        setAllInvoicesRes(prev => ({ ...prev, result: userData }))
+        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
       }
       setAllInvoicesConfig({
         ...allInvoicesConfig,
@@ -174,17 +174,24 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
         sortid:
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
-            : sorter.order === 'asceend' ? sorter.field : 'id',
+            : sorter?.order === 'ascend'
+            ? sorter.field
+            : 'id',
       });
-      const route = `/app${ISupportedRoutes.INVOICES
-        }?tabIndex=awating_payment&sortid=${sorter && sorter.order === 'descend'
-          ? `-${sorter.field}`
-          : sorter.order === 'asceend' ? sorter.field : 'id'
-        }&page=${pagination.current
-        }&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      const route = `/app${
+        ISupportedRoutes.INVOICES
+      }?tabIndex=awating_payment&sortid=${
+        sorter && sorter?.order === 'descend'
+          ? `-${sorter?.field}`
+          : sorter?.order === 'ascend'
+          ? sorter.field
+          : 'id'
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+        sorter?.order
+      }&query=${query}`;
       history.push(route);
     }
-  }
+  };
 
   const handleDelete = async () => {
     const payload = {
@@ -192,7 +199,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
     };
     await mutateDeleteOrders(payload, {
       onSuccess: () => {
-        ['invoices', 'transactions?page', 'items?page', 'invoice-view'].forEach(
+        ['invoices', 'transactions?page', 'items-list', 'invoice-view'].forEach(
           (key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           }
@@ -274,9 +281,9 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
                 `/app${ISupportedRoutes.CREATE_INVOICE}/${selectedRow[0]}`
               );
             }}
-          // onDelete={() => {
-          //   setConfirmModal(true);
-          // }}
+            // onDelete={() => {
+            //   setConfirmModal(true);
+            // }}
           />
         }
         data={result}

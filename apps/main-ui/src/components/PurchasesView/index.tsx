@@ -55,7 +55,8 @@ interface IProps {
     | IInvoiceType.INVOICE
     | IInvoiceType.PURCHASE_ORDER
     | IInvoiceType.BILL
-    | IInvoiceType.CREDITNOTE;
+    | IInvoiceType.CREDITNOTE
+    | IInvoiceType.DEBITNOTE;
   id?: number | string;
   onApprove?: (payload?: any) => void;
 }
@@ -110,6 +111,8 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
       enabled: !!id,
     }
   );
+
+
 
   const response = plainToClass(
     IInvoiceMutatedResult,
@@ -339,6 +342,8 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
     },
   ];
 
+ 
+
   const _options: IInvoiceOptions[] = [
     (response?.invoiceType === IInvoiceType.PURCHASE_ORDER ||
       response?.invoiceType === IInvoiceType.QUOTE) && {
@@ -366,12 +371,13 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
     },
 
     (response?.invoiceType === IInvoiceType?.PURCHASE_ENTRY ||
-      response?.invoiceType === IInvoiceType?.INVOICE) && {
-      title: 'Add Credit note',
+      response?.invoiceType === IInvoiceType?.INVOICE) &&
+      {
+      title: response?.invoiceType===IInvoiceType.PURCHASE_ENTRY ? 'Add Debit note' : 'Add Credit note',
       permission: PERMISSIONS?.INVOICES_CREATE,
       key: IInvoiceActions.CREDIT_NOTE,
     },
-
+    
     {
       title: 'Email',
       permission: null,
@@ -470,9 +476,9 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
       ? 'Purchase Order'
       : type === IInvoiceType.CREDITNOTE
       ? 'Credit Note'
-      : type === IInvoiceType.QUOTE
-      ? 'Quote'
-      : 'Debit Note';
+      : type === IInvoiceType.DEBITNOTE
+      ? 'Debit Note'
+      : 'Quote';
 
   return (
     <WrapperNewPurchaseView>
@@ -692,23 +698,14 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
                     <td>{moneyFormat(response?.grossTotal)}</td>
                   </tr>
                   {type !== IInvoiceType.PURCHASE_ORDER &&
-                  type !== IInvoiceType.BILL ? (
-                    <>
-                      <tr>
-                        <th>Items Discount</th>
-                        <td>{response && moneyFormat(itemsDiscount)}</td>
-                      </tr>
+                    type !== IInvoiceType.BILL &&
+                    type !== IInvoiceType.CREDITNOTE &&
+                    type !== IInvoiceType.DEBITNOTE && (
                       <tr>
                         <th>Invoice Discount</th>
                         <td>{response && moneyFormat(invoiceDiscount)}</td>
                       </tr>
-                    </>
-                  ) : (
-                    <tr>
-                      <th>Adjustments</th>
-                      <td>{response && moneyFormat(response?.adjustment)}</td>
-                    </tr>
-                  )}
+                    )}
                   <tr>
                     <th>Tax Rate</th>
                     <td>{response && moneyFormat(TotalTax)}</td>
@@ -764,81 +761,11 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
           )}
         </Row>
       </Card>
-      {/* <CommonModal
-        footer={false}
-        onCancel={() => setPaymentModal(false)}
-        visible={paymentModal}
-      >
-        <Payment
-          initialValues={{
-            ...payment,
-            totalAmount: response && response.netTotal,
-            totalDiscount: response && response.discount,
-          }}
-          reset={false}
-          onChange={(payload) => setPayment(payload)}
-        />
-        <div className="mv-10 pb-10 textRight">
-          <Button
-            className="mr-10"
-            type="primary"
-            ghost
-            size="middle"
-            onClick={() => {
-              setPaymentModal(false);
-              setPayment({ ...defaultStates });
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            loading={approving}
-            onClick={handleApprove}
-            type="primary"
-            size="middle"
-          >
-            Payment Proceed
-          </Button>
-        </div>
-      </CommonModal> */}
       <EmailModal
         onSendEmail={onEmail}
         visibility={emailModal}
         setVisibility={(a) => setEmailModal(a)}
       />
-      {/* <CommonModal
-        visible={dueDate}
-        title="Change Due Date"
-        width={400}
-        onCancel={() => {
-          setDueDate(false);
-        }}
-        footer={
-          <>
-            <Button type="text" onClick={() => setDueDate(false)}>
-              Cancel
-            </Button>
-            <Button type="primary"> Update </Button>
-          </>
-        }
-      >
-        <Form>
-          <FormLabel>Due Date</FormLabel>
-          <Form.Item
-            name="issueDate"
-            rules={[{ required: true, message: 'Required !' }]}
-          >
-            <DatePicker
-              disabledDate={(current) => {
-                return current > dayjs().endOf('day');
-              }}
-              style={{ width: '100%' }}
-              size="middle"
-            />
-          </Form.Item>
-        </Form>
-      </CommonModal> */}
-
       <div className="_visibleOnPrint" ref={printRef}>
         <PrintFormat>
           <PrintViewPurchaseWidget
@@ -1076,4 +1003,6 @@ const WrapperNewPurchaseView = styled.div`
   div.ant-table-body {
     overflow-x: hidden;
   }
+
+
 `;
