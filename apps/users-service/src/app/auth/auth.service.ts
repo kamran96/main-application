@@ -221,7 +221,11 @@ export class AuthService {
     return user;
   }
 
-  async Login(user: IUser[], @Res() res: Response): Promise<IUser[]> {
+  async Login(
+    user: IUser[],
+    @Res() res: Response,
+    req = null
+  ): Promise<IUser[]> {
     const [newUser] = user;
 
     const payload = {
@@ -231,25 +235,27 @@ export class AuthService {
 
     const token = this.jwtService.sign(payload);
 
-    if (process.env['DEVELOPMENT']) {
-      Logger.log('Set cookie for development environment');
-
+    const hostname = req.headers.origin;
+    console.log(hostname, 'host');
+    if (
+      hostname === 'https://staging.invyce.com' ||
+      hostname === 'https://cloud.invyce.com'
+    ) {
+      Logger.log('Set cookie for production environment');
       res
         .cookie('access_token', token, {
-          secure: true,
-          sameSite: 'lax',
           httpOnly: true,
-          // path: '/',
-          // expires: new Date(Moment().add(process.env.EXPIRES, 'h').toDate()),
         })
         .send({
           message: 'Login successfully',
           status: true,
         });
     } else {
-      Logger.log('Set cookie for production environment');
+      Logger.log('Set cookie for development environment');
       res
         .cookie('access_token', token, {
+          secure: true,
+          sameSite: 'none',
           httpOnly: true,
         })
         .send({
@@ -321,7 +327,11 @@ export class AuthService {
     }
   }
 
-  async ValidateUser(authDto: UserLoginDto, res: Response): Promise<IUser[]> {
+  async ValidateUser(
+    authDto: UserLoginDto,
+    res: Response,
+    req: IRequest
+  ): Promise<IUser[]> {
     const users = await this.CheckUser(authDto);
 
     if (Array.isArray(users) && users[0] !== undefined) {
@@ -343,7 +353,7 @@ export class AuthService {
           );
         }
 
-        return await this.Login(users, res);
+        return await this.Login(users, res, req);
       }
       Logger.warn('Incorrect password');
       throw new HttpException('Incorrect Password', HttpStatus.BAD_REQUEST);

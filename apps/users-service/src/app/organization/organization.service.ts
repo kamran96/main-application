@@ -286,7 +286,7 @@ export class OrganizationService {
             username: req.user.username,
           });
 
-          return await this.authService.Login(users, res);
+          return await this.authService.Login(users, res, req);
         }
       } catch (error) {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -294,13 +294,13 @@ export class OrganizationService {
     }
   }
 
-  async ChangeOrganization(user: IBaseUser, body, res: Response) {
+  async ChangeOrganization(body, res: Response, req: IRequest) {
     const organization = await this.organizationModel
       .findOne({ _id: body.organizationId })
       .populate('branches');
 
     await this.userModel.updateOne(
-      { _id: user?.id },
+      { _id: req.user?.id },
       {
         organizationId: organization.id,
         branchId: organization.branches[0].id,
@@ -315,7 +315,7 @@ export class OrganizationService {
     );
 
     const org = await this.organizationUserModel.find({
-      userId: { $in: user.id },
+      userId: { $in: req.user.id },
     });
 
     const orgIds = org.map((ids) => ids.organizationId);
@@ -338,10 +338,10 @@ export class OrganizationService {
     }
 
     const users = await this.authService.CheckUser({
-      username: user.username,
+      username: req.user.username,
     });
 
-    return await this.authService.Login(users, res);
+    return await this.authService.Login(users, res, req);
   }
 
   async ViewOrganization(

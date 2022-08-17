@@ -163,7 +163,7 @@ export class UserService {
     }
   }
 
-  async ChangeUserDetails(loginUser: IBaseUser, data, @Res() res: Response) {
+  async ChangeUserDetails(req: IRequest, data, @Res() res: Response) {
     const email = data?.email;
     const twoFactorEnabled = data?.twoFactorEnabled;
 
@@ -177,23 +177,23 @@ export class UserService {
       }
 
       await this.userModel.updateOne(
-        { _id: loginUser.id },
+        { _id: req.user.id },
         {
           email,
         }
       );
 
       const user = await this.userModel.find({
-        _id: loginUser.id,
+        _id: req.user.id,
       });
 
       await this.emailService.emit(EMAIL_CHANGED, {
-        to: loginUser.email,
-        user_name: loginUser.profile.fullName,
+        to: req.user.email,
+        user_name: req.user.profile.fullName,
         user_new_email: email,
       });
 
-      const userWithToken = await this.authService.Login(user, res);
+      const userWithToken = await this.authService.Login(user, res, req);
 
       return {
         message: 'Email successfully changed',
@@ -202,7 +202,7 @@ export class UserService {
       };
     } else if (twoFactorEnabled !== undefined) {
       await this.userModel.updateOne(
-        { _id: loginUser.id },
+        { _id: req.user.id },
         {
           twoFactorEnabled,
         }
@@ -214,15 +214,15 @@ export class UserService {
       };
     } else {
       await this.userModel.updateOne(
-        { _id: loginUser.id },
+        { _id: req.user.id },
         {
           password: bcrypt.hashSync(data.password, 10),
         }
       );
 
       await this.emailService.emit(PASSWORD_UPDATED, {
-        to: loginUser.email,
-        user_name: loginUser.profile.fullName,
+        to: req.user.email,
+        user_name: req.user.profile.fullName,
       });
 
       return {
@@ -357,7 +357,8 @@ export class UserService {
   async UpdateInvitedUser(
     userDto: InvitedUserDetailDto,
     params: ParamsDto,
-    res: Response
+    res: Response,
+    req: IRequest
   ): Promise<IUser[]> {
     try {
       const {
@@ -408,7 +409,7 @@ export class UserService {
         username: email ? email : user.username,
       });
 
-      return await this.authService.Login(new_user, res);
+      return await this.authService.Login(new_user, res, req);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -421,7 +422,8 @@ export class UserService {
   async UpdateUserProfile(
     userDto: InvitedUserDetailDto,
     params: ParamsDto,
-    res: Response
+    res: Response,
+    req: IRequest
   ): Promise<IUser[]> {
     try {
       const {
@@ -466,7 +468,7 @@ export class UserService {
         username: username ? username : email,
       });
 
-      return await this.authService.Login(new_user, res);
+      return await this.authService.Login(new_user, res, req);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

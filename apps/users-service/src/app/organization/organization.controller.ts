@@ -80,11 +80,7 @@ export class OrganizationController {
     @Body() body,
     @Res() res: Response
   ) {
-    return await this.organizationService.ChangeOrganization(
-      req.user,
-      body,
-      res
-    );
+    return await this.organizationService.ChangeOrganization(body, res, req);
   }
 
   @Get(':id')

@@ -35,13 +35,14 @@ export class AuthController {
   @Post()
   async Login(
     @Body() authDto: UserLoginDto,
-    @Res() res: Response
+    @Res() res: Response,
+    @Req() req: IRequest
   ): Promise<void> {
     try {
       Logger.log(`user login request received`);
       // Logger.debug({ body: authDto }, `Request payload contains body data`);
 
-      await this.authService.ValidateUser(authDto, res);
+      await this.authService.ValidateUser(authDto, res, req);
     } catch (error) {
       throw new HttpException(
         `Sorry! Something went wrong, ${error.message}`,
@@ -53,7 +54,8 @@ export class AuthController {
   @Post('/register')
   async Register(
     @Body() authDto: UserRegisterDto,
-    @Res() res: Response
+    @Res() res: Response,
+    @Req() req: IRequest
   ): Promise<IUser | IUserWithResponse> {
     try {
       Logger.log("Checking user's information.");
@@ -70,7 +72,7 @@ export class AuthController {
 
       Logger.log('Registering a new user');
       await this.authService.AddUser(authDto);
-      const user = await this.authService.ValidateUser(authDto, res);
+      const user = await this.authService.ValidateUser(authDto, res, req);
       if (user) {
         return {
           message: 'Successfull',
