@@ -4,6 +4,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Logger,
   Post,
   Req,
   Res,
@@ -37,6 +38,9 @@ export class AuthController {
     @Res() res: Response
   ): Promise<void> {
     try {
+      Logger.log(`user login request received`);
+      // Logger.debug({ body: authDto }, `Request payload contains body data`);
+
       await this.authService.ValidateUser(authDto, res);
     } catch (error) {
       throw new HttpException(
@@ -52,13 +56,19 @@ export class AuthController {
     @Res() res: Response
   ): Promise<IUser | IUserWithResponse> {
     try {
+      Logger.log("Checking user's information.");
       const users = await this.authService.CheckUser(authDto);
       if (Array.isArray(users) && users.length > 0) {
+        Logger.error(
+          'Username has already being taken. Please try again with an alternate username.'
+        );
         throw new HttpException(
           'Username has already being taken. Please try again with an alternate username.',
           HttpStatus.BAD_REQUEST
         );
       }
+
+      Logger.log('Registering a new user');
       await this.authService.AddUser(authDto);
       const user = await this.authService.ValidateUser(authDto, res);
       if (user) {

@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import {
   Between,
   getCustomRepository,
@@ -461,6 +467,7 @@ export class InvoiceService {
     const invoiceItems = [];
 
     if (dto?.isNewRecord === false) {
+      Logger.log('updating the current invoice');
       // we need to update invoice
       const invoice: IInvoice = await getCustomRepository(
         InvoiceRepository
@@ -551,6 +558,7 @@ export class InvoiceService {
         });
 
         if (updatedInvoice.status === Statuses.AUTHORISED) {
+          Logger.log('Managing inventory for items.');
           await axios.post(
             Host('items', 'items/item/manage-inventory'),
             {
@@ -588,6 +596,7 @@ export class InvoiceService {
             status: updatedInvoice.status,
           };
 
+          Logger.log('Making transactions for the invoice.');
           const { data: transaction } = await axios.post(
             Host('accounts', 'accounts/transaction/api'),
             {
@@ -613,7 +622,6 @@ export class InvoiceService {
           ];
 
           const invoiceLink = `${process.env.FRONTEND_HOST}/invoices/${invoice.id}`;
-
           await this.emailService.emit(INVOICE_UPDATED, {
             to: req?.user?.email,
             user_name: ToTitleCase(req?.user?.profile?.fullName),
@@ -621,6 +629,7 @@ export class InvoiceService {
             name: invoiceLink,
           });
 
+          Logger.log('Adding payments for the invoice.');
           await axios.post(
             Host('payments', 'payments/payment/add'),
             {
@@ -632,6 +641,7 @@ export class InvoiceService {
               },
             }
           );
+
           await axios.get(Host('contacts', 'contacts/contact/balance'), {
             headers: {
               cookie: `access_token=${token}`,
@@ -640,7 +650,13 @@ export class InvoiceService {
         }
         return updatedInvoice;
       }
+
+      Logger.error(
+        'Something went wrong, Invalid parameters were given while updating invoice data.'
+      );
     } else {
+      Logger.log('Creating a new invoice.');
+
       // we need to create invoice
       const invoice = await getCustomRepository(InvoiceRepository).save({
         contactId: dto.contactId,
@@ -706,6 +722,7 @@ export class InvoiceService {
       }
 
       if (invoice.status === Statuses.AUTHORISED) {
+        Logger.log('Managing inventory for items.');
         await axios.post(
           Host('items', 'items/item/manage-inventory'),
           {
@@ -743,6 +760,7 @@ export class InvoiceService {
           status: invoice.status,
         };
 
+        Logger.log('Making transactions for the invoice.');
         const { data: transaction } = await axios.post(
           Host('accounts', 'accounts/transaction/api'),
           {
@@ -768,6 +786,7 @@ export class InvoiceService {
           },
         ];
 
+        Logger.log('Adding payments for the invoice.');
         await axios.post(
           Host('payments', `payments/payment/add`),
           {
@@ -815,6 +834,7 @@ export class InvoiceService {
           ? dto.email
           : null;
 
+        Logger.log('Making a pdf out of the invoice.');
         const { data: attachment } = await axios.post(
           Host('attachments', `attachments/attachment/generate-pdf`),
           {
@@ -833,6 +853,7 @@ export class InvoiceService {
           }
         );
 
+        Logger.log('Sending email of invoice and its pdf to customer.');
         if (email) {
           await this.emailService.emit(INVOICE_CREATED, {
             to: email,

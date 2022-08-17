@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import axios from 'axios';
@@ -53,6 +59,7 @@ export class OrganizationService {
       .populate('branches');
     const mapAttachmentIds = organization.map((i) => i.attachmentId);
 
+    Logger.log('Fetching attachment for its organization.');
     const { data: attachments } = await axios.post(
       Host('attachments', `attachments/attachment/ids`),
       {
@@ -96,6 +103,7 @@ export class OrganizationService {
     };
 
     if (organizationDto && organizationDto.isNewRecord === false) {
+      Logger.log('Updating the existing organization.');
       // we need to update organization
       try {
         const organization = await this.organizationModel.findOne({
@@ -137,18 +145,24 @@ export class OrganizationService {
             _id: organizationDto.id,
           });
 
+          Logger.log('Organization data updated successfully.');
           return res.status(201).json({
             message: 'Organization updated successfully',
             status: true,
             result: updatedOrg,
           });
         }
+
+        Logger.error(
+          'Something went wrong, Invalid parameters were given while updating organization data.'
+        );
         throw new HttpException('Invalid Params', HttpStatus.BAD_REQUEST);
       } catch (error) {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
     } else {
       try {
+        Logger.log('Creating a new organization.');
         // we need to create organization
 
         const organizations = await this.organizationUserModel.find({
@@ -222,7 +236,14 @@ export class OrganizationService {
         await this.rbacService.InsertRolePermission(organization.id);
         const [adminRole] = roles.filter((r) => r.name === 'admin');
 
+        Logger.log(
+          { organization: organization.name },
+          'Accounts, Roles and RolePermissions inserted for new organization'
+        );
+
         if (req?.user?.organizationId !== null) {
+          Logger.log('New organization is added.');
+
           await this.emailService.emit(ORGANIZATION_CREATED, {
             org_name: organization.name,
             user_name: req.user.profile.fullName,
@@ -241,6 +262,8 @@ export class OrganizationService {
             result: organization,
           });
         } else {
+          Logger.log('First organization is inserted.');
+
           await this.userModel.updateOne(
             { _id: req?.user?.id },
             {
@@ -336,6 +359,8 @@ export class OrganizationService {
       .populate('currency');
 
     const orgArray = [];
+
+    Logger.log('Fetching attachment for its organization');
     if (organization.attachmentId !== undefined) {
       const { data: attachment } = await axios.post(
         Host('attachments', `attachments/attachment/ids`),
