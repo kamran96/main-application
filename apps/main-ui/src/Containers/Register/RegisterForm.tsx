@@ -200,7 +200,7 @@ export const RegisterForm: FC = () => {
                       rules={[
                         { required: true, message: 'Username required' },
                         {
-                          patter: /^[a-zA-Z0-9_-]+$/,
+                          pattern: /^[a-zA-Z0-9_-]+$/,
                           message: 'Remove unnecessary characters',
                         },
                       ].concat(
