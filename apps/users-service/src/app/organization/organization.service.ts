@@ -188,6 +188,7 @@ export class OrganizationService {
         organization.address = address;
         organization.createdById = req?.user?.id;
         organization.updatedById = req?.user?.id;
+        organization.ownerId = req?.user?.id;
         organization.status = 1;
         await organization.save();
 

@@ -100,6 +100,9 @@ export const ItemsForm: FC = () => {
 
   const checkCodeAvaliable = async (payload, callback) => {
     const request = payload;
+    if (id) {
+      request.id = id;
+    }
     clearTimeout(clearTime);
     clearTime = setTimeout(async () => {
       await mutateValidateCode(
