@@ -140,8 +140,8 @@ export const UserAccountArea: FC = () => {
       <hr />
       <div>
         <Link
-          className="link_item flex alignCenter pointer"
-          to={`/app${ISupportedRoutes.SETTINGS}${ISupportedRoutes.ACCOUNT_SETTING}`}
+          className="link_item mt-10 flex alignCenter pointer"
+          to={`/app${ISupportedRoutes.SETTINGS}${ISupportedRoutes.PROFILE_SETTING}`}
         >
           <div className="link_icon">
             {' '}

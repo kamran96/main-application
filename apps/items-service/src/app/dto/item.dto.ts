@@ -68,4 +68,5 @@ export class ParamsDto {
 
 export class CodeValidateDto {
   code: string;
+  id?: string | number;
 }

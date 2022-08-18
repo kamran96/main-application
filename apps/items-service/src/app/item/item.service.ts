@@ -14,9 +14,15 @@ import {
 import { Sorting } from '@invyce/sorting';
 
 import { Price, PriceSchema } from '../schemas/price.schema';
-import { ItemCodesDto, ItemDto, ItemIdsDto } from '../dto/item.dto';
+import {
+  CodeValidateDto,
+  ItemCodesDto,
+  ItemDto,
+  ItemIdsDto,
+} from '../dto/item.dto';
 import { ItemLedger } from '../schemas/itemLedger.schema';
 import { ItemLedgerDetailDto } from '../dto/ItemLedger.dto';
+import e = require('express');
 enum IOperationType {
   DECREASE = 'decrease',
   INCREASE = 'increase',
@@ -437,7 +443,8 @@ export class ItemService {
     });
   }
 
-  async GetItemCode(code: string, user: IBaseUser): Promise<any> {
+  async GetItemCode(dto: CodeValidateDto, user: IBaseUser): Promise<any> {
+    const { code, id } = dto;
     const item = await this.itemModel.find({
       organizationId: user.organizationId,
       branchId: user.branchId,
@@ -445,18 +452,34 @@ export class ItemService {
       status: 1,
     });
 
-    if (item.length > 0) {
-      return {
-        message: 'Item Code aready exist',
-        statusCode: HttpStatus.BAD_REQUEST,
-        status: false,
-      };
+    if (id) {
+      if ((!!item.length && item?.[0].id === id) || !item.length) {
+        return {
+          message: `${code} is available`,
+          statusCode: HttpStatus.OK,
+          status: true,
+        };
+      } else if (!!item.length && item[0]._id !== id) {
+        return {
+          message: `${code} is already in use`,
+          statusCode: HttpStatus.BAD_REQUEST,
+          status: false,
+        };
+      }
     } else {
-      return {
-        message: 'Item Code is available',
-        statusCode: HttpStatus.OK,
-        status: true,
-      };
+      if (item.length > 0) {
+        return {
+          message: `${code} is already in use`,
+          statusCode: HttpStatus.BAD_REQUEST,
+          status: false,
+        };
+      } else {
+        return {
+          message: `${code} is available`,
+          statusCode: HttpStatus.OK,
+          status: true,
+        };
+      }
     }
   }
 

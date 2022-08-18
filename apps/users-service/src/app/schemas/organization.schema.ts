@@ -49,6 +49,8 @@ export class Organization {
   createdAt: string;
   @Prop({ type: Date, default: Date.now })
   updatedAt: string;
+  @Prop()
+  ownerId: string;
 }
 
 export const OrganizationSchema = SchemaFactory.createForClass(Organization);

@@ -85,7 +85,11 @@ export const UsersList: FC = () => {
   }, [history]);
 
   const onSelectedRow = (item) => {
-    setSelectedRow(item.selectedRowKeys);
+    item?.selectedRows.map((user: any) => {
+      if (user.role.name !== 'admin') {
+        setSelectedRow(item.selectedRowKeys);
+      }
+    });
   };
 
   const handleResendInvitation = async (email, index) => {
