@@ -32,15 +32,16 @@ export class AccountsService {
       const { purpose, page_size, page_no, sort, query } = queryData;
       const ps: number = parseInt(page_size);
       const pn: number = parseInt(page_no);
+      let accounts;
+      let total;
 
-      const total = await getCustomRepository(AccountRepository).count({
+      total = await getCustomRepository(AccountRepository).count({
         status: 1,
         organizationId: user.organizationId,
       });
 
       const { sort_column, sort_order } = await Sorting(sort);
 
-      let accounts;
       if (purpose === 'ALL') {
         accounts = await getCustomRepository(AccountRepository).find({
           where: {
@@ -86,12 +87,6 @@ export class AccountsService {
           const filterData = Buffer.from(query, 'base64').toString();
           const data = JSON.parse(filterData);
 
-          // const data = {
-          //   name: {
-          //     type: 'search',
-          //     value: '"%Cash In%"',
-          //   },
-          // };
           for (const i in data) {
             if (data[i].type === 'search') {
               const val = data[i].value.toLowerCase();
@@ -111,6 +106,12 @@ export class AccountsService {
                 .offset(pn * ps - ps)
                 .limit(ps)
                 .getRawMany();
+
+              total = await getCustomRepository(AccountRepository).count({
+                status: 1,
+                organizationId: user.organizationId,
+                [i]: Raw((alias) => `LOWER(${alias}) ILike '%${val}%'`),
+              });
             } else if (data[i].type === 'in') {
               accounts = await getCustomRepository(AccountRepository)
                 .createQueryBuilder('a')
@@ -127,6 +128,12 @@ export class AccountsService {
                 .offset(pn * ps - ps)
                 .limit(ps)
                 .getRawMany();
+
+              total = await getCustomRepository(AccountRepository).count({
+                status: 1,
+                organizationId: user.organizationId,
+                secondaryAccountId: In([data[i].value]),
+              });
             }
           }
         } else {

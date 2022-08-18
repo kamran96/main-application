@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { Between, getCustomRepository, ILike, In, Like, Raw } from 'typeorm';
+import { Between, getCustomRepository, In, Raw } from 'typeorm';
 import axios from 'axios';
+import * as moment from 'moment';
 import { Sorting } from '@invyce/sorting';
 
 import {
@@ -37,8 +38,9 @@ export class TransactionService {
       const pn: number = parseInt(page_no);
 
       let transactions;
+      let total;
       const { sort_column, sort_order } = await Sorting(sort);
-      const total = await getCustomRepository(TransactionRepository).count({
+      total = await getCustomRepository(TransactionRepository).count({
         status: status || 1,
         organizationId: user.organizationId,
         branchId: user.branchId,
@@ -67,6 +69,13 @@ export class TransactionService {
               },
               relations: ['transactionItems', 'transactionItems.account'],
             });
+
+            total = await getCustomRepository(TransactionRepository).count({
+              status: status || 1,
+              organizationId: user.organizationId,
+              branchId: user.branchId,
+              [i]: Raw((alias) => `LOWER(${alias}) ILike '%${val}%'`),
+            });
           } else if (data[i].type === 'compare') {
             transactions = await getCustomRepository(
               TransactionRepository
@@ -83,16 +92,28 @@ export class TransactionService {
               },
               relations: ['transactionItems', 'transactionItems.account'],
             });
+
+            total = await getCustomRepository(TransactionRepository).count({
+              status: status || 1,
+              organizationId: user.organizationId,
+              branchId: user.branchId,
+              [i]: In(data[i].value),
+            });
           } else if (data[i].type === 'date-between') {
             const start_date = data[i].value[0];
             const end_date = data[i].value[1];
+
+            const add_one_day = moment(end_date, 'YYYY-MM-DD')
+              .add(1, 'day')
+              .format();
+
             transactions = await getCustomRepository(
               TransactionRepository
             ).find({
               where: {
                 status: status || 1,
                 organizationId: user.organizationId,
-                [i]: Between(start_date, end_date),
+                [i]: Between(start_date, add_one_day),
               },
               skip: pn * ps - ps,
               take: ps,
@@ -100,6 +121,13 @@ export class TransactionService {
                 [sort_column]: sort_order,
               },
               relations: ['transactionItems', 'transactionItems.account'],
+            });
+
+            total = await getCustomRepository(TransactionRepository).count({
+              status: status || 1,
+              organizationId: user.organizationId,
+              branchId: user.branchId,
+              [i]: Between('2022-08-01', '2022-08-02'),
             });
           }
 

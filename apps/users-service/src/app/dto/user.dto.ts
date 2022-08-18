@@ -24,7 +24,7 @@ export class InvitedUserDto {
 }
 
 export class InvitedUserDetailDto {
-  fullname: string;
+  fullName: string;
   @IsNotEmpty()
   email: string;
   @IsEmail()

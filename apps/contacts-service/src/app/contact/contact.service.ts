@@ -77,7 +77,7 @@ export class ContactService {
               {
                 status: 1,
                 organizationId: req.user.organizationId,
-                [i]: { $regex: val },
+                [i]: { $regex: new RegExp(val, 'i') },
               },
               {
                 offset: pn * ps - ps,

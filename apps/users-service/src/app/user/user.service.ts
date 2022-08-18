@@ -72,7 +72,7 @@ export class UserService {
             users = await this.userModel.find({
               status: UserStatuses.ACTIVE,
               organizationId: user.organizationId,
-              [i]: { $regex: val },
+              [i]: { $regex: new RegExp(val, 'i') },
             });
           } else if (data[i].type === 'date-between') {
             const start_date = i[1]['value'][0];
@@ -195,11 +195,11 @@ export class UserService {
 
       const userWithToken = await this.authService.Login(user, res, req);
 
-      return {
+      return res.send({
         message: 'Email successfully changed',
         result: userWithToken,
         status: true,
-      };
+      });
     } else if (twoFactorEnabled !== undefined) {
       await this.userModel.updateOne(
         { _id: req.user.id },
@@ -208,10 +208,10 @@ export class UserService {
         }
       );
 
-      return {
+      return res.send({
         message: 'Two factor successfully updated',
         status: true,
-      };
+      });
     } else {
       await this.userModel.updateOne(
         { _id: req.user.id },
@@ -225,10 +225,10 @@ export class UserService {
         user_name: req.user.profile.fullName,
       });
 
-      return {
+      return res.send({
         message: 'Password successfully changed',
         status: true,
-      };
+      });
     }
   }
 
@@ -302,7 +302,7 @@ export class UserService {
 
           roleId: user.roleId,
           branchId: user.branchId,
-          fullName: user.fullname,
+          fullName: user.fullName,
           country: user.country,
           isVerified: false,
           phoneNumber: user.phoneNumber,
@@ -362,7 +362,7 @@ export class UserService {
   ): Promise<IUser[]> {
     try {
       const {
-        fullname,
+        fullName,
         country,
         phoneNumber,
         password,
@@ -391,7 +391,7 @@ export class UserService {
           isVerified: true,
           branchId: branch.id,
           $set: {
-            'profile.fullName': fullname || user?.profile?.fullName,
+            'profile.fullName': fullName || user?.profile?.fullName,
             'profile.country': country || user?.profile?.country,
             'profile.phoneNumber': phoneNumber || user?.profile?.phoneNumber,
             'profile.attachmentId': attachmentId || user?.profile?.attachmentId,
@@ -428,12 +428,11 @@ export class UserService {
     try {
       const {
         username,
-        fullname,
+        fullName,
         country,
         phoneNumber,
         password,
         attachmentId,
-        email,
         prefix,
         jobTitle,
         cnic,
@@ -450,7 +449,7 @@ export class UserService {
           username: username || user.username,
           password: password ? await bcrypt.hashSync(password) : user.password,
           $set: {
-            'profile.fullName': fullname || user?.profile?.fullName,
+            'profile.fullName': fullName || user?.profile?.fullName,
             'profile.country': country || user?.profile?.country,
             'profile.phoneNumber': phoneNumber || user?.profile?.phoneNumber,
             'profile.attachmentId': attachmentId || user?.profile?.attachmentId,
@@ -465,7 +464,7 @@ export class UserService {
       );
 
       const new_user = await this.authService.CheckUser({
-        username: username ? username : email,
+        username: user.username || user.email,
       });
 
       return await this.authService.Login(new_user, res, req);

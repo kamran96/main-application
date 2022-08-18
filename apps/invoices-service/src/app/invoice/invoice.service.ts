@@ -74,10 +74,11 @@ export class InvoiceService {
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
     let invoices;
+    let total;
 
     const { sort_column, sort_order } = await Sorting(sort);
 
-    const total = await getCustomRepository(InvoiceRepository).count({
+    total = await getCustomRepository(InvoiceRepository).count({
       status,
       organizationId: req.user.organizationId,
       branchId: req.user.branchId,
@@ -107,6 +108,14 @@ export class InvoiceService {
             },
             relations: ['invoiceItems'],
           });
+
+          total = await getCustomRepository(InvoiceRepository).count({
+            status,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            invoiceType: invoice_type,
+            [i]: Raw((alias) => `LOWER(${alias}) ILike '%${val}%'`),
+          });
         } else if (data[i].type === 'compare') {
           invoices = await getCustomRepository(InvoiceRepository).find({
             where: {
@@ -122,15 +131,27 @@ export class InvoiceService {
             },
             relations: ['invoiceItems'],
           });
+
+          total = await getCustomRepository(InvoiceRepository).count({
+            status,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            invoiceType: invoice_type,
+            [i]: In(data[i].value),
+          });
         } else if (data[i].type === 'date-between') {
           const start_date = data[i].value[0];
           const end_date = data[i].value[1];
+          const add_one_day = moment(end_date, 'YYYY-MM-DD')
+            .add(1, 'day')
+            .format();
+
           invoices = await getCustomRepository(InvoiceRepository).find({
             where: {
               status: 1,
               organizationId: req.user.organizationId,
               branchId: req.user.branchId,
-              [i]: Between(start_date, end_date),
+              [i]: Between(start_date, add_one_day),
             },
             skip: pn * ps - ps,
             take: ps,
@@ -138,6 +159,14 @@ export class InvoiceService {
               [sort_column]: sort_order,
             },
             relations: ['invoiceItems'],
+          });
+
+          total = await getCustomRepository(InvoiceRepository).count({
+            status,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            invoiceType: invoice_type,
+            [i]: Between(start_date, add_one_day),
           });
         }
 

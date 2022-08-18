@@ -24,11 +24,12 @@ export class PurchaseOrderService {
     const token = req?.cookies['access_token'];
 
     let purchaseOrder;
+    let total;
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
     const { sort_column, sort_order } = await Sorting(sort);
 
-    const total = await getCustomRepository(PurchaseOrderRepository).count({
+    total = await getCustomRepository(PurchaseOrderRepository).count({
       status,
       organizationId: req.user.organizationId,
       branchId: req.user.branchId,
@@ -55,6 +56,13 @@ export class PurchaseOrderService {
             take: ps,
             relations: ['purchaseItems', 'purchaseItems.account'],
           });
+
+          total = await getCustomRepository(PurchaseOrderRepository).count({
+            status,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            [i]: Raw((alias) => `LOWER(${alias}) ILike '%${val}%'`),
+          });
         } else if (data[i].type === 'compare') {
           purchaseOrder = await getCustomRepository(
             PurchaseOrderRepository
@@ -69,9 +77,20 @@ export class PurchaseOrderService {
             take: ps,
             relations: ['purchaseItems', 'purchaseItems.account'],
           });
+
+          total = await getCustomRepository(PurchaseOrderRepository).count({
+            status,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            [i]: In(data[i].value),
+          });
         } else if (data[i].type === 'date-between') {
           const start_date = data[i].value[0];
           const end_date = data[i].value[1];
+          const add_one_day = moment(end_date, 'YYYY-MM-DD')
+            .add(1, 'day')
+            .format();
+
           purchaseOrder = await getCustomRepository(
             PurchaseOrderRepository
           ).find({
@@ -79,11 +98,18 @@ export class PurchaseOrderService {
               status: 1,
               organizationId: req.user.organizationId,
               branchId: req.user.branchId,
-              [i]: Between(start_date, end_date),
+              [i]: Between(start_date, add_one_day),
             },
             skip: pn * ps - ps,
             take: ps,
             relations: ['purchaseItems', 'purchaseItems.account'],
+          });
+
+          total = await getCustomRepository(PurchaseOrderRepository).count({
+            status,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            [i]: Between(start_date, add_one_day),
           });
         }
 

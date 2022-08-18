@@ -8,6 +8,7 @@ import {
   Raw,
 } from 'typeorm';
 import axios from 'axios';
+import * as moment from 'moment';
 import { BillRepository } from '../repositories/bill.repository';
 import { BillItemRepository } from '../repositories/billItem.repository';
 import { Sorting } from '@invyce/sorting';
@@ -40,11 +41,12 @@ export class BillService {
     const token = req?.cookies['access_token'];
 
     let bills;
+    let total;
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
     const { sort_column, sort_order } = await Sorting(sort);
 
-    const total = await getCustomRepository(BillRepository).count({
+    total = await getCustomRepository(BillRepository).count({
       status,
       organizationId: req.user.organizationId,
       // invoiceType: invoice_type,
@@ -71,6 +73,14 @@ export class BillService {
             take: ps,
             relations: ['purchaseItems'],
           });
+
+          total = await getCustomRepository(BillRepository).count({
+            status,
+            organizationId: req.user.organizationId,
+            // invoiceType: invoice_type,
+            branchId: req.user.branchId,
+            [i]: Raw((alias) => `LOWER(${alias}) ILike '%${val}%'`),
+          });
         } else if (data[i].type === 'compare') {
           bills = await getCustomRepository(BillRepository).find({
             where: {
@@ -83,19 +93,39 @@ export class BillService {
             take: ps,
             relations: ['purchaseItems'],
           });
+
+          total = await getCustomRepository(BillRepository).count({
+            status,
+            organizationId: req.user.organizationId,
+            // invoiceType: invoice_type,
+            branchId: req.user.branchId,
+            [i]: In(data[i].value),
+          });
         } else if (data[i].type === 'date-between') {
           const start_date = data[i].value[0];
           const end_date = data[i].value[1];
+          const add_one_day = moment(end_date, 'YYYY-MM-DD')
+            .add(1, 'day')
+            .format();
+
           bills = await getCustomRepository(BillRepository).find({
             where: {
               status: 1,
               organizationId: req.user.organizationId,
               branchId: req.user.branchId,
-              [i]: Between(start_date, end_date),
+              [i]: Between(start_date, add_one_day),
             },
             skip: pn * ps - ps,
             take: ps,
             relations: ['purchaseItems'],
+          });
+
+          total = await getCustomRepository(BillRepository).count({
+            status,
+            organizationId: req.user.organizationId,
+            // invoiceType: invoice_type,
+            branchId: req.user.branchId,
+            [i]: Between(start_date, add_one_day),
           });
         }
 
