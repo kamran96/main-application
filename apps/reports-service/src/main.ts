@@ -5,31 +5,24 @@
 
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-// import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 import { AppModule } from './app/app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-
-  // const app: any = await NestFactory.createMicroservice<MicroserviceOptions>(
-  //   AppModule,
-  //   {
-  //     transport: Transport.RMQ,
-  //     options: {
-  //       urls: ['amqp://127.0.0.1:5672'],
-  //       queue: 'report_queue',
-  //       queueOptions: {
-  //         durable: false,
-  //       },
-  //     },
-  //   }
-  // );
-
-  app.enableCors({
-    credentials: true,
-    origin: true,
-  });
+  const app: any = await NestFactory.createMicroservice<MicroserviceOptions>(
+    AppModule,
+    {
+      transport: Transport.RMQ,
+      options: {
+        urls: ['amqp://127.0.0.1:5672'],
+        queue: 'report_queue',
+        queueOptions: {
+          durable: false,
+        },
+      },
+    }
+  );
 
   if (
     process.env['NODE' + '_ENV'] === 'production' ||
