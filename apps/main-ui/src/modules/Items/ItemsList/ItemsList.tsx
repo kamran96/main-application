@@ -7,7 +7,6 @@ import { ColumnsType } from 'antd/lib/table';
 import { plainToClass } from 'class-transformer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
-import { Link } from 'react-router-dom';
 import { deleteItems, getAllCategories, getItemsList } from '../../../api';
 import { ButtonTag } from '../../../components/ButtonTags';
 import { ConfirmModal } from '../../../components/ConfirmModal';
@@ -140,20 +139,10 @@ export const ItemsList: FC = () => {
     isLoading,
     data: resolvedData,
     isFetching,
-  } = useQuery(
-    [
-      `items?page=${page}&query=${query}&sortId=${sortid}&page_size=${pageSize}`,
-      page,
-      sortid,
-      query,
-      pageSize,
-    ],
-    getItemsList,
-    {
-      cacheTime: Infinity,
-      keepPreviousData: true,
-    }
-  );
+  } = useQuery([`items-list`, page, sortid, query, pageSize], getItemsList, {
+    cacheTime: Infinity,
+    keepPreviousData: true,
+  });
 
   const handleItemsConfig = (pagination, filters, sorter: any, extra) => {
     if (sorter.order === undefined) {
@@ -253,7 +242,7 @@ export const ItemsList: FC = () => {
             NOTIFICATIONTYPE.SUCCESS,
             'Item Deleted Successfully'
           );
-          ['all-items', 'items?page'].forEach((key) => {
+          ['all-items', 'items-list'].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           });
           setConfirmModal(false);
@@ -284,7 +273,7 @@ export const ItemsList: FC = () => {
         return (
           <div
             onClick={() =>
-              setShowItemsDetails({ visibility: true, id: row.id })
+              setShowItemsDetails({ visibility: true, id: row?.id })
             }
             style={{ color: '#2395E7', cursor: 'pointer' }}
           >

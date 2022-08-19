@@ -95,7 +95,7 @@ export const DraftQuotesList: FC<IProps> = ({ columns }) => {
         [
           'invoices-quotes',
           'transactions',
-          'items?page',
+          'items-list',
           'invoice-view',
           'ledger-contact',
           'all-items',

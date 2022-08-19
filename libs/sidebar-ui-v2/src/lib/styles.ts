@@ -11,7 +11,6 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
   position: relative;
   height: calc(100vh - 0px);
   background: ${(props: IThemeProps) => props.theme.colors.sidebarBg};
-  /* max-width:  */
   padding-top: ${convertToRem(10)};
   padding-bottom: ${convertToRem(10)};
   z-index: 1;
@@ -39,12 +38,11 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
   }
 
   .logo_area {
-    flex-direction: ${(props: ISidebarWrapperProps) =>
-      !props?.toggle ? 'column' : 'row'};
+    flex-direction: 'row';
   }
   .logo_area span {
     margin-left: ${(props: ISidebarWrapperProps) =>
-      !props?.toggle ? '0' : '21px'};
+      !props?.toggle ? '14px' : '23px'};
   }
 
   .collapse {
@@ -64,7 +62,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
     ${(props: ISidebarWrapperProps) =>
       props?.toggle
         ? ` 
-      left: 23px;
+      left: 30px;
       transform: rotateY(180deg) `
         : ``};
     &:hover {
@@ -78,19 +76,22 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
 
   /* user info */
   .sidebar-userinfo {
+    margin-left: ${(props: ISidebarWrapperProps) =>
+      !props?.toggle ? '6px' : '23px'};
     .user_avatar {
-      border: ${convertToRem(2)} solid #1565d8;
+      border: ${convertToRem(1.5)} solid #1565d8;
     }
     h4 {
-      color: #1e75f1;
+      color: #7988ff;
     }
-    h6 {
+    h5 {
       color: #90a0b7;
     }
   }
 
-  /* Main Routes Settings */
-
+  hr {
+    border: 1px solid ${(props: IThemeProps) => props?.theme?.colors?.seprator};
+  }
   .routes {
     height: calc(100vh - 226px);
     overflow-y: auto;
@@ -100,6 +101,51 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
   .route_list {
     list-style: none;
     padding: 0;
+
+    .sub_route_parent {
+      padding: 6px 6px 6px 24px;
+      min-height: 34px;
+      width: 100%;
+      transition: 0.3s all ease-in-out;
+      color: ${(props: IThemeProps) =>
+        props?.theme?.colors?.sidebarDefaultText};
+    }
+
+    .submenu_container {
+      margin-top: -10px;
+      padding: 10px 10px 10px 25px;
+      /* font-size: convertToRem(0.8); */
+      font-size: 12px;
+      line-height: 2.1;
+      transition: all 3s ease-in-out !important;
+
+      ul {
+        list-style-type: none;
+        border-left: 1px solid #ebeff2;
+        padding-left: 15px;
+
+
+        li {
+          padding: 5px 0px 5px 15px;
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+
+          a {
+            color: #334d6e;
+          }
+
+          &:hover {
+            background: ${(props: IThemeProps) =>
+              props?.theme?.colors?.sidebarListActive};
+            a {
+              color: ${(props: IThemeProps) =>
+                props?.theme?.colors?.sidebarListActiveText};
+            }
+          }
+        }
+      }
+    }
 
     .route_list_item_parent {
       padding: 6px 24px;
@@ -119,7 +165,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
           props?.theme?.colors?.sidebarListActive};
         color: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarListActiveText};
-           transition: 0.3s all ease-in-out;
+        transition: 0.3s all ease-in-out;
 
         span svg {
           fill: #ffffff;
@@ -142,7 +188,6 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
           .ReportColor {
             stroke: ${(props: IThemeProps) =>
               props?.theme?.colors?.sidebarListActiveText};
-              
           }
         }
       }
@@ -184,7 +229,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
             props?.theme?.colors?.sidebarListActive};
           color: ${(props: IThemeProps) =>
             props?.theme?.colors?.sidebarListActiveText};
-             transition: 0.3s all ease-in-out;
+          transition: 0.3s all ease-in-out;
 
           span svg {
             fill: #ffffff;

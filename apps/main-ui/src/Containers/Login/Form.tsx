@@ -12,7 +12,7 @@ import { IBaseAPIError } from '../../modal/base';
 import { HeadingTemplate1 } from '../../components/HeadingTemplates';
 import { BOLDTEXT } from '../../components/Para/BoldText';
 import GoogleLogin from 'react-google-login';
-import { Seprator } from '../../components/Seprator';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
 export const LoginForm: FC = () => {
   const { mutate: mutateLogin, isLoading: logginIn } = useMutation(LoginAPI);
@@ -25,7 +25,11 @@ export const LoginForm: FC = () => {
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
-    await mutateLogin(values, {
+    console.log(values, 'values');
+    const { username, password } = values;
+    const payload = { username: username.replace(/\s/g, ''), password };
+
+    await mutateLogin(payload, {
       onSuccess: (data) => {
         // eslint-disable-next-line no-constant-condition
         if (process.env.NODE_ENV === 'production' || true) {
@@ -188,7 +192,7 @@ export const LoginForm: FC = () => {
                   size="large"
                   loading={logginIn}
                 >
-                  Sign In
+                  Log In
                 </Button>
               </Form.Item>
               <Form.Item>
@@ -207,10 +211,8 @@ export const LoginForm: FC = () => {
                   cookiePolicy={'single_host_origin'}
                 />
               </Form.Item>
-              <h5 className="orArea textCenter  mb-20 mt-20">
-                <Seprator />
-                <BOLDTEXT className='ml-10 mr-10'>OR</BOLDTEXT>
-                <Seprator />
+              <h5 className="textCenter mt-10 mb-15">
+                <BOLDTEXT>Don't have an Account</BOLDTEXT>
               </h5>
               <Form.Item className="m-reset">
                 <Button
@@ -224,7 +226,7 @@ export const LoginForm: FC = () => {
                     );
                   }}
                 >
-                  Sign Up
+                  Register
                 </Button>
               </Form.Item>
             </Col>
@@ -280,13 +282,11 @@ export const LoginFormWrapper = styled.div`
   .m-reset {
     button {
       font-size: 1rem;
-      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 22px 0px;
     }
   }
 
-  .orArea {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
 `;

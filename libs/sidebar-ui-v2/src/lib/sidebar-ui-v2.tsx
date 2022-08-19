@@ -7,18 +7,12 @@ import { Avatar, Button, Popover } from 'antd';
 import { IRoutesSchema, IRoutingSchema } from '@invyce/shared/types';
 import { FC, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import Icon from '@iconify/react';
 import { ReactElement, useState } from 'react';
-import { AppLogoWithoutText, InyvceDarkTextIcon } from './applogo';
+import { AppLogoWithoutText } from './applogo';
 import chevronRight from '@iconify/icons-carbon/chevron-right';
-import chevronDown from '@iconify/icons-carbon/chevron-down';
-import LogOut from '@iconify-icons/feather/log-out';
-import Setting from '@iconify-icons/feather/settings'
-import Sun from '@iconify-icons/feather/sun';
-import Moon from '@iconify-icons/feather/moon';
+import Icon from '@iconify/react';
 import { UserOutlined } from '@ant-design/icons';
-
-/* eslint-disable-next-line */
+import chevronDown from '@iconify/icons-carbon/chevron-down';
 
 export interface IActiveUserInfo {
   username: string;
@@ -27,6 +21,7 @@ export interface IActiveUserInfo {
   userImage: string;
   theme?: 'dark' | 'light';
   link?: string;
+  userRole: string;
 }
 
 export interface SidebarUiProps {
@@ -86,16 +81,13 @@ const MenuPopOver: FC<IPopOverProps> = ({ route }) => {
             _activeIndex > -1 ? 'active_route' : ''
           }`}
         >
-          <span className="mr-10 flex alignCenter icon">
-            {route?.icon}
-          </span>
-            <span className='route_tag '>{route?.tag}</span>
+          <span className="mr-10 flex alignCenter icon">{route?.icon}</span>
+          <span className="route_tag ">{route?.tag}</span>
         </li>
       </Popover>
     </>
   );
 };
-
 
 export const SidebarUi: FC<SidebarUiProps> = ({
   activeUserInfo,
@@ -108,6 +100,10 @@ export const SidebarUi: FC<SidebarUiProps> = ({
   const history = useHistory();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showSubnav, setShowsubnav] = useState<any>({
+    Itemindex: null,
+    isShow: false,
+  });
 
   const toggleCached: null | string = localStorage?.getItem('isToggle') || null;
   useEffect(() => {
@@ -115,12 +111,22 @@ export const SidebarUi: FC<SidebarUiProps> = ({
       setSidebarOpen(JSON.parse(toggleCached));
     }
   }, [toggleCached]);
+  let arr = [];
 
+  const handleShowSubMenu = (e: any, index: number) => {
+    e.preventDefault();
 
+    setShowsubnav({
+      Itemindex: index,
+      isShow: !showSubnav?.isShow,
+    });
+  };
+
+  console.log(showSubnav, 'show');
 
   return (
     <SidebarWrapper toggle={sidebarOpen}>
-      <div className="logo_area flex alignCenter">
+      <div className="logo_area flex alignCenter mt-5">
         <span>{sidebarOpen ? appLogo : <AppLogoWithoutText />} </span>
         <span
           onClick={() => {
@@ -139,7 +145,7 @@ export const SidebarUi: FC<SidebarUiProps> = ({
             history?.push(activeUserInfo.link);
           }
         }}
-        className="sidebar-userinfo flex alignCenter pointer ph-10"
+        className="sidebar-userinfo flex alignCenter  pointer ph-10"
       >
         <div className="avatar_area">
           {activeUserInfo?.userImage ? (
@@ -156,31 +162,29 @@ export const SidebarUi: FC<SidebarUiProps> = ({
             />
           )}
         </div>
-        <div className="sidebar_userinfo_detail ml-10  route_tag">
+        <div className=" userDetail_area ml-12  mt-10 route_tag">
           <div>
             {' '}
             <h4 className="capitalize fs-14 fw-500 m-reset">
               {activeUserInfo?.username}
             </h4>
             <span className={` online-check flex alignCenter fs-13 fw-500`}>
-              <div
-                className={`dot  ${userOnline ? 'online' : 'offline'}`}
-              ></div>
-              {userOnline ? 'Online' : 'Offline'}
+              <h5 className="capitalize">{activeUserInfo?.userRole}</h5>
             </span>
           </div>
         </div>
       </div>
+
       <div className="routes mt-10">
         <div className="main_routes">
           <ul className="route_list">
             {routes?.nestedRoutes?.map((parent, index) => {
+              console.log(index, 'index', showSubnav);
               return (
                 <div key={index}>
-                  {parent?.children?.length ? 
-                  
+                  {!sidebarOpen && parent?.children?.length ? (
                     <MenuPopOver route={parent} />
-                   : (
+                  ) : !parent?.children?.length ? (
                     <li
                       className={`route_list_item flex alignCenter pointer mv-4
                     ${
@@ -195,11 +199,40 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                         to={parent?.route as string}
                       >
                         <span className="mr-10 flex alignCenter icon">
-                          {/* <Icon className=" fs-16  icon" icon={parent?.icon} /> */}
                           {parent?.icon}
                         </span>
                         <span className="route_tag">{parent?.tag}</span>
                       </Link>
+                    </li>
+                  ) : (
+                    <li>
+                      <div
+                        className={`sub_route_parent flex alignCenter justifySpaceBetween pointer mv-4`}
+                        onClick={(e) => handleShowSubMenu(e, index)}
+                      >
+                        <span className="flex alignCenter justifySpaceBetween">
+                          <span className="mr-10 flex alignCenter icon">
+                            {parent?.icon}
+                          </span>
+                          <span className="route_tag">{parent?.tag}</span>
+                        </span>
+                        <Icon className="fs-16 arrow" icon={chevronDown} />
+                      </div>
+                      {showSubnav?.isShow && index === showSubnav?.Itemindex && (
+                        <div className="submenu_container">
+                          <ul>
+                            {parent?.children.map(
+                              (item: any, index: number) => {
+                                return (
+                                  <li key={index}>
+                                    <Link to={item?.route}>{item?.tag}</Link>
+                                  </li>
+                                );
+                              }
+                            )}
+                          </ul>
+                        </div>
+                      )}
                     </li>
                   )}
                 </div>
@@ -229,10 +262,6 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                       to={singleEntryRoute?.route as string}
                     >
                       <span className="mr-10 flex alignCenter icon">
-                        {/* <Icon
-                          className=" fs-16  icon"
-                          icon={singleEntryRoute?.icon}
-                        />*/}
                         {singleEntryRoute?.icon}
                       </span>
                       <span className="route_tag">{singleEntryRoute?.tag}</span>
@@ -243,54 +272,6 @@ export const SidebarUi: FC<SidebarUiProps> = ({
             </ul>
           </div>
         </div>
-      </div>
-      <div className="sidebar_bottom">
-        <li
-          className={`route_list_item theme_changer flex alignCenter pointer    
-                    `}
-        >
-          <Button
-            onClick={onThemeButtonClick}
-            className="theme_button"
-            type="default"
-          >
-            <span className="mr-10 flex alignCenter">
-              <Icon
-                className=" fs-16  icon"
-                icon={activeUserInfo?.theme === 'dark' ? Moon : Sun}
-              />
-            </span>
-            <span className="title">
-              {activeUserInfo?.theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-            </span>
-          </Button>
-        </li>
-        <li
-          onClick={() => history.push({
-            pathname: `/app/settings/profile-settings`,
-            state: {
-              from: history.location.pathname,
-            },
-          })}
-          className={`route_list_item flex alignCenter pointer    
-                    `}
-        >
-          <span className="mr-10 flex alignCenter">
-            <Icon className=" fs-16  icon" icon={Setting} />
-          </span>
-          <span className="route_tag">Setting</span>
-        </li>
-
-        <li
-          onClick={onLogOut}
-          className={`route_list_item flex alignCenter pointer   
-                    `}
-        >
-          <span className="mr-10 flex alignCenter">
-            <Icon className=" fs-16  icon" icon={LogOut} />
-          </span>
-          <span className="route_tag">Log Out</span>
-        </li>
       </div>
     </SidebarWrapper>
   );

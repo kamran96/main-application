@@ -3,6 +3,7 @@ import {
   HttpStatus,
   Inject,
   Injectable,
+  Logger,
   Res,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -220,7 +221,11 @@ export class AuthService {
     return user;
   }
 
-  async Login(user: IUser[], @Res() res: Response): Promise<IUser[]> {
+  async Login(
+    user: IUser[],
+    @Res() res: Response,
+    req = null
+  ): Promise<IUser[]> {
     const [newUser] = user;
 
     const payload = {
@@ -229,21 +234,42 @@ export class AuthService {
     };
 
     const token = this.jwtService.sign(payload);
-    res
-      .cookie('access_token', token, {
-        httpOnly: true,
-      })
-      .send({
-        message: 'Login successfully',
-        status: true,
-      });
+
+    const hostname = req.headers.origin;
+    console.log(hostname, 'host');
+    if (
+      hostname === 'https://staging.invyce.com' ||
+      hostname === 'https://cloud.invyce.com'
+    ) {
+      Logger.log('Set cookie for production environment');
+      res
+        .cookie('access_token', token, {
+          httpOnly: true,
+        })
+        .send({
+          message: 'Login successfully',
+          status: true,
+        });
+    } else {
+      Logger.log('Set cookie for development environment');
+      res
+        .cookie('access_token', token, {
+          secure: true,
+          sameSite: 'none',
+          httpOnly: true,
+        })
+        .send({
+          message: 'Login successfully',
+          status: true,
+        });
+    }
 
     return user;
   }
 
   async Logout(res: Response): Promise<Response> {
     // return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
-
+    Logger.log('User logout successfully...');
     return await res.clearCookie('access_token').send({
       message: 'Logout successfully.',
       status: true,
@@ -301,13 +327,18 @@ export class AuthService {
     }
   }
 
-  async ValidateUser(authDto: UserLoginDto, res: Response): Promise<IUser[]> {
+  async ValidateUser(
+    authDto: UserLoginDto,
+    res: Response,
+    req: IRequest
+  ): Promise<IUser[]> {
     const users = await this.CheckUser(authDto);
 
     if (Array.isArray(users) && users[0] !== undefined) {
       // user found
       const [user] = users;
       if (user.status === 0) {
+        Logger.warn('User no longer is active');
         throw new HttpException(
           'Sorry, you are no longer active.',
           HttpStatus.BAD_REQUEST
@@ -322,10 +353,12 @@ export class AuthService {
           );
         }
 
-        return await this.Login(users, res);
+        return await this.Login(users, res, req);
       }
+      Logger.warn('Incorrect password');
       throw new HttpException('Incorrect Password', HttpStatus.BAD_REQUEST);
     } else {
+      Logger.warn('User not found');
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
   }
@@ -344,6 +377,8 @@ export class AuthService {
 
     const stringify = JSON.stringify(data);
     const base64 = Buffer.from(stringify).toString('base64');
+
+    Logger.log({ user: usr.email }, 'Sending verification code to user');
     if (generateOtp) {
       this.sendVerificationOtp(user, generateOtp);
     } else {

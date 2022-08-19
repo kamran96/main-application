@@ -403,3 +403,17 @@ input:-webkit-autofill:active {
 .ant-form-item-extra {
   color: red !important;
 }
+
+.ant-form-item-required {
+  position: relative;
+}
+
+.ant-form-item-label
+  > label.ant-form-item-required:not(.ant-form-item-required-mark-optional):before {
+  position: absolute;
+  right: -15px;
+}
+
+.ant-form-vertical .ant-form-item-label {
+  padding: 0 2px 2px 0 !important;
+}

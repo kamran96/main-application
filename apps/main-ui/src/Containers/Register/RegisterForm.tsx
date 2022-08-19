@@ -22,7 +22,6 @@ const { Option } = Select;
 let timeOutTime: any;
 
 export const RegisterForm: FC = () => {
-  const [show, setShow] = useState(true);
   const { mutate: mutateUsernameAvaliable, data: usernameAvaliable } =
     useMutation(userCheckAPI);
   const { mutate: mutateRegister, isLoading } = useMutation(RegisterAPI);
@@ -109,7 +108,7 @@ export const RegisterForm: FC = () => {
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
-  
+
   const prefixSelector = (
     <Form.Item name="prefix" noStyle>
       <Select
@@ -157,7 +156,7 @@ export const RegisterForm: FC = () => {
           >
             <div className="personal_info">
               <div className="form_title">
-                <Heading className="mb-20" type="table">
+                <Heading className="mb-3" type="table">
                   Register Your Account!
                 </Heading>
                 <p className="form_description">
@@ -178,6 +177,7 @@ export const RegisterForm: FC = () => {
                     <Form.Item
                       name="fullName"
                       label="Full Name"
+                      labelAlign="left"
                       rules={[
                         {
                           required: true,
@@ -357,7 +357,7 @@ export const RegisterForm: FC = () => {
                       name="agreed"
                       valuePropName="checked"
                     >
-                      <Checkbox onChange={() => setShow(!show)}>
+                      <Checkbox>
                         <span>
                           I have read and agree to the{' '}
                           <a
@@ -399,7 +399,7 @@ export const RegisterForm: FC = () => {
                           loading={isLoading}
                           type="primary"
                           htmlType="submit"
-                          disabled={show}
+                          size="middle"
                         >
                           Create Account
                         </Button>

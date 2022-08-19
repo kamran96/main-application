@@ -197,7 +197,7 @@ export const ItemsForm: FC = () => {
             NOTIFICATIONTYPE.SUCCESS,
             id ? 'Updated' : 'Created'
           );
-          ['item-id', 'items?page', 'all-items'].forEach((key) => {
+          ['item-id', 'items-list', 'all-items'].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           });
           setItemsModalConfig(false, null);

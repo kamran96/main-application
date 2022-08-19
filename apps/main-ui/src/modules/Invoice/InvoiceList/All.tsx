@@ -1,21 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { ButtonTag } from '../../../components/ButtonTags';
-import React, { FC, useEffect, useState } from 'react';
-import { useQueryClient, useMutation, useQuery } from 'react-query';
+import { FC, useEffect, useState } from 'react';
+import { useMutation, useQuery } from 'react-query';
 import {
   deleteInvoiceDrafts,
   getAllContacts,
   getInvoiceListAPI,
 } from '../../../api';
-import { ConfirmModal } from '../../../components/ConfirmModal';
-import { PDFICON } from '../../../components/Icons';
 import { PurchaseListTopbar } from '../../../components/PurchasesListTopbar';
-import { PERMISSIONS } from '../../../components/Rbac/permissions';
 import { useRbac } from '../../../components/Rbac/useRbac';
 import { SmartFilter } from '../../../components/SmartFilter';
 import { CommonTable } from '../../../components/Table';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { IContactTypes, IServerError, NOTIFICATIONTYPE } from '../../../modal';
+import { IContactTypes } from '../../../modal';
 import {
   IInvoiceResponse,
   IInvoiceStatus,
@@ -25,13 +22,11 @@ import {
 import { ISupportedRoutes } from '../../../modal/routing';
 import { useCols } from './commonCol';
 import InvoicesFilterSchema from './InvoicesFilterSchema';
-import { InvoiceImports } from './invoiceImports';
 
 interface IProps {
   columns?: any[];
 }
 export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
-  const queryCache = useQueryClient();
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
     query: '',
@@ -43,8 +38,6 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
 
   const { routeHistory, setPaymentsModalConfig } = useGlobalContext();
   const { history } = routeHistory;
-  const [confirmModal, setConfirmModal] = useState(false);
-  const { notificationCallback } = useGlobalContext();
 
   const { PdfCols, _exportableCols } = useCols();
 
@@ -64,6 +57,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   const [invoiceFiltersSchema, setInvoiceFilterSchema] =
     useState(InvoicesFilterSchema);
   const [selectedRow, setSelectedRow] = useState([]);
+  const [selectedContact, setSelectedContact] = useState(null);
 
   const [filterBar, setFilterBar] = useState<boolean>(false);
 
@@ -88,8 +82,6 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
 
   const { page, query, sortid, page_size } = allInvoicesConfig;
 
-
-
   const {
     isLoading,
     data: resolvedData,
@@ -103,7 +95,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
       page,
       page_size,
       query,
-      sortid
+      sortid,
     ],
     getInvoiceListAPI,
     {
@@ -115,6 +107,10 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
 
   const onSelectedRow = (item) => {
     setSelectedRow(item.selectedRowKeys);
+    if (item?.selectedRows?.length === 1) {
+      console.log('in if');
+      setSelectedContact(item?.selectedRows?.[0]?.contactId);
+    }
   };
 
   useEffect(() => {
@@ -133,7 +129,6 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
 
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
     if (sorter.order === 'false') {
-
       setAllInvoicesConfig({
         ...allInvoicesConfig,
         sortid: 'id',
@@ -145,8 +140,6 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
       history.push(route);
     } else {
       if (sorter?.order === 'ascend') {
-
-
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] > b[sorter?.field]) {
             return 1;
@@ -155,9 +148,8 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
           }
         });
 
-        setAllInvoicesRes(prev => ({ ...prev, result: userData }))
+        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
       } else {
-
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
             return 1;
@@ -166,7 +158,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
           }
         });
 
-        setAllInvoicesRes(prev => ({ ...prev, result: userData }))
+        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
       }
       setAllInvoicesConfig({
         ...allInvoicesConfig,
@@ -175,50 +167,21 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
         sortid:
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
-            : sorter?.order === 'asceend' ? sorter.field : 'id',
+            : sorter?.order === 'asceend'
+            ? sorter.field
+            : 'id',
       });
-      const route = `/app${ISupportedRoutes.INVOICES
-      }?tabIndex=all&sortid=${sorter && sorter?.order === 'descend'
-        ? `-${sorter?.field}`
-        : sorter?.order === 'ascend' ? sorter.field : 'id'
-      }&page=${pagination.current
-      }&page_size=${pagination.pageSize}&filter=${sorter?.order}&query=${query}`;
-    history.push(route);
+      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=${
+        sorter && sorter?.order === 'descend'
+          ? `-${sorter?.field}`
+          : sorter?.order === 'ascend'
+          ? sorter.field
+          : 'id'
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+        sorter?.order
+      }&query=${query}`;
+      history.push(route);
     }
-  }
-
-  /* Function select rows and to set selectedRow state */
-
-  const handleDelete = async () => {
-    const payload = {
-      ids: [...selectedRow],
-    };
-    await mutateDeleteOrders(payload, {
-      onSuccess: () => {
-        [
-          'invoices',
-          'transactions',
-          'items?page',
-          'invoice-view',
-          'ledger-contact',
-          'all-items',
-        ].forEach((key) => {
-          (queryCache.invalidateQueries as any)((q) =>
-            q?.queryKey[0]?.toString()?.startsWith(`${key}`)
-          );
-        });
-        notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Deleted Successfully');
-
-        setSelectedRow([]);
-        setConfirmModal(false);
-      },
-      onError: (error: IServerError) => {
-        if (error?.response?.data?.message) {
-          const { message } = error.response.data;
-          notificationCallback(NOTIFICATIONTYPE.ERROR, message);
-        }
-      },
-    });
   };
 
   /* Functions Here */
@@ -242,77 +205,71 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   };
 
   return (
-    <>
-      <CommonTable
-        // themeScroll
-        pdfExportable={{
-          columns: PdfCols,
-        }}
-        className="border-top-none"
-        topbarRightPannel={renderTobarRight()}
-        hasPrint
-        exportableProps={{
-          fields: _exportableCols,
-          fileName: 'approved-invoices',
-        }}
-        exportable
-        printTitle={'Approved Invoices'}
-        customTopbar={
-          <div className="flex alignCenter">
-            <PurchaseListTopbar
-              disabled={!selectedRow.length}
-              onDelete={() => setConfirmModal(true)}
-              hideDeleteButton={!rbac.can(PERMISSIONS.INVOICES_DELETE)}
-              renderSmartFilter={
-                <SmartFilter
-                  onFilter={(encode) => {
-                    setAllInvoicesConfig({
-                      ...allInvoicesConfig,
-                      query: encode,
-                    });
-                    const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
-                    history.push(route);
-                  }}
-                  onClose={() => setFilterBar(false)}
-                  visible={filterBar}
-                  formSchema={invoiceFiltersSchema}
-                />
-              }
-            />
-            <ButtonTag
-              onClick={() => {
-                setPaymentsModalConfig(true, 5);
-              }}
-              className="ml-5s"
-              title="Create Payment"
-              size="middle"
-            />
-          </div>
-        }
-        data={result}
-        columns={columns}
-        loading={isFetching || isLoading}
-        onChange={onChangePagination}
-        totalItems={pagination && pagination.total}
-        pagination={{
-          pageSize: page_size,
-          position: ['bottomRight'],
-          current: pagination && pagination.page_no,
-          total: pagination && pagination.total,
-        }}
-        hasfooter={true}
-        onSelectRow={onSelectedRow}
-        enableRowSelection
-      />
-      <ConfirmModal
-        loading={deletingInvoice}
-        visible={confirmModal}
-        onCancel={() => setConfirmModal(false)}
-        onConfirm={handleDelete}
-        type="delete"
-        text="Are you sure want to delete selected Contact?"
-      />
-    </>
+    <CommonTable
+      // themeScroll
+      pdfExportable={{
+        columns: PdfCols,
+      }}
+      className="border-top-none"
+      topbarRightPannel={renderTobarRight()}
+      hasPrint
+      exportableProps={{
+        fields: _exportableCols,
+        fileName: 'approved-invoices',
+      }}
+      exportable
+      printTitle={'Approved Invoices'}
+      customTopbar={
+        <div className="flex alignCenter">
+          <PurchaseListTopbar
+            disabled={!selectedRow.length}
+            hideDeleteButton={true}
+            renderSmartFilter={
+              <SmartFilter
+                onFilter={(encode) => {
+                  setAllInvoicesConfig({
+                    ...allInvoicesConfig,
+                    query: encode,
+                  });
+                  const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=null&page=1&page_size=20&sortid=${sortid}&query=${encode}`;
+                  history.push(route);
+                }}
+                onClose={() => setFilterBar(false)}
+                visible={filterBar}
+                formSchema={invoiceFiltersSchema}
+              />
+            }
+          />
+          <ButtonTag
+            disabled={selectedRow.length > 1}
+            onClick={() => {
+              setPaymentsModalConfig(true, null, {
+                contactId: selectedContact,
+                type: 'receivable',
+                orders: selectedRow,
+              });
+            }}
+            className="ml-5s"
+            title="Create Payment"
+            size="middle"
+          />
+        </div>
+      }
+      data={result}
+      columns={columns}
+      loading={isFetching || isLoading}
+      onChange={onChangePagination}
+      totalItems={pagination && pagination.total}
+      pagination={{
+        pageSize: page_size,
+        position: ['bottomRight'],
+        current: pagination && pagination.page_no,
+        total: pagination && pagination.total,
+      }}
+      hasfooter={true}
+      onSelectRow={onSelectedRow}
+      enableRowSelection
+    />
   );
 };
 

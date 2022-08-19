@@ -113,7 +113,7 @@ export class UserController {
   @UseGuards(GlobalAuthGuard)
   @Post('account-settings')
   async changeEmail(@Req() req: IRequest, @Body() body, @Res() res: Response) {
-    return await this.userService.ChangeUserDetails(req.user, body, res);
+    return await this.userService.ChangeUserDetails(req, body, res);
   }
 
   @Post('/check')
@@ -177,13 +177,15 @@ export class UserController {
   async updateProfile(
     @Body() userDto: InvitedUserDetailDto,
     @Param() params: ParamsDto,
-    @Res() res: Response
+    @Res() res: Response,
+    @Req() req: IRequest
   ): Promise<IUserWithResponse> {
     try {
       const user = await this.userService.UpdateUserProfile(
         userDto,
         params,
-        res
+        res,
+        req
       );
 
       if (user) {
@@ -218,13 +220,15 @@ export class UserController {
   async updateVerifiedUser(
     @Body() userDto: InvitedUserDetailDto,
     @Param() params: ParamsDto,
-    @Res() res: Response
+    @Res() res: Response,
+    @Req() req: IRequest
   ): Promise<IUserWithResponse> {
     try {
       const user = await this.userService.UpdateInvitedUser(
         userDto,
         params,
-        res
+        res,
+        req
       );
 
       if (user) {

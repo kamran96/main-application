@@ -1379,6 +1379,28 @@
         }
       }
     },
+    "sidebar-ui-v2": {
+      "root": "libs/sidebar-ui-v2",
+      "sourceRoot": "libs/sidebar-ui-v2/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["libs/sidebar-ui-v2/**/*.{ts,tsx,js,jsx}"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/sidebar-ui-v2"],
+          "options": {
+            "jestConfig": "libs/sidebar-ui-v2/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "sorting": {
       "root": "libs/sorting",
       "sourceRoot": "libs/sorting/src",
