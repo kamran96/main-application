@@ -142,7 +142,6 @@
     "ip": "^1.1.5",
     "jsonwebtoken": "^8.5.1",
     "jwt-decode": "^3.0.0",
-    "less-loader": "^10.0.1",
     "moment": "^2.29.1",
     "mongoose": "^5.13.7",
     "mongoose-paginate-v2": "^1.4.2",
