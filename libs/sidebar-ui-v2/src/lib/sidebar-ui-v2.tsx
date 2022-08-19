@@ -111,18 +111,14 @@ export const SidebarUi: FC<SidebarUiProps> = ({
       setSidebarOpen(JSON.parse(toggleCached));
     }
   }, [toggleCached]);
-  let arr = [];
 
   const handleShowSubMenu = (e: any, index: number) => {
     e.preventDefault();
-
     setShowsubnav({
       Itemindex: index,
       isShow: !showSubnav?.isShow,
     });
   };
-
-  console.log(showSubnav, 'show');
 
   return (
     <SidebarWrapper toggle={sidebarOpen}>
