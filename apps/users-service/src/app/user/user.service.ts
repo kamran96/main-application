@@ -131,7 +131,7 @@ export class UserService {
 
       if (username) {
         return {
-          message: `Username <span class="capitalize fw-500 clr-dark">${data.username}</span> is taken, Please try another with an alternate username`,
+          message: `Username <span class="capitalize fw-500 clr-dark">${data.username}</span> is taken, Please try another`,
           available: false,
         };
       } else if (!username) {
@@ -149,7 +149,7 @@ export class UserService {
 
       if (email) {
         return {
-          message: `Email <span class="capitalize fw-500 clr-dark">${data.email}</span> is taken, Please try another with an alternate email`,
+          message: `Email <span class="capitalize fw-500 clr-dark">${data.email}</span> is taken, Please try another`,
           available: false,
         };
       } else if (!email) {

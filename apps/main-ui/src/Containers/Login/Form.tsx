@@ -25,7 +25,6 @@ export const LoginForm: FC = () => {
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
-    console.log(values, 'values');
     const { username, password } = values;
     const payload = { username: username.replace(/\s/g, ''), password };
 
