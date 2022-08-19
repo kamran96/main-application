@@ -15,3 +15,6 @@ export const getUserAPI = (key: any, id?: number) => {
 
 export const updateProfileAPI = (payload) =>
   http.put(`users/user/update-invited-user/${payload?.userId}`, payload);
+
+export const updateUserProfileAPI = (payload) =>
+  http.put(`users/user/profile/${payload?.userId}`, payload);

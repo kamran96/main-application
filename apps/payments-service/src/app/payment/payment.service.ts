@@ -51,9 +51,11 @@ export class PaymentService {
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
     let payments;
+    let total;
+
     const { sort_column, sort_order } = await Sorting(sort);
 
-    const total = await getCustomRepository(PaymentRepository).count({
+    total = await getCustomRepository(PaymentRepository).count({
       status: 1,
       organizationId: user.organizationId,
       paymentMode: paymentType,
@@ -68,15 +70,27 @@ export class PaymentService {
         if (data[i].type === 'date-between') {
           const start_date = data[i].value[0];
           const end_date = data[i].value[1];
+          const add_one_day = moment(end_date, 'YYYY-MM-DD')
+            .add(1, 'day')
+            .format();
+
           payments = await getCustomRepository(PaymentRepository).find({
             where: {
               status: 1,
               branchId: user.branchId,
               organizationId: user.organizationId,
-              [i]: Between(start_date, end_date),
+              [i]: Between(start_date, add_one_day),
             },
             skip: pn * ps - ps,
             take: ps,
+          });
+
+          total = await getCustomRepository(PaymentRepository).count({
+            status: 1,
+            organizationId: user.organizationId,
+            paymentMode: paymentType,
+            branchId: user.branchId,
+            [i]: Between(start_date, add_one_day),
           });
         }
       }

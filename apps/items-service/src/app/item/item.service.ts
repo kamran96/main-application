@@ -78,7 +78,7 @@ export class ItemService {
               {
                 status: 1,
                 organizationId: itemData.organizationId,
-                [i]: { $regex: val },
+                [i]: { $regex: new RegExp(val, 'i') },
               },
               {
                 offset: pn * ps - ps,

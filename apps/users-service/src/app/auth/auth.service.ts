@@ -236,12 +236,11 @@ export class AuthService {
     const token = this.jwtService.sign(payload);
 
     const hostname = req.headers.origin;
-    console.log(hostname, 'host');
     if (
       hostname === 'https://staging.invyce.com' ||
       hostname === 'https://cloud.invyce.com'
     ) {
-      Logger.log('Set cookie for production environment');
+      Logger.log('Setting cookie for production environment');
       res
         .cookie('access_token', token, {
           httpOnly: true,
@@ -251,7 +250,7 @@ export class AuthService {
           status: true,
         });
     } else {
-      Logger.log('Set cookie for development environment');
+      Logger.log('Setting cookie for development environment');
       res
         .cookie('access_token', token, {
           secure: true,
@@ -407,6 +406,13 @@ export class AuthService {
           HttpStatus.BAD_REQUEST
         );
       } else {
+        console.log(body, 'updating..');
+
+        const usr = await this.userModel.findOne({
+          email: body.email,
+        });
+
+        console.log(usr, 'user');
         await this.userModel.updateOne(
           {
             email: body.email,
@@ -552,7 +558,7 @@ export class AuthService {
   }
 
   async SendForgetPassword(user: IUser, code: string): Promise<void> {
-    const baseUrl = 'http://localhost:4200';
+    const baseUrl = process.env.BASE_URL;
     const _code = queryString.stringify({ code });
     const a = `${baseUrl}/page/forgot-password?${_code}&type=reset-password`;
     const operating_system = os.type();
