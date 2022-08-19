@@ -1,28 +1,129 @@
 import { convertToRem } from '@invyce/pixels-to-rem';
 import { IThemeProps } from '@invyce/shared/invyce-theme';
 import { DivProps } from '@invyce/shared/types';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle, keyframes } from 'styled-components';
 
 interface ISidebarWrapperProps extends DivProps {
   toggle: boolean;
 }
 
+const subMenuOpen = keyframes`
+  0% {
+    transform: translateY(-200px);
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    height: 0px;
+   
+   
+    padding: 0px 10px 0px 25px;
+    /* padding: 0px;
+    margin: 0px; */
+
+  }
+  30%{
+    height: 100%;
+  }
+  50%{
+    display: block;
+    opacity: 0;
+
+  }
+  70%{
+    visibility: visible;
+  }
+  100%{
+    opacity: 1;
+    transform: translateY(0);
+    padding: 10px 10px 10px 25px;
+  
+      /* font-size: convertToRem(0.8); */  
+  }
+ 
+  `;
+const subMenuClose = keyframes`
+  0%{
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    height: auto;
+    display: none;
+    padding: 10px 10px 10px 25px;
+  }
+  /* 50%{
+    opacity: 0;
+    visibility: hidden;
+  }
+  70%{
+    display: none;
+  }
+  100% {
+    transform: translateY(-200px);
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    height: 0px;
+    padding: 0px 10px 0px 25px;
+  } */
+  `;
+
 export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
   position: relative;
-  height: calc(100vh - 0px);
-  background: ${(props: IThemeProps) => props.theme.colors.sidebarBg};
-  padding-top: ${convertToRem(10)};
-  padding-bottom: ${convertToRem(10)};
-  z-index: 1;
-  transition: 0.3s all ease-in-out;
-  left: 0;
-  width: ${(props: IThemeProps) =>
-    props?.toggle ? convertToRem(206) : convertToRem(65)};
-  flex: 0 0
-    ${(props: IThemeProps) =>
-      props?.toggle ? convertToRem(206) : convertToRem(60)};
-  overflow-x: hidden;
-  overflow-y: auto;
+  .toggle {
+    position: absolute;
+    z-index: 22;
+    transition: 0.3s all ease-in-out;
+    top: 14px;
+    ${(props: ISidebarWrapperProps) =>
+      !props?.toggle
+        ? `
+    left: 50px;
+    `
+        : `left: 160px;`}
+    .collapse {
+      border: 1px solid #fff;
+      background: ${(props: IThemeProps) =>
+        props?.theme?.theme === 'light' ? `#EFEFEF` : `#383838`};
+      height: 26px;
+      width: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: #7d7d7d;
+      position: relative;
+      right: 0;
+      transition: 0.3s all ease-in-out;
+      box-shadow: 0px 0px 4px 0px transparent;
+      ${(props: ISidebarWrapperProps) =>
+        props?.toggle
+          ? ` 
+      left: 30px;
+
+      transform: rotateY(180deg) `
+          : ``};
+      &:hover {
+        box-shadow: 0px 0px 4px 0px #1e75f159;
+      }
+    }
+  }
+  .sidebar_wrapper {
+    position: relative;
+    height: calc(100vh - 0px);
+    background: ${(props: IThemeProps) => props.theme.colors.sidebarBg};
+    padding-top: ${convertToRem(10)};
+    padding-bottom: ${convertToRem(10)};
+    z-index: 1;
+    transition: 0.3s all ease-in-out;
+    left: 0;
+    width: ${(props: IThemeProps) =>
+      props?.toggle ? convertToRem(206) : convertToRem(65)};
+    flex: 0 0
+      ${(props: IThemeProps) =>
+        props?.toggle ? convertToRem(206) : convertToRem(60)};
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
   .head {
     position: relative;
     padding: 0.5rem 0.5rem 0.5rem 1.5625rem;
@@ -43,31 +144,6 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
   .logo_area span {
     margin-left: ${(props: ISidebarWrapperProps) =>
       !props?.toggle ? '14px' : '23px'};
-  }
-
-  .collapse {
-    background: ${(props: IThemeProps) =>
-      props?.theme?.theme === 'light' ? `#EFEFEF` : `#383838`};
-    height: 26px;
-    width: 26px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    color: #7d7d7d;
-    position: relative;
-    right: 0;
-    transition: 0.3s all ease-in-out;
-    box-shadow: 0px 0px 4px 0px transparent;
-    ${(props: ISidebarWrapperProps) =>
-      props?.toggle
-        ? ` 
-      left: 30px;
-      transform: rotateY(180deg) `
-        : ``};
-    &:hover {
-      box-shadow: 0px 0px 4px 0px #1e75f159;
-    }
   }
 
   .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
@@ -94,7 +170,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
   }
   .routes {
     height: calc(100vh - 226px);
-    overflow-y: auto;
+    overflow-y: scroll;
     overflow-x: hidden;
   }
 
@@ -107,23 +183,23 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
       min-height: 34px;
       width: 100%;
       transition: 0.3s all ease-in-out;
+      background-color: white;
+      z-index: 4;
+      position: relative;
       color: ${(props: IThemeProps) =>
         props?.theme?.colors?.sidebarDefaultText};
     }
 
     .submenu_container {
-      margin-top: -10px;
-      padding: 10px 10px 10px 25px;
-      /* font-size: convertToRem(0.8); */
       font-size: 12px;
       line-height: 2.1;
       transition: all 3s ease-in-out !important;
+      position: relative;
 
       ul {
         list-style-type: none;
         border-left: 1px solid #ebeff2;
         padding-left: 15px;
-
 
         li {
           padding: 5px 0px 5px 15px;
@@ -145,6 +221,27 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
           }
         }
       }
+    }
+    .open-anchor {
+      animation-name: ${subMenuOpen};
+      animation-duration: 0.5s;
+      animation-iteration-count: ease-in-out;
+      margin-top: -10px;
+      transition: 0.6s all ease-in-out;
+      padding: 10px 10px 10px 25px;
+      z-index: 1;
+    }
+    .close-anchor {
+      animation-name: ${subMenuClose};
+      animation-duration: 0.34s;
+      animation-iteration-count: linear;
+      margin-top: -10px;
+      transition: 0.34s all ease-in-out;
+      padding: 0px 10px 0px 25px;
+      height: 0px;
+      visibility: hidden;
+      opacity: 0;
+      z-index: 1;
     }
 
     .route_list_item_parent {

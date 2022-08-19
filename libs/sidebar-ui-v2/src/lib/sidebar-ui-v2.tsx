@@ -7,7 +7,7 @@ import { Avatar, Button, Popover } from 'antd';
 import { IRoutesSchema, IRoutingSchema } from '@invyce/shared/types';
 import { FC, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { ReactElement, useState } from 'react';
+import { ReactElement, useState, Fragment } from 'react';
 import { AppLogoWithoutText } from './applogo';
 import chevronRight from '@iconify/icons-carbon/chevron-right';
 import Icon from '@iconify/react';
@@ -100,10 +100,9 @@ export const SidebarUi: FC<SidebarUiProps> = ({
   const history = useHistory();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [showSubnav, setShowsubnav] = useState<any>({
-    Itemindex: null,
-    isShow: false,
-  });
+  const [openNavAncorIndex, setOpenNavAncorIndex] = useState<number | null>(
+    null
+  );
 
   const toggleCached: null | string = localStorage?.getItem('isToggle') || null;
   useEffect(() => {
@@ -114,16 +113,19 @@ export const SidebarUi: FC<SidebarUiProps> = ({
 
   const handleShowSubMenu = (e: any, index: number) => {
     e.preventDefault();
-    setShowsubnav({
-      Itemindex: index,
-      isShow: !showSubnav?.isShow,
+    console.log(index, openNavAncorIndex, 'check');
+    setOpenNavAncorIndex((prev) => {
+      if (prev === index) {
+        return null;
+      } else {
+        return index;
+      }
     });
   };
 
   return (
     <SidebarWrapper toggle={sidebarOpen}>
-      <div className="logo_area flex alignCenter mt-5">
-        <span>{sidebarOpen ? appLogo : <AppLogoWithoutText />} </span>
+      <div className="toggle">
         <span
           onClick={() => {
             setSidebarOpen(!sidebarOpen);
@@ -134,88 +136,97 @@ export const SidebarUi: FC<SidebarUiProps> = ({
           <Icon className="fs-20" icon={chevronRight} />
         </span>
       </div>
-      <hr className="mt-10" />
-      <div
-        onClick={() => {
-          if (activeUserInfo?.link) {
-            history?.push(activeUserInfo.link);
-          }
-        }}
-        className="sidebar-userinfo flex alignCenter  pointer ph-10"
-      >
-        <div className="avatar_area">
-          {activeUserInfo?.userImage ? (
-            <Avatar
-              className="user_avatar"
-              size={41}
-              src={activeUserInfo?.userImage}
-            />
-          ) : (
-            <Avatar
-              size={41}
-              className="user_avatar flex alignCenter justifyCenter"
-              icon={<UserOutlined size={28} />}
-            />
-          )}
+      <div className="sidebar_wrapper">
+        <div className="logo_area flex alignCenter mt-5">
+          <span>{sidebarOpen ? appLogo : <AppLogoWithoutText />} </span>
         </div>
-        <div className=" userDetail_area ml-12  mt-10 route_tag">
-          <div>
-            {' '}
-            <h4 className="capitalize fs-14 fw-500 m-reset">
-              {activeUserInfo?.username}
-            </h4>
-            <span className={` online-check flex alignCenter fs-13 fw-500`}>
-              <h5 className="capitalize">{activeUserInfo?.userRole}</h5>
-            </span>
+
+        <hr className="mt-10" />
+        <div
+          onClick={() => {
+            if (activeUserInfo?.link) {
+              history?.push(activeUserInfo.link);
+            }
+          }}
+          className="sidebar-userinfo flex alignCenter  pointer ph-10"
+        >
+          <div className="avatar_area">
+            {activeUserInfo?.userImage ? (
+              <Avatar
+                className="user_avatar"
+                size={41}
+                src={activeUserInfo?.userImage}
+              />
+            ) : (
+              <Avatar
+                size={41}
+                className="user_avatar flex alignCenter justifyCenter"
+                icon={<UserOutlined size={28} />}
+              />
+            )}
+          </div>
+          <div className=" userDetail_area ml-12  mt-10 route_tag">
+            <div>
+              {' '}
+              <h4 className="capitalize fs-14 fw-500 m-reset">
+                {activeUserInfo?.username}
+              </h4>
+              <span className={` online-check flex alignCenter fs-13 fw-500`}>
+                <h5 className="capitalize">{activeUserInfo?.userRole}</h5>
+              </span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="routes mt-10">
-        <div className="main_routes">
-          <ul className="route_list">
-            {routes?.nestedRoutes?.map((parent, index) => {
-              console.log(index, 'index', showSubnav);
-              return (
-                <div key={index}>
-                  {!sidebarOpen && parent?.children?.length ? (
-                    <MenuPopOver route={parent} />
-                  ) : !parent?.children?.length ? (
-                    <li
-                      className={`route_list_item flex alignCenter pointer mv-4
+        <div className="routes mt-10">
+          <div className="main_routes">
+            <ul className="route_list">
+              {routes?.nestedRoutes?.map((parent, index) => {
+                return (
+                  <Fragment key={index}>
+                    {!sidebarOpen && parent?.children?.length ? (
+                      <MenuPopOver route={parent} />
+                    ) : !parent?.children?.length ? (
+                      <li
+                        className={`route_list_item flex alignCenter pointer mv-4
                     ${
                       history?.location?.pathname === parent?.route
                         ? 'active_route'
                         : ''
                     }
                     `}
-                    >
-                      <Link
-                        className="flex alignCenter fs-14"
-                        to={parent?.route as string}
                       >
-                        <span className="mr-10 flex alignCenter icon">
-                          {parent?.icon}
-                        </span>
-                        <span className="route_tag">{parent?.tag}</span>
-                      </Link>
-                    </li>
-                  ) : (
-                    <li>
-                      <div
-                        className={`sub_route_parent flex alignCenter justifySpaceBetween pointer mv-4`}
-                        onClick={(e) => handleShowSubMenu(e, index)}
-                      >
-                        <span className="flex alignCenter justifySpaceBetween">
+                        <Link
+                          className="flex alignCenter fs-14"
+                          to={parent?.route as string}
+                        >
                           <span className="mr-10 flex alignCenter icon">
                             {parent?.icon}
                           </span>
                           <span className="route_tag">{parent?.tag}</span>
-                        </span>
-                        <Icon className="fs-16 arrow" icon={chevronDown} />
-                      </div>
-                      {showSubnav?.isShow && index === showSubnav?.Itemindex && (
-                        <div className="submenu_container">
+                        </Link>
+                      </li>
+                    ) : (
+                      <li>
+                        <div
+                          className={`sub_route_parent flex alignCenter justifySpaceBetween pointer mv-4`}
+                          onClick={(e) => handleShowSubMenu(e, index)}
+                        >
+                          <span className="flex alignCenter justifySpaceBetween">
+                            <span className="mr-10 flex alignCenter icon">
+                              {parent?.icon}
+                            </span>
+                            <span className="route_tag">{parent?.tag}</span>
+                          </span>
+                          <Icon className="fs-16 arrow" icon={chevronDown} />
+                        </div>
+                        <div
+                          className={`submenu_container ${
+                            index === openNavAncorIndex
+                              ? 'open-anchor'
+                              : 'close-anchor'
+                          }`}
+                        >
                           <ul>
                             {parent?.children.map(
                               (item: any, index: number) => {
@@ -228,44 +239,46 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                             )}
                           </ul>
                         </div>
-                      )}
-                    </li>
-                  )}
-                </div>
-              );
-            })}
-          </ul>
-        </div>
-        <hr className="seprator mt-20" />
-        <div className="quickaccess_routes">
-          <h5 className="ph-24 fs-13 head">Create New</h5>
-          <div className="mt-10">
-            <ul className="route_list">
-              {routes?.singleEntity?.map((singleEntryRoute, index) => {
-                return (
-                  <li
-                    key={index}
-                    className={`route_list_item flex alignCenter pointer mv-4 
+                      </li>
+                    )}
+                  </Fragment>
+                );
+              })}
+            </ul>
+          </div>
+          <hr className="seprator mt-20" />
+          <div className="quickaccess_routes">
+            <h5 className="ph-24 fs-13 head">Create New</h5>
+            <div className="mt-10">
+              <ul className="route_list">
+                {routes?.singleEntity?.map((singleEntryRoute, index) => {
+                  return (
+                    <li
+                      key={index}
+                      className={`route_list_item flex alignCenter pointer mv-4 
                     ${
                       history?.location?.pathname === singleEntryRoute?.route
                         ? 'active_route'
                         : ''
                     }
                     `}
-                  >
-                    <Link
-                      className="flex alignCenter fs-14"
-                      to={singleEntryRoute?.route as string}
                     >
-                      <span className="mr-10 flex alignCenter icon">
-                        {singleEntryRoute?.icon}
-                      </span>
-                      <span className="route_tag">{singleEntryRoute?.tag}</span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+                      <Link
+                        className="flex alignCenter fs-14"
+                        to={singleEntryRoute?.route as string}
+                      >
+                        <span className="mr-10 flex alignCenter icon">
+                          {singleEntryRoute?.icon}
+                        </span>
+                        <span className="route_tag">
+                          {singleEntryRoute?.tag}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
           </div>
         </div>
       </div>
