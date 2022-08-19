@@ -512,7 +512,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
 
           <div className="table_area">
             <EditableTable
-              // rowClassName={(record, index) => 'sdfio'}
+              // rowClassName={(record, index) => ""}
               loading={isFetching}
               dragable={(data) => setInvoiceItems(data)}
               columns={__columns}

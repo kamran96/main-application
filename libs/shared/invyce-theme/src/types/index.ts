@@ -87,7 +87,7 @@ export const Themes: IThemes = {
     layoutBg: `#efefef`,
     sidebarBg: '#ffff',
     sidebarListActive: '#F9FCFF', //sidebar
-    sidebarListActiveText: '#168AF4',
+    sidebarListActiveText: '#1890FF',
     sidebarDefaultText: 'rgba(62, 62, 60, 0.75)',
     tableRowHover: '#151515',
     td: `#ffff`,
