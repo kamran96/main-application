@@ -59,7 +59,8 @@ dotenv.config();
 @Injectable()
 export class InvoiceService {
   constructor(
-    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy
+    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy,
+    @Inject('REPORT_SERVICE') private readonly reportService: ClientProxy
   ) {}
   async IndexInvoice(
     req: IRequest,
@@ -751,6 +752,15 @@ export class InvoiceService {
       }
 
       if (invoice.status === Statuses.AUTHORISED) {
+        Logger.log('Update jurnal report');
+
+        const jurnalReportData = {
+          date: invoice.createdAt,
+          todaySales: invoice.netTotal,
+        };
+
+        await this.reportService.emit(INVOICE_CREATED, jurnalReportData);
+
         Logger.log('Managing inventory for items.');
         await axios.post(
           Host('items', 'items/item/manage-inventory'),
