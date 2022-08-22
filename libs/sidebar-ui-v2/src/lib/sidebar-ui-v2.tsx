@@ -10,9 +10,14 @@ import { Link, useHistory } from 'react-router-dom';
 import { ReactElement, useState, Fragment } from 'react';
 import { AppLogoWithoutText } from './applogo';
 import chevronRight from '@iconify/icons-carbon/chevron-right';
+import chevronUp from '@iconify/icons-carbon/chevron-up';
 import Icon from '@iconify/react';
 import { UserOutlined } from '@ant-design/icons';
 import chevronDown from '@iconify/icons-carbon/chevron-down';
+import LogOut from '@iconify-icons/feather/log-out';
+import Setting from '@iconify-icons/feather/settings';
+import Sun from '@iconify-icons/feather/sun';
+import Moon from '@iconify-icons/feather/moon';
 
 export interface IActiveUserInfo {
   username: string;
@@ -209,7 +214,9 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                     ) : (
                       <li>
                         <div
-                          className={`sub_route_parent flex alignCenter justifySpaceBetween pointer mv-4`}
+                          className={`route_list_item_parent sub_route_parent flex alignCenter justifySpaceBetween pointer mv-4 ${
+                            index === openNavAncorIndex ? 'active_child' : ''
+                          }`}
                           onClick={(e) => handleShowSubMenu(e, index)}
                         >
                           <span className="flex alignCenter justifySpaceBetween">
@@ -218,7 +225,14 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                             </span>
                             <span className="route_tag">{parent?.tag}</span>
                           </span>
-                          <Icon className="fs-16 arrow" icon={chevronDown} />
+                          <Icon
+                            className="fs-16 arrow"
+                            icon={
+                              index !== openNavAncorIndex || !openNavAncorIndex
+                                ? chevronDown
+                                : chevronUp
+                            }
+                          />
                         </div>
                         <div
                           className={`submenu_container ${
@@ -231,8 +245,18 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                             {parent?.children.map(
                               (item: any, index: number) => {
                                 return (
-                                  <li key={index}>
-                                    <Link to={item?.route}>{item?.tag}</Link>
+                                  <li
+                                    key={index}
+                                    className={`${
+                                      history?.location?.pathname ===
+                                      item?.route
+                                        ? 'active_route'
+                                        : ''
+                                    }`}
+                                  >
+                                    <Link to={item?.route}>
+                                      <span>{item?.tag}</span>
+                                    </Link>
                                   </li>
                                 );
                               }
@@ -280,6 +304,38 @@ export const SidebarUi: FC<SidebarUiProps> = ({
               </ul>
             </div>
           </div>
+        </div>
+        <div className="sidebar_bottom">
+          <li
+            className={`route_list_item theme_changer flex alignCenter pointer 
+                    `}
+          >
+            <Button
+              onClick={onThemeButtonClick}
+              className="theme_button"
+              type="default"
+            >
+              <span className="mr-10 flex alignCenter">
+                <Icon
+                  className=" fs-16  icon"
+                  icon={activeUserInfo?.theme === 'dark' ? Moon : Sun}
+                />
+              </span>
+              <span className="title">
+                {activeUserInfo?.theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+              </span>
+            </Button>
+          </li>
+          <li
+            onClick={onLogOut}
+            className={`route_list_item flex alignCenter pointer   
+                    `}
+          >
+            <span className="mr-10 flex alignCenter">
+              <Icon className=" fs-16  icon" icon={LogOut} />
+            </span>
+            <span className="route_tag">Log Out</span>
+          </li>
         </div>
       </div>
     </SidebarWrapper>

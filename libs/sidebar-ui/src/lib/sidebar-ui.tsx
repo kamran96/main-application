@@ -11,7 +11,6 @@ import Icon from '@iconify/react';
 import { ReactElement, useState } from 'react';
 import { AppLogoWithoutText, InyvceDarkTextIcon } from './applogo';
 import chevronRight from '@iconify/icons-carbon/chevron-right';
-import chevronDown from '@iconify/icons-carbon/chevron-down';
 import LogOut from '@iconify-icons/feather/log-out';
 import Setting from '@iconify-icons/feather/settings'
 import Sun from '@iconify-icons/feather/sun';

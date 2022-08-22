@@ -183,7 +183,6 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
       min-height: 34px;
       width: 100%;
       transition: 0.3s all ease-in-out;
-      background-color: white;
       z-index: 4;
       position: relative;
       color: ${(props: IThemeProps) =>
@@ -193,7 +192,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
     .submenu_container {
       font-size: 12px;
       line-height: 2.1;
-      transition: all 3s ease-in-out !important;
+
       position: relative;
 
       ul {
@@ -202,14 +201,13 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
         padding-left: 15px;
 
         li {
-          padding: 5px 0px 5px 15px;
+          padding: 4px 0px 4px 15px !important;
           display: flex;
           justify-content: flex-start;
           align-items: center;
-
-          a {
-            color: #334d6e;
-          }
+          transition: all 0.3s ease-in-out !important;
+          border-radius: 5px;
+          margin: 2px 0;
 
           &:hover {
             background: ${(props: IThemeProps) =>
@@ -373,32 +371,26 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
 
       span svg {
         fill: #ffffff;
-        /* transition: 0.3s all ease-in-out; */
 
         path {
           stroke: #ffffff !important;
-          /* transition: 0.3s all ease-in-out; */
         }
         .BlackSpace {
           stroke: #272525 !important;
-          /* transition: 0.2s all ease-in-out; */
         }
         .BlackFill {
           fill: #272525 !important;
         }
         .itemStroke {
           stroke: none;
-          /* transition: 0.2s all ease-in-out; */
         }
 
         .fillTransparent {
           fill: transparent;
-          /* transition: 0.2s all ease-in-out; */
         }
 
         .fillItemColor {
           fill: #ffffff !important;
-          /* transition: 0.2s all ease-in-out; */
         }
       }
     }
@@ -436,7 +428,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
     left: 0;
   }
   .sidebar_bottom .route_list_item {
-    padding: 4px 24px;
+    padding: 4px 24px 8px 24px;
     min-height: 32px;
     max-width: 100%;
     transition: 0.3s all ease-in-out;
