@@ -67,10 +67,10 @@ and Save the config file
 Then:
 
 1 Remove existing node modules, packages-lock.json and cache from the project
-  `rm -rf node_modules`
-  `rm -rf .cache`
+  - `rm -rf node_modules`
+  - `rm -rf .cache`
 2 Install node modules
-  `npm install `  OR `yarn` 
+  - `npm install `  OR `yarn` 
   Then it will works
 
 
