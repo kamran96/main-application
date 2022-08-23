@@ -59,9 +59,10 @@ Here is the solution for it
 Type following in the terminal `sudo nano ~/.zshrc` and paste
 ```
 export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-export PUPPETEER_EXECUTABLE_PATH=`which chromium`
+export PUPPETEER_EXECUTABLE_PATH='which chromium'
 
-``` and Save the config file
+``` 
+and Save the config file
 
 Then:
 - 1 Remove existing node modules, packages-lock.json and cache from the project
