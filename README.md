@@ -65,10 +65,11 @@ export PUPPETEER_EXECUTABLE_PATH='which chromium'
 and Save the config file
 
 Then:
-- 1 Remove existing node modules, packages-lock.json and cache from the project
+
+1 Remove existing node modules, packages-lock.json and cache from the project
   `rm -rf node_modules`
   `rm -rf .cache`
-- 2 Install node modules
+2 Install node modules
   `npm install `  OR `yarn` 
   Then it will works
 
