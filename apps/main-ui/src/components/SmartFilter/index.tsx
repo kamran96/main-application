@@ -68,6 +68,19 @@ export const SmartFilter: FC<IProps> = ({
     }
   };
 
+  const handleString = (str: any) => {
+    if (typeof str === 'string') {
+      const value = str.split(',');
+      return value.map((str) => {
+        return Number(str);
+      });
+    } else {
+      return str;
+    }
+  };
+
+  
+
   const handleFilter = () => {
     let generatedFilter = {};
 
@@ -81,7 +94,11 @@ export const SmartFilter: FC<IProps> = ({
           generatedFilter = { ...generatedFilter, [item]: obj };
         }
       } else {
-        const obj = { ...filter[item] };
+        const obj = {
+          ...filter[item],
+          value: handleString(filter[item].value),
+        };
+
         delete obj.isFullSearch;
         generatedFilter = { ...generatedFilter, [item]: obj };
       }

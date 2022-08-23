@@ -25,6 +25,7 @@ export const PERMISSIONS = {
   USERS_SHOW: 'users/show',
   USERS_PROFILE: 'users/profile',
   USERS_UPDATE: 'users/update',
+  
 
   // attachments
   ATTACHEMENTS_ATTACHEMENT: 'attachements/attachement',

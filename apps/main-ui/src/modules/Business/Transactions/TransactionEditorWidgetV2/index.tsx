@@ -285,7 +285,7 @@ const Editor = () => {
                   <span className="flex alignCenter mr-10">
                     <Icon icon={bxPlus} />
                   </span>
-                  Add Transaction Line
+                  Add Transaction Item
                 </Button>
               </div>
             </div>
@@ -324,7 +324,6 @@ const Editor = () => {
                       }, 200);
                     }}
                     type="primary"
-                    // style={{ backgroundColor: '#7988FF', border: 'none' }}
                   >
                     Approve
                   </Button>

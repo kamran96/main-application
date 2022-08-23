@@ -553,7 +553,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
               <span className="flex alignCenter mr-10">
                 <Icon icon={bxPlus} />
               </span>
-              Add line item
+              Add  {' '}{type === IInvoiceType.PURCHASE_ENTRY ? 'Bill' : 'Line'} item
             </Button>
           </div>
           <div className="total_invoice">

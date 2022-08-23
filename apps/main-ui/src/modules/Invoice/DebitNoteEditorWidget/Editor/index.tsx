@@ -415,7 +415,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
               <span className="flex alignCenter mr-10">
                 <Icon icon={bxPlus} />
               </span>
-              Add line item
+              Add Debit Note item
             </Button>
           </div>
           <div className="total_invoice">

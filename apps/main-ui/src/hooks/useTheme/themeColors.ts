@@ -18,6 +18,8 @@ export interface IThemeVariables {
   sidebarListActive: string;
   sidebarListActiveText: string;
   sidebarDefaultText: string;
+  sidebarHoverActive: string;
+  sidebarHoverActiveText: string;
   tableRowHover: string;
   td: string;
   seprator: string;
@@ -65,6 +67,7 @@ export interface IThemeVariables {
   svgHoverBg: string;
   svgHoverColor: string;
   organizationCard: string;
+ 
 }
 
 export interface ITheme {
@@ -102,7 +105,7 @@ export const Themes: IThemes = {
     $Primary2: `#1e5b9e`,
     layoutBg: `#efefef`,
     sidebarBg: '#ffff',
-    sidebarListActive: '#1E75F1',
+    sidebarListActive: '#7eafe199', //sidebar 
     sidebarListActiveText: '#ffff',
     sidebarDefaultText: '#334d6e',
     tableRowHover: '#151515',
@@ -150,7 +153,9 @@ export const Themes: IThemes = {
     svgBg: '#EFF3F8',
     svgHoverBg: '#FBFDFF',
     svgHoverColor: '#232C3A',
-    organizationCard: '#dff0ff'
+    organizationCard: '#dff0ff',
+    sidebarHoverActive: '#F6FAFF',
+    sidebarHoverActiveText: '#7988FF',
   },
   dark: {
     $PRIMARY: '#e4e4e4',
@@ -217,6 +222,8 @@ export const Themes: IThemes = {
     svgBg: '#242B3E',
     svgHoverBg: '#434D5E',
     svgHoverColor: '#FFFFFF',
-    organizationCard: '#0B1822'
+    organizationCard: '#0B1822',
+    sidebarHoverActive: '#060E16',
+    sidebarHoverActiveText: '#FFFFFF',
   },
 };

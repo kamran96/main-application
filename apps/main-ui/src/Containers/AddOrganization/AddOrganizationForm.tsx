@@ -156,12 +156,13 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
           );
         }}
       >
-        {phoneCodes?.map((country) => {
+        {phoneCodes?.map((country, index: number) => {
           return (
             <Option
               value={`${country?.phoneCode}`}
               title={`${country?.phoneCode}`}
               id={`${country?.short}`}
+              key={index}
             >
               <img
                 className="mr-10"

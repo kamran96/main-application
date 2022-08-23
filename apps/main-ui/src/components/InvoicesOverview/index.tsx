@@ -28,11 +28,9 @@ export const InvoicesOverview: FC<IProps> = ({ data }) => {
               </i>
             </div>
             <div className="sales_overview">
-              <H4 className="_sales_title white-space-wrap ">
-                Total Invoices Send
-              </H4>
-              <div className="flex alignCenter ">
-                <Tooltip placement={'top'} title={data?.totalInvoiceSend}>
+              <H4 className="_sales_title ">Total Invoices Send</H4>
+              <div className="flex alignCenter justifySpaceBetween">
+                <Tooltip placement={'top'} title={`${data?.totalInvoiceSend}`}>
                   <BoldText className="sales_amount">
                     {kValue(data?.totalInvoiceSend?.toFixed(0))}
                   </BoldText>

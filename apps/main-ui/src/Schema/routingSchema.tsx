@@ -148,7 +148,6 @@ export const RoutingSchema: IRoutingSchema = {
       icon: <Items />,
       permission: PERMISSIONS.ITEMS_INDEX,
     },
-
     //**** Un Comment to enable Categories in sidebar */
 
     // {

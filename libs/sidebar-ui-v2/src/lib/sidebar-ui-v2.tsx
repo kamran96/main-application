@@ -118,7 +118,6 @@ export const SidebarUi: FC<SidebarUiProps> = ({
 
   const handleShowSubMenu = (e: any, index: number) => {
     e.preventDefault();
-    console.log(index, openNavAncorIndex, 'check');
     setOpenNavAncorIndex((prev) => {
       if (prev === index) {
         return null;
@@ -247,7 +246,7 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                                 return (
                                   <li
                                     key={index}
-                                    className={`${
+                                    className={` pointer ${
                                       history?.location?.pathname ===
                                       item?.route
                                         ? 'active_route'
@@ -271,40 +270,42 @@ export const SidebarUi: FC<SidebarUiProps> = ({
             </ul>
           </div>
           <hr className="seprator mt-20" />
-          <div className="quickaccess_routes">
-            <h5 className="ph-24 fs-13 head">Create New</h5>
-            <div className="mt-10">
-              <ul className="route_list">
-                {routes?.singleEntity?.map((singleEntryRoute, index) => {
-                  return (
-                    <li
-                      key={index}
-                      className={`route_list_item flex alignCenter pointer mv-4 
+        <div className="quickaccess_routes">
+          <h5 className="ph-24 fs-13 head">Create New</h5>
+          <div className="mt-10">
+            <ul className="route_list">
+              {routes?.singleEntity?.map((singleEntryRoute, index) => {
+                return (
+                  <li
+                    key={index}
+                    className={`route_list_item flex alignCenter pointer mv-4 
                     ${
                       history?.location?.pathname === singleEntryRoute?.route
                         ? 'active_route'
                         : ''
                     }
                     `}
+                  >
+                    <Link
+                      className="flex alignCenter fs-14"
+                      to={singleEntryRoute?.route as string}
                     >
-                      <Link
-                        className="flex alignCenter fs-14"
-                        to={singleEntryRoute?.route as string}
-                      >
-                        <span className="mr-10 flex alignCenter icon">
-                          {singleEntryRoute?.icon}
-                        </span>
-                        <span className="route_tag">
-                          {singleEntryRoute?.tag}
-                        </span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+                      <span className="mr-10 flex alignCenter icon">
+                        {/* <Icon
+                          className=" fs-16  icon"
+                          icon={singleEntryRoute?.icon}
+                        />*/}
+                        {singleEntryRoute?.icon}
+                      </span>
+                      <span className="route_tag">{singleEntryRoute?.tag}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         </div>
+      </div>
         <div className="sidebar_bottom">
           <li
             className={`route_list_item theme_changer flex alignCenter pointer 
@@ -325,6 +326,23 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                 {activeUserInfo?.theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
               </span>
             </Button>
+          </li>
+          <li
+            onClick={() =>{
+              history.push({
+                pathname: `/app/settings/profile-settings`,
+                state: {
+                  from: history.location.pathname,
+                },
+              })
+            }}
+            className={`route_list_item flex alignCenter pointer   
+                    `}
+          >
+            <span className="mr-10 flex alignCenter">
+              <Icon className=" fs-16  icon" icon={Setting} />
+            </span>
+            <span className="route_tag">Setting</span>
           </li>
           <li
             onClick={onLogOut}

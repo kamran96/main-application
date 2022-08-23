@@ -1454,32 +1454,50 @@ export const InconvinienceIllustration = ({ width = 292, height = 194 }) => {
   );
 };
 
-export const Dashboard = ({ width = 16, height = 16 }) => {
+// export const Dashboard = ({ width = 16, height = 16 }) => {
+//   return (
+//     <svg
+//       xmlns="http://www.w3.org/2000/svg"
+//       width="20"
+//       height="20"
+//       viewBox="0 0 20 20"
+//       fill="none"
+//     >
+//       <path
+//         d="M8.42961 0.639648H2.76961C1.84729 0.639648 1.09961 1.38733 1.09961 2.30965V16.9697C1.09961 17.892 1.84729 18.6396 2.76961 18.6396H8.42961C9.35193 18.6396 10.0996 17.892 10.0996 16.9697V2.30965C10.0996 1.38733 9.35193 0.639648 8.42961 0.639648Z"
+//         stroke="#272525"
+//         stroke-linecap="round"
+//         stroke-linejoin="round"
+//       />
+//       <path
+//         d="M17.4296 0.639648H14.0196C13.0973 0.639648 12.3496 1.38733 12.3496 2.30965V5.71965C12.3496 6.64197 13.0973 7.38965 14.0196 7.38965H17.4296C18.3519 7.38965 19.0996 6.64197 19.0996 5.71965V2.30965C19.0996 1.38733 18.3519 0.639648 17.4296 0.639648Z"
+//         stroke="#272525"
+//         stroke-linecap="round"
+//         stroke-linejoin="round"
+//       />
+//       <path
+//         d="M17.4296 9.63965H14.0196C13.0973 9.63965 12.3496 10.3873 12.3496 11.3097V16.9697C12.3496 17.892 13.0973 18.6396 14.0196 18.6396H17.4296C18.3519 18.6396 19.0996 17.892 19.0996 16.9697V11.3097C19.0996 10.3873 18.3519 9.63965 17.4296 9.63965Z"
+//         stroke="#272525"
+//         stroke-linecap="round"
+//         stroke-linejoin="round"
+//       />
+//     </svg>
+//   );
+// };
+
+export const Dashboard = ({ height = 16, width = 16 }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      viewBox="0 0 20 20"
+      width={width}
+      height={height}
+      viewBox="0 0 16 16"
       fill="none"
     >
       <path
-        d="M8.42961 0.639648H2.76961C1.84729 0.639648 1.09961 1.38733 1.09961 2.30965V16.9697C1.09961 17.892 1.84729 18.6396 2.76961 18.6396H8.42961C9.35193 18.6396 10.0996 17.892 10.0996 16.9697V2.30965C10.0996 1.38733 9.35193 0.639648 8.42961 0.639648Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        d="M17.4296 0.639648H14.0196C13.0973 0.639648 12.3496 1.38733 12.3496 2.30965V5.71965C12.3496 6.64197 13.0973 7.38965 14.0196 7.38965H17.4296C18.3519 7.38965 19.0996 6.64197 19.0996 5.71965V2.30965C19.0996 1.38733 18.3519 0.639648 17.4296 0.639648Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        d="M17.4296 9.63965H14.0196C13.0973 9.63965 12.3496 10.3873 12.3496 11.3097V16.9697C12.3496 17.892 13.0973 18.6396 14.0196 18.6396H17.4296C18.3519 18.6396 19.0996 17.892 19.0996 16.9697V11.3097C19.0996 10.3873 18.3519 9.63965 17.4296 9.63965Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        d="M1 8.18889C0.834315 8.18889 0.7 8.05457 0.7 7.88889V1C0.7 0.834314 0.834315 0.7 1 0.7H6.11111C6.2768 0.7 6.41111 0.834315 6.41111 1V7.88889C6.41111 8.05457 6.2768 8.18889 6.11111 8.18889H1ZM1 15.3C0.834315 15.3 0.7 15.1657 0.7 15V11.6667C0.7 11.501 0.834315 11.3667 1 11.3667H6.11111C6.2768 11.3667 6.41111 11.501 6.41111 11.6667V15C6.41111 15.1657 6.2768 15.3 6.11111 15.3H1ZM9.88889 15.3C9.7232 15.3 9.58889 15.1657 9.58889 15V8.11111C9.58889 7.94543 9.7232 7.81111 9.88889 7.81111H15C15.1657 7.81111 15.3 7.94543 15.3 8.11111V15C15.3 15.1657 15.1657 15.3 15 15.3H9.88889ZM9.58889 1C9.58889 0.834314 9.7232 0.7 9.88889 0.7H15C15.1657 0.7 15.3 0.834314 15.3 1V4.33333C15.3 4.49902 15.1657 4.63333 15 4.63333H9.88889C9.7232 4.63333 9.58889 4.49902 9.58889 4.33333V1Z"
+        stroke="#7988FF"
+        stroke-width="1.4"
       />
     </svg>
   );
@@ -2069,7 +2087,7 @@ export const CreateInvoice = ({ height = 18, width = 18 }) => {
   );
 };
 
-export const CreatePo = ({ height = 20, width = 20 }) => {
+export const CreatePo = ({ height = 18, width = 16 }) => {
   return (
     <svg
       width={width}
@@ -2249,38 +2267,105 @@ export const CreateNote = ({ height = 18, width = 18 }) => {
   );
 };
 
-export const DebitNote = ({ height = 18, width = 18 }) => {
+export const DebitNote = ({ height = 16, width = 17 }) => {
   return (
     <svg
-      height={height}
-      width={width}
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 30.96 30.24"
-      className="ThreeIconsDiff"
-      style={{ strokeWidth: '0.1' }}
+      width={width}
+      height={height}
+      viewBox="0 0 17 16"
+      fill="none"
     >
-      <g id="Object">
-        <path
-          className="ItemsIconsColor fillItemColor"
-          d="M29.74 3.25v20.62a5.29 5.29 0 0 1-5.28 5.28H5.59a4 4 0 0 1-4-4 .75.75 0 0 1 .76-.75H8.1V3.25A2.26 2.26 0 0 1 10.36 1h17.12a2.26 2.26 0 0 1 2.26 2.25Z"
-        />
-        <path
-          className="BlackFill BlackSpace ItemsFill"
-          d="M25.23 6.68a.76.76 0 0 0-.75-.76H13.54a.76.76 0 0 0 0 1.51h10.94a.76.76 0 0 0 .75-.75ZM24.48 11h-7.92a.76.76 0 0 0 0 1.51h7.92a.76.76 0 0 0 0-1.51Z"
-        />
-        <path
-          className="ItemsFill"
-          d="M27.48 1H10.36A2.26 2.26 0 0 0 8.1 3.25v21.14H2.34a.75.75 0 0 0-.76.75 4 4 0 0 0 4 4h18.88a5.29 5.29 0 0 0 5.28-5.28V3.25A2.26 2.26 0 0 0 27.48 1ZM5.59 27.64a2.5 2.5 0 0 1-2.38-1.75H8a2.5 2.5 0 0 1-2.41 1.75Zm22.64-3.77a3.77 3.77 0 0 1-3.77 3.77H8.7a3.94 3.94 0 0 0 .9-2.5V3.25a.76.76 0 0 1 .76-.76h17.12a.76.76 0 0 1 .75.76Z"
-        />
-        <path
-          className="BlackFill BlackSpace ItemsFill"
-          d="M22.75 20.28h-1.36v-1.36a.64.64 0 0 0-1.27 0v1.36h-1.36a.64.64 0 0 0-.64.64.64.64 0 0 0 .64.64h1.36v1.36a.64.64 0 1 0 1.27 0v-1.36h1.36a.64.64 0 1 0 0-1.28Z"
-        />
-        <path
-          className="BlackFill BlackSpace ItemsFill"
-          d="M20.76 15.64A5.29 5.29 0 1 0 26 20.92a5.29 5.29 0 0 0-5.24-5.28Zm0 9.29a4 4 0 1 1 4-4 4 4 0 0 1-4 4Z"
-        />
-      </g>
+      <rect
+        x="3.48232"
+        y="0.6"
+        width="11.9765"
+        height="3.37143"
+        stroke="#6D7D88"
+        stroke-width="1.2"
+        className='HideStroke'
+      />
+      <rect
+        x="0.470588"
+        y="0.470588"
+        width="0.941176"
+        height="3.63025"
+        stroke="#6D7D88"
+        stroke-width="0.941176"
+        className='HideStroke'
+      />
+      <rect
+        x="3.48232"
+        y="6.31436"
+        width="11.9765"
+        height="3.37143"
+        stroke="#6D7D88"
+        stroke-width="1.2"
+        className='HideStroke'
+      />
+      <rect
+        x="0.470588"
+        y="6.18494"
+        width="0.941176"
+        height="3.63025"
+        stroke="#6D7D88"
+        stroke-width="0.941176"
+        className='HideStroke'
+        
+      />
+      <rect
+        x="3.48232"
+        y="12.0287"
+        width="11.9765"
+        height="3.37143"
+        stroke="#6D7D88"
+        stroke-width="1.2"
+        className='HideStroke'
+      />
+      <rect
+        x="0.470588"
+        y="11.8993"
+        width="0.941176"
+        height="3.63025"
+        stroke="#6D7D88"
+        stroke-width="0.941176"
+        className='HideStroke'
+      />
     </svg>
   );
 };
+// export const DebitNote = ({ height = 18, width = 18 }) => {
+//   return (
+//     <svg
+//       height={height}
+//       width={width}
+//       xmlns="http://www.w3.org/2000/svg"
+//       viewBox="0 0 30.96 30.24"
+//       className="ThreeIconsDiff"
+//       style={{ strokeWidth: '0.1' }}
+//     >
+//       <g id="Object">
+//         <path
+//           className="ItemsIconsColor fillItemColor"
+//           d="M29.74 3.25v20.62a5.29 5.29 0 0 1-5.28 5.28H5.59a4 4 0 0 1-4-4 .75.75 0 0 1 .76-.75H8.1V3.25A2.26 2.26 0 0 1 10.36 1h17.12a2.26 2.26 0 0 1 2.26 2.25Z"
+//         />
+//         <path
+//           className="BlackFill BlackSpace ItemsFill"
+//           d="M25.23 6.68a.76.76 0 0 0-.75-.76H13.54a.76.76 0 0 0 0 1.51h10.94a.76.76 0 0 0 .75-.75ZM24.48 11h-7.92a.76.76 0 0 0 0 1.51h7.92a.76.76 0 0 0 0-1.51Z"
+//         />
+//         <path
+//           className="ItemsFill"
+//           d="M27.48 1H10.36A2.26 2.26 0 0 0 8.1 3.25v21.14H2.34a.75.75 0 0 0-.76.75 4 4 0 0 0 4 4h18.88a5.29 5.29 0 0 0 5.28-5.28V3.25A2.26 2.26 0 0 0 27.48 1ZM5.59 27.64a2.5 2.5 0 0 1-2.38-1.75H8a2.5 2.5 0 0 1-2.41 1.75Zm22.64-3.77a3.77 3.77 0 0 1-3.77 3.77H8.7a3.94 3.94 0 0 0 .9-2.5V3.25a.76.76 0 0 1 .76-.76h17.12a.76.76 0 0 1 .75.76Z"
+//         />
+//         <path
+//           className="BlackFill BlackSpace ItemsFill"
+//           d="M22.75 20.28h-1.36v-1.36a.64.64 0 0 0-1.27 0v1.36h-1.36a.64.64 0 0 0-.64.64.64.64 0 0 0 .64.64h1.36v1.36a.64.64 0 1 0 1.27 0v-1.36h1.36a.64.64 0 1 0 0-1.28Z"
+//         />
+//         <path
+//           className="BlackFill BlackSpace ItemsFill"
+//           d="M20.76 15.64A5.29 5.29 0 1 0 26 20.92a5.29 5.29 0 0 0-5.24-5.28Zm0 9.29a4 4 0 1 1 4-4 4 4 0 0 1-4 4Z"
+//         />
+//       </g>
+//     </svg>
+//   );
+// };

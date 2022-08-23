@@ -77,7 +77,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
     ${(props: ISidebarWrapperProps) =>
       !props?.toggle
         ? `
-    left: 50px;
+    left: 52px;
     `
         : `left: 160px;`}
     .collapse {
@@ -143,7 +143,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
   }
   .logo_area span {
     margin-left: ${(props: ISidebarWrapperProps) =>
-      !props?.toggle ? '14px' : '23px'};
+      !props?.toggle ? '23px' : '23px'};
   }
 
   .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
@@ -192,7 +192,6 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
     .submenu_container {
       font-size: 12px;
       line-height: 2.1;
-
       position: relative;
 
       ul {
@@ -201,13 +200,18 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
         padding-left: 15px;
 
         li {
-          padding: 4px 0px 4px 15px !important;
           display: flex;
           justify-content: flex-start;
           align-items: center;
           transition: all 0.3s ease-in-out !important;
           border-radius: 5px;
           margin: 2px 0;
+
+          a {
+            padding: 4px 25px 4px 15px !important;
+            color: ${(props: IThemeProps) =>
+              props?.theme?.theme === 'dark' ? '#fff' : '#334d6e'};
+          }
 
           &:hover {
             background: ${(props: IThemeProps) =>
@@ -317,6 +321,9 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
             fill: ${(props: IThemeProps) =>
               props?.theme?.theme === 'dark' ? '#C2C2C2' : ''};
           }
+          .HideStroke {
+            transition: 0.3s all ease-in-out;
+          }
         }
 
         &:hover {
@@ -328,7 +335,6 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
 
           span svg {
             fill: #ffffff;
-            /* transition: 0.3s all ease-in-out; */
 
             path {
               stroke: #ffffff;
@@ -350,18 +356,29 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
             .fillItemColor {
               fill: #ffffff !important;
             }
+            .HideStroke {
+              transition: 0.3s all ease-in-out;
+              stroke: ${(props: IThemeProps) =>
+                props?.theme?.theme === 'light' ? 'none' : ''};
+            }
           }
         }
       }
     }
     .active_route {
       background: ${(props: IThemeProps) =>
-        props?.theme?.colors?.sidebarListActive};
+        props?.theme?.colors?.sidebarListActive} !important;
       color: ${(props: IThemeProps) =>
-        props?.theme?.colors?.sidebarListActiveText};
+        props?.theme?.colors?.sidebarListActiveText} !important;
+  
+
+      .HideStroke {
+        stroke: ${(props: IThemeProps) =>
+          props?.theme?.theme === 'light' ? 'none' : ''};
+      }
       a {
         color: ${(props: IThemeProps) =>
-          props?.theme?.colors?.sidebarListActiveText};
+          props?.theme?.colors?.sidebarListActiveText} !important;
 
         .ThreeIconsDiff {
           fill: ${(props: IThemeProps) =>
@@ -428,7 +445,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
     left: 0;
   }
   .sidebar_bottom .route_list_item {
-    padding: 4px 24px 8px 24px;
+    padding: 4px 24px;
     min-height: 32px;
     max-width: 100%;
     transition: 0.3s all ease-in-out;

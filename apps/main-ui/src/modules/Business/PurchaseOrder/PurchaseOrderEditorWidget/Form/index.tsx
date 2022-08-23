@@ -244,7 +244,7 @@ const Editor: FC<IProps> = ({ id }) => {
         </PrintFormat>
       </div>
       <Card>
-        <Row gutter={24}>
+        <Row gutter={4}>
           <Col span={24}>
             <Form
               form={antForm}
@@ -351,7 +351,7 @@ const Editor: FC<IProps> = ({ id }) => {
                     </Form.Item>
                   </Col>
                 </Row>
-                <div className="table">
+                <div className="table mt-15">
                   <EditableTable
                     loading={loading}
                     dragable={(data) => setState(data)}
