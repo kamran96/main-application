@@ -52,7 +52,24 @@ Create a file named `binding.gyp` in the rood and paste this code
 
 ```
 
+If you found Error with Puppetter while installing node modules please follow this link [StakeOverflow](https://stackoverflow.com/questions/65928783/puppeteer5-5-0-install-node-install-js-on-m1)
 
+Here is the solution for it
+
+Type following in the terminal `sudo nano ~/.zshrc` and paste
+```
+export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+export PUPPETEER_EXECUTABLE_PATH=`which chromium`
+
+``` and Save the config file
+
+Then:
+- 1 Remove existing node modules, packages-lock.json and cache from the project
+  `rm -rf node_modules`
+  `rm -rf .cache`
+- 2 Install node modules
+  `npm install `  OR `yarn` 
+  Then it will works
 
 
 ## Below are our core plugins if you want to implement in NX project
