@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { Between, getCustomRepository, In, Raw } from 'typeorm';
 import axios from 'axios';
 import * as moment from 'moment';
@@ -20,6 +26,8 @@ import {
 } from '@invyce/interfaces';
 import { DeleteTransactionsDto, TransactionDto } from '../dto/transaction.dto';
 import { Entries, Host } from '@invyce/global-constants';
+import { ClientProxy } from '@nestjs/microservices';
+import { TRANSACTION_CREATED } from '@invyce/send-email';
 
 const transactionNature = {
   reverse: true,
@@ -27,6 +35,10 @@ const transactionNature = {
 
 @Injectable()
 export class TransactionService {
+  constructor(
+    @Inject('REPORT_SERVICE') private readonly reportService: ClientProxy
+  ) {}
+
   async ListTransactions(
     user: IBaseUser,
     queryData: IPage
@@ -396,7 +408,7 @@ export class TransactionService {
             status: transactions?.status === 2 ? 2 : 1 || 1,
           });
 
-          getCustomRepository(TransactionItemRepository).save(
+          await getCustomRepository(TransactionItemRepository).save(
             debits.map((dr) => ({
               transactionId: transaction.id,
               amount: dr.amount,
@@ -411,7 +423,7 @@ export class TransactionService {
             }))
           );
 
-          getCustomRepository(TransactionItemRepository).save(
+          await getCustomRepository(TransactionItemRepository).save(
             credits.map((cr) => ({
               transactionId: transaction.id,
               amount: cr.amount,
@@ -425,6 +437,28 @@ export class TransactionService {
               status: transaction.status,
             }))
           );
+
+          if (
+            transactions.invoiceId !== undefined &&
+            transactions.report === true
+          ) {
+            const getTransaction = await getCustomRepository(
+              TransactionRepository
+            ).findOne({
+              where: {
+                id: transaction.id,
+              },
+              relations: ['transactionItems', 'transactionItems.account'],
+            });
+
+            Logger.log('Add transaction for invoice');
+
+            await this.reportService.emit(TRANSACTION_CREATED, {
+              transactions: getTransaction,
+              invoiceId: transactions.invoiceId,
+            });
+          }
+
           return transaction;
         }
       }

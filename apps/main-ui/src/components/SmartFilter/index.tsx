@@ -81,7 +81,7 @@ export const SmartFilter: FC<IProps> = ({
           generatedFilter = { ...generatedFilter, [item]: obj };
         }
       } else {
-        const obj = { ...filter[item] };
+        const obj = { ...filter[item], value: filter[item].value };
         delete obj.isFullSearch;
         generatedFilter = { ...generatedFilter, [item]: obj };
       }
@@ -378,8 +378,8 @@ export const WrapperMenu = styled.div`
   .menu_wrapper {
     /* width: ${convertToRem(180)};
     box-shadow: ${convertToRem(0)} ${convertToRem(1)} ${convertToRem(
-      4
-    )} rgb(0 0 0 / 24%); */
+  4
+)} rgb(0 0 0 / 24%); */
     padding: 0 ${convertToRem(9)};
 
     .filter_name {
@@ -441,8 +441,8 @@ export const ParentWrapper: any = styled.div`
     background: ${(props: IThemeProps) => props?.theme?.colors?.buttonTagBg};
     color: ${(props: IThemeProps) => props?.theme?.colors?.buttonTagColor};
     ${(props: IThemeProps) =>
-      props?.theme?.theme === 'dark' &&
-      `
+    props?.theme?.theme === 'dark' &&
+    `
     border-color: ${props?.theme?.colors?.seprator};
     
     `}
@@ -452,7 +452,7 @@ export const ParentWrapper: any = styled.div`
     display: flex;
     align-items: center;
     color: ${(props: any) =>
-      props.isFiltered ? `${Color.$PRIMARY} !important` : Color.$GRAY};
+    props.isFiltered ? `${Color.$PRIMARY} !important` : Color.$GRAY};
   }
 
   &:hover {

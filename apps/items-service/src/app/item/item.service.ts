@@ -71,6 +71,7 @@ export class ItemService {
           meta: 'pagination',
         };
 
+        console.log(data, 'filters`');
         for (const i in data) {
           if (data[i].type === 'search') {
             const val = data[i].value?.split('%')[1];
@@ -88,44 +89,17 @@ export class ItemService {
                 customLabels: myCustomLabels,
               }
             );
-          } else if (data[i].type === 'date-between') {
-            const start_date = i[1]['value'][0];
-            const end_date = i[1]['value'][1];
+          } else if (data[i].type === 'compare') {
+            const value =
+              typeof data[i]['value'] == 'string'
+                ? data[i]['value'].split(',')
+                : [data[i]['value']];
+
             items = await this.itemModel.paginate(
               {
                 status: 1,
                 organizationId: itemData.organizationId,
-                [i]: { $gt: start_date, $lt: end_date },
-              },
-              {
-                offset: pn * ps - ps,
-                populate: 'price',
-                limit: ps,
-                sort: { [sort_column]: sort_order },
-                customLabels: myCustomLabels,
-              }
-            );
-          } else if (data[i].type === 'compare') {
-            items = await this.itemModel.paginate(
-              {
-                status: 1,
-                organization: itemData.organizationId,
-                [i]: { $in: i[1]['value'] },
-              },
-              {
-                offset: pn * ps - ps,
-                populate: 'price',
-                limit: ps,
-                sort: { [sort_column]: sort_order },
-                customLabels: myCustomLabels,
-              }
-            );
-          } else if (data[i].type === 'in') {
-            items = await this.itemModel.paginate(
-              {
-                status: 1,
-                organization: itemData.organizationId,
-                [i]: { $in: i[1]['value'] },
+                [i]: { $in: value },
               },
               {
                 offset: pn * ps - ps,

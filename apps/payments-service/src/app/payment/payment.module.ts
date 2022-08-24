@@ -3,6 +3,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
 import { Authenticate } from '@invyce/auth-middleware';
+import { MQ_HOST } from '@invyce/global-constants';
 
 @Module({
   imports: [
@@ -11,8 +12,21 @@ import { Authenticate } from '@invyce/auth-middleware';
         name: 'EMAIL_SERVICE',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://localhost:5672'],
+          urls: [MQ_HOST()],
           queue: 'email_queue',
+          queueOptions: {
+            durable: false,
+          },
+        },
+      },
+    ]),
+    ClientsModule.register([
+      {
+        name: 'REPORT_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: [MQ_HOST()],
+          queue: 'report_queue',
           queueOptions: {
             durable: false,
           },

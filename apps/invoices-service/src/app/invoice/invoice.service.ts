@@ -754,12 +754,39 @@ export class InvoiceService {
       if (invoice.status === Statuses.AUTHORISED) {
         Logger.log('Update jurnal report');
 
-        const jurnalReportData = {
-          date: invoice.createdAt,
-          todaySales: invoice.netTotal,
-        };
+        const {
+          data: { result },
+        } = await axios.get(
+          Host('users', `users/organization/${req.user.organizationId}`),
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
 
-        await this.reportService.emit(INVOICE_CREATED, jurnalReportData);
+        const { data: contact } = await axios.post(
+          Host('contacts', `contacts/contact/ids`),
+          {
+            ids: [dto.contactId],
+            type: 1,
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
+
+        const invoiceReportData = {
+          invoice,
+          invoiceItems,
+          contact: contact[0],
+          organizationName: result.name,
+          items,
+          user: req.user,
+        };
+        await this.reportService.emit(INVOICE_CREATED, invoiceReportData);
 
         Logger.log('Managing inventory for items.');
         await axios.post(
@@ -797,6 +824,8 @@ export class InvoiceService {
           reference: dto.reference,
           amount: dto.grossTotal,
           status: invoice.status,
+          report: true, // true if report has been created
+          invoiceId: invoice.id,
         };
 
         Logger.log('Making transactions for the invoice.');
@@ -822,6 +851,7 @@ export class InvoiceService {
             paymentType: PaymentModes.INVOICES,
             transactionId: transaction.id,
             entryType: EntryType.CREDIT,
+            report: true, // true if report has been created
           },
         ];
 
@@ -853,19 +883,6 @@ export class InvoiceService {
             });
           }
         }
-
-        const { data: contact } = await axios.post(
-          Host('contacts', `contacts/contact/ids`),
-          {
-            ids: [dto.contactId],
-            type: 1,
-          },
-          {
-            headers: {
-              cookie: `access_token=${token}`,
-            },
-          }
-        );
 
         const email = contact[0].email
           ? contact[0].email
