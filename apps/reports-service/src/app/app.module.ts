@@ -2,12 +2,13 @@ import { Module } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { InvoiceModule } from './invoices/invoice.module';
+import { BillModule } from './bill/bill.module';
+import { InvoiceModule } from './invoice/invoice.module';
 
 dotenv.config();
 
 @Module({
-  imports: [InvoiceModule],
+  imports: [InvoiceModule, BillModule],
   controllers: [AppController],
   providers: [AppService],
 })

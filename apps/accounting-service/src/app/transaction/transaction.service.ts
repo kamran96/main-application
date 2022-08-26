@@ -27,7 +27,10 @@ import {
 import { DeleteTransactionsDto, TransactionDto } from '../dto/transaction.dto';
 import { Entries, Host } from '@invyce/global-constants';
 import { ClientProxy } from '@nestjs/microservices';
-import { TRANSACTION_CREATED } from '@invyce/send-email';
+import {
+  TRANSACTION_CREATED_FOR_BILL,
+  TRANSACTION_CREATED_FOR_INVOICE,
+} from '@invyce/send-email';
 
 const transactionNature = {
   reverse: true,
@@ -438,10 +441,7 @@ export class TransactionService {
             }))
           );
 
-          if (
-            transactions.invoiceId !== undefined &&
-            transactions.report === true
-          ) {
+          if (transactions.report === true) {
             const getTransaction = await getCustomRepository(
               TransactionRepository
             ).findOne({
@@ -451,12 +451,19 @@ export class TransactionService {
               relations: ['transactionItems', 'transactionItems.account'],
             });
 
-            Logger.log('Add transaction for invoice');
-
-            await this.reportService.emit(TRANSACTION_CREATED, {
-              transactions: getTransaction,
-              invoiceId: transactions.invoiceId,
-            });
+            if (transactions.invoiceId !== undefined) {
+              Logger.log('Adding transaction in reporting service for invoice');
+              await this.reportService.emit(TRANSACTION_CREATED_FOR_INVOICE, {
+                transactions: getTransaction,
+                invoiceId: transactions.invoiceId,
+              });
+            } else if (transactions.billId !== undefined) {
+              Logger.log('Adding transaction in reporting service for bill');
+              await this.reportService.emit(TRANSACTION_CREATED_FOR_BILL, {
+                transactions: getTransaction,
+                billId: transactions.billId,
+              });
+            }
           }
 
           return transaction;

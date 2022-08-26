@@ -27,7 +27,11 @@ import {
 } from '../dto/payment.dto';
 
 import { ClientProxy } from '@nestjs/microservices';
-import { SEND_FORGOT_PASSWORD, PAYMENT_CREATED } from '@invyce/send-email';
+import {
+  SEND_FORGOT_PASSWORD,
+  PAYMENT_CREATED_FOR_INVOICE,
+  PAYMENT_CREATED_FOR_BILL,
+} from '@invyce/send-email';
 
 @Injectable()
 export class PaymentService {
@@ -738,7 +742,8 @@ export class PaymentService {
   // }
 
   async AddPayment(data, user: IBaseUser): Promise<void> {
-    const paymentArr = [];
+    const paymentInvoiceArr = [];
+    const paymentBillArr = [];
     for (const i of data.payments) {
       const payment = await getCustomRepository(PaymentRepository).save({
         amount: i?.balance,
@@ -762,11 +767,20 @@ export class PaymentService {
       });
 
       if (i.invoiceId !== undefined && i.report === true) {
-        paymentArr.push(payment);
+        paymentInvoiceArr.push(payment);
+      } else if (i.billId !== undefined && i.report === true) {
+        paymentBillArr.push(payment);
       }
     }
 
-    await this.reportService.emit(PAYMENT_CREATED, paymentArr);
+    if (paymentInvoiceArr.length > 0) {
+      await this.reportService.emit(
+        PAYMENT_CREATED_FOR_INVOICE,
+        paymentInvoiceArr
+      );
+    } else if (paymentBillArr.length > 0) {
+      await this.reportService.emit(PAYMENT_CREATED_FOR_BILL, paymentBillArr);
+    }
   }
 
   async DeletePayment(paymentIds: PaymentIdsDto, req): Promise<boolean> {

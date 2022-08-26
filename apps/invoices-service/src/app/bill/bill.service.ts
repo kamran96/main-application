@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import {
   Between,
   getCustomRepository,
@@ -22,14 +28,15 @@ import {
 } from '@invyce/global-constants';
 
 import { ClientProxy } from '@nestjs/microservices';
-import { BILL_UPDATED } from '@invyce/send-email';
+import { BILL_CREATED, BILL_UPDATED } from '@invyce/send-email';
 import { CreditNoteRepository } from '../repositories/creditNote.repository';
 import { PurchaseOrderRepository } from '../repositories/purchaseOrder.repository';
 
 @Injectable()
 export class BillService {
   constructor(
-    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy
+    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy,
+    @Inject('REPORT_SERVICE') private readonly reportService: ClientProxy
   ) {}
 
   async IndexBill(req: IRequest, queryData: IPage): Promise<IBillWithResponse> {
@@ -687,6 +694,41 @@ export class BillService {
       }
 
       if (bill.status === Statuses.AUTHORISED) {
+        Logger.log('Update jurnal report');
+
+        const {
+          data: { result },
+        } = await axios.get(
+          Host('users', `users/organization/${req.user.organizationId}`),
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
+        const { data: contact } = await axios.post(
+          Host('contacts', `contacts/contact/ids`),
+          {
+            ids: [dto.contactId],
+            type: 1,
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
+
+        const billReportData = {
+          bill,
+          billItems,
+          contact: contact[0],
+          organizationName: result.name,
+          items,
+          user: req.user,
+        };
+        await this.reportService.emit(BILL_CREATED, billReportData);
+
         await axios.post(
           Host('items', `items/item/manage-inventory`),
           {
@@ -713,6 +755,8 @@ export class BillService {
           reference: dto.reference,
           amount: dto.grossTotal,
           status: bill.status,
+          report: true, // true if report has been created
+          billId: bill.id,
         };
 
         const { data: transaction } = await axios.post(
@@ -737,6 +781,7 @@ export class BillService {
             paymentType: PaymentModes.BILLS,
             transactionId: transaction.id,
             entryType: EntryType.CREDIT,
+            report: true, // true if report has been created
           },
         ];
 
