@@ -88,8 +88,8 @@ export const Themes: IThemes = {
     $Primary2: `#1e5b9e`,
     layoutBg: `#efefef`,
     sidebarBg: '#ffff',
-    sidebarListActive: '#7eafe199', //sidebar 
-    sidebarListActiveText: '#ffff',
+    sidebarListActive: '#F6FAFF', //sidebar 
+    sidebarListActiveText: '#7988FF',
     sidebarDefaultText: 'rgba(62, 62, 60, 0.75)',
     tableRowHover: '#151515',
     td: `#ffff`,
@@ -122,7 +122,7 @@ export const Themes: IThemes = {
     cmdbg: '#e5e5e5',
     cardBg: '#ffffff',
     stroke: '#F2F2F2',
-    sidebarHoverActive: '#F6FAFF',
+    sidebarHoverActive: '#7988FF',
     sidebarHoverActiveText: '#7988FF',
   },
   dark: {
@@ -176,7 +176,7 @@ export const Themes: IThemes = {
     cmdbg: `#272727`,
     cardBg: '#121212',
     stroke: '#F2F2F2',
-    sidebarHoverActive: '#060E16',
+    sidebarHoverActive: '#FFFFFF',
     sidebarHoverActiveText: '#FFFFFF',
   },
 };

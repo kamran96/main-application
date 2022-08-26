@@ -105,8 +105,8 @@ export const Themes: IThemes = {
     $Primary2: `#1e5b9e`,
     layoutBg: `#efefef`,
     sidebarBg: '#ffff',
-    sidebarListActive: '#7eafe199', //sidebar 
-    sidebarListActiveText: '#ffff',
+    sidebarListActive: '#F6FAFF', //sidebar 
+    sidebarListActiveText: '#7988FF',
     sidebarDefaultText: '#334d6e',
     tableRowHover: '#151515',
     td: `#ffff`,
@@ -223,7 +223,7 @@ export const Themes: IThemes = {
     svgHoverBg: '#434D5E',
     svgHoverColor: '#FFFFFF',
     organizationCard: '#0B1822',
-    sidebarHoverActive: '#060E16',
+    sidebarHoverActive: '#FFFFFF',
     sidebarHoverActiveText: '#FFFFFF',
   },
 };

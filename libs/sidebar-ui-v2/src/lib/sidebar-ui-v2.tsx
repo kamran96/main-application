@@ -213,7 +213,7 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                     ) : (
                       <li>
                         <div
-                          className={`route_list_item_parent sub_route_parent flex alignCenter justifySpaceBetween pointer mv-4 ${
+                          className={`route_list_item_parent sub_route_parent flex alignCenter justifySpaceBetween pointer mv-6 ${
                             index === openNavAncorIndex ? 'active_child' : ''
                           }`}
                           onClick={(e) => handleShowSubMenu(e, index)}
@@ -291,10 +291,6 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                       to={singleEntryRoute?.route as string}
                     >
                       <span className="mr-10 flex alignCenter icon">
-                        {/* <Icon
-                          className=" fs-16  icon"
-                          icon={singleEntryRoute?.icon}
-                        />*/}
                         {singleEntryRoute?.icon}
                       </span>
                       <span className="route_tag">{singleEntryRoute?.tag}</span>
@@ -308,7 +304,7 @@ export const SidebarUi: FC<SidebarUiProps> = ({
       </div>
         <div className="sidebar_bottom">
           <li
-            className={`route_list_item theme_changer flex alignCenter pointer 
+            className={`route_list_item theme_changer flex alignCenter pointer
                     `}
           >
             <Button

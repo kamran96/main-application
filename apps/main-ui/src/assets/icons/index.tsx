@@ -1454,282 +1454,233 @@ export const InconvinienceIllustration = ({ width = 292, height = 194 }) => {
   );
 };
 
-// export const Dashboard = ({ width = 16, height = 16 }) => {
-//   return (
-//     <svg
-//       xmlns="http://www.w3.org/2000/svg"
-//       width="20"
-//       height="20"
-//       viewBox="0 0 20 20"
-//       fill="none"
-//     >
-//       <path
-//         d="M8.42961 0.639648H2.76961C1.84729 0.639648 1.09961 1.38733 1.09961 2.30965V16.9697C1.09961 17.892 1.84729 18.6396 2.76961 18.6396H8.42961C9.35193 18.6396 10.0996 17.892 10.0996 16.9697V2.30965C10.0996 1.38733 9.35193 0.639648 8.42961 0.639648Z"
-//         stroke="#272525"
-//         stroke-linecap="round"
-//         stroke-linejoin="round"
-//       />
-//       <path
-//         d="M17.4296 0.639648H14.0196C13.0973 0.639648 12.3496 1.38733 12.3496 2.30965V5.71965C12.3496 6.64197 13.0973 7.38965 14.0196 7.38965H17.4296C18.3519 7.38965 19.0996 6.64197 19.0996 5.71965V2.30965C19.0996 1.38733 18.3519 0.639648 17.4296 0.639648Z"
-//         stroke="#272525"
-//         stroke-linecap="round"
-//         stroke-linejoin="round"
-//       />
-//       <path
-//         d="M17.4296 9.63965H14.0196C13.0973 9.63965 12.3496 10.3873 12.3496 11.3097V16.9697C12.3496 17.892 13.0973 18.6396 14.0196 18.6396H17.4296C18.3519 18.6396 19.0996 17.892 19.0996 16.9697V11.3097C19.0996 10.3873 18.3519 9.63965 17.4296 9.63965Z"
-//         stroke="#272525"
-//         stroke-linecap="round"
-//         stroke-linejoin="round"
-//       />
-//     </svg>
-//   );
-// };
-
-export const Dashboard = ({ height = 16, width = 16 }) => {
+export const Dashboard = ({ height = 19, width = 19 }) => {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={width}
-      height={height}
-      viewBox="0 0 16 16"
-      fill="none"
-    >
-      <path
-        d="M1 8.18889C0.834315 8.18889 0.7 8.05457 0.7 7.88889V1C0.7 0.834314 0.834315 0.7 1 0.7H6.11111C6.2768 0.7 6.41111 0.834315 6.41111 1V7.88889C6.41111 8.05457 6.2768 8.18889 6.11111 8.18889H1ZM1 15.3C0.834315 15.3 0.7 15.1657 0.7 15V11.6667C0.7 11.501 0.834315 11.3667 1 11.3667H6.11111C6.2768 11.3667 6.41111 11.501 6.41111 11.6667V15C6.41111 15.1657 6.2768 15.3 6.11111 15.3H1ZM9.88889 15.3C9.7232 15.3 9.58889 15.1657 9.58889 15V8.11111C9.58889 7.94543 9.7232 7.81111 9.88889 7.81111H15C15.1657 7.81111 15.3 7.94543 15.3 8.11111V15C15.3 15.1657 15.1657 15.3 15 15.3H9.88889ZM9.58889 1C9.58889 0.834314 9.7232 0.7 9.88889 0.7H15C15.1657 0.7 15.3 0.834314 15.3 1V4.33333C15.3 4.49902 15.1657 4.63333 15 4.63333H9.88889C9.7232 4.63333 9.58889 4.49902 9.58889 4.33333V1Z"
-        stroke="#7988FF"
-        stroke-width="1.4"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.96 30.24" height={height} width={width}>
+    <defs>
+      <style>
+        {
+          ".cls-1{stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px}"
+        }
+      </style>
+    </defs>
+    <g id="Object">
+      <rect
+        className="cls-1"
+        x={1.34}
+        y={1.13}
+        width={13.99}
+        height={27.97}
+        rx={2.59}
       />
-    </svg>
+      <rect
+        className="cls-1"
+        x={18.83}
+        y={1.13}
+        width={10.49}
+        height={10.49}
+        rx={2.59}
+      />
+      <rect
+        className="cls-1"
+        x={18.83}
+        y={15.12}
+        width={10.49}
+        height={13.99}
+        rx={2.59}
+      />
+    </g>
+  </svg>
   );
 };
 
-export const BussinesIcon = ({ width = 18, height = 18 }) => {
+export const BussinesIcon = ({ width = 19, height = 19 }) => {
   return (
-    <svg
-      width={width}
-      height={height}
-      viewBox="0 0 17 17"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.96 30.24" height={height} width={width}>
+    <defs>
+      <style>
+        {
+          ".cls-2{stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px}"
+        }
+      </style>
+    </defs>
+    <g id="Object">
       <path
-        d="M14.7079 3.34277H2.49127C1.72268 3.34277 1.09961 4.06033 1.09961 4.94548V14.2162C1.09961 15.1013 1.72268 15.8189 2.49127 15.8189H14.7079C15.4765 15.8189 16.0996 15.1013 16.0996 14.2162V4.94548C16.0996 4.06033 15.4765 3.34277 14.7079 3.34277Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        d="M22.51 7.12V4.36a1.3 1.3 0 0 0-1.3-1.3H9.75a1.3 1.3 0 0 0-1.3 1.3v2.76"
+        style={{
+          strokeLinecap: "round",
+          strokeLinejoin: "round",
+          strokeWidth: "1.5px",
+          fill: "none",
+        }}
       />
-      <path
-        className="fillTransparent"
-        d="M12.3915 3.34334V1.62549C12.3915 1.51962 12.3734 1.41479 12.3382 1.31699C12.303 1.21918 12.2514 1.13031 12.1864 1.05545C12.1214 0.980596 12.0443 0.921214 11.9593 0.880701C11.8744 0.840188 11.7834 0.819336 11.6915 0.819336H5.4998C5.31415 0.819336 5.13611 0.904271 5.00483 1.05545C4.87356 1.20664 4.7998 1.41168 4.7998 1.62549V3.34334"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+      <rect
+        className="cls-2"
+        x={1.59}
+        y={7.12}
+        width={27.78}
+        height={20.06}
+        rx={2.57}
       />
-      <path
-        className="BlackSpace"
-        d="M3.84961 7.52832H13.3413"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M6.24902 10.0225H10.7407"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
+      <path className="cls-2" d="M6.69 13.84h17.58M11.13 17.85h8.32" />
+    </g>
+  </svg>
   );
 };
 
-export const ReportIcon = ({ width = 18, height = 18 }) => {
+export const ReportIcon = ({ width = 19, height = 19 }) => {
   return (
-    <svg
-      width={width}
-      height={height}
-      viewBox="0 0 17 17"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.96 30.24" width={width} height={height}>
+    <defs>
+      <style>
+        {
+          ".cls-1{stroke-width:1.5px;stroke-linecap:round;stroke-linejoin:round}"
+        }
+      </style>
+    </defs>
+    <g id="Object">
       <path
-        className="ReportColor"
-        d="M16.0978 6.47256V14.4143C16.1137 14.7211 16.008 15.0218 15.8037 15.2511C15.5993 15.4805 15.3128 15.62 15.0062 15.6393H3.46596C3.37399 15.634 3.28397 15.6106 3.20107 15.5704C3.11817 15.5302 3.04402 15.4741 2.98286 15.4052C2.92171 15.3363 2.87475 15.256 2.8447 15.1689C2.81464 15.0818 2.80207 14.9896 2.8077 14.8976V3.61421C2.78946 3.30603 2.8941 3.00317 3.09869 2.772C3.30329 2.54082 3.59115 2.40017 3.89924 2.38086H11.7316C11.8774 2.3831 12.0211 2.41618 12.1533 2.47794C12.2854 2.53971 12.4029 2.62875 12.4982 2.7392L15.7811 5.6059C15.9864 5.84789 16.0987 6.15519 16.0978 6.47256Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        className="cls-1"
+        d="M29.52 11.92v14.79a2.18 2.18 0 0 1-2 2.29H6a1.3 1.3 0 0 1-1.22-1.37v-21a2.18 2.18 0 0 1 2-2.29h14.61a2 2 0 0 1 1.43.66l6.11 5.35a2.44 2.44 0 0 1 .59 1.57ZM9.95 16.65h12.28M9.95 9.96h8.63M9.95 23.33h14.37"
       />
       <path
-        className="BlackSpace"
-        d="M5.59961 9.01465H12.1821"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        d="M18.65 1H6.22a4.66 4.66 0 0 0-4.66 4.7v20.19"
+        style={{
+          fill: "none",
+          strokeWidth: "1.55px",
+          strokeLinecap: "round",
+          strokeLinejoin: "round",
+        }}
       />
-      <path
-        className="BlackSpace"
-        d="M5.59961 5.42285H10.224"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M5.59961 12.5977H13.307"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="fillTransparent"
-        d="M10.2652 0.639648H3.5993C2.93634 0.639648 2.30053 0.903041 1.83175 1.37189C1.36297 1.84073 1.09961 2.47662 1.09961 3.13967V13.9731"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
+    </g>
+  </svg>
   );
 };
 
-export const Accounting = ({ width = 18, height = 18 }) => {
+export const Accounting = ({ width = 19, height = 19 }) => {
   return (
-    <svg
-      width={width}
-      height={height}
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M3.62961 0.639648H2.19961C1.59209 0.639648 1.09961 1.13211 1.09961 1.73962V17.5396C1.09961 18.1472 1.59209 18.6396 2.19961 18.6396H3.62961C4.23712 18.6396 4.72961 18.1472 4.72961 17.5396V1.73962C4.72961 1.13211 4.23712 0.639648 3.62961 0.639648Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.96 30.24" width={width} height={height}>
+    <defs>
+      <style>
+        {
+          ".cls-1{stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px}"
+        }
+      </style>
+    </defs>
+    <g id="Object">
+      <rect
+        className="cls-1"
+        x={2.18}
+        y={1.55}
+        width={5.54}
+        height={27.43}
+        rx={1.68}
       />
-      <path
-        d="M10.8093 0.639648H9.3793C8.77178 0.639648 8.2793 1.13211 8.2793 1.73962V17.5396C8.2793 18.1472 8.77178 18.6396 9.3793 18.6396H10.8093C11.4168 18.6396 11.9093 18.1472 11.9093 17.5396V1.73962C11.9093 1.13211 11.4168 0.639648 10.8093 0.639648Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+      <rect
+        className="cls-1"
+        x={13.12}
+        y={1.55}
+        width={5.54}
+        height={27.43}
+        rx={1.68}
       />
-      <path
-        d="M17.99 6.63965H16.56C15.9524 6.63965 15.46 7.13211 15.46 7.73962V17.5396C15.46 18.1472 15.9524 18.6396 16.56 18.6396H17.99C18.5975 18.6396 19.09 18.1472 19.09 17.5396V7.73962C19.09 7.13211 18.5975 6.63965 17.99 6.63965Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+      <rect
+        className="cls-1"
+        x={24.07}
+        y={10.69}
+        width={5.54}
+        height={18.29}
+        rx={1.68}
       />
-    </svg>
+    </g>
+  </svg>
   );
 };
 
-export const Payments = ({ width = 18, height = 18 }) => {
+export const Payments = ({ width = 19, height = 19 }) => {
   return (
-    <svg
-      width={height}
-      height={width}
-      viewBox="0 0 20 16"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M17.4296 0.639648H2.76961C1.84729 0.639648 1.09961 1.38732 1.09961 2.30963V12.9696C1.09961 13.892 1.84729 14.6396 2.76961 14.6396H17.4296C18.3519 14.6396 19.0996 13.892 19.0996 12.9696V2.30963C19.0996 1.38732 18.3519 0.639648 17.4296 0.639648Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.96 30.24" height={height} width={width}>
+    <defs>
+      <style>
+        {
+          ".cls-1{stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px}"
+        }
+      </style>
+    </defs>
+    <g id="Object">
+      <rect
+        className="cls-1"
+        x={1.44}
+        y={3.08}
+        width={28.38}
+        height={22.07}
+        rx={2.63}
       />
-      <path
-        className="BlackSpace"
-        d="M3.7998 3.46973H10.7998"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M3.7998 6.46973H7.1298"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M13.4492 12.5596C15.3822 12.5596 16.9492 10.9926 16.9492 9.05957C16.9492 7.12657 15.3822 5.55957 13.4492 5.55957C11.5162 5.55957 9.94922 7.12657 9.94922 9.05957C9.94922 10.9926 11.5162 12.5596 13.4492 12.5596Z"
-        stroke="#272525"
-        stroke-width="1.1"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M12.0498 9.48944L12.7998 10.2394L14.5998 8.43945"
-        stroke="#272525"
-        stroke-width="1.1"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
+      <path className="cls-1" d="M5.7 7.55h11.03M5.7 12.28h5.25" />
+      <circle className="cls-1" cx={20.91} cy={16.35} r={5.52} />
+      <path className="cls-1" d="m18.7 17.04 1.19 1.18 2.83-2.83" />
+    </g>
+  </svg>
   );
 };
 
-export const Contacts = ({ width = 18, height = 18 }) => {
+export const Contacts = ({ width = 19, height = 19 }) => {
   return (
-    <svg
-      width={height}
-      height={width}
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.96 30.24" width={width} height={height}>
+    <defs>
+      <style>
+        {
+          ".cls-1{stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px}"
+        }
+      </style>
+    </defs>
+    <g id="Object">
+      <ellipse className="cls-1" cx={16.01} cy={7.86} rx={6.96} ry={6.84} />
       <path
-        d="M10.0995 9.63965C12.629 9.63965 14.6795 7.62493 14.6795 5.13965C14.6795 2.65437 12.629 0.639648 10.0995 0.639648C7.57008 0.639648 5.51953 2.65437 5.51953 5.13965C5.51953 7.62493 7.57008 9.63965 10.0995 9.63965Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        className="cls-1"
+        d="M27.37 28.4a2.3 2.3 0 0 0 2.28-2.74A13.87 13.87 0 0 0 16 14.71a13.86 13.86 0 0 0-13.64 11 2.29 2.29 0 0 0 2.28 2.69Z"
       />
-      <path
-        d="M17.5697 18.6396C17.7941 18.6423 18.0163 18.595 18.2201 18.501C18.4239 18.407 18.6042 18.2688 18.7478 18.0964C18.8915 17.924 18.9949 17.7218 19.0506 17.5044C19.1063 17.287 19.1128 17.0599 19.0697 16.8396C18.6151 14.7996 17.4788 12.9755 15.8481 11.6682C14.2174 10.3609 12.1897 9.64844 10.0997 9.64844C8.00966 9.64844 5.98204 10.3609 4.35134 11.6682C2.72064 12.9755 1.58427 14.7996 1.12969 16.8396C1.08657 17.0599 1.0931 17.287 1.14877 17.5044C1.20445 17.7218 1.30788 17.924 1.45155 18.0964C1.59522 18.2688 1.77551 18.407 1.97931 18.501C2.18311 18.595 2.40529 18.6423 2.62969 18.6396H17.5697Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
+    </g>
+  </svg>
   );
 };
 
-export const Items = ({ height = 18, width = 18 }) => {
+export const Items = ({ height = 19, width = 19 }) => {
   return (
-    <svg
-      width={height}
-      height={width}
-      viewBox="0 0 17 17"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M13.7987 3.17404L8.4084 4.53001C8.0712 4.61483 7.8692 4.947 7.95723 5.27195L9.36431 10.4664C9.45233 10.7914 9.79703 10.986 10.1342 10.9012L15.5245 9.54524C15.8617 9.46041 16.0637 9.12824 15.9757 8.80329L14.5686 3.60881C14.4806 3.28386 14.1359 3.08922 13.7987 3.17404Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.96 30.24" height={height} width={width}>
+    <defs>
+      <style>
+        {
+          ".cls-1{stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px}"
+        }
+      </style>
+    </defs>
+    <g id="Object">
+      <rect
+        className="cls-1"
+        x={15.3}
+        y={6.58}
+        width={12.2}
+        height={12.2}
+        rx={1.13}
+        transform="rotate(-14.63 21.414 12.686)"
       />
       <path
-        className="fillTransparent"
-        d="M1.38965 1.4074L3.19253 1.01647C3.41259 0.967726 3.64332 0.992826 3.84657 1.0876C4.04983 1.18238 4.21342 1.34116 4.31032 1.5377L7.71778 12.7178C7.81449 12.9149 7.97765 13.0746 8.18066 13.1708C8.38366 13.2671 8.61452 13.2942 8.83556 13.2477L16.3896 11.6232"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        d="m2.52 2.25 3.28-.73a1.8 1.8 0 0 1 2 1l6.08 20.68a1.79 1.79 0 0 0 2 1l13.47-3"
+        style={{
+          fill: "none",
+          strokeLinecap: "round",
+          strokeLinejoin: "round",
+          strokeWidth: "1.5px",
+        }}
       />
-      <path
-        className="fillTransparent"
-        d="M6.96905 15.9923C7.5366 15.9923 7.99669 15.5489 7.99669 15.002C7.99669 14.4551 7.5366 14.0117 6.96905 14.0117C6.4015 14.0117 5.94141 14.4551 5.94141 15.002C5.94141 15.5489 6.4015 15.9923 6.96905 15.9923Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
+      <circle className="cls-1" cx={12.48} cy={27.43} r={1.84} />
+    </g>
+  </svg>
   );
 };
 
-export const Categories = ({ width = 18, height = 18 }) => {
+export const Categories = ({ width = 19, height = 19 }) => {
   return (
     <svg
       width={width}
@@ -1926,446 +1877,239 @@ export const TodayInvoice = ({ height = 18, width = 18 }) => {
   );
 };
 
-export const DraftInvoice = ({ height = 18, width = 18 }) => {
+export const DraftInvoice = ({ height = 19, width = 19 }) => {
   return (
-    <svg
-      width={width}
-      height={height}
-      viewBox="0 0 17 17"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.96 30.24" width={width} height={height}>
+    <defs>
+      <style>
+        {
+          ".cls-1{stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px}"
+        }
+      </style>
+    </defs>
+    <g id="Object">
       <path
-        d="M15.9982 5.74388V14.6136C16.0165 14.9596 15.8983 15.2989 15.6691 15.5583C15.44 15.8177 15.1183 15.9764 14.7735 16H1.74375C1.53904 15.9773 1.34997 15.8794 1.21305 15.7251C1.07612 15.5709 1.00103 15.3713 1.00228 15.1648V2.39475C0.981773 2.046 1.10005 1.70332 1.33119 1.44186C1.56232 1.1804 1.88745 1.02151 2.23527 1H11.0745C11.2407 1.00325 11.4044 1.04131 11.5551 1.11179C11.7057 1.18227 11.84 1.28361 11.9493 1.40924L15.6399 4.75C15.8774 5.02573 16.005 5.37965 15.9982 5.74388Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        className="cls-1"
+        d="M29.77 10.2v16.29A2.42 2.42 0 0 1 27.51 29h-24a1.45 1.45 0 0 1-1.36-1.52V4.05A2.42 2.42 0 0 1 4.42 1.5H20.7a2.13 2.13 0 0 1 1.6.75l6.81 6.15a2.73 2.73 0 0 1 .66 1.8ZM7.21 15.2h9.28M7.21 6.98h12.88M7.21 23.41h8.2"
       />
       <path
-        d="M3.74316 8.4668H8.78344"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        className="cls-1"
+        d="m23.73 12.35-4.68 8.72.07 3.01 2.57-1.61 4.68-8.7-2.64-1.42z"
       />
-      <path
-        d="M3.74316 3.99023H10.7412"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        d="M3.74316 12.9355H8.20027"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        d="M12.7241 6.91309L10.1748 11.6653L10.2165 13.3023L11.6161 12.4254L14.157 7.6815L12.7241 6.91309Z"
-        stroke="#272525"
-        stroke-width="1.06"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
+    </g>
+  </svg>
   );
 };
 
-export const JournalEntry = ({ height = 18, width = 18 }) => {
+export const JournalEntry = ({ height = 19, width = 19 }) => {
   return (
-    <svg
-      width={width}
-      height={height}
-      viewBox="0 0 17 17"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M15.9982 5.74388V14.6136C16.0165 14.9596 15.8983 15.2989 15.6691 15.5583C15.44 15.8177 15.1183 15.9764 14.7735 16H1.74375C1.53904 15.9773 1.34997 15.8794 1.21305 15.7251C1.07612 15.5709 1.00103 15.3713 1.00228 15.1648V2.39475C0.981773 2.046 1.10005 1.70332 1.33119 1.44186C1.56232 1.1804 1.88745 1.02151 2.23527 1H11.0745C11.2407 1.00325 11.4044 1.04131 11.5551 1.11179C11.7057 1.18227 11.84 1.28361 11.9493 1.40924L15.6399 4.75C15.8774 5.02573 16.005 5.37965 15.9982 5.74388Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M3.74316 8.4668H8.78344"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M3.74316 3.99023H10.7412"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M3.74316 12.9355H8.20027"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M12.7241 6.91309L10.1748 11.6653L10.2165 13.3023L11.6161 12.4254L14.157 7.6815L12.7241 6.91309Z"
-        stroke="#272525"
-        stroke-width="1.06"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
-  );
-};
-
-export const CreateContact = ({ height = 18, width = 18 }) => {
-  return (
-    <svg
-      width={width}
-      height={height}
-      viewBox="0 0 19 18"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M8.71989 8.73926C10.9787 8.73926 12.8099 6.93942 12.8099 4.71924C12.8099 2.49905 10.9787 0.699219 8.71989 0.699219C6.46104 0.699219 4.62988 2.49905 4.62988 4.71924C4.62988 6.93942 6.46104 8.73926 8.71989 8.73926Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        d="M13.4899 10.25C12.3836 9.46823 11.1013 8.97157 9.757 8.80423C8.41267 8.63689 7.04783 8.80409 5.78358 9.2908C4.51932 9.77751 3.39476 10.5688 2.50969 11.5944C1.62462 12.62 1.00641 13.8482 0.709913 15.1701C0.669566 15.3676 0.673998 15.5717 0.722876 15.7674C0.771754 15.963 0.863839 16.1452 0.992369 16.3006C1.1209 16.456 1.28261 16.5806 1.46561 16.6653C1.64862 16.75 1.84828 16.7927 2.04992 16.7901H11.2699"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        d="M12.7998 14.1191H18.1498"
-        stroke="#232020"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        d="M15.4795 11.4492V16.7893"
-        stroke="#232020"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
-  );
-};
-
-export const CreateInvoice = ({ height = 18, width = 18 }) => {
-  return (
-    <svg
-      width={width}
-      height={height}
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 30.96 30.24"
-      className="ThreeIconsDiff"
-      style={{ strokeWidth: '0.1' }}
-    >
-      <g id="Object">
-        <path
-          className="ItemsIconsColor fillItemColor"
-          d="M29 10.25V25.3a3 3 0 0 1-2.8 3.07H4.07a2 2 0 0 1-2-2.12V4.57A2.94 2.94 0 0 1 4.9 1.5H20a2.69 2.69 0 0 1 2 .93l6.23 5.63a3.21 3.21 0 0 1 .77 2.19Z"
-        />
-        <path
-          className="BlackSpace BlackFill ItemsFill"
-          d="M22.48 19H21v-1.49a.71.71 0 0 0-1.42 0V19H18a.71.71 0 0 0 0 1.42h1.51V22A.71.71 0 0 0 21 22v-1.56h1.51a.71.71 0 0 0 0-1.42Z"
-        />
-        <path
-          className="ItemsFill"
-          d="M28.19 8.06 22 2.43a2.69 2.69 0 0 0-2-.93H4.9a2.94 2.94 0 0 0-2.79 3.07v21.68a2 2 0 0 0 2 2.12h22.13A3 3 0 0 0 29 25.3v-15a3.21 3.21 0 0 0-.81-2.24Zm-.57 17.24a1.55 1.55 0 0 1-1.38 1.7H4.07a.65.65 0 0 1-.54-.7V4.57A1.53 1.53 0 0 1 4.9 2.92H20a1.31 1.31 0 0 1 1 .51l6.24 5.63a1.83 1.83 0 0 1 .43 1.19Z"
-        />
-        <path
-          className="BlackFill BlackSpace ItemsFill"
-          d="M15.71 13.09H7.14a.71.71 0 0 1 0-1.42h8.57a.71.71 0 0 1 0 1.42ZM16.21 7.94H7.14a.71.71 0 0 1 0-1.42h9.07a.71.71 0 0 1 0 1.42ZM20.14 14.11a5.62 5.62 0 1 0 5.62 5.62 5.62 5.62 0 0 0-5.62-5.62Zm0 9.71a4.09 4.09 0 1 1 4.09-4.09 4.09 4.09 0 0 1-4.09 4.09Z"
-        />
-      </g>
-    </svg>
-  );
-};
-
-export const CreatePo = ({ height = 18, width = 16 }) => {
-  return (
-    <svg
-      width={width}
-      height={height}
-      viewBox="0 0 17 19"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M1.06939 7.06225L3.06083 18.0469H14.5614L16.0251 6.99419C16.0552 6.80188 16.0425 6.60547 15.9878 6.41841C15.9331 6.23134 15.8378 6.05797 15.7083 5.9102C15.5788 5.76242 15.4182 5.64368 15.2374 5.56209C15.0567 5.48049 14.8601 5.43807 14.661 5.4375H2.42357C2.21829 5.43772 2.01563 5.48254 1.83027 5.56874C1.64491 5.65494 1.4815 5.78032 1.35187 5.93585C1.22224 6.09139 1.12965 6.27311 1.08079 6.46793C1.03193 6.66276 1.02803 6.86577 1.06939 7.06225V7.06225Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="fillTransparent"
-        d="M3.82812 5.43738C3.88382 4.25471 4.40384 3.13847 5.28005 2.32078C6.15627 1.5031 7.32129 1.04688 8.53292 1.04688C9.74454 1.04688 10.9096 1.5031 11.7858 2.32078C12.662 3.13847 13.182 4.25471 13.2377 5.43738"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M7.06445 11.7422H10.1811"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M8.61719 10.2246V13.2699"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace fillTransparent"
-        d="M8.5374 15.0797C10.4236 15.0797 11.9527 13.5856 11.9527 11.7425C11.9527 9.89945 10.4236 8.40527 8.5374 8.40527C6.65116 8.40527 5.12207 9.89945 5.12207 11.7425C5.12207 13.5856 6.65116 15.0797 8.5374 15.0797Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
-  );
-};
-
-export const CreateBill = ({ height = 18, width = 18 }) => {
-  return (
-    <svg
-      height={height}
-      width={width}
-      xmlns="http://www.w3.org/2000/svg"
-      fill=""
-      className="ThreeIconsDiff"
-      viewBox="0 0 30.96 30.24"
-      style={{ strokeWidth: '0.1' }}
-    >
-      <g id="Object">
-        <path
-          className="ItemsIconsColor fillItemColor"
-          d="M30.08 5.33a.73.73 0 0 1-.73.73h-5.6v20.55a2.19 2.19 0 0 1-2.2 2.2H4.9a2.19 2.19 0 0 1-2.2-2.2v-20a5.13 5.13 0 0 1 5.13-5.18h18.35a3.92 3.92 0 0 1 3.9 3.9Z"
-        />
-        <g id="Object-2" data-name="Object">
-          <path
-            className="BlackFill BlackSpace ItemsFill"
-            d="M14.78 13a.75.75 0 0 0-.73-.74H7.82a.73.73 0 0 0-.65.82.74.74 0 0 0 .65.65h6.23a.73.73 0 0 0 .73-.73ZM7.82 8.08H17a.73.73 0 0 0 .65-.82.74.74 0 0 0-.65-.65H7.82a.73.73 0 0 0-.65.82.74.74 0 0 0 .65.65Z"
-          />
-          <path
-            className="ItemsFill"
-            d="M26.18 1.43H7.83A5.13 5.13 0 0 0 2.7 6.56v20.05a2.19 2.19 0 0 0 2.2 2.2h16.65a2.19 2.19 0 0 0 2.2-2.2V6.06h5.6a.73.73 0 0 0 .73-.73 3.92 3.92 0 0 0-3.9-3.9Zm-3.9 3.9v21.28a.75.75 0 0 1-.73.74H4.91a.75.75 0 0 1-.73-.74v-20A3.67 3.67 0 0 1 7.8 2.89H23a3.87 3.87 0 0 0-.72 2.44Zm1.63-.74A2.45 2.45 0 0 1 25.35 3a3.25 3.25 0 0 1 .65-.13h.21a2.44 2.44 0 0 1 2.32 1.7Z"
-          />
-          <path
-            className=" BlackFill BlackSpace ItemsFill"
-            d="M17.4 20.25h-1.33v-1.32a.62.62 0 1 0-1.24 0v1.32h-1.32A.63.63 0 0 0 13 21a.64.64 0 0 0 .55.55h1.32v1.32a.62.62 0 0 0 1.24 0V21.5h1.29a.63.63 0 0 0 .55-.7.64.64 0 0 0-.55-.55Z"
-          />
-          <path
-            className="BlackFill BlackSpace ItemsFill"
-            d="M19.08 17.24a5.14 5.14 0 1 0 1.51 3.64 5.13 5.13 0 0 0-1.51-3.64Zm-3.61 7.53a3.9 3.9 0 1 1 3.9-3.9 3.91 3.91 0 0 1-3.9 3.9Z"
-          />
-        </g>
-      </g>
-    </svg>
-  );
-};
-
-export const CreateQuote = ({ height = 18, width = 18 }) => {
-  return (
-    <svg
-      width={width}
-      height={height}
-      viewBox="0 0 17 17"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M14.8851 2.37891H2.69497C1.91905 2.37891 1.29004 2.95262 1.29004 3.66028V14.9084C1.29004 15.6161 1.91905 16.1898 2.69497 16.1898H14.8851C15.661 16.1898 16.29 15.6161 16.29 14.9084V3.66028C16.29 2.95262 15.661 2.37891 14.8851 2.37891Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M2.8291 5.44727H14.607"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M4.80664 1.18945V2.13328"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M13.0166 1.18945V2.13328"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M4.51172 9.15332H12.9245"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M4.51172 12.3535H9.55939"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
-  );
-};
-
-export const CreateNote = ({ height = 18, width = 18 }) => {
-  return (
-    <svg
-      width={width}
-      height={height}
-      viewBox="0 0 18 18"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M17.1797 11.78V2.26001C17.1988 1.89187 17.072 1.53095 16.8268 1.25574C16.5815 0.98052 16.2376 0.813239 15.8697 0.790039H1.99967C1.8906 0.796411 1.78387 0.824235 1.68559 0.871948C1.58731 0.919661 1.49941 0.986236 1.42694 1.06799C1.35448 1.14975 1.29886 1.24509 1.26329 1.34839C1.22772 1.45169 1.2129 1.561 1.21967 1.67004V15.22C1.20051 15.5881 1.32732 15.949 1.57258 16.2242C1.81784 16.4995 2.16175 16.6667 2.52967 16.6899H11.9297C12.1051 16.6899 12.2784 16.6514 12.4374 16.5771C12.5964 16.5029 12.7371 16.3946 12.8497 16.26L16.7897 12.8199C17.0397 12.531 17.178 12.1621 17.1797 11.78Z"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M4.58008 8.73926H12.4801"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M4.58008 13.04H10.1301"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        className="BlackSpace"
-        d="M4.58008 4.43945H13.8301"
-        stroke="#272525"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
-  );
-};
-
-export const DebitNote = ({ height = 16, width = 17 }) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={width}
-      height={height}
-      viewBox="0 0 17 16"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.96 30.24" height={height} width={width}>
+    <defs>
+      <style>
+        {
+          ".cls-1{stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px}"
+        }
+      </style>
+    </defs>
+    <g id="Object">
       <rect
-        x="3.48232"
-        y="0.6"
-        width="11.9765"
-        height="3.37143"
-        stroke="#6D7D88"
-        stroke-width="1.2"
-        className='HideStroke'
+        className="cls-1"
+        x={3.07}
+        y={1.74}
+        width={26.45}
+        height={26.7}
+        rx={2.47}
       />
-      <rect
-        x="0.470588"
-        y="0.470588"
-        width="0.941176"
-        height="3.63025"
-        stroke="#6D7D88"
-        stroke-width="0.941176"
-        className='HideStroke'
+      <path
+        className="cls-1"
+        d="M8.24 7.67h5.93M8.24 14.35h14.83M8.24 21.02h14.83M1.58 19.43h1.49M1.58 24.84h1.49M1.58 14.01h1.49M1.58 8.6h1.49"
       />
-      <rect
-        x="3.48232"
-        y="6.31436"
-        width="11.9765"
-        height="3.37143"
-        stroke="#6D7D88"
-        stroke-width="1.2"
-        className='HideStroke'
-      />
-      <rect
-        x="0.470588"
-        y="6.18494"
-        width="0.941176"
-        height="3.63025"
-        stroke="#6D7D88"
-        stroke-width="0.941176"
-        className='HideStroke'
-        
-      />
-      <rect
-        x="3.48232"
-        y="12.0287"
-        width="11.9765"
-        height="3.37143"
-        stroke="#6D7D88"
-        stroke-width="1.2"
-        className='HideStroke'
-      />
-      <rect
-        x="0.470588"
-        y="11.8993"
-        width="0.941176"
-        height="3.63025"
-        stroke="#6D7D88"
-        stroke-width="0.941176"
-        className='HideStroke'
-      />
-    </svg>
+    </g>
+  </svg>
   );
 };
-// export const DebitNote = ({ height = 18, width = 18 }) => {
-//   return (
-//     <svg
-//       height={height}
-//       width={width}
-//       xmlns="http://www.w3.org/2000/svg"
-//       viewBox="0 0 30.96 30.24"
-//       className="ThreeIconsDiff"
-//       style={{ strokeWidth: '0.1' }}
-//     >
-//       <g id="Object">
-//         <path
-//           className="ItemsIconsColor fillItemColor"
-//           d="M29.74 3.25v20.62a5.29 5.29 0 0 1-5.28 5.28H5.59a4 4 0 0 1-4-4 .75.75 0 0 1 .76-.75H8.1V3.25A2.26 2.26 0 0 1 10.36 1h17.12a2.26 2.26 0 0 1 2.26 2.25Z"
-//         />
-//         <path
-//           className="BlackFill BlackSpace ItemsFill"
-//           d="M25.23 6.68a.76.76 0 0 0-.75-.76H13.54a.76.76 0 0 0 0 1.51h10.94a.76.76 0 0 0 .75-.75ZM24.48 11h-7.92a.76.76 0 0 0 0 1.51h7.92a.76.76 0 0 0 0-1.51Z"
-//         />
-//         <path
-//           className="ItemsFill"
-//           d="M27.48 1H10.36A2.26 2.26 0 0 0 8.1 3.25v21.14H2.34a.75.75 0 0 0-.76.75 4 4 0 0 0 4 4h18.88a5.29 5.29 0 0 0 5.28-5.28V3.25A2.26 2.26 0 0 0 27.48 1ZM5.59 27.64a2.5 2.5 0 0 1-2.38-1.75H8a2.5 2.5 0 0 1-2.41 1.75Zm22.64-3.77a3.77 3.77 0 0 1-3.77 3.77H8.7a3.94 3.94 0 0 0 .9-2.5V3.25a.76.76 0 0 1 .76-.76h17.12a.76.76 0 0 1 .75.76Z"
-//         />
-//         <path
-//           className="BlackFill BlackSpace ItemsFill"
-//           d="M22.75 20.28h-1.36v-1.36a.64.64 0 0 0-1.27 0v1.36h-1.36a.64.64 0 0 0-.64.64.64.64 0 0 0 .64.64h1.36v1.36a.64.64 0 1 0 1.27 0v-1.36h1.36a.64.64 0 1 0 0-1.28Z"
-//         />
-//         <path
-//           className="BlackFill BlackSpace ItemsFill"
-//           d="M20.76 15.64A5.29 5.29 0 1 0 26 20.92a5.29 5.29 0 0 0-5.24-5.28Zm0 9.29a4 4 0 1 1 4-4 4 4 0 0 1-4 4Z"
-//         />
-//       </g>
-//     </svg>
-//   );
-// };
+
+export const CreateContact = ({ height = 19, width = 19 }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.96 30.24" height={height} width={width}>
+    <defs>
+      <style>
+        {
+          ".cls-1{stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px}"
+        }
+      </style>
+    </defs>
+    <g id="Object">
+      <ellipse className="cls-1" cx={14.34} cy={8.76} rx={6.56} ry={6.45} />
+      <path
+        className="cls-1"
+        d="M22 17.64a13.2 13.2 0 0 0-20.5 7.89 2.17 2.17 0 0 0 2.15 2.6h14.77M20.88 23.84h8.57M25.17 19.56v8.57"
+      />
+    </g>
+  </svg>
+  );
+};
+
+export const CreateInvoice = ({ height = 19, width = 19 }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.96 30.24" height={height} width={width}>
+    <defs>
+      <style>
+        {
+          ".cls-1{stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px}"
+        }
+      </style>
+    </defs>
+    <g id="Object">
+      <path
+        className="cls-1"
+        d="M28.72 10.25v15.66a2.34 2.34 0 0 1-2.17 2.45H3.48a1.4 1.4 0 0 1-1.3-1.47V4.33a2.32 2.32 0 0 1 2.17-2.45H20a2.06 2.06 0 0 1 1.53.72l6.54 5.92a2.58 2.58 0 0 1 .65 1.73Z"
+      />
+      <circle className="cls-1" cx={20.2} cy={20.11} r={5.05} />
+      <path
+        className="cls-1"
+        d="M18.02 20.11h4.61M20.32 17.8v4.61M6.68 12.46h8.92M6.68 7.1h9.43"
+      />
+    </g>
+  </svg>
+  );
+};
+
+export const CreatePo = ({ height = 19, width = 19 }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.96 30.24" height={height} width={width}>
+    <defs>
+      <style>
+        {
+          ".cls-1{stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px}"
+        }
+      </style>
+    </defs>
+    <g id="Object">
+      <path
+        className="cls-1"
+        d="m4.22 11.13 3.11 17.64h18L27.66 11a2.17 2.17 0 0 0-2.14-2.49H6.34a2.17 2.17 0 0 0-2.12 2.62Z"
+      />
+      <circle className="cls-1" cx={15.93} cy={18.64} r={5.35} />
+      <path
+        d="M8.55 8.52a7.38 7.38 0 0 1 14.76 0"
+        style={{
+          fill: "none",
+          strokeLinecap: "round",
+          strokeLinejoin: "round",
+          strokeWidth: "1.5px",
+        }}
+      />
+      <path className="cls-1" d="M13.62 18.64h4.89M16.06 16.2v4.89" />
+    </g>
+  </svg>
+  );
+};
+
+
+export const CreateBill = ({ width = 19, height = 19}) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.96 30.24" height={height} width={width}>
+    <defs>
+      <style>
+        {
+          ".cls-1{stroke-width:1.5px;stroke-linecap:round;stroke-linejoin:round}"
+        }
+      </style>
+    </defs>
+    <g id="Object">
+      <path className="cls-1" d="M23.13 5.12a3.23 3.23 0 0 1 6.46 0Z" />
+      <path
+        className="cls-1"
+        d="M3.14 26.85V6.38a4.49 4.49 0 0 1 4.49-4.49h18.73a3.23 3.23 0 0 0-3.23 3.23v21.73a1.5 1.5 0 0 1-1.5 1.5h-17a1.5 1.5 0 0 1-1.49-1.5ZM7.62 12.45h10.85"
+      />
+      <path
+        style={{
+          fill: "none",
+          strokeWidth: "1.5px",
+          strokeLinecap: "round",
+          strokeLinejoin: "round",
+        }}
+        d="M7.62 7.38h7.85"
+      />
+      <circle className="cls-1" cx={15} cy={21.04} r={4.84} />
+      <path className="cls-1" d="M15 22.66v-3.23M13.39 21.04h3.23" />
+    </g>
+  </svg>
+  );
+};
+
+export const CreateQuote = ({ height = 19, width = 19 }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.96 30.24" height={height} width={width}>
+    <defs>
+      <style>
+        {
+          ".cls-1{stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px}"
+        }
+      </style>
+    </defs>
+    <g id="Object">
+      <rect
+        className="cls-1"
+        x={2.97}
+        y={3.72}
+        width={24.94}
+        height={25.17}
+        rx={2.33}
+      />
+      <path
+        className="cls-1"
+        d="M5.53 9.31h19.58M8.81 1.55v1.72M22.46 1.55v1.72M8.33 16.07h13.98M8.33 21.9h8.39"
+      />
+    </g>
+  </svg>
+  );
+};
+
+export const CreateNote = ({ height = 19, width = 19 }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.96 30.24" height={height} width={width}>
+    <defs>
+      <style>
+        {
+          ".cls-1{stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px}"
+        }
+      </style>
+    </defs>
+    <g id="Object">
+      <path
+        className="cls-1"
+        d="M29.34 20.3V4a2.4 2.4 0 0 0-2.24-2.54H3.35A1.44 1.44 0 0 0 2 3v23.2a2.39 2.39 0 0 0 2.23 2.52h16.13A2.1 2.1 0 0 0 22 28l6.74-5.89a2.77 2.77 0 0 0 .6-1.81ZM7.74 15.09h13.55M7.74 22.47h9.53M7.74 7.72H23.6"
+      />
+    </g>
+  </svg>
+  );
+};
+
+export const DebitNote = ({ height = 19, width = 19 }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.96 30.24" height={height} width={width}>
+    <defs>
+      <style>
+        {
+          ".cls-1,.cls-2,.cls-3{stroke-linecap:round;stroke-linejoin:round}.cls-1{stroke-width:1.5px}.cls-2,.cls-3{fill:none}.cls-2{stroke-width:1.5px}.cls-3{stroke-width:1.2px}"
+        }
+      </style>
+    </defs>
+    <g id="Object">
+      <path className="cls-1" d="M8.18 25.21a3.23 3.23 0 1 1-6.46 0Z" />
+      <path
+        className="cls-1"
+        d="M28.17 3.48V24a4.49 4.49 0 0 1-4.49 4.49H5a3.23 3.23 0 0 0 3.23-3.23V3.48A1.5 1.5 0 0 1 9.68 2h17a1.5 1.5 0 0 1 1.49 1.48Z"
+      />
+      <path className="cls-2" d="M23.69 6.88H12.84M23.69 11.95h-7.85" />
+      <circle className="cls-1" cx={20.15} cy={19.87} r={3.73} />
+      <path
+        className="cls-3"
+        d="M20.15 18.62v2.49M20.15 18.62v2.49M21.4 19.87h-2.49"
+      />
+    </g>
+  </svg>
+  );
+};

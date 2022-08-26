@@ -122,8 +122,8 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
   /* Component did update hook to update form values when contact
    against ID is successfull fetches */
   useEffect(() => {
-    if (id && data && data.data.result) {
-      const { result } = data.data;
+    if (id && data && data?.data?.result) {
+      const { result } = data?.data;
       const { addresses } = result;
 
       form.setFieldsValue({
@@ -189,6 +189,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
 
   /* Async function to create and update a contact */
   const onFinish = async (values) => {
+
     let payload = {
       ...values,
       isNewRecord: true,
@@ -229,6 +230,12 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
           NOTIFICATIONTYPE.SUCCESS,
           id ? 'Updated Successfully' : 'Created Successfully'
         );
+        history.push({
+          pathname: `/app${ISupportedRoutes?.CONTACTS}`,
+          state: {
+            from: history.location.pathname,
+          },
+        });
       },
     });
   };

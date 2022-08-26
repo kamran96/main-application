@@ -60,7 +60,6 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
   useEffect(() => {
     if (data && data.data && data.data.result) {
       const { result } = data.data;
-      console.log(result, "reesult")
       form.setFieldsValue({
         ...result,
         financialEnding: dayjs(result?.financialEnding),
