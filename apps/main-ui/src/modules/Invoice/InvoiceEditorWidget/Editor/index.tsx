@@ -68,6 +68,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
   const [createContactName, setCreateContactName] = useState('');
   const [emailModal, setEmailModal] = useState(false);
   const [contactEmail, setContactEmail] = useState(null);
+  const [contactError, setContactError] = useState<boolean>(false);
 
   const {
     columns,
@@ -140,6 +141,8 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
         onSuccess: (data) => {
           queryCache?.invalidateQueries('all-contacts');
           notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Contact Created');
+          // AntForm.setFieldsValue({contactId: createContactName});
+          setCreateContactName('');
         },
       }
     );
@@ -159,8 +162,6 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
       const paymentData = { ...payment };
       delete paymentData.totalAmount;
       delete paymentData.totalDiscount;
-
-      console.log(paymentData, 'payments');
 
       let payload: any = {
         ...value,
@@ -343,6 +344,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                     <Form.Item
                       name="contactId"
                       rules={[{ required: true, message: 'Required !' }]}
+                      validateStatus={contactError ? 'error' : 'success'}
                     >
                       <Select
                         loading={isFetching}
@@ -350,10 +352,12 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                         showSearch
                         style={{ width: '100%' }}
                         placeholder="Select Contact"
+                        onSearch={(val) => setCreateContactName(val)}
+                        onChange={(val) => setContactError(false)}
                         // optionFilterProp="children"
                         filterOption={(input, option) => {
                           const valueInput = input.toLowerCase();
-                          setCreateContactName(input);
+                          // setCreateContactName(input);
                           const child: string = option.children as any;
                           if (typeof option?.children === 'string') {
                             return child.toLowerCase().includes(valueInput);
@@ -373,7 +377,13 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                             className="new-contact-btn"
                             onClick={(e) => {
                               e.stopPropagation();
-                              onCreateContact();
+                              e.preventDefault();
+                              if (createContactName.replace(/\s/g, '') !== '') {
+                                onCreateContact();
+                                setContactError(false);
+                              } else {
+                                setContactError(true);
+                              }
                             }}
                             type="text"
                             size="middle"
@@ -408,9 +418,9 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                       rules={[{ required: true, message: 'Required !' }]}
                     >
                       <DatePicker
-                        onChange={(date) => {
-                          setIssueDate(date);
-                        }}
+                        // onChange={(date) => {
+                        //   setIssueDate(date);
+                        // }}
                         disabledDate={(current) => {
                           return current > dayjs().endOf('day');
                         }}
@@ -426,9 +436,9 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                       rules={[{ required: true, message: 'Required !' }]}
                     >
                       <DatePicker
-                        // disabledDate={(current) => {
-                        //   return current > dayjs().endOf('day');
-                        // }}
+                        disabledDate={(current) => {
+                          return current < dayjs().endOf('day');
+                        }}
                         style={{ width: '100%' }}
                         size="middle"
                       />
@@ -512,7 +522,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
 
           <div className="table_area">
             <EditableTable
-              // rowClassName={(record, index) => 'sdfio'}
+              // rowClassName={(record, index) => ""}
               loading={isFetching}
               dragable={(data) => setInvoiceItems(data)}
               columns={__columns}
@@ -530,7 +540,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
               <span className="flex alignCenter mr-10">
                 <Icon icon={bxPlus} />
               </span>
-              Add line item
+              Add Invoice item
             </Button>
           </div>
           <div className="total_invoice">

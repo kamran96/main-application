@@ -68,7 +68,7 @@ const _Payment: FC<IProps> = ({
     }
   }, [data]);
 
-  let paymentTypeStatus = form.getFieldValue('paymentType');
+  const paymentTypeStatus = form.getFieldValue('paymentType');
 
   const disableDates = (current) => {
     if (issueDate) {
@@ -224,7 +224,7 @@ const _Payment: FC<IProps> = ({
                   },
                   {
                     validator: (rule, value, callback) => {
-                      let amount = form.getFieldValue('totalAmount');
+                      const amount = form.getFieldValue('totalAmount');
                       if (parseInt(value) > amount) {
                         try {
                           throw new Error(

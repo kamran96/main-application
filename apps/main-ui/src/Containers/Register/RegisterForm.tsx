@@ -22,7 +22,6 @@ const { Option } = Select;
 let timeOutTime: any;
 
 export const RegisterForm: FC = () => {
-  const [show, setShow] = useState(true);
   const { mutate: mutateUsernameAvaliable, data: usernameAvaliable } =
     useMutation(userCheckAPI);
   const { mutate: mutateRegister, isLoading } = useMutation(RegisterAPI);
@@ -161,7 +160,7 @@ export const RegisterForm: FC = () => {
           >
             <div className="personal_info">
               <div className="form_title">
-                <Heading className="mb-20" type="table">
+                <Heading className="mb-3" type="table">
                   Register Your Account!
                 </Heading>
                 <p className="form_description">
@@ -182,6 +181,7 @@ export const RegisterForm: FC = () => {
                     <Form.Item
                       name="fullName"
                       label="Full Name"
+                      labelAlign="left"
                       rules={[
                         {
                           required: true,
@@ -191,7 +191,7 @@ export const RegisterForm: FC = () => {
                     >
                       <Input
                         placeholder={'e.g John'}
-                        size="large"
+                        size="middle"
                         autoComplete="off"
                       />
                     </Form.Item>
@@ -228,7 +228,7 @@ export const RegisterForm: FC = () => {
                           setAvaliablity({ ...avaliablity, username: false });
                         }}
                         placeholder="e.g John"
-                        size="large"
+                        size="middle"
                         autoComplete="off"
                       />
                     </Form.Item>
@@ -272,7 +272,7 @@ export const RegisterForm: FC = () => {
                     >
                       <Input
                         placeholder="e.g someone@example.com"
-                        size="large"
+                        size="middle"
                         autoComplete="off"
                       />
                     </Form.Item>
@@ -284,7 +284,7 @@ export const RegisterForm: FC = () => {
                       label="Country"
                     >
                       <Select
-                        size="large"
+                        size="middle"
                         showSearch
                         style={{ width: '100%' }}
                         placeholder="Select a Country"
@@ -332,7 +332,7 @@ export const RegisterForm: FC = () => {
                         addonBefore={prefixSelector}
                         type="text"
                         placeholder="3188889898"
-                        size="large"
+                        size="middle"
                       />
                     </Form.Item>
                   </Col>
@@ -351,7 +351,7 @@ export const RegisterForm: FC = () => {
                       ]}
                       hasFeedback
                     >
-                      <Input.Password autoComplete="off" size="large" />
+                      <Input.Password autoComplete="off" size="middle" />
                     </Form.Item>
                   </Col>
 
@@ -361,7 +361,7 @@ export const RegisterForm: FC = () => {
                       name="agreed"
                       valuePropName="checked"
                     >
-                      <Checkbox onChange={() => setShow(!show)}>
+                      <Checkbox>
                         <span>
                           I have read and agree to the{' '}
                           <a
@@ -403,8 +403,7 @@ export const RegisterForm: FC = () => {
                           loading={isLoading}
                           type="primary"
                           htmlType="submit"
-                          disabled={show}
-                          size="large"
+                          size="middle"
                         >
                           Create Account
                         </Button>

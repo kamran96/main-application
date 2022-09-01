@@ -15,7 +15,8 @@ export const Wrapper = styled.div`
   .illustration {
     grid-column: 6 span;
     padding: 44px 60px;
-    background: #0071ff;
+    /* background: #0071ff; */
+    background: #1890FF;
     width: 100%;
     background-image: url(${bg});
     background-repeat: no-repeat;

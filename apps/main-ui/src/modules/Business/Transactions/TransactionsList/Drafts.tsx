@@ -46,7 +46,7 @@ const DRAFTTransactionsList: FC = () => {
   const [filterSchema, setFilterSchema] = useState(transactionsFilterSchema);
   const [confirmModal, setConfirmModal] = useState(false);
   const [sortedInfo, setSortedInfo] = useState(null);
-  
+
   const { routeHistory, notificationCallback, userDetails } =
     useGlobalContext();
   const { history } = routeHistory;
@@ -65,7 +65,7 @@ const DRAFTTransactionsList: FC = () => {
   const { mutate: updateTransactionStatus, isLoading: isTransactionStatus } =
     useMutation(updateTransactionDraftStatus);
 
-  const { page, query,  sortid, page_size, status } = transactionConfig;
+  const { page, query, sortid, page_size, status } = transactionConfig;
 
   const [accountsResponse, setAccountsResponse] = useState<IAccountsResult[]>(
     []
@@ -108,25 +108,21 @@ const DRAFTTransactionsList: FC = () => {
 
       const filterType = history.location.search.split('&');
       const filterIdType = filterType[1];
-      const filterOrder = filterType[4]?.split("=")[1];
-      
-     
+      const filterOrder = filterType[4]?.split('=')[1];
 
-      if(filterIdType?.includes("-")){
-         const fieldName = filterIdType?.split("=")[1].split("-")[1];
-         setSortedInfo({
-           order: filterOrder,
-           columnKey: fieldName
-         });
-      }
-      else{
-        const fieldName = filterIdType?.split("=")[1];
+      if (filterIdType?.includes('-')) {
+        const fieldName = filterIdType?.split('=')[1].split('-')[1];
         setSortedInfo({
           order: filterOrder,
-          columnKey: fieldName
-        })
+          columnKey: fieldName,
+        });
+      } else {
+        const fieldName = filterIdType?.split('=')[1];
+        setSortedInfo({
+          order: filterOrder,
+          columnKey: fieldName,
+        });
       }
-      
     }
   }, [history]);
 
@@ -287,18 +283,19 @@ const DRAFTTransactionsList: FC = () => {
   const renderCustomTopbar = () => {
     return (
       <WrapperTransactionCustomBar>
-        <PDFDownloadLinkWrapper
-          document={
-            <TransactionApprovePdf resultData={result} header={headerprops} />
-          }
-        >
-          <div className="flex alignCenter">
-            <PDFICON className="flex alignCenter mr-5" />
+        {result?.length > 0 && (
+          <PDFDownloadLinkWrapper
+            document={
+              <TransactionApprovePdf resultData={result} header={headerprops} />
+            }
+          >
+            <div className="flex alignCenter">
+              <PDFICON className="flex alignCenter mr-5" />
 
-            <span> Download PDF</span>
-          </div>
-        </PDFDownloadLinkWrapper>
-
+              <span> Download PDF</span>
+            </div>
+          </PDFDownloadLinkWrapper>
+        )}
         {/* <TransactionImport/> */}
 
         <SmartFilter
@@ -343,7 +340,7 @@ const DRAFTTransactionsList: FC = () => {
         //   order: sorter?.order,
         //   columnKey: sorter?.field
         // })
-        setResponse(prev =>({...prev,  result: userData}))
+        setResponse((prev) => ({ ...prev, result: userData }));
       } else {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
@@ -356,7 +353,7 @@ const DRAFTTransactionsList: FC = () => {
         //   order: sorter?.order,
         //   columnKey: sorter?.field
         // })
-        setResponse(prev =>({...prev,  result: userData}))
+        setResponse((prev) => ({ ...prev, result: userData }));
       }
       setTransactionsConfig({
         ...transactionConfig,
@@ -369,7 +366,9 @@ const DRAFTTransactionsList: FC = () => {
         ISupportedRoutes.TRANSACTIONS
       }?tabIndex=draft&sortid=${
         sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field
-      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}`;
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+        sorter.order
+      }`;
       history.push(route);
     }
   };

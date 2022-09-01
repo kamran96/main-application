@@ -45,6 +45,7 @@ export const PaymentsForm: FC = () => {
     paymentsModalConfig,
     setPaymentsModalConfig,
   } = useGlobalContext();
+
   const { history } = routeHistory;
 
   const { contactId, type, orders } = paymentsModalConfig;
@@ -145,6 +146,7 @@ export const PaymentsForm: FC = () => {
   const paid = amountPaid ? amountPaid : 0;
 
   const remainingTotal = Math.abs(balance) - paid;
+
   const onFinish = async (values) => {
     // return false;
     const paid_invyces = _invoiceData.map(

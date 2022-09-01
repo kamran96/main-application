@@ -108,7 +108,6 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   const onSelectedRow = (item) => {
     setSelectedRow(item.selectedRowKeys);
     if (item?.selectedRows?.length === 1) {
-      console.log('in if');
       setSelectedContact(item?.selectedRows?.[0]?.contactId);
     }
   };

@@ -373,10 +373,12 @@ export const ItemsList: FC = () => {
           icon={packageIcon}
           size="middle"
         /> */}
+
         <SmartFilter
           onFilter={(encode) => {
             const route = `/app/items?sortid=${sortid}&page=1&page_size=20&query=${encode}`;
             history.push(route);
+            
             setItemsConfig({ ...itemsConfig, query: encode });
           }}
           onClose={() => setFilterbar(false)}

@@ -20,11 +20,11 @@ export const SettingLayout: any = (props: RouteConfigComponentProps) => {
           <ul>
             {settingRoutingScheam.map(
               (route: ISettingRoutesSchema, index: number) => {
-                let activeRoute =
+                const activeRoute =
                   props?.location?.pathname === route?.route ? 'active' : '';
 
                 return (
-                  <li>
+                  <li key={index}>
                     <Link
                       className={`flex alignCenter ${activeRoute} `}
                       to={route?.route}

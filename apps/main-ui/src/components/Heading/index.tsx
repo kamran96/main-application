@@ -71,7 +71,7 @@ const HeadingWrapper: any = styled.div`
     font-weight: ${(props: any) =>
       props.fontWeight ? props.fontWeight : '600'};
     font-size: ${convertToRem(22)};
-    line-height: ${convertToRem(30)};
+    line-height: ${convertToRem(20)};
   }
   .headingContainer {
     font-style: normal;

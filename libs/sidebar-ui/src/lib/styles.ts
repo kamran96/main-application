@@ -49,21 +49,22 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
 
   .collapse {
     background: ${(props: IThemeProps) =>
-      props?.theme?.theme === 'light' ? `#f6f8fa` : `#383838`};
+      props?.theme?.theme === 'light' ? `#EFEFEF` : `#383838`};
     height: 26px;
     width: 26px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 5px;
+    border-radius: 50%;
     color: #7d7d7d;
     position: relative;
+    right: 0;
     transition: 0.3s all ease-in-out;
     box-shadow: 0px 0px 4px 0px transparent;
     ${(props: ISidebarWrapperProps) =>
       props?.toggle
         ? ` 
-      left: 20px;
+      left: 23px;
       transform: rotateY(180deg) `
         : ``};
     &:hover {
@@ -118,7 +119,11 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
           props?.theme?.colors?.sidebarListActive};
         color: ${(props: IThemeProps) =>
           props?.theme?.colors?.sidebarListActiveText};
+<<<<<<< HEAD
+           transition: 0.3s all ease-in-out;
+=======
         transition: 0.3s all ease-in-out;
+>>>>>>> ea5490c662e8b7cc710177292bdc8980d8ef6981
 
         span svg {
           fill: #ffffff;
@@ -131,6 +136,14 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
           }
           .BlackSpace {
             stroke: #272525;
+<<<<<<< HEAD
+          }
+          .fillTransparent {
+            fill: transparent;
+          }
+          .BlackFill {
+            fill: #272525 !important;
+=======
             transition: 0.3s all ease-in-out;
           }
           .fillTransparent {
@@ -140,11 +153,16 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
           .BlackFill {
             fill: #272525 !important;
             transition: 0.3s all ease-in-out;
+>>>>>>> ea5490c662e8b7cc710177292bdc8980d8ef6981
           }
           .ReportColor {
             stroke: ${(props: IThemeProps) =>
               props?.theme?.colors?.sidebarListActiveText};
+<<<<<<< HEAD
+              
+=======
             transition: 0.3s all ease-in-out;
+>>>>>>> ea5490c662e8b7cc710177292bdc8980d8ef6981
           }
         }
       }
@@ -186,11 +204,15 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
             props?.theme?.colors?.sidebarListActive};
           color: ${(props: IThemeProps) =>
             props?.theme?.colors?.sidebarListActiveText};
+<<<<<<< HEAD
+             transition: 0.3s all ease-in-out;
+=======
           transition: 0.3s all ease-in-out;
+>>>>>>> ea5490c662e8b7cc710177292bdc8980d8ef6981
 
           span svg {
             fill: #ffffff;
-            transition: 0.3s all ease-in-out;
+            /* transition: 0.3s all ease-in-out; */
 
             path {
               stroke: #ffffff;
@@ -198,6 +220,14 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
             }
             .BlackSpace {
               stroke: #272525 !important;
+<<<<<<< HEAD
+            }
+            .BlackFill {
+              fill: #272525 !important;
+            }
+            .itemStroke {
+              stroke: none;
+=======
               transition: 0.3s all ease-in-out;
             }
             .BlackFill {
@@ -207,15 +237,22 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
             .itemStroke {
               stroke: none;
               transition: 0.3s all ease-in-out;
+>>>>>>> ea5490c662e8b7cc710177292bdc8980d8ef6981
             }
 
             .fillTransparent {
               fill: transparent !important;
+<<<<<<< HEAD
+            }
+            .fillItemColor {
+              fill: #ffffff !important;
+=======
               transition: 0.3s all ease-in-out;
             }
             .fillItemColor {
               fill: #ffffff !important;
               transition: 0.3s all ease-in-out;
+>>>>>>> ea5490c662e8b7cc710177292bdc8980d8ef6981
             }
           }
         }
@@ -238,6 +275,17 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
 
       span svg {
         fill: #ffffff;
+<<<<<<< HEAD
+        /* transition: 0.3s all ease-in-out; */
+
+        path {
+          stroke: #ffffff !important;
+          /* transition: 0.3s all ease-in-out; */
+        }
+        .BlackSpace {
+          stroke: #272525 !important;
+          /* transition: 0.2s all ease-in-out; */
+=======
         transition: 0.3s all ease-in-out;
 
         path {
@@ -247,23 +295,36 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
         .BlackSpace {
           stroke: #272525 !important;
           transition: 0.3s all ease-in-out;
+>>>>>>> ea5490c662e8b7cc710177292bdc8980d8ef6981
         }
         .BlackFill {
           fill: #272525 !important;
         }
         .itemStroke {
           stroke: none;
+<<<<<<< HEAD
+          /* transition: 0.2s all ease-in-out; */
+=======
           transition: 0.3s all ease-in-out;
+>>>>>>> ea5490c662e8b7cc710177292bdc8980d8ef6981
         }
 
         .fillTransparent {
           fill: transparent;
+<<<<<<< HEAD
+          /* transition: 0.2s all ease-in-out; */
+=======
           transition: 0.3s all ease-in-out;
+>>>>>>> ea5490c662e8b7cc710177292bdc8980d8ef6981
         }
 
         .fillItemColor {
           fill: #ffffff !important;
+<<<<<<< HEAD
+          /* transition: 0.2s all ease-in-out; */
+=======
           transition: 0.3s all ease-in-out;
+>>>>>>> ea5490c662e8b7cc710177292bdc8980d8ef6981
         }
       }
     }

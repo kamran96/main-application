@@ -24,9 +24,4 @@ export default {
     label: 'Credit Limit',
     value: '',
   },
-  createdAt: {
-    type: FilterType.DATE_BETWEEN,
-    label: 'Created At',
-    value: '',
-  },
 };
