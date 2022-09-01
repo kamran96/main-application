@@ -215,6 +215,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
           &:hover {
             background: ${(props: IThemeProps) =>
               props?.theme?.colors?.sidebarListActive};
+            transition: all 0.3s ease-in-out !important;
             a {
               color: ${(props: IThemeProps) =>
                 props?.theme?.colors?.sidebarListActiveText};
@@ -314,9 +315,20 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
       background: ${(props: IThemeProps) =>
         props?.theme?.colors?.sidebarListActive};
 
+      span {
+        color: ${(props: IThemeProps) =>
+          props?.theme?.colors?.sidebarListActiveText} !important;
+
+        span svg {
+          fill: none;
+          stroke: ${(props: IThemeProps) =>
+            props?.theme?.theme === 'dark' ? '#fff' : '#7988FF'};
+        }
+      }
+
       a {
         color: ${(props: IThemeProps) =>
-          props?.theme?.colors?.sidebarListActiveText};
+          props?.theme?.colors?.sidebarListActiveText} !important;
         span svg {
           fill: none;
           stroke: ${(props: IThemeProps) =>
