@@ -209,7 +209,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
           a {
             color: ${(props: IThemeProps) =>
               props?.theme?.theme === 'dark' ? '#fff' : '#334d6e'};
-            padding: 4px 25px 4px 10px !important;
+            padding: 4px 20px 4px 10px !important;
           }
 
           &:hover {
