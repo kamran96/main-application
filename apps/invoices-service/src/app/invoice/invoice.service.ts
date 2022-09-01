@@ -59,7 +59,8 @@ dotenv.config();
 @Injectable()
 export class InvoiceService {
   constructor(
-    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy
+    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy,
+    @Inject('REPORT_SERVICE') private readonly reportService: ClientProxy
   ) {}
   async IndexInvoice(
     req: IRequest,
@@ -74,10 +75,11 @@ export class InvoiceService {
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
     let invoices;
+    let total;
 
     const { sort_column, sort_order } = await Sorting(sort);
 
-    const total = await getCustomRepository(InvoiceRepository).count({
+    total = await getCustomRepository(InvoiceRepository).count({
       status,
       organizationId: req.user.organizationId,
       branchId: req.user.branchId,
@@ -107,6 +109,14 @@ export class InvoiceService {
             },
             relations: ['invoiceItems'],
           });
+
+          total = await getCustomRepository(InvoiceRepository).count({
+            status,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            invoiceType: invoice_type,
+            [i]: Raw((alias) => `LOWER(${alias}) ILike '%${val}%'`),
+          });
         } else if (data[i].type === 'compare') {
           invoices = await getCustomRepository(InvoiceRepository).find({
             where: {
@@ -122,15 +132,27 @@ export class InvoiceService {
             },
             relations: ['invoiceItems'],
           });
+
+          total = await getCustomRepository(InvoiceRepository).count({
+            status,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            invoiceType: invoice_type,
+            [i]: In(data[i].value),
+          });
         } else if (data[i].type === 'date-between') {
           const start_date = data[i].value[0];
           const end_date = data[i].value[1];
+          const add_one_day = moment(end_date, 'YYYY-MM-DD')
+            .add(1, 'day')
+            .format();
+
           invoices = await getCustomRepository(InvoiceRepository).find({
             where: {
               status: 1,
               organizationId: req.user.organizationId,
               branchId: req.user.branchId,
-              [i]: Between(start_date, end_date),
+              [i]: Between(start_date, add_one_day),
             },
             skip: pn * ps - ps,
             take: ps,
@@ -138,6 +160,14 @@ export class InvoiceService {
               [sort_column]: sort_order,
             },
             relations: ['invoiceItems'],
+          });
+
+          total = await getCustomRepository(InvoiceRepository).count({
+            status,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            invoiceType: invoice_type,
+            [i]: Between(start_date, add_one_day),
           });
         }
 
@@ -722,6 +752,42 @@ export class InvoiceService {
       }
 
       if (invoice.status === Statuses.AUTHORISED) {
+        Logger.log('Update jurnal report');
+
+        const {
+          data: { result },
+        } = await axios.get(
+          Host('users', `users/organization/${req.user.organizationId}`),
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
+
+        const { data: contact } = await axios.post(
+          Host('contacts', `contacts/contact/ids`),
+          {
+            ids: [dto.contactId],
+            type: 1,
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
+
+        const invoiceReportData = {
+          invoice,
+          invoiceItems,
+          contact: contact[0],
+          organizationName: result.name,
+          items,
+          user: req.user,
+        };
+        await this.reportService.emit(INVOICE_CREATED, invoiceReportData);
+
         Logger.log('Managing inventory for items.');
         await axios.post(
           Host('items', 'items/item/manage-inventory'),
@@ -758,6 +824,8 @@ export class InvoiceService {
           reference: dto.reference,
           amount: dto.grossTotal,
           status: invoice.status,
+          report: true, // true if report has been created
+          invoiceId: invoice.id,
         };
 
         Logger.log('Making transactions for the invoice.');
@@ -783,6 +851,7 @@ export class InvoiceService {
             paymentType: PaymentModes.INVOICES,
             transactionId: transaction.id,
             entryType: EntryType.CREDIT,
+            report: true, // true if report has been created
           },
         ];
 
@@ -814,19 +883,6 @@ export class InvoiceService {
             });
           }
         }
-
-        const { data: contact } = await axios.post(
-          Host('contacts', `contacts/contact/ids`),
-          {
-            ids: [dto.contactId],
-            type: 1,
-          },
-          {
-            headers: {
-              cookie: `access_token=${token}`,
-            },
-          }
-        );
 
         const email = contact[0].email
           ? contact[0].email

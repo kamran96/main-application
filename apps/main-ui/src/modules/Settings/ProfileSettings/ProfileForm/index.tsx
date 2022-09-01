@@ -4,7 +4,7 @@ import { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 
-import { updateProfileAPI } from '../../../../api';
+import { updateProfileAPI, updateUserProfileAPI } from '../../../../api';
 import { FormLabel } from '../../../../components/FormLabel';
 import { Heading } from '../../../../components/Heading';
 import { Para } from '../../../../components/Para';
@@ -32,7 +32,7 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
   const [attachmentData, setAttachmentData] = useState<IAttachment | any>(null);
 
   const { mutate: mutateUpdateProfile, isLoading: updatingProfile } =
-    useMutation(updateProfileAPI);
+    useMutation(updateUserProfileAPI);
 
   const onFinish = async (values) => {
     const payload = { ...values, attachmentId, userId: id };

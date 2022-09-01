@@ -24,6 +24,7 @@ export class OrganizationDto {
   city: string;
   country: string;
   postalCode: string;
+  ownerId: string;
 }
 
 export class OrganizationParams {

@@ -10,6 +10,7 @@ export interface IRoutesSchema {
   break?: boolean;
   icon?: any;
   permission?: string;
+  [key: string]: any;
 }
 
 export interface IRouteChildren {

@@ -1,6 +1,13 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { Between, getCustomRepository, ILike, In, Like, Raw } from 'typeorm';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
+import { Between, getCustomRepository, In, Raw } from 'typeorm';
 import axios from 'axios';
+import * as moment from 'moment';
 import { Sorting } from '@invyce/sorting';
 
 import {
@@ -19,6 +26,11 @@ import {
 } from '@invyce/interfaces';
 import { DeleteTransactionsDto, TransactionDto } from '../dto/transaction.dto';
 import { Entries, Host } from '@invyce/global-constants';
+import { ClientProxy } from '@nestjs/microservices';
+import {
+  TRANSACTION_CREATED_FOR_BILL,
+  TRANSACTION_CREATED_FOR_INVOICE,
+} from '@invyce/send-email';
 
 const transactionNature = {
   reverse: true,
@@ -26,6 +38,10 @@ const transactionNature = {
 
 @Injectable()
 export class TransactionService {
+  constructor(
+    @Inject('REPORT_SERVICE') private readonly reportService: ClientProxy
+  ) {}
+
   async ListTransactions(
     user: IBaseUser,
     queryData: IPage
@@ -37,8 +53,9 @@ export class TransactionService {
       const pn: number = parseInt(page_no);
 
       let transactions;
+      let total;
       const { sort_column, sort_order } = await Sorting(sort);
-      const total = await getCustomRepository(TransactionRepository).count({
+      total = await getCustomRepository(TransactionRepository).count({
         status: status || 1,
         organizationId: user.organizationId,
         branchId: user.branchId,
@@ -67,6 +84,13 @@ export class TransactionService {
               },
               relations: ['transactionItems', 'transactionItems.account'],
             });
+
+            total = await getCustomRepository(TransactionRepository).count({
+              status: status || 1,
+              organizationId: user.organizationId,
+              branchId: user.branchId,
+              [i]: Raw((alias) => `LOWER(${alias}) ILike '%${val}%'`),
+            });
           } else if (data[i].type === 'compare') {
             transactions = await getCustomRepository(
               TransactionRepository
@@ -83,16 +107,28 @@ export class TransactionService {
               },
               relations: ['transactionItems', 'transactionItems.account'],
             });
+
+            total = await getCustomRepository(TransactionRepository).count({
+              status: status || 1,
+              organizationId: user.organizationId,
+              branchId: user.branchId,
+              [i]: In(data[i].value),
+            });
           } else if (data[i].type === 'date-between') {
             const start_date = data[i].value[0];
             const end_date = data[i].value[1];
+
+            const add_one_day = moment(end_date, 'YYYY-MM-DD')
+              .add(1, 'day')
+              .format();
+
             transactions = await getCustomRepository(
               TransactionRepository
             ).find({
               where: {
                 status: status || 1,
                 organizationId: user.organizationId,
-                [i]: Between(start_date, end_date),
+                [i]: Between(start_date, add_one_day),
               },
               skip: pn * ps - ps,
               take: ps,
@@ -100,6 +136,13 @@ export class TransactionService {
                 [sort_column]: sort_order,
               },
               relations: ['transactionItems', 'transactionItems.account'],
+            });
+
+            total = await getCustomRepository(TransactionRepository).count({
+              status: status || 1,
+              organizationId: user.organizationId,
+              branchId: user.branchId,
+              [i]: Between('2022-08-01', '2022-08-02'),
             });
           }
 
@@ -368,7 +411,7 @@ export class TransactionService {
             status: transactions?.status === 2 ? 2 : 1 || 1,
           });
 
-          getCustomRepository(TransactionItemRepository).save(
+          await getCustomRepository(TransactionItemRepository).save(
             debits.map((dr) => ({
               transactionId: transaction.id,
               amount: dr.amount,
@@ -383,7 +426,7 @@ export class TransactionService {
             }))
           );
 
-          getCustomRepository(TransactionItemRepository).save(
+          await getCustomRepository(TransactionItemRepository).save(
             credits.map((cr) => ({
               transactionId: transaction.id,
               amount: cr.amount,
@@ -397,6 +440,32 @@ export class TransactionService {
               status: transaction.status,
             }))
           );
+
+          if (transactions.report === true) {
+            const getTransaction = await getCustomRepository(
+              TransactionRepository
+            ).findOne({
+              where: {
+                id: transaction.id,
+              },
+              relations: ['transactionItems', 'transactionItems.account'],
+            });
+
+            if (transactions.invoiceId !== undefined) {
+              Logger.log('Adding transaction in reporting service for invoice');
+              await this.reportService.emit(TRANSACTION_CREATED_FOR_INVOICE, {
+                transactions: getTransaction,
+                invoiceId: transactions.invoiceId,
+              });
+            } else if (transactions.billId !== undefined) {
+              Logger.log('Adding transaction in reporting service for bill');
+              await this.reportService.emit(TRANSACTION_CREATED_FOR_BILL, {
+                transactions: getTransaction,
+                billId: transactions.billId,
+              });
+            }
+          }
+
           return transaction;
         }
       }

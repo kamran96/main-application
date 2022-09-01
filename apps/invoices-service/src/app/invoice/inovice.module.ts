@@ -20,6 +20,19 @@ import { MQ_HOST } from '@invyce/global-constants';
         },
       },
     ]),
+    ClientsModule.register([
+      {
+        name: 'REPORT_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: [MQ_HOST()],
+          queue: 'report_queue',
+          queueOptions: {
+            durable: false,
+          },
+        },
+      },
+    ]),
   ],
   controllers: [InvoiceController],
   providers: [InvoiceService],

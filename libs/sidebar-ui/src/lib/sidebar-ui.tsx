@@ -12,7 +12,7 @@ import { ReactElement, useState } from 'react';
 import { AppLogoWithoutText, InyvceDarkTextIcon } from './applogo';
 import chevronRight from '@iconify/icons-carbon/chevron-right';
 import LogOut from '@iconify-icons/feather/log-out';
-import Setting from '@iconify-icons/feather/settings'
+import Setting from '@iconify-icons/feather/settings';
 import Sun from '@iconify-icons/feather/sun';
 import Moon from '@iconify-icons/feather/moon';
 import { UserOutlined } from '@ant-design/icons';
@@ -265,12 +265,14 @@ export const SidebarUi: FC<SidebarUiProps> = ({
           </Button>
         </li>
         <li
-          onClick={() => history.push({
-            pathname: `/app/settings/profile-settings`,
-            state: {
-              from: history.location.pathname,
-            },
-          })}
+          onClick={() =>
+            history.push({
+              pathname: `/app/settings/profile-settings`,
+              state: {
+                from: history.location.pathname,
+              },
+            })
+          }
           className={`route_list_item flex alignCenter pointer    
                     `}
         >

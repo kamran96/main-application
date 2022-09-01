@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import {
   Between,
   getCustomRepository,
@@ -8,6 +14,7 @@ import {
   Raw,
 } from 'typeorm';
 import axios from 'axios';
+import * as moment from 'moment';
 import { BillRepository } from '../repositories/bill.repository';
 import { BillItemRepository } from '../repositories/billItem.repository';
 import { Sorting } from '@invyce/sorting';
@@ -21,14 +28,15 @@ import {
 } from '@invyce/global-constants';
 
 import { ClientProxy } from '@nestjs/microservices';
-import { BILL_UPDATED } from '@invyce/send-email';
+import { BILL_CREATED, BILL_UPDATED } from '@invyce/send-email';
 import { CreditNoteRepository } from '../repositories/creditNote.repository';
 import { PurchaseOrderRepository } from '../repositories/purchaseOrder.repository';
 
 @Injectable()
 export class BillService {
   constructor(
-    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy
+    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy,
+    @Inject('REPORT_SERVICE') private readonly reportService: ClientProxy
   ) {}
 
   async IndexBill(req: IRequest, queryData: IPage): Promise<IBillWithResponse> {
@@ -40,11 +48,12 @@ export class BillService {
     const token = req?.cookies['access_token'];
 
     let bills;
+    let total;
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
     const { sort_column, sort_order } = await Sorting(sort);
 
-    const total = await getCustomRepository(BillRepository).count({
+    total = await getCustomRepository(BillRepository).count({
       status,
       organizationId: req.user.organizationId,
       // invoiceType: invoice_type,
@@ -71,6 +80,14 @@ export class BillService {
             take: ps,
             relations: ['purchaseItems'],
           });
+
+          total = await getCustomRepository(BillRepository).count({
+            status,
+            organizationId: req.user.organizationId,
+            // invoiceType: invoice_type,
+            branchId: req.user.branchId,
+            [i]: Raw((alias) => `LOWER(${alias}) ILike '%${val}%'`),
+          });
         } else if (data[i].type === 'compare') {
           bills = await getCustomRepository(BillRepository).find({
             where: {
@@ -83,19 +100,39 @@ export class BillService {
             take: ps,
             relations: ['purchaseItems'],
           });
+
+          total = await getCustomRepository(BillRepository).count({
+            status,
+            organizationId: req.user.organizationId,
+            // invoiceType: invoice_type,
+            branchId: req.user.branchId,
+            [i]: In(data[i].value),
+          });
         } else if (data[i].type === 'date-between') {
           const start_date = data[i].value[0];
           const end_date = data[i].value[1];
+          const add_one_day = moment(end_date, 'YYYY-MM-DD')
+            .add(1, 'day')
+            .format();
+
           bills = await getCustomRepository(BillRepository).find({
             where: {
               status: 1,
               organizationId: req.user.organizationId,
               branchId: req.user.branchId,
-              [i]: Between(start_date, end_date),
+              [i]: Between(start_date, add_one_day),
             },
             skip: pn * ps - ps,
             take: ps,
             relations: ['purchaseItems'],
+          });
+
+          total = await getCustomRepository(BillRepository).count({
+            status,
+            organizationId: req.user.organizationId,
+            // invoiceType: invoice_type,
+            branchId: req.user.branchId,
+            [i]: Between(start_date, add_one_day),
           });
         }
 
@@ -657,6 +694,41 @@ export class BillService {
       }
 
       if (bill.status === Statuses.AUTHORISED) {
+        Logger.log('Update jurnal report');
+
+        const {
+          data: { result },
+        } = await axios.get(
+          Host('users', `users/organization/${req.user.organizationId}`),
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
+        const { data: contact } = await axios.post(
+          Host('contacts', `contacts/contact/ids`),
+          {
+            ids: [dto.contactId],
+            type: 1,
+          },
+          {
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          }
+        );
+
+        const billReportData = {
+          bill,
+          billItems,
+          contact: contact[0],
+          organizationName: result.name,
+          items,
+          user: req.user,
+        };
+        await this.reportService.emit(BILL_CREATED, billReportData);
+
         await axios.post(
           Host('items', `items/item/manage-inventory`),
           {
@@ -683,6 +755,8 @@ export class BillService {
           reference: dto.reference,
           amount: dto.grossTotal,
           status: bill.status,
+          report: true, // true if report has been created
+          billId: bill.id,
         };
 
         const { data: transaction } = await axios.post(
@@ -707,6 +781,7 @@ export class BillService {
             paymentType: PaymentModes.BILLS,
             transactionId: transaction.id,
             entryType: EntryType.CREDIT,
+            report: true, // true if report has been created
           },
         ];
 

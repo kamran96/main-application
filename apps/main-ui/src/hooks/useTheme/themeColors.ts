@@ -67,7 +67,6 @@ export interface IThemeVariables {
   svgHoverBg: string;
   svgHoverColor: string;
   organizationCard: string;
- 
 }
 
 export interface ITheme {
@@ -90,7 +89,7 @@ interface IThemes {
 export const Themes: IThemes = {
   light: {
     $PRIMARY: '#1890ff',
-    $Secondary: '#143C69',
+    $Secondary: '#1e75f1', //#143C69
     topbar: '#143C69',
     $BLACK: '#000000',
     $LIGHT_BLACK: '#272727',
@@ -105,7 +104,7 @@ export const Themes: IThemes = {
     $Primary2: `#1e5b9e`,
     layoutBg: `#efefef`,
     sidebarBg: '#ffff',
-    sidebarListActive: '#F6FAFF', //sidebar 
+    sidebarListActive: '#F6FAFF', //sidebar
     sidebarListActiveText: '#7988FF',
     sidebarDefaultText: '#334d6e',
     tableRowHover: '#151515',

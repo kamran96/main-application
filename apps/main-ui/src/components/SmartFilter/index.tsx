@@ -79,8 +79,6 @@ export const SmartFilter: FC<IProps> = ({
     }
   };
 
-  
-
   const handleFilter = () => {
     let generatedFilter = {};
 
@@ -94,11 +92,7 @@ export const SmartFilter: FC<IProps> = ({
           generatedFilter = { ...generatedFilter, [item]: obj };
         }
       } else {
-        const obj = {
-          ...filter[item],
-          value: handleString(filter[item].value),
-        };
-
+        const obj = { ...filter[item], value: filter[item].value };
         delete obj.isFullSearch;
         generatedFilter = { ...generatedFilter, [item]: obj };
       }

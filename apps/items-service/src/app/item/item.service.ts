@@ -14,9 +14,15 @@ import {
 import { Sorting } from '@invyce/sorting';
 
 import { Price, PriceSchema } from '../schemas/price.schema';
-import { ItemCodesDto, ItemDto, ItemIdsDto } from '../dto/item.dto';
+import {
+  CodeValidateDto,
+  ItemCodesDto,
+  ItemDto,
+  ItemIdsDto,
+} from '../dto/item.dto';
 import { ItemLedger } from '../schemas/itemLedger.schema';
 import { ItemLedgerDetailDto } from '../dto/ItemLedger.dto';
+import e = require('express');
 enum IOperationType {
   DECREASE = 'decrease',
   INCREASE = 'increase',
@@ -65,6 +71,7 @@ export class ItemService {
           meta: 'pagination',
         };
 
+        console.log(data, 'filters`');
         for (const i in data) {
           if (data[i].type === 'search') {
             const val = data[i].value?.split('%')[1];
@@ -72,24 +79,7 @@ export class ItemService {
               {
                 status: 1,
                 organizationId: itemData.organizationId,
-                [i]: { $regex: val },
-              },
-              {
-                offset: pn * ps - ps,
-                populate: 'price',
-                limit: ps,
-                sort: { [sort_column]: sort_order },
-                customLabels: myCustomLabels,
-              }
-            );
-          } else if (data[i].type === 'date-between') {
-            const start_date = i[1]['value'][0];
-            const end_date = i[1]['value'][1];
-            items = await this.itemModel.paginate(
-              {
-                status: 1,
-                organizationId: itemData.organizationId,
-                [i]: { $gt: start_date, $lt: end_date },
+                [i]: { $regex: new RegExp(val, 'i') },
               },
               {
                 offset: pn * ps - ps,
@@ -100,26 +90,16 @@ export class ItemService {
               }
             );
           } else if (data[i].type === 'compare') {
+            const value =
+              typeof data[i]['value'] == 'string'
+                ? data[i]['value'].split(',')
+                : [data[i]['value']];
+
             items = await this.itemModel.paginate(
               {
                 status: 1,
-                organization: itemData.organizationId,
-                [i]: { $in: i[1]['value'] },
-              },
-              {
-                offset: pn * ps - ps,
-                populate: 'price',
-                limit: ps,
-                sort: { [sort_column]: sort_order },
-                customLabels: myCustomLabels,
-              }
-            );
-          } else if (data[i].type === 'in') {
-            items = await this.itemModel.paginate(
-              {
-                status: 1,
-                organization: itemData.organizationId,
-                [i]: { $in: i[1]['value'] },
+                organizationId: itemData.organizationId,
+                [i]: { $in: value },
               },
               {
                 offset: pn * ps - ps,
@@ -437,7 +417,8 @@ export class ItemService {
     });
   }
 
-  async GetItemCode(code: string, user: IBaseUser): Promise<any> {
+  async GetItemCode(dto: CodeValidateDto, user: IBaseUser): Promise<any> {
+    const { code, id } = dto;
     const item = await this.itemModel.find({
       organizationId: user.organizationId,
       branchId: user.branchId,
@@ -445,18 +426,34 @@ export class ItemService {
       status: 1,
     });
 
-    if (item.length > 0) {
-      return {
-        message: 'Item Code aready exist',
-        statusCode: HttpStatus.BAD_REQUEST,
-        status: false,
-      };
+    if (id) {
+      if ((!!item.length && item?.[0].id === id) || !item.length) {
+        return {
+          message: `${code} is available`,
+          statusCode: HttpStatus.OK,
+          status: true,
+        };
+      } else if (!!item.length && item[0]._id !== id) {
+        return {
+          message: `${code} is already in use`,
+          statusCode: HttpStatus.BAD_REQUEST,
+          status: false,
+        };
+      }
     } else {
-      return {
-        message: 'Item Code is available',
-        statusCode: HttpStatus.OK,
-        status: true,
-      };
+      if (item.length > 0) {
+        return {
+          message: `${code} is already in use`,
+          statusCode: HttpStatus.BAD_REQUEST,
+          status: false,
+        };
+      } else {
+        return {
+          message: `${code} is available`,
+          statusCode: HttpStatus.OK,
+          status: true,
+        };
+      }
     }
   }
 

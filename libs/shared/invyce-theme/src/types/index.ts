@@ -73,7 +73,7 @@ interface IThemes {
 export const Themes: IThemes = {
   light: {
     $PRIMARY: '#1890ff',
-    $Secondary: '#143C69',
+    $Secondary: '#1e75f1', //#143C69
     topbar: '#143C69',
     $BLACK: '#000000',
     $LIGHT_BLACK: '#272727',

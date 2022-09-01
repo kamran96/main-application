@@ -43,11 +43,12 @@ export class CreditNoteService {
     const token = req.cookies['access_token'];
 
     let credit_note;
+    let total;
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
     const { sort_column, sort_order } = await Sorting(sort);
 
-    const total = await getCustomRepository(CreditNoteRepository).count({
+    total = await getCustomRepository(CreditNoteRepository).count({
       status,
       organizationId: req.user.organizationId,
       branchId: req.user.branchId,
@@ -74,6 +75,14 @@ export class CreditNoteService {
             take: ps,
             relations: ['creditNoteItems'],
           });
+
+          total = await getCustomRepository(CreditNoteRepository).count({
+            status,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            invoiceType: invoice_type,
+            [i]: Raw((alias) => `LOWER(${alias}) ILike '%${val}%'`),
+          });
         } else if (data[i].type === 'compare') {
           credit_note = await getCustomRepository(CreditNoteRepository).find({
             where: {
@@ -87,20 +96,40 @@ export class CreditNoteService {
             take: ps,
             relations: ['creditNoteItems'],
           });
+
+          total = await getCustomRepository(CreditNoteRepository).count({
+            status,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            invoiceType: invoice_type,
+            [i]: In(data[i].value),
+          });
         } else if (data[i].type === 'date-between') {
           const start_date = data[i].value[0];
           const end_date = data[i].value[1];
+          const add_one_day = moment(end_date, 'YYYY-MM-DD')
+            .add(1, 'day')
+            .format();
+
           credit_note = await getCustomRepository(CreditNoteRepository).find({
             where: {
               status: status,
               organizationId: req.user.organizationId,
               branchId: req.user.branchId,
               invoiceType: invoice_type,
-              [i]: Between(start_date, end_date),
+              [i]: Between(start_date, add_one_day),
             },
             skip: pn * ps - ps,
             take: ps,
             relations: ['creditNoteItems'],
+          });
+
+          total = await getCustomRepository(CreditNoteRepository).count({
+            status,
+            organizationId: req.user.organizationId,
+            branchId: req.user.branchId,
+            invoiceType: invoice_type,
+            [i]: Between(start_date, add_one_day),
           });
         }
 

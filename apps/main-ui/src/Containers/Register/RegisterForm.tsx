@@ -261,7 +261,7 @@ export const RegisterForm: FC = () => {
                               {
                                 validator: (rule, value, callback) => {
                                   checkUsernameAvaliable(
-                                    { username: value },
+                                    { email: value },
                                     callback
                                   );
                                 },

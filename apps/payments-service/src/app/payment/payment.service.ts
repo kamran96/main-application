@@ -27,12 +27,17 @@ import {
 } from '../dto/payment.dto';
 
 import { ClientProxy } from '@nestjs/microservices';
-import { SEND_FORGOT_PASSWORD } from '@invyce/send-email';
+import {
+  SEND_FORGOT_PASSWORD,
+  PAYMENT_CREATED_FOR_INVOICE,
+  PAYMENT_CREATED_FOR_BILL,
+} from '@invyce/send-email';
 
 @Injectable()
 export class PaymentService {
   constructor(
-    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy
+    @Inject('EMAIL_SERVICE') private readonly emailService: ClientProxy,
+    @Inject('REPORT_SERVICE') private readonly reportService: ClientProxy
   ) {}
 
   /**
@@ -51,9 +56,11 @@ export class PaymentService {
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
     let payments;
+    let total;
+
     const { sort_column, sort_order } = await Sorting(sort);
 
-    const total = await getCustomRepository(PaymentRepository).count({
+    total = await getCustomRepository(PaymentRepository).count({
       status: 1,
       organizationId: user.organizationId,
       paymentMode: paymentType,
@@ -68,15 +75,28 @@ export class PaymentService {
         if (data[i].type === 'date-between') {
           const start_date = data[i].value[0];
           const end_date = data[i].value[1];
+          const add_one_day = moment(end_date, 'YYYY-MM-DD')
+            .add(1, 'day')
+            .format();
+
           payments = await getCustomRepository(PaymentRepository).find({
             where: {
               status: 1,
               branchId: user.branchId,
               organizationId: user.organizationId,
-              [i]: Between(start_date, end_date),
+              paymentMode: paymentType,
+              [i]: Between(start_date, add_one_day),
             },
             skip: pn * ps - ps,
             take: ps,
+          });
+
+          total = await getCustomRepository(PaymentRepository).count({
+            status: 1,
+            organizationId: user.organizationId,
+            paymentMode: paymentType,
+            branchId: user.branchId,
+            [i]: Between(start_date, add_one_day),
           });
         }
       }
@@ -722,9 +742,10 @@ export class PaymentService {
   // }
 
   async AddPayment(data, user: IBaseUser): Promise<void> {
-    console.log('okkkk');
+    const paymentInvoiceArr = [];
+    const paymentBillArr = [];
     for (const i of data.payments) {
-      await getCustomRepository(PaymentRepository).save({
+      const payment = await getCustomRepository(PaymentRepository).save({
         amount: i?.balance,
         dueDate: i?.dueDate,
         date: i?.date,
@@ -744,6 +765,21 @@ export class PaymentService {
         updatedById: user.id,
         status: i.status || 1,
       });
+
+      if (i.invoiceId !== undefined && i.report === true) {
+        paymentInvoiceArr.push(payment);
+      } else if (i.billId !== undefined && i.report === true) {
+        paymentBillArr.push(payment);
+      }
+    }
+
+    if (paymentInvoiceArr.length > 0) {
+      await this.reportService.emit(
+        PAYMENT_CREATED_FOR_INVOICE,
+        paymentInvoiceArr
+      );
+    } else if (paymentBillArr.length > 0) {
+      await this.reportService.emit(PAYMENT_CREATED_FOR_BILL, paymentBillArr);
     }
   }
 
