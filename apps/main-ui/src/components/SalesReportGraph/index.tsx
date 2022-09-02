@@ -2,7 +2,6 @@ import React, { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { Card } from '../Card';
-import { Color } from '../../modal';
 import * as echarts from 'echarts';
 import { useWindowSize } from '../../utils/useWindowSize';
 import { SalesOverviewGraphAPI } from '../../api/mainDashboard';

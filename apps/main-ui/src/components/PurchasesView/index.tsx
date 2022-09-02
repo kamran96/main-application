@@ -1,4 +1,4 @@
-import { Card, Col, Row, Button, Dropdown, Menu, Form, DatePicker } from 'antd';
+import { Card, Col, Row, Button, Dropdown, Menu } from 'antd';
 import { useEffect, useState } from 'react';
 import { FC } from 'react';
 import styled from 'styled-components';
@@ -21,22 +21,12 @@ import {
 } from '../../api';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { IInvoiceItem, IInvoiceType } from '@invyce/shared/types';
-import { useQueryClient, useMutation, useQuery } from 'react-query';
-import {
-  IErrorMessages,
-  IServerError,
-  NOTIFICATIONTYPE,
-  PaymentMode,
-  IInvoiceMutatedResult,
-  IInvoiceResult,
-} from '../../modal';
+import { useMutation, useQuery } from 'react-query';
+import { NOTIFICATIONTYPE, IInvoiceMutatedResult } from '../../modal';
 import dayjs from 'dayjs';
 import { useRef } from 'react';
 import { PERMISSIONS } from '../Rbac/permissions';
-import printDiv, {
-  ConvertDivToPDFAndDownload,
-  DownloadPDF,
-} from '../../utils/Print';
+import printDiv, { ConvertDivToPDFAndDownload } from '../../utils/Print';
 import { Link, useHistory } from 'react-router-dom';
 import { EmailModal } from './Email';
 import { IThemeProps } from '../../hooks/useTheme/themeColors';
@@ -48,8 +38,6 @@ import { InvoicePDF } from '../PDFs';
 import DummyLogo from '../../assets/quickbook.png';
 import { plainToClass } from 'class-transformer';
 import { ISupportedRoutes } from '@invyce/shared/types';
-import { CommonModal } from '../../components';
-import { FormLabel } from '../FormLabel';
 interface IProps {
   type?:
     | IInvoiceType.INVOICE
@@ -111,8 +99,6 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
       enabled: !!id,
     }
   );
-
-
 
   const response = plainToClass(
     IInvoiceMutatedResult,
@@ -342,8 +328,6 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
     },
   ];
 
- 
-
   const _options: IInvoiceOptions[] = [
     (response?.invoiceType === IInvoiceType.PURCHASE_ORDER ||
       response?.invoiceType === IInvoiceType.QUOTE) && {
@@ -371,13 +355,15 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
     },
 
     (response?.invoiceType === IInvoiceType?.PURCHASE_ENTRY ||
-      response?.invoiceType === IInvoiceType?.INVOICE) &&
-      {
-      title: response?.invoiceType===IInvoiceType.PURCHASE_ENTRY ? 'Add Debit note' : 'Add Credit note',
+      response?.invoiceType === IInvoiceType?.INVOICE) && {
+      title:
+        response?.invoiceType === IInvoiceType.PURCHASE_ENTRY
+          ? 'Add Debit note'
+          : 'Add Credit note',
       permission: PERMISSIONS?.INVOICES_CREATE,
       key: IInvoiceActions.CREDIT_NOTE,
     },
-    
+
     {
       title: 'Email',
       permission: null,
@@ -1003,6 +989,4 @@ const WrapperNewPurchaseView = styled.div`
   div.ant-table-body {
     overflow-x: hidden;
   }
-
-
 `;

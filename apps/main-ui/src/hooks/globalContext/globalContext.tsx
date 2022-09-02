@@ -2,6 +2,7 @@ import { createContext, useContext } from 'react';
 import { IAuth, IUser, NOTIFICATIONTYPE } from '../../modal';
 import { ILoginActions } from './globalManager';
 import { IRolePermissions } from '@invyce/shared/types';
+import { IThemeVariables } from '../useTheme/themeColors';
 
 interface IAction {
   type?: ILoginActions;
@@ -150,6 +151,7 @@ interface IGlobalContextvalues {
   setBills: (visibility: boolean, type: IImportType) => void;
   refetchPermissions: () => void;
   userAuthenticated: boolean;
+  Colors: IThemeVariables;
 }
 
 export const globalContext = createContext<Partial<IGlobalContextvalues>>({});

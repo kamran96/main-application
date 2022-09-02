@@ -1,5 +1,6 @@
 import copyIcon from '@iconify-icons/feather/copy';
 import { Button, Col, Form, Progress, Row, Select } from 'antd';
+import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
 import React, { FC, useEffect, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
@@ -10,7 +11,6 @@ import { ButtonTag } from '../../../../components/ButtonTags';
 import { FormLabel } from '../../../../components/FormLabel';
 import { BoldText } from '../../../../components/Para/BoldText';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { Color } from '../../../../modal';
 import { IOrganizations } from '../../../../modal/organization';
 
 const { Option } = Select;
@@ -319,7 +319,7 @@ const MainWrapper = styled.div`
       color: #3e3e3c;
     }
     tbody tr td.isReady {
-      color: ${Color.$PRIMARY};
+      color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
     }
     tbody tr td.isCompleted {
       color: #1ed21e;

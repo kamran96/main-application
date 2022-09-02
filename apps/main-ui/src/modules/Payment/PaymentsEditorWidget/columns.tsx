@@ -5,10 +5,11 @@ import dayjs from 'dayjs';
 import moneyFormat from '../../../utils/moneyFormat';
 import Icon from '@iconify/react';
 import convertToRem from '../../../utils/convertToRem';
-import { Color } from '../../../modal';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import { ColumnsType } from 'antd/lib/table';
 import { IInvoiceResult } from '../../../modal/invoice';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 const { Option } = Select;
 
 export default function (
@@ -24,6 +25,8 @@ export default function (
       return null;
     }
   };
+
+  const { Colors } = useGlobalContext();
 
   const columns: ColumnsType<any> = [
     {
@@ -158,7 +161,7 @@ export default function (
             <Icon
               style={{
                 fontSize: convertToRem(17),
-                color: Color.$GRAY,
+                color: `${(props: IThemeProps) => props?.theme?.colors?.$GRAY}`,
                 cursor: 'pointer',
               }}
               icon={deleteIcon}

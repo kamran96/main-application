@@ -7,8 +7,8 @@ import React, { FC, ReactElement } from 'react';
 import styled from 'styled-components';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import { PDFICON } from '../../../../../components/Icons';
-import { Color } from '../../../../../modal';
 import { ButtonTag } from '../../../../../components/ButtonTags';
+import { IThemeProps } from '../../../../../hooks/useTheme/themeColors';
 
 interface IProps {
   disabled?: boolean;
@@ -114,8 +114,8 @@ const WrapperPurchaseTopbar = styled.div`
     background: #e4e4e4;
     color: #333333;
     &:hover {
-      background: ${Color.$Secondary};
-      color: ${Color.$WHITE};
+      background: ${(props: IThemeProps) => props?.theme?.colors?.$Secondary};
+      color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE}};
     }
   }
 

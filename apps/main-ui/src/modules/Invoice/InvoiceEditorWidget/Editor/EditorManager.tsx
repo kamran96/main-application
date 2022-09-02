@@ -28,12 +28,11 @@ import {
   getInvoiceByIDAPI,
 } from '../../../../api';
 import { getAccountsByTypeAPI } from '../../../../api/accounts';
-import { Option } from '../../../../components/CommonSelect';
+import { Option } from '@components';
 import { Editable, EditableSelect } from '../../../../components/Editable';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { useShortcut } from '../../../../hooks/useShortcut';
 import {
-  Color,
   IContactType,
   IContactTypes,
   NOTIFICATIONTYPE,
@@ -96,7 +95,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
 
   const [rowsErrors, setRowsErrors] = useState([]);
   const [width] = useWindowSize();
-  const { notificationCallback, setItemsModalConfig, userDetails } =
+  const { notificationCallback, setItemsModalConfig, userDetails, Colors } =
     useGlobalContext();
 
   const { organization } = userDetails;
@@ -658,7 +657,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
                       const itemDiscount = record.itemDiscount;
                       delete allItems[index]?.quantityError;
 
-                      const costOfGoodAmount = purchasePrice * quantity ;
+                      const costOfGoodAmount = purchasePrice * quantity;
                       const tax = record.tax;
 
                       if (
@@ -906,7 +905,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
               <Icon
                 style={{
                   fontSize: convertToRem(20),
-                  color: Color.$GRAY,
+                  color: Colors.$GRAY,
                   cursor: 'pointer',
                 }}
                 icon={deleteIcon}

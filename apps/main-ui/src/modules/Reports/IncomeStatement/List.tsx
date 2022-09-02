@@ -13,7 +13,7 @@ import { SmartFilter } from '../../../components/SmartFilter';
 import { TableCard } from '../../../components/TableCard';
 import { P } from '../../../components/Typography';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { Color, ISupportedRoutes } from '../../../modal';
+import { ISupportedRoutes } from '../../../modal';
 import { IAccountsResult } from '../../../modal/accounts';
 import moneyFormat from '../../../utils/moneyFormat';
 import printDiv from '../../../utils/Print';
@@ -57,7 +57,7 @@ export const IncomeStatementList: FC = () => {
     IBalanceSheetData[]
   >([]);
   const [total, setTotals] = useState(0);
-  const { routeHistory, userDetails } = useGlobalContext();
+  const { routeHistory, userDetails, Colors } = useGlobalContext();
   const { history } = routeHistory;
 
   const [config, setConfig] = useState({

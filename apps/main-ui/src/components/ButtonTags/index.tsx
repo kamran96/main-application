@@ -6,13 +6,11 @@ import { FC, ReactNode, Ref } from 'react';
 import styled from 'styled-components';
 import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
-import { Color } from '../../modal';
-
 interface IProps {
   size: SizeType;
   title: string;
   icon?: any;
-  onClick?: (payload? : any) => void;
+  onClick?: (payload?: any) => void;
   ref?: Ref<any>;
   disabled?: boolean;
   className?: string;
@@ -80,10 +78,11 @@ const WrapperButtonTag = styled.div`
     }
 
     &:hover {
-      background: ${Color.$Secondary} !important;
-      color: ${Color.$WHITE};
+      background: ${(props: IThemeProps) =>
+        props?.theme?.colors?.$Secondary} !important;
+      color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE};
       span {
-        color: ${Color.$WHITE};
+        color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE};
       }
     }
   }

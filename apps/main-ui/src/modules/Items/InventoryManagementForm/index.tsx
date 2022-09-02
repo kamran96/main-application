@@ -13,11 +13,12 @@ import { IItemsResult } from '../../../modal/items';
 import { WrapperInventoryManagement } from './styles';
 import bxPlus from '@iconify-icons/bx/bx-plus';
 import convertToRem from '../../../utils/convertToRem';
-import { Color, NOTIFICATIONTYPE } from '../../../modal';
+import { NOTIFICATIONTYPE } from '../../../modal';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { getAllAccounts } from '../../../api/accounts';
 import { IAccountsResult } from '../../../modal';
+import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 
 const { Option } = Select;
 
@@ -281,7 +282,7 @@ export const ManageInventoryForm: FC = () => {
             <Icon
               style={{
                 fontSize: convertToRem(20),
-                color: Color.$GRAY,
+                color: `${(props: IThemeProps) => props?.theme?.colors?.$GRAY}`,
                 cursor: 'pointer',
               }}
               icon={deleteIcon}

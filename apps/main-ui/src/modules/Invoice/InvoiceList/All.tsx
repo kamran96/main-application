@@ -7,7 +7,7 @@ import {
   getAllContacts,
   getInvoiceListAPI,
 } from '../../../api';
-import { PurchaseListTopbar } from '../../../components/PurchasesListTopbar';
+import { PurchaseListTopbar } from '@components';
 import { useRbac } from '../../../components/Rbac/useRbac';
 import { SmartFilter } from '../../../components/SmartFilter';
 import { CommonTable } from '../../../components/Table';

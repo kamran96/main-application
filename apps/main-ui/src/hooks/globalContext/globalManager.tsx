@@ -23,6 +23,7 @@ import { IAuth, IUser } from '../../modal/auth';
 import { IRolePermissions } from '../../modal/rbac';
 import { DecriptionData, EncriptData } from '../../utils/encription';
 import { useTheme } from '../useTheme';
+import { IThemeVariables, Themes } from '../useTheme/themeColors';
 import { globalContext, IImportType, IPaymentsModal } from './globalContext';
 import { useHttp } from './useHttp';
 
@@ -446,6 +447,8 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
 
   const { theme: appTheme, themeLoading } = useTheme(theme);
 
+  const Colors: IThemeVariables = Themes[appTheme];
+
   const checkingUser = isLoading || permissionsFetching;
 
   return (
@@ -681,6 +684,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         },
         refetchUser,
         refetchPermissions,
+        Colors,
       }}
     >
       <WrapperChildren>

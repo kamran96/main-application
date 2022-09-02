@@ -272,10 +272,10 @@ export const ItemsList: FC = () => {
       render: (data, row, index) => {
         return (
           <div
+            className="item-name pointer"
             onClick={() =>
               setShowItemsDetails({ visibility: true, id: row?.id })
             }
-            style={{ color: '#2395E7', cursor: 'pointer' }}
           >
             {data}
           </div>
@@ -378,7 +378,7 @@ export const ItemsList: FC = () => {
           onFilter={(encode) => {
             const route = `/app/items?sortid=${sortid}&page=1&page_size=20&query=${encode}`;
             history.push(route);
-            
+
             setItemsConfig({ ...itemsConfig, query: encode });
           }}
           onClose={() => setFilterbar(false)}

@@ -27,12 +27,11 @@ import {
   getBillsById,
 } from '../../../../api';
 import { getAccountsByTypeAPI } from '../../../../api/accounts';
-import { Option } from '../../../../components/CommonSelect';
+import { Option } from '@components';
 import { Editable, EditableSelect } from '../../../../components/Editable';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { useShortcut } from '../../../../hooks/useShortcut';
 import {
-  Color,
   IContactType,
   IContactTypes,
   ISupportedRoutes,
@@ -88,7 +87,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
   const [width] = useWindowSize();
 
   /* ************ HOOKS *************** */
-  const { notificationCallback, setItemsModalConfig, userDetails } =
+  const { notificationCallback, setItemsModalConfig, userDetails, Colors } =
     useGlobalContext();
 
   const { organization } = userDetails;
@@ -756,7 +755,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
             <Icon
               style={{
                 fontSize: convertToRem(20),
-                color: Color.$GRAY,
+                color: Colors.$GRAY,
                 cursor: 'pointer',
               }}
               icon={deleteIcon}

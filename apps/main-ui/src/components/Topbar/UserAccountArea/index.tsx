@@ -15,7 +15,7 @@ import { getOrganizations } from '../../../api/organizations';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { ILoginActions } from '../../../hooks/globalContext/globalManager';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
-import { Color, NOTIFICATIONTYPE } from '../../../modal';
+import { NOTIFICATIONTYPE } from '../../../modal';
 import { IOrganizations, IOrganizationType } from '../../../modal/organization';
 import { ISupportedRoutes } from '../../../modal/routing';
 import convertToRem from '../../../utils/convertToRem';
@@ -289,7 +289,7 @@ const WrapperUserAccountArea = styled.div`
   .add_organization {
     display: flex;
     align-items: center;
-    color: ${Color.$PRIMARY};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
     font-style: unset;
     .add_org_icon {
       font-size: ${convertToRem(16)};
@@ -469,7 +469,7 @@ const BranchesMenu = styled.div`
   }
 
   .branch_cheveron_icon {
-    color: ${Color.$WHITE};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
   }
   /* &:hover {
     transition: 0.3s all ease-in-out;

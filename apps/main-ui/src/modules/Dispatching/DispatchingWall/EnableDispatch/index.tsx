@@ -1,4 +1,5 @@
 import { Button, Switch } from 'antd';
+import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { CommonModal } from '../../../../components';
@@ -6,7 +7,6 @@ import { Heading } from '../../../../components/Heading';
 import { SelectCard } from '../../../../components/SelectCard';
 import { Seprator } from '../../../../components/Seprator';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { Color } from '../../../../modal';
 
 export const EnableDispatchModal: FC = () => {
   const { dispatchConfigModal, setDispatchConfigModal } = useGlobalContext();
@@ -123,8 +123,9 @@ const ModalBodyWrapper = styled.div`
     text-align: right;
     margin-top: 20px;
     .next_color {
-      background-color: ${Color.$Secondary};
-      color: ${Color.$WHITE};
+      background-color: ${(props: IThemeProps) =>
+        props?.theme?.colors?.$Secondary};
+      color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE};
     }
   }
 `;

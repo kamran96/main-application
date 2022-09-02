@@ -2,7 +2,6 @@ import React, { FC, ReactElement } from 'react';
 import styled from 'styled-components';
 import convertToRem from '../../../utils/convertToRem';
 import { BoldText } from '../../../components/Para/BoldText';
-import { Color } from '../../../modal';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 import { Card } from '../../../components/Card';
 

@@ -19,6 +19,9 @@
     },
     {
       "path": "./tsconfig.spec.json"
+    },
+    {
+      "path": "./apps/main-ui"
     }
   ],
   "baseUrl": "src",

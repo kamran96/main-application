@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import { IThemeProps } from '../../hooks/useTheme/themeColors';
-import { Color } from '../../modal';
 import convertToRem from '../../utils/convertToRem';
 
 export const WrapperTable = styled.div`
@@ -121,8 +120,8 @@ export const WrapperTable = styled.div`
       outline: none;
 
       &:hover {
-        background: ${Color.$Secondary};
-        color: ${Color.$WHITE};
+        background: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
+        color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE};
         border: none;
         outline: none;
       }
@@ -143,7 +142,7 @@ export const WrapperTable = styled.div`
     background-color: #f5f5f5;
   }
 
-  ${(props) =>
+  ${(props: any) =>
     props.scrollabletable &&
     ` div.ant-table-body {
     overflow-y: scroll;

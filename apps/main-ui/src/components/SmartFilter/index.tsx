@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-escape */
 import React, { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Color, FilterType, IVariants } from '../../modal';
+import { FilterType, IVariants } from '../../modal';
 import { Drawer, Button, Space, Menu, Popover, Form } from 'antd';
 import { FormLabel } from '../FormLabel';
 import convertToRem from '../../utils/convertToRem';
@@ -42,7 +42,7 @@ export const SmartFilter: FC<IProps> = ({
   const [isFiltered, setIsFiltered] = useState<boolean>(false);
   const [attributeValues, setAttributeValues] = useState([]);
 
-  const { routeHistory } = useGlobalContext();
+  const { routeHistory, Colors } = useGlobalContext();
   const { history } = routeHistory;
   const { search } = history.location;
 
@@ -202,7 +202,7 @@ export const SmartFilter: FC<IProps> = ({
                       <Icon
                         style={{
                           fontSize: convertToRem(16),
-                          color: Color.$GRAY,
+                          color: Colors.$GRAY,
                           cursor: 'pointer',
                         }}
                         icon={editSolid}
@@ -213,7 +213,7 @@ export const SmartFilter: FC<IProps> = ({
                       <Icon
                         style={{
                           fontSize: convertToRem(16),
-                          color: Color.$GRAY,
+                          color: Colors.$GRAY,
                           cursor: 'pointer',
                         }}
                         icon={deleteIcon}
@@ -420,11 +420,11 @@ export const WrapperMenu = styled.div`
         align-items: center;
       }
       i {
-        color: ${Color.$PRIMARY};
+        color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
         font-size: ${convertToRem(11)};
       }
       p {
-        color: ${Color.$GRAY};
+        color: ${(props: IThemeProps) => props?.theme?.colors?.$GRAY};
       }
     }
 
@@ -463,12 +463,15 @@ export const ParentWrapper: any = styled.div`
     display: flex;
     align-items: center;
     color: ${(props: any) =>
-      props.isFiltered ? `${Color.$PRIMARY} !important` : Color.$GRAY};
+      props.isFiltered
+        ? `${(props: IThemeProps) =>
+            props?.theme?.colors?.$PRIMARY};} !important`
+        : (props: IThemeProps) => props?.theme?.colors?.$GRAY};
   }
 
   &:hover {
     .filter-icon {
-      color: ${Color.$PRIMARY};
+      color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
     }
   }
 `;

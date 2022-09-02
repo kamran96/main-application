@@ -7,7 +7,7 @@ import { addAttributesAPI, getCategoryAttributesAPI } from '../../../api';
 import { CommonModal } from '../../../components';
 import { CommonLoader } from '../../../components/FallBackLoader';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { Color, IVariants, NOTIFICATIONTYPE } from '../../../modal';
+import { IVariants, NOTIFICATIONTYPE } from '../../../modal';
 import convertToRem from '../../../utils/convertToRem';
 import { AttriForm } from './form';
 import { WrapperAttributeWidget } from './styles';
@@ -19,7 +19,7 @@ export const AttributeEditorWidget: FC = () => {
   const [checkValidation, setCheckValidation] = useState(false);
   const [errors, setErrors] = useState([]);
 
-  const { attributeConfig, setAttributeConfig, notificationCallback } =
+  const { attributeConfig, setAttributeConfig, notificationCallback, Colors } =
     useGlobalContext();
   const { visibility, categoryObj } = attributeConfig;
   const categoryId = (categoryObj && categoryObj.id) || null;
@@ -154,7 +154,7 @@ export const AttributeEditorWidget: FC = () => {
                               <Icon
                                 style={{
                                   fontSize: convertToRem(16),
-                                  color: Color.$GRAY_LIGHT,
+                                  color: Colors.$GRAY_LIGHT,
                                   cursor: 'pointer',
                                 }}
                                 icon={deleteIcon}

@@ -11,7 +11,7 @@ import { Heading } from '../../components/Heading';
 import { P } from '../../components/Typography';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { IThemeProps } from '../../hooks/useTheme/themeColors';
-import { Color, ISupportedRoutes } from '../../modal';
+import { ISupportedRoutes } from '../../modal';
 import { IInvoiceDashboardDetails } from '../../modal/invoice';
 import convertToRem from '../../utils/convertToRem';
 import { AllInvoices } from './Allinvoices';
@@ -21,7 +21,7 @@ import { SummaryInvoice } from './SummaryInvoice';
 import { Card } from '../../components/Card';
 
 export const InvoiceDashboard: FC = () => {
-  const { routeHistory } = useGlobalContext();
+  const { routeHistory, Colors } = useGlobalContext();
   const { history } = routeHistory;
   /* React Hooks Here */
   /* Local States */

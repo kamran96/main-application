@@ -19,8 +19,6 @@ interface IProps {
   [key: string]: any;
 }
 
-export const Option = Select.Option;
-
 export const CommonSelect: FC<IProps> = ({
   className,
   loading,

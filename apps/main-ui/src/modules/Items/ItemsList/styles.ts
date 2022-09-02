@@ -1,9 +1,12 @@
 import styled from 'styled-components';
 import { Menu } from 'antd';
 import convertToRem from '../../../utils/convertToRem';
-import { Color } from '../../../modal';
+import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 
 export const ItemsListWrapper = styled.div`
+  .item-name {
+    color: ${(props: IThemeProps) => props?.theme?.colors?.linkColor};
+  }
   .custom_topbar {
     display: flex;
     align-items: center;
@@ -37,7 +40,7 @@ export const ActionsMenuWrapper = styled(Menu)`
     line-height: ${convertToRem(16)};
     letter-spacing: 0.05em;
     text-transform: capitalize;
-    color: ${Color.$TEXT};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$TEXT};
   }
 
   .ant-dropdown-menu-item-divider,

@@ -1,8 +1,7 @@
 import { Tag } from 'antd';
 import { ColumnsType } from 'antd/es/table';
+import { LightColors } from '../../../hooks/useTheme/themeColors';
 import React from 'react';
-
-import { Color } from '../../../modal';
 
 export const columns: ColumnsType<any> = [
   {
@@ -24,7 +23,7 @@ export const columns: ColumnsType<any> = [
         <>
           {employees.map((name) => {
             return (
-              <Tag color={Color.$PRIMARY} key={name}>
+              <Tag color={LightColors.$PRIMARY} key={name}>
                 {name.toUpperCase()}
               </Tag>
             );
@@ -42,7 +41,7 @@ export const columns: ColumnsType<any> = [
         <>
           {supervisors.map((name) => {
             return (
-              <Tag color={Color.$LOGO} key={name}>
+              <Tag color={LightColors?.$LOGO} key={name}>
                 {name.toUpperCase()}
               </Tag>
             );

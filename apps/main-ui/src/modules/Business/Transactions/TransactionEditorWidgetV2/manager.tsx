@@ -19,7 +19,7 @@ import defaultState from './default';
 import Icon from '@iconify/react';
 import dayjs from 'dayjs';
 import { convertToRem } from '@invyce/pixels-to-rem';
-import { Color } from '../../../../modal/theme';
+
 import deleteIcon from '@iconify/icons-carbon/delete';
 import dotsGrid from '@iconify-icons/mdi/dots-grid';
 import { getAllAccounts } from '../../../../api/accounts';
@@ -40,7 +40,7 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
   id,
 }) => {
   const [form] = Form.useForm();
-  const { notificationCallback } = useGlobalContext();
+  const { notificationCallback, Colors } = useGlobalContext();
   const [width] = useWindowSize();
   const [transactionsList, setTransactionsList] = useState<ITransactionsList[]>(
     [{ ...defaultState }]
@@ -327,7 +327,7 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
               <Icon
                 style={{
                   fontSize: convertToRem(20),
-                  color: Color.$GRAY,
+                  color: Colors.$GRAY,
                   cursor: 'pointer',
                 }}
                 icon={deleteIcon}
