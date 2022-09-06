@@ -8,20 +8,24 @@ import {
   getAllContacts,
   getInvoiceListAPI,
 } from '../../../api';
-import { ConfirmModal } from '../../../components/ConfirmModal';
-import { PurchaseListTopbar } from '../../../components/PurchasesListTopbar';
+import {
+  ConfirmModal,
+  PurchaseListTopbar,
+  SmartFilter,
+  CommonTable,
+} from '@components';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
 import { useRbac } from '../../../components/Rbac/useRbac';
-import { SmartFilter } from '../../../components/SmartFilter';
-import { CommonTable } from '../../../components/Table';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { IContactTypes, IServerError, NOTIFICATIONTYPE } from '../../../modal';
 import {
   IInvoiceResponse,
   INVOICETYPE,
   ORDER_TYPE,
-} from '../../../modal/invoice';
-import { ISupportedRoutes } from '../../../modal/routing';
+  IContactTypes,
+  IServerError,
+  NOTIFICATIONTYPE,
+  ISupportedRoutes,
+} from '@invyce/shared/types';
 import { useCols } from './commonCol';
 import InvoicesFilterSchema from './InvoicesFilterSchema';
 

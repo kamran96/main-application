@@ -5,8 +5,7 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import styled from 'styled-components';
 
 import { CreatePermissionsAPI, getPermissionModulesAPI } from '../../../api';
-import { CommonModal } from '../../../components';
-import { FormLabel } from '../../../components/FormLabel';
+import { CommonModal, FormLabel } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 
 export const PermissionsEditorWidget: FC = () => {

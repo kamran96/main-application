@@ -12,24 +12,30 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useHistory } from 'react-router-dom';
 
-import { getInvoiceNumber, InvoiceCreateAPI } from '../../../../api';
-import { create_update_contact } from '../../../../api/Contact';
-import { ConfirmModal } from '../../../../components/ConfirmModal';
-import { DatePicker } from '../../../../components/DatePicker';
-import { FormLabel } from '../../../../components/FormLabel';
-import { PrintFormat } from '../../../../components/PrintFormat';
-import { PrintViewPurchaseWidget } from '../../../../components/PurchasesWidget/PrintViewPurchaseWidget';
+import {
+  getInvoiceNumber,
+  InvoiceCreateAPI,
+  create_update_contact,
+} from '../../../../api';
+import {
+  ConfirmModal,
+  DatePicker,
+  FormLabel,
+  PrintFormat,
+  PrintViewPurchaseWidget,
+  Seprator,
+} from '@components';
 import { Rbac } from '../../../../components/Rbac';
 import { PERMISSIONS } from '../../../../components/Rbac/permissions';
-import { Seprator } from '../../../../components/Seprator';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import {
   IErrorMessages,
   IServerError,
   NOTIFICATIONTYPE,
   ISupportedRoutes,
-} from '../../../../modal';
-import { IInvoiceType, ITaxTypes } from '../../../../modal/invoice';
+  IInvoiceType,
+  ITaxTypes,
+} from '@invyce/shared/types';
 import { addition } from '../../../../utils/helperFunctions';
 import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv from '../../../../utils/Print';

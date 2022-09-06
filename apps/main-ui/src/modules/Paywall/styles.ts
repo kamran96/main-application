@@ -1,5 +1,5 @@
 import styled, { createGlobalStyle } from 'styled-components';
-import { CommonModal } from '../../components';
+import { CommonModal } from '@components';
 
 type DivProps = JSX.IntrinsicElements['div'];
 

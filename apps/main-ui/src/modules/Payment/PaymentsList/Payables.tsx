@@ -3,14 +3,16 @@ import React, { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 
-import { paymentDeleteAPI, paymentIndexAPI } from '../../../api/payment';
-import { ButtonTag } from '../../../components/ButtonTags';
-import { ConfirmModal } from '../../../components/ConfirmModal';
-import { PDFICON } from '../../../components/Icons';
+import { paymentDeleteAPI, paymentIndexAPI } from '../../../api';
+import {
+  ButtonTag,
+  ConfirmModal,
+  PDFICON,
+  SmartFilter,
+  CommonTable,
+} from '@components';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
-import { SmartFilter } from '../../../components/SmartFilter';
-import { CommonTable } from '../../../components/Table';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import {
   IPaymentResponse,
@@ -18,7 +20,7 @@ import {
   NOTIFICATIONTYPE,
   ISupportedRoutes,
   TRANSACTION_MODE,
-} from '../../../modal';
+} from '@invyce/shared/types';
 import { PaymentImport } from '../PaymentsImport';
 import { useCols } from './CommonCols';
 import filterSchema from './paymentFilterSchema';
@@ -39,7 +41,7 @@ export const PaymentPaidList: FC = () => {
       pagination: {},
       result: [],
     });
-  
+
   const [selectedRow, setSelectedRow] = useState([]);
   const [filterBar, setFilterbar] = useState(false);
   const [confirmModal, setConfirmModal] = useState(false);
@@ -141,7 +143,7 @@ export const PaymentPaidList: FC = () => {
             return -1;
           }
         });
-        setPaymentResponse(prev =>({...prev,  result: userData}))
+        setPaymentResponse((prev) => ({ ...prev, result: userData }));
       } else {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
@@ -150,17 +152,17 @@ export const PaymentPaidList: FC = () => {
             return -1;
           }
         });
-       
-        setPaymentResponse(prev =>({...prev,  result: userData}))
+
+        setPaymentResponse((prev) => ({ ...prev, result: userData }));
       }
       history.push(
         `/app${ISupportedRoutes.PAYMENTS}?tabIndex=paid&sortid=${
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field
-        }&page=${pagination.current}&page_size=${
-          pagination.pageSize
-        }&filter=${sorter.order}&query=${query}`
+        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+          sorter.order
+        }&query=${query}`
       );
       setConfig({
         ...config,

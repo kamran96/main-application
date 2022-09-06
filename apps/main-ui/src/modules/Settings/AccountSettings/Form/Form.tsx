@@ -11,13 +11,11 @@ import {
   Checkbox,
   Switch,
 } from 'antd';
-import { FormLabel } from '../../../../components/FormLabel';
-import { DivProps, IBaseAPIError, IErrorData } from '../../../../modal';
+import { FormLabel, ConfirmModal, BOLDTEXT, CommonModal } from '@components';
+import { DivProps, IBaseAPIError, IErrorData } from '@invyce/shared/types';
 import convertToRem from '../../../../utils/convertToRem';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { ConfirmModal } from '../../../../components/ConfirmModal';
 import ReactInputVerificationCode from 'react-input-verification-code';
-import { BOLDTEXT } from '../../../../components/Para/BoldText';
 import { useMutation, useQuery } from 'react-query';
 import {
   ChangeAccountPreferencesAPI,
@@ -25,12 +23,11 @@ import {
   generateAuthenticator,
   updateAccountSetting,
   verifyAuthenticatorCode,
+  userCheckAPI,
 } from '../../../../api';
 import dayjs from 'dayjs';
 import { invycePersist } from '@invyce/invyce-persist';
 import { updateToken } from '../../../../utils/http';
-import { CommonModal } from '../../../../components';
-import { userCheckAPI } from '../../../../api/users';
 import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
 
 const defaultState = {

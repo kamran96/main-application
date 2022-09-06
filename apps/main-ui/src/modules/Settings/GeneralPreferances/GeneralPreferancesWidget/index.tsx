@@ -3,8 +3,7 @@ import { Icon } from '@iconify/react';
 import { Button, Col, Input, Row } from 'antd';
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
-import { CommonModal } from '../../../../components';
-import { FormLabel } from '../../../../components/FormLabel';
+import { CommonModal, FormLabel } from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import convertToRem from '../../../../utils/convertToRem';
 

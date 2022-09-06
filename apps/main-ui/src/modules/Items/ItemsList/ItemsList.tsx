@@ -8,31 +8,33 @@ import { plainToClass } from 'class-transformer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import { deleteItems, getAllCategories, getItemsList } from '../../../api';
-import { ButtonTag } from '../../../components/ButtonTags';
-import { ConfirmModal } from '../../../components/ConfirmModal';
-import { Heading } from '../../../components/Heading';
+import {
+  ButtonTag,
+  ConfirmModal,
+  Heading,
+  SmartFilter,
+  CommonTable,
+} from '@components';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
-import { SmartFilter } from '../../../components/SmartFilter';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { ICategory, NOTIFICATIONTYPE } from '../../../modal';
 import {
   IItemsResponse,
   IItemsResult,
   ITemsResult,
   ITEM_TYPE,
-} from '../../../modal/items';
-import { ISupportedRoutes } from '../../../modal/routing';
+  ICategory,
+  NOTIFICATIONTYPE,
+  ISupportedRoutes,
+} from '@invyce/shared/types';
 import moneyFormat from '../../../utils/moneyFormat';
 import { useWindowSize } from '../../../utils/useWindowSize';
-import { CommonTable } from './../../../components/Table';
 import filterSchema from './filterSchema';
 import { PrintColumns, PDFColumns } from './PrintColumns';
 import { ItemsListWrapper } from './styles';
 import packageIcon from '@iconify-icons/feather/package';
 import ItemsImport from '../ItemsImport';
 import { ItemsViewContainer } from './ItemDrawerView';
-
 export const ItemsList: FC = () => {
   /* HOOKS */
   const queryCache = useQueryClient();

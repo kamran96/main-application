@@ -1,7 +1,7 @@
 import { Button } from 'antd';
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { Heading } from '../../components/Heading';
+import { Heading } from '@components';
 import { RbacList } from './RbacList';
 import addLine from '@iconify/icons-ri/add-line';
 import Icon from '@iconify/react';

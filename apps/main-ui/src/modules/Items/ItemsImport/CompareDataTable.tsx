@@ -1,4 +1,4 @@
-import { CommonTable } from '../../../components/Table';
+import { CommonTable } from '@components';
 import { FC, useState } from 'react';
 import { Button, Select } from 'antd';
 import { ColumnsType } from 'antd/lib/table';

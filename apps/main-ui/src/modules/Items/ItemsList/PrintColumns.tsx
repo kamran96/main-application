@@ -1,6 +1,6 @@
 import { ColumnsType } from 'antd/es/table';
 import moneyFormat from '../../../utils/moneyFormat';
-import { ITEM_TYPE } from '../../../modal/items';
+import { ITEM_TYPE } from '@invyce/shared/types';
 
 export const PrintColumns: ColumnsType<any> = [
   {

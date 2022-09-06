@@ -4,35 +4,33 @@ import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
 import { IncomeStatementAPI } from '../../../api';
-import { ButtonTag } from '../../../components/ButtonTags';
-import { Heading } from '../../../components/Heading';
-import { BoldText } from '../../../components/Para/BoldText';
-import { PrintFormat } from '../../../components/PrintFormat';
-import { PrintHeader } from '../../../components/PrintHeader';
-import { SmartFilter } from '../../../components/SmartFilter';
-import { TableCard } from '../../../components/TableCard';
-import { P } from '../../../components/Typography';
+import {
+  ButtonTag,
+  Heading,
+  BoldText,
+  PrintFormat,
+  SmartFilter,
+  PrintHeader,
+  TableCard,
+  P,
+  CommonLoader,
+  PrintHeaderFormat,
+  TableDivisions,
+  Addressbar,
+  TopbarLogoWithDetails,
+  IncomeStatementPdf,
+  PDFICON,
+} from '@components';
+
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { ISupportedRoutes } from '../../../modal';
-import { IAccountsResult } from '../../../modal/accounts';
+import { ISupportedRoutes, IAccountsResult } from '@invyce/shared/types';
 import moneyFormat from '../../../utils/moneyFormat';
 import printDiv from '../../../utils/Print';
 import FilterSchema from './filter';
 import printIcon from '@iconify-icons/bytesize/print';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
-import { CommonLoader } from '../../../components/FallBackLoader';
-import {
-  PrintHeaderFormat,
-  TableDivisions,
-} from '../../../components/PrintHeader';
-import {
-  Addressbar,
-  TopbarLogoWithDetails,
-} from '../../../components/PrintHeader/Formats';
 import DUMMYLOGO from '../../../assets/quickbook.png';
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
-import { IncomeStatementPdf } from '../../../components/PDFs/IncomeStatementPdf';
-import { PDFICON } from '../../../components/Icons';
 // import FilterSchema from "./filterSchema";
 
 interface IBalanceSheetConfig {

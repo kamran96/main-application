@@ -3,12 +3,14 @@ import dayjs from 'dayjs';
 import React, { FC, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
-import { getItemDetail } from '../../../../api';
-import { Card } from '../../../../components/Card';
-import { Seprator } from '../../../../components/Seprator';
+import { getItemDetail, getItemByIDAPI } from '../../../../api';
+import { Card, Seprator } from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { ISupportedRoutes } from '../../../../modal';
-import { IItemViewResponse, IItemViewResult } from '../../../../modal/items';
+import {
+  ISupportedRoutes,
+  IItemViewResult,
+  IItemViewResponse,
+} from '@invyce/shared/types';
 import moneyFormat from '../../../../utils/moneyFormat';
 import { SummaryItem } from './SummaryItem';
 import view from '@iconify-icons/carbon/view';
@@ -19,7 +21,6 @@ import Icon from '@iconify/react';
 import { ItemSalesGraph } from '../ItemsView/ItemSalesGraph';
 import { WrapperItemsView, ItemDrawer } from './SummaryItem/styles';
 import { ItemDetails } from './ItemDetails';
-import { getItemByIDAPI } from '../../../../api/Items';
 
 interface Iprops {
   showItemDetails: any;

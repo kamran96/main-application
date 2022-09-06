@@ -3,12 +3,11 @@ import React, { FC, lazy, Suspense, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { FallBackLoader } from '../../../components/FallBackLoader';
+import { FallBackLoader, TableTabs, TableTabsContent } from '@components';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
-import { TableTabs, TableTabsContent } from '../../../components/TableTabs';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { ISupportedRoutes } from '../../../modal';
+import { ISupportedRoutes } from '@invyce/shared/types';
 import { useCols } from './commonCol';
 import OverDueInvoices from './Overdue';
 
@@ -22,7 +21,7 @@ export const InvoiceList: FC = () => {
   const { routeHistory } = useGlobalContext();
   const [activeTab, setActiveTab] = useState('');
   const { search } = routeHistory.history.location;
-  const {InvoiceColumns} = useCols();
+  const { InvoiceColumns } = useCols();
   useEffect(() => {
     if (!activeTab) {
       setActiveTab('all');

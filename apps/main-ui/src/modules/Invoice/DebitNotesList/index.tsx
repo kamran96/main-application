@@ -11,10 +11,8 @@ import {
   TableTabsContent,
 } from '@components';
 
-// import { FallBackLoader } from '../../../components/FallBackLoader';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
-// import { TableTabs, TableTabsContent } from '../../../components/TableTabs';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { ISupportedRoutes } from '@invyce/shared/types';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';

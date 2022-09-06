@@ -4,14 +4,10 @@ import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
 import React, { FC, useEffect, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
-import { duplicateItemsAPI } from '../../../../api';
-import { getOrganizations } from '../../../../api/organizations';
-import { CommonModal } from '../../../../components';
-import { ButtonTag } from '../../../../components/ButtonTags';
-import { FormLabel } from '../../../../components/FormLabel';
-import { BoldText } from '../../../../components/Para/BoldText';
+import { duplicateItemsAPI, getOrganizations } from '../../../../api';
+import { CommonModal, ButtonTag, FormLabel, BoldText } from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { IOrganizations } from '../../../../modal/organization';
+import { IOrganizations } from '@invyce/shared/types';
 
 const { Option } = Select;
 

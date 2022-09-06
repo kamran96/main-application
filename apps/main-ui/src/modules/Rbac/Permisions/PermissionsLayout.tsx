@@ -8,15 +8,13 @@ import {
   getPermissionModulesAPI,
   getRbacListAPI,
   permissionsShowAPI,
-} from '../../../api/rbac';
-import { CommonLoader } from '../../../components/FallBackLoader';
-import { BoldText } from '../../../components/Para/BoldText';
-import { P } from '../../../components/Para/P';
+} from '../../../api';
+import { CommonLoader, BoldText, P } from '@components';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
 import { useRbac } from '../../../components/Rbac/useRbac';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
-import { ISupportedRoutes } from '../../../modal';
+import { ISupportedRoutes } from '@invyce/shared/types';
 
 export const PermissionsLayout: FC = () => {
   const queryCache = useQueryClient();

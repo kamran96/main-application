@@ -6,10 +6,9 @@ import { useQueryClient, useMutation } from 'react-query';
 import styled from 'styled-components';
 
 import { deleteInvoicesAPI } from '../../../api';
-import { ConfirmModal } from '../../../components/ConfirmModal';
-import { MoreActions, TableActions } from '../../../components/TableActions';
+import { ConfirmModal, MoreActions, TableActions } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { NOTIFICATIONTYPE } from '../../../modal';
+import { NOTIFICATIONTYPE } from '@invyce/shared/types';
 import convertToRem from '../../../utils/convertToRem';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 

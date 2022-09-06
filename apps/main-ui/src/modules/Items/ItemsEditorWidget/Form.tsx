@@ -19,18 +19,21 @@ import {
   createUpdateItem,
   fetchSingleItem,
   getAllCategories,
+  getAllAccounts,
+  validateItemCodeAPI,
 } from '../../../api';
-import { getAllAccounts } from '../../../api/accounts';
 import { FormLabel } from '../../../components/FormLabel';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { NOTIFICATIONTYPE } from '../../../modal';
-import { IAccountsResult } from '../../../modal/accounts';
-import { IServerError } from '../../../modal/base';
-import { ICategory, IVariants } from '../../../modal/categories';
-import { ITEM_TYPE } from '../../../modal/items';
+import {
+  NOTIFICATIONTYPE,
+  IAccountsResult,
+  IServerError,
+  IVariants,
+  ICategory,
+  ITEM_TYPE,
+} from '@invyce/shared/types';
 import convertToRem from '../../../utils/convertToRem';
 import { DynamicForm } from './DynamicForm';
-import { validateItemCodeAPI } from '../../../api/Items';
 
 const { Option } = Select;
 

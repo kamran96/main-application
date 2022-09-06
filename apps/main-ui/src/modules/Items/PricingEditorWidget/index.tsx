@@ -3,10 +3,9 @@ import React, { FC, useEffect } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 import { createPricingAPI, getPriceByIDAPI } from '../../../api';
-import { CommonModal } from '../../../components';
-import { FormLabel } from '../../../components/FormLabel';
+import { CommonModal, FormLabel } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { NOTIFICATIONTYPE } from '../../../modal';
+import { NOTIFICATIONTYPE } from '@invyce/shared/types';
 
 const { Option } = Select;
 
@@ -39,8 +38,6 @@ const PricingEditorWidget: FC = () => {
       form.setFieldsValue({ ...result, salePrice, purchasePrice });
     }
   }, [data, form]);
-
-
 
   const onSubmit = async (values) => {
     let payload = {
@@ -80,7 +77,8 @@ const PricingEditorWidget: FC = () => {
         onSuccess: () => {
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
-            `Price is ${obj.action === 'UPDATE' ? 'Updated' : 'Created'
+            `Price is ${
+              obj.action === 'UPDATE' ? 'Updated' : 'Created'
             } sucessfully`
           );
           form.resetFields();
@@ -94,8 +92,6 @@ const PricingEditorWidget: FC = () => {
       console.log(error);
     }
   };
-
-
 
   return (
     <CommonModal

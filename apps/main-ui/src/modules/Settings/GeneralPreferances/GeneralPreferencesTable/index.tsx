@@ -1,6 +1,6 @@
 import React, { FC, useMemo } from 'react';
 import styled from 'styled-components';
-import { CommonTable } from '../../../../components/Table';
+import { CommonTable } from '@components';
 
 export const GeneralPreferencesTable: FC = () => {
   const columns = useMemo(

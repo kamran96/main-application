@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { CommonModal } from '../../../components';
+import { CommonModal } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { useQuery } from 'react-query';
 import { WrapperModalContent } from './style';

@@ -1,7 +1,7 @@
 import { Col, Row } from 'antd';
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { Heading } from '../../../components/Heading';
+import { Heading } from '@components';
 import { PermissionsLayout } from './PermissionsLayout';
 
 export const PermissionsContainer: FC = () => {

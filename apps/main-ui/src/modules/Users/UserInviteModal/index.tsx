@@ -9,20 +9,20 @@ import {
   InvalidateQueryFilters,
 } from 'react-query';
 import styled from 'styled-components';
-import { getRbacListAPI } from '../../../api';
-import { CommonModal } from '../../../components';
+import { CommonModal } from '@components';
 import { Button, Form, Input, Select, Space } from 'antd';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import {
   IBaseAPIError,
   IErrorMessages,
   NOTIFICATIONTYPE,
-} from '../../../modal';
+} from '@invyce/shared/types';
 import {
   getALLBranches,
   inviteUserAPI,
   userCheckAPI,
-} from './../../../api/users';
+  getRbacListAPI,
+} from './../../../api';
 import { IThemeProps } from '@invyce/shared/invyce-theme';
 
 const { Option } = Select;

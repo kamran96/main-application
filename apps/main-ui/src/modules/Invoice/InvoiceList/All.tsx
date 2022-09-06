@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { ButtonTag } from '../../../components/ButtonTags';
 import { FC, useEffect, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import {
@@ -7,19 +6,22 @@ import {
   getAllContacts,
   getInvoiceListAPI,
 } from '../../../api';
-import { PurchaseListTopbar } from '@components';
-import { useRbac } from '../../../components/Rbac/useRbac';
-import { SmartFilter } from '../../../components/SmartFilter';
-import { CommonTable } from '../../../components/Table';
-import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { IContactTypes } from '../../../modal';
 import {
+  PurchaseListTopbar,
+  ButtonTag,
+  SmartFilter,
+  CommonTable,
+} from '@components';
+import { useRbac } from '../../../components/Rbac/useRbac';
+import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import {
+  IContactTypes,
   IInvoiceResponse,
   IInvoiceStatus,
   INVOICETYPE,
   ORDER_TYPE,
-} from '../../../modal/invoice';
-import { ISupportedRoutes } from '../../../modal/routing';
+  ISupportedRoutes,
+} from '@invyce/shared/types';
 import { useCols } from './commonCol';
 import InvoicesFilterSchema from './InvoicesFilterSchema';
 

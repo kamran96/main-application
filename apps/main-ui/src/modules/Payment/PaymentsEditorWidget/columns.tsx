@@ -7,7 +7,7 @@ import Icon from '@iconify/react';
 import convertToRem from '../../../utils/convertToRem';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import { ColumnsType } from 'antd/lib/table';
-import { IInvoiceResult } from '../../../modal/invoice';
+import { IInvoiceResult } from '@invyce/shared/types';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 const { Option } = Select;

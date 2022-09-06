@@ -1,4 +1,4 @@
-import { IRoutingSchema, ISupportedRoutes } from '../modal';
+import { IRoutingSchema, ISupportedRoutes } from '@invyce/shared/types';
 import { PERMISSIONS } from '../components/Rbac/permissions';
 import {
   BussinesIcon,

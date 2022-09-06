@@ -1,11 +1,10 @@
 import React, { FC } from 'react';
-import { ButtonTag } from '../../../components/ButtonTags';
+import { ButtonTag } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 
 const ItemsImport = () => {
   const { setItemsImportconfig, itemsImportconfig } = useGlobalContext();
 
-  
   return (
     <ButtonTag
       onClick={() => {

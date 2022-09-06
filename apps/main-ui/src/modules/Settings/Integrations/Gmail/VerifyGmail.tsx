@@ -2,7 +2,7 @@ import { Card } from 'antd';
 import React from 'react';
 import styled from 'styled-components';
 import GmailLogo from '../../../../assets/gmail.png';
-import { Loader } from '../../../../components/Loader';
+import { Loader } from '@components';
 import { VerifiedIcon } from '../../../../assets/icons';
 import { useMutation } from 'react-query';
 import { GmailVerificationAPI } from '../../../../api';

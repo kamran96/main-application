@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ColumnsType } from 'antd/es/table';
-import { ISupportedRoutes, TRANSACTION_MODE } from '../../../modal';
+import { ISupportedRoutes, TRANSACTION_MODE } from '@invyce/shared/types';
 import dayjs from 'dayjs';
 import moneyFormat from '../../../utils/moneyFormat';
 import { useQuery } from 'react-query';
