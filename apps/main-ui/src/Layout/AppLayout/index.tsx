@@ -16,7 +16,7 @@ import { RoutingSchema } from '../../Schema/routingSchema';
 import { InvyceCmdPalette } from './CommandPalette';
 import { ContentArea, NewUserContentArea, WrapperApplayout } from './styles';
 import { ErrorBoundary } from '@invyce/error-boundry';
-import { Inconvinience } from '../../components/ErrorBoundries/Inconvinience';
+import { Inconvinience } from '@components';
 
 interface IProps {
   children: ReactNode;

@@ -1,10 +1,8 @@
 import styled from 'styled-components';
 import { FC, useState, useEffect } from 'react';
-import { CommonModal } from '../../../components';
 import { ColumnsType } from 'antd/lib/table';
 import { G } from '@react-pdf/renderer';
-import { EditableSelect } from '../../../components/Editable';
-import { Option } from '@components';
+import { Option, CommonModal, EditableSelect } from '@components';
 import { EditableTable } from '@invyce/editable-table';
 import { Heading } from '@invyce/shared/components';
 import Paragraph from 'antd/lib/typography/Paragraph';

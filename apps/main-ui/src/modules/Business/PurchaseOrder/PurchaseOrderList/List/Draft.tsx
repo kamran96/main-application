@@ -3,27 +3,28 @@ import { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 
-import { purchaseOrderDeleteAPI, getAllContacts } from '../../../../../api';
-import { purchaseOrderList } from '../../../../../api/purchaseOrder';
-import { ConfirmModal } from '../../../../../components/ConfirmModal';
+import {
+  purchaseOrderDeleteAPI,
+  getAllContacts,
+  purchaseOrderList,
+} from '../../../../../api';
+import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
+import { ConfirmModal, SmartFilter, CommonTable } from '@components';
+
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
-import { SmartFilter } from '../../../../../components/SmartFilter';
-import { CommonTable } from '../../../../../components/Table';
-import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
+
 import {
   IContactType,
   IContactTypes,
   IErrorMessages,
   IServerError,
   NOTIFICATIONTYPE,
-} from '../../../../../modal';
-import {
   IInvoiceResponse,
   INVOICETYPE,
   ORDER_TYPE,
-} from '../../../../../modal/invoice';
-import { ISupportedRoutes } from '../../../../../modal/routing';
+  ISupportedRoutes,
+} from '@invyce/shared/types';
 import { useCols } from './CommonCol';
 import FilterSchema from './PoFilterSchema';
 import { PurchaseOrderImport } from '../PurchaseOrderImport';
@@ -172,10 +173,13 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
             ? `-${sorter.field}`
             : sorter.field,
       });
-      const route = `/app${ISupportedRoutes.PURCHASE_ORDER
-        }?tabIndex=draft&sortid=${sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
-        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order
-        }&query=${query}`;
+      const route = `/app${
+        ISupportedRoutes.PURCHASE_ORDER
+      }?tabIndex=draft&sortid=${
+        sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+        sorter.order
+      }&query=${query}`;
       history.push(route);
     }
   };
@@ -238,7 +242,9 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
     dataIndex: 'owner',
     key: 'owner',
     sorter: false,
-    render: (data) => <span className="capitalize">{data?.profile?.fullName}</span>,
+    render: (data) => (
+      <span className="capitalize">{data?.profile?.fullName}</span>
+    ),
   });
 
   const renerTopRightbar = () => {

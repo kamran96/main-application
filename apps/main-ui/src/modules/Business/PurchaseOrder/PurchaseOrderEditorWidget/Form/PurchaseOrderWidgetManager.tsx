@@ -8,8 +8,8 @@ import React, {
 } from 'react';
 import { ColumnsType } from 'antd/lib/table';
 import { Form, Select } from 'antd';
-import { Editable, EditableSelect } from '../../../../../components/Editable';
 import { useQuery } from 'react-query';
+import { Editable, EditableSelect } from '@components';
 import {
   getAllItems,
   getInvoiceNumber,
@@ -17,7 +17,7 @@ import {
 } from '../../../../../api';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import convertToRem from '../../../../../utils/convertToRem';
-import { IInvoiceMutatedResult, IInvoiceTypes } from '../../../../../modal';
+import { IInvoiceMutatedResult, IInvoiceTypes } from '@invyce/shared/types';
 import { SortableHandle } from 'react-sortable-hoc';
 import { Icon } from '@iconify/react';
 import dotsGrid from '@iconify-icons/mdi/dots-grid';

@@ -10,21 +10,21 @@ import {
   getAllAccountsAPI,
   getSecondaryAccounts,
 } from '../../../api/accounts';
-import { ButtonTag } from '../../../components/ButtonTags';
-import { ConfirmModal } from '../../../components/ConfirmModal';
+import { ButtonTag, ConfirmModal, SmartFilter } from '@components';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
-import { SmartFilter } from '../../../components/SmartFilter';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { IAccounts } from '../../../modal/accounts';
-import { ISupportedRoutes } from '../../../modal/routing';
+import {
+  IAccounts,
+  ISupportedRoutes,
+  IErrorResponse,
+} from '@invyce/shared/types';
 import moneyFormat from '../../../utils/moneyFormat';
 import { useWindowSize } from '../../../utils/useWindowSize';
 import { CommonTable } from './../../../components/Table';
 import AccountsFilterringSchema from './AccountsFilteringSchema';
 import { pdfColsAccounts, _csvColumnsAccount } from './exportableCols';
 import { AccountsWrapper, ListWrapper } from './styles';
-import { IErrorResponse } from '@invyce/shared/types';
 import { AccountsImport } from '../AccountsImport';
 
 interface IProps {

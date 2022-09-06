@@ -6,8 +6,6 @@ import { Button } from 'antd';
 import React, { FC, ReactElement } from 'react';
 import styled from 'styled-components';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
-import { PDFICON } from '../../../../../components/Icons';
-import { ButtonTag } from '../../../../../components/ButtonTags';
 import { IThemeProps } from '../../../../../hooks/useTheme/themeColors';
 
 interface IProps {

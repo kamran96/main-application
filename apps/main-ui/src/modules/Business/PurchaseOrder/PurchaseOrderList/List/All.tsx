@@ -4,29 +4,29 @@ import React, { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 import { purchaseOrderDeleteAPI, getAllContacts } from '../../../../../api';
-import { CommonTable } from '../../../../../components/Table';
 import {
   IInvoiceResponse,
   INVOICETYPE,
   ORDER_TYPE,
 } from '../../../../../modal/invoice';
-import convertToRem from '../../../../../utils/convertToRem';
-import { SmartFilter } from '../../../../../components/SmartFilter';
-import { ISupportedRoutes } from '../../../../../modal/routing';
-import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
-import FilterSchema from './PoFilterSchema';
-import { ConfirmModal } from '../../../../../components/ConfirmModal';
 import {
   IBaseAPIError,
   IContactType,
   IContactTypes,
   NOTIFICATIONTYPE,
-} from '../../../../../modal';
+  ISupportedRoutes,
+} from '@invyce/shared/types';
+
+import { CommonTable, ConfirmModal, SmartFilter } from '@components';
+
+import convertToRem from '../../../../../utils/convertToRem';
+import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
+import { useRbac } from '../../../../../components/Rbac/useRbac';
+import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
+import FilterSchema from './PoFilterSchema';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
 import { purchaseOrderList } from '../../../../../api/purchaseOrder';
 import { useCols } from './CommonCol';
-import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
-import { useRbac } from '../../../../../components/Rbac/useRbac';
 import { PurchaseOrderImport } from '../PurchaseOrderImport';
 
 interface IProps {

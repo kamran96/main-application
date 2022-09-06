@@ -4,12 +4,12 @@ import { FC } from 'react';
 import styled from 'styled-components';
 import InvyceLog from '../../assets/invyceLogo.png';
 import LoginIllustration from '../../assets/forgot.png';
-import { HeadingTemplate1 } from '../../components/HeadingTemplates';
+import { HeadingTemplate1 } from '@components';
 import convertToRem from '../../utils/convertToRem';
 import { useMutation } from 'react-query';
 import { requestResetPasswordAPI } from '../../api';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
-import { NOTIFICATIONTYPE } from '../../modal';
+import { NOTIFICATIONTYPE } from '@invyce/shared/types';
 
 export const EmailForm: FC = () => {
   const {
@@ -66,7 +66,10 @@ export const EmailForm: FC = () => {
                   label="Email / Username"
                   name="username"
                   rules={[
-                    { required: true, message: 'Please enter your email/username' },
+                    {
+                      required: true,
+                      message: 'Please enter your email/username',
+                    },
                     // { type: 'email' },
                   ]}
                   hasFeedback

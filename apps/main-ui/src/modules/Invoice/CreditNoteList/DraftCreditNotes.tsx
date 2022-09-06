@@ -10,7 +10,13 @@ import {
   getAllContacts,
   getCreditNotes,
 } from '../../../api';
-import { CommonTable } from '../../../components/Table';
+import {
+  CommonTable,
+  ButtonTag,
+  SmartFilter,
+  PDFICON,
+  ConfirmModal,
+} from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import {
   IInvoiceType,
@@ -18,18 +24,13 @@ import {
   ISupportedRoutes,
   NOTIFICATIONTYPE,
   IServerError,
-} from '../../../modal';
-import { IInvoiceResponse } from '../../../modal/invoice';
-import { ButtonTag } from '../../../components/ButtonTags';
+  IInvoiceResponse,
+} from '@invyce/shared/types';
 import editSolid from '@iconify-icons/clarity/edit-solid';
-import { SmartFilter } from '../../../components/SmartFilter';
-import { PDFICON } from '../../../components/Icons';
 import FilteringSchema from './FilteringSchema';
 import { useCols } from './commonCols';
-
 import { useHistory } from 'react-router-dom';
 import deleteIcon from '@iconify/icons-carbon/delete';
-import { ConfirmModal } from '../../../components/ConfirmModal';
 import { ImportCreditNote } from './ImportCreditNote';
 
 export const DraftCreditNotes: FC = () => {

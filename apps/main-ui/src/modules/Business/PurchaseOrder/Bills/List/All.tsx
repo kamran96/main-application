@@ -1,16 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* THIS PAGE BELONGS TO ALL PURCHASES ORDERS TAB */
-import { ButtonTag } from '../../../../../components/ButtonTags';
+import { ButtonTag, ConfirmModal, SmartFilter, CommonTable } from '@components';
 import { FC, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import styled from 'styled-components';
-
-import { getAllContacts, getPoListAPI } from '../../../../../api';
-import { ConfirmModal } from '../../../../../components/ConfirmModal';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
-import { SmartFilter } from '../../../../../components/SmartFilter';
-import { CommonTable } from '../../../../../components/Table';
+import { getAllContacts, getPoListAPI } from '../../../../../api';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import {
   IBaseAPIError,
@@ -21,7 +17,7 @@ import {
   ISupportedRoutes,
   NOTIFICATIONTYPE,
   ORDER_TYPE,
-} from '../../../../../modal';
+} from '@invyce/shared/types';
 import convertToRem from '../../../../../utils/convertToRem';
 import { useCols } from './CommonCol';
 import FilterSchema from './PoFilterSchema';

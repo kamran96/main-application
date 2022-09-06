@@ -18,7 +18,7 @@ import {
   IErrorMessages,
   IServerError,
   NOTIFICATIONTYPE,
-} from '../../modal';
+} from '@invyce/shared/types';
 import { IAuth, IUser } from '../../modal/auth';
 import { IRolePermissions } from '../../modal/rbac';
 import { DecriptionData, EncriptData } from '../../utils/encription';

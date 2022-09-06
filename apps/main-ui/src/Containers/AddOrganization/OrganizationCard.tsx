@@ -1,14 +1,12 @@
 import React, { FC } from 'react';
 import { Dropdown, Menu } from 'antd';
 import styled from 'styled-components';
-import { ThreeDotsIcon } from '../../components/Icons';
-import { ButtonTag } from '../../components/ButtonTags';
+import { ButtonTag, H4, ThreeDotsIcon } from '@components';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import noImage from '@iconify/icons-carbon/no-image';
 import editSolid from '@iconify/icons-clarity/edit-solid';
 import checkMark from '@iconify/icons-carbon/checkmark-outline';
 import Icon from '@iconify/react';
-import { H4 } from '../../../src/components/Typography';
 import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
 interface IProps {
@@ -96,7 +94,8 @@ const CardWrapper = styled.div`
   min-width: 290px;
   height: 260px;
   background: ${(props: IThemeProps) => props.theme.colors.cardBg};
-  border: 1px solid ${(props: IThemeProps) => props.theme.colors.organizationCard};
+  border: 1px solid
+    ${(props: IThemeProps) => props.theme.colors.organizationCard};
   border-radius: 8px;
   margin: 12px;
   padding: 6px 16px;

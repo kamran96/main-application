@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import { topSuggestInvoicesAPI } from '../../../api';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
-import { ITopSuggestedInvoices } from '../../../modal/invoice';
+import { ITopSuggestedInvoices } from '@invyce/shared/types';
 
 export const AllInvoices: FC = () => {
   const [{ result }, setTopSuggestedInvoices] = useState<ITopSuggestedInvoices>(

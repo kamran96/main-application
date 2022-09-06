@@ -2,13 +2,14 @@ import { Breadcrumb } from 'antd';
 import React, { FC, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-
-import { BreadCrumbArea } from '../../../../components/BreadCrumbArea';
-import { Heading } from '../../../../components/Heading';
-import { PurchasesWidget } from '../../../../components/PurchasesWidget';
-import { TableCard } from '../../../../components/TableCard';
+import {
+  BreadCrumbArea,
+  Heading,
+  PurchasesWidget,
+  TableCard,
+} from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { ISupportedRoutes } from '../../../../modal/routing';
+import { ISupportedRoutes } from '@invyce/shared/types';
 
 interface IProps {}
 

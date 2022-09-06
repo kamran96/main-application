@@ -2,16 +2,15 @@ import React, { FC, useEffect, useState } from 'react';
 import { Button, Col, Form, Input, Modal, Row, Select } from 'antd';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import styled from 'styled-components';
-import { FormLabel } from '../../../../components/FormLabel';
+import { FormLabel } from '@components';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { getBanks } from '../../../../api/accounts';
-import { ACCOUNT_TYPES } from '../../../../modal/accounts';
-import { createBankAPI } from '../../../../api/banks';
+import { getBanks, createBankAPI } from '../../../../api';
 import {
   IErrorMessages,
   IErrorResponse,
   NOTIFICATIONTYPE,
-} from '../../../../modal';
+  ACCOUNT_TYPES,
+} from '@invyce/shared/types';
 import { number } from 'echarts';
 import { type } from 'os';
 
@@ -101,8 +100,9 @@ export const AddBankWidget: FC = () => {
               <Form.Item
                 name="accountNumber"
                 rules={[
-                  { required: true, 
-                    message: 'Please add Account Number' ,
+                  {
+                    required: true,
+                    message: 'Please add Account Number',
                     type: 'number',
                   },
                   {

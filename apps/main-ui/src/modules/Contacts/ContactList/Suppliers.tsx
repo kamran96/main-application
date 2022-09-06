@@ -6,15 +6,20 @@ import React, { FC, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
 import { deleteContacts, getContacts } from '../../../api/Contact';
-import { ButtonTag } from '../../../components/ButtonTags';
-import { ConfirmModal } from '../../../components/ConfirmModal';
-import { PDFICON } from '../../../components/Icons';
-import { SmartFilter } from '../../../components/SmartFilter';
+import {
+  ButtonTag,
+  ConfirmModal,
+  SmartFilter,
+  CommonTable,
+  PDFICON,
+} from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { IContactTypes, NOTIFICATIONTYPE } from '../../../modal';
+import {
+  IContactTypes,
+  NOTIFICATIONTYPE,
+  ISupportedRoutes,
+} from '@invyce/shared/types';
 import { IPagination, IServerError } from '../../../modal/base';
-import { ISupportedRoutes } from '../../../modal/routing';
-import { CommonTable } from './../../../components/Table';
 import FilterSchema from './FilterSchema';
 import { ContactListWrapper, ContactMainWrapper } from './styles';
 import printIcon from '@iconify-icons/bytesize/print';
@@ -72,21 +77,20 @@ export const Suppliers: FC = () => {
 
       const filterType = history.location.search.split('&');
       const filterIdType = filterType[1];
-      const filterOrder = filterType[4]?.split("=")[1];
-      
-      if(filterIdType?.includes("-")){
-         const fieldName = filterIdType?.split("=")[1].split("-")[1];
-         setsortedInfo({
-           order: filterOrder,
-           columnKey: fieldName
-         });
-      }
-      else{
-        const fieldName = filterIdType?.split("=")[1];
+      const filterOrder = filterType[4]?.split('=')[1];
+
+      if (filterIdType?.includes('-')) {
+        const fieldName = filterIdType?.split('=')[1].split('-')[1];
         setsortedInfo({
           order: filterOrder,
-          columnKey: fieldName
-        })
+          columnKey: fieldName,
+        });
+      } else {
+        const fieldName = filterIdType?.split('=')[1];
+        setsortedInfo({
+          order: filterOrder,
+          columnKey: fieldName,
+        });
       }
     }
   }, [routeHistory]);
@@ -121,7 +125,7 @@ export const Suppliers: FC = () => {
             return -1;
           }
         });
-        setContactResponse(userData)
+        setContactResponse(userData);
       }
       setConfig({
         ...config,
@@ -139,9 +143,9 @@ export const Suppliers: FC = () => {
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field
-        }&page=${pagination.current}&page_size=${
-          pagination.pageSize
-        }&filter=${sorter.order}&query=${query}`
+        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+          sorter.order
+        }&query=${query}`
       );
     }
   };
@@ -200,7 +204,7 @@ export const Suppliers: FC = () => {
       dataIndex: 'email',
       key: 'email',
       sorter: true,
-      sortOrder: sortedInfo?.columnKey === 'email' && sortedInfo?.order
+      sortOrder: sortedInfo?.columnKey === 'email' && sortedInfo?.order,
     },
     {
       title: 'Company Name',

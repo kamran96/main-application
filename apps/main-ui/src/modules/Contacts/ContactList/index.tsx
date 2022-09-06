@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 
 import { Heading } from '../../../components/Heading';
 import { TableTabs, TableTabsContent } from '../../../components/TableTabs';
+
 import { ISupportedRoutes } from '../../../modal';
 import { ContactMainWrapper } from './styles';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
@@ -49,7 +50,7 @@ export const ContactList: FC = () => {
           <Link
             to={{
               pathname: `/app${ISupportedRoutes.CREATE_CONTACT}`,
-              state:  activeTab,
+              state: activeTab,
             }}
           >
             Add Contact

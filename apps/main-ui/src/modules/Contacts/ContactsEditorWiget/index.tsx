@@ -2,11 +2,9 @@ import { Breadcrumb, Col, Row } from 'antd';
 import React, { FC } from 'react';
 import { Link } from 'react-router-dom';
 
-import { BreadCrumbArea } from '../../../components/BreadCrumbArea';
-import { Heading } from '../../../components/Heading';
-import { TableCard } from '../../../components/TableCard';
+import { BreadCrumbArea, Heading, TableCard } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { ISupportedRoutes } from '../../../modal/routing';
+import { ISupportedRoutes } from '@invyce/shared/types';
 import { ContactsForm } from './ContactsForm';
 import { WrapperContactsEditor } from './styles';
 
@@ -20,7 +18,9 @@ export const ContactsEditorWidget: FC = () => {
 
   return (
     <WrapperContactsEditor>
-      <Heading type="form">{id ? 'Update Contact' : 'Create New Contact'}</Heading>
+      <Heading type="form">
+        {id ? 'Update Contact' : 'Create New Contact'}
+      </Heading>
       <BreadCrumbArea>
         <Breadcrumb>
           <Breadcrumb.Item>

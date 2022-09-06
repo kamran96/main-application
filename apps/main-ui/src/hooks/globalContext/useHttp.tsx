@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { IBaseAPIError } from '../../modal';
+import { IBaseAPIError } from '@invyce/shared/types';
 import http from '../../utils/http';
 
 interface IAPIOptions {

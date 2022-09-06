@@ -1,12 +1,11 @@
 import { ITableExportFields } from 'ant-table-extensions';
 import { ColumnsType } from 'antd/es/table';
-import { Capitalize } from '../../../../../components/Typography';
+import { Capitalize } from '@components';
 import { plainToClass } from 'class-transformer';
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { ISupportedRoutes } from '../../../../../modal';
-import { InvoiceResultClass } from '../../../../../modal/invoice';
+import { ISupportedRoutes, InvoiceResultClass } from '@invyce/shared/types';
 import moneyFormat from '../../../../../utils/moneyFormat';
 
 export const useCols = () => {

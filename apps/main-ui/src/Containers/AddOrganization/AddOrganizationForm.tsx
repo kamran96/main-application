@@ -5,19 +5,20 @@ import { FC, useEffect } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 import en from 'world_countries_lists/data/en/world.json';
-
 import {
   addOrganizationAPI,
   getOrganizationByIdAPI,
 } from '../../api/organizations';
-import { CommonModal } from '../../components';
-import { DatePicker } from '../../components/DatePicker';
-import { BOLDTEXT } from '../../components/Para/BoldText';
-import { Seprator } from '../../components/Seprator';
-import { UploadAtachment } from '../../components/UploadAtachment';
+import {
+  CommonModal,
+  DatePicker,
+  BOLDTEXT,
+  Seprator,
+  UploadAtachment,
+} from '@components';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { ILoginActions } from '../../hooks/globalContext/globalManager';
-import { NOTIFICATIONTYPE } from '../../modal';
+import { NOTIFICATIONTYPE } from '@invyce/shared/types';
 import { IBaseAPIError, IServerError } from '../../modal/base';
 import { updateToken } from '../../utils/http';
 import phoneCodes from '../../utils/phoneCodes';
@@ -91,7 +92,6 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
         ['all-organizations', `organization`]?.forEach((key) => {
           (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
         });
-
 
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Created');
         handleClose();

@@ -1,10 +1,8 @@
 import React, { FC } from 'react';
-import { Heading } from '../../../components/Heading';
-import { TableCard } from '../../../components/TableCard';
+import { Heading, TableCard, BreadCrumbArea } from '@components';
 import { Breadcrumb } from 'antd';
 import { Link } from 'react-router-dom';
-import { ISupportedRoutes } from '../../../modal/routing';
-import { BreadCrumbArea } from '../../../components/BreadCrumbArea';
+import { ISupportedRoutes } from '@invyce/shared/types';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { CreditNoteEditor } from './Editor';
 
@@ -15,7 +13,7 @@ export const CreditNoteEditorWidget: FC = () => {
 
   return (
     <>
-      <Heading type='form'>Credit Note</Heading>
+      <Heading type="form">Credit Note</Heading>
       <BreadCrumbArea>
         <Breadcrumb>
           <Breadcrumb.Item>

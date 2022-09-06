@@ -7,20 +7,23 @@ import {
   getAllContacts,
   getInvoiceListAPI,
 } from '../../../../api';
-import { ConfirmModal } from '../../../../components/ConfirmModal';
-import { PurchaseListTopbar } from '../../../../components/PurchasesListTopbar';
-import { PERMISSIONS } from '../../../../components/Rbac/permissions';
-import { useRbac } from '../../../../components/Rbac/useRbac';
-import { SmartFilter } from '../../../../components/SmartFilter';
-import { CommonTable } from '../../../../components/Table';
+import {
+  ConfirmModal,
+  PurchaseListTopbar,
+  SmartFilter,
+  CommonTable,
+} from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import {
   IErrorMessages,
   IServerError,
   NOTIFICATIONTYPE,
-} from '../../../../modal';
-import { IInvoiceResponse, ORDER_TYPE } from '../../../../modal/invoice';
-import { ISupportedRoutes } from '../../../../modal/routing';
+  IInvoiceResponse,
+  ORDER_TYPE,
+  ISupportedRoutes,
+} from '@invyce/shared/types';
+import { PERMISSIONS } from '../../../../components/Rbac/permissions';
+import { useRbac } from '../../../../components/Rbac/useRbac';
 import { PDFQuotesCols } from './commonCol';
 import { QuoteImport } from '../QuoteImport';
 import QuotesFilters from './QuotesFilters';

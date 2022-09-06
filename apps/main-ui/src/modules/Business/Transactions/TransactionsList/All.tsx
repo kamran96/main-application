@@ -4,25 +4,28 @@ import dayjs from 'dayjs';
 import { FC, useEffect, useState, lazy, Suspense } from 'react';
 import { useQuery } from 'react-query';
 import { getAllTransactionsAPI } from '../../../../api';
-import { SmartFilter } from '../../../../components/SmartFilter';
-import { CommonTable } from '../../../../components/Table';
+import {
+  SmartFilter,
+  CommonTable,
+  TransactionApprovePdf,
+  PDFICON,
+  TransactionItem,
+} from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import {
   IResponseTransactions,
   TransactionsStatus,
-} from '../../../../modal/transaction';
-import { IAccountsResult } from '../../../../modal/accounts';
-import { ISupportedRoutes } from '../../../../modal/routing';
+  IAccountsResult,
+  ISupportedRoutes,
+} from '@invyce/shared/types';
 import moneyFormat from '../../../../utils/moneyFormat';
 import { WrapperTransactionCustomBar, WrapperTransactionsList } from './styles';
 import { TransactionItemTable } from './TransactionItemsTable';
 import transactionsFilterSchema from './transactionsFilterSchema';
 import { PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
-import { TransactionApprovePdf } from '../../../../components/PDFs/TransactionApprovePdf';
-import { PDFICON } from '../../../../components/Icons';
 import DUMMYLOGO from '../../../../assets/quickbook.png';
 import styled from 'styled-components';
-import { TransactionItem } from '../../../../components/PDFs/TransactionSingleItemPdf';
+
 import { TransactionImport } from '../importTransactions';
 
 const APPROVETransactionList: FC = () => {

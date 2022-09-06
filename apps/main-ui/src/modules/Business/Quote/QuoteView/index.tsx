@@ -1,11 +1,9 @@
 import { Breadcrumb } from 'antd';
 import React from 'react';
-import { BreadCrumbArea } from '../../../../components/BreadCrumbArea';
-import { TableCard } from '../../../../components/TableCard';
+import { BreadCrumbArea, PurchasesView, TableCard } from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { Link } from 'react-router-dom';
-import { IInvoiceType, ISupportedRoutes } from '../../../../modal';
-import { PurchasesView } from '../../../../components/PurchasesView';
+import { IInvoiceType, ISupportedRoutes } from '@invyce/shared/types';
 
 export const QuoteView = () => {
   const { routeHistory } = useGlobalContext();

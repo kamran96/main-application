@@ -3,12 +3,14 @@ import { Button } from 'antd';
 import React, { FC, lazy, Suspense, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { FallBackLoader } from '../../../../components/FallBackLoader';
-import { Heading } from '../../../../components/Heading';
-
-import { TableTabs, TableTabsContent } from '../../../../components/TableTabs';
+import {
+  FallBackLoader,
+  Heading,
+  TableTabs,
+  TableTabsContent,
+} from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { ISupportedRoutes } from '../../../../modal';
+import { ISupportedRoutes } from '@invyce/shared/types';
 import AwaitingPurchaseList from './List/AwaitingPayment';
 import { useCols } from './List/CommonCol';
 import DueExpiredPurchases from './List/DueExpired';
@@ -22,8 +24,8 @@ export const BillsList: FC = () => {
   const [activeTab, setActiveTab] = useState('');
   const { routeHistory } = useGlobalContext();
   const { search } = routeHistory.history.location;
-  const {PurchaseOrderColumns} = useCols();
-  
+  const { PurchaseOrderColumns } = useCols();
+
   useEffect(() => {
     if (!activeTab) {
       setActiveTab('all');

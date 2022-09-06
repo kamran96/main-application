@@ -24,8 +24,8 @@ import {
   ISupportedRoutes,
   IUser,
   NOTIFICATIONTYPE,
-} from '../../modal';
-import { Capitalize } from '../../components/Typography';
+} from '@invyce/shared/types';
+import { Capitalize } from '@components';
 
 const { Option } = Select;
 

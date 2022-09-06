@@ -2,10 +2,7 @@ import { Button, Switch } from 'antd';
 import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { CommonModal } from '../../../../components';
-import { Heading } from '../../../../components/Heading';
-import { SelectCard } from '../../../../components/SelectCard';
-import { Seprator } from '../../../../components/Seprator';
+import { CommonModal, Heading, SelectCard, Seprator } from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 
 export const EnableDispatchModal: FC = () => {
