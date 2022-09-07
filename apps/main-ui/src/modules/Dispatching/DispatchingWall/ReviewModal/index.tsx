@@ -2,9 +2,7 @@ import { List } from 'antd';
 import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { CommonModal } from '../../../../components';
-import { Heading } from '../../../../components/Heading';
-import { Seprator } from '../../../../components/Seprator';
+import { CommonModal, Heading, Seprator } from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 
 export const ReviewModal: FC = () => {

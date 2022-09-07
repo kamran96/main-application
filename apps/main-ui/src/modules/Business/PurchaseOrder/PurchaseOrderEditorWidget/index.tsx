@@ -1,11 +1,10 @@
 import React, { FC } from 'react';
 import { Breadcrumb } from 'antd';
 import styled from 'styled-components';
-import { BreadCrumbArea } from '../../../../components/BreadCrumbArea';
-import { Heading } from '../../../../components/Heading';
+import { BreadCrumbArea, Heading } from '@components';
 import { PurchaseOrderForm } from './Form';
 import { Link } from 'react-router-dom';
-import { ISupportedRoutes } from '../../../../modal/routing';
+import { ISupportedRoutes } from '@invyce/shared/types';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 
 export const PurchaseOrderEditorWidget: FC = () => {
@@ -16,7 +15,7 @@ export const PurchaseOrderEditorWidget: FC = () => {
   return (
     <WrapperWidget>
       <Heading type="form">Create Purchase Order</Heading>
-      <div className='flex alignFEnd justifySpaceBetween'>
+      <div className="flex alignFEnd justifySpaceBetween">
         <BreadCrumbArea>
           <Breadcrumb>
             <Breadcrumb.Item>

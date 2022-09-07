@@ -5,7 +5,6 @@ import deleteIcon from '@iconify/icons-carbon/delete';
 import Icon from '@iconify/react';
 import baselineAlternateEmail from '@iconify-icons/ic/baseline-alternate-email';
 import editSolid from '@iconify/icons-clarity/edit-solid';
-import { PDFICON } from '../../../../../components/Icons';
 import printIcon from '@iconify-icons/bytesize/print';
 import { IThemeProps } from '../../../../../hooks/useTheme/themeColors';
 

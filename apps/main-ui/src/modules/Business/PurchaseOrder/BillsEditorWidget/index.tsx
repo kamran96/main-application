@@ -1,12 +1,10 @@
 import { FC } from 'react';
 import { Breadcrumb } from 'antd';
 import styled from 'styled-components';
-import { BreadCrumbArea } from '../../../../components/BreadCrumbArea';
-import { Link } from 'react-router-dom';
-import { ISupportedRoutes } from '../../../../modal';
-import { Heading } from '../../../../components/Heading';
-import { PurchasesWidget } from '../../../../components/PurchasesWidget';
+import { BreadCrumbArea, Heading, PurchasesWidget } from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
+import { Link } from 'react-router-dom';
+import { ISupportedRoutes } from '@invyce/shared/types';
 
 export const BillsEditorWidget: FC = () => {
   const { routeHistory } = useGlobalContext();

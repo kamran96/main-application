@@ -6,18 +6,21 @@ import { FC, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
 import { deleteContacts, getContacts } from '../../../api/Contact';
-import { ButtonTag } from '../../../components/ButtonTags';
-import { ConfirmModal } from '../../../components/ConfirmModal';
-import { SmartFilter } from '../../../components/SmartFilter';
+import {
+  ButtonTag,
+  ConfirmModal,
+  SmartFilter,
+  CommonTable,
+  PDFICON,
+} from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import {
   IContactTypes,
   NOTIFICATIONTYPE,
   ReactQueryKeys,
+  ISupportedRoutes,
 } from '@invyce/shared/types';
 import { IPagination, IServerError } from '../../../modal/base';
-import { ISupportedRoutes } from '../../../modal/routing';
-import { CommonTable } from './../../../components/Table';
 import FilterSchema from './FilterSchema';
 import { ContactListWrapper, ContactMainWrapper } from './styles';
 import { Rbac } from '../../../components/Rbac';

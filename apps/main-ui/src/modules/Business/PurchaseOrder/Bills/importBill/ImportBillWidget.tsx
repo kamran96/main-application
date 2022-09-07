@@ -11,7 +11,7 @@ import { CompareDataModal } from './CompareDataModal';
 import { CompareDataTable } from './CompareDataTable';
 import { ReactQueryKeys } from '../../../../../modal';
 import { InvoiceImportManager } from '../../../../Invoice/InvoiceImportManager';
-import { getBillsKeysApi } from '../../../../../api/bills';
+import { getBillsKeysApi } from '../../../../../api';
 
 interface Idata {
   xero: {

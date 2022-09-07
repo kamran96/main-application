@@ -1,8 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { FC, lazy, Suspense, useEffect, useState } from 'react';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { TableTabs, TableTabsContent } from '../../../../components/TableTabs';
-import { FallBackLoader } from '../../../../components/FallBackLoader';
+import { TableTabs, TableTabsContent, FallBackLoader } from '@components';
 import { WrapperTransactionsList } from './styles';
 
 export const TransactionsList: FC = () => {

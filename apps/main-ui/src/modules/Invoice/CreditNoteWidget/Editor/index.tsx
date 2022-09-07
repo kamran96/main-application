@@ -9,21 +9,23 @@ import { FC, useRef, useState } from 'react';
 import { useQueryClient, useMutation } from 'react-query';
 
 import { CreditNoteCreateAPI } from '../../../../api';
-import { ConfirmModal } from '../../../../components/ConfirmModal';
-import { DatePicker } from '../../../../components/DatePicker';
-import { FormLabel } from '../../../../components/FormLabel';
-import { PrintFormat } from '../../../../components/PrintFormat';
-import { PrintViewPurchaseWidget } from '../../../../components/PurchasesWidget/PrintViewPurchaseWidget';
+import {
+  ConfirmModal,
+  DatePicker,
+  FormLabel,
+  PrintFormat,
+  PrintViewPurchaseWidget,
+  Seprator,
+} from '@components';
 import { Rbac } from '../../../../components/Rbac';
 import { PERMISSIONS } from '../../../../components/Rbac/permissions';
-import { Seprator } from '../../../../components/Seprator';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import {
   IErrorMessages,
   IServerError,
   ISupportedRoutes,
   NOTIFICATIONTYPE,
-} from '../../../../modal';
+} from '@invyce/shared/types';
 import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv, { DownloadPDF } from '../../../../utils/Print';
 import defaultItems, { Requires } from './defaultStates';

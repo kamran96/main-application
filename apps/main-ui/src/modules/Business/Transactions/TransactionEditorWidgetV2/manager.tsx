@@ -8,27 +8,28 @@ import {
   useEffect,
   useMemo,
 } from 'react';
-import { Editable, EditableSelect } from '../../../../components/Editable';
-import {
-  ITranactionContext,
-  ITransactionEditorProps,
-  ITransactionsList,
-} from './types';
 import { EditableColumnsType } from '@invyce/editable-table';
 import defaultState from './default';
 import Icon from '@iconify/react';
 import dayjs from 'dayjs';
 import { convertToRem } from '@invyce/pixels-to-rem';
-
 import deleteIcon from '@iconify/icons-carbon/delete';
 import dotsGrid from '@iconify-icons/mdi/dots-grid';
 import { getAllAccounts } from '../../../../api/accounts';
-import { IAccountsResult } from '@invyce/shared/types';
 import { getSingleTransactionById } from '../../../../api';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { NOTIFICATIONTYPE } from '@invyce/shared/types';
-import { IServerError } from '../../../../modal';
+import { Editable, EditableSelect } from '@components';
+import {
+  ITranactionContext,
+  ITransactionEditorProps,
+  ITransactionsList,
+} from './types';
+import {
+  NOTIFICATIONTYPE,
+  IServerError,
+  IAccountsResult,
+} from '@invyce/shared/types';
 
 const transactionContext = createContext<Partial<ITranactionContext>>({});
 export const useTransaction = () => useContext(transactionContext);

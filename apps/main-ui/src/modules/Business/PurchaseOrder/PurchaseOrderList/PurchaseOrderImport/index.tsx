@@ -1,18 +1,17 @@
-import React, { FC } from 'react'
-import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext'
-import { ButtonTag } from '../../../../../components/ButtonTags'
+import React, { FC } from 'react';
+import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
+import { ButtonTag } from '@components';
 
-
-export const PurchaseOrderImport:FC = (props) => {
-    const {setPurchaseOrder} = useGlobalContext();
+export const PurchaseOrderImport: FC = (props) => {
+  const { setPurchaseOrder } = useGlobalContext();
   return (
-    <ButtonTag 
-    onClick={() => {
+    <ButtonTag
+      onClick={() => {
         setPurchaseOrder(true, 'purchaseOrder');
-    }}
-    className="mr-10"
-    title='Import'
-    size='middle'
+      }}
+      className="mr-10"
+      title="Import"
+      size="middle"
     />
-    )
- }
+  );
+};

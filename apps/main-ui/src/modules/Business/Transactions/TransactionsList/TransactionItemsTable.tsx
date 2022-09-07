@@ -1,10 +1,12 @@
 import React, { FC, useEffect, useState } from 'react';
 import { ColumnsType } from 'antd/es/table';
 import styled from 'styled-components';
-import { BoldText } from '../../../../components/Para/BoldText';
-import { CommonTable } from '../../../../components/Table';
-import { ITransactionItem, TransactionsType } from '../../../../modal';
-import { IAccountsResult } from '../../../../modal/accounts';
+import { BoldText, CommonTable } from '@components';
+import {
+  ITransactionItem,
+  TransactionsType,
+  IAccountsResult,
+} from '@invyce/shared/types';
 import moneyFormat from '../../../../utils/moneyFormat';
 
 interface IProps {

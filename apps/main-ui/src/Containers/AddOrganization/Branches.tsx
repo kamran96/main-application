@@ -5,13 +5,10 @@ import { ColumnsType } from 'antd/lib/table';
 import { FC, useState } from 'react';
 import { useQueryClient, useMutation } from 'react-query';
 import styled from 'styled-components';
-
+import { ButtonTag, ConfirmModal, CommonTable } from '@components';
 import { activeBranchAPI, branchDeleteAPI } from '../../api';
-import { ButtonTag } from '../../components/ButtonTags';
-import { ConfirmModal } from '../../components/ConfirmModal';
-import { CommonTable } from '../../components/Table';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
-import { NOTIFICATIONTYPE } from '../../modal';
+import { NOTIFICATIONTYPE } from '@invyce/shared/types';
 import { IBranch } from '../../modal/organization';
 
 interface IProps {

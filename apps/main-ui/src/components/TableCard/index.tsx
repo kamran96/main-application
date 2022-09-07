@@ -20,7 +20,7 @@ export const TableCard: FC<IProps> = ({
   minHeight,
   refernace,
 }) => {
-  let height =
+  const height =
     typeof minHeight === 'number'
       ? JSON.stringify(minHeight) + 'px'
       : minHeight;

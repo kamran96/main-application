@@ -4,20 +4,16 @@ import { plainToClass } from 'class-transformer';
 import dayjs from 'dayjs';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
-
 import { getContactLedger } from '../../../api';
-import { Loader } from '../../../components/Loader';
-import { BoldText } from '../../../components/Para/BoldText';
-import { SmartFilter } from '../../../components/SmartFilter';
-import { CommonTable } from '../../../components/Table';
+import { Loader, BoldText, SmartFilter, CommonTable } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import {
   IContactLedgerResp,
   IContactLedgerResponse,
   IContactTypes,
   IEntryType,
-} from '../../../modal';
-import { ISupportedRoutes } from '../../../modal/routing';
+  ISupportedRoutes,
+} from '@invyce/shared/types';
 import moneyFormat from '../../../utils/moneyFormat';
 import FilterSchema from './ledgerFilterSchema';
 import { Link } from 'react-router-dom';

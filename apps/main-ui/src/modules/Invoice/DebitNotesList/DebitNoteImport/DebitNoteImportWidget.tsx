@@ -1,4 +1,4 @@
-import { CommonModal } from '../../../../components';
+import { CommonModal } from '@components';
 import React, { FC, useState } from 'react';
 import { useGlobalContext } from '../../../../../src/hooks/globalContext/globalContext';
 import bookHalf from '@iconify/icons-bi/book-half';
@@ -102,9 +102,7 @@ const DebitNoteImportWidget: FC = (props) => {
                 <a>here</a>
               </div>
               <InvoiceImportManager
-                headers={`Number,Ref,To,Data,Amount,Items,Status`.split(
-                  ','
-                )}
+                headers={`Number,Ref,To,Data,Amount,Items,Status`.split(',')}
                 onLoad={(payload, file) => {
                   setFileData(file);
                   setFileExtractedData(payload);

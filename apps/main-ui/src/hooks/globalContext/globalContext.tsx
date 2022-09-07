@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { IAuth, IUser, NOTIFICATIONTYPE } from '../../modal';
+import { IAuth, IUser, NOTIFICATIONTYPE } from '@invyce/shared/types';
 import { ILoginActions } from './globalManager';
 import { IRolePermissions } from '@invyce/shared/types';
 import { IThemeVariables } from '../useTheme/themeColors';

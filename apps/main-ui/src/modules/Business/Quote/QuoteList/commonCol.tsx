@@ -2,7 +2,7 @@ import React from 'react';
 import { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { Link } from 'react-router-dom';
-import { ISupportedRoutes } from '../../../../modal';
+import { ISupportedRoutes } from '@invyce/shared/types';
 
 export const QuoteColumns: ColumnsType<any> = [
   {

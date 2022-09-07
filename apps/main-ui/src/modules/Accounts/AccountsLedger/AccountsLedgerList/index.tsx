@@ -1,17 +1,14 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { ColumnsType } from 'antd/es/table';
-import { ITableColumns } from '../../../../components/PDFs/PDFTable';
+import { ITableColumns } from '../../../../components/PDFs';
 import { plainToClass } from 'class-transformer';
 import dayjs from 'dayjs';
 import React, { FC, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
 import { getAccountLedger } from '../../../../api/accounts';
-import { Loader } from '../../../../components/Loader';
-import { BoldText } from '../../../../components/Para/BoldText';
-import { SmartFilter } from '../../../../components/SmartFilter';
-import { CommonTable } from '../../../../components/Table';
+import { Loader, BoldText, SmartFilter, CommonTable } from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { ISupportedRoutes, TransactionsType } from '../../../../modal';
 import {
@@ -60,7 +57,6 @@ export const AccountsLedgerList: FC<IProps> = ({ id, accountName }) => {
       enabled: !!id,
     }
   );
-
 
   useEffect(() => {
     if (history?.location?.search) {

@@ -8,29 +8,25 @@ import {
   getAllContacts,
   getPoListAPI,
 } from '../../../../../api';
-import { CommonTable } from '../../../../../components/Table';
+import { CommonTable, SmartFilter, ConfirmModal } from '@components';
 import {
   IInvoiceResponse,
   INVOICETYPE,
   INVOICE_TYPE_STRINGS,
   ORDER_TYPE,
-} from '../../../../../modal/invoice';
-import convertToRem from '../../../../../utils/convertToRem';
-import { SmartFilter } from '../../../../../components/SmartFilter';
-import { ISupportedRoutes } from '../../../../../modal/routing';
-import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
-import FilterSchema from './PoFilterSchema';
-import { ConfirmModal } from '../../../../../components/ConfirmModal';
-import {
+  ISupportedRoutes,
   IBaseAPIError,
   IContactType,
   IContactTypes,
   NOTIFICATIONTYPE,
-} from '../../../../../modal';
-import { PurchaseTopbar } from './PurchaseTableTopbar';
-import { useCols } from './CommonCol';
+} from '@invyce/shared/types';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
+import convertToRem from '../../../../../utils/convertToRem';
+import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
+import FilterSchema from './PoFilterSchema';
+import { PurchaseTopbar } from './PurchaseTableTopbar';
+import { useCols } from './CommonCol';
 import { ImportBill } from '../importBill';
 
 interface IProps {

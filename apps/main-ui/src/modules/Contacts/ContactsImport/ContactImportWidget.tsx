@@ -4,7 +4,7 @@ import { Icon } from '@iconify/react';
 import { FC } from 'react';
 import { useState } from 'react';
 import { WrapperModalContent } from './style';
-import { CommonModal } from '../../../components';
+import { CommonModal } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { InvoiceImportManager } from '../../Invoice/InvoiceImportManager';
 import { useQuery } from 'react-query';

@@ -1,4 +1,4 @@
-import { CommonModal } from '../../../components';
+import { CommonModal } from '@components';
 import React, { FC, useState } from 'react';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import bookHalf from '@iconify/icons-bi/book-half';
@@ -54,8 +54,6 @@ const AccountsImportWidget: FC = (props) => {
     }
   );
 
-
-
   const onDownloadTemplate = () => {
     const headers = [
       [
@@ -69,12 +67,11 @@ const AccountsImportWidget: FC = (props) => {
         'taxRate',
         'totalCredit',
         'totalDebit',
-        'balance'
+        'balance',
       ],
     ];
     downloadCSV(headers);
   };
-
 
   return (
     <CommonModal

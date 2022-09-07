@@ -8,15 +8,12 @@ import dayjs from 'dayjs';
 import { FC, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
-
 import { deleteCategoryAPI, getChildCategoriesAPI } from '../../api';
 import { getAllUsers } from '../../api/users';
-import { ButtonTag } from '../../components/ButtonTags';
-import { ConfirmModal } from '../../components/ConfirmModal';
-import { CommonTable } from '../../components/Table';
+import { ButtonTag, ConfirmModal, CommonTable } from '@components';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { IThemeProps } from '../../hooks/useTheme/themeColors';
-import { NOTIFICATIONTYPE } from '../../modal';
+import { NOTIFICATIONTYPE } from '@invyce/shared/types';
 
 interface IProps {
   id?: number;

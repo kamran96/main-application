@@ -1,16 +1,14 @@
 import { FC } from 'react';
 import styled from 'styled-components';
 import { Form, Input, Button, Row, Col, Checkbox } from 'antd';
-import { FormLabel } from '../../components/FormLabel';
+import { FormLabel, HeadingTemplate1, BOLDTEXT, Seprator } from '@components';
 import { useMutation } from 'react-query';
 import { googleLoginAPI, LoginAPI } from '../../api';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { ILoginActions } from '../../hooks/globalContext/globalManager';
 import { updateToken } from '../../utils/http';
-import { ISupportedRoutes, NOTIFICATIONTYPE } from '../../modal';
+import { ISupportedRoutes, NOTIFICATIONTYPE } from '@invyce/shared/types';
 import { IBaseAPIError } from '../../modal/base';
-import { HeadingTemplate1 } from '../../components/HeadingTemplates';
-import { BOLDTEXT } from '../../components/Para/BoldText';
 import GoogleLogin from 'react-google-login';
 import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
@@ -287,5 +285,4 @@ export const LoginFormWrapper = styled.div`
       padding: 22px 0px;
     }
   }
-
 `;

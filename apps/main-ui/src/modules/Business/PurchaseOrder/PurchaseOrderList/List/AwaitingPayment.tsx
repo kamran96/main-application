@@ -9,12 +9,12 @@ import {
   IInvoiceResponse,
   INVOICETYPE,
   ORDER_TYPE,
-} from '../../../../../modal/invoice';
+  ISupportedRoutes,
+} from '@invyce/shared/types';
 import convertToRem from '../../../../../utils/convertToRem';
 import { Link } from 'react-router-dom';
-import { useCols} from './CommonCol';
-import {useHistory} from "react-router-dom"
-import {ISupportedRoutes } from '../../../../../modal';
+import { useCols } from './CommonCol';
+import { useHistory } from 'react-router-dom';
 interface IProps {
   columns?: any[];
 }
@@ -35,7 +35,7 @@ export const AwaitingPayment: FC<IProps> = ({ columns }) => {
     });
 
   const { page, query, sortid, pageSize } = allInvoicesConfig;
-  const {pdfColsPO, _csvColumns } = useCols();
+  const { pdfColsPO, _csvColumns } = useCols();
   const history = useHistory();
 
   const {
@@ -80,8 +80,8 @@ export const AwaitingPayment: FC<IProps> = ({ columns }) => {
             return -1;
           }
         });
-        
-        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+
+        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
       } else {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
@@ -90,8 +90,8 @@ export const AwaitingPayment: FC<IProps> = ({ columns }) => {
             return -1;
           }
         });
-        
-        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+
+        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
       }
       setAllInvoicesConfig({
         ...allInvoicesConfig,
@@ -103,15 +103,16 @@ export const AwaitingPayment: FC<IProps> = ({ columns }) => {
             : sorter.field,
       });
 
-      const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=all&sortid=${
-        sorter && sorter.order === 'descend'
-          ? `-${sorter.field}`
-          : sorter.field
-      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      const route = `/app${
+        ISupportedRoutes.PURCHASE_ORDER
+      }?tabIndex=all&sortid=${
+        sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+        sorter.order
+      }&query=${query}`;
       history.push(route);
     }
-  }
-
+  };
 
   useEffect(() => {
     if (resolvedData && resolvedData.data && resolvedData.data.result) {

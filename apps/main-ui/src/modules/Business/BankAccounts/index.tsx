@@ -1,13 +1,11 @@
 import React from 'react';
 import { Button } from 'antd';
 import styled from 'styled-components';
-import { Heading } from '../../../components/Heading';
-import { TableCard } from '../../../components/TableCard';
+import { Heading } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { BanksList } from './BanksList';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
-
 export const BankAccounts = () => {
   const { setBanksModalConfig } = useGlobalContext();
   return (

@@ -22,7 +22,7 @@ import { PERMISSIONS } from '../../../components/Rbac/permissions';
 import { useRbac } from '../../../components/Rbac/useRbac';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
-import { DivProps, ISupportedRoutes } from '../../../modal';
+import { DivProps, ISupportedRoutes } from '@invyce/shared/types';
 import CommandPlatteGlobalStyles from './commandPaletteGlobalStyles';
 import LogOut from '@iconify-icons/feather/log-out';
 import {

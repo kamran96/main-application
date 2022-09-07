@@ -8,9 +8,7 @@ import {
   getAllContacts,
   getPoListAPI,
 } from '../../../../../api';
-import { ConfirmModal } from '../../../../../components/ConfirmModal';
-import { SmartFilter } from '../../../../../components/SmartFilter';
-import { CommonTable } from '../../../../../components/Table';
+import { ConfirmModal, SmartFilter, CommonTable } from '@components';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import {
   IContactType,
@@ -18,19 +16,17 @@ import {
   IErrorMessages,
   IServerError,
   NOTIFICATIONTYPE,
-} from '../../../../../modal';
-import {
   IInvoiceResponse,
   INVOICETYPE,
   INVOICE_TYPE_STRINGS,
   ORDER_TYPE,
   ISupportedRoutes,
-} from '../../../../../modal';
+} from '@invyce/shared/types';
+import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
+import { useRbac } from '../../../../../components/Rbac/useRbac';
 import FilterSchema from './PoFilterSchema';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
 import { useCols } from './CommonCol';
-import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
-import { useRbac } from '../../../../../components/Rbac/useRbac';
 import { ImportBill } from '../importBill';
 
 interface IProps {
@@ -55,7 +51,7 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
     page_size: 10,
   });
   const { page, query, sortid, page_size } = allInvoicesConfig;
-  const {PDFColsBills, _csvExportable} = useCols();
+  const { PDFColsBills, _csvExportable } = useCols();
 
   const [confirmModal, setConfirmModal] = useState(false);
   const [{ result, pagination }, setAllInvoicesRes] =
@@ -155,8 +151,8 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
             return -1;
           }
         });
-        
-        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+
+        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
       } else {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
@@ -165,8 +161,8 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
             return -1;
           }
         });
-        
-        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+
+        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
       }
       setAllInvoicesConfig({
         ...allInvoicesConfig,
@@ -177,18 +173,14 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
             ? `-${sorter.field}`
             : sorter.field,
       });
-      const route = `/app${
-        ISupportedRoutes.PURCHASES
-      }?tabIndex=draft&sortid=${
-        sorter && sorter.order === 'descend'
-          ? `-${sorter.field}`
-          : sorter.field
-      }&page=${pagination.current}&page_size=${
-        pagination.pageSize
-      }&filter=${sorter.order}&query=${query}`;
+      const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=draft&sortid=${
+        sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+        sorter.order
+      }&query=${query}`;
       history.push(route);
     }
-  }
+  };
 
   /* ********** METHODS HERE *************** */
   /* ************** ASYNC FUNCTION IS TO  DELETE ORDER ******** */

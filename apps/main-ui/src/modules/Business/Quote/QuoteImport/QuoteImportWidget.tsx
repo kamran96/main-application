@@ -1,4 +1,4 @@
-import { CommonModal } from '../../../../components';
+import { CommonModal } from '@components';
 import React, { FC, useState } from 'react';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import bookHalf from '@iconify/icons-bi/book-half';
@@ -53,7 +53,6 @@ const QuoteImportWidget: FC = () => {
     }
   );
 
-
   return (
     <CommonModal
       visible={visibility}
@@ -103,9 +102,7 @@ const QuoteImportWidget: FC = () => {
                 <a>here</a>
               </div>
               <InvoiceImportManager
-                headers={`Number,Ref,Customer,Date,Items,Amount`.split(
-                  ','
-                )}
+                headers={`Number,Ref,Customer,Date,Items,Amount`.split(',')}
                 onLoad={(payload, file) => {
                   setFileData(file);
                   setFileExtractedData(payload);

@@ -4,10 +4,9 @@ import { FC, useEffect } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 import { createCategoryAPI, getCategoryByIdAPI } from '../../../api';
-import { CommonModal } from '../../../components';
-import { FormLabel } from '../../../components/FormLabel';
+import { CommonModal, FormLabel } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { NOTIFICATIONTYPE } from '../../../modal';
+import { NOTIFICATIONTYPE } from '@invyce/shared/types';
 
 const CategoryEditorWidget: FC = () => {
   const queryCache = useQueryClient();

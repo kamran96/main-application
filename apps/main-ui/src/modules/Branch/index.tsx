@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { Heading } from '../../components/Heading';
-import { TableCard } from '../../components/TableCard';
+import { Heading, TableCard } from '@components';
 
 export const Branch: FC = () => {
   return (

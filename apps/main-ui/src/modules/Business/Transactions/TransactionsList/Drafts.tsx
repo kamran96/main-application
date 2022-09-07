@@ -8,30 +8,34 @@ import {
   getAllTransactionsAPI,
   updateTransactionDraftStatus,
 } from '../../../../api';
-import { SmartFilter } from '../../../../components/SmartFilter';
-import { CommonTable } from '../../../../components/Table';
+import {
+  SmartFilter,
+  CommonTable,
+  ConfirmModal,
+  PurchaseListTopbar,
+  TransactionApprovePdf,
+  PDFICON,
+  TransactionItem,
+} from '@components';
+
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import {
   IResponseTransactions,
   TransactionsStatus,
-} from '../../../../modal/transaction';
-import { IAccountsResult } from '../../../../modal/accounts';
-import { ISupportedRoutes } from '../../../../modal/routing';
+  IAccountsResult,
+  ISupportedRoutes,
+  NOTIFICATIONTYPE,
+  IServerError,
+} from '@invyce/shared/types';
 import moneyFormat from '../../../../utils/moneyFormat';
 import { WrapperTransactionCustomBar, WrapperTransactionsList } from './styles';
 import { TransactionItemTable } from './TransactionItemsTable';
 import transactionsFilterSchema from './transactionsFilterSchema';
-import { ConfirmModal } from '../../../../components/ConfirmModal';
-import { PurchaseListTopbar } from '../../../../components/PurchasesListTopbar';
-import { NOTIFICATIONTYPE, IServerError } from '../../../../modal';
-import { TransactionApprovePdf } from '../../../../components/PDFs/TransactionApprovePdf';
-import { PDFICON } from '../../../../components/Icons';
 import DUMMYLOGO from '../../../../assets/quickbook.png';
 import styled from 'styled-components';
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
 import { PERMISSIONS } from '../../../../components/Rbac/permissions';
 import { useRbac } from '../../../../components/Rbac/useRbac';
-import { TransactionItem } from '../../../../components/PDFs/TransactionSingleItemPdf';
 import { TransactionImport } from '../importTransactions';
 
 const DRAFTTransactionsList: FC = () => {

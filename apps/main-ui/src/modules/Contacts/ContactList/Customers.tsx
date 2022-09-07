@@ -6,10 +6,8 @@ import { FC, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
 import { deleteContacts, getContacts } from '../../../api/Contact';
-import { ButtonTag } from '../../../components/ButtonTags';
-import { ConfirmModal } from '../../../components/ConfirmModal';
-import { SmartFilter } from '../../../components/SmartFilter';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
+import { ButtonTag, ConfirmModal, SmartFilter, CommonTable } from '@components';
 import {
   IContactTypes,
   NOTIFICATIONTYPE,
@@ -17,11 +15,10 @@ import {
 } from '../../../modal';
 import { IPagination, IServerError } from '../../../modal/base';
 import { ISupportedRoutes } from '../../../modal/routing';
-import { CommonTable } from './../../../components/Table';
 import FilterSchema from './FilterSchema';
-import { ContactListWrapper, ContactMainWrapper } from './styles';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
+import { ContactListWrapper, ContactMainWrapper } from './styles';
 import moneyFormat from '../../../utils/moneyFormat';
 import ContactsImport from '../ContactsImport';
 import { useHistory } from 'react-router-dom';

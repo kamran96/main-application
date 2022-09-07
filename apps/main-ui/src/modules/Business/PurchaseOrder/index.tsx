@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 import styled from 'styled-components';
-
-import { Heading } from '../../../components/Heading';
+import { Heading } from '@components';
 import { PurchaseOrderList } from './PurchaseOrderList';
 
 export const PurchaseOrderContainer: FC = () => {

@@ -2,7 +2,7 @@ import { ColumnsType } from 'antd/lib/table';
 import React from 'react';
 import dayJs from 'dayjs';
 import { Link } from 'react-router-dom';
-import { ISupportedRoutes } from '../../../modal';
+import { ISupportedRoutes } from '@invyce/shared/types';
 import { ITableExportFields } from 'ant-table-extensions';
 import { useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';

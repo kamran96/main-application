@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import Switch from 'react-router/Switch';
+import { CommonLoader } from '@components';
 import { useRbac } from '../components/Rbac/useRbac';
-import { CommonLoader } from '../components/FallBackLoader';
 
 const renderRoutes = (routes, extraProps = {}, switchProps = {}) => {
   return (

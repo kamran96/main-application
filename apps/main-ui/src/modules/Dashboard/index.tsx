@@ -3,18 +3,19 @@ import dayjs from 'dayjs';
 import { FC, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
-import { DailyStalesDashboardAPI } from '../../api/mainDashboard';
-import { CustomDateRange } from '../../components/DateRange';
-
-import { ExpensesOverview } from '../../components/ExpensesOverview';
-import { Heading } from '../../components/Heading';
-import { InvoiceOverview } from '../../components/InvoiceDetailOverview';
-import { InvoicesOverview } from '../../components/InvoicesOverview';
-import { ProfitAndLossOverview } from '../../components/ProfitAndLoss';
-import { Sales } from '../../components/SalesOverview';
-import { SalesReportGraph } from '../../components/SalesReportGraph';
-import { SystemMessages } from '../../components/SystemMessages/SystemMessages';
-import { IDashboardSalesOverview } from '../../modal';
+import { DailyStalesDashboardAPI } from '../../api';
+import {
+  CustomDateRange,
+  ExpensesOverview,
+  Heading,
+  InvoiceOverview,
+  InvoicesOverview,
+  ProfitAndLossOverview,
+  Sales,
+  SalesReportGraph,
+  SystemMessages,
+} from '@components';
+import { IDashboardSalesOverview } from '@invyce/shared/types';
 
 export const DashboardContainer: FC<any> = () => {
   const [dailySales, setDailySales] = useState<IDashboardSalesOverview>({

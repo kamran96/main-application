@@ -5,19 +5,20 @@ import { useQuery } from 'react-query';
 import styled from 'styled-components';
 
 import { TrialbalanceAPI } from '../../../../api';
-import { Heading } from '../../../../components/Heading';
-import { BoldText } from '../../../../components/Para/BoldText';
-import { SmartFilter } from '../../../../components/SmartFilter';
-import { CommonTable } from '../../../../components/Table';
-import { TableCard } from '../../../../components/TableCard';
-import { ISupportedRoutes } from '../../../../modal';
-import { IAccountsResult } from '../../../../modal/accounts';
+import {
+  Heading,
+  SmartFilter,
+  CommonTable,
+  TableCard,
+  P,
+  BoldText,
+} from '@components';
+import { ISupportedRoutes, IAccountsResult } from '@invyce/shared/types';
 import moneyFormat from '../../../../utils/moneyFormat';
 import FilterSchema from './filterSchema';
 import { _csvColumnsTrialBalance } from './exportableCols';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import dayjs from 'dayjs';
-import { P } from '../../../../components/Typography';
 import { Text } from '@react-pdf/renderer';
 interface IExtendedValues extends IAccountsResult {
   credit: number;
@@ -272,16 +273,16 @@ export const TrialBalanceList: FC = () => {
           }}
           customTopbar={renderTableHeaderLeft()}
           topbarRightPannel={
-            <div className='flex alignCenter'>
-            <SmartFilter
-              formSchema={FilterSchema}
-              onFilter={(q) => {
-                history.push(
-                  `/app${ISupportedRoutes.TRIAL_BALANCE}?query=${q}`
-                );
-                setConfig({ ...config, query: q });
-              }}
-            />
+            <div className="flex alignCenter">
+              <SmartFilter
+                formSchema={FilterSchema}
+                onFilter={(q) => {
+                  history.push(
+                    `/app${ISupportedRoutes.TRIAL_BALANCE}?query=${q}`
+                  );
+                  setConfig({ ...config, query: q });
+                }}
+              />
             </div>
           }
           hasPrint
