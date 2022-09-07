@@ -77,6 +77,7 @@ interface IAction {
 
 export const GlobalManager: FC<IProps> = ({ children }) => {
   const queryCache = useQueryClient();
+
   /* MUTATIONS */
   const {
     mutate: mutateSendPDF,
@@ -286,6 +287,11 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     setAuth(null);
     setAutherized(false);
     localStorage.clear();
+  };
+
+  const usePrefetchQuery = async (queryKey: any[], fn: () => void) => {
+    console.log(queryKey, fn, 'in manager');
+    await queryCache.prefetchQuery(queryKey, fn);
   };
 
   const handleLogin = async (action: IAction) => {
@@ -685,6 +691,7 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         refetchUser,
         refetchPermissions,
         Colors,
+        usePrefetchQuery,
       }}
     >
       <WrapperChildren>

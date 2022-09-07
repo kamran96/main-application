@@ -1,4 +1,9 @@
-import { IRoutingSchema, ISupportedRoutes } from '../modal';
+import {
+  IContactTypes,
+  IRoutingSchema,
+  ISupportedRoutes,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import { PERMISSIONS } from '../components/Rbac/permissions';
 import {
   BussinesIcon,
@@ -17,6 +22,7 @@ import {
   Dashboard,
   DebitNote,
 } from '../assets/icons/index';
+import { getContacts } from '@api';
 
 const root = `/app`;
 export const RoutingSchema: IRoutingSchema = {
@@ -140,6 +146,39 @@ export const RoutingSchema: IRoutingSchema = {
       route: `${root}${ISupportedRoutes.CONTACTS}`,
       children: [],
       permission: PERMISSIONS.CONTACTS_INDEX,
+      prefetchQueries: [
+        {
+          fn: getContacts,
+          queryKey: [
+            ReactQueryKeys.CONTACTS_KEYS,
+            IContactTypes.CUSTOMER,
+            1,
+            'id',
+            20,
+            '',
+          ],
+        },
+        {
+          fn: getContacts,
+          queryKey: [
+            ReactQueryKeys.CONTACTS_KEYS,
+            IContactTypes.SUPPLIER,
+            1,
+            'id',
+            20,
+            '',
+          ],
+        },
+      ],
+      fn: getContacts,
+      queryKey: [
+        ReactQueryKeys.CONTACTS_KEYS,
+        IContactTypes.CUSTOMER,
+        1,
+        'id',
+        20,
+        '',
+      ],
     },
     {
       tag: 'Items',

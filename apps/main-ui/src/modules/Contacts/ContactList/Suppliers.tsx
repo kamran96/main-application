@@ -2,22 +2,24 @@
 import editSolid from '@iconify-icons/clarity/edit-solid';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import { ColumnsType } from 'antd/lib/table';
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
 import { deleteContacts, getContacts } from '../../../api/Contact';
 import { ButtonTag } from '../../../components/ButtonTags';
 import { ConfirmModal } from '../../../components/ConfirmModal';
-import { PDFICON } from '../../../components/Icons';
 import { SmartFilter } from '../../../components/SmartFilter';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { IContactTypes, NOTIFICATIONTYPE } from '../../../modal';
+import {
+  IContactTypes,
+  NOTIFICATIONTYPE,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import { IPagination, IServerError } from '../../../modal/base';
 import { ISupportedRoutes } from '../../../modal/routing';
 import { CommonTable } from './../../../components/Table';
 import FilterSchema from './FilterSchema';
 import { ContactListWrapper, ContactMainWrapper } from './styles';
-import printIcon from '@iconify-icons/bytesize/print';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
 import moneyFormat from '../../../utils/moneyFormat';
@@ -72,21 +74,20 @@ export const Suppliers: FC = () => {
 
       const filterType = history.location.search.split('&');
       const filterIdType = filterType[1];
-      const filterOrder = filterType[4]?.split("=")[1];
-      
-      if(filterIdType?.includes("-")){
-         const fieldName = filterIdType?.split("=")[1].split("-")[1];
-         setsortedInfo({
-           order: filterOrder,
-           columnKey: fieldName
-         });
-      }
-      else{
-        const fieldName = filterIdType?.split("=")[1];
+      const filterOrder = filterType[4]?.split('=')[1];
+
+      if (filterIdType?.includes('-')) {
+        const fieldName = filterIdType?.split('=')[1].split('-')[1];
         setsortedInfo({
           order: filterOrder,
-          columnKey: fieldName
-        })
+          columnKey: fieldName,
+        });
+      } else {
+        const fieldName = filterIdType?.split('=')[1];
+        setsortedInfo({
+          order: filterOrder,
+          columnKey: fieldName,
+        });
       }
     }
   }, [routeHistory]);
@@ -121,7 +122,7 @@ export const Suppliers: FC = () => {
             return -1;
           }
         });
-        setContactResponse(userData)
+        setContactResponse(userData);
       }
       setConfig({
         ...config,
@@ -139,9 +140,9 @@ export const Suppliers: FC = () => {
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field
-        }&page=${pagination.current}&page_size=${
-          pagination.pageSize
-        }&filter=${sorter.order}&query=${query}`
+        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+          sorter.order
+        }&query=${query}`
       );
     }
   };
@@ -150,7 +151,7 @@ export const Suppliers: FC = () => {
   /* this hook fetches contact list against page number and also sorts request data against sort id */
   /* eg. sortid = name (assending) -name (descending) */
   const params: any = [
-    `contacts-list-suppliers?page_no=${page}&sort=${sortid}&page_size=${page_size}&type=${IContactTypes.SUPPLIER}&query=${query}`,
+    ReactQueryKeys?.CONTACTS_KEYS,
     IContactTypes.SUPPLIER,
     page,
     sortid,
@@ -200,7 +201,7 @@ export const Suppliers: FC = () => {
       dataIndex: 'email',
       key: 'email',
       sorter: true,
-      sortOrder: sortedInfo?.columnKey === 'email' && sortedInfo?.order
+      sortOrder: sortedInfo?.columnKey === 'email' && sortedInfo?.order,
     },
     {
       title: 'Company Name',

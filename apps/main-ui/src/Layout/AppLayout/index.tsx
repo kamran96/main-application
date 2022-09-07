@@ -33,6 +33,7 @@ export const AppLayout: FC<IProps> = ({ children }) => {
     setTheme,
     setVerifiedModal,
     isOnline,
+    usePrefetchQuery,
   } = useGlobalContext();
   const handleThemeSwitch = async (theme) => {
     setTheme(theme);
@@ -86,6 +87,7 @@ export const AppLayout: FC<IProps> = ({ children }) => {
         <section className="layout">
           {/* <Sidebar/> */}
           <SidebarUi
+            onPrefetch={usePrefetchQuery}
             appLogo={
               theme === 'dark' ? (
                 <InyvceLightTextIcon />

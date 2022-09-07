@@ -12,7 +12,7 @@
     "skipLibCheck": true
   },
   "files": [],
-  "include": ["src"],
+  "include": ["src", "../../libs/shared/types/src/modal/ReactQueryKeys.ts"],
   "references": [
     {
       "path": "./tsconfig.app.json"

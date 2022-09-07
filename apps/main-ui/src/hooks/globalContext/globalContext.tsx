@@ -152,6 +152,7 @@ interface IGlobalContextvalues {
   refetchPermissions: () => void;
   userAuthenticated: boolean;
   Colors: IThemeVariables;
+  usePrefetchQuery: (queryKey: any[], fn: () => void) => void;
 }
 
 export const globalContext = createContext<Partial<IGlobalContextvalues>>({});

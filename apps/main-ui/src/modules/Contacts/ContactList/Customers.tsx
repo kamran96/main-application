@@ -10,7 +10,11 @@ import { ButtonTag } from '../../../components/ButtonTags';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import { SmartFilter } from '../../../components/SmartFilter';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { IContactTypes, NOTIFICATIONTYPE } from '../../../modal';
+import {
+  IContactTypes,
+  NOTIFICATIONTYPE,
+  ReactQueryKeys,
+} from '../../../modal';
 import { IPagination, IServerError } from '../../../modal/base';
 import { ISupportedRoutes } from '../../../modal/routing';
 import { CommonTable } from './../../../components/Table';
@@ -58,7 +62,7 @@ export const Customers: FC = () => {
   /* eg. sortid = name (assending) -name (descending) */
 
   const params: any = [
-    `contacts-list-customers?page_no=${page}&sort=${sortid}&page_size=${page_size}&type=${IContactTypes.CUSTOMER}&query=${query}`,
+    ReactQueryKeys.CONTACTS_KEYS,
     IContactTypes.CUSTOMER,
     page,
     sortid,
