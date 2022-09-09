@@ -188,16 +188,18 @@ export const ContactImportWidget: FC = () => {
           />
         </div>
 
-        <CompareDataTable
-          contactKeysResponse={contactKeysResponse}
-          compareData={compareData}
-          fileExtractedData={fileExtractedData && fileExtractedData}
-          setStep={() => setStep(2)}
-          fileData={fileData}
-          onComplete={() => {
-            onResetState();
-          }}
-        />
+        <div className="rendertable">
+          <CompareDataTable
+            contactKeysResponse={contactKeysResponse}
+            compareData={compareData}
+            fileExtractedData={fileExtractedData && fileExtractedData}
+            setStep={() => setStep(2)}
+            fileData={fileData}
+            onComplete={() => {
+              onResetState();
+            }}
+          />
+        </div>
       </WrapperModalContent>
     </CommonModal>
   );
