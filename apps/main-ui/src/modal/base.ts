@@ -29,6 +29,7 @@ export interface IPagination {
   page_no?: number;
   sort_column?: string;
   sort_order?: string;
+  totalDocs?: number;
 }
 
 export interface IBaseRequest {

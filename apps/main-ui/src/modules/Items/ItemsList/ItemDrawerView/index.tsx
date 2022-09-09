@@ -10,6 +10,7 @@ import {
   ISupportedRoutes,
   IItemViewResult,
   IItemViewResponse,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import moneyFormat from '../../../../utils/moneyFormat';
 import { SummaryItem } from './SummaryItem';
@@ -55,7 +56,7 @@ export const ItemsViewContainer: FC<Iprops> = ({
   }, [location]);
 
   const { data: itemViewResponse } = useQuery(
-    [`item-details-${showItemDetails?.id}`, showItemDetails?.id],
+    [ReactQueryKeys?.ITEMS_VIEW, showItemDetails?.id],
     getItemByIDAPI,
     {
       enabled: !!showItemDetails?.id,

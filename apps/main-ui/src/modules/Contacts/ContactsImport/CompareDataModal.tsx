@@ -260,7 +260,7 @@ export const CompareDataModalWrapper = styled.div`
   .CnfrmBtn {
     display: flex;
     justify-content: flex-end;
-    align-items: center;
+    align-items: flex-end;
   }
   .btn {
     margin: 5px 4px;

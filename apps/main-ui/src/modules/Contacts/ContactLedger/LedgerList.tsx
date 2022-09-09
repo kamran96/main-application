@@ -13,6 +13,7 @@ import {
   IContactTypes,
   IEntryType,
   ISupportedRoutes,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import moneyFormat from '../../../utils/moneyFormat';
 import FilterSchema from './ledgerFilterSchema';
@@ -60,14 +61,7 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
   }, [history]);
 
   const { isLoading, data: resolvedData } = useQuery(
-    [
-      `ledger-contact-${id}?type=${type}&page=${page}&pageSize=${page_size}&query=${query}`,
-      id,
-      type,
-      query,
-      page_size,
-      page,
-    ],
+    [ReactQueryKeys.CONTACT_VIEW, id, type, query, page_size, page],
 
     getContactLedger,
     {

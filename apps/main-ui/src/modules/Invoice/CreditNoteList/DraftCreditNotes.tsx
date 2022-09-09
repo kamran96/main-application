@@ -25,6 +25,7 @@ import {
   NOTIFICATIONTYPE,
   IServerError,
   IInvoiceResponse,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import editSolid from '@iconify-icons/clarity/edit-solid';
 import FilteringSchema from './FilteringSchema';
@@ -193,7 +194,7 @@ export const DraftCreditNotes: FC = () => {
             'transactions',
             'items-list',
             'invoice-view',
-            'ledger-contact',
+            ReactQueryKeys.CONTACT_VIEW,
             'all-items',
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) =>

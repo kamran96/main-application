@@ -17,6 +17,7 @@ import {
   IPaymentResponse,
   ISupportedRoutes,
   NOTIFICATIONTYPE,
+  ReactQueryKeys,
   TRANSACTION_MODE,
 } from '@invyce/shared/types';
 import { useCols } from './CommonCols';
@@ -58,7 +59,8 @@ export const PaymentRecievedList: FC = () => {
     isFetching,
   } = useQuery(
     [
-      `payments-list?page_no=${page}&sort=${sortid}&page_size=${page_size}&query=${query}=paymentType=recieveables`,
+      // `payments-list?page_no=${page}&sort=${sortid}&page_size=${page_size}&query=${query}=paymentType=recieveables`,\
+      ReactQueryKeys.PAYMENTS_KEYS,
       page,
       sortid,
       page_size,

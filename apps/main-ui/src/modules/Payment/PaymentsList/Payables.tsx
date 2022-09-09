@@ -20,10 +20,13 @@ import {
   NOTIFICATIONTYPE,
   ISupportedRoutes,
   TRANSACTION_MODE,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import { PaymentImport } from '../PaymentsImport';
 import { useCols } from './CommonCols';
 import filterSchema from './paymentFilterSchema';
+
+const defaultSortId = 'id';
 
 export const PaymentPaidList: FC = () => {
   const { routeHistory, notificationCallback } = useGlobalContext();
@@ -49,7 +52,7 @@ export const PaymentPaidList: FC = () => {
   const [config, setConfig] = useState({
     page: 1,
     query: '',
-    sortid: 'id',
+    sortid: defaultSortId,
     sortItem: '',
     page_size: 20,
   });
@@ -61,7 +64,8 @@ export const PaymentPaidList: FC = () => {
     isFetching,
   } = useQuery(
     [
-      `payments-list?page_no=${page}&sort=${sortid}&page_size=${page_size}&query=${query}&paymentType=payables`,
+      // `payments-list?page_no=${page}&sort=${sortid}&page_size=${page_size}&query=${query}&paymentType=payables`,
+      ReactQueryKeys.PAYMENTS_KEYS,
       page,
       sortid,
       page_size,
@@ -122,58 +126,71 @@ export const PaymentPaidList: FC = () => {
   const { columns } = useCols();
 
   const handlePaymentConfig = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      setConfig({
-        ...config,
-        sortid: 'id',
-        sortItem: null,
-        page: pagination.current,
-        page_size: pagination.pageSize,
-      });
-
-      history.push(
-        `/app${ISupportedRoutes.PAYMENTS}?tabIndex=paid&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
-      );
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+    if (sorter?.column) {
+      if (sorter.order === false) {
+        setConfig({
+          ...config,
+          sortid: 'id',
+          sortItem: null,
+          page: pagination.current,
+          page_size: pagination.pageSize,
         });
-        setPaymentResponse((prev) => ({ ...prev, result: userData }));
+
+        history.push(
+          `/app${ISupportedRoutes.PAYMENTS}?tabIndex=paid&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+        );
       } else {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
-        });
+        // if (sorter?.order === 'ascend') {
+        //   const userData = [...result].sort((a, b) => {
+        //     if (a[sorter?.field] > b[sorter?.field]) {
+        //       return 1;
+        //     } else {
+        //       return -1;
+        //     }
+        //   });
+        //   setPaymentResponse((prev) => ({ ...prev, result: userData }));
+        // } else {
+        //   const userData = [...result].sort((a, b) => {
+        //     if (a[sorter?.field] < b[sorter?.field]) {
+        //       return 1;
+        //     } else {
+        //       return -1;
+        //     }
+        //   });
 
-        setPaymentResponse((prev) => ({ ...prev, result: userData }));
+        //   setPaymentResponse((prev) => ({ ...prev, result: userData }));
+        // }
+        history.push(
+          `/app${ISupportedRoutes.PAYMENTS}?tabIndex=paid&sortid=${
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field
+          }&page=${pagination.current}&page_size=${
+            pagination.pageSize
+          }&filter=${sorter.order}&query=${query}`
+        );
+        setConfig({
+          ...config,
+          sortItem: sorter.field,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
+        });
       }
-      history.push(
-        `/app${ISupportedRoutes.PAYMENTS}?tabIndex=paid&sortid=${
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field
-        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-          sorter.order
-        }&query=${query}`
-      );
+    } else {
       setConfig({
         ...config,
-        sortItem: sorter.field,
-        page: pagination.current,
+        sortid: defaultSortId,
+        page: pagination?.current,
         page_size: pagination.pageSize,
-        sortid:
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field,
       });
+
+      history.push(
+        `/app${ISupportedRoutes.PAYMENTS}?tabIndex=paid&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+      );
     }
   };
 

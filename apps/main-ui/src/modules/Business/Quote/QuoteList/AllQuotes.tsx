@@ -21,6 +21,7 @@ import {
   IInvoiceResponse,
   ORDER_TYPE,
   ISupportedRoutes,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import { PDFQuotesCols } from './commonCol';
 import { QuoteImport } from '../QuoteImport';
@@ -91,7 +92,7 @@ export const ALLQuotesList: FC<IProps> = ({ columns }) => {
           'transactions',
           'items-list',
           'invoice-view',
-          'ledger-contact',
+          ReactQueryKeys.CONTACT_VIEW,
           'all-items',
         ].forEach((key) => {
           (queryCache.invalidateQueries as any)((q) => q.startsWith(`${key}`));

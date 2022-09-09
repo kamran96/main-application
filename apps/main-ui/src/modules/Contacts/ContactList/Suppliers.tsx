@@ -2,10 +2,10 @@
 import editSolid from '@iconify-icons/clarity/edit-solid';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import { ColumnsType } from 'antd/lib/table';
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
-import { deleteContacts, getContacts } from '../../../api/Contact';
+import { deleteContacts, getContactLedger, getContacts } from '../../../api';
 import {
   ButtonTag,
   ConfirmModal,
@@ -17,12 +17,12 @@ import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import {
   IContactTypes,
   NOTIFICATIONTYPE,
+  ReactQueryKeys,
   ISupportedRoutes,
 } from '@invyce/shared/types';
 import { IPagination, IServerError } from '../../../modal/base';
 import FilterSchema from './FilterSchema';
 import { ContactListWrapper, ContactMainWrapper } from './styles';
-import printIcon from '@iconify-icons/bytesize/print';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
 import moneyFormat from '../../../utils/moneyFormat';
@@ -47,6 +47,8 @@ export const Suppliers: FC = () => {
   });
   const { page, query, sortid, page_size } = config;
 
+  const defaultSortId = 'id';
+
   const queryCache = useQueryClient();
 
   /*  CONTAINER STATES*/
@@ -60,12 +62,7 @@ export const Suppliers: FC = () => {
   const { history } = routeHistory;
 
   useEffect(() => {
-    if (
-      routeHistory &&
-      routeHistory.history &&
-      routeHistory.history.location &&
-      routeHistory.history.location.search
-    ) {
+    if (routeHistory?.history?.location?.search) {
       let obj = {};
       const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
@@ -74,78 +71,60 @@ export const Suppliers: FC = () => {
       });
 
       setConfig({ ...config, ...obj });
-
-      const filterType = history.location.search.split('&');
-      const filterIdType = filterType[1];
-      const filterOrder = filterType[4]?.split('=')[1];
-
-      if (filterIdType?.includes('-')) {
-        const fieldName = filterIdType?.split('=')[1].split('-')[1];
-        setsortedInfo({
-          order: filterOrder,
-          columnKey: fieldName,
-        });
-      } else {
-        const fieldName = filterIdType?.split('=')[1];
-        setsortedInfo({
-          order: filterOrder,
-          columnKey: fieldName,
-        });
-      }
     }
-  }, [routeHistory]);
+  }, []);
 
   const handleContactsConfig = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      history.push(
-        `/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`
-      );
-      setConfig({
-        ...config,
-        sortid: null,
-        sortItem: null,
-        page: pagination.current,
-        page_size: pagination.pageSize,
-      });
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...contactsResponse].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+    console.log(sorter, 'sorter');
+    if (sorter?.column) {
+      if (sorter.order === false) {
+        history.push(
+          `/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+        );
+        setConfig({
+          ...config,
+          sortid: null,
+          sortItem: null,
+          page: pagination.current,
+          page_size: pagination.pageSize,
         });
-        setContactResponse(userData);
       } else {
-        const userData = [...contactsResponse].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+        setConfig({
+          ...config,
+          sortItem: sorter.field,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
         });
-        setContactResponse(userData);
+
+        setsortedInfo({
+          order: sorter?.order,
+          columnKey: sorter?.columnKey,
+        });
+
+        history.push(
+          `/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers&sortid=${
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field
+          }&page=${pagination.current}&page_size=${
+            pagination.pageSize
+          }&query=${query}`
+        );
       }
+    } else {
       setConfig({
         ...config,
-        sortItem: sorter.field,
+        sortid: defaultSortId,
         page: pagination.current,
         page_size: pagination.pageSize,
-        sortid:
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field,
       });
-
+      setsortedInfo(null);
       history.push(
-        `/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers&sortid=${
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field
-        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-          sorter.order
-        }&query=${query}`
+        `/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
       );
     }
   };
@@ -154,7 +133,7 @@ export const Suppliers: FC = () => {
   /* this hook fetches contact list against page number and also sorts request data against sort id */
   /* eg. sortid = name (assending) -name (descending) */
   const params: any = [
-    `contacts-list-suppliers?page_no=${page}&sort=${sortid}&page_size=${page_size}&type=${IContactTypes.SUPPLIER}&query=${query}`,
+    ReactQueryKeys?.CONTACTS_KEYS,
     IContactTypes.SUPPLIER,
     page,
     sortid,
@@ -171,7 +150,7 @@ export const Suppliers: FC = () => {
 
   /* ComponentDidUpdate hook for updaing contactResponse state when successfully API fetches contact list data */
   useEffect(() => {
-    if (resolvedData && resolvedData.data && resolvedData.data.result) {
+    if (resolvedData?.data?.result) {
       const { result, pagination } = resolvedData.data;
       const generatedResult = [];
       result.forEach((item) => {
@@ -179,6 +158,19 @@ export const Suppliers: FC = () => {
       });
       setContactResponse(generatedResult);
       setPaginationData(pagination);
+      if (pagination?.next === page + 1) {
+        queryCache?.prefetchQuery(
+          [
+            ReactQueryKeys.CONTACTS_KEYS,
+            IContactTypes.SUPPLIER,
+            page + 1,
+            sortid,
+            page_size,
+            query,
+          ],
+          getContacts
+        );
+      }
     }
   }, [resolvedData]);
 
@@ -335,6 +327,16 @@ export const Suppliers: FC = () => {
       <ContactListWrapper>
         <div className="table_container">
           <CommonTable
+            onRow={(record) => {
+              return {
+                onMouseEnter: () => {
+                  queryCache.prefetchQuery(
+                    [ReactQueryKeys?.CONTACT_VIEW, record?.id, 2, '', 20, 1],
+                    getContactLedger
+                  );
+                },
+              };
+            }}
             pdfExportable={{
               columns: pdfCols,
             }}

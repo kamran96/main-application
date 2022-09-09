@@ -1,4 +1,4 @@
-import { Integrations, useApiCallback, Host } from '@invyce/global-constants';
+import { Integrations, Host } from '@invyce/global-constants';
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import formidable = require('formidable');
@@ -20,26 +20,30 @@ export class CsvService {
     if (!req || !req.cookies) return null;
     const token = req.cookies['access_token'];
 
-    let formData = {};
     const csvData = []; // array of objects
 
     const form = formidable({ multiples: true });
+    console.log('before parse');
 
     await form.parse(req, async (err, fields, files) => {
-      formData = { fields, files };
-
-      console.log(files.file, 'what is it');
+      console.log('in function');
 
       const compareData = JSON.parse(fields.compareData);
-      const readStream = fs.readFileSync(files.file?.path, {
+      console.log('compare data', files.file, 'path', files.file?.filepath);
+
+      const readStream = fs.readFileSync(files.file?.filepath, {
         encoding: 'utf8',
       });
+
+      console.log('in 38', readStream);
 
       const moduleType = JSON.parse(fields.module);
 
       const string = readStream.replace('\r', '');
       const lbreak = string.split('\n');
       const accessors = lbreak[0].split(',');
+
+      console.log('in 42');
 
       for (let i = 1; i < lbreak.length; i++) {
         const obj = {};
@@ -48,11 +52,14 @@ export class CsvService {
         });
         csvData.push(obj);
       }
+
+      console.log('data constructed 52');
       switch (moduleType) {
         case Modules.CONTACT:
+          console.log('before get transactions');
           // eslint-disable-next-line no-case-declarations, @typescript-eslint/ban-types
           const transactions: Object = JSON.parse(fields.transactions);
-          console.log(csvData);
+          console.log(csvData, 'in contacts');
           await axios.post(
             Host('contacts', 'contacts/contact/sync'),
             {

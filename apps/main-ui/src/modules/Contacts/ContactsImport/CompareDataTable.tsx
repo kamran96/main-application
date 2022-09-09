@@ -62,6 +62,7 @@ export const CompareDataTable: FC<IProps> = ({
 
   const onConfirmUpload = async () => {
     const formData = new FormData();
+
     formData.append('file', fileData);
     formData.append('compareData', JSON.stringify(compareData));
     formData.append('module', JSON.stringify('contact'));

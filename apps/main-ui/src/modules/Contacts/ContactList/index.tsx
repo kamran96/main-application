@@ -13,11 +13,13 @@ import { FallBackLoader } from '../../../components/FallBackLoader';
 import { Rbac } from '../../../components/Rbac/index';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
 
+import Customers from './Customers';
+import Suppliers from './Suppliers';
 export const ContactList: FC = () => {
   /* DYNAMIC IMPORTS */
 
-  const Customers = lazy(() => import('./Customers'));
-  const Suppliers = lazy(() => import('./Suppliers'));
+  // const Customers = lazy(() => import('./Customers'));
+  // const Suppliers = lazy(() => import('./Suppliers'));
 
   const { routeHistory } = useGlobalContext();
   const [activeTab, setActiveTab] = useState('');
@@ -73,14 +75,14 @@ export const ContactList: FC = () => {
       >
         <>
           <TableTabsContent tab="Customers" key="customers">
-            <Suspense fallback={<FallBackLoader />}>
-              <Customers />
-            </Suspense>
+            <Customers />
+            {/* <Suspense fallback={<FallBackLoader />}>
+            </Suspense> */}
           </TableTabsContent>
           <TableTabsContent tab="Suppliers" key="suppliers">
-            <Suspense fallback={<FallBackLoader />}>
-              <Suppliers />
-            </Suspense>
+            <Suppliers />
+            {/* <Suspense fallback={<FallBackLoader />}>
+            </Suspense> */}
           </TableTabsContent>
         </>
       </TableTabs>

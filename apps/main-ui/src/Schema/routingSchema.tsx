@@ -1,4 +1,10 @@
-import { IRoutingSchema, ISupportedRoutes } from '@invyce/shared/types';
+import {
+  IContactTypes,
+  IRoutingSchema,
+  ISupportedRoutes,
+  ReactQueryKeys,
+  TRANSACTION_MODE,
+} from '@invyce/shared/types';
 import { PERMISSIONS } from '../components/Rbac/permissions';
 import {
   BussinesIcon,
@@ -17,6 +23,7 @@ import {
   Dashboard,
   DebitNote,
 } from '../assets/icons/index';
+import { getContacts, getItemsList, paymentIndexAPI } from '@api';
 
 const root = `/app`;
 export const RoutingSchema: IRoutingSchema = {
@@ -132,6 +139,39 @@ export const RoutingSchema: IRoutingSchema = {
       route: `${root}${ISupportedRoutes.PAYMENTS}`,
       children: [],
       permission: PERMISSIONS.PAYMENTS_INDEX,
+      // prefetchQuries: [
+      //   {
+      //     fn: paymentIndexAPI,
+      //     queryKey: [
+      //       ReactQueryKeys.PAYMENTS_KEYS,
+      //       1,
+      //       'id',
+      //       20,
+      //       '',
+      //       TRANSACTION_MODE?.PAYABLES,
+      //     ],
+      //   },
+      //   {
+      //     fn: paymentIndexAPI,
+      //     queryKey: [
+      //       ReactQueryKeys.PAYMENTS_KEYS,
+      //       1,
+      //       'id',
+      //       20,
+      //       '',
+      //       TRANSACTION_MODE?.RECEIVABLES,
+      //     ],
+      //   },
+      // ],
+      // fn: paymentIndexAPI,
+      // queryKey: [
+      //   ReactQueryKeys.PAYMENTS_KEYS,
+      //   1,
+      //   'id',
+      //   20,
+      //   '',
+      //   TRANSACTION_MODE?.PAYABLES,
+      // ],
     },
 
     {
@@ -140,13 +180,55 @@ export const RoutingSchema: IRoutingSchema = {
       route: `${root}${ISupportedRoutes.CONTACTS}`,
       children: [],
       permission: PERMISSIONS.CONTACTS_INDEX,
+      prefetchQueries: [
+        {
+          fn: getContacts,
+          queryKey: [
+            ReactQueryKeys.CONTACTS_KEYS,
+            IContactTypes.CUSTOMER,
+            1,
+            'id',
+            20,
+            '',
+          ],
+        },
+        {
+          fn: getContacts,
+          queryKey: [
+            ReactQueryKeys.CONTACTS_KEYS,
+            IContactTypes.SUPPLIER,
+            1,
+            'id',
+            20,
+            '',
+          ],
+        },
+      ],
+      fn: getContacts,
+      queryKey: [
+        ReactQueryKeys.CONTACTS_KEYS,
+        IContactTypes.CUSTOMER,
+        1,
+        'id',
+        20,
+        '',
+      ],
     },
     {
       tag: 'Items',
-      route: '/app/items',
+      // route: '/app/items',
+      route: `${root}${ISupportedRoutes?.ITEMS}`,
       children: [],
       icon: <Items />,
       permission: PERMISSIONS.ITEMS_INDEX,
+      prefetchQueries: [
+        {
+          fn: getItemsList,
+          queryKey: [ReactQueryKeys.ITEMS_KEYS, 1, 'id', '', 20],
+        },
+      ],
+      fn: getItemsList,
+      queryKey: [ReactQueryKeys.ITEMS_KEYS, 1, 'id', '', 20],
     },
     //**** Un Comment to enable Categories in sidebar */
 

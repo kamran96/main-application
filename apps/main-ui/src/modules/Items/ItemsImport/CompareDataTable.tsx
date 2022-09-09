@@ -144,7 +144,11 @@ export const CompareDataTable: FC<IProps> = ({
 
   return (
     <div className="TableWrapper">
-      <CommonTable columns={columns} data={fileExtractedData} />
+      <CommonTable
+        columns={columns}
+        data={fileExtractedData}
+        pagination={false}
+      />
       <div className="CnfrmBtn">
         <Button className="btn" onClick={() => setStep(2)}>
           Back

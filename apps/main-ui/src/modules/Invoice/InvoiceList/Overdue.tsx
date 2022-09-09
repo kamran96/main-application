@@ -27,6 +27,7 @@ import {
   IContactTypes,
   IServerError,
   NOTIFICATIONTYPE,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import { useCols } from './commonCol';
 import InvoicesFilterSchema from './InvoicesFilterSchema';
@@ -153,7 +154,7 @@ export const OverDueInvoices: FC<IProps> = ({ columns }) => {
           'transactions',
           'items-list',
           'invoice-view',
-          'ledger-contact',
+          ReactQueryKeys.CONTACT_VIEW,
           'all-items',
         ].forEach((key) => {
           (queryCache.invalidateQueries as any)((q) => q.startsWith(`${key}`));

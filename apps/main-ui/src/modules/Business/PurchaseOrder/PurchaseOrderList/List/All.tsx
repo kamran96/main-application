@@ -15,6 +15,7 @@ import {
   IContactTypes,
   NOTIFICATIONTYPE,
   ISupportedRoutes,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 
 import { CommonTable, ConfirmModal, SmartFilter } from '@components';
@@ -213,7 +214,7 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
           'transactions',
           'items-list',
           'invoice-view',
-          'ledger-contact',
+          ReactQueryKeys.CONTACT_VIEW,
           'all-items',
         ].forEach((key) => {
           (queryCache.invalidateQueries as any)((q) => q?.startsWith(`${key}`));

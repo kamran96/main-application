@@ -7,7 +7,12 @@ import { ColumnsType } from 'antd/lib/table';
 import { plainToClass } from 'class-transformer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
-import { deleteItems, getAllCategories, getItemsList } from '../../../api';
+import {
+  deleteItems,
+  getAllCategories,
+  getItemByIDAPI,
+  getItemsList,
+} from '../../../api';
 import {
   ButtonTag,
   ConfirmModal,
@@ -26,6 +31,7 @@ import {
   ICategory,
   NOTIFICATIONTYPE,
   ISupportedRoutes,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import moneyFormat from '../../../utils/moneyFormat';
 import { useWindowSize } from '../../../utils/useWindowSize';
@@ -35,6 +41,9 @@ import { ItemsListWrapper } from './styles';
 import packageIcon from '@iconify-icons/feather/package';
 import ItemsImport from '../ItemsImport';
 import { ItemsViewContainer } from './ItemDrawerView';
+
+const defaultSortId = 'id';
+
 export const ItemsList: FC = () => {
   /* HOOKS */
   const queryCache = useQueryClient();
@@ -93,26 +102,8 @@ export const ItemsList: FC = () => {
         obj = { ...obj, [split[0]]: split[1] };
       });
       setItemsConfig({ ...itemsConfig, ...obj });
-
-      const filterType = history.location.search.split('&');
-      const filterIdType = filterType[0];
-      const filterOrder = filterType[3]?.split('=')[1];
-
-      if (filterIdType?.includes('-')) {
-        const fieldName = filterIdType?.split('=')[1].split('-')[1];
-        setSortedInfo({
-          order: filterOrder,
-          columnKey: fieldName,
-        });
-      } else {
-        const fieldName = filterIdType?.split('=')[1];
-        setSortedInfo({
-          order: filterOrder,
-          columnKey: fieldName,
-        });
-      }
     }
-  }, [history, routeHistory?.location?.search]);
+  }, []);
 
   const { data: allCategoriesData } = useQuery(
     [`all-categories`],
@@ -121,12 +112,12 @@ export const ItemsList: FC = () => {
 
   const resolvedCategories: ICategory[] =
     (allCategoriesData &&
-      allCategoriesData.data &&
-      allCategoriesData.data.result) ||
+      allCategoriesData?.data &&
+      allCategoriesData?.data?.result) ||
     [];
 
   useEffect(() => {
-    if (resolvedCategories && resolvedCategories.length) {
+    if (resolvedCategories && resolvedCategories?.length) {
       const filteringSchema = {
         ...filterSchema,
       };
@@ -141,71 +132,18 @@ export const ItemsList: FC = () => {
     isLoading,
     data: resolvedData,
     isFetching,
-  } = useQuery([`items-list`, page, sortid, query, pageSize], getItemsList, {
-    cacheTime: Infinity,
-    keepPreviousData: true,
-  });
-
-  const handleItemsConfig = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      setItemsConfig({
-        ...itemsConfig,
-        sortid: 'id',
-        page: pagination.current,
-        page_size: pagination.pageSize,
-      });
-
-      history.push(
-        `/app${ISupportedRoutes.ITEMS}?sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
-      );
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
-        });
-        setSortedInfo({
-          order: sorter.order,
-          columnKey: sorter.columnKey,
-        });
-        setItemsConfig((prev) => ({ ...prev, result: userData }));
-      } else {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
-        });
-        setSortedInfo({
-          order: sorter.order,
-          columnKey: sorter.columnKey,
-        });
-        setItemsConfig((prev) => ({ ...prev, result: userData }));
-      }
-
-      history.push(
-        `/app${ISupportedRoutes.ITEMS}?sortid=${
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field
-        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-          sorter.order
-        }&query=${query}`
-      );
-
-      setItemsConfig({
-        ...itemsConfig,
-        sortid: sorter.order === 'descend' ? `-${sorter.field}` : sorter.field,
-      });
+  } = useQuery(
+    [ReactQueryKeys?.ITEMS_KEYS, page, sortid, query, pageSize],
+    getItemsList,
+    {
+      cacheTime: Infinity,
+      keepPreviousData: true,
     }
-  };
+  );
 
   useEffect(() => {
-    if (resolvedData && resolvedData.data && resolvedData.data.result) {
+    if (resolvedData?.data?.result) {
+      // const {response, result} = resolvedData?.data
       const response: IItemsResponse = resolvedData.data;
       const result: IItemsResult[] | any = [];
       // response.result.forEach((item) => {
@@ -230,8 +168,65 @@ export const ItemsList: FC = () => {
       });
 
       setItemsResponse({ ...response, result });
+      if (resolvedData?.data?.pagination.next === page + 1) {
+        queryCache?.prefetchQuery(
+          [ReactQueryKeys?.ITEMS_KEYS, page + 1, sortid, query, page_size],
+          getItemsList
+        );
+      }
     }
   }, [resolvedData]);
+
+  const handleItemsConfig = (pagination, filters, sorter: any, extra) => {
+    if (sorter?.column) {
+      if (sorter?.order === false) {
+        setItemsConfig({
+          ...itemsConfig,
+          sortid: defaultSortId,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+        });
+
+        history.push(
+          `/app${ISupportedRoutes.ITEMS}?sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+        );
+      } else {
+        history.push(
+          `/app${ISupportedRoutes.ITEMS}?sortid=${
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field
+          }&page=${pagination.current}&page_size=${
+            pagination.pageSize
+          }&query=${query}`
+        );
+
+        setItemsConfig({
+          ...itemsConfig,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+          sortid:
+            sorter.order === 'descend' ? `-${sorter.field}` : sorter.field,
+        });
+
+        setSortedInfo({
+          order: sorter.order,
+          columnKey: sorter.columnKey,
+        });
+      }
+    } else {
+      setItemsConfig({
+        ...itemsConfig,
+        sortid: defaultSortId,
+        page: pagination.current,
+        page_size: pagination.pageSize,
+      });
+      setSortedInfo(null);
+      history.push(
+        `/app${ISupportedRoutes.ITEMS}?sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+      );
+    }
+  };
 
   const handleDelete = async () => {
     const payload = {
@@ -475,6 +470,16 @@ export const ItemsList: FC = () => {
           </div>
         </div>
         <CommonTable
+          onRow={(record) => {
+            return {
+              onMouseEnter: () => {
+                queryCache.prefetchQuery(
+                  [ReactQueryKeys?.ITEMS_VIEW, record?.id],
+                  getItemByIDAPI
+                );
+              },
+            };
+          }}
           className="customized-table"
           rowKey={(record) => record.id}
           key={'table1'}

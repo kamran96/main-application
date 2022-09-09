@@ -19,6 +19,7 @@ import {
   IContactType,
   IContactTypes,
   NOTIFICATIONTYPE,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
@@ -218,9 +219,9 @@ export const DueExpiredBills: FC<IProps> = ({ columns, activeTab }) => {
           [
             'invoices',
             'transactions',
-            'items-list',
+            ReactQueryKeys?.ITEMS_KEYS,
             'invoice-view',
-            'ledger-contact',
+            ReactQueryKeys.CONTACT_VIEW,
             'all-items',
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) =>

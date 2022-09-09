@@ -27,6 +27,7 @@ import {
   IServerError,
   ISupportedRoutes,
   NOTIFICATIONTYPE,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv, { DownloadPDF } from '../../../../utils/Print';
@@ -163,7 +164,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
             'transactions?page',
             'items-list',
             'invoice-view',
-            'ledger-contact',
+            ReactQueryKeys.CONTACT_VIEW,
             'all-items',
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
