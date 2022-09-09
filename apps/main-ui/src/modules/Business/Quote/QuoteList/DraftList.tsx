@@ -22,6 +22,7 @@ import {
   INVOICETYPE,
   ORDER_TYPE,
   ISupportedRoutes,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import { PERMISSIONS } from '../../../../components/Rbac/permissions';
 import { useRbac } from '../../../../components/Rbac/useRbac';
@@ -99,7 +100,7 @@ export const DraftQuotesList: FC<IProps> = ({ columns }) => {
           'transactions',
           'items-list',
           'invoice-view',
-          'ledger-contact',
+          ReactQueryKeys.CONTACT_VIEW,
           'all-items',
         ].forEach((key) => {
           (queryCache.invalidateQueries as any)((q) => q?.startsWith(`${key}`));

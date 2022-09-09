@@ -3,7 +3,7 @@ import printIcon from '@iconify-icons/bytesize/print';
 import Icon from '@iconify/react';
 import { EditableTable } from '@invyce/editable-table';
 import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
-import { IInvoiceType, ITaxTypes } from '@invyce/shared/types';
+import { IInvoiceType, ITaxTypes, ReactQueryKeys } from '@invyce/shared/types';
 import dayjs from 'dayjs';
 import { FC, useRef, useState } from 'react';
 import { useQueryClient, useMutation } from 'react-query';
@@ -171,7 +171,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
             'transactions',
             'items-list',
             'invoice-view',
-            'ledger-contact',
+            ReactQueryKeys.CONTACT_VIEW,
             'all-items',
             'ACCRECCREDIT',
           ].forEach((key) => {

@@ -75,77 +75,96 @@ export const Suppliers: FC = () => {
 
       setConfig({ ...config, ...obj });
 
-      const filterType = history.location.search.split('&');
-      const filterIdType = filterType[1];
-      const filterOrder = filterType[4]?.split('=')[1];
+      // const filterType = history.location.search.split('&');
+      // const filterIdType = filterType[1];
+      // const filterOrder = filterType[4]?.split('=')[1];
 
-      if (filterIdType?.includes('-')) {
-        const fieldName = filterIdType?.split('=')[1].split('-')[1];
-        setsortedInfo({
-          order: filterOrder,
-          columnKey: fieldName,
-        });
-      } else {
-        const fieldName = filterIdType?.split('=')[1];
-        setsortedInfo({
-          order: filterOrder,
-          columnKey: fieldName,
-        });
-      }
+      // if (filterIdType?.includes('-')) {
+      //   const fieldName = filterIdType?.split('=')[1].split('-')[1];
+      //   setsortedInfo({
+      //     order: filterOrder,
+      //     columnKey: fieldName,
+      //   });
+      // } else {
+      //   const fieldName = filterIdType?.split('=')[1];
+      //   setsortedInfo({
+      //     order: filterOrder,
+      //     columnKey: fieldName,
+      //   });
+      // }
     }
   }, [routeHistory]);
 
   const handleContactsConfig = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      history.push(
-        `/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`
-      );
+    console.log(sorter, 'sorter');
+    if (sorter?.column) {
+      if (sorter.order === false) {
+        history.push(
+          `/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+        );
+        setConfig({
+          ...config,
+          sortid: null,
+          sortItem: null,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+        });
+      } else {
+        // if (sorter?.order === 'ascend') {
+        //   const userData = [...contactsResponse].sort((a, b) => {
+        //     if (a[sorter?.field] > b[sorter?.field]) {
+        //       return 1;
+        //     } else {
+        //       return -1;
+        //     }
+        //   });
+        //   setContactResponse(userData);
+        // } else {
+        //   const userData = [...contactsResponse].sort((a, b) => {
+        //     if (a[sorter?.field] < b[sorter?.field]) {
+        //       return 1;
+        //     } else {
+        //       return -1;
+        //     }
+        //   });
+        //   setContactResponse(userData);
+        // }
+        setConfig({
+          ...config,
+          sortItem: sorter.field,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
+        });
+
+        setsortedInfo({
+          order: sorter?.order,
+          columnKey: sorter?.columnKey,
+        });
+
+        history.push(
+          `/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers&sortid=${
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field
+          }&page=${pagination.current}&page_size=${
+            pagination.pageSize
+          }&query=${query}`
+        );
+      }
+    } else {
       setConfig({
         ...config,
         sortid: null,
-        sortItem: null,
         page: pagination.current,
         page_size: pagination.pageSize,
       });
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...contactsResponse].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
-        });
-        setContactResponse(userData);
-      } else {
-        const userData = [...contactsResponse].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
-        });
-        setContactResponse(userData);
-      }
-      setConfig({
-        ...config,
-        sortItem: sorter.field,
-        page: pagination.current,
-        page_size: pagination.pageSize,
-        sortid:
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field,
-      });
-
+      setsortedInfo(null);
       history.push(
-        `/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers&sortid=${
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field
-        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-          sorter.order
-        }&query=${query}`
+        `/app${ISupportedRoutes.CONTACTS}?tabIndex=suppliers&sortid=${config?.sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
       );
     }
   };

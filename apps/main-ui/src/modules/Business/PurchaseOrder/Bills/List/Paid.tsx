@@ -19,6 +19,7 @@ import {
   IContactTypes,
   NOTIFICATIONTYPE,
   ISupportedRoutes,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import convertToRem from '../../../../../utils/convertToRem';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
@@ -218,7 +219,7 @@ export const PaidBills: FC<IProps> = ({ columns, activeTab }) => {
             'transactions',
             'items-list',
             'invoice-view',
-            'ledger-contact',
+            ReactQueryKeys.CONTACT_VIEW,
             'all-items',
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) =>

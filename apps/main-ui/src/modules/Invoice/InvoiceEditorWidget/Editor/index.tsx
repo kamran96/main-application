@@ -4,7 +4,7 @@ import Icon from '@iconify/react';
 import { EditableTable } from '@invyce/editable-table';
 import { IContact } from '@invyce/interfaces';
 import { invycePersist } from '@invyce/invyce-persist';
-import { IContactTypes } from '@invyce/shared/types';
+import { IContactTypes, ReactQueryKeys } from '@invyce/shared/types';
 import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import dayjs from 'dayjs';
@@ -209,7 +209,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
             'transactions?page',
             'items-list',
             'invoice-view',
-            'ledger-contact',
+            ReactQueryKeys.CONTACT_VIEW,
             'all-items',
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));

@@ -20,6 +20,7 @@ import {
   IServerError,
   ISupportedRoutes,
   NOTIFICATIONTYPE,
+  ReactQueryKeys,
 } from '../../modal';
 import { IContactTypes } from '../../modal';
 import { IInvoiceStatus, IInvoiceType, ITaxTypes } from '../../modal/invoice';
@@ -193,7 +194,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
             'transactions?page',
             'items-list',
             'invoice-view',
-            'ledger-contact',
+            ReactQueryKeys.CONTACT_VIEW,
             'all-items',
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));

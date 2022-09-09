@@ -15,6 +15,7 @@ import {
   INVOICE_TYPE_STRINGS,
   ORDER_TYPE,
   ISupportedRoutes,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import convertToRem from '../../../../../utils/convertToRem';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
@@ -219,7 +220,7 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
             'transactions',
             'items-list',
             'invoice-view',
-            'ledger-contact',
+            ReactQueryKeys.CONTACT_VIEW,
             'all-items',
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) =>

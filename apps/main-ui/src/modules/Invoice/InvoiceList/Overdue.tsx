@@ -16,7 +16,12 @@ import { useRbac } from '../../../components/Rbac/useRbac';
 import { SmartFilter } from '../../../components/SmartFilter';
 import { CommonTable } from '../../../components/Table';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { IContactTypes, IServerError, NOTIFICATIONTYPE } from '../../../modal';
+import {
+  IContactTypes,
+  IServerError,
+  NOTIFICATIONTYPE,
+  ReactQueryKeys,
+} from '../../../modal';
 import {
   IInvoiceResponse,
   INVOICETYPE,
@@ -149,7 +154,7 @@ export const OverDueInvoices: FC<IProps> = ({ columns }) => {
           'transactions',
           'items-list',
           'invoice-view',
-          'ledger-contact',
+          ReactQueryKeys.CONTACT_VIEW,
           'all-items',
         ].forEach((key) => {
           (queryCache.invalidateQueries as any)((q) => q.startsWith(`${key}`));

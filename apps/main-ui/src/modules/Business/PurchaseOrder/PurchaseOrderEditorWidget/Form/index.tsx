@@ -25,6 +25,7 @@ import {
   IInvoiceTypes,
   NOTIFICATIONTYPE,
   ISupportedRoutes,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import printDiv, { DownloadPDF } from '../../../../../utils/Print';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
@@ -206,7 +207,7 @@ const Editor: FC<IProps> = ({ id }) => {
             'transactions?page',
             'items-list',
             'invoice-view',
-            'ledger-contact',
+            ReactQueryKeys.CONTACT_VIEW,
             'all-items',
             `purchase-order-${id}`,
           ].forEach((key) => {
