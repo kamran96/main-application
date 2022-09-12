@@ -24,6 +24,7 @@ import {
   TRANSACTION_MODE,
   IInvoiceItem,
   IInvoiceResult,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import moneyFormat from '../../../utils/moneyFormat';
 import Columns from './columns';
@@ -173,13 +174,15 @@ export const PaymentsForm: FC = () => {
       await mutatePayment(payload, {
         onSuccess: () => {
           notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Payment Created');
-          ['all-credit-invoices', 'payments-list', 'invoices'].forEach(
-            (key) => {
-              (queryCache.invalidateQueries as any)((q) =>
-                q?.startsWith(`${key}`)
-              );
-            }
-          );
+          [
+            'all-credit-invoices',
+            ReactQueryKeys.PAYMENTS_KEYS,
+            'invoices',
+          ].forEach((key) => {
+            (queryCache.invalidateQueries as any)((q) =>
+              q?.startsWith(`${key}`)
+            );
+          });
           form.resetFields();
 
           _setInvoiceData([

@@ -139,39 +139,39 @@ export const RoutingSchema: IRoutingSchema = {
       route: `${root}${ISupportedRoutes.PAYMENTS}`,
       children: [],
       permission: PERMISSIONS.PAYMENTS_INDEX,
-      // prefetchQuries: [
-      //   {
-      //     fn: paymentIndexAPI,
-      //     queryKey: [
-      //       ReactQueryKeys.PAYMENTS_KEYS,
-      //       1,
-      //       'id',
-      //       20,
-      //       '',
-      //       TRANSACTION_MODE?.PAYABLES,
-      //     ],
-      //   },
-      //   {
-      //     fn: paymentIndexAPI,
-      //     queryKey: [
-      //       ReactQueryKeys.PAYMENTS_KEYS,
-      //       1,
-      //       'id',
-      //       20,
-      //       '',
-      //       TRANSACTION_MODE?.RECEIVABLES,
-      //     ],
-      //   },
-      // ],
-      // fn: paymentIndexAPI,
-      // queryKey: [
-      //   ReactQueryKeys.PAYMENTS_KEYS,
-      //   1,
-      //   'id',
-      //   20,
-      //   '',
-      //   TRANSACTION_MODE?.PAYABLES,
-      // ],
+      prefetchQueries: [
+        {
+          fn: paymentIndexAPI,
+          queryKey: [
+            ReactQueryKeys.PAYMENTS_KEYS,
+            1,
+            'id',
+            20,
+            '',
+            TRANSACTION_MODE?.PAYABLES,
+          ],
+        },
+        {
+          fn: paymentIndexAPI,
+          queryKey: [
+            ReactQueryKeys.PAYMENTS_KEYS,
+            1,
+            'id',
+            20,
+            '',
+            TRANSACTION_MODE?.RECEIVABLES,
+          ],
+        },
+      ],
+      fn: paymentIndexAPI,
+      queryKey: [
+        ReactQueryKeys.PAYMENTS_KEYS,
+        1,
+        'id',
+        20,
+        '',
+        TRANSACTION_MODE?.PAYABLES,
+      ],
     },
 
     {

@@ -3,7 +3,11 @@ import React, { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 
-import { paymentDeleteAPI, paymentIndexAPI } from '../../../api';
+import {
+  getContactLedger,
+  paymentDeleteAPI,
+  paymentIndexAPI,
+} from '../../../api';
 import {
   ButtonTag,
   ConfirmModal,
@@ -58,13 +62,13 @@ export const PaymentPaidList: FC = () => {
   });
   const { page, query, sortid, page_size } = config;
 
+  // `payments-list?page_no=${page}&sort=${sortid}&page_size=${page_size}&query=${query}&paymentType=payables`,
   const {
     isLoading,
     data: resolvedData,
     isFetching,
   } = useQuery(
     [
-      // `payments-list?page_no=${page}&sort=${sortid}&page_size=${page_size}&query=${query}&paymentType=payables`,
       ReactQueryKeys.PAYMENTS_KEYS,
       page,
       sortid,
@@ -80,7 +84,21 @@ export const PaymentPaidList: FC = () => {
 
   useEffect(() => {
     if (resolvedData && resolvedData.data && resolvedData.data.result) {
+      const { pagination } = resolvedData?.data;
       setPaymentResponse(resolvedData.data);
+      if (pagination?.next === page + 1) {
+        queryCache?.prefetchQuery(
+          [
+            ReactQueryKeys.PAYMENTS_KEYS,
+            page + 1,
+            sortid,
+            page_size,
+            query,
+            TRANSACTION_MODE.PAYABLES,
+          ],
+          paymentIndexAPI
+        );
+      }
     }
   }, [resolvedData]);
 
@@ -97,9 +115,11 @@ export const PaymentPaidList: FC = () => {
           NOTIFICATIONTYPE.SUCCESS,
           'Payment Deleted Successfully'
         );
-        ['payments-list', 'transactions', 'invoices'].forEach((key) => {
-          (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
-        });
+        [ReactQueryKeys.PAYMENTS_KEYS, 'transactions', 'invoices'].forEach(
+          (key) => {
+            (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
+          }
+        );
         setConfirmModal(false);
       },
       onError: (error: IServerError) => {
@@ -140,26 +160,6 @@ export const PaymentPaidList: FC = () => {
           `/app${ISupportedRoutes.PAYMENTS}?tabIndex=paid&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
         );
       } else {
-        // if (sorter?.order === 'ascend') {
-        //   const userData = [...result].sort((a, b) => {
-        //     if (a[sorter?.field] > b[sorter?.field]) {
-        //       return 1;
-        //     } else {
-        //       return -1;
-        //     }
-        //   });
-        //   setPaymentResponse((prev) => ({ ...prev, result: userData }));
-        // } else {
-        //   const userData = [...result].sort((a, b) => {
-        //     if (a[sorter?.field] < b[sorter?.field]) {
-        //       return 1;
-        //     } else {
-        //       return -1;
-        //     }
-        //   });
-
-        //   setPaymentResponse((prev) => ({ ...prev, result: userData }));
-        // }
         history.push(
           `/app${ISupportedRoutes.PAYMENTS}?tabIndex=paid&sortid=${
             sorter && sorter.order === 'descend'
@@ -252,6 +252,23 @@ export const PaymentPaidList: FC = () => {
   return (
     <WrapperPaymentList>
       <CommonTable
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => {
+              queryCache.prefetchQuery(
+                [
+                  ReactQueryKeys?.CONTACT_VIEW,
+                  record?.contactId,
+                  record?.paymentType,
+                  '',
+                  20,
+                  1,
+                ],
+                getContactLedger
+              );
+            },
+          };
+        }}
         topbarRightPannel={renderTopbarRight()}
         hasPrint
         printTitle={'Payment Paid List'}
