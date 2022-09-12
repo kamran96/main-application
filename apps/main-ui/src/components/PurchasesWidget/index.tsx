@@ -190,7 +190,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
           ClearAll();
 
           [
-            'invoices',
+            ReactQueryKeys?.INVOICES_KEYS,
             'transactions?page',
             ReactQueryKeys?.ITEMS_KEYS,
             'invoice-view',

@@ -1,7 +1,11 @@
 import {
   IContactTypes,
+  IInvoiceStatus,
+  INVOICETYPE,
+  INVOICE_TYPE_STRINGS,
   IRoutingSchema,
   ISupportedRoutes,
+  ORDER_TYPE,
   ReactQueryKeys,
   TRANSACTION_MODE,
 } from '@invyce/shared/types';
@@ -24,6 +28,8 @@ import {
   DebitNote,
 } from '../assets/icons/index';
 import { getContacts, getItemsList, paymentIndexAPI } from '@api';
+import { getInvoiceListAPI } from '@api';
+import { getCreditNotes } from '@api';
 
 const root = `/app`;
 export const RoutingSchema: IRoutingSchema = {
@@ -52,6 +58,84 @@ export const RoutingSchema: IRoutingSchema = {
           route: `${root}${ISupportedRoutes.INVOICES}`,
           tag: 'Invoices',
           permission: PERMISSIONS.INVOICES_INDEX,
+          prefetchQueries: [
+            {
+              fn: getInvoiceListAPI,
+              queryKey: [
+                ReactQueryKeys?.INVOICES_KEYS,
+                ORDER_TYPE?.SALE_INVOICE,
+                IInvoiceStatus?.approve,
+                'All',
+                1,
+                20,
+                '',
+                'id',
+              ],
+            },
+            {
+              fn: getInvoiceListAPI,
+              queryKey: [
+                ReactQueryKeys?.INVOICES_KEYS,
+                ORDER_TYPE?.SALE_INVOICE,
+                IInvoiceStatus?.approve,
+                'AWAITING_PAYMENT',
+                1,
+                20,
+                '',
+                'id',
+              ],
+            },
+            {
+              fn: getInvoiceListAPI,
+              queryKey: [
+                ReactQueryKeys?.INVOICES_KEYS,
+                ORDER_TYPE?.SALE_INVOICE,
+                IInvoiceStatus?.draft,
+                'ALL',
+                1,
+                20,
+                '',
+                'id',
+              ],
+            },
+            {
+              fn: getInvoiceListAPI,
+              queryKey: [
+                ReactQueryKeys?.INVOICES_KEYS,
+                ORDER_TYPE?.SALE_INVOICE,
+                INVOICETYPE.Approved,
+                INVOICE_TYPE_STRINGS.Date_Expired,
+                1,
+                20,
+                '',
+                'id',
+              ],
+            },
+            {
+              fn: getInvoiceListAPI,
+              queryKey: [
+                ReactQueryKeys?.INVOICES_KEYS,
+                ORDER_TYPE.SALE_INVOICE,
+                INVOICETYPE.Approved,
+                'PAID ',
+                1,
+                20,
+                '',
+                'id',
+              ],
+            },
+          ],
+          fn: getInvoiceListAPI,
+          queryKey: [
+            ReactQueryKeys?.INVOICES_KEYS,
+            ORDER_TYPE?.SALE_INVOICE,
+            IInvoiceStatus?.approve,
+            'All',
+            1,
+            20,
+            '',
+            'id',
+          ],
         },
         {
           route: `${root}${ISupportedRoutes.CREDIT_NOTES}`,

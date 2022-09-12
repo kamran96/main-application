@@ -167,7 +167,7 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
           /* this will clear invoice items, formdata and payment */
           setInvoiceItems([{ ...defaultItems }]);
           [
-            'invoices',
+            ReactQueryKeys?.INVOICES_KEYS,
             'transactions',
             'items-list',
             'invoice-view',

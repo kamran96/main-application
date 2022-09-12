@@ -203,7 +203,7 @@ const Editor: FC<IProps> = ({ id }) => {
             },
           ]);
           [
-            'invoices',
+            ReactQueryKeys?.INVOICES_KEYS,
             'transactions?page',
             'items-list',
             'invoice-view',

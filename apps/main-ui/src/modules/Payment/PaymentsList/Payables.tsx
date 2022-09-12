@@ -83,7 +83,7 @@ export const PaymentPaidList: FC = () => {
   );
 
   useEffect(() => {
-    if (resolvedData && resolvedData.data && resolvedData.data.result) {
+    if (resolvedData?.data?.result) {
       const { pagination } = resolvedData?.data;
       setPaymentResponse(resolvedData.data);
       if (pagination?.next === page + 1) {
@@ -100,7 +100,7 @@ export const PaymentPaidList: FC = () => {
         );
       }
     }
-  }, [resolvedData]);
+  }, []);
 
   /* Payment Delete Async Function */
   const handleDeletePayment = async () => {
@@ -115,11 +115,13 @@ export const PaymentPaidList: FC = () => {
           NOTIFICATIONTYPE.SUCCESS,
           'Payment Deleted Successfully'
         );
-        [ReactQueryKeys.PAYMENTS_KEYS, 'transactions', 'invoices'].forEach(
-          (key) => {
-            (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
-          }
-        );
+        [
+          ReactQueryKeys.PAYMENTS_KEYS,
+          'transactions',
+          ReactQueryKeys?.INVOICES_KEYS,
+        ].forEach((key) => {
+          (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
+        });
         setConfirmModal(false);
       },
       onError: (error: IServerError) => {
@@ -150,7 +152,7 @@ export const PaymentPaidList: FC = () => {
       if (sorter.order === false) {
         setConfig({
           ...config,
-          sortid: 'id',
+          sortid: defaultSortId,
           sortItem: null,
           page: pagination.current,
           page_size: pagination.pageSize,
@@ -256,14 +258,7 @@ export const PaymentPaidList: FC = () => {
           return {
             onMouseEnter: () => {
               queryCache.prefetchQuery(
-                [
-                  ReactQueryKeys?.CONTACT_VIEW,
-                  record?.contactId,
-                  record?.paymentType,
-                  '',
-                  20,
-                  1,
-                ],
+                [ReactQueryKeys?.CONTACT_VIEW, record?.contactId, 2, '', 20, 1],
                 getContactLedger
               );
             },

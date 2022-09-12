@@ -57,29 +57,29 @@ export const InvoiceList: FC = () => {
       >
         <>
           <TableTabsContent tab="All" key="all">
-            <Suspense fallback={<FallBackLoader />}>
-              <ALLInvoiceList columns={InvoiceColumns} />
-            </Suspense>
+            <ALLInvoiceList columns={InvoiceColumns} />
+            {/* <Suspense fallback={<FallBackLoader />}>
+            </Suspense> */}
           </TableTabsContent>
           <TableTabsContent tab="Draft" key="draft">
-            <Suspense fallback={<FallBackLoader />}>
-              <DraftInvoiceList columns={InvoiceColumns} />
-            </Suspense>
+            <DraftInvoiceList columns={InvoiceColumns} />
+            {/* <Suspense fallback={<FallBackLoader />}>
+            </Suspense> */}
           </TableTabsContent>
           <TableTabsContent tab="Awating Payment" key="awating_payment">
-            <Suspense fallback={<FallBackLoader />}>
-              <AwaitingtInvoiceList columns={InvoiceColumns} />
-            </Suspense>
+            <AwaitingtInvoiceList columns={InvoiceColumns} />
+            {/* <Suspense fallback={<FallBackLoader />}>
+            </Suspense> */}
           </TableTabsContent>
           <TableTabsContent tab="Paid" key="paid">
-            <Suspense fallback={<FallBackLoader />}>
-              <PaidtInvoiceList columns={InvoiceColumns} />
-            </Suspense>
+            <PaidtInvoiceList columns={InvoiceColumns} />
+            {/* <Suspense fallback={<FallBackLoader />}>
+            </Suspense> */}
           </TableTabsContent>
           <TableTabsContent tab="Overdue" key="due_expired">
-            <Suspense fallback={<FallBackLoader />}>
-              <OverDueInvoices columns={InvoiceColumns} />
-            </Suspense>
+            <OverDueInvoices columns={InvoiceColumns} />
+            {/* <Suspense fallback={<FallBackLoader />}>
+            </Suspense> */}
           </TableTabsContent>
         </>
       </TableTabs>

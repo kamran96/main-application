@@ -217,7 +217,7 @@ export const DueExpiredBills: FC<IProps> = ({ columns, activeTab }) => {
             'Deleted Successfully'
           );
           [
-            'invoices',
+            ReactQueryKeys?.INVOICES_KEYS,
             'transactions',
             ReactQueryKeys?.ITEMS_KEYS,
             'invoice-view',

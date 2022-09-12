@@ -24,6 +24,7 @@ import {
   INVOICETYPE,
   ORDER_TYPE,
   ISupportedRoutes,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import { useCols } from './CommonCol';
 import FilterSchema from './PoFilterSchema';
@@ -192,7 +193,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
     };
     await mutateDeleteOrders(payload, {
       onSuccess: () => {
-        ['invoices', 'invoice-view'].forEach((key) => {
+        [ReactQueryKeys?.INVOICES_KEYS, 'invoice-view'].forEach((key) => {
           (queryCache.invalidateQueries as any)((q) => q?.startsWith(`${key}`));
         });
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Deleted Successfully');

@@ -21,6 +21,7 @@ import {
   INVOICE_TYPE_STRINGS,
   ORDER_TYPE,
   ISupportedRoutes,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
@@ -190,7 +191,7 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
     };
     await mutateDeleteOrders(payload, {
       onSuccess: () => {
-        ['invoices', 'invoice-view'].forEach((key) => {
+        [ReactQueryKeys?.INVOICES_KEYS, 'invoice-view'].forEach((key) => {
           (queryCache.invalidateQueries as any)((q) => q?.startsWith(`${key}`));
         });
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Deleted Successfully');

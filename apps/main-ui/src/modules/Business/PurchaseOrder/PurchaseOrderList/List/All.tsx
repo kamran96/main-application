@@ -210,9 +210,10 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
       onSuccess: () => {
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Deleted Successfully');
         [
-          'invoices',
+          ReactQueryKeys?.INVOICES_KEYS,
           'transactions',
           'items-list',
+          ReactQueryKeys?.ITEMS_KEYS,
           'invoice-view',
           ReactQueryKeys.CONTACT_VIEW,
           'all-items',

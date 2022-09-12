@@ -180,9 +180,10 @@ export const AprovedCreditNotes: FC = () => {
       {
         onSuccess: () => {
           [
-            'invoices',
+            ReactQueryKeys?.INVOICES_KEYS,
             'transactions',
             'items-list',
+            ReactQueryKeys?.ITEMS_KEYS,
             'invoice-view',
             ReactQueryKeys.CONTACT_VIEW,
             'all-items',

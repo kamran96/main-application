@@ -96,7 +96,7 @@ export const PaymentRecievedList: FC = () => {
         );
       }
     }
-  }, [resolvedData]);
+  }, []);
 
   const handleDeletePayment = async () => {
     const payload = {
@@ -104,13 +104,13 @@ export const PaymentRecievedList: FC = () => {
     };
     mutatePaymentDelete(payload, {
       onSuccess: () => {
-        [ReactQueryKeys.PAYMENTS_KEYS, 'transactions', 'invoices'].forEach(
-          (key) => {
-            (queryCache.invalidateQueries as any)((q) =>
-              q.startsWith(`${key}`)
-            );
-          }
-        );
+        [
+          ReactQueryKeys.PAYMENTS_KEYS,
+          'transactions',
+          ReactQueryKeys?.INVOICES_KEYS,
+        ].forEach((key) => {
+          (queryCache.invalidateQueries as any)((q) => q.startsWith(`${key}`));
+        });
         setSelectedRow([]);
         setConfirmModal(false);
         notificationCallback(
@@ -135,26 +135,6 @@ export const PaymentRecievedList: FC = () => {
           `/app${ISupportedRoutes.PAYMENTS}?tabIndex=received&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
         );
       } else {
-        // if (sorter?.order === 'ascend') {
-        //   const userData = [...result].sort((a, b) => {
-        //     if (a[sorter?.field] > b[sorter?.field]) {
-        //       return 1;
-        //     } else {
-        //       return -1;
-        //     }
-        //   });
-        //   setPaymentResponse((prev) => ({ ...prev, result: userData }));
-        // } else {
-        //   const userData = [...result].sort((a, b) => {
-        //     if (a[sorter?.field] < b[sorter?.field]) {
-        //       return 1;
-        //     } else {
-        //       return -1;
-        //     }
-        //   });
-
-        //   setPaymentResponse((prev) => ({ ...prev, result: userData }));
-        // }
         history.push(
           `/app${ISupportedRoutes.PAYMENTS}?tabIndex=received&sortid=${
             sorter && sorter.order === 'descend'
@@ -267,14 +247,7 @@ export const PaymentRecievedList: FC = () => {
           return {
             onMouseEnter: () => {
               queryCache.prefetchQuery(
-                [
-                  ReactQueryKeys?.CONTACT_VIEW,
-                  record?.contactId,
-                  record?.paymentType,
-                  '',
-                  20,
-                  1,
-                ],
+                [ReactQueryKeys?.CONTACT_VIEW, record?.contactId, 1, '', 20, 1],
                 getContactLedger
               );
             },

@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import { deleteInvoicesAPI } from '../../../api';
 import { ConfirmModal, MoreActions, TableActions } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { NOTIFICATIONTYPE } from '@invyce/shared/types';
+import { NOTIFICATIONTYPE, ReactQueryKeys } from '@invyce/shared/types';
 import convertToRem from '../../../utils/convertToRem';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 
@@ -45,7 +45,7 @@ export const CommonTopbar: FC<IProps> = ({
       await mutateDeleteInvoices(payload, {
         onSuccess: () => {
           (queryCache.invalidateQueries as any)((q) =>
-            q.startsWith('invoices')
+            q.startsWith(ReactQueryKeys?.INVOICES_KEYS)
           );
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,

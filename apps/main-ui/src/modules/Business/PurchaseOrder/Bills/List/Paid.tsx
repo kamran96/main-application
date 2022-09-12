@@ -215,9 +215,10 @@ export const PaidBills: FC<IProps> = ({ columns, activeTab }) => {
             'Deleted Successfully'
           );
           [
-            'invoices',
+            ReactQueryKeys?.INVOICES_KEYS,
             'transactions',
             'items-list',
+            ReactQueryKeys?.ITEMS_KEYS,
             'invoice-view',
             ReactQueryKeys.CONTACT_VIEW,
             'all-items',

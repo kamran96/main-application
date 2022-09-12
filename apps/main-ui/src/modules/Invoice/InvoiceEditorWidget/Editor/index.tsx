@@ -211,7 +211,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
           refetchInvoiceNumber();
 
           [
-            'invoices',
+            ReactQueryKeys?.INVOICES_KEYS,
             'transactions?page',
             'items-list',
             'invoice-view',

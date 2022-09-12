@@ -38,6 +38,7 @@ interface IProps {
   columns?: any[];
   activeTab?: string;
 }
+
 export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
   const queryCache = useQueryClient();
   /* HOOKS HERE */
@@ -151,38 +152,60 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
   //handleSorting
 
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      setAllInvoicesConfig({
-        ...allInvoicesConfig,
-        sortid: null,
-        page: pagination.current,
-        page_size: pagination.pageSize,
-      });
-      const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=awating_payment&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
-      history.push(route);
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+    if (sorter?.column) {
+      if (sorter.order === undefined) {
+        setAllInvoicesConfig({
+          ...allInvoicesConfig,
+          sortid: null,
+          page: pagination.current,
+          page_size: pagination.pageSize,
         });
-
-        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
+        const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=awating_payment&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+        history.push(route);
       } else {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+        if (sorter?.order === 'ascend') {
+          const userData = [...result].sort((a, b) => {
+            if (a[sorter?.field] > b[sorter?.field]) {
+              return 1;
+            } else {
+              return -1;
+            }
+          });
+
+          setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
+        } else {
+          const userData = [...result].sort((a, b) => {
+            if (a[sorter?.field] < b[sorter?.field]) {
+              return 1;
+            } else {
+              return -1;
+            }
+          });
+
+          setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
+        }
+
+        setAllInvoicesConfig({
+          ...allInvoicesConfig,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
         });
-
-        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
+        const route = `/app${
+          ISupportedRoutes.INVOICES
+        }?tabIndex=awating_payment&sortid=${
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field
+        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+          sorter.order
+        }&query=${query}`;
+        history.push(route);
       }
-
+    } else {
       setAllInvoicesConfig({
         ...allInvoicesConfig,
         page: pagination.current,
@@ -216,7 +239,7 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
             'Deleted Successfully'
           );
           [
-            'invoices',
+            ReactQueryKeys?.INVOICES_KEYS,
             'transactions',
             ReactQueryKeys?.ITEMS_KEYS,
             'invoice-view',

@@ -24,6 +24,7 @@ import {
   IServerError,
   NOTIFICATIONTYPE,
   ISupportedRoutes,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import moneyFormat from '../../../utils/moneyFormat';
 import { useCols } from './commonCol';
@@ -32,6 +33,8 @@ import InvoicesFilterSchema from './InvoicesFilterSchema';
 interface IProps {
   columns?: any[];
 }
+const defaultSortId = 'id';
+
 export const PaidtInvoiceList: FC<IProps> = ({ columns }) => {
   const queryCache = useQueryClient();
   const { mutate: mutateDeleteOrders, isLoading: deletingInvoice } =
@@ -65,12 +68,7 @@ export const PaidtInvoiceList: FC<IProps> = ({ columns }) => {
   const { PdfCols, _exportableCols } = useCols();
 
   useEffect(() => {
-    if (
-      routeHistory &&
-      routeHistory.history &&
-      routeHistory.history.location &&
-      routeHistory.history.location.search
-    ) {
+    if (routeHistory?.history?.location?.search) {
       let obj = {};
       const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
@@ -80,7 +78,7 @@ export const PaidtInvoiceList: FC<IProps> = ({ columns }) => {
 
       setAllInvoicesConfig({ ...allInvoicesConfig, ...obj });
     }
-  }, [routeHistory]);
+  }, []);
 
   const allContacts = useQuery([`all-contacts`, 'ALL'], getAllContacts);
 
@@ -89,11 +87,7 @@ export const PaidtInvoiceList: FC<IProps> = ({ columns }) => {
   );
 
   useEffect(() => {
-    if (
-      allContacts.data &&
-      allContacts.data.data &&
-      allContacts.data.data.result
-    ) {
+    if (allContacts?.data?.data?.result) {
       const { result } = allContacts.data.data;
       const schema = invoiceFiltersSchema;
       schema.contactId.value = result.filter(
@@ -103,13 +97,14 @@ export const PaidtInvoiceList: FC<IProps> = ({ columns }) => {
     }
   }, [allContacts.data, invoiceFiltersSchema]);
 
+  // `invoices-${ORDER_TYPE.SALE_INVOICE}-${INVOICETYPE.PAID}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
   const {
     isLoading,
     data: resolvedData,
     isFetching,
   } = useQuery(
     [
-      `invoices-${ORDER_TYPE.SALE_INVOICE}-${INVOICETYPE.PAID}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
+      ReactQueryKeys?.INVOICES_KEYS,
       ORDER_TYPE.SALE_INVOICE,
       INVOICETYPE.Approved,
       'PAID ',
@@ -129,72 +124,78 @@ export const PaidtInvoiceList: FC<IProps> = ({ columns }) => {
   };
 
   useEffect(() => {
-    if (resolvedData && resolvedData.data && resolvedData.data.result) {
-      const { result } = resolvedData.data;
+    if (resolvedData?.data?.result) {
+      const { result, pagination } = resolvedData.data;
       const newResult = [];
       result.forEach((item, index) => {
         newResult.push({ ...item, key: item.id });
       });
 
       setAllInvoicesRes({ ...resolvedData.data, result: newResult });
+      if (pagination?.next === page + 1) {
+        queryCache?.prefetchQuery(
+          [
+            ReactQueryKeys?.INVOICES_KEYS,
+            ORDER_TYPE.SALE_INVOICE,
+            INVOICETYPE.Approved,
+            'PAID ',
+            page + 1,
+            page_size,
+            query,
+            sortid,
+          ],
+          getInvoiceListAPI
+        );
+      }
     }
   }, [resolvedData]);
 
   //handleSorting
 
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      setAllInvoicesConfig({
-        ...allInvoicesConfig,
-        sortid: 'id',
-        page: pagination.current,
-        page_size: pagination.pageSize,
-      });
-      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=paid&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
-      history.push(route);
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+    if (sorter?.column) {
+      if (sorter.order === undefined) {
+        setAllInvoicesConfig({
+          ...allInvoicesConfig,
+          sortid: defaultSortId,
+          page: pagination.current,
+          page_size: pagination.pageSize,
         });
-
-        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
+        const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=paid&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+        history.push(route);
       } else {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+        setAllInvoicesConfig({
+          ...allInvoicesConfig,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.order === 'asceend'
+              ? sorter.field
+              : 'id',
         });
 
-        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
+        const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=paid&sortid=${
+          sorter && sorter?.order === 'descend'
+            ? `-${sorter?.field}`
+            : sorter?.order === 'ascend'
+            ? sorter.field
+            : 'id'
+        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+          sorter?.order
+        }&query=${query}`;
+        history.push(route);
       }
+    } else {
       setAllInvoicesConfig({
         ...allInvoicesConfig,
         page: pagination.current,
         page_size: pagination.pageSize,
-        sortid:
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.order === 'asceend'
-            ? sorter.field
-            : 'id',
+        sortid: defaultSortId,
       });
 
-      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=paid&sortid=${
-        sorter && sorter?.order === 'descend'
-          ? `-${sorter?.field}`
-          : sorter?.order === 'ascend'
-          ? sorter.field
-          : 'id'
-      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-        sorter?.order
-      }&query=${query}`;
+      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=paid&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter?.order}&query=${query}`;
       history.push(route);
     }
   };
@@ -205,13 +206,16 @@ export const PaidtInvoiceList: FC<IProps> = ({ columns }) => {
     };
     await mutateDeleteOrders(payload, {
       onSuccess: () => {
-        ['invoices', 'transactions?page', 'items-list', 'invoice-view'].forEach(
-          (key) => {
-            (queryCache.invalidateQueries as any)((q) =>
-              q.queryKey[0].toString().startsWith(key)
-            );
-          }
-        );
+        [
+          ReactQueryKeys?.INVOICES_KEYS,
+          'transactions?page',
+          'items-list',
+          'invoice-view',
+        ].forEach((key) => {
+          (queryCache.invalidateQueries as any)((q) =>
+            q.queryKey[0].toString().startsWith(key)
+          );
+        });
 
         setSelectedRow([]);
         setConfirmModal(false);

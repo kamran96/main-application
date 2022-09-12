@@ -24,6 +24,7 @@ import {
   INVOICETYPE,
   ORDER_TYPE,
   ISupportedRoutes,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import moneyFormat from '../../../utils/moneyFormat';
 import { useCols } from './commonCol';
@@ -33,6 +34,7 @@ import InvoicesFilterSchema from './InvoicesFilterSchema';
 interface IProps {
   columns?: any[];
 }
+const defaultSortId = 'id';
 export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
   const queryCache = useQueryClient();
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
@@ -67,12 +69,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
   const { history } = routeHistory;
 
   useEffect(() => {
-    if (
-      routeHistory &&
-      routeHistory.history &&
-      routeHistory.history.location &&
-      routeHistory.history.location.search
-    ) {
+    if (routeHistory?.history?.location?.search) {
       let obj = {};
       const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
@@ -82,17 +79,13 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
 
       setAllInvoicesConfig({ ...allInvoicesConfig, ...obj });
     }
-  }, [routeHistory]);
+  }, []);
 
   const allContacts = useQuery([`all-contacts`, 'ALL'], getAllContacts);
 
   useEffect(() => {
-    if (
-      allContacts.data &&
-      allContacts.data.data &&
-      allContacts.data.data.result
-    ) {
-      const { result } = allContacts.data.data;
+    if (allContacts?.data?.data?.result) {
+      const { result } = allContacts?.data?.data;
       const schema = invoiceFiltersSchema;
       schema.contactId.value = result.filter(
         (item) => item.contactType === IContactTypes.CUSTOMER
@@ -101,13 +94,14 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
     }
   }, [allContacts.data, invoiceFiltersSchema]);
 
+  // `invoices-${ORDER_TYPE.SALE_INVOICE}-${INVOICETYPE.Payment_Awaiting}?page=${page}&query=${query}&sort=${sortid}&page_size=${pageSize}`,
   const {
     isLoading,
     data: resolvedData,
     isFetching,
   } = useQuery(
     [
-      `invoices-${ORDER_TYPE.SALE_INVOICE}-${INVOICETYPE.Payment_Awaiting}?page=${page}&query=${query}&sort=${sortid}&page_size=${pageSize}`,
+      ReactQueryKeys?.INVOICES_KEYS,
       ORDER_TYPE.SALE_INVOICE,
       INVOICETYPE.Approved,
       'AWAITING_PAYMENT',
@@ -127,72 +121,98 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
   };
 
   useEffect(() => {
-    if (resolvedData && resolvedData.data && resolvedData.data.result) {
-      const { result } = resolvedData.data;
+    if (resolvedData?.data?.result) {
+      const { result, pagination } = resolvedData.data;
       const newResult = [];
       result.forEach((item, index) => {
         newResult.push({ ...item, key: item.id });
       });
 
       setAllInvoicesRes({ ...resolvedData.data, result: newResult });
+      if (pagination?.next === page + 1) {
+        queryCache?.prefetchQuery(
+          [
+            ReactQueryKeys?.INVOICES_KEYS,
+            ORDER_TYPE.SALE_INVOICE,
+            INVOICETYPE.Approved,
+            'AWAITING_PAYMENT',
+            page + 1,
+            pageSize,
+            query,
+            sortid,
+          ],
+          getInvoiceListAPI
+        );
+      }
     }
   }, [resolvedData]);
 
   //HandleSorting
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      setAllInvoicesConfig({
-        ...allInvoicesConfig,
-        sortid: 'id',
-        page: pagination.current,
-        pageSize: pagination.pageSize,
-      });
-      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=awating_payment&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
-      history.push(route);
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+    if (sorter?.column) {
+      if (sorter.order === 'false') {
+        setAllInvoicesConfig({
+          ...allInvoicesConfig,
+          sortid: defaultSortId,
+          page: pagination.current,
+          pageSize: pagination.pageSize,
         });
-
-        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
+        const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=awating_payment&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+        history.push(route);
       } else {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
-        });
+        // if (sorter?.order === 'ascend') {
+        //   const userData = [...result].sort((a, b) => {
+        //     if (a[sorter?.field] > b[sorter?.field]) {
+        //       return 1;
+        //     } else {
+        //       return -1;
+        //     }
+        //   });
 
-        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
-      }
-      setAllInvoicesConfig({
-        ...allInvoicesConfig,
-        page: pagination.current,
-        pageSize: pagination.pageSize,
-        sortid:
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
+        //   setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
+        // } else {
+        //   const userData = [...result].sort((a, b) => {
+        //     if (a[sorter?.field] < b[sorter?.field]) {
+        //       return 1;
+        //     } else {
+        //       return -1;
+        //     }
+        //   });
+
+        //   setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
+        // }
+        setAllInvoicesConfig({
+          ...allInvoicesConfig,
+          page: pagination.current,
+          pageSize: pagination.pageSize,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter?.order === 'ascend'
+              ? sorter.field
+              : 'id',
+        });
+        const route = `/app${
+          ISupportedRoutes.INVOICES
+        }?tabIndex=awating_payment&sortid=${
+          sorter && sorter?.order === 'descend'
+            ? `-${sorter?.field}`
             : sorter?.order === 'ascend'
             ? sorter.field
-            : 'id',
+            : 'id'
+        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+          sorter?.order
+        }&query=${query}`;
+        history.push(route);
+      }
+    } else {
+      setAllInvoicesConfig({
+        ...allInvoicesConfig,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        sortid: defaultSortId,
       });
-      const route = `/app${
-        ISupportedRoutes.INVOICES
-      }?tabIndex=awating_payment&sortid=${
-        sorter && sorter?.order === 'descend'
-          ? `-${sorter?.field}`
-          : sorter?.order === 'ascend'
-          ? sorter.field
-          : 'id'
-      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-        sorter?.order
-      }&query=${query}`;
+      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=awating_payment&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter?.order}&query=${query}`;
       history.push(route);
     }
   };
@@ -203,11 +223,14 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
     };
     await mutateDeleteOrders(payload, {
       onSuccess: () => {
-        ['invoices', 'transactions?page', 'items-list', 'invoice-view'].forEach(
-          (key) => {
-            (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
-          }
-        );
+        [
+          ReactQueryKeys?.INVOICES_KEYS,
+          'transactions?page',
+          'items-list',
+          'invoice-view',
+        ].forEach((key) => {
+          (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
+        });
 
         setSelectedRow([]);
         setConfirmModal(false);

@@ -177,7 +177,7 @@ export const PaymentsForm: FC = () => {
           [
             'all-credit-invoices',
             ReactQueryKeys.PAYMENTS_KEYS,
-            'invoices',
+            ReactQueryKeys?.INVOICES_KEYS,
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) =>
               q?.startsWith(`${key}`)

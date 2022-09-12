@@ -190,7 +190,7 @@ export const DraftCreditNotes: FC = () => {
       {
         onSuccess: () => {
           [
-            'invoices',
+            ReactQueryKeys?.INVOICES_KEYS,
             'transactions',
             'items-list',
             'invoice-view',
