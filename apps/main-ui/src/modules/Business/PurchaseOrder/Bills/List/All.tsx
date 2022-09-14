@@ -6,13 +6,19 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import styled from 'styled-components';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
-import { getAllContacts, getPoListAPI } from '../../../../../api';
+import {
+  findInvoiceByID,
+  getAllContacts,
+  getContactLedger,
+  getPoListAPI,
+} from '../../../../../api';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import {
   IBaseAPIError,
   IContactType,
   IContactTypes,
   IInvoiceResponse,
+  IInvoiceType,
   INVOICETYPE,
   ISupportedRoutes,
   NOTIFICATIONTYPE,
@@ -228,6 +234,40 @@ export const ALLBillsList: FC<IProps> = ({ columns, activeTab }) => {
   return (
     <ALlWrapper>
       <CommonTable
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => {
+              const prefetchQueries = [
+                {
+                  queryKey: [
+                    ReactQueryKeys?.CONTACT_VIEW,
+                    record?.contactId,
+                    record?.contact?.contactType,
+                    '',
+                    20,
+                    1,
+                  ],
+                  fn: getContactLedger,
+                },
+                {
+                  queryKey: [
+                    ReactQueryKeys?.INVOICE_VIEW,
+                    record?.id && record?.id?.toString(),
+                    IInvoiceType.BILL,
+                  ],
+                  fn: findInvoiceByID,
+                },
+              ];
+
+              for (const CurrentQuery of prefetchQueries) {
+                queryCache.prefetchQuery(
+                  CurrentQuery?.queryKey,
+                  CurrentQuery?.fn
+                );
+              }
+            },
+          };
+        }}
         pdfExportable={{ columns: PDFColsBills }}
         exportable
         exportableProps={{

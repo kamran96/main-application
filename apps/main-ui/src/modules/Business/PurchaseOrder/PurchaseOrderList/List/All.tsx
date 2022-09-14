@@ -3,7 +3,11 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
-import { purchaseOrderDeleteAPI, getAllContacts } from '../../../../../api';
+import {
+  purchaseOrderDeleteAPI,
+  getAllContacts,
+  findInvoiceByID,
+} from '../../../../../api';
 import {
   IInvoiceResponse,
   INVOICETYPE,
@@ -16,6 +20,7 @@ import {
   NOTIFICATIONTYPE,
   ISupportedRoutes,
   ReactQueryKeys,
+  IInvoiceType,
 } from '@invyce/shared/types';
 
 import { CommonTable, ConfirmModal, SmartFilter } from '@components';
@@ -282,6 +287,20 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
   return (
     <ALlWrapper>
       <CommonTable
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => {
+              queryCache.prefetchQuery(
+                [
+                  ReactQueryKeys?.INVOICE_VIEW,
+                  record?.id && record?.id?.toString(),
+                  IInvoiceType.PURCHASE_ORDER,
+                ],
+                findInvoiceByID
+              );
+            },
+          };
+        }}
         pdfExportable={{ columns: pdfColsPO }}
         exportable
         exportableProps={{

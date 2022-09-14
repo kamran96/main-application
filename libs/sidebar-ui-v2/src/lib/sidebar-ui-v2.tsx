@@ -262,33 +262,33 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                             {parent?.children.map(
                               (item: any, index: number) => {
                                 return (
-                                  <li
-                                    onMouseOver={async () => {
-                                      if (
-                                        item?.queryKey?.length &&
-                                        item?.fn &&
-                                        item?.fn !== undefined
-                                      ) {
-                                        for (const CurrItem of item?.prefetchQueries) {
-                                          queryClient.prefetchQuery(
-                                            CurrItem?.queryKey,
-                                            CurrItem?.fn
-                                          );
+                                  <Link to={item?.route}>
+                                    <li
+                                      onMouseOver={async () => {
+                                        if (
+                                          item?.queryKey?.length &&
+                                          item?.fn &&
+                                          item?.fn !== undefined
+                                        ) {
+                                          for (const CurrItem of item?.prefetchQueries) {
+                                            queryClient.prefetchQuery(
+                                              CurrItem?.queryKey,
+                                              CurrItem?.fn
+                                            );
+                                          }
                                         }
-                                      }
-                                    }}
-                                    key={index}
-                                    className={` pointer mv-2 ${
-                                      history?.location?.pathname ===
-                                      item?.route
-                                        ? 'active_route'
-                                        : ''
-                                    }`}
-                                  >
-                                    <Link to={item?.route}>
+                                      }}
+                                      key={index}
+                                      className={` pointer mv-2 ${
+                                        history?.location?.pathname ===
+                                        item?.route
+                                          ? 'active_route'
+                                          : ''
+                                      }`}
+                                    >
                                       <span>{item?.tag}</span>
-                                    </Link>
-                                  </li>
+                                    </li>
+                                  </Link>
                                 );
                               }
                             )}

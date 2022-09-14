@@ -7,6 +7,8 @@ import {
   getAllContacts,
   getCreditNotes,
   deleteCreditNoteAPI,
+  getContactLedger,
+  findInvoiceByID,
 } from '../../../api';
 import { CommonTable, ButtonTag, SmartFilter, ConfirmModal } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
@@ -272,6 +274,40 @@ export const AprovedCreditNotes: FC = () => {
   return (
     <CreditNoteWrapper>
       <CommonTable
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => {
+              const prefetchQueries = [
+                {
+                  queryKey: [
+                    ReactQueryKeys?.CONTACT_VIEW,
+                    record?.contactId,
+                    record?.contact?.contactType,
+                    '',
+                    20,
+                    1,
+                  ],
+                  fn: getContactLedger,
+                },
+                {
+                  queryKey: [
+                    ReactQueryKeys?.INVOICE_VIEW,
+                    record?.id && record?.id?.toString(),
+                    IInvoiceType.CREDITNOTE,
+                  ],
+                  fn: findInvoiceByID,
+                },
+              ];
+
+              for (const CurrentQuery of prefetchQueries) {
+                queryCache.prefetchQuery(
+                  CurrentQuery?.queryKey,
+                  CurrentQuery?.fn
+                );
+              }
+            },
+          };
+        }}
         pdfExportable={{ columns: pdfCols }}
         loading={isLoading}
         columns={columns}

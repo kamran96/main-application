@@ -7,6 +7,7 @@ import {
   purchaseOrderDeleteAPI,
   getAllContacts,
   purchaseOrderList,
+  findInvoiceByID,
 } from '../../../../../api';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import { ConfirmModal, SmartFilter, CommonTable } from '@components';
@@ -25,6 +26,7 @@ import {
   ORDER_TYPE,
   ISupportedRoutes,
   ReactQueryKeys,
+  IInvoiceType,
 } from '@invyce/shared/types';
 import { useCols } from './CommonCol';
 import FilterSchema from './PoFilterSchema';
@@ -189,9 +191,13 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
     };
     await mutateDeleteOrders(payload, {
       onSuccess: () => {
-        [ReactQueryKeys?.INVOICES_KEYS, ReactQueryKeys.INVOICE_VIEW].forEach((key) => {
-          (queryCache.invalidateQueries as any)((q) => q?.startsWith(`${key}`));
-        });
+        [ReactQueryKeys?.INVOICES_KEYS, ReactQueryKeys.INVOICE_VIEW].forEach(
+          (key) => {
+            (queryCache.invalidateQueries as any)((q) =>
+              q?.startsWith(`${key}`)
+            );
+          }
+        );
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Deleted Successfully');
 
         setSelectedRow([]);
@@ -278,6 +284,20 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   return (
     <ALlWrapper>
       <CommonTable
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => {
+              queryCache.prefetchQuery(
+                [
+                  ReactQueryKeys?.INVOICE_VIEW,
+                  record?.id && record?.id?.toString(),
+                  IInvoiceType.PURCHASE_ORDER,
+                ],
+                findInvoiceByID
+              );
+            },
+          };
+        }}
         pdfExportable={{ columns: pdfColsPO }}
         exportable
         exportableProps={{

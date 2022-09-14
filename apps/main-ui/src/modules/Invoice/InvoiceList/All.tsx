@@ -224,7 +224,6 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
     <CommonTable
       // themeScroll
       onRow={(record) => {
-        console.log(record, 'record');
         return {
           onMouseEnter: () => {
             const prefetchQueries = [
@@ -242,7 +241,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
               {
                 queryKey: [
                   ReactQueryKeys?.INVOICE_VIEW,
-                  record?.id,
+                  record?.id && record?.id?.toString(),
                   IInvoiceType.INVOICE,
                 ],
                 fn: findInvoiceByID,
