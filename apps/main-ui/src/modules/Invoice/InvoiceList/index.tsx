@@ -2,7 +2,6 @@ import { Button } from 'antd';
 import React, { FC, lazy, Suspense, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-
 import { FallBackLoader, TableTabs, TableTabsContent } from '@components';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
@@ -10,13 +9,17 @@ import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { ISupportedRoutes } from '@invyce/shared/types';
 import { useCols } from './commonCol';
 import OverDueInvoices from './Overdue';
+import ALLInvoiceList from './All';
+import AwaitingtInvoiceList from './AwaitingPayment';
+import DraftInvoiceList from './Drafts';
+import PaidtInvoiceList from './Paid';
 
 export const InvoiceList: FC = () => {
   /* Dynamic Imports */
-  const ALLInvoiceList = lazy(() => import('./All'));
-  const AwaitingtInvoiceList = lazy(() => import('./AwaitingPayment'));
-  const DraftInvoiceList = lazy(() => import('./Drafts'));
-  const PaidtInvoiceList = lazy(() => import('./Paid'));
+  // const ALLInvoiceList = lazy(() => import('./All'));
+  // const AwaitingtInvoiceList = lazy(() => import('./AwaitingPayment'));
+  // const DraftInvoiceList = lazy(() => import('./Drafts'));
+  // const PaidtInvoiceList = lazy(() => import('./Paid'));
 
   const { routeHistory } = useGlobalContext();
   const [activeTab, setActiveTab] = useState('');

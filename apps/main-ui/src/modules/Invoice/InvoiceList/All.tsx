@@ -3,7 +3,9 @@ import { FC, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import {
   deleteInvoiceDrafts,
+  findInvoiceByID,
   getAllContacts,
+  getContactLedger,
   getInvoiceListAPI,
 } from '../../../api';
 import {
@@ -22,6 +24,7 @@ import {
   ORDER_TYPE,
   ISupportedRoutes,
   ReactQueryKeys,
+  IInvoiceType,
 } from '@invyce/shared/types';
 import { useCols } from './commonCol';
 import InvoicesFilterSchema from './InvoicesFilterSchema';
@@ -123,6 +126,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   useEffect(() => {
     if (resolvedData?.data?.result) {
       const { result, pagination } = resolvedData.data;
+      console.log(pagination, 'pag');
       const newResult = [];
       result.forEach((item, index) => {
         newResult.push({ ...item, key: item.id });
@@ -162,27 +166,6 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
         const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
         history.push(route);
       } else {
-        // if (sorter?.order === 'ascend') {
-        //   const userData = [...result].sort((a, b) => {
-        //     if (a[sorter?.field] > b[sorter?.field]) {
-        //       return 1;
-        //     } else {
-        //       return -1;
-        //     }
-        //   });
-
-        //   setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
-        // } else {
-        //   const userData = [...result].sort((a, b) => {
-        //     if (a[sorter?.field] < b[sorter?.field]) {
-        //       return 1;
-        //     } else {
-        //       return -1;
-        //     }
-        //   });
-
-        //   setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
-        // }
         setAllInvoicesConfig({
           ...allInvoicesConfig,
           page: pagination.current,
@@ -200,8 +183,8 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
             : sorter?.order === 'ascend'
             ? sorter.field
             : 'id'
-        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-          sorter?.order
+        }&page=${pagination.current}&page_size=${
+          pagination.pageSize
         }&query=${query}`;
         history.push(route);
       }
@@ -212,7 +195,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
         page_size: pagination.pageSize,
         sortid: defaultSortId,
       });
-      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter?.order}&query=${query}`;
+      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
       history.push(route);
     }
   };
@@ -240,6 +223,41 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   return (
     <CommonTable
       // themeScroll
+      onRow={(record) => {
+        console.log(record, 'record');
+        return {
+          onMouseEnter: () => {
+            const prefetchQueries = [
+              {
+                queryKey: [
+                  ReactQueryKeys?.CONTACT_VIEW,
+                  record?.contactId,
+                  record?.contact?.contactType,
+                  '',
+                  20,
+                  1,
+                ],
+                fn: getContactLedger,
+              },
+              {
+                queryKey: [
+                  ReactQueryKeys?.INVOICE_VIEW,
+                  record?.id,
+                  IInvoiceType.INVOICE,
+                ],
+                fn: findInvoiceByID,
+              },
+            ];
+
+            for (const CurrentQuery of prefetchQueries) {
+              queryCache.prefetchQuery(
+                CurrentQuery?.queryKey,
+                CurrentQuery?.fn
+              );
+            }
+          },
+        };
+      }}
       pdfExportable={{
         columns: PdfCols,
       }}

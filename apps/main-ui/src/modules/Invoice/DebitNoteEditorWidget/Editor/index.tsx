@@ -161,9 +161,9 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
           setInvoiceItems([{ ...defaultItems }]);
           [
             ReactQueryKeys?.INVOICES_KEYS,
-            'transactions?page',
-            'items-list',
-            'invoice-view',
+            ReactQueryKeys?.TRANSACTION_KEYS,
+            ReactQueryKeys?.ITEMS_KEYS,
+            ReactQueryKeys?.INVOICE_VIEW,
             ReactQueryKeys.CONTACT_VIEW,
             'all-items',
           ].forEach((key) => {

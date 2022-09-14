@@ -2,7 +2,7 @@
 import { ColumnsType } from 'antd/lib/table';
 import dayjs from 'dayjs';
 import { FC, useEffect, useState, lazy, Suspense } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { getAllTransactionsAPI } from '../../../../api';
 import {
   SmartFilter,
@@ -17,6 +17,7 @@ import {
   TransactionsStatus,
   IAccountsResult,
   ISupportedRoutes,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import moneyFormat from '../../../../utils/moneyFormat';
 import { WrapperTransactionCustomBar, WrapperTransactionsList } from './styles';
@@ -27,22 +28,20 @@ import DUMMYLOGO from '../../../../assets/quickbook.png';
 import styled from 'styled-components';
 
 import { TransactionImport } from '../importTransactions';
-
+const defaultSorterId = 'id';
 const APPROVETransactionList: FC = () => {
   const [sortedInfo, setSortedInfo] = useState(null);
   const [filterBar, setFilterbar] = useState<boolean>(false);
   const [{ result, pagination }, setResponse] = useState<IResponseTransactions>(
     {
       result: [],
+      pagination: null,
     }
   );
-
+  const queryCache = useQueryClient();
   const [filterSchema, setFilterSchema] = useState(transactionsFilterSchema);
-
   const { routeHistory, userDetails } = useGlobalContext();
-
   const { history } = routeHistory;
-
   const { organization } = userDetails;
   const {
     address: organizationAddress,
@@ -92,35 +91,29 @@ const APPROVETransactionList: FC = () => {
 
       setTransactionsConfig({ ...transactionConfig, ...obj });
 
-      const filterType = history.location.search.split('&');
-      const filterIdType = filterType[1];
-      const filterOrder = filterType[4]?.split('=')[1];
+      // const filterType = history.location.search.split('&');
+      // const filterIdType = filterType[1];
+      // const filterOrder = filterType[4]?.split('=')[1];
 
-      if (filterIdType?.includes('-')) {
-        const fieldName = filterIdType?.split('=')[1].split('-')[1];
-        setSortedInfo({
-          order: filterOrder,
-          columnKey: fieldName,
-        });
-      } else {
-        const fieldName = filterIdType?.split('=')[1];
-        setSortedInfo({
-          order: filterOrder,
-          columnKey: fieldName,
-        });
-      }
+      // if (filterIdType?.includes('-')) {
+      //   const fieldName = filterIdType?.split('=')[1].split('-')[1];
+      //   setSortedInfo({
+      //     order: filterOrder,
+      //     columnKey: fieldName,
+      //   });
+      // } else {
+      //   const fieldName = filterIdType?.split('=')[1];
+      //   setSortedInfo({
+      //     order: filterOrder,
+      //     columnKey: fieldName,
+      //   });
+      // }
     }
-  }, [history]);
+  }, []);
 
+  // `transactions?page=${page}&query=${query}&page_size=${page_size}&status=${status}`,
   const { isLoading, data: resolvedData } = useQuery(
-    [
-      `transactions?page=${page}&query=${query}&page_size=${page_size}&status=${status}`,
-      page,
-      page_size,
-      query,
-      status,
-      sortid,
-    ],
+    [ReactQueryKeys.TRANSACTION_KEYS, page, page_size, query, status, sortid],
     getAllTransactionsAPI,
     {
       keepPreviousData: true,
@@ -128,8 +121,8 @@ const APPROVETransactionList: FC = () => {
   );
 
   useEffect(() => {
-    if (resolvedData && resolvedData.data && resolvedData.data.result) {
-      const { result } = resolvedData.data;
+    if (resolvedData?.data?.result) {
+      const { result, pagination } = resolvedData?.data;
       const newResult = [];
 
       result.forEach((res) => {
@@ -137,6 +130,20 @@ const APPROVETransactionList: FC = () => {
       });
 
       setResponse({ ...resolvedData.data, result: newResult });
+
+      if (pagination?.next === page + 1) {
+        queryCache?.prefetchQuery(
+          [
+            ReactQueryKeys.TRANSACTION_KEYS,
+            page + 1,
+            page_size,
+            query,
+            status,
+            sortid,
+          ],
+          getAllTransactionsAPI
+        );
+      }
     }
   }, [resolvedData]);
 
@@ -247,57 +254,39 @@ const APPROVETransactionList: FC = () => {
   };
 
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      setTransactionsConfig({
-        ...transactionConfig,
-        sortid: null,
-        page: pagination.current,
-        page_size: pagination.pageSize,
-      });
-      const route = `/app${ISupportedRoutes.TRANSACTIONS}?tabIndex=approve&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}`;
-      history.push(route);
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+    if (sorter?.column) {
+      if (sorter.order === 'false') {
+        setTransactionsConfig({
+          ...transactionConfig,
+          sortid: defaultSorterId,
+          page: pagination.current,
+          page_size: pagination.pageSize,
         });
-        // setSortedInfo({
-        //   order: sorter?.order,
-        //   columnKey: sorter?.field
-        // })
-        setResponse((prev) => ({ ...prev, result: userData }));
+        const route = `/app${ISupportedRoutes.TRANSACTIONS}?tabIndex=approve&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}`;
+        history.push(route);
       } else {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+        setTransactionsConfig({
+          ...transactionConfig,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+          sortid:
+            sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field,
         });
-        // setSortedInfo({
-        //   order: sorter?.order,
-        //   columnKey: sorter?.field
-        // })
-        setResponse((prev) => ({ ...prev, result: userData }));
+        const route = `/app${
+          ISupportedRoutes.TRANSACTIONS
+        }?tabIndex=approve&sortid=${
+          sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field
+        }&page=${pagination.current}&page_size=${pagination.pageSize}`;
+        history.push(route);
       }
+    } else {
       setTransactionsConfig({
         ...transactionConfig,
         page: pagination.current,
         page_size: pagination.pageSize,
-        sortid:
-          sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field,
+        sortid: defaultSorterId,
       });
-      const route = `/app${
-        ISupportedRoutes.TRANSACTIONS
-      }?tabIndex=approve&sortid=${
-        sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field
-      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-        sorter.order
-      }`;
+      const route = `/app${ISupportedRoutes.TRANSACTIONS}?tabIndex=approve&sortid=${defaultSorterId}&page=${pagination.current}&page_size=${pagination.pageSize}`;
       history.push(route);
     }
   };

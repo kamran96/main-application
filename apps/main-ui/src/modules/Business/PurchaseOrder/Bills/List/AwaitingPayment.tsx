@@ -39,6 +39,7 @@ interface IProps {
   activeTab?: string;
 }
 
+const defaultSortedId = 'id';
 export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
   const queryCache = useQueryClient();
   /* HOOKS HERE */
@@ -58,7 +59,7 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
     query: '',
-    sortid: '',
+    sortid: defaultSortedId,
     page_size: 10,
   });
   /* ********* DESTRUCTURING ALL INVOICESCONFIG *************** */
@@ -115,13 +116,14 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
 
   /* ******* PAGINATED QUERY TO FETCH LIST OF PURCHASES ********** */
   /* ******* ORDERS ONLY TYPE (PROCESSED PURCHASE ORDERS) ********** */
+  // `invoices-purchases-${INVOICETYPE.Payment_Awaiting}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
   const {
     isLoading,
     data: resolvedData,
     isFetching,
   } = useQuery(
     [
-      `invoices-purchases-${INVOICETYPE.Payment_Awaiting}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
+      ReactQueryKeys.BILL_KEYS,
       [ORDER_TYPE.PURCAHSE_ORDER],
       INVOICETYPE.Approved,
       INVOICE_TYPE_STRINGS.Payment_Awaiting,
@@ -138,14 +140,29 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
 
   /* CONDITIONAL RENDERING LIFE CYCLE HOOK TO UPDATE ALL INVOICES STATE WHEN API CALL IS DONE */
   useEffect(() => {
-    if (resolvedData && resolvedData.data && resolvedData.data.result) {
-      const { result } = resolvedData.data;
+    if (resolvedData?.data?.result) {
+      const { result, pagination } = resolvedData?.data;
       const newResult = [];
       result.forEach((item, index) => {
         newResult.push({ ...item, key: item.id });
       });
 
       setAllInvoicesRes({ ...resolvedData.data, result: newResult });
+      if (pagination?.next === page + 1) {
+        queryCache?.prefetchQuery(
+          [
+            ReactQueryKeys.BILL_KEYS,
+            [ORDER_TYPE.PURCAHSE_ORDER],
+            INVOICETYPE.Approved,
+            INVOICE_TYPE_STRINGS.Payment_Awaiting,
+            page + 1,
+            page_size,
+            query,
+            sortid,
+          ],
+          getPoListAPI
+        );
+      }
     }
   }, [resolvedData]);
 
@@ -153,38 +170,38 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
 
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
     if (sorter?.column) {
-      if (sorter.order === undefined) {
-        setAllInvoicesConfig({
-          ...allInvoicesConfig,
-          sortid: null,
-          page: pagination.current,
-          page_size: pagination.pageSize,
-        });
-        const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=awating_payment&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
-        history.push(route);
-      } else {
-        if (sorter?.order === 'ascend') {
-          const userData = [...result].sort((a, b) => {
-            if (a[sorter?.field] > b[sorter?.field]) {
-              return 1;
-            } else {
-              return -1;
-            }
+      if (sorter?.column) {
+        if (sorter.order === 'false') {
+          setAllInvoicesConfig({
+            ...allInvoicesConfig,
+            sortid: defaultSortedId,
+            page: pagination.current,
+            page_size: pagination.pageSize,
           });
-
-          setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
+          const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=awating_payment&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+          history.push(route);
         } else {
-          const userData = [...result].sort((a, b) => {
-            if (a[sorter?.field] < b[sorter?.field]) {
-              return 1;
-            } else {
-              return -1;
-            }
+          setAllInvoicesConfig({
+            ...allInvoicesConfig,
+            page: pagination.current,
+            page_size: pagination.pageSize,
+            sortid:
+              sorter && sorter.order === 'descend'
+                ? `-${sorter.field}`
+                : sorter.field,
           });
-
-          setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
+          const route = `/app${
+            ISupportedRoutes.INVOICES
+          }?tabIndex=awating_payment&sortid=${
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field
+          }&page=${pagination.current}&page_size=${
+            pagination.pageSize
+          }&filter=${sorter.order}&query=${query}`;
+          history.push(route);
         }
-
+      } else {
         setAllInvoicesConfig({
           ...allInvoicesConfig,
           page: pagination.current,
@@ -210,18 +227,9 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
         ...allInvoicesConfig,
         page: pagination.current,
         page_size: pagination.pageSize,
-        sortid:
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field,
+        sortid: defaultSortedId,
       });
-      const route = `/app${
-        ISupportedRoutes.INVOICES
-      }?tabIndex=awating_payment&sortid=${
-        sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
-      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-        sorter.order
-      }&query=${query}`;
+      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=awating_payment&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
       history.push(route);
     }
   };
@@ -240,9 +248,9 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
           );
           [
             ReactQueryKeys?.INVOICES_KEYS,
-            'transactions',
+            ReactQueryKeys?.TRANSACTION_KEYS,
             ReactQueryKeys?.ITEMS_KEYS,
-            'invoice-view',
+            ReactQueryKeys.INVOICE_VIEW,
             ReactQueryKeys.CONTACT_VIEW,
             'all-items',
           ].forEach((key) => {
@@ -255,12 +263,7 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
           setConfirmModal(false);
         },
         onError: (error: IBaseAPIError) => {
-          if (
-            error &&
-            error.response &&
-            error.response.data &&
-            error.response.data.message
-          ) {
+          if (error?.response?.data?.message) {
             const { message } = error.response.data;
             notificationCallback(NOTIFICATIONTYPE.ERROR, message);
           }

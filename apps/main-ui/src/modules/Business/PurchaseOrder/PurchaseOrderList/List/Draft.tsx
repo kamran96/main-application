@@ -34,6 +34,9 @@ import { PurchaseTopbar } from './PurchaseTableTopbar';
 interface IProps {
   columns?: any[];
 }
+
+const defaultSortedId = 'id';
+
 export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   const queryCache = useQueryClient();
   /* HOOKS HERE */
@@ -49,7 +52,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
     query: '',
-    sortid: 'id',
+    sortid: defaultSortedId,
     pageSize: 10,
   });
 
@@ -113,13 +116,14 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   /*  ////////////// - METHODS HERE - \\\\\\\\\\\\ */
 
   /* ********* PAGINATED QUERY FOR FETCHING DRAFT ORDERS *************** */
+  // `invoices-${ORDER_TYPE.PURCAHSE_ORDER}-${INVOICETYPE.DRAFT}?page=${page}&query=${query}&sort=${sortid}&page_size=${pageSize}`,
   const {
     isLoading,
     data: resolvedData,
     isFetching,
   } = useQuery(
     [
-      `invoices-${ORDER_TYPE.PURCAHSE_ORDER}-${INVOICETYPE.DRAFT}?page=${page}&query=${query}&sort=${sortid}&page_size=${pageSize}`,
+      ReactQueryKeys?.PURCHASEORDERS_KEY,
       INVOICETYPE.ALL,
       INVOICETYPE.DRAFT,
       page,
@@ -134,53 +138,45 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   );
 
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      setAllInvoicesConfig({
-        ...allInvoicesConfig,
-        sortid: 'id',
-        page: pagination.current,
-        pageSize: pagination.pageSize,
-      });
-      const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
-      history.push(route);
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+    if (sorter?.column) {
+      if (sorter.order === 'false') {
+        setAllInvoicesConfig({
+          ...allInvoicesConfig,
+          sortid: defaultSortedId,
+          page: pagination.current,
+          pageSize: pagination.pageSize,
         });
-
-        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
+        const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+        history.push(route);
       } else {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+        setAllInvoicesConfig({
+          ...allInvoicesConfig,
+          page: pagination.current,
+          pageSize: pagination.pageSize,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
         });
-
-        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
-      }
-      setAllInvoicesConfig({
-        ...allInvoicesConfig,
-        page: pagination.current,
-        pageSize: pagination.pageSize,
-        sortid:
+        const route = `/app${
+          ISupportedRoutes.PURCHASE_ORDER
+        }?tabIndex=draft&sortid=${
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
-            : sorter.field,
+            : sorter.field
+        }&page=${pagination.current}&page_size=${
+          pagination.pageSize
+        }&query=${query}`;
+        history.push(route);
+      }
+    } else {
+      setAllInvoicesConfig({
+        ...allInvoicesConfig,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        sortid: defaultSortedId,
       });
-      const route = `/app${
-        ISupportedRoutes.PURCHASE_ORDER
-      }?tabIndex=draft&sortid=${
-        sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
-      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-        sorter.order
-      }&query=${query}`;
+      const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=draft&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
       history.push(route);
     }
   };
@@ -193,7 +189,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
     };
     await mutateDeleteOrders(payload, {
       onSuccess: () => {
-        [ReactQueryKeys?.INVOICES_KEYS, 'invoice-view'].forEach((key) => {
+        [ReactQueryKeys?.INVOICES_KEYS, ReactQueryKeys.INVOICE_VIEW].forEach((key) => {
           (queryCache.invalidateQueries as any)((q) => q?.startsWith(`${key}`));
         });
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Deleted Successfully');
@@ -202,12 +198,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
         setConfirmModal(false);
       },
       onError: (error: IServerError) => {
-        if (
-          error &&
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
+        if (error?.response?.data?.message) {
           const { message } = error.response.data;
           notificationCallback(NOTIFICATIONTYPE.ERROR, message);
         } else {
@@ -225,14 +216,29 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   };
 
   useEffect(() => {
-    if (resolvedData && resolvedData.data && resolvedData.data.result) {
-      const { result } = resolvedData.data;
+    if (resolvedData?.data?.result) {
+      const { result, pagination } = resolvedData.data;
       const newResult = [];
-      result.forEach((item, index) => {
+      result?.forEach((item, index) => {
         newResult.push({ ...item, key: item.id });
       });
 
       setAllInvoicesRes({ ...resolvedData.data, result: newResult });
+
+      if (pagination?.next === page + 1) {
+        queryCache?.prefetchQuery(
+          [
+            ReactQueryKeys?.PURCHASEORDERS_KEY,
+            INVOICETYPE.ALL,
+            INVOICETYPE.DRAFT,
+            page + 1,
+            pageSize,
+            query,
+            sortid,
+          ],
+          purchaseOrderList
+        );
+      }
     }
   }, [resolvedData]);
 

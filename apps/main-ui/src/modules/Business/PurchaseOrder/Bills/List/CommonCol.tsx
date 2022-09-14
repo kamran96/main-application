@@ -32,7 +32,7 @@ export const useCols = () => {
         });
       }
     }
-  }, [history?.location?.search]);
+  }, []);
 
   const PurchaseOrderColumns: ColumnsType<any> = [
     {
@@ -135,7 +135,7 @@ export const useCols = () => {
       sortOrder: sortedInfo?.columnKey === 'status' && sortedInfo?.order,
       render: (data, row, index) => {
         const rowData = plainToClass(InvoiceResultClass, row);
-        return <>{row && rowData.getStatus()}</>;
+        return <>{row && rowData?.getStatus()}</>;
       },
     },
   ];
@@ -200,8 +200,8 @@ export const useCols = () => {
       dataIndex: '',
       key: '',
       render: (data, row, index) => {
-        const rowData = plainToClass(InvoiceResultClass, row);
-        return rowData.getStatus();
+        // const rowData = plainToClass(InvoiceResultClass, row);
+        // return rowData?.getStatus();
       },
     },
   ];

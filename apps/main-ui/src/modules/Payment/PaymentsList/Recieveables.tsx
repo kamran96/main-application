@@ -106,7 +106,7 @@ export const PaymentRecievedList: FC = () => {
       onSuccess: () => {
         [
           ReactQueryKeys.PAYMENTS_KEYS,
-          'transactions',
+          ReactQueryKeys?.TRANSACTION_KEYS,
           ReactQueryKeys?.INVOICES_KEYS,
         ].forEach((key) => {
           (queryCache.invalidateQueries as any)((q) => q.startsWith(`${key}`));

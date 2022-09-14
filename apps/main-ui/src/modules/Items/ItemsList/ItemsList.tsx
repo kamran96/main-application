@@ -239,7 +239,7 @@ export const ItemsList: FC = () => {
             NOTIFICATIONTYPE.SUCCESS,
             'Item Deleted Successfully'
           );
-          ['all-items', 'items-list'].forEach((key) => {
+          ['all-items', ReactQueryKeys?.ITEMS_KEYS].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           });
           setConfirmModal(false);

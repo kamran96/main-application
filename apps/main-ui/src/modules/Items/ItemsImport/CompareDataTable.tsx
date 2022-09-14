@@ -4,7 +4,11 @@ import { Button, Select } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { CsvImportAPi, getAllAccounts } from '../../../api';
-import { IAccountsResult, NOTIFICATIONTYPE } from '@invyce/shared/types';
+import {
+  IAccountsResult,
+  NOTIFICATIONTYPE,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 
 const { Option } = Select;
@@ -65,7 +69,7 @@ export const CompareDataTable: FC<IProps> = ({
           'Items Imported Successfully'
         );
         onSuccess();
-        ['item-id', 'items-list', 'all-items'].forEach((key) => {
+        ['item-id', ReactQueryKeys?.ITEMS_KEYS, 'all-items'].forEach((key) => {
           (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
         });
       },

@@ -11,7 +11,11 @@ import {
 } from '../../../api/accounts';
 import { CommonModal, FormLabel } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { NOTIFICATIONTYPE, ISecondaryAccount } from '@invyce/shared/types';
+import {
+  NOTIFICATIONTYPE,
+  ISecondaryAccount,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import convertToRem from '../../../utils/convertToRem';
 import getRangeOfNumbers from '../../../utils/getRangeOfNumbers';
 
@@ -77,7 +81,7 @@ export const AccountsForm: FC = () => {
             NOTIFICATIONTYPE.SUCCESS,
             id ? 'Updated' : 'Created'
           );
-          ['accounts', `account-${id}`]?.forEach((key) => {
+          [ReactQueryKeys.ACCOUNTS_KEYS, `account-${id}`]?.forEach((key) => {
             (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
           });
           setAccountsModalConfig({ visibility: false, id: null });

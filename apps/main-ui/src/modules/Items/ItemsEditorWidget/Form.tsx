@@ -31,6 +31,7 @@ import {
   IVariants,
   ICategory,
   ITEM_TYPE,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import convertToRem from '../../../utils/convertToRem';
 import { DynamicForm } from './DynamicForm';
@@ -203,9 +204,11 @@ export const ItemsForm: FC = () => {
             NOTIFICATIONTYPE.SUCCESS,
             id ? 'Updated' : 'Created'
           );
-          ['item-id', 'items-list', 'all-items'].forEach((key) => {
-            (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
-          });
+          ['item-id', ReactQueryKeys?.ITEMS_KEYS, 'all-items'].forEach(
+            (key) => {
+              (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
+            }
+          );
           setItemsModalConfig(false, null);
           form.resetFields();
           setFormData({});

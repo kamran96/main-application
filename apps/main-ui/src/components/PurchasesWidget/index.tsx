@@ -191,9 +191,9 @@ const Editor: FC<IProps> = ({ type, id }) => {
 
           [
             ReactQueryKeys?.INVOICES_KEYS,
-            'transactions?page',
+            ReactQueryKeys?.TRANSACTION_KEYS,
             ReactQueryKeys?.ITEMS_KEYS,
-            'invoice-view',
+            ReactQueryKeys.INVOICE_VIEW,
             ReactQueryKeys.CONTACT_VIEW,
             'all-items',
           ].forEach((key) => {

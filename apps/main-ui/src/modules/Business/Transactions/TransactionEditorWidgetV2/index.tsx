@@ -5,7 +5,7 @@ import { Wrapper } from './styles';
 import bxPlus from '@iconify-icons/bx/bx-plus';
 import Icon from '@iconify/react';
 import dayjs from 'dayjs';
-import { ISupportedRoutes, NOTIFICATIONTYPE } from '@invyce/shared/types';
+import { ISupportedRoutes, NOTIFICATIONTYPE, ReactQueryKeys } from '@invyce/shared/types';
 import { Link, useHistory } from 'react-router-dom';
 import { Heading, BoldText, BreadCrumbArea, DatePicker } from '@components';
 import TextArea from 'antd/lib/input/TextArea';
@@ -155,7 +155,7 @@ const Editor = () => {
                 });
               } else {
                 [
-                  'accounts',
+                  ReactQueryKeys.ACCOUNTS_KEYS,
                   `transactions`,
                   `report-trialbalance`,
                   `report-balance-sheet`,

@@ -20,7 +20,11 @@ import {
   EmailInvoiceAPI,
 } from '../../api';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
-import { IInvoiceItem, IInvoiceType } from '@invyce/shared/types';
+import {
+  IInvoiceItem,
+  IInvoiceType,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import { useMutation, useQuery } from 'react-query';
 import { NOTIFICATIONTYPE, IInvoiceMutatedResult } from '../../modal';
 import dayjs from 'dayjs';
@@ -76,6 +80,8 @@ interface IInvoiceOptions {
 export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
   /* ******API STAKE******* */
 
+  console.log(id, type, 'ivoice');
+
   const APISTAKE_APPROVED =
     type === 'PO' ? pushDraftToPurchaseAPI : pushDraftToInvoiceAPI;
   /* ******API STAKE ENDS HERE******* */
@@ -93,10 +99,11 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
 
   /* ************ QUERIES & MUTATIONS **************  */
   const { data, isLoading } = useQuery(
-    [`invoice-view-${id}`, id, type],
+    [ReactQueryKeys.INVOICE_VIEW, id, type],
     findInvoiceByID,
     {
       enabled: !!id,
+      keepPreviousData: true,
     }
   );
 

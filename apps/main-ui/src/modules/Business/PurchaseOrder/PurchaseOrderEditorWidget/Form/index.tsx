@@ -204,9 +204,9 @@ const Editor: FC<IProps> = ({ id }) => {
           ]);
           [
             ReactQueryKeys?.INVOICES_KEYS,
-            'transactions?page',
-            'items-list',
-            'invoice-view',
+            ReactQueryKeys?.TRANSACTION_KEYS,
+            ReactQueryKeys?.ITEMS_KEYS,
+            ReactQueryKeys.INVOICE_VIEW,
             ReactQueryKeys.CONTACT_VIEW,
             'all-items',
             `purchase-order-${id}`,

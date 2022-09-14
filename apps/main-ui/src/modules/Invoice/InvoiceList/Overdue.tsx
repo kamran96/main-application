@@ -160,9 +160,9 @@ export const OverDueInvoices: FC<IProps> = ({ columns }) => {
       onSuccess: () => {
         [
           ReactQueryKeys?.INVOICES_KEYS,
-          'transactions',
-          'items-list',
-          'invoice-view',
+          ReactQueryKeys?.TRANSACTION_KEYS,
+          ReactQueryKeys?.ITEMS_KEYS,
+          ReactQueryKeys?.INVOICE_VIEW,
           ReactQueryKeys.CONTACT_VIEW,
           'all-items',
         ].forEach((key) => {

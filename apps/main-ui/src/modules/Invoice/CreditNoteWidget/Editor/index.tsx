@@ -168,12 +168,13 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
           setInvoiceItems([{ ...defaultItems }]);
           [
             ReactQueryKeys?.INVOICES_KEYS,
-            'transactions',
-            'items-list',
-            'invoice-view',
+            ReactQueryKeys?.TRANSACTION_KEYS,
+            ReactQueryKeys?.ITEMS_KEYS,
+            ReactQueryKeys?.INVOICE_VIEW,
             ReactQueryKeys.CONTACT_VIEW,
             'all-items',
             'ACCRECCREDIT',
+            ReactQueryKeys?.CREDITNOTE_KEYS,
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           });

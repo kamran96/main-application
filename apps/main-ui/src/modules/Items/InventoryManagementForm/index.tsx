@@ -16,6 +16,7 @@ import {
   IItemsResult,
   NOTIFICATIONTYPE,
   IAccountsResult,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import { WrapperInventoryManagement } from './styles';
 import bxPlus from '@iconify-icons/bx/bx-plus';
@@ -327,7 +328,11 @@ export const ManageInventoryForm: FC = () => {
               NOTIFICATIONTYPE?.SUCCESS,
               'Updated Stocks Successfully'
             );
-            [`all-items`, 'items-list', `transactions?page`]?.forEach((key) => {
+            [
+              `all-items`,
+              ReactQueryKeys?.ITEMS_KEYS,
+              `transactions?page`,
+            ]?.forEach((key) => {
               (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
             });
             resetForm();

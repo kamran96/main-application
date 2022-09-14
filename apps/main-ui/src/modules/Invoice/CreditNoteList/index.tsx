@@ -69,14 +69,14 @@ export const CreditNoteList: FC = () => {
       >
         <>
           <TableTabsContent tab="Aproved" key="aproved">
-            <Suspense fallback={<FallBackLoader />}>
-              <AprovedCreditNotes />
-            </Suspense>
+            {/* <Suspense fallback={<FallBackLoader />}>
+            </Suspense> */}
+            <AprovedCreditNotes />
           </TableTabsContent>
           <TableTabsContent tab="Draft" key="draft">
-            <Suspense fallback={<FallBackLoader />}>
-              <DraftCreditNotes />
-            </Suspense>
+            {/* <Suspense fallback={<FallBackLoader />}>
+            </Suspense> */}
+            <DraftCreditNotes />
           </TableTabsContent>
         </>
       </TableTabs>

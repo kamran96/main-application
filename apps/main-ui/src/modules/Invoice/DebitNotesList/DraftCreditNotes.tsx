@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import React, { FC } from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import styled from 'styled-components';
 import { getAllContacts, getCreditNotes } from '../../../api';
 import { CommonTable, ButtonTag, SmartFilter, PDFICON } from '@components';
@@ -13,19 +13,21 @@ import {
   IInvoiceType,
   ISupportedRoutes,
   IInvoiceResponse,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import editSolid from '@iconify-icons/clarity/edit-solid';
 import FilteringSchema from './FilteringSchema';
 import { useCols } from './commonCols';
 import { DebitNoteImport } from './DebitNoteImport';
 
+const defaultSortedId = 'id';
 export const DraftDebitNotes: FC = () => {
   /* HOOKS HERE */
 
   const { routeHistory } = useGlobalContext();
   const { history } = routeHistory;
   const { location } = history;
-
+  const queryCache = useQueryClient();
   /* LOCATL STATES */
   const [{ result, pagination }, setCreditNoteResponse] =
     useState<IInvoiceResponse>({
@@ -47,9 +49,11 @@ export const DraftDebitNotes: FC = () => {
 
   /* API CALLS STACKS GOES HERE */
   /* PAGINATED QUERY TO FETCH CREDIT NOTES WITH PAGINATION */
+
+  // `credit-notes?page=${page}&type=${2}&pageSize=${pageSize}&query=${query}`,
   const { data: creditNoteListData, isLoading } = useQuery(
     [
-      `credit-notes?page=${page}&type=${2}&pageSize=${pageSize}&query=${query}`,
+      ReactQueryKeys?.DEBITNOTE_KEYS,
       2, // this specifies Draft CREDIT NOTES
       page,
       pageSize,
@@ -80,53 +84,45 @@ export const DraftDebitNotes: FC = () => {
   }, [contactsData, FilteringSchema]);
 
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      setCreditNoteConfig({
-        ...creditNoteConfig,
-        page: pagination.current,
-        pageSize: pagination.pageSize,
-        sortid: 'id',
-      });
-      const route = `/app${ISupportedRoutes.DEBIT_NOTES}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
-      history.push(route);
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+    if (sorter?.column) {
+      if (sorter.order === 'false') {
+        setCreditNoteConfig({
+          ...creditNoteConfig,
+          page: pagination.current,
+          pageSize: pagination.pageSize,
+          sortid: defaultSortedId,
         });
-
-        setCreditNoteResponse((prev) => ({ ...prev, result: userData }));
+        const route = `/app${ISupportedRoutes.DEBIT_NOTES}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+        history.push(route);
       } else {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+        setCreditNoteConfig({
+          ...creditNoteConfig,
+          page: pagination.current,
+          pageSize: pagination.pageSize,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
         });
-
-        setCreditNoteResponse((prev) => ({ ...prev, result: userData }));
-      }
-      setCreditNoteConfig({
-        ...creditNoteConfig,
-        page: pagination.current,
-        pageSize: pagination.pageSize,
-        sortid:
+        const route = `/app${
+          ISupportedRoutes.DEBIT_NOTES
+        }?tabIndex=draft&sortid=${
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
-            : sorter.field,
+            : sorter.field
+        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+          sorter.order
+        }&query=${query}`;
+        history.push(route);
+      }
+    } else {
+      setCreditNoteConfig({
+        ...creditNoteConfig,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        sortid: defaultSortedId,
       });
-      const route = `/app${
-        ISupportedRoutes.DEBIT_NOTES
-      }?tabIndex=draft&sortid=${
-        sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
-      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-        sorter.order
-      }&query=${query}`;
+      const route = `/app${ISupportedRoutes.DEBIT_NOTES}?tabIndex=draft&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
       history.push(route);
     }
   };
@@ -146,10 +142,26 @@ export const DraftDebitNotes: FC = () => {
 
       setCreditNoteConfig({ ...creditNoteConfig, ...obj });
     }
-  }, [location]);
+  }, []);
+
   useEffect(() => {
-    if (creditNoteListData?.data?.result) {
+    if (creditNoteListData?.data) {
       setCreditNoteResponse(creditNoteListData?.data);
+
+      if (creditNoteListData?.data?.pagination?.next === page + 1) {
+        queryCache?.prefetchQuery(
+          [
+            ReactQueryKeys.DEBITNOTE_KEYS,
+            2, // this specifies APPROVED CREDIT NOTES
+            page + 1,
+            pageSize,
+            IInvoiceType.DEBITNOTE,
+            query,
+            sortid,
+          ],
+          getCreditNotes
+        );
+      }
     }
   }, [creditNoteListData]);
   /* COMPONENT DID UPDATE HERE */

@@ -18,6 +18,7 @@ import {
   IAccounts,
   ISupportedRoutes,
   IErrorResponse,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import moneyFormat from '../../../utils/moneyFormat';
 import { useWindowSize } from '../../../utils/useWindowSize';
@@ -32,13 +33,15 @@ interface IProps {
   data: any;
 }
 
+const defaultSortedId = 'id';
+
 export const AccountsList: FC<IProps> = ({ data }) => {
   const queryCache = useQueryClient();
   const [sortedInfo, setSortedInfo] = useState(null);
   const [accountsConfig, setAccountConfig] = useState({
     page: 1,
     query: '',
-    sortid: 'id',
+    sortid: defaultSortedId,
     page_size: 20,
   });
   const [confirmModal, setConfirmModal] = useState<boolean>(false);
@@ -53,12 +56,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
   const { history } = routeHistory;
 
   useEffect(() => {
-    if (
-      routeHistory &&
-      routeHistory.history &&
-      routeHistory.history.location &&
-      routeHistory.history.location.search
-    ) {
+    if (routeHistory?.history?.location?.search) {
       let obj = {};
       const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
@@ -106,18 +104,13 @@ export const AccountsList: FC<IProps> = ({ data }) => {
 
   const { setAccountsModalConfig } = useGlobalContext();
 
+  // `accounts?page=${page}&query=${query}sort=${sortid}`,
   const {
     isLoading,
     data: resolvedData,
     isFetching,
   } = useQuery(
-    [
-      `accounts?page=${page}&query=${query}sort=${sortid}`,
-      page,
-      sortid,
-      page_size,
-      query,
-    ],
+    [ReactQueryKeys.ACCOUNTS_KEYS, page, sortid, page_size, query],
     getAllAccountsAPI,
     {
       keepPreviousData: true,
@@ -131,11 +124,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
   );
 
   useEffect(() => {
-    if (
-      secondaryAccounts.data &&
-      secondaryAccounts.data.data &&
-      secondaryAccounts.data.data.result
-    ) {
+    if (secondaryAccounts?.data?.data?.result) {
       const { result } = secondaryAccounts.data.data;
       const schema = { ...filterSchema };
       schema.secondaryAccountId.value = [...result];
@@ -162,14 +151,21 @@ export const AccountsList: FC<IProps> = ({ data }) => {
     });
   };
   useEffect(() => {
-    if (resolvedData && resolvedData.data) {
-      const { result }: IAccounts = resolvedData.data;
+    if (resolvedData && resolvedData?.data) {
+      const { result, pagination }: IAccounts = resolvedData?.data;
       const newResult = [];
       result.forEach((accItem) => {
         newResult.push({ ...accItem, key: accItem.id });
       });
 
       setResponse({ ...resolvedData.data, result: newResult });
+
+      if (pagination?.next === page + 1) {
+        queryCache?.prefetchQuery(
+          [ReactQueryKeys.ACCOUNTS_KEYS, page, sortid, page_size, query],
+          getAllAccountsAPI
+        );
+      }
     }
   }, [resolvedData]);
 
@@ -312,55 +308,47 @@ export const AccountsList: FC<IProps> = ({ data }) => {
   };
 
   const handleAccountsConfig = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      history.push(
-        `/app${ISupportedRoutes.ACCOUNTS}?sortid="id"&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
-      );
-      setAccountConfig({
-        ...accountsConfig,
-        sortid: null,
-        page: pagination.current,
-        page_size: pagination.pageSize,
-      });
-    } else {
-      history.push(
-        `/app${ISupportedRoutes.ACCOUNTS}?sortid=${
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field
-        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-          sorter.order
-        }&query=${query}`
-      );
-      if (sorter?.order === 'ascend') {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+    if (sorter?.column) {
+      if (sorter.order === 'false') {
+        history.push(
+          `/app${ISupportedRoutes.ACCOUNTS}?sortid="id"&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+        );
+        setAccountConfig({
+          ...accountsConfig,
+          sortid: defaultSortedId,
+          page: pagination.current,
+          page_size: pagination.pageSize,
         });
-        setResponse((prev) => ({ ...prev, result: userData }));
       } else {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+        setAccountConfig({
+          ...accountsConfig,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
         });
-
-        setResponse((prev) => ({ ...prev, result: userData }));
+        history.push(
+          `/app${ISupportedRoutes.ACCOUNTS}?sortid=${
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field
+          }&page=${pagination.current}&page_size=${
+            pagination.pageSize
+          }&filter=${sorter.order}&query=${query}`
+        );
       }
+    } else {
       setAccountConfig({
         ...accountsConfig,
         page: pagination.current,
         page_size: pagination.pageSize,
-        sortid:
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field,
+        sortid: defaultSortedId,
       });
+      history.push(
+        `/app${ISupportedRoutes.ACCOUNTS}?sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`
+      );
     }
   };
 

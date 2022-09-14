@@ -208,9 +208,9 @@ export const PaidtInvoiceList: FC<IProps> = ({ columns }) => {
       onSuccess: () => {
         [
           ReactQueryKeys?.INVOICES_KEYS,
-          'transactions?page',
-          'items-list',
-          'invoice-view',
+          ReactQueryKeys?.TRANSACTION_KEYS,
+          ReactQueryKeys?.ITEMS_KEYS,
+          ReactQueryKeys?.INVOICE_VIEW,
         ].forEach((key) => {
           (queryCache.invalidateQueries as any)((q) =>
             q.queryKey[0].toString().startsWith(key)

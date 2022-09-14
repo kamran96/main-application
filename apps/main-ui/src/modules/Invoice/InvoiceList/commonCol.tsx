@@ -34,7 +34,7 @@ export const useCols = () => {
         });
       }
     }
-  }, [history?.location?.search]);
+  }, []);
 
   const InvoiceColumns: ColumnsType<any> = [
     {
