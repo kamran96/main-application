@@ -200,7 +200,7 @@ const Editor = () => {
   // JSX RENDER
   return (
     <>
-      <div className="mb-10">
+      <div>
         <Heading type="form">Journal Entry</Heading>
       </div>
 
@@ -214,7 +214,6 @@ const Editor = () => {
           <Breadcrumb.Item>Journal Entry</Breadcrumb.Item>
         </Breadcrumb>
       </BreadCrumbArea>
-
 
       <Card>
         <Wrapper>
@@ -280,13 +279,13 @@ const Editor = () => {
                 <Button
                   className="flex alignCenter"
                   onClick={addRow}
-                  type="link"
+                  type="primary"
                   ghost
                 >
                   <span className="flex alignCenter mr-10">
                     <Icon icon={bxPlus} />
                   </span>
-                  Add Transaction Row
+                  Add Transaction Item
                 </Button>
               </div>
             </div>
@@ -301,7 +300,9 @@ const Editor = () => {
                   <TextArea size="small" className="mh-10" rows={3} />
                 </Form.Item>
               </Col>
-              <Col className="flex alignFEnd justifyFlexEnd" span={6}>
+            </Row>
+            <Row gutter={24}>
+              <Col className="flex alignFEnd justifyFlexEnd" span={24}>
                 <Form.Item name="status">
                   <Button
                     onClick={() => {

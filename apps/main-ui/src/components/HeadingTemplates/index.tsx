@@ -10,7 +10,7 @@ interface IProps {
 export const HeadingTemplate1: FC<IProps> = ({ title, paragraph }) => {
   return (
     <StyledWrapper className="form_title">
-      <Heading className="mb-15" type="table">
+      <Heading className="mb-2" type="table">
         {title}
       </Heading>
       <p className="form_description">{paragraph}</p>

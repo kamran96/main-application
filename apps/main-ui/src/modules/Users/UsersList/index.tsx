@@ -85,9 +85,9 @@ export const UsersList: FC = () => {
   }, [history]);
 
   const onSelectedRow = (item) => {
-    item?.selectedRows.map((user: any) => {
-      if (user.role.name !== 'admin') {
-        setSelectedRow(item.selectedRowKeys);
+    item.selectedRows.map((users: any, index: number) => {
+      if (users.role.name !== 'admin') {
+        setSelectedRow(users.id);
       }
     });
   };

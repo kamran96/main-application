@@ -10,7 +10,7 @@ import { Link, useHistory } from 'react-router-dom';
 import Icon from '@iconify/react';
 import { ReactElement, useState } from 'react';
 import { AppLogoWithoutText, InyvceDarkTextIcon } from './applogo';
-import sidebarCollapse24 from '@iconify/icons-octicon/sidebar-collapse-24';
+import chevronRight from '@iconify/icons-carbon/chevron-right';
 import LogOut from '@iconify-icons/feather/log-out';
 import Setting from '@iconify-icons/feather/settings';
 import Sun from '@iconify-icons/feather/sun';
@@ -81,21 +81,20 @@ const MenuPopOver: FC<IPopOverProps> = ({ route }) => {
         overlayClassName={'open_popover'}
       >
         <li
-          className={`route_list_item_parent flex alignCenter pointer fs-14 ${
+          className={`route_list_item_parent flex alignCenter pointer fs-14  ${
             _activeIndex > -1 ? 'active_route' : ''
           }`}
         >
           <span className="mr-10 flex alignCenter icon">
-            {/* <Icon className=" icon fs-16" icon={route?.icon} /> */}
             {route?.icon}
           </span>
-
-          <span className="route_tag">{route?.tag}</span>
+            <span className='route_tag '>{route?.tag}</span>
         </li>
       </Popover>
     </>
   );
 };
+
 
 export const SidebarUi: FC<SidebarUiProps> = ({
   activeUserInfo,
@@ -116,6 +115,8 @@ export const SidebarUi: FC<SidebarUiProps> = ({
     }
   }, [toggleCached]);
 
+
+
   return (
     <SidebarWrapper toggle={sidebarOpen}>
       <div className="logo_area flex alignCenter">
@@ -127,7 +128,7 @@ export const SidebarUi: FC<SidebarUiProps> = ({
           }}
           className="collapse pointer"
         >
-          <Icon className="fs-20" icon={sidebarCollapse24} />
+          <Icon className="fs-20" icon={chevronRight} />
         </span>
       </div>
       <hr className="mt-10" />
@@ -175,9 +176,10 @@ export const SidebarUi: FC<SidebarUiProps> = ({
             {routes?.nestedRoutes?.map((parent, index) => {
               return (
                 <div key={index}>
-                  {parent?.children?.length ? (
+                  {parent?.children?.length ? 
+                  
                     <MenuPopOver route={parent} />
-                  ) : (
+                   : (
                     <li
                       className={`route_list_item flex alignCenter pointer mv-4
                     ${

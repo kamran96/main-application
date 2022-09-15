@@ -9,7 +9,8 @@ export const RegisterWrapper = styled.div`
 
     .illustration {
       grid-column: span 5;
-      background: #0071ff;
+      /* background: #0071ff; */
+      background: #1890FF;
       min-height: 100vh;
       padding: 44px 60px;
       background-image: url(${bg});

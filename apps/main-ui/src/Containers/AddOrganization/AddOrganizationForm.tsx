@@ -60,7 +60,6 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
   useEffect(() => {
     if (data && data.data && data.data.result) {
       const { result } = data.data;
-      console.log(result, "reesult")
       form.setFieldsValue({
         ...result,
         financialEnding: dayjs(result?.financialEnding),
@@ -156,12 +155,13 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
           );
         }}
       >
-        {phoneCodes?.map((country) => {
+        {phoneCodes?.map((country, index: number) => {
           return (
             <Option
               value={`${country?.phoneCode}`}
               title={`${country?.phoneCode}`}
               id={`${country?.short}`}
+              key={index}
             >
               <img
                 className="mr-10"

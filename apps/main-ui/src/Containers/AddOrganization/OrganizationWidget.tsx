@@ -141,7 +141,7 @@ export const OrganizationWidget: FC = () => {
             <Col span={12}>
               <Form.Item
                 name="name"
-                label="Name of Organization?"
+                label="Name of Organization"
                 rules={[
                   { required: true, message: 'Organization Name is required!' },
                 ]}
@@ -156,26 +156,13 @@ export const OrganizationWidget: FC = () => {
             <Col span={12}>
               <Form.Item
                 name="email"
-                label="Email?"
+                label="Organization Email"
                 rules={[{ required: true, message: 'Email is required!' }]}
               >
                 <Input
                   size="middle"
                   autoComplete="off"
                   placeholder="abce@domain.com"
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="faxNumber"
-                label="Fax No"
-                rules={[{ required: false, message: 'Fax is required!' }]}
-              >
-                <Input
-                  size="middle"
-                  autoComplete="off"
-                  placeholder="Enter your fax number"
                 />
               </Form.Item>
             </Col>
@@ -194,6 +181,19 @@ export const OrganizationWidget: FC = () => {
                   type="text"
                   placeholder="3188889898"
                   size="middle"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="faxNumber"
+                label="Fax No"
+                rules={[{ required: false, message: 'Fax is required!' }]}
+              >
+                <Input
+                  size="middle"
+                  autoComplete="off"
+                  placeholder="Enter your fax number"
                 />
               </Form.Item>
             </Col>
@@ -347,7 +347,8 @@ const OrganizationWidgetWrapper = styled.div`
   .illustration {
     grid-column: 6 span;
     padding: 44px 60px;
-    background: #0071ff;
+    /* background: #0071ff; */
+    background: #1890FF;
     /* height: 100vh;  */
     width: 100%;
     background-repeat: no-repeat;

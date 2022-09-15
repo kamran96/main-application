@@ -77,6 +77,7 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
             value={country?.phoneCode}
             title={`${country?.phoneCode}`}
             id={country?.short}
+            key={country?.phoneCode}
           >
             <img
               className="mr-10"
@@ -155,11 +156,12 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
                         .includes(input?.toLocaleLowerCase());
                     }}
                   >
-                    {en?.map((country) => {
+                    {en?.map((country, index) => {
                       return (
                         <Option
                           title={country?.name}
                           value={`${country?.name}`}
+                          key={index}
                         >
                           <img
                             className="mr-10"

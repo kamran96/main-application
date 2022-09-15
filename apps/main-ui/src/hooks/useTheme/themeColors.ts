@@ -18,6 +18,8 @@ export interface IThemeVariables {
   sidebarListActive: string;
   sidebarListActiveText: string;
   sidebarDefaultText: string;
+  sidebarHoverActive: string;
+  sidebarHoverActiveText: string;
   tableRowHover: string;
   td: string;
   seprator: string;
@@ -102,8 +104,8 @@ export const Themes: IThemes = {
     $Primary2: `#1e5b9e`,
     layoutBg: `#efefef`,
     sidebarBg: '#ffff',
-    sidebarListActive: '#1E75F1',
-    sidebarListActiveText: '#ffff',
+    sidebarListActive: '#F6FAFF', //sidebar
+    sidebarListActiveText: '#7988FF',
     sidebarDefaultText: '#334d6e',
     tableRowHover: '#151515',
     td: `#ffff`,
@@ -151,6 +153,8 @@ export const Themes: IThemes = {
     svgHoverBg: '#FBFDFF',
     svgHoverColor: '#232C3A',
     organizationCard: '#dff0ff',
+    sidebarHoverActive: '#F6FAFF',
+    sidebarHoverActiveText: '#7988FF',
   },
   dark: {
     $PRIMARY: '#e4e4e4',
@@ -218,5 +222,7 @@ export const Themes: IThemes = {
     svgHoverBg: '#434D5E',
     svgHoverColor: '#FFFFFF',
     organizationCard: '#0B1822',
+    sidebarHoverActive: '#FFFFFF',
+    sidebarHoverActiveText: '#FFFFFF',
   },
 };

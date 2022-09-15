@@ -18,7 +18,7 @@ export const WrapperPurchaseOrderForm = styled.div`
     visibility: visible;
   }
   .ref_header {
-    padding: ${convertToRem(19)} ${convertToRem(26)};
+    /* padding: ${convertToRem(19)} ${convertToRem(26)}; */
     border-bottom: ${convertToRem(0)};
     box-sizing: border-box;
     border-radius: ${convertToRem(5)} ${convertToRem(5)} 0 0;

@@ -6,7 +6,7 @@ import { invycePersist } from '@invyce/invyce-persist';
 import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import dayjs from 'dayjs';
-import { FC, useRef, useState } from 'react';
+import { FC, useCallback, useMemo, useRef, useState } from 'react';
 import { useQueryClient, useMutation } from 'react-query';
 
 import {
@@ -63,6 +63,8 @@ const Editor: FC<IProps> = ({ type, id }) => {
   const [printModal, setPrintModal] = useState(false);
   const [taxType, setTaxType] = useState<ITaxTypes>(ITaxTypes.TAX_INCLUSIVE);
   const [createContactName, setCreateContactName] = useState('');
+  const [contactError, setContactError] = useState<boolean>(false);
+  // const [form] = Form.useForm();
 
   const {
     columns,
@@ -122,6 +124,8 @@ const Editor: FC<IProps> = ({ type, id }) => {
         onSuccess: (data) => {
           queryCache?.invalidateQueries('all-contacts');
           notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Contact Created');
+          // AntForm.setFieldsValue({ contactId: createContactName });
+          setCreateContactName('');
         },
       }
     );
@@ -131,8 +135,6 @@ const Editor: FC<IProps> = ({ type, id }) => {
   const RouteState: any = history?.location?.state;
   const onFinish = async (value) => {
     const errors = handleCheckValidation();
-
-    console.log(errors, 'check errors');
 
     if (!errors?.length) {
       const paymentData = { ...payment };
@@ -336,6 +338,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
                     <Form.Item
                       name="contactId"
                       rules={[{ required: true, message: 'Required !' }]}
+                      validateStatus={contactError ? 'error' : 'success'}
                     >
                       <Select
                         loading={isFetching}
@@ -343,10 +346,13 @@ const Editor: FC<IProps> = ({ type, id }) => {
                         showSearch
                         style={{ width: '100%' }}
                         placeholder="Select Contact"
+                        value={createContactName}
+                        onSearch={(val) => setCreateContactName(val)}
+                        onChange={(val) => setContactError(false)}
                         // optionFilterProp="children"
                         filterOption={(input, option) => {
                           const valueInput = input.toLowerCase();
-                          setCreateContactName(input);
+                          // setCreateContactName(input);
                           const child: string = option.children as any;
                           if (typeof option?.children === 'string') {
                             return child.toLowerCase().includes(valueInput);
@@ -354,11 +360,6 @@ const Editor: FC<IProps> = ({ type, id }) => {
                             return true;
                           }
                         }}
-                        // onChange={(val) => {
-                        //   if (val !== 'newContact') {
-                        //     AntForm.setFieldsValue({ contactId: val });
-                        //   }
-                        // }}
                       >
                         <Option
                           key={'new-contact'}
@@ -371,7 +372,13 @@ const Editor: FC<IProps> = ({ type, id }) => {
                             className="new-contact-btn"
                             onClick={(e) => {
                               e.stopPropagation();
-                              onCreateContact();
+                              e.preventDefault();
+                              if (createContactName.replace(/\s/g, '') !== '') {
+                                onCreateContact();
+                                setContactError(false);
+                              } else {
+                                setContactError(true);
+                              }
                             }}
                             type="text"
                             size="middle"
@@ -553,7 +560,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
               <span className="flex alignCenter mr-10">
                 <Icon icon={bxPlus} />
               </span>
-              Add line item
+              Add {type === IInvoiceType.PURCHASE_ENTRY ? 'Bill' : 'Line'} item
             </Button>
           </div>
           <div className="total_invoice">

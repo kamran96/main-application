@@ -89,28 +89,23 @@ const APPROVETransactionList: FC = () => {
 
       setTransactionsConfig({ ...transactionConfig, ...obj });
 
-
       const filterType = history.location.search.split('&');
       const filterIdType = filterType[1];
-      const filterOrder = filterType[4]?.split("=")[1];
+      const filterOrder = filterType[4]?.split('=')[1];
 
-
-
-      if (filterIdType?.includes("-")) {
-        const fieldName = filterIdType?.split("=")[1].split("-")[1];
+      if (filterIdType?.includes('-')) {
+        const fieldName = filterIdType?.split('=')[1].split('-')[1];
         setSortedInfo({
           order: filterOrder,
-          columnKey: fieldName
+          columnKey: fieldName,
+        });
+      } else {
+        const fieldName = filterIdType?.split('=')[1];
+        setSortedInfo({
+          order: filterOrder,
+          columnKey: fieldName,
         });
       }
-      else {
-        const fieldName = filterIdType?.split("=")[1];
-        setSortedInfo({
-          order: filterOrder,
-          columnKey: fieldName
-        })
-      }
-
     }
   }, [history]);
 
@@ -213,17 +208,19 @@ const APPROVETransactionList: FC = () => {
   const renderCustomTopbar = () => {
     return (
       <WrapperTransactionCustomBar>
-        <PDFDownloadLinkWrapper
-          document={
-            <TransactionApprovePdf resultData={result} header={headerprops} />
-          }
-        >
-          <div className="flex alignCenter">
-            <PDFICON className="flex alignCenter mr-5" />
+        {result.length > 0 && (
+          <PDFDownloadLinkWrapper
+            document={
+              <TransactionApprovePdf resultData={result} header={headerprops} />
+            }
+          >
+            <div className="flex alignCenter">
+              <PDFICON className="flex alignCenter mr-5" />
 
-            <span> Download PDF</span>
-          </div>
-        </PDFDownloadLinkWrapper>
+              <span> Download PDF</span>
+            </div>
+          </PDFDownloadLinkWrapper>
+        )}
 
         {/* <TransactionImport/> */}
 
@@ -269,7 +266,7 @@ const APPROVETransactionList: FC = () => {
         //   order: sorter?.order,
         //   columnKey: sorter?.field
         // })
-        setResponse(prev => ({ ...prev, result: userData }))
+        setResponse((prev) => ({ ...prev, result: userData }));
       } else {
         const userData = [...result].sort((a, b) => {
           if (a[sorter?.field] < b[sorter?.field]) {
@@ -282,7 +279,7 @@ const APPROVETransactionList: FC = () => {
         //   order: sorter?.order,
         //   columnKey: sorter?.field
         // })
-        setResponse(prev => ({ ...prev, result: userData }))
+        setResponse((prev) => ({ ...prev, result: userData }));
       }
       setTransactionsConfig({
         ...transactionConfig,
@@ -291,9 +288,13 @@ const APPROVETransactionList: FC = () => {
         sortid:
           sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field,
       });
-      const route = `/app${ISupportedRoutes.TRANSACTIONS
-        }?tabIndex=approve&sortid=${sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field
-        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}`;
+      const route = `/app${
+        ISupportedRoutes.TRANSACTIONS
+      }?tabIndex=approve&sortid=${
+        sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field
+      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+        sorter.order
+      }`;
       history.push(route);
     }
   };
@@ -375,5 +376,3 @@ const PDFDownloadLinkWrapper = styled(PDFDownloadLink)`
     color: #ffff;
   }
 `;
-
-

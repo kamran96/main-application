@@ -29,6 +29,8 @@ import {
   usePurchaseOrderContext,
 } from './PurchaseOrderWidgetManager';
 import { WrapperPurchaseOrderForm } from './styles';
+import bxPlus from '@iconify-icons/bx/bx-plus';
+import Icon from '@iconify/react';
 
 const { Option } = Select;
 interface IProps {
@@ -242,17 +244,8 @@ const Editor: FC<IProps> = ({ id }) => {
         </PrintFormat>
       </div>
       <Card>
-        <Row gutter={24}>
+        <Row gutter={4}>
           <Col span={24}>
-            <div className="flex alignFEnd justifySpaceBetween pv-13">
-              <div></div>
-              <h4 className="bold m-reset">
-                Already Purchased? &nbsp;
-                <Link to={`/app${ISupportedRoutes.CREATE_PURCHASE_Entry}`}>
-                  Enter Purchases Here
-                </Link>
-              </h4>
-            </div>
             <Form
               form={antForm}
               onFinish={onFinish}
@@ -358,7 +351,7 @@ const Editor: FC<IProps> = ({ id }) => {
                     </Form.Item>
                   </Col>
                 </Row>
-                <div className="table">
+                <div className="table mt-15">
                   <EditableTable
                     loading={loading}
                     dragable={(data) => setState(data)}
@@ -368,7 +361,15 @@ const Editor: FC<IProps> = ({ id }) => {
                   />
                 </div>
                 <div className="add_purcahseitem  pv-20">
-                  <Button onClick={addRow} type="default">
+                  <Button
+                    className="flex alignCenter"
+                    onClick={addRow}
+                    type="primary"
+                    ghost
+                  >
+                    <span className="flex alignCenter mr-10">
+                      <Icon icon={bxPlus} />
+                    </span>
                     Add new purchase item
                   </Button>
                 </div>

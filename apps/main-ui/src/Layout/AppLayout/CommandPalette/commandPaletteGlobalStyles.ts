@@ -161,9 +161,12 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
     align-items: center;
     justify-content: center;
     }
-    .icons svg path{
-      font-weight: 400;
-      color: #${(props: IThemeProps) => props?.theme?.colors?.svgColor};
+    .icons svg{
+      color: ${(props: IThemeProps) => props?.theme?.colors?.svgColor};
+      fill: none;
+      stroke: ${(props: IThemeProps) => props?.theme?.colors?.svgColor};
+      /* stroke: ${(props: IThemeProps) => 
+             props?.theme?.theme === 'dark' ? '#fff' : '#272525'}; */
     }
 }
 
@@ -198,8 +201,6 @@ const CommandPlatteGlobalStyles = createGlobalStyle`
   border-bottom: 0.4em solid rgba(255, 255, 255, 0.2);
   border-left: 0.4em solid rgb(255, 255, 255);
 }
-
-
 `;
 
 export default CommandPlatteGlobalStyles;

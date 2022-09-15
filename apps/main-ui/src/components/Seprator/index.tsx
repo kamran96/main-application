@@ -7,7 +7,7 @@ export const Seprator = styled.hr((props: IThemeProps) => {
     border: 'none',
     height: `${convertToRem(1)}`,
     background: props?.theme?.colors?.seprator || `#F4F4F4`,
-    width: '100%',
+    width:  '100%',
     ...props,
   };
 });

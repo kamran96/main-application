@@ -2,7 +2,7 @@ import brightnessContrast from '@iconify-icons/carbon/brightness-contrast';
 import Moon from '@iconify-icons/feather/moon';
 import Icon from '@iconify/react';
 import { IRoutesSchema, ISupportedRoutes } from '@invyce/shared/types';
-import { SidebarUi } from '@invyce/sidebar-ui';
+import { SidebarUi } from '@invyce/sidebar-ui-v2';
 import { Button } from 'antd';
 import { ReactNode, useEffect } from 'react';
 import { FC } from 'react';
@@ -97,6 +97,7 @@ export const AppLayout: FC<IProps> = ({ children }) => {
               userEmail: userDetails?.profile?.email,
               username: userDetails?.username,
               userImage: userDetails?.profile?.attachment?.path,
+              userRole: userDetails?.role?.name,
               theme: theme === 'light' ? 'light' : 'dark',
               link: `${ISupportedRoutes.DASHBOARD_LAYOUT}${ISupportedRoutes.SETTINGS}${ISupportedRoutes.PROFILE_SETTING}`,
             }}

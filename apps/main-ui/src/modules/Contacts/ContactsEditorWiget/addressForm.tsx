@@ -13,6 +13,8 @@ interface IProps {
 
 export const AddressForm: FC<IProps> = ({ onChange, item, index, reset }) => {
   const [form] = Form.useForm();
+
+  console.log(item, "item")
   useEffect(() => {
     if (item) {
       form.setFieldsValue(item);
