@@ -32,6 +32,7 @@ import {
   SEND_FORGOT_PASSWORD,
 } from '@invyce/send-email';
 import { Branch } from '../schemas/branch.schema';
+import { Sorting } from '@invyce/sorting';
 
 @Injectable()
 export class UserService {
@@ -45,11 +46,12 @@ export class UserService {
   ) {}
 
   async ListUsers(user: IBaseUser, query: IPage) {
-    const { page_size, page_no, filters, purpose } = query;
+    const { page_size, page_no, query: filters, purpose, sort } = query;
     const ps: number = parseInt(page_size);
     const pn: number = parseInt(page_no);
 
     let users;
+    const { sort_column, sort_order } = await Sorting(sort);
 
     if (purpose === 'ALL') {
       users = await this.userModel
@@ -66,34 +68,78 @@ export class UserService {
         const filterData = Buffer.from(filters, 'base64').toString();
         const data = JSON.parse(filterData);
 
+        const myCustomLabels = {
+          docs: 'users',
+          totalDocs: 'total',
+          meta: 'pagination',
+          limit: 'page_size',
+          page: 'page_no',
+          nextPage: 'next',
+          prevPage: 'prev',
+          totalPages: 'total_pages',
+        };
+
         for (const i in data) {
           if (data[i].type === 'search') {
             const val = data[i].value?.split('%')[1];
-            users = await this.userModel.find({
-              status: UserStatuses.ACTIVE,
-              organizationId: user.organizationId,
-              [i]: { $regex: new RegExp(val, 'i') },
-            });
+
+            users = await this.userModel.paginate(
+              {
+                status: UserStatuses.ACTIVE,
+                organizationId: user.organizationId,
+                [i]: { $regex: new RegExp(val, 'i') },
+              },
+              {
+                offset: pn * ps - ps,
+                limit: ps,
+                sort: { [sort_column]: sort_order },
+                customLabels: myCustomLabels,
+              }
+            );
           } else if (data[i].type === 'date-between') {
             const start_date = i[1]['value'][0];
             const end_date = i[1]['value'][1];
-            users = await this.userModel.find({
-              status: UserStatuses.ACTIVE,
-              organizationId: user.organizationId,
-              [i]: { $gt: start_date, $lt: end_date },
-            });
+            users = await this.userModel.paginate(
+              {
+                status: UserStatuses.ACTIVE,
+                organizationId: user.organizationId,
+                [i]: { $gt: start_date, $lt: end_date },
+              },
+              {
+                offset: pn * ps - ps,
+                limit: ps,
+                sort: { [sort_column]: sort_order },
+                customLabels: myCustomLabels,
+              }
+            );
           } else if (data[i].type === 'compare') {
-            users = await this.userModel.find({
-              status: UserStatuses.ACTIVE,
-              organization: user.organizationId,
-              [i]: { $in: i[1]['value'] },
-            });
+            users = await this.userModel.paginate(
+              {
+                status: UserStatuses.ACTIVE,
+                organization: user.organizationId,
+                [i]: { $in: i[1]['value'] },
+              },
+              {
+                offset: pn * ps - ps,
+                limit: ps,
+                sort: { [sort_column]: sort_order },
+                customLabels: myCustomLabels,
+              }
+            );
           } else if (data[i].type === 'in') {
-            users = await this.userModel.find({
-              status: UserStatuses.ACTIVE,
-              organization: user.organizationId,
-              [i]: { $in: i[1]['value'] },
-            });
+            users = await this.userModel.paginate(
+              {
+                status: UserStatuses.ACTIVE,
+                organization: user.organizationId,
+                [i]: { $in: i[1]['value'] },
+              },
+              {
+                offset: pn * ps - ps,
+                limit: ps,
+                sort: { [sort_column]: sort_order },
+                customLabels: myCustomLabels,
+              }
+            );
           }
         }
       } else {

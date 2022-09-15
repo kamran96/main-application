@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { aql } from 'arangojs';
+import * as dayjs from 'dayjs';
 import { DB } from '../arangodb/arango.service';
 import { InvoiceSchema } from '../schemas/invoice.schema';
 
@@ -102,30 +103,60 @@ export class InvoiceService {
       `);
   }
 
-  async AgedReceivables() {
-    // const current = await DB.query(aql`
-    //   FOR i IN invoices
-    //   FILTER i.dueDate < '2022-08-25'
-    //   COLLECT dueDate = i.dueDate < '2022-08-25'
-    //   AGGREGATE balance = SUM(i.total)
-    //   RETURN { dueDate, balance}
-    // `);
+  async AgedReceivables(user) {
+    const addOneDay = dayjs().add(1, 'day').format('YYYY-MM-DD');
+    const oneMonth = dayjs(addOneDay).add(1, 'month').format('YYYY-MM-DD');
+    const oneMonthToTwoMonths = dayjs(oneMonth)
+      .add(1, 'month')
+      .format('YYYY-MM-DD');
+    const twoMonthToThreeMonths = dayjs(oneMonthToTwoMonths)
+      .add(1, 'month')
+      .format('YYYY-MM-DD');
 
-    const current = await DB.query(aql`
-        FOR i IN invoices
-          LET current = (
-            FOR r IN current
-            FILTER i.dueDate < '2022-08-25'
-            COLLECT dueDate = i.dueDate < '2022-08-25'
-            AGGREGATE balance = SUM(i.total)
-            RETURN balance
-          )
-          RETURN { dueDate, balance}  
-    `);
+    const current = await DB.query({
+      query: `
+      FOR i IN invoices
+        FILTER i.organizationId == @organizationId
+        COLLECT contact = i.contact.name,
+              invoice = i.invoiceNumber,
+              dueDate = i.dueDate
+          AGGREGATE balance = SUM(i.total)
+          RETURN {
+              "current": dueDate <= '${addOneDay}' ? {
+              contact,
+              invoice,
+              dueDate: DATE_FORMAT(dueDate, '%dd-%mmm-%yy'),
+              balance
+              } : {},
+              "oneMonth": dueDate >= '${addOneDay}' and dueDate <= '${oneMonth}' ? {
+              contact,
+              invoice,
+              dueDate: DATE_FORMAT(dueDate, '%dd-%mmm-%yy'),
+              balance
+              } : {},
+              "twoMonths": dueDate >= '${oneMonth}' and dueDate <= '${oneMonthToTwoMonths}' ? {
+                contact,
+              invoice,
+              dueDate: DATE_FORMAT(dueDate, '%dd-%mmm-%yy'),
+              balance
+              } : {},
+              "threeMonths": dueDate >= '${oneMonthToTwoMonths}' and dueDate <= '${twoMonthToThreeMonths}' ? {
+                contact,
+              invoice,
+              dueDate: DATE_FORMAT(dueDate, '%dd-%mmm-%yy'),
+              balance
+              } : {},
+              "overThreeMonths": dueDate >= '${twoMonthToThreeMonths}' ? {
+                contact,
+              invoice,
+              dueDate: DATE_FORMAT(dueDate, '%dd-%mmm-%yy'),
+              balance
+              } : {}
+          }
+      `,
+      bindVars: { organizationId: user.organizationId },
+    });
 
-    console.log(await current.all());
-    // for await (const i of current) {
-    //   console.log(i);
-    // }
+    return await current.all();
   }
 }

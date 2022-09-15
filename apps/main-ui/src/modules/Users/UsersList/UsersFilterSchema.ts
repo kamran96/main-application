@@ -1,7 +1,7 @@
 import { FilterType } from '../../../modal';
 
 export default {
-  name: {
+  username: {
     type: FilterType.SEARCH,
     label: 'User Name',
     value: '',

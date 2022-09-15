@@ -31,6 +31,7 @@ import {
   SEND_FORGOT_PASSWORD,
   PAYMENT_CREATED_FOR_INVOICE,
   PAYMENT_CREATED_FOR_BILL,
+  CREATE_CONTACT_LEDGER,
 } from '@invyce/send-email';
 
 @Injectable()
@@ -743,7 +744,9 @@ export class PaymentService {
 
   async AddPayment(data, user: IBaseUser): Promise<void> {
     const paymentInvoiceArr = [];
+    const paymentInvoiceArrWithInvoice = [];
     const paymentBillArr = [];
+    const paymentBillArrWithBill = [];
     for (const i of data.payments) {
       const payment = await getCustomRepository(PaymentRepository).save({
         amount: i?.balance,
@@ -767,19 +770,49 @@ export class PaymentService {
       });
 
       if (i.invoiceId !== undefined && i.report === true) {
-        paymentInvoiceArr.push(payment);
+        if (i.type) {
+          paymentInvoiceArrWithInvoice.push({
+            ...payment,
+            type: i.type,
+            invoice: i.invoice,
+            contact: i.contact,
+          });
+        } else {
+          paymentInvoiceArr.push({ ...payment });
+        }
       } else if (i.billId !== undefined && i.report === true) {
+        if (i.type) {
+          paymentBillArrWithBill.push({
+            ...payment,
+            type: i.type,
+            invoice: i.invoice,
+            contact: i.contact,
+          });
+        }
         paymentBillArr.push(payment);
       }
     }
 
-    if (paymentInvoiceArr.length > 0) {
+    if (
+      paymentInvoiceArr.length > 0 ||
+      paymentInvoiceArrWithInvoice.length > 0
+    ) {
       await this.reportService.emit(
         PAYMENT_CREATED_FOR_INVOICE,
         paymentInvoiceArr
       );
-    } else if (paymentBillArr.length > 0) {
+
+      await this.reportService.emit(
+        CREATE_CONTACT_LEDGER,
+        paymentInvoiceArrWithInvoice
+      );
+    } else if (paymentBillArr.length > 0 || paymentBillArrWithBill.length > 0) {
       await this.reportService.emit(PAYMENT_CREATED_FOR_BILL, paymentBillArr);
+
+      await this.reportService.emit(
+        CREATE_CONTACT_LEDGER,
+        paymentBillArrWithBill
+      );
     }
   }
 

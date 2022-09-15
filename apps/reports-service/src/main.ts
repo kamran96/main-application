@@ -14,20 +14,6 @@ import { MQ_HOST } from '@invyce/global-constants';
 import { AppModule } from './app/app.module';
 
 async function bootstrap() {
-  // const app: any = await NestFactory.createMicroservice<MicroserviceOptions>(
-  //   AppModule,
-  //   {
-  //     transport: Transport.RMQ,
-  //     options: {
-  //       urls: [MQ_HOST()],
-  //       queue: 'report_queue',
-  //       queueOptions: {
-  //         durable: false,
-  //       },
-  //     },
-  //   }
-  // );
-
   const ssl = process.env.SSL === 'true' ? true : false;
   let httpsOptions = null;
   if (ssl) {
