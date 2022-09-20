@@ -95,7 +95,7 @@ export const ARANGO_DB_CONNECTION = () => {
     return {};
   } else if (process.env['NODE' + '_ENV'] === 'staging') {
     return {
-      url: 'https://167.172.4.40:8529',
+      url: 'http://167.172.4.40:8529',
       databaseName: 'staging-reports',
       auth: { username: 'root', password: '' },
     };
