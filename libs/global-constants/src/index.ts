@@ -89,6 +89,24 @@ export const MQ_HOST = () => {
     : 'amqp://localhost:5672';
 };
 
+export const ARANGO_DB_CONNECTION = () => {
+  if (process.env['NODE' + '_ENV'] === 'production') {
+    return {};
+  } else if (process.env['NODE' + '_ENV'] === 'staging') {
+    return {
+      url: 'https://167.172.4.40:8529',
+      databaseName: 'staging-reports',
+      auth: { username: 'root', password: '' },
+    };
+  } else {
+    return {
+      url: 'http://127.0.0.1:8529',
+      databaseName: 'reports',
+      auth: { username: 'root', password: 'asdf' },
+    };
+  }
+};
+
 export const useApiCallback = (route: string) => {
   const service = route.split('/')[0];
   const baseURL =

@@ -1,6 +1,4 @@
 import { Database } from 'arangojs';
+import { ARANGO_DB_CONNECTION } from '@invyce/global-constants';
 
-export const DB = new Database({
-  url: 'http://127.0.0.1:8529',
-  auth: { username: 'root', password: 'asdf' },
-});
+export const DB = new Database(ARANGO_DB_CONNECTION());
