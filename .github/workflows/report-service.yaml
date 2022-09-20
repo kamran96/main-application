@@ -83,11 +83,11 @@ jobs:
           TEMP_FOLDER="$(mktemp -d)"
           echo Clone the repository...
           git clone -b main "https://zeeshooo:${ACCESS_TOKEN}@github.com/invyce/invyce-ops.git" ${TEMP_FOLDER}
-          cd ${TEMP_FOLDER}/rabbitmq/enviroments/staging
+          cd ${TEMP_FOLDER}/reports/enviroments/staging
           ls
           echo Update kustomize newTag in kustomization.yaml with new image tag
           CONTAINER_IMAGE_TAG=$CONTAINER_IMAGE_TAG yq e -i '.images[0].newTag = env(CONTAINER_IMAGE_TAG)' ./kustomization.yaml
-          echo 'Container image newTag updated in rabbitmq/enviroments/staging/kustomization.yaml'
+          echo 'Container image newTag updated in reports/enviroments/staging/kustomization.yaml'
           cd ../
           git config user.reports "zeeshan@invyce.com"
           git config user.name "zeeshooo"
@@ -158,11 +158,11 @@ jobs:
           TEMP_FOLDER="$(mktemp -d)"
           echo Clone the repository...
           git clone -b main "https://zeeshooo:${ACCESS_TOKEN}@github.com/invyce/invyce-ops.git" ${TEMP_FOLDER}
-          cd ${TEMP_FOLDER}/rabbitmq/enviroments/prod
+          cd ${TEMP_FOLDER}/reports/enviroments/prod
           ls
           echo Update kustomize newTag in kustomization.yaml with new image tag
           CONTAINER_IMAGE_TAG=$CONTAINER_IMAGE_TAG yq e -i '.images[0].newTag = env(CONTAINER_IMAGE_TAG)' ./kustomization.yaml
-          echo 'Container image newTag updated in rabbitmq/enviroments/prod/kustomization.yaml'
+          echo 'Container image newTag updated in reports/enviroments/prod/kustomization.yaml'
           cd ../
           git config user.reports "zeeshan@invyce.com"
           git config user.name "zeeshooo"
