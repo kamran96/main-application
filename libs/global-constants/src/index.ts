@@ -91,6 +91,7 @@ export const MQ_HOST = () => {
 
 export const ARANGO_DB_CONNECTION = () => {
   console.log(process.env['NODE' + '_ENV'], 'environment');
+  console.log('hello');
   if (process.env['NODE' + '_ENV'] === 'production') {
     return {};
   } else if (process.env['NODE' + '_ENV'] === 'staging') {
