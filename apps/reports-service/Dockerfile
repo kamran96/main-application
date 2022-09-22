@@ -12,7 +12,7 @@ ARG NODE_ENV
 ARG PORT
 USER node
 
-ENV NODE_ENV ${NODE_ENV} 
+ENV NODE_ENV=${NODE_ENV} 
 
 WORKDIR /home/node/app
 
