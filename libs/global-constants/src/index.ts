@@ -90,13 +90,11 @@ export const MQ_HOST = () => {
 };
 
 export const ARANGO_DB_CONNECTION = () => {
-  console.log(process.env['NODE' + '_ENV'], 'environment');
-  console.log('hello');
   if (process.env['NODE' + '_ENV'] === 'production') {
     return {};
   } else if (process.env['NODE' + '_ENV'] === 'staging') {
     return {
-      url: 'https://167.172.4.40:8529',
+      url: 'http://my-arangodb-cluster-ea.default.svc.cluster.local',
       databaseName: 'staging-reports',
       auth: { username: 'root', password: '' },
     };
