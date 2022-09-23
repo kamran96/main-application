@@ -1,4 +1,5 @@
 export * from './lib/global-constants.module';
+import * as fs from 'fs';
 import axios from 'axios';
 
 export enum Integrations {
@@ -94,15 +95,23 @@ export const ARANGO_DB_CONNECTION = () => {
     return {};
   } else if (process.env['NODE' + '_ENV'] === 'staging') {
     return {
-      url: 'http://my-arangodb-cluster-ea.default.svc.cluster.local',
+      url: 'https://167.172.4.40:8529',
       databaseName: 'staging-reports',
       auth: { username: 'root', password: '' },
+      agentOptions: {
+        // highly risky will remove this later
+        rejectUnauthorized: false,
+      },
     };
   } else {
     return {
       url: 'http://127.0.0.1:8529',
       databaseName: 'reports',
       auth: { username: 'root', password: 'asdf' },
+      agentOptions: {
+        // highly risky
+        rejectUnauthorized: false,
+      },
     };
   }
 };
