@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { aql } from 'arangojs';
-import { DB } from '../arangodb/arango.service';
+import { Arango } from '../arangodb/arango.service';
 
 @Injectable()
 export class AccountService {
   async TrailBalance() {
+    const DB = await Arango();
     const result = await DB.query(aql`
     LET result = (
         FOR i IN transactions
@@ -41,6 +42,7 @@ export class AccountService {
   }
 
   async BalanceSheet() {
+    const DB = await Arango();
     const result = await DB.query(aql`
     LET result = (
         FOR i IN transactions
@@ -78,6 +80,7 @@ export class AccountService {
   }
 
   async IncomeStatment() {
+    const DB = await Arango();
     const result = await DB.query(aql`
     LET result = (
         FOR i IN transactions

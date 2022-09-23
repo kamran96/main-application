@@ -92,26 +92,28 @@ export const MQ_HOST = () => {
 
 export const ARANGO_DB_CONNECTION = () => {
   if (process.env['NODE' + '_ENV'] === 'production') {
-    return {};
-  } else if (process.env['NODE' + '_ENV'] === 'staging') {
     return {
       url: 'https://167.172.4.40:8529',
-      databaseName: 'staging-reports',
+      databaseName: 'reports',
       auth: { username: 'root', password: '' },
       agentOptions: {
         // highly risky will remove this later
         rejectUnauthorized: false,
       },
     };
+  } else if (process.env['NODE' + '_ENV'] === 'staging') {
+    return {
+      host: 'https://167.172.4.40:8529',
+      databaseName: 'staging-reports',
+      username: 'root',
+      password: '',
+    };
   } else {
     return {
-      url: 'http://127.0.0.1:8529',
+      host: 'http://127.0.0.1:8529',
       databaseName: 'reports',
-      auth: { username: 'root', password: 'asdf' },
-      agentOptions: {
-        // highly risky
-        rejectUnauthorized: false,
-      },
+      username: 'root',
+      password: 'asdf',
     };
   }
 };

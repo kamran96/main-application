@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { aql } from 'arangojs';
-import { DB } from '../arangodb/arango.service';
+import { Arango } from '../arangodb/arango.service';
 import { TransactionSchema } from '../schemas/transaction.schema';
 
 @Injectable()
 export class TransactionService {
   async CreateTransaction(data) {
+    const DB = await Arango();
+
     // await DB.collection('transactions').drop();
     const transactionCollection = await (
       await DB.listCollections()

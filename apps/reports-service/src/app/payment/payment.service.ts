@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { aql } from 'arangojs';
 import { PaymentModes } from '@invyce/global-constants';
-import { DB } from '../arangodb/arango.service';
+import { Arango } from '../arangodb/arango.service';
 import { PaymentSchema } from '../schemas/payment.schema';
 import { IPage, IRequest } from '@invyce/interfaces';
 
@@ -9,6 +9,7 @@ import { IPage, IRequest } from '@invyce/interfaces';
 export class PaymentService {
   async CreateContactLegder(data) {
     // await DB.collection('payments').drop();
+    const DB = await Arango();
 
     const paymentCollection = await (
       await DB.listCollections()
@@ -46,6 +47,8 @@ export class PaymentService {
   }
 
   async ContactLedger(contactId: string, req: IRequest, query: IPage) {
+    const DB = await Arango();
+
     const { page_no, page_size, query: filters, type } = query;
 
     if (type == PaymentModes.INVOICES) {

@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { aql } from 'arangojs';
 import * as dayjs from 'dayjs';
-import { DB } from '../arangodb/arango.service';
+import { Arango } from '../arangodb/arango.service';
 import { BillSchema } from '../schemas/bill.schema';
 
 @Injectable()
 export class BillService {
   async CreateBill(data) {
     // await DB.collection('bills').drop();
+    const DB = await Arango();
 
     const billCollection = await (
       await DB.listCollections()
@@ -60,6 +61,7 @@ export class BillService {
 
   async CreatePaymentForBill(data) {
     // update payment for bill
+    const DB = await Arango();
 
     for (const d of data) {
       await DB.query(aql`
@@ -72,6 +74,7 @@ export class BillService {
 
   async CreateTransactionForBill(data) {
     // update transaction for bill
+    const DB = await Arango();
 
     const transactionArray = [];
 
@@ -106,6 +109,8 @@ export class BillService {
   }
 
   async AgedPayables(user) {
+    const DB = await Arango();
+
     const addOneDay = dayjs().add(1, 'day').format('YYYY-MM-DD');
     const oneMonth = dayjs(addOneDay).add(1, 'month').format('YYYY-MM-DD');
     const oneMonthToTwoMonths = dayjs(oneMonth)
