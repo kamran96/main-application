@@ -28,5 +28,8 @@ export const Arango = async () => {
       username,
       password,
     },
+    agentOptions: {
+      rejectUnauthorized: false,
+    },
   });
 };
