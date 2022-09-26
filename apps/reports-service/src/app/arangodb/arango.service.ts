@@ -9,6 +9,10 @@ export const Arango = async () => {
 
   const db = arangojs({
     url: host,
+    // highly risky will remove this later for production mode
+    agentOptions: {
+      rejectUnauthorized: false,
+    },
   });
 
   await db.useBasicAuth(username, password);
@@ -23,10 +27,6 @@ export const Arango = async () => {
     auth: {
       username,
       password,
-    },
-    agentOptions: {
-      // highly risky will remove this later for production mode
-      rejectUnauthorized: false,
     },
   });
 };
