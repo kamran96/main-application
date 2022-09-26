@@ -96,10 +96,6 @@ export const ARANGO_DB_CONNECTION = () => {
       url: 'https://167.172.4.40:8529',
       databaseName: 'reports',
       auth: { username: 'root', password: '' },
-      agentOptions: {
-        // highly risky will remove this later
-        rejectUnauthorized: false,
-      },
     };
   } else if (process.env['NODE' + '_ENV'] === 'staging') {
     return {

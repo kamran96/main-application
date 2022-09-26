@@ -1,4 +1,4 @@
-import arangojs, { Database } from 'arangojs';
+import { arangojs, Database } from 'arangojs';
 import { ARANGO_DB_CONNECTION } from '@invyce/global-constants';
 
 // console.log(ARANGO_DB_CONNECTION(), 'arango data');
@@ -15,19 +15,18 @@ export const Arango = async () => {
   const dbs = await db.listDatabases();
 
   if (!dbs.includes(databaseName)) {
-    return await db.createDatabase(databaseName);
-  } else {
-    return new Database({
-      url: host,
-      auth: {
-        username,
-        password,
-      },
-      databaseName,
-      agentOptions: {
-        // highly risky will remove this later for production mode
-        rejectUnauthorized: false,
-      },
-    });
+    await db.createDatabase(databaseName, [{ username: 'root' }]);
   }
+  return new Database({
+    url: host,
+    databaseName,
+    auth: {
+      username,
+      password,
+    },
+    agentOptions: {
+      // highly risky will remove this later for production mode
+      rejectUnauthorized: false,
+    },
+  });
 };
