@@ -45,6 +45,7 @@ interface IPopOverProps {
 }
 const MenuPopOver: FC<IPopOverProps> = ({ route }) => {
   const history = useHistory();
+  const queryClient = useQueryClient();
 
   const _activeIndex: any = route?.children?.findIndex(
     (i) => i?.route === history?.location?.pathname
@@ -59,6 +60,17 @@ const MenuPopOver: FC<IPopOverProps> = ({ route }) => {
             className={`popover_list_item mv-4 ${
               _activeIndex === index ? 'active_child' : ''
             }`}
+            onMouseOver={async () => {
+              if (
+                childRoute?.queryKey?.length &&
+                childRoute?.fn &&
+                childRoute?.fn !== undefined
+              ) {
+                for (const item of childRoute?.prefetchQueries) {
+                  queryClient.prefetchQuery(item?.queryKey, item?.fn);
+                }
+              }
+            }}
           >
             <Link
               className="fs-14"

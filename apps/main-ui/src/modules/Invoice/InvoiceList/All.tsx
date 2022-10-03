@@ -126,7 +126,6 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   useEffect(() => {
     if (resolvedData?.data?.result) {
       const { result, pagination } = resolvedData.data;
-      console.log(pagination, 'pag');
       const newResult = [];
       result.forEach((item, index) => {
         newResult.push({ ...item, key: item.id });

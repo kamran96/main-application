@@ -22,3 +22,4 @@ export * from './payment';
 export * from './Register';
 export * from './roles';
 export * from './users';
+export * from './report';

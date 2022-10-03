@@ -145,8 +145,6 @@ const DRAFTTransactionsList: FC = () => {
   useEffect(() => {
     if (resolvedData?.data?.result) {
       const { result, pagination } = resolvedData.data;
-
-      console.log(pagination, 'pag');
       const newResult = [];
 
       result.forEach((res) => {
