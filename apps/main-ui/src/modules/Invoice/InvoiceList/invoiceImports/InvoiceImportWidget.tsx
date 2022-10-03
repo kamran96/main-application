@@ -1,4 +1,4 @@
-import { CommonModal } from '../../../../components';
+import { CommonModal } from '@components';
 import React, { FC, useState } from 'react';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import bookHalf from '@iconify/icons-bi/book-half';
@@ -52,7 +52,6 @@ const TransactionImportWidget: FC = () => {
       enabled: !!compareDataModal,
     }
   );
-
 
   return (
     <CommonModal

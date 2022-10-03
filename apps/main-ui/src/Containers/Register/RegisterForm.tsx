@@ -3,17 +3,14 @@ import { Button, Checkbox, Col, Form, Input, Row, Select } from 'antd';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { useMutation } from 'react-query';
 import { Link } from 'react-router-dom';
-
 import styled from 'styled-components';
 import en from 'world_countries_lists/data/en/world.json';
 import { RegisterAPI } from '../../api/auth';
 import { userCheckAPI } from '../../api/users';
-import { Heading } from '../../components/Heading';
-import { BOLDTEXT } from '../../components/Para/BoldText';
-import { Seprator } from '../../components/Seprator';
+import { Heading, BOLDTEXT, Seprator } from '@components';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { ILoginActions } from '../../hooks/globalContext/globalManager';
-import { IBaseAPIError, NOTIFICATIONTYPE } from '../../modal';
+import { IBaseAPIError, NOTIFICATIONTYPE } from '@invyce/shared/types';
 import { updateToken } from '../../utils/http';
 import phoneCodes from '../../utils/phoneCodes';
 

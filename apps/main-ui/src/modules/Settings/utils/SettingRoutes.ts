@@ -2,7 +2,7 @@ import { PermissionsContainer } from './../../Rbac/Permisions/index';
 import { UsersContainer } from './../../Users/index';
 import { ProfileSettings } from './../ProfileSettings/index';
 import { RouteConfig } from 'react-router-config';
-import { ISupportedRoutes } from '../../../modal';
+import { ISupportedRoutes } from '@invyce/shared/types';
 import { Integrations } from '../Integrations';
 import { Redirect } from './Redirect';
 import { AccountSettings } from '../AccountSettings';

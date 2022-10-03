@@ -1,13 +1,11 @@
 import React, { FC, useState } from 'react';
-import { Card } from '../../components/Card';
-import { H2, H4, P } from '../../components/Typography';
+import { H2, H4, P, Card, FormLabel } from '@components';
 import { Button, Col, Input, Row, Switch } from 'antd';
 import PaywallPackages from './offers';
 import checkIcon from '@iconify-icons/fe/check';
 import chevronLeft from '@iconify-icons/feather/chevron-left';
 import Icon from '@iconify/react';
 import { Form } from 'antd';
-import { FormLabel } from '../../components/FormLabel';
 import { WrapperPaywall, PaywallModal } from './styles';
 import Illustration from '../../assets/paywall.png';
 import MaskedInput from 'antd-mask-input';

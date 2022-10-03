@@ -5,9 +5,9 @@ import styled from 'styled-components';
 import { QuickbooksVerifycationAPI } from '../../../../api';
 import { VerifiedIcon } from '../../../../assets/icons';
 import Quickbook from '../../../../assets/quickbook.png';
-import { Loader } from '../../../../components/Loader';
+import { Loader } from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { ISupportedRoutes } from '../../../../modal';
+import { ISupportedRoutes } from '@invyce/shared/types';
 
 export const VerifyQuickBooks: FC = () => {
   const { routeHistory } = useGlobalContext();

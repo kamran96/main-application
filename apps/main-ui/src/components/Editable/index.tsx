@@ -5,7 +5,6 @@ import { ClickOutSide } from './../../utils/clickoutside';
 import { LiteralUnion } from 'antd/lib/_util/type';
 import styled from 'styled-components';
 import { P } from '../Typography';
-import CommonSelect from '../CommonSelect';
 import { Select } from 'antd';
 import CSS from 'csstype';
 import { isString } from '../../utils/helperFunctions';
@@ -434,5 +433,3 @@ const WrapperEditableSelect = styled.div<any>`
     }
   }
 `;
-
-export default CommonSelect;

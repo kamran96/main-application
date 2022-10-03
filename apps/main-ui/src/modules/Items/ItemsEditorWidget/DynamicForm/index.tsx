@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { Input, Select } from 'antd';
 import styled from 'styled-components';
 
-import { IVariants } from '../../../../modal/categories';
+import { IVariants } from '@invyce/shared/types';
 import convertToRem from '../../../../utils/convertToRem';
 
 const { Option } = Select;

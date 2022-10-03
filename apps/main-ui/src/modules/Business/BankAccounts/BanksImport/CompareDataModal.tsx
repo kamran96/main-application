@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 import { ColumnsType } from 'antd/lib/table';
 import { G } from '@react-pdf/renderer';
 import { EditableSelect } from '../../../../components/Editable';
-import { Option } from '../../../../components/CommonSelect';
+import { Option } from '@components';
 import { EditableTable } from '@invyce/editable-table';
 import { Heading } from '@invyce/shared/components';
 import Paragraph from 'antd/lib/typography/Paragraph';

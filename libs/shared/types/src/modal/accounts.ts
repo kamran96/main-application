@@ -1,3 +1,4 @@
+import { Pagination } from './../../../../../apps/main-api/src/Common/services/pagination.service';
 import { IBase, IBaseRequest } from './base';
 
 export enum ACCOUNT_TYPES {
@@ -24,6 +25,7 @@ export enum ACCOUNT_TYPES_NAMES {
 
 export interface IAccounts extends IBaseRequest {
   result: IAccountsResult[];
+  pagination?: any;
 }
 
 export interface IAccountsResult extends IBase {

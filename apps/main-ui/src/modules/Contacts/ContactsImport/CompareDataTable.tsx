@@ -1,4 +1,4 @@
-import { CommonTable } from '../../../components/Table';
+import { CommonTable } from '@components';
 import { FC, useState } from 'react';
 import { Button, Select } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
@@ -6,7 +6,7 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { CsvImportAPi, getAllAccounts } from '../../../api';
 import { IAccountsResult } from '@invyce/shared/types';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { NOTIFICATIONTYPE } from '../../../modal/notification';
+import { NOTIFICATIONTYPE } from '@invyce/shared/types';
 
 const { Option } = Select;
 
@@ -62,6 +62,7 @@ export const CompareDataTable: FC<IProps> = ({
 
   const onConfirmUpload = async () => {
     const formData = new FormData();
+
     formData.append('file', fileData);
     formData.append('compareData', JSON.stringify(compareData));
     formData.append('module', JSON.stringify('contact'));

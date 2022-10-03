@@ -1,7 +1,7 @@
 import { Col, Row } from 'antd';
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { H4 } from '../../../components/Typography';
+import { H4 } from '@components';
 import { Gmail } from './Gmail';
 import { QuickBooks } from './Quickbooks';
 import { Xero } from './Xero';

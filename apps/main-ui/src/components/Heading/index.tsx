@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { IThemeProps } from '../../hooks/useTheme/themeColors';
-import { Color } from '../../modal';
 import convertToRem from '../../utils/convertToRem';
 
 interface IProps {
@@ -64,7 +63,7 @@ const HeadingWrapper: any = styled.div`
         ? props.color
         : props.theme
         ? props?.theme?.colors?.$LIGHT_BLACK
-        : Color.$LIGHT_BLACK};
+        : `${(props: IThemeProps) => props?.theme?.colors?.$LIGHT_BLACK}`};
   }
   .headingForm {
     font-style: normal;

@@ -1,4 +1,4 @@
-import { FilterType } from '../../../modal';
+import { FilterType } from '@invyce/shared/types';
 
 export default {
   name: {

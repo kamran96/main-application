@@ -16,7 +16,7 @@ import { RoutingSchema } from '../../Schema/routingSchema';
 import { InvyceCmdPalette } from './CommandPalette';
 import { ContentArea, NewUserContentArea, WrapperApplayout } from './styles';
 import { ErrorBoundary } from '@invyce/error-boundry';
-import { Inconvinience } from '../../components/ErrorBoundries/Inconvinience';
+import { Inconvinience } from '@components';
 
 interface IProps {
   children: ReactNode;
@@ -33,6 +33,7 @@ export const AppLayout: FC<IProps> = ({ children }) => {
     setTheme,
     setVerifiedModal,
     isOnline,
+    usePrefetchQuery,
   } = useGlobalContext();
   const handleThemeSwitch = async (theme) => {
     setTheme(theme);
@@ -86,6 +87,7 @@ export const AppLayout: FC<IProps> = ({ children }) => {
         <section className="layout">
           {/* <Sidebar/> */}
           <SidebarUi
+            onPrefetch={usePrefetchQuery}
             appLogo={
               theme === 'dark' ? (
                 <InyvceLightTextIcon />

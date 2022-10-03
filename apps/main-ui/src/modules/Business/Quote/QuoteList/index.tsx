@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { TableTabs, TableTabsContent } from '../../../../components/TableTabs';
+import { TableTabs, TableTabsContent } from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { ALLQuotesList } from './AllQuotes';
 import { QuoteColumns } from './commonCol';
@@ -15,7 +15,7 @@ export const QuoteList = () => {
 
   useEffect(() => {
     if (search) {
-      let filterTab = search.split('?')[1].split('&')[0].split('=')[1];
+      const filterTab = search.split('?')[1].split('&')[0].split('=')[1];
       if (filterTab !== null && filterTab !== 'id') {
         setActiveTab(filterTab);
       }

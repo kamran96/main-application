@@ -9,20 +9,32 @@
     "strict": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
   },
   "files": [],
-  "include": ["src"],
+  "include": ["src", "../../libs/shared/types/src/modal/ReactQueryKeys.ts"],
   "references": [
     {
       "path": "./tsconfig.app.json"
     },
     {
       "path": "./tsconfig.spec.json"
-    }
+    },
+    {
+      "path": "./apps/main-ui"
+    },
+    {
+      "path": "./apps/main-ui/components"
+    },
+    {
+      "path": "./apps/main-ui/api"
+    },
+    {
+      "path": "./apps/main-ui/modal"
+    },
   ],
   "baseUrl": "src",
   "paths": {
-    "@components/*": ["components/*"]
+    "@components": ["components/index.ts"]
   }
 }

@@ -1,9 +1,9 @@
 import { renderRoutes } from 'react-router-config';
 import styled from 'styled-components';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
-import { Color } from '../../modal';
 import { routes } from '../../routes/index';
 import { ConfigProvider } from 'antd';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
 const AppContainer = () => {
   const { theme } = useGlobalContext();
@@ -29,7 +29,7 @@ interface IThemeWrapperProps {
 
 const ThemeWrapper = styled.div<IThemeWrapperProps>`
   .clr-primary {
-    color: ${Color.$PRIMARY};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
   }
 
   .pointer {

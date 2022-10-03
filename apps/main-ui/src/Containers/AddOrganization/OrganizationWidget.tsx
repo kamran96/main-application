@@ -6,11 +6,13 @@ import en from 'world_countries_lists/data/en/world.json';
 import { addOrganizationAPI } from '../../api/organizations';
 import InvyceLog from '../../assets/invyceLogo.png';
 import OrgIllustration from '../../assets/organization.png';
-import { DatePicker } from '../../components/DatePicker';
-import { HeadingTemplate1 } from '../../components/HeadingTemplates';
-import { BOLDTEXT } from '../../components/Para/BoldText';
-import { Seprator } from '../../components/Seprator';
-import { UploadAtachment } from '../../components/UploadAtachment';
+import {
+  DatePicker,
+  HeadingTemplate1,
+  BOLDTEXT,
+  Seprator,
+  UploadAtachment,
+} from '@components';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { ILoginActions } from '../../hooks/globalContext/globalManager';
 import { IThemeProps } from '../../hooks/useTheme/themeColors';
@@ -298,7 +300,7 @@ export const OrganizationWidget: FC = () => {
                   onUploadSuccess={(id) => {
                     form.setFieldsValue({ attachmentId: id });
                   }}
-                //   defaultValue={attachmentData}
+                  //   defaultValue={attachmentData}
                 />
               </Form.Item>
             </Col>
@@ -348,7 +350,7 @@ const OrganizationWidgetWrapper = styled.div`
     grid-column: 6 span;
     padding: 44px 60px;
     /* background: #0071ff; */
-    background: #1890FF;
+    background: #1890ff;
     /* height: 100vh;  */
     width: 100%;
     background-repeat: no-repeat;

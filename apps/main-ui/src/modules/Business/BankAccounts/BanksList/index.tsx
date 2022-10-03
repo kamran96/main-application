@@ -1,77 +1,81 @@
 import React, { FC, useEffect, useState } from 'react';
 import { ColumnsType } from 'antd/lib/table';
 import dayjs from 'dayjs';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import styled from 'styled-components';
-import { getBankAccountsList } from '../../../../api/banks';
-import { CommonTable } from '../../../../components/Table';
-import { ACCOUNT_TYPES, ACCOUNT_TYPES_NAMES } from '../../../../modal/accounts';
-import { IBaseAPIError } from '../../../../modal/base';
-import { ISupportedRoutes, NOTIFICATIONTYPE } from '../../../../modal';
+import { getBankAccountsList } from '../../../../api';
+import { CommonTable, TableCard } from '@components';
+import {
+  ACCOUNT_TYPES,
+  ACCOUNT_TYPES_NAMES,
+  IBaseAPIError,
+  ISupportedRoutes,
+  NOTIFICATIONTYPE,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { TableCard } from '../../../../components/TableCard';
 import { useHistory } from 'react-router-dom';
 import { BanksImport } from '../BanksImport';
+import { QueryCache } from 'apps/main-ui/src/hooks/usePaginatedQuery';
 
+const defaultSortedId = 'id';
 export const BanksList: FC = () => {
   const [responseBanks, setResponseBanks] = useState([]);
   const [sortedInfo, setSortedInfo] = useState(null);
   const [bankConfig, setBankConfig] = useState({
-    sortid: 'id',
+    sortid: defaultSortedId,
   });
+  const queryCache = useQueryClient();
 
-  const {sortid} = bankConfig;
+  const { sortid } = bankConfig;
+  //    `bank-list  `
 
   const { notificationCallback } = useGlobalContext();
-  const { isLoading, data } = useQuery([`banks-list`, sortid], getBankAccountsList, {
-    onError: (error: IBaseAPIError) => {
-      if (
-        error &&
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        const { message } = error.response.data;
-        notificationCallback(NOTIFICATIONTYPE.ERROR, message);
-      }
-    },
-  });
-
-  
+  const { isLoading, data } = useQuery(
+    [ReactQueryKeys.BANK_KEYS, sortid],
+    getBankAccountsList,
+    {
+      onError: (error: IBaseAPIError) => {
+        if (error?.response?.data?.message) {
+          const { message } = error.response.data;
+          notificationCallback(NOTIFICATIONTYPE.ERROR, message);
+        }
+      },
+    }
+  );
 
   const history = useHistory();
 
-  useEffect(() => {
-    if (
-      history &&
-      history.location &&
-      history.location.search
-    ) {
-      const filterType = history.location.search.split('&');
-      const filterIdType = filterType[0];
-      const filterOrder = filterType[1]?.split("=")[1];
-      
-      if(filterIdType?.includes("-")){
-         const fieldName = filterIdType?.split("=")[1].split("-")[1];
-         setSortedInfo({
-           order: filterOrder,
-           columnKey: fieldName
-         });
-      }
-      else{
-        const fieldName = filterIdType?.split("=")[1];
-        setSortedInfo({
-          order: filterOrder,
-          columnKey: fieldName
-        })
-      }
-    }
-  }, [history?.location?.search]);
+  // useEffect(() => {
+  //   if (history && history.location && history.location.search) {
+  //     const filterType = history.location.search.split('&');
+  //     const filterIdType = filterType[0];
+  //     const filterOrder = filterType[1]?.split('=')[1];
+
+  //     if (filterIdType?.includes('-')) {
+  //       const fieldName = filterIdType?.split('=')[1].split('-')[1];
+  //       setSortedInfo({
+  //         order: filterOrder,
+  //         columnKey: fieldName,
+  //       });
+  //     } else {
+  //       const fieldName = filterIdType?.split('=')[1];
+  //       setSortedInfo({
+  //         order: filterOrder,
+  //         columnKey: fieldName,
+  //       });
+  //     }
+  //   }
+  // }, [history?.location?.search]);
 
   useEffect(() => {
     if (data && data.data && data.data.result) {
       const { result } = data.data;
       setResponseBanks(result);
+
+      // if (pagination?.next === page + 1) {
+      //   queryCache?.prefetchQuery([ReactQueryKeys.BANK_KEYS, sortid], getBankAccountsList );
+      // }
     }
   }, [data]);
 
@@ -96,66 +100,45 @@ export const BanksList: FC = () => {
   };
 
   const handleBankConfig = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      history.push(
-        `/app${ISupportedRoutes.BANK_ACCOUNTS}?sortid="id"`
-      );
-      setBankConfig({
-        sortid: null
-      });
+    if (sorter?.column) {
+      if (sorter.order === 'false') {
+        history.push(`/app${ISupportedRoutes.BANK_ACCOUNTS}?sortid="id"`);
+        setBankConfig({
+          sortid: defaultSortedId,
+        });
+      } else {
+        history.push(
+          `/app${ISupportedRoutes.BANK_ACCOUNTS}?sortid=${
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field
+          }&filter=${sorter.order}`
+        );
+        setBankConfig({
+          ...bankConfig,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
+        });
+      }
     } else {
       history.push(
-        `/app${ISupportedRoutes.BANK_ACCOUNTS}?sortid=${
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field
-        }&filter=${sorter.order}`
+        `/app${ISupportedRoutes.BANK_ACCOUNTS}?sortid=${defaultSortedId}&filter=${sorter.order}`
       );
-      if (sorter?.order === 'ascend') {
-        const userData = [...responseBanks].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
-        });
-        setResponseBanks(userData)
-      } else {
-        const userData = [...responseBanks].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
-        });
-       
-        setResponseBanks(userData)
-      }
       setBankConfig({
-        sortid:
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field,
+        sortid: defaultSortedId,
       });
     }
   };
 
   const renderCustomTopbar = () => {
-    return (
-      <div>
-        
-      </div>
-    )
-  }
-
-  const topbarRightPannel = () => {
-    return (
-      <div className="flex alignCenter mb-3">
-        {/* <BanksImport/> */}
-      </div>
-    );
+    return <div></div>;
   };
 
+  const topbarRightPannel = () => {
+    return <div className="flex alignCenter mb-3">{/* <BanksImport/> */}</div>;
+  };
 
   const columns: ColumnsType<any> = [
     {
@@ -212,18 +195,18 @@ export const BanksList: FC = () => {
           customTopbar={renderCustomTopbar()}
           exportable
           topbarRightPannel={topbarRightPannel()}
-            //  onChange={
-            //    handleContactsConfig
-            //  }
-            //  pagination={{
-            //    pageSize: page_size,
-            //    position: ["bottomRight"],
-            //    current: paginationData.page_no,
-            //    total: paginationData.total,
-            //  }}
-            //  hasfooter={true}
-            //  onSelectRow={onSelectedRow}
-            //  enableRowSelection
+          //  onChange={
+          //    handleContactsConfig
+          //  }
+          //  pagination={{
+          //    pageSize: page_size,
+          //    position: ["bottomRight"],
+          //    current: paginationData.page_no,
+          //    total: paginationData.total,
+          //  }}
+          //  hasfooter={true}
+          //  onSelectRow={onSelectedRow}
+          //  enableRowSelection
         />
       </TableCard>
     </WrapperBanksList>

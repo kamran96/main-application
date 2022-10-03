@@ -4,21 +4,20 @@ import React, { FC, useEffect, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
 
 import { CashActivityStatementAPI } from '../../../api';
-import { ButtonTag } from '../../../components/ButtonTags';
-import { BoldText } from '../../../components/Para/BoldText';
-import { PrintFormat } from '../../../components/PrintFormat';
 import {
+  ButtonTag,
+  BoldText,
+  PrintFormat,
   PrintHeaderFormat,
   TableDivisions,
-} from '../../../components/PrintHeader';
-import {
   Addressbar,
   TopbarLogoWithDetails,
-} from '../../../components/PrintHeader/Formats';
-import { SmartFilter } from '../../../components/SmartFilter';
-import { TableCard } from '../../../components/TableCard';
-import { P } from '../../../components/Typography';
-import { ICashFlow, ICashFlowResult } from '../../../modal/reports';
+  SmartFilter,
+  TableCard,
+  P,
+} from '@components';
+
+import { ICashFlow, ICashFlowResult } from '@invyce/shared/types';
 import moneyFormat from '../../../utils/moneyFormat';
 import printDiv from '../../../utils/Print';
 import { WrapperCashActivity } from './styles';

@@ -2,15 +2,13 @@ import React, { FC, useEffect, useState } from 'react';
 import addLine from '@iconify/icons-ri/add-line';
 import { Icon } from '@iconify/react';
 import { Button } from 'antd';
-
-import { Heading } from '../../components/Heading';
+import { Heading } from '@components';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { AccountsList } from './AccountsList';
 import { columns, data } from './AccountsList/var';
 import AccountingWrapper, { Header } from './styles';
 import { Rbac } from '../../components/Rbac';
 import { PERMISSIONS } from '../../components/Rbac/permissions';
-
 export const Accounts: FC = () => {
   const [accountsList, setAccountsList] = useState([]);
   const { setAccountsModalConfig } = useGlobalContext();

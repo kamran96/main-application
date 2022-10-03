@@ -1,4 +1,4 @@
-import { CommonModal } from '../../../../components';
+import { CommonModal } from '@components';
 import React, { FC, useState } from 'react';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import bookHalf from '@iconify/icons-bi/book-half';
@@ -36,7 +36,8 @@ const data: Idata = {
 };
 
 const TransactionImportWidget: FC = () => {
-  const { transactionsImportConfig, setTransactionsImportConfig } = useGlobalContext();
+  const { transactionsImportConfig, setTransactionsImportConfig } =
+    useGlobalContext();
   const { visibility } = transactionsImportConfig;
   const [step, setStep] = useState<number>(1);
   const [fileData, setFileData] = useState<File>();
@@ -52,7 +53,6 @@ const TransactionImportWidget: FC = () => {
       enabled: !!compareDataModal,
     }
   );
-
 
   return (
     <CommonModal
@@ -103,9 +103,7 @@ const TransactionImportWidget: FC = () => {
                 <a>here</a>
               </div>
               <InvoiceImportManager
-                headers={`ID,Ref,Date,Narration,Note,Amount`.split(
-                  ','
-                )}
+                headers={`ID,Ref,Date,Narration,Note,Amount`.split(',')}
                 onLoad={(payload, file) => {
                   setFileData(file);
                   setFileExtractedData(payload);

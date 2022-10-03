@@ -1,7 +1,5 @@
 import React from 'react';
-import { Heading } from '../../../components/Heading';
-import { Seprator } from '../../../components/Seprator';
-import { TableCard } from '../../../components/TableCard';
+import { Heading, Seprator, TableCard } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { ProfileForm } from './ProfileForm';
 import { WrapperSettings } from './styles';

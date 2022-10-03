@@ -1,5 +1,4 @@
 import { ITableExportFields } from 'ant-table-extensions';
-import { ITableColumns } from '../../../../components/PDFs/PDFTable';
 
 export const _csvColumnsTrialBalance: ITableExportFields = {
   name: 'Particulars',

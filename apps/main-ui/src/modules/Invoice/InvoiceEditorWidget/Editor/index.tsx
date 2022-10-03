@@ -4,7 +4,7 @@ import Icon from '@iconify/react';
 import { EditableTable } from '@invyce/editable-table';
 import { IContact } from '@invyce/interfaces';
 import { invycePersist } from '@invyce/invyce-persist';
-import { IContactTypes } from '@invyce/shared/types';
+import { IContactTypes, ReactQueryKeys } from '@invyce/shared/types';
 import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import dayjs from 'dayjs';
@@ -12,24 +12,30 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useHistory } from 'react-router-dom';
 
-import { getInvoiceNumber, InvoiceCreateAPI } from '../../../../api';
-import { create_update_contact } from '../../../../api/Contact';
-import { ConfirmModal } from '../../../../components/ConfirmModal';
-import { DatePicker } from '../../../../components/DatePicker';
-import { FormLabel } from '../../../../components/FormLabel';
-import { PrintFormat } from '../../../../components/PrintFormat';
-import { PrintViewPurchaseWidget } from '../../../../components/PurchasesWidget/PrintViewPurchaseWidget';
+import {
+  getInvoiceNumber,
+  InvoiceCreateAPI,
+  create_update_contact,
+} from '../../../../api';
+import {
+  ConfirmModal,
+  DatePicker,
+  FormLabel,
+  PrintFormat,
+  PrintViewPurchaseWidget,
+  Seprator,
+} from '@components';
 import { Rbac } from '../../../../components/Rbac';
 import { PERMISSIONS } from '../../../../components/Rbac/permissions';
-import { Seprator } from '../../../../components/Seprator';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import {
   IErrorMessages,
   IServerError,
   NOTIFICATIONTYPE,
   ISupportedRoutes,
-} from '../../../../modal';
-import { IInvoiceType, ITaxTypes } from '../../../../modal/invoice';
+  IInvoiceType,
+  ITaxTypes,
+} from '@invyce/shared/types';
 import { addition } from '../../../../utils/helperFunctions';
 import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv from '../../../../utils/Print';
@@ -205,11 +211,11 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
           refetchInvoiceNumber();
 
           [
-            'invoices',
-            'transactions?page',
-            'items-list',
-            'invoice-view',
-            'ledger-contact',
+            ReactQueryKeys?.INVOICES_KEYS,
+            ReactQueryKeys?.TRANSACTION_KEYS,
+            ReactQueryKeys?.ITEMS_KEYS,
+            ReactQueryKeys?.INVOICE_VIEW,
+            ReactQueryKeys.CONTACT_VIEW,
             'all-items',
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));

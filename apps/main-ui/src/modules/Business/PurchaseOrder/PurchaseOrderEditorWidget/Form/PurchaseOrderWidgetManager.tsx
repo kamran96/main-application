@@ -8,8 +8,8 @@ import React, {
 } from 'react';
 import { ColumnsType } from 'antd/lib/table';
 import { Form, Select } from 'antd';
-import { Editable, EditableSelect } from '../../../../../components/Editable';
 import { useQuery } from 'react-query';
+import { Editable, EditableSelect } from '@components';
 import {
   getAllItems,
   getInvoiceNumber,
@@ -17,11 +17,7 @@ import {
 } from '../../../../../api';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import convertToRem from '../../../../../utils/convertToRem';
-import {
-  Color,
-  IInvoiceMutatedResult,
-  IInvoiceTypes,
-} from '../../../../../modal';
+import { IInvoiceMutatedResult, IInvoiceTypes } from '@invyce/shared/types';
 import { SortableHandle } from 'react-sortable-hoc';
 import { Icon } from '@iconify/react';
 import dotsGrid from '@iconify-icons/mdi/dots-grid';
@@ -29,6 +25,7 @@ import { useShortcut } from '../../../../../hooks/useShortcut';
 import { response } from 'express';
 import { plainToClass } from 'class-transformer';
 import dayjs from 'dayjs';
+import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 
 const { Option } = Select;
 
@@ -137,6 +134,8 @@ export const PurchaseOrderWidgetManager: FC<IProps> = ({ children, id }) => {
   useShortcut('i', handleAddRow);
   useShortcut('b', removeRowFromLastIndex);
   useShortcut('/', ClearAll);
+
+  const { Colors } = useGlobalContext();
 
   const getItemWithItemId = (id) => {
     if (allItemsResult && allItemsResult.length) {
@@ -303,7 +302,7 @@ export const PurchaseOrderWidgetManager: FC<IProps> = ({ children, id }) => {
             <Icon
               style={{
                 fontSize: convertToRem(20),
-                color: Color.$GRAY,
+                color: Colors.$GRAY,
                 cursor: 'pointer',
               }}
               icon={deleteIcon}

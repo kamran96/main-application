@@ -3,27 +3,29 @@ import printIcon from '@iconify-icons/bytesize/print';
 import Icon from '@iconify/react';
 import { EditableTable } from '@invyce/editable-table';
 import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
-import { IInvoiceType, ITaxTypes } from '@invyce/shared/types';
+import { IInvoiceType, ITaxTypes, ReactQueryKeys } from '@invyce/shared/types';
 import dayjs from 'dayjs';
 import { FC, useRef, useState } from 'react';
 import { useQueryClient, useMutation } from 'react-query';
 
 import { CreditNoteCreateAPI } from '../../../../api';
-import { ConfirmModal } from '../../../../components/ConfirmModal';
-import { DatePicker } from '../../../../components/DatePicker';
-import { FormLabel } from '../../../../components/FormLabel';
-import { PrintFormat } from '../../../../components/PrintFormat';
-import { PrintViewPurchaseWidget } from '../../../../components/PurchasesWidget/PrintViewPurchaseWidget';
+import {
+  ConfirmModal,
+  DatePicker,
+  FormLabel,
+  PrintFormat,
+  PrintViewPurchaseWidget,
+  Seprator,
+} from '@components';
 import { Rbac } from '../../../../components/Rbac';
 import { PERMISSIONS } from '../../../../components/Rbac/permissions';
-import { Seprator } from '../../../../components/Seprator';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import {
   IErrorMessages,
   IServerError,
   ISupportedRoutes,
   NOTIFICATIONTYPE,
-} from '../../../../modal';
+} from '@invyce/shared/types';
 import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv, { DownloadPDF } from '../../../../utils/Print';
 import defaultItems, { Requires } from './defaultStates';
@@ -165,13 +167,14 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
           /* this will clear invoice items, formdata and payment */
           setInvoiceItems([{ ...defaultItems }]);
           [
-            'invoices',
-            'transactions',
-            'items-list',
-            'invoice-view',
-            'ledger-contact',
+            ReactQueryKeys?.INVOICES_KEYS,
+            ReactQueryKeys?.TRANSACTION_KEYS,
+            ReactQueryKeys?.ITEMS_KEYS,
+            ReactQueryKeys?.INVOICE_VIEW,
+            ReactQueryKeys.CONTACT_VIEW,
             'all-items',
             'ACCRECCREDIT',
+            ReactQueryKeys?.CREDITNOTE_KEYS,
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           });

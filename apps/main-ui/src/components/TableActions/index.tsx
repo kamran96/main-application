@@ -1,10 +1,10 @@
 import Icon from '@iconify/react';
 import React, { FC, ReactElement } from 'react';
 import styled from 'styled-components';
-import { Color } from '../../modal';
 import convertToRem from '../../utils/convertToRem';
 import threeDotsVertical from '@iconify-icons/bi/three-dots-vertical';
 import { Dropdown, Menu } from 'antd';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 
 interface IProps {
   children?: ReactElement<any>;
@@ -18,6 +18,7 @@ export const TableActions: FC<IProps> = ({ children, onClick }) => {
 };
 
 export const MoreActions: FC = ({ children }) => {
+  const { Colors } = useGlobalContext();
   const menu = (
     <Menu className="menu_wrapper">
       {children ? (
@@ -38,7 +39,7 @@ export const MoreActions: FC = ({ children }) => {
       <Icon
         style={{
           fontSize: convertToRem(18),
-          color: Color.$GRAY_LIGHT,
+          color: Colors.$GRAY_LIGHT,
           cursor: 'pointer',
         }}
         icon={threeDotsVertical}

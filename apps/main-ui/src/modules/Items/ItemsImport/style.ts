@@ -8,14 +8,13 @@ interface ModalWrapper extends DivProps {
 export const WrapperModalContent = styled.div<ModalWrapper>`
   display: flex;
   padding-bottom: 1rem;
-  overflow: hidden;
-  height: 41rem;
 
   .container {
     transition: 0.6s all ease-in-out;
     width: ${(props: any) => (props?.step === 1 ? '100%' : 0)};
     opacity: ${(props: any) => (props?.step === 1 ? 1 : 0)};
-    display: flex;
+    display: ${(props: any) =>
+      props?.step === 1 ? 'flex' : 'none'} !important;
     align-items: center;
     min-height: 0;
     flex-direction: column;
@@ -26,6 +25,7 @@ export const WrapperModalContent = styled.div<ModalWrapper>`
   .CompareModal {
     width: ${(props: any) => (props?.step === 2 ? '100%' : 0)};
     opacity: ${(props: any) => (props?.step === 2 ? 1 : 0)};
+    display: ${(props: any) => (props?.step === 2 ? 'block' : 'none')};
     transform: ${(props: any) =>
       props?.step === 2
         ? 'translateX(0)'
@@ -33,14 +33,16 @@ export const WrapperModalContent = styled.div<ModalWrapper>`
         ? 'translateX(-100%)'
         : 'translateX(100%)'};
     transition: 0.4s ease-in-out;
-    height: 100vh;
   }
   .TableWrapper {
     width: ${(props: any) => (props?.step === 3 ? '100%' : 0)};
     opacity: ${(props: any) => (props?.step === 3 ? 1 : 0)};
+    display: ${(props: any) => (props?.step === 3 ? 'block' : 'none')};
     transform: ${(props: any) =>
       props?.step === 3 ? 'translateX(0)' : 'translateX(100%)'};
     transition: 0.4s ease-in-out;
+    min-height: 70vh !important;
+    overflow-y: scroll;
 
     .CnfrmBtn {
       display: flex;
@@ -48,7 +50,7 @@ export const WrapperModalContent = styled.div<ModalWrapper>`
       align-items: center;
     }
     .btn {
-      margin: 5px 4px;
+      margin: 15px 4px 4px 4px;
     }
   }
   .modal-icon {

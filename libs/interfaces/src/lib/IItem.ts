@@ -1,4 +1,5 @@
 import { IBase, IPagination } from '..';
+import { message } from 'antd';
 
 export interface IItem extends IBase {
   name: string;
@@ -31,4 +32,9 @@ export interface IItemWithResponse {
   status: boolean;
   result?: IItem[] | IItem | IItemWithResponse;
   pagination?: IPagination;
+}
+
+export interface IGetSingleItemResponse {
+  nextItem: string | number;
+  prevItem: string | number;
 }

@@ -1,17 +1,13 @@
 import copyIcon from '@iconify-icons/feather/copy';
 import { Button, Col, Form, Progress, Row, Select } from 'antd';
+import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
 import React, { FC, useEffect, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
-import { duplicateItemsAPI } from '../../../../api';
-import { getOrganizations } from '../../../../api/organizations';
-import { CommonModal } from '../../../../components';
-import { ButtonTag } from '../../../../components/ButtonTags';
-import { FormLabel } from '../../../../components/FormLabel';
-import { BoldText } from '../../../../components/Para/BoldText';
+import { duplicateItemsAPI, getOrganizations } from '../../../../api';
+import { CommonModal, ButtonTag, FormLabel, BoldText } from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { Color } from '../../../../modal';
-import { IOrganizations } from '../../../../modal/organization';
+import { IOrganizations } from '@invyce/shared/types';
 
 const { Option } = Select;
 
@@ -319,7 +315,7 @@ const MainWrapper = styled.div`
       color: #3e3e3c;
     }
     tbody tr td.isReady {
-      color: ${Color.$PRIMARY};
+      color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
     }
     tbody tr td.isCompleted {
       color: #1ed21e;

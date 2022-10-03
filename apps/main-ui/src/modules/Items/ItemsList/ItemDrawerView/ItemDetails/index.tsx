@@ -1,8 +1,7 @@
 import React, { FC } from 'react';
 import { Col, Row } from 'antd';
-import { Seprator } from '../../../../../components/Seprator';
 import dayjs from 'dayjs';
-import { Card } from '../../../../../components/Card';
+import { Card, Seprator } from '@components';
 import { ISupportedRoutes } from '../../../../../modal';
 import { Link } from 'react-router-dom';
 import moneyFormat from '../../../../../utils/moneyFormat';

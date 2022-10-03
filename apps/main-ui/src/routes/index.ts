@@ -53,8 +53,9 @@ import { VerifyQuickBooks } from '../modules/Settings/Integrations/Quickbooks/Ve
 import { VerifyXero } from '../modules/Settings/Integrations/Xero/VerifyXero';
 import { CreditNoteEditorWidget } from '../modules/Invoice/CreditNoteWidget';
 import { DebitNoteEditorWidget } from '../modules/Invoice/DebitNoteEditorWidget';
-import { Import } from '../components/Import';
-import { JoinUser } from '../Containers/JoinUser';
+// import { Import } from '../components/Import';
+// import { JoinUser } from '../Containers/JoinUser';
+import { Import, JoinUser } from '@components';
 import { VerifyUser } from '../Containers/JoinUser/VerifyUser';
 import { CreditNoteList } from '../modules/Invoice/CreditNoteList';
 import { CreditNoteView } from '../modules/Invoice/CreditNoteList/View';

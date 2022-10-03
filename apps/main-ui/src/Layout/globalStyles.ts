@@ -29,6 +29,8 @@ body{
     
     }
 
+
+
   
 
     .ant-picker-cell-disabled::before{
@@ -281,6 +283,11 @@ input:-webkit-autofill{
 .new-contact-btn:hover{
   
   color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE} !important
+}
+
+.ant-btn-primary{
+  background: ${(props: IThemeProps) =>
+    props?.theme?.colors?.sidebarHoverActive};
 }
 
 

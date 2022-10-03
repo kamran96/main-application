@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { WrapperUser } from './styles';
-import { Heading } from './../../components/Heading/index';
+import { Heading } from '@components';
 import { UsersList } from './UsersList/index';
 import { Button } from 'antd';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';

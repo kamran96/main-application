@@ -10,6 +10,8 @@ export interface IRoutesSchema {
   break?: boolean;
   icon?: any;
   permission?: string;
+  fn?: () => void;
+  queryKey?: any[];
   [key: string]: any;
 }
 

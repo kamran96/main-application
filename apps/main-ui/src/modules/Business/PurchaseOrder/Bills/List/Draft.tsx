@@ -5,12 +5,12 @@ import styled from 'styled-components';
 
 import {
   deletePurchaseDrafts,
+  findInvoiceByID,
   getAllContacts,
+  getContactLedger,
   getPoListAPI,
 } from '../../../../../api';
-import { ConfirmModal } from '../../../../../components/ConfirmModal';
-import { SmartFilter } from '../../../../../components/SmartFilter';
-import { CommonTable } from '../../../../../components/Table';
+import { ConfirmModal, SmartFilter, CommonTable } from '@components';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import {
   IContactType,
@@ -18,24 +18,25 @@ import {
   IErrorMessages,
   IServerError,
   NOTIFICATIONTYPE,
-} from '../../../../../modal';
-import {
   IInvoiceResponse,
   INVOICETYPE,
   INVOICE_TYPE_STRINGS,
   ORDER_TYPE,
   ISupportedRoutes,
-} from '../../../../../modal';
+  ReactQueryKeys,
+  IInvoiceType,
+} from '@invyce/shared/types';
+import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
+import { useRbac } from '../../../../../components/Rbac/useRbac';
 import FilterSchema from './PoFilterSchema';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
 import { useCols } from './CommonCol';
-import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
-import { useRbac } from '../../../../../components/Rbac/useRbac';
 import { ImportBill } from '../importBill';
 
 interface IProps {
   columns?: any[];
 }
+const defaultSortedId = 'id';
 export const DraftBills: FC<IProps> = ({ columns }) => {
   const queryCache = useQueryClient();
   /* HOOKS HERE */
@@ -51,11 +52,11 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
     query: '',
-    sortid: '',
+    sortid: defaultSortedId,
     page_size: 10,
   });
   const { page, query, sortid, page_size } = allInvoicesConfig;
-  const {PDFColsBills, _csvExportable} = useCols();
+  const { PDFColsBills, _csvExportable } = useCols();
 
   const [confirmModal, setConfirmModal] = useState(false);
   const [{ result, pagination }, setAllInvoicesRes] =
@@ -97,12 +98,7 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
   const { history } = routeHistory;
 
   useEffect(() => {
-    if (
-      routeHistory &&
-      routeHistory.history &&
-      routeHistory.history.location &&
-      routeHistory.history.location.search
-    ) {
+    if (routeHistory?.history?.location?.search) {
       let obj = {};
       const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
@@ -112,16 +108,17 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
 
       setAllInvoicesConfig({ ...allInvoicesConfig, ...obj });
     }
-  }, [routeHistory, history]);
+  }, []);
 
   /* ********* PAGINATED QUERY FOR FETCHING DRAFT ORDERS *************** */
+  // `invoices-purchases-${INVOICETYPE.DRAFT}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
   const {
     isLoading,
     data: resolvedData,
     isFetching,
   } = useQuery(
     [
-      `invoices-purchases-${INVOICETYPE.DRAFT}?page=${page}&query=${query}&sort=${sortid}&page_size=${page_size}`,
+      ReactQueryKeys.BILL_KEYS,
       ORDER_TYPE.PURCAHSE_ORDER,
       INVOICETYPE.DRAFT,
       'ALL',
@@ -137,58 +134,48 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
   );
 
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      setAllInvoicesConfig({
-        ...allInvoicesConfig,
-        sortid: null,
-        page: pagination.current,
-        page_size: pagination.pageSize,
-      });
-      const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=draft&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}`;
-      history.push(route);
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+    if (sorter?.column) {
+      if (sorter.order === 'false') {
+        setAllInvoicesConfig({
+          ...allInvoicesConfig,
+          sortid: null,
+          page: pagination.current,
+          page_size: pagination.pageSize,
         });
-        
-        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+        const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=draft&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}`;
+        history.push(route);
       } else {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+        setAllInvoicesConfig({
+          ...allInvoicesConfig,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
         });
-        
-        setAllInvoicesRes(prev =>({...prev,  result: userData}))
-      }
-      setAllInvoicesConfig({
-        ...allInvoicesConfig,
-        page: pagination.current,
-        page_size: pagination.pageSize,
-        sortid:
+        const route = `/app${
+          ISupportedRoutes.PURCHASES
+        }?tabIndex=draft&sortid=${
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
-            : sorter.field,
+            : sorter.field
+        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+          sorter.order
+        }&query=${query}`;
+        history.push(route);
+      }
+    } else {
+      setAllInvoicesConfig({
+        ...allInvoicesConfig,
+        page: pagination.current,
+        page_size: pagination.pageSize,
+        sortid: defaultSortedId,
       });
-      const route = `/app${
-        ISupportedRoutes.PURCHASES
-      }?tabIndex=draft&sortid=${
-        sorter && sorter.order === 'descend'
-          ? `-${sorter.field}`
-          : sorter.field
-      }&page=${pagination.current}&page_size=${
-        pagination.pageSize
-      }&filter=${sorter.order}&query=${query}`;
+      const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=draft&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
       history.push(route);
     }
-  }
+  };
 
   /* ********** METHODS HERE *************** */
   /* ************** ASYNC FUNCTION IS TO  DELETE ORDER ******** */
@@ -198,21 +185,20 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
     };
     await mutateDeleteOrders(payload, {
       onSuccess: () => {
-        ['invoices', 'invoice-view'].forEach((key) => {
-          (queryCache.invalidateQueries as any)((q) => q?.startsWith(`${key}`));
-        });
+        [ReactQueryKeys?.INVOICES_KEYS, ReactQueryKeys.INVOICE_VIEW].forEach(
+          (key) => {
+            (queryCache.invalidateQueries as any)((q) =>
+              q?.startsWith(`${key}`)
+            );
+          }
+        );
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Deleted Successfully');
 
         setSelectedRow([]);
         setConfirmModal(false);
       },
       onError: (error: IServerError) => {
-        if (
-          error &&
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
+        if (error?.response?.data?.message) {
           const { message } = error.response.data;
           notificationCallback(NOTIFICATIONTYPE.ERROR, message);
         } else {
@@ -230,14 +216,30 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
   };
 
   useEffect(() => {
-    if (resolvedData && resolvedData.data && resolvedData.data.result) {
-      const { result } = resolvedData.data;
+    if (resolvedData?.data?.result) {
+      const { result, pagination } = resolvedData?.data;
       const newResult = [];
       result.forEach((item, index) => {
         newResult.push({ ...item, key: item.id });
       });
 
       setAllInvoicesRes({ ...resolvedData.data, result: newResult });
+
+      if (pagination?.next === page + 1) {
+        queryCache?.prefetchQuery(
+          [
+            ReactQueryKeys.BILL_KEYS,
+            ORDER_TYPE.PURCAHSE_ORDER,
+            INVOICETYPE.DRAFT,
+            'ALL',
+            page + 1,
+            page_size,
+            query,
+            sortid,
+          ],
+          getPoListAPI
+        );
+      }
     }
   }, [resolvedData]);
 
@@ -268,6 +270,40 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
   return (
     <ALlWrapper>
       <CommonTable
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => {
+              const prefetchQueries = [
+                {
+                  queryKey: [
+                    ReactQueryKeys?.CONTACT_VIEW,
+                    record?.contactId,
+                    record?.contact?.contactType,
+                    '',
+                    20,
+                    1,
+                  ],
+                  fn: getContactLedger,
+                },
+                {
+                  queryKey: [
+                    ReactQueryKeys?.INVOICE_VIEW,
+                    record?.id && record?.id?.toString(),
+                    IInvoiceType.BILL,
+                  ],
+                  fn: findInvoiceByID,
+                },
+              ];
+
+              for (const CurrentQuery of prefetchQueries) {
+                queryCache.prefetchQuery(
+                  CurrentQuery?.queryKey,
+                  CurrentQuery?.fn
+                );
+              }
+            },
+          };
+        }}
         pdfExportable={{ columns: PDFColsBills }}
         exportable
         exportableProps={{

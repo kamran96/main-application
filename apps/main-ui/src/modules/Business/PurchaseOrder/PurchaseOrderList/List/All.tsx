@@ -3,36 +3,44 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
-import { purchaseOrderDeleteAPI, getAllContacts } from '../../../../../api';
-import { CommonTable } from '../../../../../components/Table';
+import {
+  purchaseOrderDeleteAPI,
+  getAllContacts,
+  findInvoiceByID,
+} from '../../../../../api';
 import {
   IInvoiceResponse,
   INVOICETYPE,
   ORDER_TYPE,
 } from '../../../../../modal/invoice';
-import convertToRem from '../../../../../utils/convertToRem';
-import { SmartFilter } from '../../../../../components/SmartFilter';
-import { ISupportedRoutes } from '../../../../../modal/routing';
-import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
-import FilterSchema from './PoFilterSchema';
-import { ConfirmModal } from '../../../../../components/ConfirmModal';
 import {
   IBaseAPIError,
   IContactType,
   IContactTypes,
   NOTIFICATIONTYPE,
-} from '../../../../../modal';
+  ISupportedRoutes,
+  ReactQueryKeys,
+  IInvoiceType,
+} from '@invyce/shared/types';
+
+import { CommonTable, ConfirmModal, SmartFilter } from '@components';
+
+import convertToRem from '../../../../../utils/convertToRem';
+import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
+import { useRbac } from '../../../../../components/Rbac/useRbac';
+import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
+import FilterSchema from './PoFilterSchema';
 import { PurchaseTopbar } from './PurchaseTableTopbar';
 import { purchaseOrderList } from '../../../../../api/purchaseOrder';
 import { useCols } from './CommonCol';
-import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
-import { useRbac } from '../../../../../components/Rbac/useRbac';
 import { PurchaseOrderImport } from '../PurchaseOrderImport';
 
 interface IProps {
   columns?: any[];
   activeTab?: string;
 }
+
+const defaultSortedId = 'id';
 export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
   /* HOOKS HERE */
   const queryCache = useQueryClient();
@@ -51,7 +59,7 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
     query: '',
-    sortid: '',
+    sortid: defaultSortedId,
     pageSize: 10,
   });
   /* ********* DESTRUCTURING ALL INVOICESCONFIG *************** */
@@ -93,12 +101,7 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
     });
 
   useEffect(() => {
-    if (
-      routeHistory &&
-      routeHistory.history &&
-      routeHistory.history.location &&
-      routeHistory.history.location.search
-    ) {
+    if (routeHistory?.history?.location?.search) {
       let obj = {};
       const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
@@ -113,13 +116,16 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
 
   /* ******* PAGINATED QUERY TO FETCH LIST OF PURCHASES ********** */
   /* ******* ORDERS ONLY TYPE (PROCESSED PURCHASE ORDERS) ********** */
+
+  // `invoices-${ORDER_TYPE.PURCAHSE_ORDER}-${INVOICETYPE.Approved}?page=${page}&query=${query}&sort=${sortid}&page_size=${pageSize}`,
+
   const {
     isLoading,
     data: resolvedData,
     isFetching,
   } = useQuery(
     [
-      `invoices-${ORDER_TYPE.PURCAHSE_ORDER}-${INVOICETYPE.Approved}?page=${page}&query=${query}&sort=${sortid}&page_size=${pageSize}`,
+      ReactQueryKeys?.PURCHASEORDERS_KEY,
       INVOICETYPE.ALL,
       INVOICETYPE.Approved,
       page,
@@ -134,68 +140,76 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
   );
 
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      setAllInvoicesConfig({
-        ...allInvoicesConfig,
-        sortid: null,
-        page: pagination.current,
-        pageSize: pagination.pageSize,
-      });
-      const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=all&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
-      history.push(route);
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+    if (sorter?.column) {
+      if (sorter.order === 'false') {
+        setAllInvoicesConfig({
+          ...allInvoicesConfig,
+          sortid: defaultSortedId,
+          page: pagination.current,
+          pageSize: pagination.pageSize,
         });
-
-        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
+        const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=all&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+        history.push(route);
       } else {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+        setAllInvoicesConfig({
+          ...allInvoicesConfig,
+          page: pagination.current,
+          pageSize: pagination.pageSize,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
         });
 
-        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
-      }
-      setAllInvoicesConfig({
-        ...allInvoicesConfig,
-        page: pagination.current,
-        pageSize: pagination.pageSize,
-        sortid:
+        const route = `/app${
+          ISupportedRoutes.PURCHASE_ORDER
+        }?tabIndex=all&sortid=${
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
-            : sorter.field,
+            : sorter.field
+        }&page=${pagination.current}&page_size=${
+          pagination.pageSize
+        }&query=${query}`;
+        history.push(route);
+      }
+    } else {
+      setAllInvoicesConfig({
+        ...allInvoicesConfig,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        sortid: defaultSortedId,
       });
 
-      const route = `/app${
-        ISupportedRoutes.PURCHASE_ORDER
-      }?tabIndex=all&sortid=${
-        sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
-      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-        sorter.order
-      }&query=${query}`;
+      const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=all&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
       history.push(route);
     }
   };
 
   /* CONDITIONAL RENDERING LIFE CYCLE HOOK TO UPDATE ALL INVOICES STATE WHEN API CALL IS DONE */
   useEffect(() => {
-    if (resolvedData && resolvedData.data && resolvedData.data.result) {
-      const { result } = resolvedData.data;
+    if (resolvedData?.data?.result) {
+      const { result, pagination } = resolvedData.data;
       const newResult = [];
       result.forEach((item, index) => {
         newResult.push({ ...item, key: item.id });
       });
 
       setAllInvoicesRes({ ...resolvedData.data, result: newResult });
+
+      if (pagination.next === page + 1) {
+        queryCache.prefetchQuery(
+          [
+            ReactQueryKeys?.PURCHASEORDERS_KEY,
+            INVOICETYPE.ALL,
+            INVOICETYPE.Approved,
+            page + 1,
+            pageSize,
+            query,
+            sortid,
+          ],
+          purchaseOrderList
+        );
+      }
     }
   }, [resolvedData]);
 
@@ -209,11 +223,11 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
       onSuccess: () => {
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Deleted Successfully');
         [
-          'invoices',
-          'transactions',
-          'items-list',
-          'invoice-view',
-          'ledger-contact',
+          ReactQueryKeys?.INVOICES_KEYS,
+          ReactQueryKeys?.TRANSACTION_KEYS,
+          ReactQueryKeys?.ITEMS_KEYS,
+          ReactQueryKeys.INVOICE_VIEW,
+          ReactQueryKeys.CONTACT_VIEW,
           'all-items',
         ].forEach((key) => {
           (queryCache.invalidateQueries as any)((q) => q?.startsWith(`${key}`));
@@ -223,12 +237,7 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
         setConfirmModal(false);
       },
       onError: (error: IBaseAPIError) => {
-        if (
-          error &&
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
+        if (error?.response?.data?.message) {
           const { message } = error.response.data;
           notificationCallback(NOTIFICATIONTYPE.ERROR, message);
         }
@@ -278,6 +287,20 @@ export const ALLPurchaseOrdersList: FC<IProps> = ({ columns, activeTab }) => {
   return (
     <ALlWrapper>
       <CommonTable
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => {
+              queryCache.prefetchQuery(
+                [
+                  ReactQueryKeys?.INVOICE_VIEW,
+                  record?.id && record?.id?.toString(),
+                  IInvoiceType.PURCHASE_ORDER,
+                ],
+                findInvoiceByID
+              );
+            },
+          };
+        }}
         pdfExportable={{ columns: pdfColsPO }}
         exportable
         exportableProps={{

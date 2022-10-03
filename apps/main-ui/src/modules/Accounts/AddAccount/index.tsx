@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { CommonModal } from '../../../components';
+import { CommonModal } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { AccountsForm } from './Form';
 

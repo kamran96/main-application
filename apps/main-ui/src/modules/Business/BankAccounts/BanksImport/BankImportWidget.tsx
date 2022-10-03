@@ -1,4 +1,4 @@
-import { CommonModal } from '../../../../components';
+import { CommonModal } from '@components';
 import React, { FC, useState } from 'react';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import bookHalf from '@iconify/icons-bi/book-half';
@@ -9,7 +9,7 @@ import Icon from '@iconify/react';
 import downloadIcon from '@iconify/icons-bi/download';
 import { InvoiceImportManager } from '../../../Invoice/InvoiceImportManager';
 import { ReactQueryKeys } from '../../../../modal';
-import { getBankKeysApi } from '../../../../api/banks';
+import { getBankKeysApi } from '../../../../api';
 import { CompareDataTable } from './CompareDataTable';
 import { CompareDataModal } from './CompareDataModal';
 
@@ -102,9 +102,7 @@ const BankImportWidget: FC = (props) => {
                 <a>here</a>
               </div>
               <InvoiceImportManager
-                headers={`Bank Name,Account Name,Type,Last Updated`.split(
-                  ','
-                )}
+                headers={`Bank Name,Account Name,Type,Last Updated`.split(',')}
                 onLoad={(payload, file) => {
                   setFileData(file);
                   setFileExtractedData(payload);

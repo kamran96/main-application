@@ -30,7 +30,6 @@ import { getAccountsByTypeAPI } from '../../api/accounts';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { useShortcut } from '../../hooks/useShortcut';
 import {
-  Color,
   IContactType,
   IContactTypes,
   IInvoiceMutatedResult,
@@ -45,7 +44,7 @@ import convertToRem from '../../utils/convertToRem';
 import { calculateInvoice, totalDiscountInInvoice } from '../../utils/formulas';
 import moneyFormat from '../../utils/moneyFormat';
 import { useWindowSize } from '../../utils/useWindowSize';
-import { Option } from '../CommonSelect';
+import { Option } from '@components';
 import { Editable, EditableSelect } from '../Editable';
 import defaultItems, { defaultFormData, defaultPayment } from './defaultStates';
 import { invycePersist } from '@invyce/invyce-persist';
@@ -127,7 +126,7 @@ export const PurchaseManager: FC<IProps> = ({
   const [rowsErrors, setRowsErrors] = useState([]);
   const [width] = useWindowSize();
 
-  const { notificationCallback, setItemsModalConfig, userDetails } =
+  const { notificationCallback, setItemsModalConfig, userDetails, Colors } =
     useGlobalContext();
 
   const { organization } = userDetails;
@@ -895,7 +894,7 @@ export const PurchaseManager: FC<IProps> = ({
             <Icon
               style={{
                 fontSize: convertToRem(20),
-                color: Color.$GRAY,
+                color: Colors.$GRAY,
                 cursor: 'pointer',
               }}
               icon={deleteIcon}

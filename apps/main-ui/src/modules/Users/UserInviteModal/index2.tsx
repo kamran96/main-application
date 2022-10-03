@@ -3,13 +3,11 @@ import styled from 'styled-components';
 import { Modal, Select } from 'antd';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { Form, Input, Button } from 'antd';
-import { FormLabel } from '../../../components/FormLabel';
+import { FormLabel, CommonModal } from '@components';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
-import { getALLBranches, inviteUserAPI } from '../../../api/users';
-import { NOTIFICATIONTYPE, IBaseAPIError } from '../../../modal';
+import { getALLBranches, inviteUserAPI, getRbacListAPI } from '../../../api';
+import { NOTIFICATIONTYPE, IBaseAPIError } from '@invyce/shared/types';
 import { IRoles } from '../../../api/roles';
-import { getRbacListAPI } from '../../../api';
-import { CommonModal } from '../../../components';
 
 const { Option } = Select;
 

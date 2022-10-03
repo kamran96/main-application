@@ -3,22 +3,18 @@ import { Icon } from '@iconify/react';
 import { Button, Col, Input, Row } from 'antd';
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
-import { CommonModal } from '../../../../components';
-import { FormLabel } from '../../../../components/FormLabel';
+import { CommonModal, FormLabel } from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { Color } from '../../../../modal';
 import convertToRem from '../../../../utils/convertToRem';
 
 export const GeneralPreferencesWidget: FC = () => {
   const [formData, setFormData] = useState([{ name: '', type: '' }]);
-  const { preferancesModal, setPreferancesModal } = useGlobalContext();
-
-  const handleContinue = () => {};
+  const { preferancesModal, setPreferancesModal, Colors } = useGlobalContext();
 
   const handleChange = (e, index) => {
-    let name = e.target.name;
-    let value = e.target.value;
-    let rest = [...formData];
+    const name = e.target.name;
+    const value = e.target.value;
+    const rest = [...formData];
     rest[index][name] = value;
 
     setFormData(rest);
@@ -29,7 +25,6 @@ export const GeneralPreferencesWidget: FC = () => {
       width={765}
       title="Add Preferences"
       visible={preferancesModal}
-      onOk={handleContinue}
       onCancel={() => setPreferancesModal(false)}
       cancelText={'Cancel'}
       okText={'Create'}
@@ -67,7 +62,7 @@ export const GeneralPreferencesWidget: FC = () => {
                 {formData.length > 1 && (
                   <i
                     onClick={() => {
-                      let item = [...formData];
+                      const item = [...formData];
                       item.splice(index, 1);
                       setFormData(item);
                     }}
@@ -76,7 +71,7 @@ export const GeneralPreferencesWidget: FC = () => {
                     <Icon
                       style={{
                         fontSize: convertToRem(20),
-                        color: Color.$GRAY,
+                        color: Colors.$GRAY,
                         cursor: 'pointer',
                       }}
                       icon={deleteIcon}
@@ -90,7 +85,7 @@ export const GeneralPreferencesWidget: FC = () => {
         <div className="add_more">
           <Button
             onClick={() => {
-              let addForm: any[] = [...formData];
+              const addForm: any[] = [...formData];
               addForm.push({
                 name: '',
                 type: '',

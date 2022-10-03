@@ -1,17 +1,15 @@
 import { ColumnType } from 'antd/lib/list';
 import { ColumnsType } from 'antd/lib/table';
 import React, { FC, useState } from 'react';
-import { CommonTable } from '../../../../components/Table';
-import { Heading } from '../../../../components/Heading';
+import { CommonTable, Heading, ButtonTag } from '@components';
 import { WrapperTaxList } from './styles';
-import { ButtonTag } from '../../../../components/ButtonTags';
 import editSolid from '@iconify-icons/clarity/edit-solid';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import { TaxEditorWidget } from '../TaxEditorWidget';
 import Button from 'antd/es/button';
 import { useQuery } from 'react-query';
 import { getTaxesListAPI } from '../../../../api';
-import { ITaxResponse } from '../../../../modal/tax';
+import { ITaxResponse } from '@invyce/shared/types';
 import { useEffect } from 'react';
 export const TaxList: FC = () => {
   /* COMPONENT STATE */

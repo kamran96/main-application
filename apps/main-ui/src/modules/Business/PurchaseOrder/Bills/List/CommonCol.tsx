@@ -1,12 +1,11 @@
 import { ITableExportFields } from 'ant-table-extensions';
 import { ColumnsType } from 'antd/es/table';
-import { Capitalize } from '../../../../../components/Typography';
+import { Capitalize } from '@components';
 import { plainToClass } from 'class-transformer';
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { ISupportedRoutes } from '../../../../../modal';
-import { InvoiceResultClass } from '../../../../../modal/invoice';
+import { ISupportedRoutes, InvoiceResultClass } from '@invyce/shared/types';
 import moneyFormat from '../../../../../utils/moneyFormat';
 
 export const useCols = () => {
@@ -33,7 +32,7 @@ export const useCols = () => {
         });
       }
     }
-  }, [history?.location?.search]);
+  }, []);
 
   const PurchaseOrderColumns: ColumnsType<any> = [
     {
@@ -136,7 +135,7 @@ export const useCols = () => {
       sortOrder: sortedInfo?.columnKey === 'status' && sortedInfo?.order,
       render: (data, row, index) => {
         const rowData = plainToClass(InvoiceResultClass, row);
-        return <>{row && rowData.getStatus()}</>;
+        return <>{row && rowData?.getStatus()}</>;
       },
     },
   ];
@@ -201,8 +200,8 @@ export const useCols = () => {
       dataIndex: '',
       key: '',
       render: (data, row, index) => {
-        const rowData = plainToClass(InvoiceResultClass, row);
-        return rowData.getStatus();
+        // const rowData = plainToClass(InvoiceResultClass, row);
+        // return rowData?.getStatus();
       },
     },
   ];

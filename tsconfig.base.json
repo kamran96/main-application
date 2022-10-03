@@ -39,7 +39,9 @@
       "@invyce/shared/utils": ["libs/shared/utils/src/index.ts"],
       "@invyce/sidebar-ui": ["libs/sidebar-ui/src/index.ts"],
       "@invyce/sidebar-ui-v2": ["libs/sidebar-ui-v2/src/index.ts"],
-      "@invyce/sorting": ["libs/sorting/src/index.ts"]
+      "@invyce/sorting": ["libs/sorting/src/index.ts"],
+      "@components": ["apps/main-ui/src/components"],
+      "@api": ["apps/main-ui/src/api"]
     }
   },
   "exclude": ["node_modules", "tmp"]

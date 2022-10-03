@@ -3,7 +3,7 @@ import { Avatar, Menu, Tooltip } from 'antd';
 import styled from 'styled-components';
 import { Icon } from '@iconify/react';
 import plusOutlined from '@iconify-icons/ant-design/plus-outlined';
-import { Color, NOTIFICATIONTYPE } from '../../../modal';
+import { NOTIFICATIONTYPE } from '../../../modal';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { IBranch, IOrganizations } from '../../../modal/organization';
 import { useQueryClient, useMutation } from 'react-query';
@@ -213,15 +213,17 @@ const WrapperOrganizationMenu: any = styled.div`
     }
 
     .active::after {
-      background-color: ${Color.$PRIMARY};
+      background-color: ${(props: IThemeProps) =>
+        props?.theme?.colors?.$PRIMARY};
     }
   }
 
   .active-organization {
     .ant-menu-submenu-title {
       background-color: #f0f0f0;
-      border-left: 5px solid ${Color.$PRIMARY};
-      color: ${Color.$PRIMARY};
+      border-left: 5px solid
+        ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
+      color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
     }
   }
 `;

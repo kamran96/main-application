@@ -3,20 +3,18 @@ import React, { FC, useEffect, useState } from 'react';
 import { useMutation } from 'react-query';
 import styled from 'styled-components';
 import XeroLogo from '../../../../assets/xero.png';
-import { H3, H4, P } from '../../../../components/Typography';
+import { H3, H4, P, Seprator, CommonModal } from '@components';
 import {
   XeroCopyModulesAPI,
   XeroIntegrationAPI,
   XeroVerification,
 } from '../../../../api';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { Seprator } from '../../../../components/Seprator';
-import { CommonModal } from '../../../../components';
 import {
   IBaseAPIError,
   ISupportedRoutes,
   NOTIFICATIONTYPE,
-} from '../../../../modal';
+} from '@invyce/shared/types';
 import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
 import { useHistory } from 'react-router-dom';
 

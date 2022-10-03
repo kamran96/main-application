@@ -8,14 +8,12 @@ import dayjs from 'dayjs';
 import { FC, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
-
 import { deleteCategoryAPI, getChildCategoriesAPI } from '../../api';
 import { getAllUsers } from '../../api/users';
-import { ButtonTag } from '../../components/ButtonTags';
-import { ConfirmModal } from '../../components/ConfirmModal';
-import { CommonTable } from '../../components/Table';
+import { ButtonTag, ConfirmModal, CommonTable } from '@components';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
-import { Color, NOTIFICATIONTYPE } from '../../modal';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
+import { NOTIFICATIONTYPE } from '@invyce/shared/types';
 
 interface IProps {
   id?: number;
@@ -220,10 +218,10 @@ const AttributesTable = ({ attributes }) => {
 
 const WrapperChildCategory = styled.div`
   .attribute-icon {
-    color: ${Color.$GRAY};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$GRAY};
     transition: 0.4s all ease-in-out;
   }
   .attribute-icon:hover {
-    color: ${Color.$PRIMARY};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
   }
 `;

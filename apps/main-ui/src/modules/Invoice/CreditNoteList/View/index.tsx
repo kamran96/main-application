@@ -4,8 +4,8 @@ import styled from 'styled-components';
 import { BreadCrumbArea } from '../../../../components/BreadCrumbArea';
 import { Breadcrumb } from 'antd';
 import { Link } from 'react-router-dom';
-import { IInvoiceType, ISupportedRoutes } from '../../../../modal';
-import { PurchasesView } from '../../../../components/PurchasesView';
+import { IInvoiceType, ISupportedRoutes } from '@invyce/shared/types';
+import { PurchasesView } from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 
 export const CreditNoteView: FC = () => {

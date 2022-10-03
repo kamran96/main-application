@@ -5,7 +5,8 @@ import editSolid from '@iconify/icons-clarity/edit-solid';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import { MoreActions, TableActions } from '../TableActions';
 import convertToRem from '../../utils/convertToRem';
-import { Color } from '../../modal';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
 interface IProps {
   selectedRow?: number[];
@@ -24,6 +25,8 @@ export const TableTopbar: SFC<IProps> = ({
   onFilterClick,
   renderFilter,
 }) => {
+  const { Colors } = useGlobalContext();
+
   return (
     <WrapperTableTopbar>
       <div className="contacts_search flex alignCenter justifySpaceBetween">
@@ -36,7 +39,7 @@ export const TableTopbar: SFC<IProps> = ({
                     <Icon
                       style={{
                         fontSize: convertToRem(16),
-                        color: Color.$GRAY_LIGHT,
+                        color: Colors.$GRAY_LIGHT,
                         cursor: 'pointer',
                       }}
                       icon={editSolid}
@@ -47,7 +50,7 @@ export const TableTopbar: SFC<IProps> = ({
                   <Icon
                     style={{
                       fontSize: convertToRem(16),
-                      color: Color.$GRAY_LIGHT,
+                      color: Colors.$GRAY_LIGHT,
                       cursor: 'pointer',
                     }}
                     icon={deleteIcon}
@@ -92,7 +95,7 @@ const WrapperTableTopbar = styled.div`
         transition: 0.3s all ease-in-out;
 
         &:hover {
-          color: ${Color.$PRIMARY};
+          color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
         }
       }
     }
@@ -103,7 +106,7 @@ const WrapperTableTopbar = styled.div`
     align-items: center;
   }
   .sort {
-    color: ${Color.$PRIMARY};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
     font-size: ${convertToRem(14)};
     text-transform: capitalize;
     margin: 0 5px;
@@ -114,7 +117,7 @@ const WrapperTableTopbar = styled.div`
     font-size: ${convertToRem(24)};
     display: flex;
     align-items: center;
-    color: ${Color.$GRAY};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$GRAY};
     margin-left: ${convertToRem(20)};
   }
 `;

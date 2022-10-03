@@ -4,15 +4,12 @@ import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 import { getBranchByIdAPI } from '../../../api';
 import { addBrnachAPI } from '../../../api/organizations';
-import { CommonModal } from '../../../components';
-import { FormLabel } from '../../../components/FormLabel';
+import { CommonModal, BOLDTEXT, Seprator } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { ILoginActions } from '../../../hooks/globalContext/globalManager';
-import { NOTIFICATIONTYPE } from '../../../modal';
+import { NOTIFICATIONTYPE } from '@invyce/shared/types';
 import { updateToken } from '../../../utils/http';
 import phoneCodes from '../../../utils/phoneCodes';
-import { BOLDTEXT } from '../../../components/Para/BoldText';
-import { Seprator } from '../../../components/Seprator';
 import TextArea from 'antd/lib/input/TextArea';
 
 const { Option } = Select;

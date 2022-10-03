@@ -4,7 +4,7 @@ import React, { FC } from 'react';
 import styled from 'styled-components';
 import { Card } from '../Card';
 import { H4 } from '../Typography';
-import { Color, IDashboardSalesOverview } from '../../modal';
+import { IDashboardSalesOverview } from '../../modal';
 import fileText from '@iconify-icons/feather/file-text';
 import { BoldText } from '../Para/BoldText';
 import { Inflation } from '../Inflation';

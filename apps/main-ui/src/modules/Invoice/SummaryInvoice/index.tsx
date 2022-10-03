@@ -1,10 +1,8 @@
 import React, { FC, ReactElement } from 'react';
 import styled from 'styled-components';
 import convertToRem from '../../../utils/convertToRem';
-import { BoldText } from '../../../components/Para/BoldText';
-import { Color } from '../../../modal';
+import { BoldText, Card } from '@components';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
-import { Card } from '../../../components/Card';
 
 interface IProps {
   amount: number;

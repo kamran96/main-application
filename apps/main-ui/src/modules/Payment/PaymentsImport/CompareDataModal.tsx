@@ -1,8 +1,6 @@
 import React, { FC, useState } from 'react';
 import { ColumnsType } from 'antd/lib/table';
-import { G } from '@react-pdf/renderer';
-import { EditableSelect } from '../../../components/Editable';
-import { Option } from '../../../components/CommonSelect';
+import { Option, EditableSelect } from '@components';
 import { EditableTable } from '@invyce/editable-table';
 import { Heading } from '@invyce/shared/components';
 import Paragraph from 'antd/lib/typography/Paragraph';
@@ -48,8 +46,7 @@ const a = [
   {
     label: 'Date',
     keyName: 'Date',
-    description:
-      'Please select a field which is related to Date of payments',
+    description: 'Please select a field which is related to Date of payments',
   },
   {
     label: 'Stock',
@@ -65,12 +62,14 @@ const a = [
   {
     label: 'Skype Name',
     keyName: 'skypeName',
-    description: 'Please select a field which is related to Skype Name of payments',
+    description:
+      'Please select a field which is related to Skype Name of payments',
   },
   {
     label: 'Fax Number',
     keyName: 'faxNumber',
-    description: 'Please select a field which is related to Fax Number of payments',
+    description:
+      'Please select a field which is related to Fax Number of payments',
   },
   {
     label: 'Cell Number',
@@ -93,7 +92,8 @@ const a = [
   {
     label: 'payments Name',
     keyName: 'paymentsName',
-    description: 'Please select a field which is related to payments Name of payments',
+    description:
+      'Please select a field which is related to payments Name of payments',
   },
   {
     label: 'Payments Mode',

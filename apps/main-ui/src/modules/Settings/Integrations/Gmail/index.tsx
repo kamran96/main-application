@@ -4,7 +4,7 @@ import { useMutation } from 'react-query';
 import styled from 'styled-components';
 import { GmailIntegrationAPI } from '../../../../api';
 import GmailLogo from '../../../../assets/gmail.png';
-import { H4 } from '../../../../components/Typography';
+import { H4 } from '@components';
 import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
 
 export const Gmail = () => {

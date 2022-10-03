@@ -8,19 +8,20 @@ import { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 
+import { deleteUserAPI, getUsersListAPI, resendInvitation } from '../../../api';
 import {
-  deleteUserAPI,
-  getUsersListAPI,
-  resendInvitation,
-} from '../../../api/users';
-import { ButtonTag } from '../../../components/ButtonTags';
-import { ConfirmModal } from '../../../components/ConfirmModal';
-import { PDFICON } from '../../../components/Icons';
-import { SmartFilter } from '../../../components/SmartFilter';
+  ButtonTag,
+  ConfirmModal,
+  PDFICON,
+  SmartFilter,
+  CommonTable,
+} from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { IProfile, NOTIFICATIONTYPE } from '../../../modal';
-import { ISupportedRoutes } from '../../../modal/routing';
-import { CommonTable } from './../../../components/Table';
+import {
+  IProfile,
+  NOTIFICATIONTYPE,
+  ISupportedRoutes,
+} from '@invyce/shared/types';
 import UserFilterSchema from './UsersFilterSchema';
 import { useHistory } from 'react-router-dom';
 
@@ -242,7 +243,7 @@ export const UsersList: FC = () => {
           />
           <SmartFilter
             onFilter={(encode) => {
-              const route = `/app${ISupportedRoutes.USERS}?sortid=${sortid}&page=1&page_size=${page_size}&query=${encode}`;
+              const route = `/app/settings${ISupportedRoutes.USERS}?sortid=${sortid}&page=1&page_size=${page_size}&query=${encode}`;
               history.push(route);
               setUsersConfig({ ...usersConfig, query: encode });
             }}

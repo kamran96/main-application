@@ -1,7 +1,7 @@
 import { Form, Space, Input, Checkbox, Button } from 'antd';
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { CommonModal } from '../../../../components';
+import { CommonModal } from '@components';
 import trash2 from '@iconify-icons/feather/trash-2';
 import { Icon } from '@iconify/react';
 import { PlusOutlined } from '@ant-design/icons';

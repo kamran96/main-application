@@ -1,5 +1,5 @@
+import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 import styled from 'styled-components';
-import { Color } from '../../../modal';
 import convertToRem from '../../../utils/convertToRem';
 
 export const ContactListWrapper: any = styled.div`
@@ -34,7 +34,7 @@ export const ContactListWrapper: any = styled.div`
         transition: 0.3s all ease-in-out;
 
         &:hover {
-          color: ${Color.$PRIMARY};
+          color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
         }
       }
     }
@@ -45,7 +45,7 @@ export const ContactListWrapper: any = styled.div`
     align-items: center;
   }
   .sort {
-    color: ${Color.$PRIMARY};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
     font-size: ${convertToRem(14)};
     text-transform: capitalize;
     margin: 0 5px;

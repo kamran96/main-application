@@ -6,6 +6,7 @@ import { Item, ItemSchema } from '../schemas/item.schema';
 import { Host, Integrations } from '@invyce/global-constants';
 import {
   IBaseUser,
+  IGetSingleItemResponse,
   IItem,
   IItemWithResponse,
   IPage,
@@ -36,6 +37,22 @@ export class ItemService {
     @InjectModel(Price.name) private priceModel,
     @InjectModel(ItemLedger.name) private itemLedgerModel
   ) {}
+
+  async GetItem(user: IBaseUser, id: string): Promise<IGetSingleItemResponse> {
+    const items: IItem[] = await this.itemModel.find({
+      status: 1,
+      organizationId: user.organizationId,
+    });
+
+    console.log(items, 'is here');
+    const indexed = items.findIndex((i) => i.id === id);
+    const nextItem = items[indexed + 1]?.id || null;
+    const prevItem = items[indexed - 1]?.id || null;
+    return {
+      nextItem,
+      prevItem,
+    };
+  }
 
   async ListItems(
     itemData: IBaseUser,
@@ -71,7 +88,6 @@ export class ItemService {
           meta: 'pagination',
         };
 
-        console.log(data, 'filters`');
         for (const i in data) {
           if (data[i].type === 'search') {
             const val = data[i].value?.split('%')[1];

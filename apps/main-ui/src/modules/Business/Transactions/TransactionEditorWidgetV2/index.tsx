@@ -4,19 +4,19 @@ import { TransactionManager, useTransaction } from './manager';
 import { Wrapper } from './styles';
 import bxPlus from '@iconify-icons/bx/bx-plus';
 import Icon from '@iconify/react';
-import { DatePicker } from '../../../../components/DatePicker';
 import dayjs from 'dayjs';
-import { BreadCrumbArea } from '../../../../components/BreadCrumbArea';
-import { ISupportedRoutes } from '../../../../modal/routing';
+import {
+  ISupportedRoutes,
+  NOTIFICATIONTYPE,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import { Link, useHistory } from 'react-router-dom';
-import { Heading } from '../../../../components/Heading';
+import { Heading, BoldText, BreadCrumbArea, DatePicker } from '@components';
 import TextArea from 'antd/lib/input/TextArea';
-import { BoldText } from '../../../../components/Para/BoldText';
 import moneyFormat from '../../../../utils/moneyFormat';
 import { createTransactionAPI } from '../../../../api';
 import { useMutation, useQueryClient } from 'react-query';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { NOTIFICATIONTYPE } from '@invyce/shared/types';
 import { ITransactionsList } from './types';
 import { Status } from '@sentry/react';
 
@@ -152,15 +152,15 @@ const Editor = () => {
               resetTransactions();
               form.resetFields();
               if (form.getFieldValue('status') === 2) {
-                [`transactions`]?.forEach((key) => {
+                [ReactQueryKeys.TRANSACTION_KEYS]?.forEach((key) => {
                   (queryCache?.invalidateQueries as any)((q) =>
                     q?.queryKey[0]?.toString().startsWith(key)
                   );
                 });
               } else {
                 [
-                  'accounts',
-                  `transactions`,
+                  ReactQueryKeys.ACCOUNTS_KEYS,
+                  ReactQueryKeys.TRANSACTION_KEYS,
                   `report-trialbalance`,
                   `report-balance-sheet`,
                 ]?.forEach((key) => {

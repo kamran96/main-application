@@ -2,8 +2,8 @@ import { Button } from 'antd';
 import React, { FC } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { Heading } from '../../../components/Heading';
-import { ISupportedRoutes } from '../../../modal/routing';
+import { Heading } from '@components';
+import { ISupportedRoutes } from '@invyce/shared/types';
 import { TransactionsList } from './TransactionsList';
 
 export const TransactionContainer: FC = () => {

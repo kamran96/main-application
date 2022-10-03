@@ -1,14 +1,13 @@
 import { List } from 'antd';
+import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { CommonModal } from '../../../../components';
-import { Heading } from '../../../../components/Heading';
-import { Seprator } from '../../../../components/Seprator';
+import { CommonModal, Heading, Seprator } from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { Color } from '../../../../modal';
 
 export const ReviewModal: FC = () => {
-  const { reviewConfigModal, setreviewConfigModal } = useGlobalContext();
+  const { reviewConfigModal, setreviewConfigModal, Colors } =
+    useGlobalContext();
   const { visibility } = reviewConfigModal;
 
   return (
@@ -42,8 +41,9 @@ export default ReviewModal;
 const WrapperReviewModal = styled.div`
   margin-bottom: 128px;
   .header {
-    background-color: ${Color.$Secondary};
-    color: ${Color.$WHITE};
+    background-color: ${(props: IThemeProps) =>
+      props?.theme?.colors?.$Secondary};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE};
     margin: -1px;
   }
 `;

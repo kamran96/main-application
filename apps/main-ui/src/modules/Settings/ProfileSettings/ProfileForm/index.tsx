@@ -3,15 +3,17 @@ import { getFlag } from '../../../../utils/getFlags';
 import { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
-
 import { updateProfileAPI, updateUserProfileAPI } from '../../../../api';
-import { FormLabel } from '../../../../components/FormLabel';
-import { Heading } from '../../../../components/Heading';
-import { Para } from '../../../../components/Para';
-import { Seprator } from '../../../../components/Seprator';
-import { UploadAtachment } from '../../../../components/UploadAtachment';
+import {
+  FormLabel,
+  Heading,
+  Para,
+  Seprator,
+  UploadAtachment,
+} from '@components';
+
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { IAttachment, NOTIFICATIONTYPE } from '../../../../modal';
+import { IAttachment, NOTIFICATIONTYPE } from '@invyce/shared/types';
 import convertToRem from '../../../../utils/convertToRem';
 import phoneCodes from '../../../../utils/phoneCodes';
 import en from '../../../../../../../node_modules/world_countries_lists/data/en/world.json';
@@ -52,7 +54,7 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
   useEffect(() => {
     if (userDetails?.profile) {
       const { profile } = userDetails;
-      console.log(profile.prefix, "profile")
+      console.log(profile.prefix, 'profile');
       form.setFieldsValue({ ...profile, prefix: parseInt(profile?.prefix) });
       setAttachmentData(profile.attachment);
     }

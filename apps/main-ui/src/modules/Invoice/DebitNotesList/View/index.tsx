@@ -1,11 +1,10 @@
 import React from 'react';
 import { FC } from 'react';
 import styled from 'styled-components';
-import { BreadCrumbArea } from '../../../../components/BreadCrumbArea';
+import { BreadCrumbArea, PurchasesView } from '@components';
 import { Breadcrumb } from 'antd';
 import { Link } from 'react-router-dom';
 import { IInvoiceType, ISupportedRoutes } from '@invyce/shared/types';
-import { PurchasesView } from '../../../../components/PurchasesView';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 
 export const DebitNotesView: FC = () => {
@@ -14,7 +13,6 @@ export const DebitNotesView: FC = () => {
   const invId = pathname.split(
     `${ISupportedRoutes?.DASHBOARD_LAYOUT}${ISupportedRoutes?.DEBIT_NOTES}/`
   )[1];
-
 
   return (
     <WrapperCreditNoteView>

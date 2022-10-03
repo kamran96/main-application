@@ -1,11 +1,10 @@
 import { IThemeProps } from '@invyce/shared/invyce-theme';
 import styled from 'styled-components';
-import { Color } from '../../../../../modal';
 import convertToRem from '../../../../../utils/convertToRem';
 
 export const WrapperItemsView = styled.div`
   ._itemviewcard {
-    background: ${Color.$WHITE};
+    background: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE};
     display: flex;
     flex-direction: column;
     justify-content: space-around;

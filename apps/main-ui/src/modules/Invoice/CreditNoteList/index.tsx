@@ -4,12 +4,15 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import fileInvoice from '@iconify-icons/la/file-invoice';
 import { Icon } from '@iconify/react';
-import { Heading } from '../../../components/Heading';
+import {
+  Heading,
+  FallBackLoader,
+  TableTabs,
+  TableTabsContent,
+} from '@components';
 
-import { FallBackLoader } from '../../../components/FallBackLoader';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
-import { TableTabs, TableTabsContent } from '../../../components/TableTabs';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { ISupportedRoutes } from '../../../modal';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
@@ -66,14 +69,14 @@ export const CreditNoteList: FC = () => {
       >
         <>
           <TableTabsContent tab="Aproved" key="aproved">
-            <Suspense fallback={<FallBackLoader />}>
-              <AprovedCreditNotes />
-            </Suspense>
+            {/* <Suspense fallback={<FallBackLoader />}>
+            </Suspense> */}
+            <AprovedCreditNotes />
           </TableTabsContent>
           <TableTabsContent tab="Draft" key="draft">
-            <Suspense fallback={<FallBackLoader />}>
-              <DraftCreditNotes />
-            </Suspense>
+            {/* <Suspense fallback={<FallBackLoader />}>
+            </Suspense> */}
+            <DraftCreditNotes />
           </TableTabsContent>
         </>
       </TableTabs>

@@ -3,27 +3,31 @@ import { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 
-import { purchaseOrderDeleteAPI, getAllContacts } from '../../../../../api';
-import { purchaseOrderList } from '../../../../../api/purchaseOrder';
-import { ConfirmModal } from '../../../../../components/ConfirmModal';
+import {
+  purchaseOrderDeleteAPI,
+  getAllContacts,
+  purchaseOrderList,
+  findInvoiceByID,
+} from '../../../../../api';
+import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
+import { ConfirmModal, SmartFilter, CommonTable } from '@components';
+
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
-import { SmartFilter } from '../../../../../components/SmartFilter';
-import { CommonTable } from '../../../../../components/Table';
-import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
+
 import {
   IContactType,
   IContactTypes,
   IErrorMessages,
   IServerError,
   NOTIFICATIONTYPE,
-} from '../../../../../modal';
-import {
   IInvoiceResponse,
   INVOICETYPE,
   ORDER_TYPE,
-} from '../../../../../modal/invoice';
-import { ISupportedRoutes } from '../../../../../modal/routing';
+  ISupportedRoutes,
+  ReactQueryKeys,
+  IInvoiceType,
+} from '@invyce/shared/types';
 import { useCols } from './CommonCol';
 import FilterSchema from './PoFilterSchema';
 import { PurchaseOrderImport } from '../PurchaseOrderImport';
@@ -32,6 +36,9 @@ import { PurchaseTopbar } from './PurchaseTableTopbar';
 interface IProps {
   columns?: any[];
 }
+
+const defaultSortedId = 'id';
+
 export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   const queryCache = useQueryClient();
   /* HOOKS HERE */
@@ -47,7 +54,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
     query: '',
-    sortid: 'id',
+    sortid: defaultSortedId,
     pageSize: 10,
   });
 
@@ -111,13 +118,14 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   /*  ////////////// - METHODS HERE - \\\\\\\\\\\\ */
 
   /* ********* PAGINATED QUERY FOR FETCHING DRAFT ORDERS *************** */
+  // `invoices-${ORDER_TYPE.PURCAHSE_ORDER}-${INVOICETYPE.DRAFT}?page=${page}&query=${query}&sort=${sortid}&page_size=${pageSize}`,
   const {
     isLoading,
     data: resolvedData,
     isFetching,
   } = useQuery(
     [
-      `invoices-${ORDER_TYPE.PURCAHSE_ORDER}-${INVOICETYPE.DRAFT}?page=${page}&query=${query}&sort=${sortid}&page_size=${pageSize}`,
+      ReactQueryKeys?.PURCHASEORDERS_KEY,
       INVOICETYPE.ALL,
       INVOICETYPE.DRAFT,
       page,
@@ -132,50 +140,45 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   );
 
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      setAllInvoicesConfig({
-        ...allInvoicesConfig,
-        sortid: 'id',
-        page: pagination.current,
-        pageSize: pagination.pageSize,
-      });
-      const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
-      history.push(route);
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+    if (sorter?.column) {
+      if (sorter.order === 'false') {
+        setAllInvoicesConfig({
+          ...allInvoicesConfig,
+          sortid: defaultSortedId,
+          page: pagination.current,
+          pageSize: pagination.pageSize,
         });
-
-        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
+        const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+        history.push(route);
       } else {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+        setAllInvoicesConfig({
+          ...allInvoicesConfig,
+          page: pagination.current,
+          pageSize: pagination.pageSize,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
         });
-
-        setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
-      }
-      setAllInvoicesConfig({
-        ...allInvoicesConfig,
-        page: pagination.current,
-        pageSize: pagination.pageSize,
-        sortid:
+        const route = `/app${
+          ISupportedRoutes.PURCHASE_ORDER
+        }?tabIndex=draft&sortid=${
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
-            : sorter.field,
-      });
-      const route = `/app${ISupportedRoutes.PURCHASE_ORDER
-        }?tabIndex=draft&sortid=${sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
-        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order
+            : sorter.field
+        }&page=${pagination.current}&page_size=${
+          pagination.pageSize
         }&query=${query}`;
+        history.push(route);
+      }
+    } else {
+      setAllInvoicesConfig({
+        ...allInvoicesConfig,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        sortid: defaultSortedId,
+      });
+      const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=draft&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
       history.push(route);
     }
   };
@@ -188,21 +191,20 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
     };
     await mutateDeleteOrders(payload, {
       onSuccess: () => {
-        ['invoices', 'invoice-view'].forEach((key) => {
-          (queryCache.invalidateQueries as any)((q) => q?.startsWith(`${key}`));
-        });
+        [ReactQueryKeys?.INVOICES_KEYS, ReactQueryKeys.INVOICE_VIEW].forEach(
+          (key) => {
+            (queryCache.invalidateQueries as any)((q) =>
+              q?.startsWith(`${key}`)
+            );
+          }
+        );
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Deleted Successfully');
 
         setSelectedRow([]);
         setConfirmModal(false);
       },
       onError: (error: IServerError) => {
-        if (
-          error &&
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
+        if (error?.response?.data?.message) {
           const { message } = error.response.data;
           notificationCallback(NOTIFICATIONTYPE.ERROR, message);
         } else {
@@ -220,14 +222,29 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   };
 
   useEffect(() => {
-    if (resolvedData && resolvedData.data && resolvedData.data.result) {
-      const { result } = resolvedData.data;
+    if (resolvedData?.data?.result) {
+      const { result, pagination } = resolvedData.data;
       const newResult = [];
-      result.forEach((item, index) => {
+      result?.forEach((item, index) => {
         newResult.push({ ...item, key: item.id });
       });
 
       setAllInvoicesRes({ ...resolvedData.data, result: newResult });
+
+      if (pagination?.next === page + 1) {
+        queryCache?.prefetchQuery(
+          [
+            ReactQueryKeys?.PURCHASEORDERS_KEY,
+            INVOICETYPE.ALL,
+            INVOICETYPE.DRAFT,
+            page + 1,
+            pageSize,
+            query,
+            sortid,
+          ],
+          purchaseOrderList
+        );
+      }
     }
   }, [resolvedData]);
 
@@ -238,7 +255,9 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
     dataIndex: 'owner',
     key: 'owner',
     sorter: false,
-    render: (data) => <span className="capitalize">{data?.profile?.fullName}</span>,
+    render: (data) => (
+      <span className="capitalize">{data?.profile?.fullName}</span>
+    ),
   });
 
   const renerTopRightbar = () => {
@@ -265,6 +284,20 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
   return (
     <ALlWrapper>
       <CommonTable
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => {
+              queryCache.prefetchQuery(
+                [
+                  ReactQueryKeys?.INVOICE_VIEW,
+                  record?.id && record?.id?.toString(),
+                  IInvoiceType.PURCHASE_ORDER,
+                ],
+                findInvoiceByID
+              );
+            },
+          };
+        }}
         pdfExportable={{ columns: pdfColsPO }}
         exportable
         exportableProps={{

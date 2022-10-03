@@ -1,4 +1,4 @@
-import { QueryKey } from '../modal';
+import { IContactTypes, QueryKey } from '@invyce/shared/types';
 import http from '../utils/http';
 
 enum ContactServiceAPI {
@@ -7,11 +7,11 @@ enum ContactServiceAPI {
 }
 
 export const getContacts = ({ queryKey }: QueryKey) => {
-  const type = queryKey[1];
-  const page = queryKey[2];
-  const sortid = queryKey[3];
-  const page_size = queryKey[4];
-  const query = queryKey[5];
+  const type = queryKey[1] || IContactTypes.CUSTOMER;
+  const page = queryKey[2] || 1;
+  const sortid = queryKey[3] || 'id';
+  const page_size = queryKey[4] || 20;
+  const query = queryKey[5] || '';
 
   let url = `${ContactServiceAPI.default}?page_size=${page_size}&page_no=${page}&sort=${sortid}&type=${type}`;
   if (query) {

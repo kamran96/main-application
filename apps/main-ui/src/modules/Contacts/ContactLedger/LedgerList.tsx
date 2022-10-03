@@ -2,22 +2,20 @@ import React, { FC, useEffect, useState } from 'react';
 import { ColumnsType } from 'antd/lib/table';
 import { plainToClass } from 'class-transformer';
 import dayjs from 'dayjs';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import styled from 'styled-components';
-
-import { getContactLedger } from '../../../api';
-import { Loader } from '../../../components/Loader';
-import { BoldText } from '../../../components/Para/BoldText';
-import { SmartFilter } from '../../../components/SmartFilter';
-import { CommonTable } from '../../../components/Table';
+import { findInvoiceByID, getContactLedger } from '../../../api';
+import { Loader, BoldText, SmartFilter, CommonTable } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import {
   IContactLedgerResp,
   IContactLedgerResponse,
   IContactTypes,
   IEntryType,
-} from '../../../modal';
-import { ISupportedRoutes } from '../../../modal/routing';
+  IInvoiceType,
+  ISupportedRoutes,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import moneyFormat from '../../../utils/moneyFormat';
 import FilterSchema from './ledgerFilterSchema';
 import { Link } from 'react-router-dom';
@@ -27,9 +25,11 @@ interface IProps {
   type?: IContactTypes;
 }
 
+const defaultSortedId = 'id';
+
 export const LedgerList: FC<IProps> = ({ id, type }) => {
   const accessor = type === IContactTypes.SUPPLIER ? 'bill' : 'invoice';
-
+  const queryCache = useQueryClient();
   const [{ pagination, result, contact }, setResponse] =
     useState<IContactLedgerResponse>({
       pagination: {},
@@ -43,7 +43,7 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
     query: '',
     page: 1,
     page_size: 20,
-    sortid: 'id',
+    sortid: defaultSortedId,
   });
 
   const { query, page, page_size, sortid } = ledgerConfig;
@@ -61,17 +61,10 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
       });
       setLedgerConfig({ ...ledgerConfig, ...obj });
     }
-  }, [history]);
+  }, []);
 
   const { isLoading, data: resolvedData } = useQuery(
-    [
-      `ledger-contact-${id}?type=${type}&page=${page}&pageSize=${page_size}&query=${query}`,
-      id,
-      type,
-      query,
-      page_size,
-      page,
-    ],
+    [ReactQueryKeys.CONTACT_VIEW, id, type, query, page_size, page],
 
     getContactLedger,
     {
@@ -81,7 +74,7 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
   );
 
   useEffect(() => {
-    if (resolvedData && resolvedData.data && resolvedData.data.result) {
+    if (resolvedData?.data?.result) {
       const resolvedResult = plainToClass(
         IContactLedgerResp,
         resolvedData.data
@@ -145,7 +138,6 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
       dataIndex: 'entryType',
       key: 'entryType',
       render: (data, row, index) => {
-        console.log(row, data, index, 'debit');
         const renderDebit = () => {
           return data === IEntryType.DEBIT || data === IEntryType?.DEBIT_NOTE
             ? moneyFormat(row.amount)
@@ -179,29 +171,48 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
   ];
 
   const handleContactsConfig = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      history.push(
-        `/app${ISupportedRoutes.CONTACTS}/${id}?type=${
-          type === 1 ? 'customer' : 'supplier'
-        }&sortid=${sortid}&page=${pagination.current}&page_size=${
-          pagination.pageSize
-        }&query=${query}`
-      );
-      setLedgerConfig({
-        ...ledgerConfig,
-        sortid: null,
-        page: pagination.current,
-        page_size: pagination.pageSize,
-      });
+    if (sorter?.column) {
+      if (sorter.order === 'false') {
+        history.push(
+          `/app${ISupportedRoutes.CONTACTS}/${id}?type=${
+            type === 1 ? 'customer' : 'supplier'
+          }&sortid=${sortid}&page=${pagination.current}&page_size=${
+            pagination.pageSize
+          }&query=${query}`
+        );
+        setLedgerConfig({
+          ...ledgerConfig,
+          sortid: null,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+        });
+      } else {
+        history.push(
+          `/app${ISupportedRoutes.CONTACTS}?type=${
+            type === 1 ? 'customer' : 'supplier'
+          }&sortid=${
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field
+          }&page=${pagination.current}&page_size=${
+            pagination.pageSize
+          }&query=${query}`
+        );
+        setLedgerConfig({
+          ...ledgerConfig,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
+        });
+      }
     } else {
       history.push(
         `/app${ISupportedRoutes.CONTACTS}?type=${
           type === 1 ? 'customer' : 'supplier'
-        }&sortid=${
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field
-        }&page=${pagination.current}&page_size=${
+        }&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${
           pagination.pageSize
         }&query=${query}`
       );
@@ -209,10 +220,7 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
         ...ledgerConfig,
         page: pagination.current,
         page_size: pagination.pageSize,
-        sortid:
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field,
+        sortid: defaultSortedId,
       });
     }
   };
@@ -248,6 +256,24 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
         </div>
       ) : (
         <CommonTable
+          onRow={(record) => {
+            return {
+              onMouseEnter: () => {
+                queryCache.prefetchQuery(
+                  [
+                    ReactQueryKeys?.INVOICE_VIEW,
+                    type === IContactTypes.CUSTOMER
+                      ? record?.invoiceId?.toString()
+                      : record?.billId?.toString(),
+                    type === IContactTypes.SUPPLIER
+                      ? IInvoiceType.BILL
+                      : IInvoiceType.INVOICE,
+                  ],
+                  findInvoiceByID
+                );
+              },
+            };
+          }}
           printTitle={`${contact?.name.toLocaleUpperCase()} Ledger`}
           size="middle"
           customTopbar={<></>}

@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { Heading } from '../../components/Heading';
+import { Heading } from '@components';
 import { renderRoutes, RouteConfigComponentProps } from 'react-router-config';
 import convertToRem from '../../utils/convertToRem';
 import {
