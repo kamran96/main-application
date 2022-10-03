@@ -23,6 +23,8 @@ export interface IItemsResponse extends IBaseRequest {
 
 export interface IItemViewResult extends IBaseRequest {
   result?: IItemsResult;
+  nextItem?: string;
+  prevItem?: string;
 }
 
 export interface IItemsResult extends IBase {

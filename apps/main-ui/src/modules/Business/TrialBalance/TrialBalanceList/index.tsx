@@ -4,7 +4,10 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
 
-import { TrialbalanceAPI } from '../../../../api';
+import {
+  TrialbalanceAPI,
+  AccountTrailBalanceReportsApi,
+} from '../../../../api';
 import {
   Heading,
   SmartFilter,
@@ -49,7 +52,7 @@ export const TrialBalanceList: FC = () => {
 
   const { data, isLoading, isFetched } = useQuery(
     [`report-trialbalance-query=${query}`, query],
-    TrialbalanceAPI
+    AccountTrailBalanceReportsApi
   );
 
   useEffect(() => {

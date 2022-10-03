@@ -8,6 +8,7 @@ import {
   getContactLedger,
   getInvoiceListAPI,
 } from '../../../api';
+// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 import {
   PurchaseListTopbar,
   ButtonTag,
@@ -242,7 +243,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
               {
                 queryKey: [
                   ReactQueryKeys?.INVOICE_VIEW,
-                  record?.id,
+                  record?.id.toString(),
                   IInvoiceType.INVOICE,
                 ],
                 fn: findInvoiceByID,

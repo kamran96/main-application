@@ -125,7 +125,6 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
   /* LOCAL STATES */
   const [emailModal, setEmailModal] = useState(false);
   const [tableData, setTableData] = useState<IInvoiceItem[]>([]);
-  const [dueDate, setDueDate] = useState(false);
 
   /* LOCAL STATES ENDS HERE */
 

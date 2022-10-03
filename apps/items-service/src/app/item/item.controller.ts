@@ -80,15 +80,21 @@ export class ItemController {
   }
 
   @Get('/:id')
-  async show(@Param() params: ParamsDto): Promise<IItemWithResponse> {
+  async show(
+    @Req() req: IRequest,
+    @Param() params: ParamsDto
+  ): Promise<IItemWithResponse> {
     try {
       const item = await this.itemService.FindById(params.id);
+
+      const config = await this.itemService.GetItem(req.user, params.id);
 
       if (item) {
         return {
           message: 'Item created successfull',
           status: true,
           result: item,
+          ...config,
         };
       }
 

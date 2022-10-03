@@ -29,14 +29,19 @@ import {
   Dashboard,
   DebitNote,
 } from '../assets/icons/index';
-import { getContacts, getItemsList, paymentIndexAPI } from '@api';
-import { getInvoiceListAPI } from '@api';
-import { getCreditNotes } from '@api';
-import { purchaseOrderList } from '@api';
-import { getPoListAPI } from '@api';
-import { getAllAccountsAPI } from '@api';
-import { getAllTransactionsAPI } from '@api';
-import { getBankAccountsList } from '@api';
+// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
+import {
+  getContacts,
+  getItemsList,
+  paymentIndexAPI,
+  getInvoiceListAPI,
+  getCreditNotes,
+  purchaseOrderList,
+  getPoListAPI,
+  getAllAccountsAPI,
+  getAllTransactionsAPI,
+  getBankAccountsList,
+} from '@api';
 
 const root = `/app`;
 export const RoutingSchema: IRoutingSchema = {

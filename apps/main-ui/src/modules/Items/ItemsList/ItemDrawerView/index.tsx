@@ -42,24 +42,27 @@ export const ItemsViewContainer: FC<Iprops> = ({
     end: dayjs(),
   });
 
-  const [{ result, message }, setItemDetails] = useState<IItemViewResult>({
-    result: null,
-    message: '',
-  });
+  const [{ result, message, nextItem, prevItem }, setItemDetails] =
+    useState<IItemViewResult>({
+      result: null,
+      message: '',
+      nextItem: '',
+      prevItem: '',
+    });
 
   useEffect(() => {
-    const routeId = location.pathname.split(
-      `${ISupportedRoutes.DASHBOARD_LAYOUT}${ISupportedRoutes.ITEMS}/`
-    )[1];
-    setApiConfig({ ...apiConfig, id: routeId });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location]);
+    if (showItemDetails?.id) {
+      setApiConfig((prev) => {
+        return { ...prev, id: showItemDetails?.id };
+      });
+    }
+  }, [showItemDetails?.id]);
 
   const { data: itemViewResponse } = useQuery(
-    [ReactQueryKeys?.ITEMS_VIEW, showItemDetails?.id],
+    [ReactQueryKeys?.ITEMS_VIEW, apiConfig?.id],
     getItemByIDAPI,
     {
-      enabled: !!showItemDetails?.id,
+      enabled: !!apiConfig?.id,
     }
   );
 
@@ -69,9 +72,41 @@ export const ItemsViewContainer: FC<Iprops> = ({
     }
   }, [itemViewResponse]);
 
+  const handleMutateApiConfig = (id) => {
+    setApiConfig((prev) => {
+      return { ...prev, id };
+    });
+  };
+
   return (
     <ItemDrawer
-      title={<span className="capitalize">{result?.name}</span> || ''}
+      title={
+        (
+          <div>
+            <span className="capitalize mr-10">{result?.name}</span>
+            <span
+              onClick={() => {
+                if (prevItem) {
+                  handleMutateApiConfig(prevItem);
+                }
+              }}
+              className="mr-10 isTagButton"
+            >
+              Prev
+            </span>
+            <span
+              onClick={() => {
+                if (nextItem) {
+                  handleMutateApiConfig(nextItem);
+                }
+              }}
+              className="isTagButton"
+            >
+              Next
+            </span>
+          </div>
+        ) || ''
+      }
       placement="right"
       size={'large'}
       onClose={() => setShowItemsDetails({ visibility: false, id: null })}
