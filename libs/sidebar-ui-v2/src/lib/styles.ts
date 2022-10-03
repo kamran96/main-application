@@ -205,11 +205,11 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
           align-items: center;
           transition: all 0.3s ease-in-out !important;
           border-radius: 5px;
+          padding: 4px 20px 4px 10px !important;
+          color: ${(props: IThemeProps) =>
+            props?.theme?.theme === 'dark' ? '#fff' : '#334d6e'};
 
           a {
-            color: ${(props: IThemeProps) =>
-              props?.theme?.theme === 'dark' ? '#fff' : '#334d6e'};
-            padding: 4px 20px 4px 10px !important;
           }
 
           &:hover {

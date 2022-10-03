@@ -29,6 +29,7 @@ import {
   NOTIFICATIONTYPE,
   IServerError,
   IAccountsResult,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 
 const transactionContext = createContext<Partial<ITranactionContext>>({});
@@ -48,7 +49,7 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
   );
   //state and fetch single data by Id;
   const { data: TransactionData, isLoading: isTransactionLoading } = useQuery(
-    [`transaction-${id}`, id],
+    [ReactQueryKeys.TRANSACTION_KEYS, id],
     getSingleTransactionById,
     {
       enabled: !!id,

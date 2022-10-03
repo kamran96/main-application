@@ -15,6 +15,7 @@ import {
   NOTIFICATIONTYPE,
   IAccountsResult,
   IOrganizationType,
+  ReactQueryKeys,
 } from '@invyce/shared/types';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { AddressForm } from './addressForm';
@@ -206,7 +207,11 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
 
     await mutateAddContact(payload, {
       onSuccess: () => {
-        [`contacts-list`, `all-contacts`, `transactions`].forEach((key) => {
+        [
+          `contacts-list`,
+          `all-contacts`,
+          ReactQueryKeys?.TRANSACTION_KEYS,
+        ].forEach((key) => {
           (queryCache.invalidateQueries as any)((q) => q.startsWith(key));
         });
         if (id) {
@@ -214,7 +219,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
             `contacts-list`,
             `all-contacts`,
             `contact-${id}`,
-            `transactions`,
+            ReactQueryKeys?.TRANSACTION_KEYS,
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q.startsWith(key));
           });

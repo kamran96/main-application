@@ -5,7 +5,9 @@ import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 import {
   deletePurchaseDrafts,
+  findInvoiceByID,
   getAllContacts,
+  getContactLedger,
   getPoListAPI,
 } from '../../../../../api';
 import { CommonTable, SmartFilter, ConfirmModal } from '@components';
@@ -20,6 +22,7 @@ import {
   IContactTypes,
   NOTIFICATIONTYPE,
   ReactQueryKeys,
+  IInvoiceType,
 } from '@invyce/shared/types';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
@@ -281,6 +284,40 @@ export const DueExpiredBills: FC<IProps> = ({ columns, activeTab }) => {
   return (
     <ALlWrapper>
       <CommonTable
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => {
+              const prefetchQueries = [
+                {
+                  queryKey: [
+                    ReactQueryKeys?.CONTACT_VIEW,
+                    record?.contactId,
+                    record?.contact?.contactType,
+                    '',
+                    20,
+                    1,
+                  ],
+                  fn: getContactLedger,
+                },
+                {
+                  queryKey: [
+                    ReactQueryKeys?.INVOICE_VIEW,
+                    record?.id && record?.id?.toString(),
+                    IInvoiceType.BILL,
+                  ],
+                  fn: findInvoiceByID,
+                },
+              ];
+
+              for (const CurrentQuery of prefetchQueries) {
+                queryCache.prefetchQuery(
+                  CurrentQuery?.queryKey,
+                  CurrentQuery?.fn
+                );
+              }
+            },
+          };
+        }}
         exportable
         pdfExportable={{ columns: PDFColsBills }}
         exportableProps={{

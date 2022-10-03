@@ -7,9 +7,10 @@ import { useQueryClient, useMutation, useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import {
   deleteAccountsAPI,
+  getAccountLedger,
   getAllAccountsAPI,
   getSecondaryAccounts,
-} from '../../../api/accounts';
+} from '../../../api';
 import { ButtonTag, ConfirmModal, SmartFilter } from '@components';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
@@ -358,6 +359,16 @@ export const AccountsList: FC<IProps> = ({ data }) => {
     <AccountsWrapper ref={ref}>
       <ListWrapper>
         <CommonTable
+          onRow={(record) => {
+            return {
+              onMouseEnter: () => {
+                queryCache.prefetchQuery(
+                  [ReactQueryKeys.ACCOUNT_VIEW, record?.id, 20, 1, ''],
+                  getAccountLedger
+                );
+              },
+            };
+          }}
           pdfExportable={{
             columns: pdfColsAccounts,
           }}

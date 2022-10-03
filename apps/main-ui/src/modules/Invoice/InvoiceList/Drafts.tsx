@@ -5,7 +5,9 @@ import { useQueryClient, useMutation, useQuery, QueryCache } from 'react-query';
 import { InvoiceImports } from './invoiceImports';
 import {
   deleteInvoiceDrafts,
+  findInvoiceByID,
   getAllContacts,
+  getContactLedger,
   getInvoiceListAPI,
 } from '../../../api';
 import {
@@ -26,6 +28,7 @@ import {
   NOTIFICATIONTYPE,
   ISupportedRoutes,
   ReactQueryKeys,
+  IInvoiceType,
 } from '@invyce/shared/types';
 import { useCols } from './commonCol';
 import InvoicesFilterSchema from './InvoicesFilterSchema';
@@ -246,12 +249,7 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
         setConfirmModal(false);
       },
       onError: (error: IServerError) => {
-        if (
-          error &&
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
+        if (error?.response?.data?.message) {
           const { message } = error.response.data;
           notificationCallback(NOTIFICATIONTYPE.ERROR, message);
         }
@@ -283,6 +281,40 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
     <>
       <CommonTable
         pdfExportable={{ columns: PdfCols }}
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => {
+              const prefetchQueries = [
+                {
+                  queryKey: [
+                    ReactQueryKeys?.CONTACT_VIEW,
+                    record?.contactId,
+                    record?.contact?.contactType,
+                    '',
+                    20,
+                    1,
+                  ],
+                  fn: getContactLedger,
+                },
+                {
+                  queryKey: [
+                    ReactQueryKeys?.INVOICE_VIEW,
+                    record?.id && record?.id?.toString(),
+                    IInvoiceType.INVOICE,
+                  ],
+                  fn: findInvoiceByID,
+                },
+              ];
+
+              for (const CurrentQuery of prefetchQueries) {
+                queryCache.prefetchQuery(
+                  CurrentQuery?.queryKey,
+                  CurrentQuery?.fn
+                );
+              }
+            },
+          };
+        }}
         className="border-top-none"
         exportable
         exportableProps={{

@@ -4,7 +4,9 @@ import React, { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import {
   deleteInvoiceDrafts,
+  findInvoiceByID,
   getAllContacts,
+  getContactLedger,
   getInvoiceListAPI,
 } from '../../../api';
 import { InvoiceImports } from './invoiceImports';
@@ -28,6 +30,7 @@ import {
   IServerError,
   NOTIFICATIONTYPE,
   ReactQueryKeys,
+  IInvoiceType,
 } from '@invyce/shared/types';
 import { useCols } from './commonCol';
 import InvoicesFilterSchema from './InvoicesFilterSchema';
@@ -213,6 +216,40 @@ export const OverDueInvoices: FC<IProps> = ({ columns }) => {
   return (
     <>
       <CommonTable
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => {
+              const prefetchQueries = [
+                {
+                  queryKey: [
+                    ReactQueryKeys?.CONTACT_VIEW,
+                    record?.contactId,
+                    record?.contact?.contactType,
+                    '',
+                    20,
+                    1,
+                  ],
+                  fn: getContactLedger,
+                },
+                {
+                  queryKey: [
+                    ReactQueryKeys?.INVOICE_VIEW,
+                    record?.id && record?.id?.toString(),
+                    IInvoiceType.INVOICE,
+                  ],
+                  fn: findInvoiceByID,
+                },
+              ];
+
+              for (const CurrentQuery of prefetchQueries) {
+                queryCache.prefetchQuery(
+                  CurrentQuery?.queryKey,
+                  CurrentQuery?.fn
+                );
+              }
+            },
+          };
+        }}
         pdfExportable={{
           columns: PdfCols,
         }}

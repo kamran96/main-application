@@ -5,7 +5,11 @@ import { Wrapper } from './styles';
 import bxPlus from '@iconify-icons/bx/bx-plus';
 import Icon from '@iconify/react';
 import dayjs from 'dayjs';
-import { ISupportedRoutes, NOTIFICATIONTYPE, ReactQueryKeys } from '@invyce/shared/types';
+import {
+  ISupportedRoutes,
+  NOTIFICATIONTYPE,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import { Link, useHistory } from 'react-router-dom';
 import { Heading, BoldText, BreadCrumbArea, DatePicker } from '@components';
 import TextArea from 'antd/lib/input/TextArea';
@@ -148,7 +152,7 @@ const Editor = () => {
               resetTransactions();
               form.resetFields();
               if (form.getFieldValue('status') === 2) {
-                [`transactions`]?.forEach((key) => {
+                [ReactQueryKeys.TRANSACTION_KEYS]?.forEach((key) => {
                   (queryCache?.invalidateQueries as any)((q) =>
                     q?.queryKey[0]?.toString().startsWith(key)
                   );
@@ -156,7 +160,7 @@ const Editor = () => {
               } else {
                 [
                   ReactQueryKeys.ACCOUNTS_KEYS,
-                  `transactions`,
+                  ReactQueryKeys.TRANSACTION_KEYS,
                   `report-trialbalance`,
                   `report-balance-sheet`,
                 ]?.forEach((key) => {

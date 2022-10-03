@@ -127,7 +127,6 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   useEffect(() => {
     if (resolvedData?.data?.result) {
       const { result, pagination } = resolvedData.data;
-      console.log(pagination, 'pag');
       const newResult = [];
       result.forEach((item, index) => {
         newResult.push({ ...item, key: item.id });
@@ -225,7 +224,6 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
     <CommonTable
       // themeScroll
       onRow={(record) => {
-        console.log(record, 'record');
         return {
           onMouseEnter: () => {
             const prefetchQueries = [
@@ -243,7 +241,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
               {
                 queryKey: [
                   ReactQueryKeys?.INVOICE_VIEW,
-                  record?.id.toString(),
+                  record?.id && record?.id?.toString(),
                   IInvoiceType.INVOICE,
                 ],
                 fn: findInvoiceByID,

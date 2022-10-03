@@ -5,7 +5,9 @@ import styled from 'styled-components';
 
 import {
   deletePurchaseDrafts,
+  findInvoiceByID,
   getAllContacts,
+  getContactLedger,
   getPoListAPI,
 } from '../../../../../api';
 import { ConfirmModal, SmartFilter, CommonTable } from '@components';
@@ -22,6 +24,7 @@ import {
   ORDER_TYPE,
   ISupportedRoutes,
   ReactQueryKeys,
+  IInvoiceType,
 } from '@invyce/shared/types';
 import { PERMISSIONS } from '../../../../../components/Rbac/permissions';
 import { useRbac } from '../../../../../components/Rbac/useRbac';
@@ -267,6 +270,40 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
   return (
     <ALlWrapper>
       <CommonTable
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => {
+              const prefetchQueries = [
+                {
+                  queryKey: [
+                    ReactQueryKeys?.CONTACT_VIEW,
+                    record?.contactId,
+                    record?.contact?.contactType,
+                    '',
+                    20,
+                    1,
+                  ],
+                  fn: getContactLedger,
+                },
+                {
+                  queryKey: [
+                    ReactQueryKeys?.INVOICE_VIEW,
+                    record?.id && record?.id?.toString(),
+                    IInvoiceType.BILL,
+                  ],
+                  fn: findInvoiceByID,
+                },
+              ];
+
+              for (const CurrentQuery of prefetchQueries) {
+                queryCache.prefetchQuery(
+                  CurrentQuery?.queryKey,
+                  CurrentQuery?.fn
+                );
+              }
+            },
+          };
+        }}
         pdfExportable={{ columns: PDFColsBills }}
         exportable
         exportableProps={{

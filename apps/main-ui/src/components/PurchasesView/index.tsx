@@ -80,8 +80,6 @@ interface IInvoiceOptions {
 export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
   /* ******API STAKE******* */
 
-  console.log(id, type, 'ivoice');
-
   const APISTAKE_APPROVED =
     type === 'PO' ? pushDraftToPurchaseAPI : pushDraftToInvoiceAPI;
   /* ******API STAKE ENDS HERE******* */

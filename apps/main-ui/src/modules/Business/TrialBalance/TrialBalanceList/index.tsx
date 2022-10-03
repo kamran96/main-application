@@ -4,10 +4,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
 
-import {
-  TrialbalanceAPI,
-  AccountTrailBalanceReportsApi,
-} from '../../../../api';
+import { TrialbalanceAPI, getTribalanceReport } from '../../../../api';
 import {
   Heading,
   SmartFilter,
@@ -46,13 +43,14 @@ export const TrialBalanceList: FC = () => {
         const split = item.split('=');
         obj = { ...obj, [split[0]]: split[1] };
       });
+
       setConfig({ ...config, ...obj });
     }
   }, [history]);
 
   const { data, isLoading, isFetched } = useQuery(
     [`report-trialbalance-query=${query}`, query],
-    AccountTrailBalanceReportsApi
+    getTribalanceReport
   );
 
   useEffect(() => {
