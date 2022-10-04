@@ -406,13 +406,10 @@ export class AuthService {
           HttpStatus.BAD_REQUEST
         );
       } else {
-        console.log(body, 'updating..');
-
         const usr = await this.userModel.findOne({
           email: body.email,
         });
 
-        console.log(usr, 'user');
         await this.userModel.updateOne(
           {
             email: body.email,

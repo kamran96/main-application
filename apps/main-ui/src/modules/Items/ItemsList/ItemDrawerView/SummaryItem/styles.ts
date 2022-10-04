@@ -73,6 +73,9 @@ export const WrapperItemsView = styled.div`
 
 export const ItemDrawer = styled(Drawer)`
   .ant-drawer-body {
-    padding-top: 0px;
+    /* padding-top: 0px; */
+    background-color: ${(props: IThemeProps) =>
+      props?.theme?.colors?.layoutBg} !important;
+    padding: 16px;
   }
 `;

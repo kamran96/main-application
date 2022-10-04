@@ -1,7 +1,7 @@
 import { FilterType } from '@invyce/shared/types';
 
 export default {
-  name: {
+  username: {
     type: FilterType.SEARCH,
     label: 'User Name',
     value: '',

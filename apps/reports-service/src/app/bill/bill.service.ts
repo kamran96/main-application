@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { aql } from 'arangojs';
-import { DB } from '../arangodb/arango.service';
+import * as dayjs from 'dayjs';
+import { Arango } from '../arangodb/arango.service';
 import { BillSchema } from '../schemas/bill.schema';
 
 @Injectable()
 export class BillService {
   async CreateBill(data) {
     // await DB.collection('bills').drop();
+    const DB = await Arango();
 
     const billCollection = await (
       await DB.listCollections()
@@ -59,6 +61,7 @@ export class BillService {
 
   async CreatePaymentForBill(data) {
     // update payment for bill
+    const DB = await Arango();
 
     for (const d of data) {
       await DB.query(aql`
@@ -71,6 +74,7 @@ export class BillService {
 
   async CreateTransactionForBill(data) {
     // update transaction for bill
+    const DB = await Arango();
 
     const transactionArray = [];
 
@@ -102,5 +106,64 @@ export class BillService {
               FILTER i.billId == ${data.billId}
               UPDATE i WITH { transactions: ${transactionArray} } IN bills
           `);
+  }
+
+  async AgedPayables(user) {
+    const DB = await Arango();
+
+    const addOneDay = dayjs().add(1, 'day').format('YYYY-MM-DD');
+    const oneMonth = dayjs(addOneDay).add(1, 'month').format('YYYY-MM-DD');
+    const oneMonthToTwoMonths = dayjs(oneMonth)
+      .add(1, 'month')
+      .format('YYYY-MM-DD');
+    const twoMonthToThreeMonths = dayjs(oneMonthToTwoMonths)
+      .add(1, 'month')
+      .format('YYYY-MM-DD');
+
+    const current = await DB.query({
+      query: `
+      FOR i IN bills
+        FILTER i.organizationId == @organizationId
+        COLLECT contact = i.contact.name,
+              invoice = i.invoiceNumber,
+              dueDate = i.dueDate
+          AGGREGATE balance = SUM(i.total)
+          RETURN {
+              "current": dueDate <= '${addOneDay}' ? {
+              contact,
+              invoice,
+              dueDate: DATE_FORMAT(dueDate, '%dd-%mmm-%yy'),
+              balance
+              } : {},
+              "oneMonth": dueDate >= '${addOneDay}' and dueDate <= '${oneMonth}' ? {
+              contact,
+              invoice,
+              dueDate: DATE_FORMAT(dueDate, '%dd-%mmm-%yy'),
+              balance
+              } : {},
+              "twoMonths": dueDate >= '${oneMonth}' and dueDate <= '${oneMonthToTwoMonths}' ? {
+                contact,
+              invoice,
+              dueDate: DATE_FORMAT(dueDate, '%dd-%mmm-%yy'),
+              balance
+              } : {},
+              "threeMonths": dueDate >= '${oneMonthToTwoMonths}' and dueDate <= '${twoMonthToThreeMonths}' ? {
+                contact,
+              invoice,
+              dueDate: DATE_FORMAT(dueDate, '%dd-%mmm-%yy'),
+              balance
+              } : {},
+              "overThreeMonths": dueDate >= '${twoMonthToThreeMonths}' ? {
+                contact,
+              invoice,
+              dueDate: DATE_FORMAT(dueDate, '%dd-%mmm-%yy'),
+              balance
+              } : {}
+          }
+      `,
+      bindVars: { organizationId: user.organizationId },
+    });
+
+    return await current.all();
   }
 }

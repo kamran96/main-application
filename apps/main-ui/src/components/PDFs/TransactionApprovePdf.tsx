@@ -32,7 +32,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     fontSize: '10px',
     marginHorizontal: '15px',
-    border: '1px solid #F4F4F4',
+    // border: '1px solid #F4F4F4',
+    border: '1px solid #333',
     fontWeight: 'bold',
     lineHeight: '1.5',
     backgroundColor: '#F4F4F4',
@@ -41,12 +42,14 @@ const styles = StyleSheet.create({
   },
   tableItemOthers: {
     flex: '1 0 100px',
-    borderRight: '1px solid #F4F4F4',
+    // borderRight: '1px solid #F4F4F4',
+    borderRight: '1px solid #333',
     padding: '8px 5px',
   },
   tableItemParticular: {
     flex: '2 0 200px',
-    borderRight: '1px solid #F4F4F4',
+    // borderRight: '1px solid #F4F4F4',
+    borderRight: '1px solid #333',
     padding: '8px 5px',
   },
   tableBody: {
@@ -55,16 +58,16 @@ const styles = StyleSheet.create({
     color: '#272727',
     fontSize: '9px',
     marginHorizontal: '15px',
-    borderLeft: '1px solid #F4F4F4',
-    borderRight: '1px solid #F4F4F4',
-    borderBottom: '1.5px solid #F4F4F4',
+    borderLeft: '1px solid #333',
+    borderRight: '1px solid #333',
+    borderBottom: '1.5px solid #333',
     fontWeight: 'normal',
     lineHeight: '1.5',
     fontFamily: 'Roboto Slab',
   },
   tableCredit: {
     flex: '1 0 100px',
-    borderRight: '1px solid #F4F4F4',
+    borderRight: '1px solid #333',
     padding: '9px 5px',
     display: 'flex',
     flexDirection: 'column',
@@ -78,6 +81,9 @@ const styles = StyleSheet.create({
     paddingTop: '10px',
     paddingBottom: '10px',
     paddingLeft: '40px',
+  },
+  ItemColor: {
+    color: '#6F6F84',
   },
 });
 
@@ -105,14 +111,14 @@ export const TransactionApprovePdf: FC<IProps> = ({ header, resultData }) => {
 
             return (
               <View style={styles.tableBody}>
-                <Text style={styles.tableItemOthers}>
+                <Text style={[styles.tableItemOthers, styles?.ItemColor]}>
                   {dayjs(item.date).format(`MMMM D, YYYY`)}
                 </Text>
 
                 <View style={styles.tableItemParticular}>
                   {debit.map((debitItem: any) => {
                     return (
-                      <Text style={{ padding: '10px 0' }}>
+                      <Text style={{ padding: '10px 0', color: '#6F6F84' }}>
                         {debitItem?.account?.name}
                       </Text>
                     );
@@ -125,15 +131,19 @@ export const TransactionApprovePdf: FC<IProps> = ({ header, resultData }) => {
                       </Text>
                     );
                   })}
-                  <Text style={styles.narration}>({item.narration})</Text>
+                  <Text style={[styles.narration, styles.ItemColor]}>
+                    ({item.narration})
+                  </Text>
                 </View>
 
-                <Text style={styles.tableItemOthers}>{item.ref}</Text>
+                <Text style={[styles.tableItemOthers, styles.ItemColor]}>
+                  {item.ref}
+                </Text>
 
                 <View style={styles.tableItemOthers}>
                   {debit.map((debitItem) => {
                     return (
-                      <Text style={{ padding: '10px 0' }}>
+                      <Text style={{ padding: '10px 0', color: '#6F6F84' }}>
                         {moneyFormat(debitItem?.amount.toFixed(2))}
                       </Text>
                     );
@@ -143,7 +153,7 @@ export const TransactionApprovePdf: FC<IProps> = ({ header, resultData }) => {
                 <View style={styles.tableCredit}>
                   {credit.map((creditItem) => {
                     return (
-                      <Text style={{ padding: '10px 0' }}>
+                      <Text style={{ padding: '10px 0', color: '#6F6F84' }}>
                         {moneyFormat(creditItem?.amount.toFixed(2))}
                       </Text>
                     );

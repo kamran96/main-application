@@ -28,6 +28,7 @@ import { DeleteTransactionsDto, TransactionDto } from '../dto/transaction.dto';
 import { Entries, Host } from '@invyce/global-constants';
 import { ClientProxy } from '@nestjs/microservices';
 import {
+  TRANSACTION_CREATED,
   TRANSACTION_CREATED_FOR_BILL,
   TRANSACTION_CREATED_FOR_INVOICE,
 } from '@invyce/send-email';
@@ -320,6 +321,18 @@ export class TransactionService {
         arr.push(transactionItems);
       }
 
+      const accounts = await getCustomRepository(AccountRepository).find({
+        where: { organizationId: userInfo.organizationId },
+        relations: ['secondaryAccount', 'primaryAccount'],
+      });
+
+      Logger.log('Adding transaction in reporting service');
+      await this.reportService.emit(TRANSACTION_CREATED, {
+        transaction: transaction,
+        transactionItems: arr,
+        accounts: accounts,
+      });
+
       return {
         ...transaction,
         transactionItems: arr,
@@ -373,7 +386,6 @@ export class TransactionService {
 
   async TransactionApi(transactions, user: IBaseUser): Promise<ITransaction> {
     try {
-      console.log('making transaction...');
       if (transactions) {
         const debits = transactions['dr'];
         const credits = transactions['cr'];
@@ -465,6 +477,26 @@ export class TransactionService {
               });
             }
           }
+
+          const accounts = await getCustomRepository(AccountRepository).find({
+            where: { organizationId: user.organizationId },
+            relations: ['secondaryAccount', 'primaryAccount'],
+          });
+
+          const transactionItems = await getCustomRepository(
+            TransactionItemRepository
+          ).find({
+            where: {
+              transactionId: transaction.id,
+            },
+          });
+
+          Logger.log('Adding transaction in reporting service');
+          await this.reportService.emit(TRANSACTION_CREATED, {
+            transaction: transaction,
+            transactionItems: transactionItems,
+            accounts: accounts,
+          });
 
           return transaction;
         }

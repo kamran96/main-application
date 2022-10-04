@@ -782,6 +782,12 @@ export class BillService {
             transactionId: transaction.id,
             entryType: EntryType.CREDIT,
             report: true, // true if report has been created
+            type: 2,
+            contact: contact[0] || {},
+            invoice: {
+              ...bill,
+              invoiceItems: billItems,
+            },
           },
         ];
 
