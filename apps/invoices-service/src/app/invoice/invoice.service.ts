@@ -45,6 +45,7 @@ import {
 import { BillItemRepository } from '../repositories/billItem.repository';
 import { InvoiceDto, InvoiceIdsDto } from '../dto/invoice.dto';
 import {
+  CREATE_CONTACT_LEDGER,
   INVOICE_CREATED,
   INVOICE_UPDATED,
   PO_CREATED,
@@ -644,7 +645,7 @@ export class InvoiceService {
               ...updatedInvoice,
               invoiceId: invoice.id,
               balance: dto.netTotal,
-              data: dto.issueDate,
+              date: dto.issueDate,
               paymentType: PaymentModes.INVOICES,
               transactionId: transaction.id,
               entryType: EntryType.CREDIT,
@@ -847,11 +848,17 @@ export class InvoiceService {
             invoiceId: invoice.id,
             contactId: dto.contactId,
             balance: invoice.netTotal,
-            data: invoice.issueDate,
+            date: invoice.issueDate,
             paymentType: PaymentModes.INVOICES,
             transactionId: transaction.id,
             entryType: EntryType.CREDIT,
             report: true, // true if report has been created
+            type: 1,
+            contact: contact[0] || {},
+            invoice: {
+              ...invoice,
+              invoiceItems,
+            },
           },
         ];
 

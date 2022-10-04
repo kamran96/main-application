@@ -1,4 +1,5 @@
 export * from './lib/global-constants.module';
+import * as fs from 'fs';
 import axios from 'axios';
 
 export enum Integrations {
@@ -87,6 +88,30 @@ export const MQ_HOST = () => {
     process.env['NODE' + '_ENV'] === 'staging'
     ? `amqp://${process.env.RABBIT_USERNAME}:${process.env.RABBIT_PASSWORD}@${process.env.RABBIT_HOST}:${process.env.RABBIT_PORT}`
     : 'amqp://localhost:5672';
+};
+
+export const ARANGO_DB_CONNECTION = () => {
+  if (process.env['NODE' + '_ENV'] === 'production') {
+    return {
+      url: 'https://167.172.4.40:8529',
+      databaseName: 'reports',
+      auth: { username: 'root', password: '' },
+    };
+  } else if (process.env['NODE' + '_ENV'] === 'staging') {
+    return {
+      host: 'https://167.172.4.40:8529',
+      databaseName: 'staging-reports',
+      username: 'root',
+      password: '',
+    };
+  } else {
+    return {
+      host: 'http://127.0.0.1:8529',
+      databaseName: 'reports',
+      username: 'root',
+      password: 'asdf',
+    };
+  }
 };
 
 export const useApiCallback = (route: string) => {

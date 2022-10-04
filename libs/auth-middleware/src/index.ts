@@ -25,7 +25,7 @@ export class Authenticate implements NestMiddleware {
       const token = req.cookies['access_token'];
 
       if (!token) {
-        return 401;
+        throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
       }
 
       const user = await axios.post(

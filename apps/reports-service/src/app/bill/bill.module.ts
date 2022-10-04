@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { Authenticate } from '@invyce/auth-middleware';
 import { BillController } from './bill.controller';
 import { BillService } from './bill.service';
 
@@ -7,4 +8,8 @@ import { BillService } from './bill.service';
   controllers: [BillController],
   providers: [BillService],
 })
-export class BillModule {}
+export class BillModule {
+  configure(route) {
+    route.apply(Authenticate).forRoutes(BillController);
+  }
+}

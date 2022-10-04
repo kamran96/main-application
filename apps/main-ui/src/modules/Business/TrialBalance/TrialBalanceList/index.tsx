@@ -50,7 +50,7 @@ export const TrialBalanceList: FC = () => {
 
   const { data, isLoading, isFetched } = useQuery(
     [`report-trialbalance-query=${query}`, query],
-    TrialbalanceAPI
+    getTribalanceReport
   );
 
   useEffect(() => {

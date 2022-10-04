@@ -8,6 +8,7 @@ import {
   getContactLedger,
   getInvoiceListAPI,
 } from '../../../api';
+// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 import {
   PurchaseListTopbar,
   ButtonTag,

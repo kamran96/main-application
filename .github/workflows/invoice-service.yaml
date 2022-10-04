@@ -122,106 +122,106 @@ jobs:
           git add .
           git commit -m "refactor - updated kustomize kustomization.yaml for staging environment with container image - $CONTAINER_IMAGE_TAG"
           git push -u origin main
-  DeployProd:
-    name: Deploy to production
-    if: github.event.ref == 'refs/heads/main'
-    needs: [DeployStaging]
-    runs-on: ubuntu-latest
-    environment:
-      name: production
-      url: 'https://api.cloud.invyce.com/invoices'
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Checkout
-        uses: actions/checkout@v2
+  # DeployProd:
+  #   name: Deploy to production
+  #   if: github.event.ref == 'refs/heads/main'
+  #   needs: [DeployStaging]
+  #   runs-on: ubuntu-latest
+  #   environment:
+  #     name: production
+  #     url: 'https://api.cloud.invyce.com/invoices'
+  #   steps:
+  #     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
 
-      - name: Use Node ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
+  #     - name: Use Node ${{ matrix.node-version }}
+  #       uses: actions/setup-node@v1
+  #       with:
+  #         node-version: ${{ matrix.node-version }}
       
-      - name: cache node_modules
-        id: cache-node-modules
-        uses: actions/cache@v2
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-build-node-modules-cache-${{ hashFiles('**/yarn.lock') }}
+  #     - name: cache node_modules
+  #       id: cache-node-modules
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: '**/node_modules'
+  #         key: ${{ runner.os }}-build-node-modules-cache-${{ hashFiles('**/yarn.lock') }}
 
-      - name: install dependencies
-        if: steps.cache-node-modules.cache-hit != 'true'
-        run: yarn install --prefer-offline
+  #     - name: install dependencies
+  #       if: steps.cache-node-modules.cache-hit != 'true'
+  #       run: yarn install --prefer-offline
       
-      # INSTALL digital ocean cli
-      - name: Install doctl
-        uses: digitalocean/action-doctl@v2
-        with:
-          token: ${{ secrets.DO_ACCESS_TOKEN }}
+  #     # INSTALL digital ocean cli
+  #     - name: Install doctl
+  #       uses: digitalocean/action-doctl@v2
+  #       with:
+  #         token: ${{ secrets.DO_ACCESS_TOKEN }}
 
-          # Runs a set of commands using the runners shell
-      - name: build required projects
-        run: yarn build invoices-service
+  #         # Runs a set of commands using the runners shell
+  #     - name: build required projects
+  #       run: yarn build invoices-service
       
-      # docker build item service images
-      - name: Build container image
-        run: docker build -f $GITHUB_WORKSPACE/apps/invoices-service/Dockerfile --build-arg NODE_ENV=production -t registry.digitalocean.com/invyce-images/invoices-service:$(echo $GITHUB_SHA | head -c7) .
+  #     # docker build item service images
+  #     - name: Build container image
+  #       run: docker build -f $GITHUB_WORKSPACE/apps/invoices-service/Dockerfile --build-arg NODE_ENV=production -t registry.digitalocean.com/invyce-images/invoices-service:$(echo $GITHUB_SHA | head -c7) .
 
-      # - name: Add IP address to trusted source (managed database)
-      #   uses: GarreauArthur/manage-digital-ocean-managed-database-trusted-sources-gh-action@main
-      #   with:
-      #     action: "add"
-      #     database_id: ${{ secrets.DATABASE_ID }}
-      #     digitalocean_token: ${{ secrets.DO_ACCESS_TOKEN }}
+  #     # - name: Add IP address to trusted source (managed database)
+  #     #   uses: GarreauArthur/manage-digital-ocean-managed-database-trusted-sources-gh-action@main
+  #     #   with:
+  #     #     action: "add"
+  #     #     database_id: ${{ secrets.DATABASE_ID }}
+  #     #     digitalocean_token: ${{ secrets.DO_ACCESS_TOKEN }}
 
-      # Run database migration
-      - name: run db migrations
-        run: yarn run inv_migration_run
-        env: 
-          DB_HOST: ${{ secrets.PROD_DB_HOST }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          INV_DB_NAME: ${{ secrets.INV_DB_NAME }}
-          DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
-          DB_USER: ${{ secrets.DB_USER }}
-          NODE_ENV: 'production'
+  #     # Run database migration
+  #     - name: run db migrations
+  #       run: yarn run inv_migration_run
+  #       env: 
+  #         DB_HOST: ${{ secrets.PROD_DB_HOST }}
+  #         DB_PORT: ${{ secrets.DB_PORT }}
+  #         INV_DB_NAME: ${{ secrets.INV_DB_NAME }}
+  #         DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+  #         DB_USER: ${{ secrets.DB_USER }}
+  #         NODE_ENV: 'production'
 
-      # - name: Remove IP address to trusted source (managed database)
-      #   uses: GarreauArthur/manage-digital-ocean-managed-database-trusted-sources-gh-action@main
-      #   with:
-      #     action: "remove"
-      #     database_id: ${{ secrets.DATABASE_ID }}
-      #     digitalocean_token: ${{ secrets.DO_ACCESS_TOKEN }}
+  #     # - name: Remove IP address to trusted source (managed database)
+  #     #   uses: GarreauArthur/manage-digital-ocean-managed-database-trusted-sources-gh-action@main
+  #     #   with:
+  #     #     action: "remove"
+  #     #     database_id: ${{ secrets.DATABASE_ID }}
+  #     #     digitalocean_token: ${{ secrets.DO_ACCESS_TOKEN }}
 
-      #login to digitalocean for 1200 seconds
-      - name: Log in to DigitalOcean Container Registry with short-lived credentials
-        run: doctl registry login --expiry-seconds 1200
+  #     #login to digitalocean for 1200 seconds
+  #     - name: Log in to DigitalOcean Container Registry with short-lived credentials
+  #       run: doctl registry login --expiry-seconds 1200
      
-      # push image to registry
-      - name: Push service image to DigitalOcean Container Registry
-        run: docker push registry.digitalocean.com/invyce-images/invoices-service:$(echo $GITHUB_SHA | head -c7)
+  #     # push image to registry
+  #     - name: Push service image to DigitalOcean Container Registry
+  #       run: docker push registry.digitalocean.com/invyce-images/invoices-service:$(echo $GITHUB_SHA | head -c7)
       
-      - name: Update deployment file
-        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/invyce-images/invoices-service:'${TAG}'|' $GITHUB_WORKSPACE/apps/invoices-service/src/main.ts
+  #     - name: Update deployment file
+  #       run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/invyce-images/invoices-service:'${TAG}'|' $GITHUB_WORKSPACE/apps/invoices-service/src/main.ts
      
-      - name: Install yq
-        run: |
-          wget https://github.com/mikefarah/yq/releases/download/v4.12.0/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
-          yq --version
-       # Clone git repository with Helm charts, update and push changes
-      - name: Update image tag in Helm git repo
-        run: |
-          CONTAINER_IMAGE_TAG="$(echo $GITHUB_SHA | head -c7)"
-          echo New container image newTag: $CONTAINER_IMAGE_TAG
-          echo Create temporary folder to clone the repo into...
-          TEMP_FOLDER="$(mktemp -d)"
-          echo Clone the repository...
-          git clone -b main "https://zeeshooo:${ACCESS_TOKEN}@github.com/invyce/invyce-ops.git" ${TEMP_FOLDER}
-          cd ${TEMP_FOLDER}/invoices/enviroments/prod
-          ls
-          echo Update kustomize newTag in kustomization.yaml with new image tag
-          CONTAINER_IMAGE_TAG=$CONTAINER_IMAGE_TAG yq e -i '.images[0].newTag = env(CONTAINER_IMAGE_TAG)' ./kustomization.yaml
-          echo 'Container image newTag updated in invoices/enviroments/prod/kustomization.yaml'
-          cd ../
-          git config user.email "zeeshan@invyce.com"
-          git config user.name "zeeshooo"
-          git add .
-          git commit -m "refactor - updated kustomize kustomization.yaml for prod environment with container image - $CONTAINER_IMAGE_TAG"
-          git push -u origin main
+  #     - name: Install yq
+  #       run: |
+  #         wget https://github.com/mikefarah/yq/releases/download/v4.12.0/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
+  #         yq --version
+  #      # Clone git repository with Helm charts, update and push changes
+  #     - name: Update image tag in Helm git repo
+  #       run: |
+  #         CONTAINER_IMAGE_TAG="$(echo $GITHUB_SHA | head -c7)"
+  #         echo New container image newTag: $CONTAINER_IMAGE_TAG
+  #         echo Create temporary folder to clone the repo into...
+  #         TEMP_FOLDER="$(mktemp -d)"
+  #         echo Clone the repository...
+  #         git clone -b main "https://zeeshooo:${ACCESS_TOKEN}@github.com/invyce/invyce-ops.git" ${TEMP_FOLDER}
+  #         cd ${TEMP_FOLDER}/invoices/enviroments/prod
+  #         ls
+  #         echo Update kustomize newTag in kustomization.yaml with new image tag
+  #         CONTAINER_IMAGE_TAG=$CONTAINER_IMAGE_TAG yq e -i '.images[0].newTag = env(CONTAINER_IMAGE_TAG)' ./kustomization.yaml
+  #         echo 'Container image newTag updated in invoices/enviroments/prod/kustomization.yaml'
+  #         cd ../
+  #         git config user.email "zeeshan@invyce.com"
+  #         git config user.name "zeeshooo"
+  #         git add .
+  #         git commit -m "refactor - updated kustomize kustomization.yaml for prod environment with container image - $CONTAINER_IMAGE_TAG"
+  #         git push -u origin main
