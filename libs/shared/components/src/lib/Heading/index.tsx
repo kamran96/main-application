@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { IThemeProps } from '@invyce/shared/invyce-theme';
-import { Color } from '@invyce/shared/types';
 import { convertToRem } from '@invyce/pixels-to-rem';
 
 interface IProps {
@@ -64,7 +63,7 @@ const HeadingWrapper: any = styled.div`
         ? props.color
         : props.theme
         ? props?.theme?.colors?.$LIGHT_BLACK
-        : Color.$LIGHT_BLACK};
+        : `#272727`};
   }
   .headingForm {
     font-style: normal;

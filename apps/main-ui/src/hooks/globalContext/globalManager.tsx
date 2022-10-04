@@ -18,11 +18,12 @@ import {
   IErrorMessages,
   IServerError,
   NOTIFICATIONTYPE,
-} from '../../modal';
+} from '@invyce/shared/types';
 import { IAuth, IUser } from '../../modal/auth';
 import { IRolePermissions } from '../../modal/rbac';
 import { DecriptionData, EncriptData } from '../../utils/encription';
 import { useTheme } from '../useTheme';
+import { IThemeVariables, Themes } from '../useTheme/themeColors';
 import { globalContext, IImportType, IPaymentsModal } from './globalContext';
 import { useHttp } from './useHttp';
 
@@ -76,6 +77,7 @@ interface IAction {
 
 export const GlobalManager: FC<IProps> = ({ children }) => {
   const queryCache = useQueryClient();
+
   /* MUTATIONS */
   const {
     mutate: mutateSendPDF,
@@ -287,6 +289,11 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
     localStorage.clear();
   };
 
+  const usePrefetchQuery = async (queryKey: any[], fn: () => void) => {
+    console.log(queryKey, fn, 'in manager');
+    await queryCache.prefetchQuery(queryKey, fn);
+  };
+
   const handleLogin = async (action: IAction) => {
     switch (action.type) {
       case ILoginActions.LOGIN:
@@ -445,6 +452,8 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   };
 
   const { theme: appTheme, themeLoading } = useTheme(theme);
+
+  const Colors: IThemeVariables = Themes[appTheme];
 
   const checkingUser = isLoading || permissionsFetching;
 
@@ -681,6 +690,8 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
         },
         refetchUser,
         refetchPermissions,
+        Colors,
+        usePrefetchQuery,
       }}
     >
       <WrapperChildren>

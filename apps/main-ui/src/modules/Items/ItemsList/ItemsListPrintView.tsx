@@ -1,8 +1,8 @@
 import { ColumnsType } from 'antd/es/table';
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { PrintHeader } from '../../../components/PrintHeader';
-import { IItemsResult } from '../../../modal/items';
+import { PrintHeader } from '@components';
+import { IItemsResult } from '@invyce/shared/types';
 import moneyFormat from '../../../utils/moneyFormat';
 
 interface IProps {

@@ -8,31 +8,38 @@ import {
   getAllTransactionsAPI,
   updateTransactionDraftStatus,
 } from '../../../../api';
-import { SmartFilter } from '../../../../components/SmartFilter';
-import { CommonTable } from '../../../../components/Table';
+import {
+  SmartFilter,
+  CommonTable,
+  ConfirmModal,
+  PurchaseListTopbar,
+  TransactionApprovePdf,
+  PDFICON,
+  TransactionItem,
+} from '@components';
+
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import {
   IResponseTransactions,
   TransactionsStatus,
-} from '../../../../modal/transaction';
-import { IAccountsResult } from '../../../../modal/accounts';
-import { ISupportedRoutes } from '../../../../modal/routing';
+  IAccountsResult,
+  ISupportedRoutes,
+  NOTIFICATIONTYPE,
+  IServerError,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import moneyFormat from '../../../../utils/moneyFormat';
 import { WrapperTransactionCustomBar, WrapperTransactionsList } from './styles';
 import { TransactionItemTable } from './TransactionItemsTable';
 import transactionsFilterSchema from './transactionsFilterSchema';
-import { ConfirmModal } from '../../../../components/ConfirmModal';
-import { PurchaseListTopbar } from '../../../../components/PurchasesListTopbar';
-import { NOTIFICATIONTYPE, IServerError } from '../../../../modal';
-import { TransactionApprovePdf } from '../../../../components/PDFs/TransactionApprovePdf';
-import { PDFICON } from '../../../../components/Icons';
 import DUMMYLOGO from '../../../../assets/quickbook.png';
 import styled from 'styled-components';
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
 import { PERMISSIONS } from '../../../../components/Rbac/permissions';
 import { useRbac } from '../../../../components/Rbac/useRbac';
-import { TransactionItem } from '../../../../components/PDFs/TransactionSingleItemPdf';
 import { TransactionImport } from '../importTransactions';
+
+const defaultSorterId = 'id';
 
 const DRAFTTransactionsList: FC = () => {
   const queryCache = useQueryClient();
@@ -54,7 +61,7 @@ const DRAFTTransactionsList: FC = () => {
   const [transactionConfig, setTransactionsConfig] = useState({
     page: 1,
     query: '',
-    sortid: 'id',
+    sortid: defaultSorterId,
     page_size: 20,
     status: TransactionsStatus.DRAFT,
   });
@@ -106,35 +113,29 @@ const DRAFTTransactionsList: FC = () => {
 
       setTransactionsConfig({ ...transactionConfig, ...obj });
 
-      const filterType = history.location.search.split('&');
-      const filterIdType = filterType[1];
-      const filterOrder = filterType[4]?.split('=')[1];
+      // const filterType = history.location.search.split('&');
+      // const filterIdType = filterType[1];
+      // const filterOrder = filterType[4]?.split('=')[1];
 
-      if (filterIdType?.includes('-')) {
-        const fieldName = filterIdType?.split('=')[1].split('-')[1];
-        setSortedInfo({
-          order: filterOrder,
-          columnKey: fieldName,
-        });
-      } else {
-        const fieldName = filterIdType?.split('=')[1];
-        setSortedInfo({
-          order: filterOrder,
-          columnKey: fieldName,
-        });
-      }
+      // if (filterIdType?.includes('-')) {
+      //   const fieldName = filterIdType?.split('=')[1].split('-')[1];
+      //   setSortedInfo({
+      //     order: filterOrder,
+      //     columnKey: fieldName,
+      //   });
+      // } else {
+      //   const fieldName = filterIdType?.split('=')[1];
+      //   setSortedInfo({
+      //     order: filterOrder,
+      //     columnKey: fieldName,
+      //   });
+      // }
     }
-  }, [history]);
+  }, []);
 
+  // `transactions?page=${page}&query=${query}&page_size=${page_size}&status=${status}`,
   const { isLoading, data: resolvedData } = useQuery(
-    [
-      `transactions?page=${page}&query=${query}&page_size=${page_size}&status=${status}`,
-      page,
-      page_size,
-      query,
-      status,
-      sortid,
-    ],
+    [ReactQueryKeys.TRANSACTION_KEYS, page, page_size, query, status, sortid],
     getAllTransactionsAPI,
     {
       keepPreviousData: true,
@@ -142,8 +143,8 @@ const DRAFTTransactionsList: FC = () => {
   );
 
   useEffect(() => {
-    if (resolvedData && resolvedData.data && resolvedData.data.result) {
-      const { result } = resolvedData.data;
+    if (resolvedData?.data?.result) {
+      const { result, pagination } = resolvedData.data;
       const newResult = [];
 
       result.forEach((res) => {
@@ -151,6 +152,17 @@ const DRAFTTransactionsList: FC = () => {
       });
 
       setResponse({ ...resolvedData.data, result: newResult });
+
+      if (pagination?.next === page + 1) {
+        queryCache?.prefetchQuery([
+          ReactQueryKeys.TRANSACTION_KEYS,
+          page + 1,
+          page_size,
+          query,
+          status,
+          sortid,
+        ]);
+      }
     }
   }, [resolvedData]);
 
@@ -178,7 +190,7 @@ const DRAFTTransactionsList: FC = () => {
     // console.log(payload, "payload");
     await mutateDeleteTrasaction(payload, {
       onSuccess: () => {
-        ['transactions, transactions?page'].forEach((key) => {
+        [ReactQueryKeys?.TRANSACTION_KEYS].forEach((key) => {
           (queryCache.invalidateQueries as any)((q) =>
             q.queryKey[0].toString().startsWith(key)
           );
@@ -187,12 +199,7 @@ const DRAFTTransactionsList: FC = () => {
         setConfirmModal(false);
       },
       onError: (error: IServerError) => {
-        if (
-          error &&
-          error?.response &&
-          error?.response?.data &&
-          error?.response?.data?.message
-        ) {
+        if (error?.response?.data?.message) {
           const { message } = error?.response?.data;
           notificationCallback(NOTIFICATIONTYPE.ERROR, message);
         }
@@ -205,8 +212,8 @@ const DRAFTTransactionsList: FC = () => {
     await updateTransactionStatus(userId, {
       onSuccess: () => {
         [
-          'transactions, transactions?page',
-          'accounts',
+          ReactQueryKeys.TRANSACTION_KEYS,
+          ReactQueryKeys.ACCOUNTS_KEYS,
           `report-trialbalance`,
           `report-balance-sheet`,
         ].forEach((key) => {
@@ -216,12 +223,7 @@ const DRAFTTransactionsList: FC = () => {
         });
       },
       onError: (error: IServerError) => {
-        if (
-          error &&
-          error?.response &&
-          error?.response?.data &&
-          error?.response?.data?.message
-        ) {
+        if (error?.response?.data?.message) {
           const { message } = error?.response?.data;
           notificationCallback(NOTIFICATIONTYPE.ERROR, message);
         }

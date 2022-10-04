@@ -4,7 +4,7 @@ import { Tooltip } from 'antd';
 import React, { FC } from 'react';
 import styled from 'styled-components';
 
-import { Color, IDashboardSalesOverview } from '../../modal';
+import { IDashboardSalesOverview } from '../../modal';
 import { kValue } from '../../utils/helperFunctions';
 import { Card } from '../Card';
 import { Inflation } from '../Inflation';

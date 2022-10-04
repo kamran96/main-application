@@ -20,6 +20,7 @@ import {
   IServerError,
   ISupportedRoutes,
   NOTIFICATIONTYPE,
+  ReactQueryKeys,
 } from '../../modal';
 import { IContactTypes } from '../../modal';
 import { IInvoiceStatus, IInvoiceType, ITaxTypes } from '../../modal/invoice';
@@ -189,11 +190,11 @@ const Editor: FC<IProps> = ({ type, id }) => {
           ClearAll();
 
           [
-            'invoices',
-            'transactions?page',
-            'items-list',
-            'invoice-view',
-            'ledger-contact',
+            ReactQueryKeys?.INVOICES_KEYS,
+            ReactQueryKeys?.TRANSACTION_KEYS,
+            ReactQueryKeys?.ITEMS_KEYS,
+            ReactQueryKeys?.INVOICE_VIEW,
+            ReactQueryKeys?.CONTACT_VIEW,
             'all-items',
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
@@ -204,13 +205,8 @@ const Editor: FC<IProps> = ({ type, id }) => {
           );
         },
         onError: (error: IServerError) => {
-          if (
-            error &&
-            error.response &&
-            error.response.data &&
-            error.response.data.message
-          ) {
-            const { message } = error.response.data;
+          if (error?.response?.data?.message) {
+            const { message } = error?.response?.data;
             notificationCallback(NOTIFICATIONTYPE.ERROR, message);
           } else {
             notificationCallback(

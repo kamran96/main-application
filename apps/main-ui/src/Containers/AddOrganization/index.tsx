@@ -8,11 +8,7 @@ export const Organizations = () => {
   const { userDetails } = useGlobalContext();
 
   if (userDetails?.organizationId) {
-    return (
-      <>
-        <OrganizationsList />
-      </>
-    );
+    return <OrganizationsList />;
   } else {
     return <OrganizationWidget />;
   }

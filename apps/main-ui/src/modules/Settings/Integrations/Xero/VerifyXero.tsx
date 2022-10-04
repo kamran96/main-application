@@ -5,9 +5,9 @@ import styled from 'styled-components';
 import { XeroVerification } from '../../../../api';
 import { VerifiedIcon } from '../../../../assets/icons';
 import XeroLogo from '../../../../assets/xero.svg';
-import { Loader } from '../../../../components/Loader';
+import { Loader } from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { ISupportedRoutes } from '../../../../modal';
+import { ISupportedRoutes } from '@invyce/shared/types';
 
 export const VerifyXero: FC = () => {
   const { routeHistory } = useGlobalContext();

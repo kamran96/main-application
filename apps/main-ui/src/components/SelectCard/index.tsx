@@ -1,8 +1,9 @@
 import React, { FC, useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { Color, DivProps } from '../../modal';
+import { DivProps } from '../../modal';
 import Icon from '@iconify/react';
 import checkCircle from '@iconify-icons/fe/check-circle';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
 interface IProps {
   label: string;
@@ -74,8 +75,6 @@ interface IWrapperSelectCardProps extends DivProps {
 
 const WrapperSelectCard = styled.div<IWrapperSelectCardProps>`
   position: relative;
-  /* background-color: ${(props: any) =>
-    props.isChecked ? Color.$Secondary : Color.$WHITE}; */
   box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.08);
   border-radius: 10px;
   padding: 14px 18px;
@@ -87,7 +86,9 @@ const WrapperSelectCard = styled.div<IWrapperSelectCardProps>`
   overflow: hidden;
   border: 2px solid;
   border-color: ${(props: any) =>
-    props.isChecked ? Color.$Secondary : Color.$WHITE};
+    props.isChecked
+      ? `${(props: IThemeProps) => props?.theme?.colors?.$Secondary}`
+      : `${(props: IThemeProps) => props?.theme?.colors?.$WHITE}`};
 
   &::after {
     position: absolute;
@@ -111,8 +112,6 @@ const WrapperSelectCard = styled.div<IWrapperSelectCardProps>`
     font-size: 16px;
     line-height: 19px;
     text-transform: capitalize;
-    /* color: ${(props: any) =>
-      props.isChecked ? Color.$WHITE : Color.$BLACK}; */
     margin: 0;
     transition: 0.3s all ease-in-out;
   }
@@ -125,8 +124,6 @@ const WrapperSelectCard = styled.div<IWrapperSelectCardProps>`
     text-transform: capitalize;
     margin: 0;
     transition: 0.3s all ease-in-out;
-    /* color: ${(props: any) =>
-      props.isChecked ? Color.$WHITE : Color.$BLACK}; */
   }
   .select_input {
     width: 100%;
@@ -140,7 +137,9 @@ const WrapperSelectCard = styled.div<IWrapperSelectCardProps>`
   }
   .icon_area {
     color: ${(props: any) =>
-      props.isChecked ? Color.$Secondary : Color.$CHECK_BOX};
+      props.isChecked
+        ? `${(props: IThemeProps) => props?.theme?.colors?.$Secondary}`
+        : `${(props: IThemeProps) => props?.theme?.colors?.$CHECK_BOX}`};
     .icn {
       border-radius: 50%;
       background-color: white;

@@ -4,7 +4,7 @@ import { plainToClass } from 'class-transformer';
 import dayjs from 'dayjs';
 import { Link } from 'react-router-dom';
 import { InvoiceResultClass } from '../../../modal/invoice';
-import { ISupportedRoutes } from '../../../modal/routing';
+import { ISupportedRoutes } from '@invyce/shared/types';
 import moneyFormat from '../../../utils/moneyFormat';
 import { useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -34,7 +34,7 @@ export const useCols = () => {
         });
       }
     }
-  }, [history?.location?.search]);
+  }, []);
 
   const InvoiceColumns: ColumnsType<any> = [
     {

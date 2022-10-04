@@ -3,25 +3,34 @@ import { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 
-import { paymentDeleteAPI, paymentIndexAPI } from '../../../api/payment';
-import { ButtonTag } from '../../../components/ButtonTags';
-import { ConfirmModal } from '../../../components/ConfirmModal';
-import { SmartFilter } from '../../../components/SmartFilter';
-import { CommonTable } from '../../../components/Table';
+import {
+  getContactLedger,
+  paymentDeleteAPI,
+  paymentIndexAPI,
+} from '../../../api';
+import {
+  ButtonTag,
+  ConfirmModal,
+  SmartFilter,
+  CommonTable,
+  PDFICON,
+} from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import FilterSchema from './paymentFilterSchema';
 import {
   IPaymentResponse,
   ISupportedRoutes,
   NOTIFICATIONTYPE,
+  ReactQueryKeys,
   TRANSACTION_MODE,
-} from '../../../modal';
+} from '@invyce/shared/types';
 import { useCols } from './CommonCols';
-import { PDFICON } from '../../../components/Icons';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
 import moneyFormat from '../../../utils/moneyFormat';
 import { PaymentImport } from '../PaymentsImport';
+
+const defaultSortId = 'id';
 
 export const PaymentRecievedList: FC = () => {
   const queryCache = useQueryClient();
@@ -44,19 +53,20 @@ export const PaymentRecievedList: FC = () => {
   const [config, setConfig] = useState({
     page: 1,
     query: '',
-    sortid: 'id',
+    sortid: defaultSortId,
     sortItem: '',
     page_size: 20,
   });
   const { page, query, sortid, page_size } = config;
 
+  // `payments-list?page_no=${page}&sort=${sortid}&page_size=${page_size}&query=${query}=paymentType=recieveables`,\
   const {
     isLoading,
     data: resolvedData,
     isFetching,
   } = useQuery(
     [
-      `payments-list?page_no=${page}&sort=${sortid}&page_size=${page_size}&query=${query}=paymentType=recieveables`,
+      ReactQueryKeys.PAYMENTS_KEYS,
       page,
       sortid,
       page_size,
@@ -69,10 +79,24 @@ export const PaymentRecievedList: FC = () => {
     }
   );
   useEffect(() => {
-    if (resolvedData && resolvedData.data && resolvedData.data.result) {
+    if (resolvedData?.data?.result) {
+      const { pagination } = resolvedData?.data;
       setPaymentResponse(resolvedData.data);
+      if (pagination?.next === page + 1) {
+        queryCache?.prefetchQuery(
+          [
+            ReactQueryKeys.PAYMENTS_KEYS,
+            page,
+            sortid,
+            page_size,
+            query,
+            TRANSACTION_MODE.RECEIVABLES,
+          ],
+          paymentIndexAPI
+        );
+      }
     }
-  }, [resolvedData]);
+  }, []);
 
   const handleDeletePayment = async () => {
     const payload = {
@@ -80,7 +104,11 @@ export const PaymentRecievedList: FC = () => {
     };
     mutatePaymentDelete(payload, {
       onSuccess: () => {
-        ['payments-list?', 'transactions', 'invoices'].forEach((key) => {
+        [
+          ReactQueryKeys.PAYMENTS_KEYS,
+          ReactQueryKeys?.TRANSACTION_KEYS,
+          ReactQueryKeys?.INVOICES_KEYS,
+        ].forEach((key) => {
           (queryCache.invalidateQueries as any)((q) => q.startsWith(`${key}`));
         });
         setSelectedRow([]);
@@ -94,57 +122,48 @@ export const PaymentRecievedList: FC = () => {
   };
 
   const handlePaymentConfig = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      setConfig({
-        ...config,
-        sortid: 'id',
-        sortItem: null,
-        page: pagination.current,
-        page_size: pagination.pageSize,
-      });
-      history.push(
-        `/app${ISupportedRoutes.PAYMENTS}?tabIndex=received&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
-      );
-      
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+    if (sorter?.column) {
+      if (sorter.order === undefined) {
+        setConfig({
+          ...config,
+          sortid: defaultSortId,
+          sortItem: null,
+          page: pagination.current,
+          page_size: pagination.pageSize,
         });
-        setPaymentResponse(prev =>({...prev,  result: userData}))
+        history.push(
+          `/app${ISupportedRoutes.PAYMENTS}?tabIndex=received&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+        );
       } else {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+        history.push(
+          `/app${ISupportedRoutes.PAYMENTS}?tabIndex=received&sortid=${
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field
+          }&page=${pagination.current}&page_size=${
+            pagination.pageSize
+          }&filter=${sorter.order}&query=${query}`
+        );
+        setConfig({
+          ...config,
+          sortItem: sorter.field,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
         });
-       
-        setPaymentResponse(prev =>({...prev,  result: userData}))
       }
+    } else {
       history.push(
-        `/app${ISupportedRoutes.PAYMENTS}?tabIndex=received&sortid=${
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field
-        }&page=${pagination.current}&page_size=${
-          pagination.pageSize
-        }&filter=${sorter.order}&query=${query}`
+        `/app${ISupportedRoutes.PAYMENTS}?tabIndex=received&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`
       );
       setConfig({
         ...config,
-        sortItem: sorter.field,
         page: pagination.current,
         page_size: pagination.pageSize,
-        sortid:
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field,
+        sortid: defaultSortId,
       });
     }
   };
@@ -224,6 +243,16 @@ export const PaymentRecievedList: FC = () => {
   return (
     <WrapperPaymentRecieved>
       <CommonTable
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => {
+              queryCache.prefetchQuery(
+                [ReactQueryKeys?.CONTACT_VIEW, record?.contactId, 1, '', 20, 1],
+                getContactLedger
+              );
+            },
+          };
+        }}
         topbarRightPannel={renderTopbarRight()}
         hasPrint
         printTitle={'Payments Recieved List'}

@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import bxSearchAlt from '@iconify/icons-bx/bx-search-alt';
 import { Icon } from '@iconify/react';
-import { CommonModal } from '../../../components';
+import { CommonModal } from '@components';
 import { useState } from 'react';
 import deleteIcon from '@iconify/icons-carbon/delete';
 interface IProps {

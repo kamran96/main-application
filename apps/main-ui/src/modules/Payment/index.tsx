@@ -2,10 +2,9 @@ import { Button } from 'antd';
 import React, { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { Heading } from '../../components/Heading';
+import { Heading, TableTabs, TableTabsContent } from '@components';
 import { Rbac } from '../../components/Rbac';
 import { PERMISSIONS } from '../../components/Rbac/permissions';
-import { TableTabs, TableTabsContent } from '../../components/TableTabs';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { PaymentPaidList } from './PaymentsList/Payables';
 import { PaymentRecievedList } from './PaymentsList/Recieveables';
@@ -16,7 +15,6 @@ export const PaymentContainer: FC = () => {
   const { history } = routeHistory;
   const { search } = history.location;
 
-  
   useEffect(() => {
     if (!activeTab) {
       setActiveTab('customers');
@@ -33,7 +31,6 @@ export const PaymentContainer: FC = () => {
       }
     }
   }, [search]);
-
 
   return (
     <WrapperPaymentContainer>

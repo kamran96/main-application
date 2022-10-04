@@ -3,7 +3,7 @@ import { useQuery } from 'react-query';
 import styled from 'styled-components';
 import { draftInvoicesSuggestAPI } from '../../../api';
 import { IThemeProps } from '../../../hooks/useTheme/themeColors';
-import { IInvoiceDraftsDashboard } from '../../../modal/invoice';
+import { IInvoiceDraftsDashboard } from '@invyce/shared/types';
 import Data from './var';
 
 export const DraftInvoices: FC = () => {

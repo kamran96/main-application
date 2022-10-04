@@ -8,12 +8,13 @@ import TextArea from 'antd/lib/input/TextArea';
 import dayjs from 'dayjs';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
-import { getAllContacts } from '../../../api';
-import { getBankAccounts } from '../../../api/accounts';
-import { getInvoiceAgainstID, paymentCreateAPI } from '../../../api/payment';
-import { DatePicker } from '../../../components/DatePicker';
-import { FormLabel } from '../../../components/FormLabel';
-import { CommonTable } from '../../../components/Table';
+import {
+  getAllContacts,
+  getBankAccounts,
+  getInvoiceAgainstID,
+  paymentCreateAPI,
+} from '../../../api';
+import { DatePicker, FormLabel, CommonTable } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import {
   IContactType,
@@ -21,8 +22,10 @@ import {
   NOTIFICATIONTYPE,
   PaymentType,
   TRANSACTION_MODE,
-} from '../../../modal';
-import { IInvoiceItem, IInvoiceResult } from '../../../modal/invoice';
+  IInvoiceItem,
+  IInvoiceResult,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import moneyFormat from '../../../utils/moneyFormat';
 import Columns from './columns';
 
@@ -171,13 +174,15 @@ export const PaymentsForm: FC = () => {
       await mutatePayment(payload, {
         onSuccess: () => {
           notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Payment Created');
-          ['all-credit-invoices', 'payments-list', 'invoices'].forEach(
-            (key) => {
-              (queryCache.invalidateQueries as any)((q) =>
-                q?.startsWith(`${key}`)
-              );
-            }
-          );
+          [
+            'all-credit-invoices',
+            ReactQueryKeys.PAYMENTS_KEYS,
+            ReactQueryKeys?.INVOICES_KEYS,
+          ].forEach((key) => {
+            (queryCache.invalidateQueries as any)((q) =>
+              q?.startsWith(`${key}`)
+            );
+          });
           form.resetFields();
 
           _setInvoiceData([

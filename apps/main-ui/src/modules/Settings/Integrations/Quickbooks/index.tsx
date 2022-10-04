@@ -3,15 +3,12 @@ import { FC, useEffect, useState } from 'react';
 import { useMutation } from 'react-query';
 import styled from 'styled-components';
 
-import { QuickbooksIntegrationAPI } from '../../../../api';
+import { QuickbooksIntegrationAPI, QuickbooksFetchAPI } from '../../../../api';
 import Quickbook from '../../../../assets/quickbook.png';
-import { CommonModal } from '../../../../components';
-import { Seprator } from '../../../../components/Seprator';
-import { H3, H4 } from '../../../../components/Typography';
+import { CommonModal, Seprator, H3, H4 } from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
-import { ISupportedRoutes } from '../../../../modal';
-import { QuickbooksFetchAPI } from '../../../../api';
+import { ISupportedRoutes } from '@invyce/shared/types';
 
 export const QuickBooks: FC = () => {
   const [modalVisible, setModalVisible] = useState(false);

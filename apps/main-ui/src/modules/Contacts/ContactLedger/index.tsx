@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Breadcrumb } from 'antd';
 import styled from 'styled-components';
-import { BreadCrumbArea } from '../../../components/BreadCrumbArea';
-import { Heading } from '../../../components/Heading';
-import { TableCard } from '../../../components/TableCard';
+import { BreadCrumbArea, Heading, TableCard } from '@components';
 import { LedgerList } from './LedgerList';
 import { Link } from 'react-router-dom';
-import { ISupportedRoutes } from '../../../modal/routing';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { useQuery } from 'react-query';
 import { getAllContacts } from '../../../api';
-import { IContactType } from '../../../modal';
+import { IContactType, ISupportedRoutes } from '@invyce/shared/types';
 import { Capitalize } from '../../../components/Typography';
 
 export const ContactLedger = () => {

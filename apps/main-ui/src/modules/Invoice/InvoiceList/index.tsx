@@ -2,27 +2,29 @@ import { Button } from 'antd';
 import React, { FC, lazy, Suspense, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-
-import { FallBackLoader } from '../../../components/FallBackLoader';
+import { FallBackLoader, TableTabs, TableTabsContent } from '@components';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
-import { TableTabs, TableTabsContent } from '../../../components/TableTabs';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { ISupportedRoutes } from '../../../modal';
+import { ISupportedRoutes } from '@invyce/shared/types';
 import { useCols } from './commonCol';
 import OverDueInvoices from './Overdue';
+import ALLInvoiceList from './All';
+import AwaitingtInvoiceList from './AwaitingPayment';
+import DraftInvoiceList from './Drafts';
+import PaidtInvoiceList from './Paid';
 
 export const InvoiceList: FC = () => {
   /* Dynamic Imports */
-  const ALLInvoiceList = lazy(() => import('./All'));
-  const AwaitingtInvoiceList = lazy(() => import('./AwaitingPayment'));
-  const DraftInvoiceList = lazy(() => import('./Drafts'));
-  const PaidtInvoiceList = lazy(() => import('./Paid'));
+  // const ALLInvoiceList = lazy(() => import('./All'));
+  // const AwaitingtInvoiceList = lazy(() => import('./AwaitingPayment'));
+  // const DraftInvoiceList = lazy(() => import('./Drafts'));
+  // const PaidtInvoiceList = lazy(() => import('./Paid'));
 
   const { routeHistory } = useGlobalContext();
   const [activeTab, setActiveTab] = useState('');
   const { search } = routeHistory.history.location;
-  const {InvoiceColumns} = useCols();
+  const { InvoiceColumns } = useCols();
   useEffect(() => {
     if (!activeTab) {
       setActiveTab('all');
@@ -58,29 +60,29 @@ export const InvoiceList: FC = () => {
       >
         <>
           <TableTabsContent tab="All" key="all">
-            <Suspense fallback={<FallBackLoader />}>
-              <ALLInvoiceList columns={InvoiceColumns} />
-            </Suspense>
+            <ALLInvoiceList columns={InvoiceColumns} />
+            {/* <Suspense fallback={<FallBackLoader />}>
+            </Suspense> */}
           </TableTabsContent>
           <TableTabsContent tab="Draft" key="draft">
-            <Suspense fallback={<FallBackLoader />}>
-              <DraftInvoiceList columns={InvoiceColumns} />
-            </Suspense>
+            <DraftInvoiceList columns={InvoiceColumns} />
+            {/* <Suspense fallback={<FallBackLoader />}>
+            </Suspense> */}
           </TableTabsContent>
           <TableTabsContent tab="Awating Payment" key="awating_payment">
-            <Suspense fallback={<FallBackLoader />}>
-              <AwaitingtInvoiceList columns={InvoiceColumns} />
-            </Suspense>
+            <AwaitingtInvoiceList columns={InvoiceColumns} />
+            {/* <Suspense fallback={<FallBackLoader />}>
+            </Suspense> */}
           </TableTabsContent>
           <TableTabsContent tab="Paid" key="paid">
-            <Suspense fallback={<FallBackLoader />}>
-              <PaidtInvoiceList columns={InvoiceColumns} />
-            </Suspense>
+            <PaidtInvoiceList columns={InvoiceColumns} />
+            {/* <Suspense fallback={<FallBackLoader />}>
+            </Suspense> */}
           </TableTabsContent>
           <TableTabsContent tab="Overdue" key="due_expired">
-            <Suspense fallback={<FallBackLoader />}>
-              <OverDueInvoices columns={InvoiceColumns} />
-            </Suspense>
+            <OverDueInvoices columns={InvoiceColumns} />
+            {/* <Suspense fallback={<FallBackLoader />}>
+            </Suspense> */}
           </TableTabsContent>
         </>
       </TableTabs>

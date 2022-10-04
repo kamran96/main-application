@@ -8,7 +8,7 @@ import Lock from '@iconify-icons/feather/lock';
 import Bullet from '@iconify-icons/feather/list';
 import Eye from '@iconify-icons/feather/eye';
 
-import { ISupportedRoutes } from '../../../modal';
+import { ISupportedRoutes } from '@invyce/shared/types';
 
 export interface ISettingRoutesSchema {
   tag: string;

@@ -1,10 +1,8 @@
 import { Button } from 'antd';
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { Heading } from '../../../components/Heading';
-import { H4 } from '../../../components/Typography';
+import { Heading, H4, TableCard } from '@components';
 import Dispatch from '../../../assets/Dispatch.png';
-import { TableCard } from '../../../components/TableCard';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 
 export const DispatchingWall: FC = () => {

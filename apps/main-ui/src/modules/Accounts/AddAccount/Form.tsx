@@ -9,13 +9,15 @@ import {
   getAccountCodeAPI,
   getSecondaryAccounts,
 } from '../../../api/accounts';
-import { CommonModal } from '../../../components';
-import { FormLabel } from '../../../components/FormLabel';
+import { CommonModal, FormLabel } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { NOTIFICATIONTYPE } from '../../../modal';
+import {
+  NOTIFICATIONTYPE,
+  ISecondaryAccount,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import convertToRem from '../../../utils/convertToRem';
 import getRangeOfNumbers from '../../../utils/getRangeOfNumbers';
-import { ISecondaryAccount } from './../../../modal/accounts';
 
 const { Option } = Select;
 export const AccountsForm: FC = () => {
@@ -79,7 +81,7 @@ export const AccountsForm: FC = () => {
             NOTIFICATIONTYPE.SUCCESS,
             id ? 'Updated' : 'Created'
           );
-          ['accounts', `account-${id}`]?.forEach((key) => {
+          [ReactQueryKeys.ACCOUNTS_KEYS, `account-${id}`]?.forEach((key) => {
             (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
           });
           setAccountsModalConfig({ visibility: false, id: null });

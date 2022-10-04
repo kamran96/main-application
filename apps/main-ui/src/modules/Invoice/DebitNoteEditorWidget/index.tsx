@@ -1,9 +1,7 @@
 import React, { FC } from 'react';
-import { Heading } from '../../../components/Heading';
-import { TableCard } from '../../../components/TableCard';
+import { Heading, TableCard, BreadCrumbArea } from '@components';
 import { Breadcrumb } from 'antd';
 import { Link, useHistory } from 'react-router-dom';
-import { BreadCrumbArea } from '../../../components/BreadCrumbArea';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { DebitNoteEditor } from './Editor';
 import { ISupportedRoutes } from '@invyce/shared/types';
@@ -17,7 +15,7 @@ export const DebitNoteEditorWidget: FC = () => {
 
   return (
     <>
-      <Heading type='form'>Debit Note</Heading>
+      <Heading type="form">Debit Note</Heading>
       <BreadCrumbArea>
         <Breadcrumb>
           <Breadcrumb.Item>

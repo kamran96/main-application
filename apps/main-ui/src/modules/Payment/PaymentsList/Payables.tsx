@@ -3,14 +3,20 @@ import React, { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 
-import { paymentDeleteAPI, paymentIndexAPI } from '../../../api/payment';
-import { ButtonTag } from '../../../components/ButtonTags';
-import { ConfirmModal } from '../../../components/ConfirmModal';
-import { PDFICON } from '../../../components/Icons';
+import {
+  getContactLedger,
+  paymentDeleteAPI,
+  paymentIndexAPI,
+} from '../../../api';
+import {
+  ButtonTag,
+  ConfirmModal,
+  PDFICON,
+  SmartFilter,
+  CommonTable,
+} from '@components';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
-import { SmartFilter } from '../../../components/SmartFilter';
-import { CommonTable } from '../../../components/Table';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import {
   IPaymentResponse,
@@ -18,10 +24,13 @@ import {
   NOTIFICATIONTYPE,
   ISupportedRoutes,
   TRANSACTION_MODE,
-} from '../../../modal';
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import { PaymentImport } from '../PaymentsImport';
 import { useCols } from './CommonCols';
 import filterSchema from './paymentFilterSchema';
+
+const defaultSortId = 'id';
 
 export const PaymentPaidList: FC = () => {
   const { routeHistory, notificationCallback } = useGlobalContext();
@@ -39,7 +48,7 @@ export const PaymentPaidList: FC = () => {
       pagination: {},
       result: [],
     });
-  
+
   const [selectedRow, setSelectedRow] = useState([]);
   const [filterBar, setFilterbar] = useState(false);
   const [confirmModal, setConfirmModal] = useState(false);
@@ -47,19 +56,20 @@ export const PaymentPaidList: FC = () => {
   const [config, setConfig] = useState({
     page: 1,
     query: '',
-    sortid: 'id',
+    sortid: defaultSortId,
     sortItem: '',
     page_size: 20,
   });
   const { page, query, sortid, page_size } = config;
 
+  // `payments-list?page_no=${page}&sort=${sortid}&page_size=${page_size}&query=${query}&paymentType=payables`,
   const {
     isLoading,
     data: resolvedData,
     isFetching,
   } = useQuery(
     [
-      `payments-list?page_no=${page}&sort=${sortid}&page_size=${page_size}&query=${query}&paymentType=payables`,
+      ReactQueryKeys.PAYMENTS_KEYS,
       page,
       sortid,
       page_size,
@@ -73,10 +83,24 @@ export const PaymentPaidList: FC = () => {
   );
 
   useEffect(() => {
-    if (resolvedData && resolvedData.data && resolvedData.data.result) {
+    if (resolvedData?.data?.result) {
+      const { pagination } = resolvedData?.data;
       setPaymentResponse(resolvedData.data);
+      if (pagination?.next === page + 1) {
+        queryCache?.prefetchQuery(
+          [
+            ReactQueryKeys.PAYMENTS_KEYS,
+            page + 1,
+            sortid,
+            page_size,
+            query,
+            TRANSACTION_MODE.PAYABLES,
+          ],
+          paymentIndexAPI
+        );
+      }
     }
-  }, [resolvedData]);
+  }, []);
 
   /* Payment Delete Async Function */
   const handleDeletePayment = async () => {
@@ -91,18 +115,17 @@ export const PaymentPaidList: FC = () => {
           NOTIFICATIONTYPE.SUCCESS,
           'Payment Deleted Successfully'
         );
-        ['payments-list', 'transactions', 'invoices'].forEach((key) => {
+        [
+          ReactQueryKeys.PAYMENTS_KEYS,
+          ReactQueryKeys?.TRANSACTION_KEYS,
+          ReactQueryKeys?.INVOICES_KEYS,
+        ].forEach((key) => {
           (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
         });
         setConfirmModal(false);
       },
       onError: (error: IServerError) => {
-        if (
-          error &&
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
+        if (error?.response?.data?.message) {
           const { message } = error.response.data;
           notificationCallback(NOTIFICATIONTYPE.ERROR, message);
         } else {
@@ -120,58 +143,51 @@ export const PaymentPaidList: FC = () => {
   const { columns } = useCols();
 
   const handlePaymentConfig = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
+    if (sorter?.column) {
+      if (sorter.order === false) {
+        setConfig({
+          ...config,
+          sortid: defaultSortId,
+          sortItem: null,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+        });
+
+        history.push(
+          `/app${ISupportedRoutes.PAYMENTS}?tabIndex=paid&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+        );
+      } else {
+        history.push(
+          `/app${ISupportedRoutes.PAYMENTS}?tabIndex=paid&sortid=${
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field
+          }&page=${pagination.current}&page_size=${
+            pagination.pageSize
+          }&filter=${sorter.order}&query=${query}`
+        );
+        setConfig({
+          ...config,
+          sortItem: sorter.field,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
+        });
+      }
+    } else {
       setConfig({
         ...config,
-        sortid: 'id',
-        sortItem: null,
-        page: pagination.current,
+        sortid: defaultSortId,
+        page: pagination?.current,
         page_size: pagination.pageSize,
       });
 
       history.push(
-        `/app${ISupportedRoutes.PAYMENTS}?tabIndex=paid&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+        `/app${ISupportedRoutes.PAYMENTS}?tabIndex=paid&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
       );
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
-        });
-        setPaymentResponse(prev =>({...prev,  result: userData}))
-      } else {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
-        });
-       
-        setPaymentResponse(prev =>({...prev,  result: userData}))
-      }
-      history.push(
-        `/app${ISupportedRoutes.PAYMENTS}?tabIndex=paid&sortid=${
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field
-        }&page=${pagination.current}&page_size=${
-          pagination.pageSize
-        }&filter=${sorter.order}&query=${query}`
-      );
-      setConfig({
-        ...config,
-        sortItem: sorter.field,
-        page: pagination.current,
-        page_size: pagination.pageSize,
-        sortid:
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field,
-      });
     }
   };
 
@@ -233,6 +249,16 @@ export const PaymentPaidList: FC = () => {
   return (
     <WrapperPaymentList>
       <CommonTable
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => {
+              queryCache.prefetchQuery(
+                [ReactQueryKeys?.CONTACT_VIEW, record?.contactId, 2, '', 20, 1],
+                getContactLedger
+              );
+            },
+          };
+        }}
         topbarRightPannel={renderTopbarRight()}
         hasPrint
         printTitle={'Payment Paid List'}

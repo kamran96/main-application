@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { Tabs } from 'antd';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import convertToRem from '../../utils/convertToRem';
-import { Color } from '../../modal';
 import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
 const { TabPane } = Tabs;
@@ -88,7 +87,7 @@ const CustomizedTabs: any = styled(Tabs)`
       background: ${(props: IThemeProps) =>
         props?.theme?.colors?.tabBgActive} !important;
       .ant-tabs-tab-btn {
-        color: ${Color.$WHITE};
+        color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE};
       }
     }
   }

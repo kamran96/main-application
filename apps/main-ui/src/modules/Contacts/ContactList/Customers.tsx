@@ -5,23 +5,30 @@ import { ColumnsType } from 'antd/lib/table';
 import { FC, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
-import { deleteContacts, getContacts } from '../../../api/Contact';
-import { ButtonTag } from '../../../components/ButtonTags';
-import { ConfirmModal } from '../../../components/ConfirmModal';
-import { SmartFilter } from '../../../components/SmartFilter';
+import {
+  deleteContacts,
+  getContactLedger,
+  getContacts,
+} from '../../../api/Contact';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { IContactTypes, NOTIFICATIONTYPE } from '../../../modal';
+import { ButtonTag, ConfirmModal, SmartFilter, CommonTable } from '@components';
+import {
+  IContactTypes,
+  NOTIFICATIONTYPE,
+  ReactQueryKeys,
+} from '../../../modal';
 import { IPagination, IServerError } from '../../../modal/base';
 import { ISupportedRoutes } from '../../../modal/routing';
-import { CommonTable } from './../../../components/Table';
 import FilterSchema from './FilterSchema';
-import { ContactListWrapper, ContactMainWrapper } from './styles';
 import { Rbac } from '../../../components/Rbac';
 import { PERMISSIONS } from '../../../components/Rbac/permissions';
+import { ContactListWrapper, ContactMainWrapper } from './styles';
 import moneyFormat from '../../../utils/moneyFormat';
 import ContactsImport from '../ContactsImport';
 import { useHistory } from 'react-router-dom';
 import { pdfCols } from './pdfCols';
+
+const defaultSortId = 'id';
 
 export const Customers: FC = () => {
   /* HOOKS */
@@ -51,6 +58,7 @@ export const Customers: FC = () => {
     useMutation(deleteContacts);
 
   const { routeHistory, notificationCallback } = useGlobalContext();
+
   const history = useHistory();
 
   /* usePagination hook React Query */
@@ -58,7 +66,7 @@ export const Customers: FC = () => {
   /* eg. sortid = name (assending) -name (descending) */
 
   const params: any = [
-    `contacts-list-customers?page_no=${page}&sort=${sortid}&page_size=${page_size}&type=${IContactTypes.CUSTOMER}&query=${query}`,
+    ReactQueryKeys.CONTACTS_KEYS,
     IContactTypes.CUSTOMER,
     page,
     sortid,
@@ -72,6 +80,35 @@ export const Customers: FC = () => {
     isFetching,
   } = useQuery(params, getContacts);
 
+  // ********************COMPONENT LIFE CYCLE HOOKS STARTS HERE******************************
+
+  /* ---------ComponentDidUpdate hook for updaing contactResponse state when successfully API fetches contact list data------- */
+  useEffect(() => {
+    if (resolvedData?.data?.result) {
+      const { result, pagination } = resolvedData.data;
+      const generatedResult = [];
+      result.forEach((item) => {
+        generatedResult.push({ ...item, key: item.id });
+      });
+      setContactResponse(generatedResult);
+      setPaginationData(pagination);
+      if (pagination?.next === page + 1) {
+        queryCache.prefetchQuery(
+          [
+            ReactQueryKeys.CONTACTS_KEYS,
+            IContactTypes.CUSTOMER,
+            page + 1,
+            sortid,
+            page_size,
+            query,
+          ],
+          getContacts
+        );
+      }
+    }
+  }, [resolvedData]);
+
+  // ---------------COMPONENT DID UPDATE WHEN SEARCH PARAMS FOUND --------------//
   useEffect(() => {
     if (routeHistory?.history?.location?.search) {
       let obj = {};
@@ -82,94 +119,64 @@ export const Customers: FC = () => {
       });
 
       setConfig({ ...config, ...obj });
-
-      const filterType = history.location.search.split('&');
-      const filterIdType = filterType[1];
-      const filterOrder = filterType[4]?.split('=')[1];
-
-      if (filterIdType?.includes('-')) {
-        const fieldName = filterIdType?.split('=')[1].split('-')[1];
-        setSortedInfo({
-          order: filterOrder,
-          columnKey: fieldName,
-        });
-      } else {
-        const fieldName = filterIdType?.split('=')[1];
-        setSortedInfo({
-          order: filterOrder,
-          columnKey: fieldName,
-        });
-      }
     }
-  }, [routeHistory]);
+  }, []);
+
+  // ********************COMPONENT LIFE CYCLE HOOKS STARTS HERE******************************
 
   const handleContactsConfig = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      setConfig({
-        ...config,
-        sortid: null,
-        sortItem: null,
-        page: pagination.current,
-        page_size: pagination.pageSize,
-      });
-      history.push(
-        `/app${ISupportedRoutes.CONTACTS}?tabIndex=customers&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
-      );
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...contactsResponse].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+    if (sorter?.column) {
+      if (sorter?.order === false) {
+        setConfig({
+          ...config,
+          sortid: null,
+          sortItem: null,
+          page: pagination.current,
+          page_size: pagination.pageSize,
         });
-        setContactResponse(userData);
+        history.push(
+          `/app${ISupportedRoutes.CONTACTS}?tabIndex=customers&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
+        );
       } else {
-        const userData = [...contactsResponse].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+        setConfig({
+          ...config,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+          sortItem: sorter?.field,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
         });
-        setContactResponse(userData);
+
+        setSortedInfo({
+          order: sorter?.order,
+          columnKey: sorter?.columnKey,
+        });
+
+        history.push(
+          `/app${ISupportedRoutes.CONTACTS}?tabIndex=customers&sortid=${
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field
+          }&page=${pagination.current}&page_size=${
+            pagination.pageSize
+          }&query=${query}`
+        );
       }
+    } else {
       setConfig({
         ...config,
+        sortid: defaultSortId,
         page: pagination.current,
         page_size: pagination.pageSize,
-        sortItem: sorter?.field,
-        sortid:
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field,
       });
-
+      setSortedInfo(null);
       history.push(
-        `/app${ISupportedRoutes.CONTACTS}?tabIndex=customers&sortid=${
-          sorter && sorter.order === 'descend'
-            ? `-${sorter.field}`
-            : sorter.field
-        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-          sorter.order
-        }&query=${query}`
+        `${history?.location?.pathname}?tabIndex=customers&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`
       );
     }
   };
-
-  /* ComponentDidUpdate hook for updaing contactResponse state when successfully API fetches contact list data */
-  useEffect(() => {
-    if (resolvedData && resolvedData.data && resolvedData.data.result) {
-      const { result, pagination } = resolvedData.data;
-      const generatedResult = [];
-      result.forEach((item) => {
-        generatedResult.push({ ...item, key: item.id });
-      });
-      setContactResponse(generatedResult);
-      setPaginationData(pagination);
-    }
-  }, [resolvedData]);
 
   /* columns setup antd table */
   const columns: ColumnsType<any> = [
@@ -251,12 +258,7 @@ export const Customers: FC = () => {
         setConfirmModal(false);
       },
       onError: (error: IServerError) => {
-        if (
-          error &&
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
+        if (error?.response?.data?.message) {
           const { message } = error.response.data;
           notificationCallback(NOTIFICATIONTYPE.ERROR, `${message}`);
         }
@@ -330,6 +332,16 @@ export const Customers: FC = () => {
       <ContactListWrapper>
         <div className="table_container">
           <CommonTable
+            onRow={(record) => {
+              return {
+                onMouseEnter: () => {
+                  queryCache.prefetchQuery(
+                    [ReactQueryKeys?.CONTACT_VIEW, record?.id, 1, '', 20, 1],
+                    getContactLedger
+                  );
+                },
+              };
+            }}
             exportable
             pdfExportable={{ columns: pdfCols }}
             printTitle={'Customers List'}
@@ -340,12 +352,12 @@ export const Customers: FC = () => {
             columns={columns}
             loading={isFetching || isLoading}
             onChange={handleContactsConfig}
-            totalItems={paginationData.total}
+            totalItems={paginationData.totalDocs}
             pagination={{
               pageSize: page_size,
               position: ['bottomRight'],
               current: paginationData.page_no,
-              total: paginationData.total,
+              total: paginationData.totalDocs,
             }}
             hasfooter={true}
             onSelectRow={onSelectedRow}

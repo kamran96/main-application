@@ -2,47 +2,39 @@
 import printIcon from '@iconify-icons/bytesize/print';
 import { Card } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import {
-  FC,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  lazy,
-  Suspense,
-} from 'react';
+import { FC, useEffect, useMemo, useRef, useState, lazy } from 'react';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
 import { BalanceSheetAPI } from '../../../../api';
-import { ButtonTag } from '../../../../components/ButtonTags';
-import { Heading } from '../../../../components/Heading';
 import {
-  BoldText,
+  ButtonTag,
+  Heading,
+  SmartFilter,
+  Capitalize,
+  P,
+  PDFICON,
+  BalanceSheetPdf,
   BOLDTEXT,
   MeduimText,
-} from '../../../../components/Para/BoldText';
-import { PrintFormat } from '../../../../components/PrintFormat';
-import {
-  PrintHeaderFormat,
-  TableDivisions,
-} from '../../../../components/PrintHeader';
-import {
   Addressbar,
   TopbarLogoWithDetails,
-} from '../../../../components/PrintHeader/Formats';
-import { SmartFilter } from '../../../../components/SmartFilter';
-import { Capitalize, P } from '../../../../components/Typography';
+  PrintHeaderFormat,
+  TableDivisions,
+} from '@components';
+import { PrintFormat } from '../../../../components/PrintFormat';
+
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { IThemeProps } from '@invyce/shared/invyce-theme';
-import { DivProps, ISupportedRoutes } from '../../../../modal';
-import { IAccountsResult } from '../../../../modal/accounts';
+import {
+  DivProps,
+  ISupportedRoutes,
+  IAccountsResult,
+} from '@invyce/shared/types';
 import moneyFormat from '../../../../utils/moneyFormat';
 import printDiv from '../../../../utils/Print';
 import FilterSchema from './filterSchema';
 import DUMMYLOGO from '../../../../assets/quickbook.png';
-import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
-import { PDFICON } from '../../../../components/Icons';
-import { BalanceSheetPdf } from '../../../../components/PDFs/BalanceSheetPdf';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 
 interface IBalanceSheetConfig {
   columns: ColumnsType<any>;
@@ -139,9 +131,7 @@ export const BalanceSheetList: FC = () => {
       const { result } = data.data;
 
       setTotals(() => {
-
-        const newRes = result
-        ?.map((item) => {
+        const newRes = result?.map((item) => {
           return {
             ...item?.accounts?.reduce((a, b) => {
               // debugger;
@@ -157,9 +147,11 @@ export const BalanceSheetList: FC = () => {
             totalDebits:
               item?.type === ITransactionType?.DEBIT ? item?.balance : 0,
           };
-        })
+        });
 
-        return newRes?.length &&  newRes?.reduce((a, b) => {
+        return (
+          newRes?.length &&
+          newRes?.reduce((a, b) => {
             return {
               totalCredits: a?.totalCredits + b?.totalCredits,
               totalDebits: a?.totalDebits + b?.totalDebits,
@@ -168,7 +160,8 @@ export const BalanceSheetList: FC = () => {
               opening_credits: a?.opening_credits + b?.opening_credits,
               opening_debits: a?.opening_debits + b?.opening_debits,
             };
-          });
+          })
+        );
       });
 
       setBalanceSheet(result);
@@ -198,31 +191,31 @@ export const BalanceSheetList: FC = () => {
             <P className="dark-text"></P>
           </div>
           <div className="_disable_print flex alignCenter">
-           {balanceSheetData?.length>0 && (
+            {balanceSheetData?.length > 0 && (
               <PDFDownloadLinkWrapper
-              document={
-                <BalanceSheetPdf
-                  totals={{
-                    totalCredits,
-                    totalDebits,
-                    closing_credits,
-                    closing_debits,
-                    opening_credits,
-                    opening_debits,
-                  }}
-                  header={headerprops}
-                  balanceSheetData={balanceSheetData}
-                  searchquery={searchedQueryItem}
-                />
-              }
-            >
-              <div className="flex alignCenter">
-                <PDFICON className="flex alignCenter mr-5" />
+                document={
+                  <BalanceSheetPdf
+                    totals={{
+                      totalCredits,
+                      totalDebits,
+                      closing_credits,
+                      closing_debits,
+                      opening_credits,
+                      opening_debits,
+                    }}
+                    header={headerprops}
+                    balanceSheetData={balanceSheetData}
+                    searchquery={searchedQueryItem}
+                  />
+                }
+              >
+                <div className="flex alignCenter">
+                  <PDFICON className="flex alignCenter mr-5" />
 
-                <span> Download PDF</span>
-              </div>
-            </PDFDownloadLinkWrapper>
-           )}
+                  <span> Download PDF</span>
+                </div>
+              </PDFDownloadLinkWrapper>
+            )}
             <ButtonTag
               className="mh-10"
               onClick={onPrint}
@@ -230,7 +223,7 @@ export const BalanceSheetList: FC = () => {
               size="middle"
               icon={printIcon}
             />
-            
+
             <SmartFilter
               formSchema={FilterSchema}
               onFilter={(query) => {
@@ -421,7 +414,7 @@ export const BalanceSheetList: FC = () => {
                           </td>
                           <td>
                             <MeduimText>
-                              {moneyFormat(closing_credits.toFixed(2)|| 0)}
+                              {moneyFormat(closing_credits.toFixed(2) || 0)}
                             </MeduimText>
                           </td>
                         </>

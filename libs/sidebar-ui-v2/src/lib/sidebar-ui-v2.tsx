@@ -18,6 +18,7 @@ import LogOut from '@iconify-icons/feather/log-out';
 import Setting from '@iconify-icons/feather/settings';
 import Sun from '@iconify-icons/feather/sun';
 import Moon from '@iconify-icons/feather/moon';
+import { useQueryClient } from 'react-query';
 
 export interface IActiveUserInfo {
   username: string;
@@ -36,6 +37,7 @@ export interface SidebarUiProps {
   onLogOut?: () => void;
   onThemeButtonClick?: () => void;
   userOnline?: boolean;
+  onPrefetch?: (queryKey?: any[], fn?: () => void) => void;
 }
 
 interface IPopOverProps {
@@ -43,6 +45,7 @@ interface IPopOverProps {
 }
 const MenuPopOver: FC<IPopOverProps> = ({ route }) => {
   const history = useHistory();
+  const queryClient = useQueryClient();
 
   const _activeIndex: any = route?.children?.findIndex(
     (i) => i?.route === history?.location?.pathname
@@ -57,6 +60,17 @@ const MenuPopOver: FC<IPopOverProps> = ({ route }) => {
             className={`popover_list_item mv-4 ${
               _activeIndex === index ? 'active_child' : ''
             }`}
+            onMouseOver={async () => {
+              if (
+                childRoute?.queryKey?.length &&
+                childRoute?.fn &&
+                childRoute?.fn !== undefined
+              ) {
+                for (const item of childRoute?.prefetchQueries) {
+                  queryClient.prefetchQuery(item?.queryKey, item?.fn);
+                }
+              }
+            }}
           >
             <Link
               className="fs-14"
@@ -101,8 +115,10 @@ export const SidebarUi: FC<SidebarUiProps> = ({
   onThemeButtonClick,
   userOnline,
   appLogo,
+  onPrefetch,
 }) => {
   const history = useHistory();
+  const queryClient = useQueryClient();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [openNavAncorIndex, setOpenNavAncorIndex] = useState<number | null>(
@@ -192,6 +208,20 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                       <MenuPopOver route={parent} />
                     ) : !parent?.children?.length ? (
                       <li
+                        onMouseOver={async () => {
+                          if (
+                            parent?.queryKey?.length &&
+                            parent?.fn &&
+                            parent?.fn !== undefined
+                          ) {
+                            for (const item of parent?.prefetchQueries) {
+                              queryClient.prefetchQuery(
+                                item?.queryKey,
+                                item?.fn
+                              );
+                            }
+                          }
+                        }}
                         className={`route_list_item flex alignCenter pointer mv-4
                     ${
                       history?.location?.pathname === parent?.route
@@ -214,7 +244,7 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                       <li>
                         <div
                           className={`route_list_item_parent sub_route_parent flex alignCenter justifySpaceBetween pointer mv-6 ${
-                            index === openNavAncorIndex ? 'active_child' : ''
+                            index === openNavAncorIndex ? 'active_route' : ''
                           }`}
                           onClick={(e) => handleShowSubMenu(e, index)}
                         >
@@ -244,19 +274,33 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                             {parent?.children.map(
                               (item: any, index: number) => {
                                 return (
-                                  <li
-                                    key={index}
-                                    className={` pointer ${
-                                      history?.location?.pathname ===
-                                      item?.route
-                                        ? 'active_route'
-                                        : ''
-                                    }`}
-                                  >
-                                    <Link to={item?.route}>
+                                  <Link to={item?.route}>
+                                    <li
+                                      onMouseOver={async () => {
+                                        if (
+                                          item?.queryKey?.length &&
+                                          item?.fn &&
+                                          item?.fn !== undefined
+                                        ) {
+                                          for (const CurrItem of item?.prefetchQueries) {
+                                            queryClient.prefetchQuery(
+                                              CurrItem?.queryKey,
+                                              CurrItem?.fn
+                                            );
+                                          }
+                                        }
+                                      }}
+                                      key={index}
+                                      className={` pointer mv-2 ${
+                                        history?.location?.pathname ===
+                                        item?.route
+                                          ? 'active_route'
+                                          : ''
+                                      }`}
+                                    >
                                       <span>{item?.tag}</span>
-                                    </Link>
-                                  </li>
+                                    </li>
+                                  </Link>
                                 );
                               }
                             )}
@@ -270,38 +314,40 @@ export const SidebarUi: FC<SidebarUiProps> = ({
             </ul>
           </div>
           <hr className="seprator mt-20" />
-        <div className="quickaccess_routes">
-          <h5 className="ph-24 fs-13 head">Create New</h5>
-          <div className="mt-10">
-            <ul className="route_list">
-              {routes?.singleEntity?.map((singleEntryRoute, index) => {
-                return (
-                  <li
-                    key={index}
-                    className={`route_list_item flex alignCenter pointer mv-4 
+          <div className="quickaccess_routes">
+            <h5 className="ph-24 fs-13 head">Create New</h5>
+            <div className="mt-10">
+              <ul className="route_list">
+                {routes?.singleEntity?.map((singleEntryRoute, index) => {
+                  return (
+                    <li
+                      key={index}
+                      className={`route_list_item flex alignCenter pointer mv-4 
                     ${
                       history?.location?.pathname === singleEntryRoute?.route
                         ? 'active_route'
                         : ''
                     }
                     `}
-                  >
-                    <Link
-                      className="flex alignCenter fs-14"
-                      to={singleEntryRoute?.route as string}
                     >
-                      <span className="mr-10 flex alignCenter icon">
-                        {singleEntryRoute?.icon}
-                      </span>
-                      <span className="route_tag">{singleEntryRoute?.tag}</span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+                      <Link
+                        className="flex alignCenter fs-14"
+                        to={singleEntryRoute?.route as string}
+                      >
+                        <span className="mr-10 flex alignCenter icon">
+                          {singleEntryRoute?.icon}
+                        </span>
+                        <span className="route_tag">
+                          {singleEntryRoute?.tag}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
         <div className="sidebar_bottom">
           <li
             className={`route_list_item theme_changer flex alignCenter pointer
@@ -324,13 +370,13 @@ export const SidebarUi: FC<SidebarUiProps> = ({
             </Button>
           </li>
           <li
-            onClick={() =>{
+            onClick={() => {
               history.push({
                 pathname: `/app/settings/profile-settings`,
                 state: {
                   from: history.location.pathname,
                 },
-              })
+              });
             }}
             className={`route_list_item flex alignCenter pointer   
                     `}

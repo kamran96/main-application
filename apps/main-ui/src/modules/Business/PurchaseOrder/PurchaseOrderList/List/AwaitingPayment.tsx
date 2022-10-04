@@ -1,30 +1,34 @@
 import React, { FC, useEffect, useState } from 'react';
 import Button from 'antd/es/button';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import styled from 'styled-components';
-import { getInvoiceListAPI } from '../../../../../api';
+import { findInvoiceByID, getInvoiceListAPI } from '../../../../../api';
 import { Action } from '../../../../../components/Common';
 import { CommonTable } from '../../../../../components/Table';
 import {
   IInvoiceResponse,
   INVOICETYPE,
   ORDER_TYPE,
-} from '../../../../../modal/invoice';
+  ISupportedRoutes,
+  ReactQueryKeys,
+  IInvoiceType,
+} from '@invyce/shared/types';
 import convertToRem from '../../../../../utils/convertToRem';
 import { Link } from 'react-router-dom';
-import { useCols} from './CommonCol';
-import {useHistory} from "react-router-dom"
-import {ISupportedRoutes } from '../../../../../modal';
+import { useCols } from './CommonCol';
+import { useHistory } from 'react-router-dom';
 interface IProps {
   columns?: any[];
 }
+const defaultSortedId = 'id';
 export const AwaitingPayment: FC<IProps> = ({ columns }) => {
   const [allInvoicesConfig, setAllInvoicesConfig] = useState({
     page: 1,
     query: '',
-    sortid: '',
+    sortid: defaultSortedId,
     pageSize: 10,
   });
+  const queryCache = useQueryClient();
 
   const [selectedRow, setSelectedRow] = useState([]);
 
@@ -35,16 +39,17 @@ export const AwaitingPayment: FC<IProps> = ({ columns }) => {
     });
 
   const { page, query, sortid, pageSize } = allInvoicesConfig;
-  const {pdfColsPO, _csvColumns } = useCols();
+  const { pdfColsPO, _csvColumns } = useCols();
   const history = useHistory();
 
+  // `awaitingPayment_purchaseOrders?page=${page}&query=${query}&sort=${sortid}&page_size=${pageSize}`,
   const {
     isLoading,
     data: resolvedData,
     isFetching,
   } = useQuery(
     [
-      `awaitingPayment_purchaseOrders?page=${page}&query=${query}&sort=${sortid}&page_size=${pageSize}`,
+      ReactQueryKeys.PURCHASEORDERS_KEY,
       ORDER_TYPE.PURCAHSE_ORDER,
       INVOICETYPE.Payment_Awaiting,
       page,
@@ -62,66 +67,74 @@ export const AwaitingPayment: FC<IProps> = ({ columns }) => {
   };
 
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      setAllInvoicesConfig({
-        ...allInvoicesConfig,
-        sortid: null,
-        page: pagination.current,
-        pageSize: pagination.pageSize,
-      });
-      const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=all&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
-      history.push(route);
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+    if (sorter?.column) {
+      if (sorter.order === 'false') {
+        setAllInvoicesConfig({
+          ...allInvoicesConfig,
+          sortid: defaultSortedId,
+          page: pagination.current,
+          pageSize: pagination.pageSize,
         });
-        
-        setAllInvoicesRes(prev =>({...prev,  result: userData}))
+        const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=all&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+        history.push(route);
       } else {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+        setAllInvoicesConfig({
+          ...allInvoicesConfig,
+          page: pagination.current,
+          pageSize: pagination.pageSize,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
         });
-        
-        setAllInvoicesRes(prev =>({...prev,  result: userData}))
-      }
-      setAllInvoicesConfig({
-        ...allInvoicesConfig,
-        page: pagination.current,
-        pageSize: pagination.pageSize,
-        sortid:
+
+        const route = `/app${
+          ISupportedRoutes.PURCHASE_ORDER
+        }?tabIndex=all&sortid=${
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
-            : sorter.field,
+            : sorter.field
+        }&page=${pagination.current}&page_size=${
+          pagination.pageSize
+        }&query=${query}`;
+        history.push(route);
+      }
+    } else {
+      setAllInvoicesConfig({
+        ...allInvoicesConfig,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        sortid: defaultSortedId,
       });
 
-      const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=all&sortid=${
-        sorter && sorter.order === 'descend'
-          ? `-${sorter.field}`
-          : sorter.field
-      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=all&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
       history.push(route);
     }
-  }
-
+  };
 
   useEffect(() => {
-    if (resolvedData && resolvedData.data && resolvedData.data.result) {
-      const { result } = resolvedData.data;
+    if (resolvedData?.data?.result) {
+      const { result, pagination } = resolvedData.data;
       const newResult = [];
       result.forEach((item, index) => {
         newResult.push({ ...item, key: item.id });
       });
 
       setAllInvoicesRes({ ...resolvedData.data, result: newResult });
+      if (pagination?.next === page + 1) {
+        queryCache?.prefetchQuery(
+          [
+            ReactQueryKeys?.PURCHASEORDERS_KEY,
+            INVOICETYPE.ALL,
+            INVOICETYPE.DRAFT,
+            page + 1,
+            pageSize,
+            query,
+            sortid,
+          ],
+          getInvoiceListAPI
+        );
+      }
     }
   }, [resolvedData]);
 
@@ -156,6 +169,20 @@ export const AwaitingPayment: FC<IProps> = ({ columns }) => {
   return (
     <ALlWrapper>
       <CommonTable
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => {
+              queryCache.prefetchQuery(
+                [
+                  ReactQueryKeys?.INVOICE_VIEW,
+                  record?.id && record?.id?.toString(),
+                  IInvoiceType.PURCHASE_ORDER,
+                ],
+                findInvoiceByID
+              );
+            },
+          };
+        }}
         pdfExportable={{ columns: pdfColsPO }}
         exportable
         exportableProps={{

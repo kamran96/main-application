@@ -6,8 +6,7 @@ import Icon from '@iconify/react';
 import { Button, Modal } from 'antd';
 import React, { FC, ReactNode } from 'react';
 import styled from 'styled-components';
-
-import { Color } from '../../modal';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
 interface IProps {
   visible: boolean;
@@ -132,10 +131,10 @@ const WrapperConfirmModal = styled(Modal)`
       color: #ff0000;
     }
     .mention-icon {
-      color: ${Color.$PRIMARY};
+      color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
     }
     .info-icon {
-      color: ${Color.$PRIMARY};
+      color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
     }
     .warning-icon {
       color: #ffb100;

@@ -301,6 +301,10 @@ input:-webkit-autofill:active {
   -o-transition: none !important;
 }
 
+/* Link */
+
+
+
 /* BUTTON */
 
 .ant-btn {
@@ -421,4 +425,18 @@ input:-webkit-autofill:active {
 
 .ant-form-vertical .ant-form-item-label {
   padding: 0 2px 2px 0 !important;
+}
+
+.isTagButton{
+  font-size: 13px;
+  background-color: #7988ff54;
+  padding: 3px 8px;
+  border-radius: 5px;
+  transition: 0.3s all ease-in-out;
+  cursor: pointer;
+}
+
+.isTagButton:hover{
+  background-color: #7988ff;
+  color: #eee
 }

@@ -5,7 +5,8 @@ import { Icon } from '@iconify/react';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import bxsEdit from '@iconify/icons-bx/bxs-edit';
 import convertToRem from '../../utils/convertToRem';
-import { Color } from '../../modal';
+import { useGlobalContext } from '../../hooks/globalContext/globalContext';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
 interface IActionProps {
   componentType: 'icon' | 'text';
@@ -20,6 +21,7 @@ export const Action: FC<IActionProps> = ({
   onClick,
   className,
 }) => {
+  const { Colors } = useGlobalContext();
   return (
     <WrapperAction className={className} onClick={onClick}>
       {componentType === 'icon' ? (
@@ -27,7 +29,7 @@ export const Action: FC<IActionProps> = ({
           <Icon
             style={{
               fontSize: convertToRem(20),
-              color: Color.$GRAY,
+              color: Colors.$GRAY,
               cursor: 'pointer',
             }}
             icon={
@@ -50,12 +52,12 @@ export const Action: FC<IActionProps> = ({
 
 const WrapperAction = styled.div`
   .delete {
-    color: ${Color.$THEME_RED};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$THEME_RED};
   }
   .edit {
-    color: ${Color.$PRIMARY};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
   }
   .archive {
-    color: ${Color.$LIGHT_BLACK};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$LIGHT_BLACK};
   }
 `;

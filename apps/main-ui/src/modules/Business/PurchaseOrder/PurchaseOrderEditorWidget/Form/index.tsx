@@ -7,23 +7,28 @@ import dayjs from 'dayjs';
 import { FC, useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Link, useHistory } from 'react-router-dom';
-
-import { getAllContacts, getInvoiceNumber } from '../../../../../api';
-import { CreatePurchaseOrderAPI } from '../../../../../api/purchaseOrder';
-import { ConfirmModal } from '../../../../../components/ConfirmModal';
-import { DatePicker } from '../../../../../components/DatePicker';
-import { FormLabel } from '../../../../../components/FormLabel';
-import { PrintFormat } from '../../../../../components/PrintFormat';
-import { PrintViewPurchaseWidget } from '../../../../../components/PurchasesWidget/PrintViewPurchaseWidget';
-import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
+import {
+  getAllContacts,
+  getInvoiceNumber,
+  CreatePurchaseOrderAPI,
+} from '../../../../../api';
+import {
+  ConfirmModal,
+  DatePicker,
+  FormLabel,
+  PrintFormat,
+  PrintViewPurchaseWidget,
+} from '@components';
 import {
   IContactType,
   IContactTypes,
   IInvoiceTypes,
   NOTIFICATIONTYPE,
-} from '../../../../../modal';
-import { ISupportedRoutes } from '../../../../../modal/routing';
+  ISupportedRoutes,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import printDiv, { DownloadPDF } from '../../../../../utils/Print';
+import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import {
   PurchaseOrderWidgetManager,
   usePurchaseOrderContext,
@@ -198,11 +203,11 @@ const Editor: FC<IProps> = ({ id }) => {
             },
           ]);
           [
-            'invoices',
-            'transactions?page',
-            'items-list',
-            'invoice-view',
-            'ledger-contact',
+            ReactQueryKeys?.INVOICES_KEYS,
+            ReactQueryKeys?.TRANSACTION_KEYS,
+            ReactQueryKeys?.ITEMS_KEYS,
+            ReactQueryKeys.INVOICE_VIEW,
+            ReactQueryKeys.CONTACT_VIEW,
             'all-items',
             `purchase-order-${id}`,
           ].forEach((key) => {

@@ -1,8 +1,7 @@
 import React, { FC, useState } from 'react';
 import { ColumnsType } from 'antd/lib/table';
 import { G } from '@react-pdf/renderer';
-import { EditableSelect } from '../../../../components/Editable';
-import { Option } from '../../../../components/CommonSelect';
+import { Option, EditableSelect } from '@components';
 import { EditableTable } from '@invyce/editable-table';
 import { Heading } from '@invyce/shared/components';
 import Paragraph from 'antd/lib/typography/Paragraph';
@@ -25,7 +24,8 @@ const a = [
   {
     label: 'ref',
     keyName: 'ref',
-    description: 'Please select a field which is related to ref of transactions',
+    description:
+      'Please select a field which is related to ref of transactions',
   },
   {
     label: 'Narrations',
@@ -54,7 +54,8 @@ const a = [
   {
     label: 'Stock',
     keyName: 'stock',
-    description: 'Please select a field which is related to Stocks of transactions',
+    description:
+      'Please select a field which is related to Stocks of transactions',
   },
   {
     label: 'Web Link',
@@ -65,12 +66,14 @@ const a = [
   {
     label: 'Skype Name',
     keyName: 'skypeName',
-    description: 'Please select a field which is related to Skype Name of transactions',
+    description:
+      'Please select a field which is related to Skype Name of transactions',
   },
   {
     label: 'Fax Number',
     keyName: 'faxNumber',
-    description: 'Please select a field which is related to Fax Number of transactions',
+    description:
+      'Please select a field which is related to Fax Number of transactions',
   },
   {
     label: 'Cell Number',
@@ -93,7 +96,8 @@ const a = [
   {
     label: 'payments Name',
     keyName: 'paymentsName',
-    description: 'Please select a field which is related to payments Name of transactions',
+    description:
+      'Please select a field which is related to payments Name of transactions',
   },
   {
     label: 'Payments Mode',
@@ -103,12 +107,14 @@ const a = [
   {
     label: 'Comment',
     keyName: 'comment',
-    description: 'Please select a field which is related to Email of transactions',
+    description:
+      'Please select a field which is related to Email of transactions',
   },
   {
     label: 'Contact',
     keyName: 'contact',
-    description: 'Please select a field which is related to Name of transactions',
+    description:
+      'Please select a field which is related to Name of transactions',
   },
 ];
 

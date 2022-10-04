@@ -1,10 +1,8 @@
-import React, { SFC } from 'react';
-import { Heading } from '../../components/Heading';
+import React, { FC } from 'react';
+import { Heading } from '@components';
 import { DashboardWrapper } from '../../Layout/DashboardStyles';
 
-interface IProps {}
-
-export const Dashboard: SFC<IProps> = ({}) => {
+export const Dashboard: FC = () => {
   return (
     <DashboardWrapper>
       <Heading type="container">Dashboard</Heading>

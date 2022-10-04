@@ -2,9 +2,10 @@ import React, { SFC } from 'react';
 import styled from 'styled-components';
 import { Card } from '../Card';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
-import { Color } from '../../modal';
+
 import convertToRem from '../../utils/convertToRem';
 import { H4, P } from '../Typography';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
 export const SystemMessages: SFC = () => {
   const { userDetails } = useGlobalContext();
@@ -33,10 +34,10 @@ const WrapperWellcome = styled.div`
     padding: ${convertToRem(8)} ${convertToRem(38)};
 
     h4 {
-      color: ${Color.$WHITE};
+      color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE};
     }
     p {
-      color: ${Color.$WHITE};
+      color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE};
       padding: ${convertToRem(8)} 0;
     }
   }

@@ -2,7 +2,7 @@
 import { Button } from 'antd';
 import React, { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Color, ISupportedRoutes } from '../../modal';
+import { ISupportedRoutes } from '../../modal';
 import { Card } from '../Card';
 import { Seprator } from '../Seprator';
 import { H4 } from '../Typography';
@@ -13,7 +13,7 @@ import bxPlus from '@iconify-icons/bx/bx-plus';
 import * as echarts from 'echarts';
 import { useWindowSize } from '../../utils/useWindowSize';
 import { useQuery } from 'react-query';
-import { InvoicePIEchartAPI } from '../../api/mainDashboard';
+import { InvoicePIEchartAPI } from '../../api';
 import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
 export const InvoiceOverview: FC = () => {
@@ -23,7 +23,7 @@ export const InvoiceOverview: FC = () => {
   const [width, height] = useWindowSize();
   const pieWidth = width >= 1200 && width <= 1320 ? '297px' : '333px';
 
-  const { data: responseData, isLoading: isFetching } = useQuery(
+  const { data: responseData, isLoading: isFetching } = useQuery<any>(
     [`pie-chart-maindashboard`],
     InvoicePIEchartAPI
   );

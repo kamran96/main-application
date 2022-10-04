@@ -1,7 +1,6 @@
 import styled from 'styled-components';
-import { Color } from '../../../../modal';
 import convertToRem from '../../../../utils/convertToRem';
-import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
+import { ITheme, IThemeProps } from '../../../../hooks/useTheme/themeColors';
 
 export const WrapperInvoiceForm = styled.div`
   margin: 0 0 ${convertToRem(20)} 0;
@@ -38,7 +37,7 @@ export const WrapperInvoiceForm = styled.div`
 
     .deleteActionIcon {
       font-size: ${convertToRem(20)};
-      color: ${Color.$LIGHT_BLACK};
+      color: ${(props: IThemeProps) => props?.theme?.colors?.$LIGHT_BLACK};
     }
   }
 

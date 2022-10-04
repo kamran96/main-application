@@ -7,8 +7,10 @@ import {
   getAllContacts,
   getCreditNotes,
   deleteCreditNoteAPI,
+  getContactLedger,
+  findInvoiceByID,
 } from '../../../api';
-import { CommonTable } from '../../../components/Table';
+import { CommonTable, ButtonTag, SmartFilter, ConfirmModal } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import {
   IInvoiceType,
@@ -16,17 +18,17 @@ import {
   ISupportedRoutes,
   NOTIFICATIONTYPE,
   IServerError,
-} from '../../../modal';
-import { IInvoiceResponse } from '../../../modal/invoice';
-import { ButtonTag } from '../../../components/ButtonTags';
+  IInvoiceResponse,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import editSolid from '@iconify-icons/clarity/edit-solid';
-import { SmartFilter } from '../../../components/SmartFilter';
 import FilteringSchema from './FilteringSchema';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import { useCols } from './commonCols';
-import { ConfirmModal } from '../../../components/ConfirmModal';
 import { useHistory } from 'react-router-dom';
 import { ImportCreditNote } from './ImportCreditNote';
+
+const defaultSortedId = 'id';
 
 export const AprovedCreditNotes: FC = () => {
   const queryCache = useQueryClient();
@@ -61,9 +63,11 @@ export const AprovedCreditNotes: FC = () => {
 
   /* API CALLS STACKS GOES HERE */
   /* PAGINATED QUERY TO FETCH CREDIT NOTES WITH PAGINATION */
+
+  // `credit-notes?page=${page}&type=${1}&pageSize=${pageSize}&query=${query}`,
   const { data: creditNoteListData, isLoading } = useQuery(
     [
-      `credit-notes?page=${page}&type=${1}&pageSize=${pageSize}&query=${query}`,
+      ReactQueryKeys?.CREDITNOTE_KEYS,
       1, // this specifies APPROVED CREDIT NOTES
       page,
       pageSize,
@@ -108,10 +112,26 @@ export const AprovedCreditNotes: FC = () => {
 
       setCreditNoteConfig({ ...creditNoteConfig, ...obj });
     }
-  }, [location]);
+  }, []);
+
   useEffect(() => {
-    if (creditNoteListData?.data?.result) {
+    if (creditNoteListData?.data) {
       setCreditNoteResponse(creditNoteListData?.data);
+
+      if (creditNoteListData?.data?.pagination?.next === page + 1) {
+        queryCache?.prefetchQuery(
+          [
+            ReactQueryKeys?.CREDITNOTE_KEYS,
+            1, // this specifies APPROVED CREDIT NOTES
+            page + 1,
+            pageSize,
+            IInvoiceType.CREDITNOTE,
+            query,
+            sortid,
+          ],
+          getCreditNotes
+        );
+      }
     }
   }, [creditNoteListData]);
   /* COMPONENT DID UPDATE HERE */
@@ -124,54 +144,47 @@ export const AprovedCreditNotes: FC = () => {
   };
 
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      setCreditNoteConfig({
-        ...creditNoteConfig,
-        page: pagination.current,
-        sortid: 'id',
-        pageSize: pagination.pageSize,
-      });
-      const route = `/app${ISupportedRoutes.CREDIT_NOTES}?tabIndex=aproved&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
-      history.push(route);
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+    if (sorter?.column) {
+      if (sorter.order === 'false') {
+        setCreditNoteConfig({
+          ...creditNoteConfig,
+          page: pagination.current,
+          sortid: defaultSortedId,
+          pageSize: pagination.pageSize,
         });
-
-        setCreditNoteResponse((prev) => ({ ...prev, result: userData }));
+        const route = `/app${ISupportedRoutes.CREDIT_NOTES}?tabIndex=aproved&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+        history.push(route);
       } else {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+        setCreditNoteConfig({
+          ...creditNoteConfig,
+          page: pagination.current,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
+          pageSize: pagination.pageSize,
         });
 
-        setCreditNoteResponse((prev) => ({ ...prev, result: userData }));
-      }
-      setCreditNoteConfig({
-        ...creditNoteConfig,
-        page: pagination.current,
-        sortid:
+        const route = `/app${
+          ISupportedRoutes.CREDIT_NOTES
+        }?tabIndex=aproved&sortid=${
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
-            : sorter.field,
+            : sorter.field
+        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+          sorter.order
+        }&query=${query}`;
+        history.push(route);
+      }
+    } else {
+      setCreditNoteConfig({
+        ...creditNoteConfig,
+        page: pagination.current,
+        sortid: defaultSortedId,
         pageSize: pagination.pageSize,
       });
 
-      const route = `/app${
-        ISupportedRoutes.CREDIT_NOTES
-      }?tabIndex=aproved&sortid=${
-        sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field
-      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-        sorter.order
-      }&query=${query}`;
+      const route = `/app${ISupportedRoutes.CREDIT_NOTES}?tabIndex=aproved&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
       history.push(route);
     }
   };
@@ -182,13 +195,14 @@ export const AprovedCreditNotes: FC = () => {
       {
         onSuccess: () => {
           [
-            'invoices',
-            'transactions',
-            'items-list',
-            'invoice-view',
-            'ledger-contact',
+            ReactQueryKeys?.INVOICES_KEYS,
+            ReactQueryKeys?.TRANSACTION_KEYS,
+            ReactQueryKeys?.ITEMS_KEYS,
+            ReactQueryKeys.INVOICE_VIEW,
+            ReactQueryKeys.CONTACT_VIEW,
             'all-items',
             'ACCRECCREDIT',
+            ReactQueryKeys?.CREDITNOTE_KEYS,
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) =>
               q?.queryKey[0]?.toString()?.startsWith(`${key}`)
@@ -260,6 +274,40 @@ export const AprovedCreditNotes: FC = () => {
   return (
     <CreditNoteWrapper>
       <CommonTable
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => {
+              const prefetchQueries = [
+                {
+                  queryKey: [
+                    ReactQueryKeys?.CONTACT_VIEW,
+                    record?.contactId,
+                    record?.contact?.contactType,
+                    '',
+                    20,
+                    1,
+                  ],
+                  fn: getContactLedger,
+                },
+                {
+                  queryKey: [
+                    ReactQueryKeys?.INVOICE_VIEW,
+                    record?.id && record?.id?.toString(),
+                    IInvoiceType.CREDITNOTE,
+                  ],
+                  fn: findInvoiceByID,
+                },
+              ];
+
+              for (const CurrentQuery of prefetchQueries) {
+                queryCache.prefetchQuery(
+                  CurrentQuery?.queryKey,
+                  CurrentQuery?.fn
+                );
+              }
+            },
+          };
+        }}
         pdfExportable={{ columns: pdfCols }}
         loading={isLoading}
         columns={columns}

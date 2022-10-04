@@ -5,16 +5,17 @@ import { Button } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import { deleteCategoryAPI, getCategoriesAPI } from '../../api';
-import { ButtonTag } from '../../components/ButtonTags';
-import { ConfirmModal } from '../../components/ConfirmModal';
-import { Heading } from '../../components/Heading';
+import {
+  ButtonTag,
+  ConfirmModal,
+  Heading,
+  SmartFilter,
+  CommonTable,
+} from '@components';
 import { Rbac } from '../../components/Rbac';
 import { PERMISSIONS } from '../../components/Rbac/permissions';
-import { SmartFilter } from '../../components/SmartFilter';
-import { CommonTable } from '../../components/Table';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
-import { NOTIFICATIONTYPE } from '../../modal';
-import { ICategoriesGetResponse } from '../../modal/categories';
+import { NOTIFICATIONTYPE, ICategoriesGetResponse } from '@invyce/shared/types';
 import { ChildCategory } from './ChildCategories';
 import { Columns } from './columns';
 import { WrapperCategoriesContainer } from './styles';

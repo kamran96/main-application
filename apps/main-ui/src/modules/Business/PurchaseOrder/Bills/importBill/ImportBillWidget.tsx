@@ -1,4 +1,4 @@
-import { CommonModal } from '../../../../../components';
+import { CommonModal } from '@components';
 import React, { FC, useState } from 'react';
 import { useGlobalContext } from '../../../../../hooks/globalContext/globalContext';
 import bookHalf from '@iconify/icons-bi/book-half';
@@ -11,7 +11,7 @@ import { CompareDataModal } from './CompareDataModal';
 import { CompareDataTable } from './CompareDataTable';
 import { ReactQueryKeys } from '../../../../../modal';
 import { InvoiceImportManager } from '../../../../Invoice/InvoiceImportManager';
-import { getBillsKeysApi } from '../../../../../api/bills';
+import { getBillsKeysApi } from '../../../../../api';
 
 interface Idata {
   xero: {

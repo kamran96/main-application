@@ -3,21 +3,27 @@ import { Button, Col, Row, Select } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
-import { getAllItems, StockUpdateAPI } from '../../../api';
-import CommonSelect from '../../../components/CommonSelect';
-import { Editable, EditableSelect } from '../../../components/Editable';
-import { Heading } from '../../../components/Heading';
-import { CommonTable } from '../../../components/Table';
-import { TableCard } from '../../../components/TableCard';
-import { IItemsResult } from '../../../modal/items';
+import { getAllItems, StockUpdateAPI, getAllAccounts } from '../../../api';
+import {
+  CommonSelect,
+  Editable,
+  EditableSelect,
+  Heading,
+  CommonTable,
+  TableCard,
+} from '@components';
+import {
+  IItemsResult,
+  NOTIFICATIONTYPE,
+  IAccountsResult,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import { WrapperInventoryManagement } from './styles';
 import bxPlus from '@iconify-icons/bx/bx-plus';
 import convertToRem from '../../../utils/convertToRem';
-import { Color, NOTIFICATIONTYPE } from '../../../modal';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { getAllAccounts } from '../../../api/accounts';
-import { IAccountsResult } from '../../../modal';
+import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 
 const { Option } = Select;
 
@@ -281,7 +287,7 @@ export const ManageInventoryForm: FC = () => {
             <Icon
               style={{
                 fontSize: convertToRem(20),
-                color: Color.$GRAY,
+                color: `${(props: IThemeProps) => props?.theme?.colors?.$GRAY}`,
                 cursor: 'pointer',
               }}
               icon={deleteIcon}
@@ -322,7 +328,11 @@ export const ManageInventoryForm: FC = () => {
               NOTIFICATIONTYPE?.SUCCESS,
               'Updated Stocks Successfully'
             );
-            [`all-items`, 'items-list', `transactions?page`]?.forEach((key) => {
+            [
+              `all-items`,
+              ReactQueryKeys?.ITEMS_KEYS,
+              `transactions?page`,
+            ]?.forEach((key) => {
               (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
             });
             resetForm();

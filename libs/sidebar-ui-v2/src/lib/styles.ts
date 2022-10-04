@@ -205,16 +205,17 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
           align-items: center;
           transition: all 0.3s ease-in-out !important;
           border-radius: 5px;
+          padding: 4px 20px 4px 10px !important;
+          color: ${(props: IThemeProps) =>
+            props?.theme?.theme === 'dark' ? '#fff' : '#334d6e'};
 
           a {
-            color: ${(props: IThemeProps) =>
-              props?.theme?.theme === 'dark' ? '#fff' : '#334d6e'};
-            padding: 4px 20px 4px 10px !important;
           }
 
           &:hover {
             background: ${(props: IThemeProps) =>
               props?.theme?.colors?.sidebarListActive};
+            transition: all 0.3s ease-in-out !important;
             a {
               color: ${(props: IThemeProps) =>
                 props?.theme?.colors?.sidebarListActiveText};
@@ -269,7 +270,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
         span svg {
           fill: none;
           stroke: ${(props: IThemeProps) =>
-            props?.theme?.theme === 'dark' ? '#fff' : '#7988FF'};
+            props?.theme?.colors?.sidebarListActiveText};
           /* stroke-width: 1.8px; */
         }
       }
@@ -291,7 +292,6 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
           fill: none;
           stroke: ${(props: IThemeProps) =>
             props?.theme?.theme === 'dark' ? '#fff' : '#272525'};
-          /* stroke-width: 1.8px; */
         }
 
         &:hover {
@@ -304,8 +304,9 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
           span svg {
             fill: none;
             stroke: ${(props: IThemeProps) =>
-              props?.theme?.theme === 'dark' ? '#fff' : '#7988FF'};
+              props?.theme?.colors?.sidebarListActiveText};
             /* stroke-width: 1.8px; */
+            transition: 0.3s all ease-in-out;
           }
         }
       }
@@ -313,14 +314,32 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
     .active_route {
       background: ${(props: IThemeProps) =>
         props?.theme?.colors?.sidebarListActive};
+      transition: 0.3s all ease-in-out;
 
-      a {
+      span {
         color: ${(props: IThemeProps) =>
-          props?.theme?.colors?.sidebarListActiveText};
+          props?.theme?.colors?.sidebarListActiveText} !important;
+
+        svg {
+          fill: none;
+          stroke: ${(props: IThemeProps) =>
+            props?.theme?.colors?.sidebarListActiveText};
+        }
+
         span svg {
           fill: none;
           stroke: ${(props: IThemeProps) =>
-            props?.theme?.theme === 'dark' ? '#fff' : '#7988FF'};
+            props?.theme?.colors?.sidebarListActiveText};
+        }
+      }
+
+      a {
+        color: ${(props: IThemeProps) =>
+          props?.theme?.colors?.sidebarListActiveText} !important;
+        span svg {
+          fill: none;
+          stroke: ${(props: IThemeProps) =>
+            props?.theme?.colors?.sidebarListActiveText};
         }
       }
     }
@@ -450,11 +469,18 @@ export const PopOverListWrapper = styled.ul`
     }
   }
 
-  .active_child a {
-    background: ${(props: IThemeProps) =>
-      props?.theme?.colors?.sidebarListActive};
-    color: ${(props: IThemeProps) =>
-      props?.theme?.colors?.sidebarListActiveText};
+  .active_child {
+    span svg {
+      fill: none;
+      stroke: ${(props: IThemeProps) =>
+        props?.theme?.theme === 'dark' ? '#fff' : '#7988FF'} !important;
+    }
+    a {
+      background: ${(props: IThemeProps) =>
+        props?.theme?.colors?.sidebarListActive} !important;
+      color: ${(props: IThemeProps) =>
+        props?.theme?.colors?.sidebarListActiveText};
+    }
   }
 `;
 

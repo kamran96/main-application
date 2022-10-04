@@ -3,7 +3,7 @@ import { Form, Input, Select, Tabs } from 'antd';
 import { FormLabel } from '../FormLabel';
 import { DatePicker } from '../DatePicker';
 import { useState } from 'react';
-import { PaymentMode } from '../../modal/payment';
+import { PaymentMode } from '@invyce/shared/types';
 import dayjs from 'dayjs';
 import { defaultSettings } from './constants';
 import { PaymentType } from '@invyce/shared/types';

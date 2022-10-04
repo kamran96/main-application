@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { PaymentMode } from '../../../../modal';
+import { PaymentMode } from '@invyce/shared/types';
 
 export default {
   itemId: null,

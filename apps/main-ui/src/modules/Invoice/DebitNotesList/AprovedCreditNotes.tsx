@@ -3,29 +3,39 @@ import dayjs from 'dayjs';
 import React, { FC } from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import styled from 'styled-components';
-import { getAllContacts, getCreditNotes } from '../../../api';
-import { CommonTable } from '../../../components/Table';
+import {
+  findInvoiceByID,
+  getAllContacts,
+  getContactLedger,
+  getCreditNotes,
+} from '../../../api';
+import { CommonTable, ButtonTag, SmartFilter, PDFICON } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { IContactTypes, IInvoiceType, ISupportedRoutes } from '../../../modal';
-import { IInvoiceResponse } from '../../../modal/invoice';
-import { ButtonTag } from '../../../components/ButtonTags';
+import {
+  IContactTypes,
+  IInvoiceType,
+  ISupportedRoutes,
+  IInvoiceResponse,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import editSolid from '@iconify-icons/clarity/edit-solid';
-import { SmartFilter } from '../../../components/SmartFilter';
-import { PDFICON } from '../../../components/Icons';
 import FilteringSchema from './FilteringSchema';
 import { useCols } from './commonCols';
 import { DebitNoteImport } from './DebitNoteImport';
 
+const defaultSortedId = 'id';
+
 export const AprovedDebitNotes: FC = () => {
   /* HOOKS HERE */
+  const queryCache = useQueryClient();
 
   const { routeHistory } = useGlobalContext();
   const { history } = routeHistory;
   const { location } = history;
 
-  const {columns, pdfCols, csvColumns} = useCols();
+  const { columns, pdfCols, csvColumns } = useCols();
 
   /* LOCATL STATES */
   const [{ result, pagination }, setCreditNoteResponse] =
@@ -39,7 +49,7 @@ export const AprovedDebitNotes: FC = () => {
     page: 1,
     pageSize: 20,
     query: '',
-    sortid: 'id'
+    sortid: 'id',
   });
   const { page, pageSize, sortid, query } = creditNoteConfig;
 
@@ -47,15 +57,17 @@ export const AprovedDebitNotes: FC = () => {
 
   /* API CALLS STACKS GOES HERE */
   /* PAGINATED QUERY TO FETCH CREDIT NOTES WITH PAGINATION */
+
+  // `credit-notes?page=${page}&type=${1}&pageSize=${pageSize}&query=${query}`,
   const { data: creditNoteListData, isLoading } = useQuery(
     [
-      `credit-notes?page=${page}&type=${1}&pageSize=${pageSize}&query=${query}`,
+      ReactQueryKeys.DEBITNOTE_KEYS,
       1, // this specifies APPROVED CREDIT NOTES
       page,
       pageSize,
       IInvoiceType.DEBITNOTE,
       query,
-      sortid
+      sortid,
     ],
     getCreditNotes,
     {
@@ -80,30 +92,48 @@ export const AprovedDebitNotes: FC = () => {
   }, [contactsData, FilteringSchema]);
 
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
-    if(sorter.order === undefined){
+    if (sorter?.column) {
+      if (sorter.order === 'false') {
+        setCreditNoteConfig({
+          ...creditNoteConfig,
+          page: pagination.current,
+          pageSize: pagination.pageSize,
+          sortid: defaultSortedId,
+        });
+        const route = `/app${ISupportedRoutes.DEBIT_NOTES}?tabIndex=aproved&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+        history.push(route);
+      } else {
+        setCreditNoteConfig({
+          ...creditNoteConfig,
+          page: pagination.current,
+          pageSize: pagination.pageSize,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
+        });
+        const route = `/app${
+          ISupportedRoutes.DEBIT_NOTES
+        }?tabIndex=aproved&sortid=${
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field
+        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
+          sorter.order
+        }&query=${query}`;
+        history.push(route);
+      }
+    } else {
       setCreditNoteConfig({
         ...creditNoteConfig,
         page: pagination.current,
         pageSize: pagination.pageSize,
-        sortid: 'id'
+        sortid: defaultSortedId,
       });
-      const route = `/app${ISupportedRoutes.DEBIT_NOTES}?tabIndex=aproved&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
-      history.push(route);
-    }else{
-      setCreditNoteConfig({
-        ...creditNoteConfig,
-        page: pagination.current,
-        pageSize: pagination.pageSize,
-        sortid: sorter && sorter.order === 'descend' ? `-${sorter.field}` : sorter.field,
-      });
-      const route = `/app${ISupportedRoutes.DEBIT_NOTES}?tabIndex=aproved&sortid=${
-        sorter && sorter.order === 'descend'
-          ? `-${sorter.field}`
-          : sorter.field
-      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      const route = `/app${ISupportedRoutes.DEBIT_NOTES}?tabIndex=aproved&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
       history.push(route);
     }
-  }
+  };
 
   /* PAGINATED QUERY TO FETCH CREDIT NOTES WITH PAGINATION */
   /* API CALLS STACKS ENDS HERE */
@@ -120,10 +150,26 @@ export const AprovedDebitNotes: FC = () => {
 
       setCreditNoteConfig({ ...creditNoteConfig, ...obj });
     }
-  }, [location]);
+  }, []);
+
   useEffect(() => {
-    if (creditNoteListData?.data?.result) {
+    if (creditNoteListData?.data) {
       setCreditNoteResponse(creditNoteListData?.data);
+
+      if (creditNoteListData?.data?.pagination?.next === page + 1) {
+        queryCache?.prefetchQuery(
+          [
+            ReactQueryKeys.DEBITNOTE_KEYS,
+            1, // this specifies APPROVED CREDIT NOTES
+            page + 1,
+            pageSize,
+            IInvoiceType.DEBITNOTE,
+            query,
+            sortid,
+          ],
+          getCreditNotes
+        );
+      }
     }
   }, [creditNoteListData]);
   /* COMPONENT DID UPDATE HERE */
@@ -174,6 +220,40 @@ export const AprovedDebitNotes: FC = () => {
   return (
     <CreditNoteWrapper>
       <CommonTable
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => {
+              const prefetchQueries = [
+                {
+                  queryKey: [
+                    ReactQueryKeys?.CONTACT_VIEW,
+                    record?.contactId,
+                    record?.contact?.contactType,
+                    '',
+                    20,
+                    1,
+                  ],
+                  fn: getContactLedger,
+                },
+                {
+                  queryKey: [
+                    ReactQueryKeys?.INVOICE_VIEW,
+                    record?.id && record?.id?.toString(),
+                    IInvoiceType.DEBITNOTE,
+                  ],
+                  fn: findInvoiceByID,
+                },
+              ];
+
+              for (const CurrentQuery of prefetchQueries) {
+                queryCache.prefetchQuery(
+                  CurrentQuery?.queryKey,
+                  CurrentQuery?.fn
+                );
+              }
+            },
+          };
+        }}
         pdfExportable={{ columns: pdfCols }}
         loading={isLoading}
         columns={columns}

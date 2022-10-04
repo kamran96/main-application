@@ -1,10 +1,14 @@
-import { CommonTable } from '../../../components/Table';
+import { CommonTable } from '@components';
 import { FC, useState } from 'react';
 import { Button, Select } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { CsvImportAPi, getAllAccounts } from '../../../api';
-import { IAccountsResult, NOTIFICATIONTYPE } from '@invyce/shared/types';
+import {
+  IAccountsResult,
+  NOTIFICATIONTYPE,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 
 const { Option } = Select;
@@ -65,7 +69,7 @@ export const CompareDataTable: FC<IProps> = ({
           'Items Imported Successfully'
         );
         onSuccess();
-        ['item-id', 'items-list', 'all-items'].forEach((key) => {
+        ['item-id', ReactQueryKeys?.ITEMS_KEYS, 'all-items'].forEach((key) => {
           (queryCache?.invalidateQueries as any)((q) => q?.startsWith(key));
         });
       },
@@ -144,7 +148,11 @@ export const CompareDataTable: FC<IProps> = ({
 
   return (
     <div className="TableWrapper">
-      <CommonTable columns={columns} data={fileExtractedData} />
+      <CommonTable
+        columns={columns}
+        data={fileExtractedData}
+        pagination={false}
+      />
       <div className="CnfrmBtn">
         <Button className="btn" onClick={() => setStep(2)}>
           Back

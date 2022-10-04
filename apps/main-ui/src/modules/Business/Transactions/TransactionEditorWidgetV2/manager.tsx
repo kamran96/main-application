@@ -8,27 +8,29 @@ import {
   useEffect,
   useMemo,
 } from 'react';
-import { Editable, EditableSelect } from '../../../../components/Editable';
-import {
-  ITranactionContext,
-  ITransactionEditorProps,
-  ITransactionsList,
-} from './types';
 import { EditableColumnsType } from '@invyce/editable-table';
 import defaultState from './default';
 import Icon from '@iconify/react';
 import dayjs from 'dayjs';
 import { convertToRem } from '@invyce/pixels-to-rem';
-import { Color } from '../../../../modal/theme';
 import deleteIcon from '@iconify/icons-carbon/delete';
 import dotsGrid from '@iconify-icons/mdi/dots-grid';
 import { getAllAccounts } from '../../../../api/accounts';
-import { IAccountsResult } from '@invyce/shared/types';
 import { getSingleTransactionById } from '../../../../api';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { NOTIFICATIONTYPE } from '@invyce/shared/types';
-import { IServerError } from '../../../../modal';
+import { Editable, EditableSelect } from '@components';
+import {
+  ITranactionContext,
+  ITransactionEditorProps,
+  ITransactionsList,
+} from './types';
+import {
+  NOTIFICATIONTYPE,
+  IServerError,
+  IAccountsResult,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 
 const transactionContext = createContext<Partial<ITranactionContext>>({});
 export const useTransaction = () => useContext(transactionContext);
@@ -40,14 +42,14 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
   id,
 }) => {
   const [form] = Form.useForm();
-  const { notificationCallback } = useGlobalContext();
+  const { notificationCallback, Colors } = useGlobalContext();
   const [width] = useWindowSize();
   const [transactionsList, setTransactionsList] = useState<ITransactionsList[]>(
     [{ ...defaultState }]
   );
   //state and fetch single data by Id;
   const { data: TransactionData, isLoading: isTransactionLoading } = useQuery(
-    [`transaction-${id}`, id],
+    [ReactQueryKeys.TRANSACTION_KEYS, id],
     getSingleTransactionById,
     {
       enabled: !!id,
@@ -327,7 +329,7 @@ export const TransactionManager: FC<ITransactionEditorProps> = ({
               <Icon
                 style={{
                   fontSize: convertToRem(20),
-                  color: Color.$GRAY,
+                  color: Colors.$GRAY,
                   cursor: 'pointer',
                 }}
                 icon={deleteIcon}

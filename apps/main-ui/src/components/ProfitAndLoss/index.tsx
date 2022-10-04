@@ -2,7 +2,6 @@ import { Button, Select } from 'antd';
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { IThemeProps } from '../../hooks/useTheme/themeColors';
-import { Color } from '../../modal';
 import moneyFormat from '../../utils/moneyFormat';
 import { Card } from '../Card';
 import { P } from '../Para/P';

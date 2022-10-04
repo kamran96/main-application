@@ -6,11 +6,11 @@ import { useQueryClient, useMutation } from 'react-query';
 import styled from 'styled-components';
 
 import { deleteInvoicesAPI } from '../../../api';
-import { ConfirmModal } from '../../../components/ConfirmModal';
-import { MoreActions, TableActions } from '../../../components/TableActions';
+import { ConfirmModal, MoreActions, TableActions } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { Color, NOTIFICATIONTYPE } from '../../../modal';
+import { NOTIFICATIONTYPE, ReactQueryKeys } from '@invyce/shared/types';
 import convertToRem from '../../../utils/convertToRem';
+import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 
 interface IProps {
   selectedRow?: number[];
@@ -45,7 +45,7 @@ export const CommonTopbar: FC<IProps> = ({
       await mutateDeleteInvoices(payload, {
         onSuccess: () => {
           (queryCache.invalidateQueries as any)((q) =>
-            q.startsWith('invoices')
+            q.startsWith(ReactQueryKeys?.INVOICES_KEYS)
           );
           notificationCallback(
             NOTIFICATIONTYPE.SUCCESS,
@@ -70,7 +70,8 @@ export const CommonTopbar: FC<IProps> = ({
                     <Icon
                       style={{
                         fontSize: convertToRem(16),
-                        color: Color.$GRAY_LIGHT,
+                        color: `${(props: IThemeProps) =>
+                          props?.theme?.colors?.$GRAY_LIGHT}`,
                         cursor: 'pointer',
                       }}
                       icon={editSolid}
@@ -81,7 +82,8 @@ export const CommonTopbar: FC<IProps> = ({
                   <Icon
                     style={{
                       fontSize: convertToRem(16),
-                      color: Color.$GRAY_LIGHT,
+                      color: `${(props: IThemeProps) =>
+                        props?.theme?.colors?.$GRAY_LIGHT}`,
                       cursor: 'pointer',
                     }}
                     icon={deleteIcon}
@@ -134,7 +136,7 @@ const WrapperCommonTopbar = styled.div`
         transition: 0.3s all ease-in-out;
 
         &:hover {
-          color: ${Color.$PRIMARY};
+          color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
         }
       }
     }
@@ -145,7 +147,7 @@ const WrapperCommonTopbar = styled.div`
     align-items: center;
   }
   .sort {
-    color: ${Color.$PRIMARY};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$GRAY_LIGHT};
     font-size: ${convertToRem(14)};
     text-transform: capitalize;
     margin: 0 5px;
@@ -156,7 +158,7 @@ const WrapperCommonTopbar = styled.div`
     font-size: ${convertToRem(24)};
     display: flex;
     align-items: center;
-    color: ${Color.$GRAY};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$GRAY};
     margin-left: ${convertToRem(20)};
   }
 `;

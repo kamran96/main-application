@@ -1,8 +1,8 @@
 import React, { FC, useState } from 'react';
-import { CommonModal } from '../../../components';
+import { CommonModal } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { useMutation, useQuery } from 'react-query';
-import { getPaymentKeysApi } from '../../../../src/api/payment';
+import { getPaymentKeysApi } from '../../../../src/api';
 import { ReactQueryKeys } from '../../../../src/modal';
 import { WrapperModalContent } from './style';
 import { Button } from 'antd';
@@ -156,7 +156,6 @@ const PaymentImportWidget: FC = () => {
           compareData={compareData}
           itemKeysResponse={itemKeysResponse}
         />
-
       </WrapperModalContent>
     </CommonModal>
   );

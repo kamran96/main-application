@@ -2,13 +2,11 @@ import { ColumnsType } from 'antd/lib/table';
 import React, { FC, useEffect, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
-import { deleteRolesAPI, getRbacListAPI } from '../../../api/rbac';
-import { ButtonTag } from '../../../components/ButtonTags';
-import { CommonTable } from '../../../components/Table';
-import { IRolesResponse, NOTIFICATIONTYPE } from '../../../modal';
+import { deleteRolesAPI, getRbacListAPI } from '../../../api';
+import { ButtonTag, CommonTable, ConfirmModal } from '@components';
+import { IRolesResponse, NOTIFICATIONTYPE } from '@invyce/shared/types';
 import editSolid from '@iconify-icons/clarity/edit-solid';
 import deleteIcon from '@iconify/icons-carbon/delete';
-import { ConfirmModal } from '../../../components/ConfirmModal';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 
 export const RbacList: FC = () => {

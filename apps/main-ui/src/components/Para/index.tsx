@@ -1,6 +1,6 @@
 import React, { SFC } from 'react';
 import styled from 'styled-components';
-import { Color } from '../../modal';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
 import convertToRem from '../../utils/convertToRem';
 
 interface IProps {
@@ -76,6 +76,6 @@ const ParaWrapper: any = styled.p`
   color: ${(props: any) => (props.type = 'gray_text' ? '#BDBDBD' : '#4a4a4a')};
 
   .default {
-    color: ${Color.$BLACK};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$BLACK};
   }
 `;

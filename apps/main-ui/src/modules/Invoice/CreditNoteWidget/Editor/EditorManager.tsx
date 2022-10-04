@@ -27,11 +27,11 @@ import {
   getInvoiceNumber,
 } from '../../../../api';
 import { getAccountsByTypeAPI } from '../../../../api/accounts';
-import { Option } from '../../../../components/CommonSelect';
+import { Option } from '@components';
 import { Editable, EditableSelect } from '../../../../components/Editable';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import { useShortcut } from '../../../../hooks/useShortcut';
-import { Color, IContactType, IContactTypes } from '../../../../modal';
+import { IContactType, IContactTypes } from '../../../../modal';
 import { IAccountsResult } from '../../../../modal/accounts';
 import { ORDER_TYPE } from '../../../../modal/invoice';
 import { IItemsResult } from '@invyce/shared/types';
@@ -79,12 +79,11 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
     type: string;
   };
 
-
   const [rowsErrors, setRowsErrors] = useState([]);
   const [width] = useWindowSize();
 
   /* ************ HOOKS *************** */
-  const { setItemsModalConfig, userDetails } = useGlobalContext();
+  const { setItemsModalConfig, userDetails, Colors } = useGlobalContext();
 
   const { organization } = userDetails;
 
@@ -187,7 +186,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
     AntForm.setFieldsValue(defaultFormData);
   }, [AntForm]);
 
-  console.log(relation, "what is relation")
+  console.log(relation, 'what is relation');
 
   const APICATEGORYSTAKE =
     relation?.type === IInvoiceType.INVOICE
@@ -195,7 +194,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
       : creditNoteViewAPI;
 
   const key =
-    relation?.type === IInvoiceType.INVOICE 
+    relation?.type === IInvoiceType.INVOICE
       ? 'invoiceItems'
       : 'creditNoteItems';
 
@@ -388,7 +387,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
       className: `select-column`,
 
       render: (value, record, index) => {
-        console.log(value, "value")
+        console.log(value, 'value');
         return (
           <EditableSelect
             error={record?.errors?.length && record?.errors?.includes('itemId')}
@@ -652,63 +651,63 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
       },
     },
     enableAccountColumn
-    ? {
-        title: 'Account',
-        dataIndex: 'accountId',
-        width: width > 1500 ? 220 : 150,
-        render: (value, row, index) => {
-          return (
-            <EditableSelect
-              error={
-                row?.errors?.length && row?.errors?.includes('accountId')
-              }
-              className={`border-less-select contacttype-${IContactTypes.CUSTOMER}`}
-              value={{
-                value: value !== null ? value : '',
-                label:
-                  (accountsList?.length && getAccountNameByID(value)) ||
-                  'Select Account',
-              }}
-              labelInValue={true}
-              loading={accountsLoading}
-              size="middle"
-              showSearch
-              style={{ width: '100%' }}
-              placeholder="Select Account"
-              optionFilterProp="children"
-              onChange={(val) => {
-                setInvoiceItems((prev) => {
-                  const allItems = [...prev];
+      ? {
+          title: 'Account',
+          dataIndex: 'accountId',
+          width: width > 1500 ? 220 : 150,
+          render: (value, row, index) => {
+            return (
+              <EditableSelect
+                error={
+                  row?.errors?.length && row?.errors?.includes('accountId')
+                }
+                className={`border-less-select contacttype-${IContactTypes.CUSTOMER}`}
+                value={{
+                  value: value !== null ? value : '',
+                  label:
+                    (accountsList?.length && getAccountNameByID(value)) ||
+                    'Select Account',
+                }}
+                labelInValue={true}
+                loading={accountsLoading}
+                size="middle"
+                showSearch
+                style={{ width: '100%' }}
+                placeholder="Select Account"
+                optionFilterProp="children"
+                onChange={(val) => {
+                  setInvoiceItems((prev) => {
+                    const allItems = [...prev];
 
-                  allItems[index] = {
-                    ...allItems[index],
-                    accountId: val.value,
-                    errors: RemovedErrors(
-                      allItems[index].errors,
-                      'accountId'
-                    ),
-                  };
+                    allItems[index] = {
+                      ...allItems[index],
+                      accountId: val.value,
+                      errors: RemovedErrors(
+                        allItems[index].errors,
+                        'accountId'
+                      ),
+                    };
 
-                  return allItems;
-                });
-              }}
-            >
-              <>
-                {accountsList.map((acc: IAccountsResult, index: number) => {
-                  return (
-                    <Option key={index} value={acc.id}>
-                      {acc.name}
-                    </Option>
-                  );
-                })}
-              </>
-            </EditableSelect>
-          );
+                    return allItems;
+                  });
+                }}
+              >
+                <>
+                  {accountsList.map((acc: IAccountsResult, index: number) => {
+                    return (
+                      <Option key={index} value={acc.id}>
+                        {acc.name}
+                      </Option>
+                    );
+                  })}
+                </>
+              </EditableSelect>
+            );
+          },
+        }
+      : {
+          width: 0,
         },
-      }
-    : {
-        width: 0,
-      },
     {
       title: 'Tax',
       dataIndex: 'tax',
@@ -757,7 +756,7 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
             <Icon
               style={{
                 fontSize: convertToRem(20),
-                color: Color.$GRAY,
+                color: Colors.$GRAY,
                 cursor: 'pointer',
               }}
               icon={deleteIcon}

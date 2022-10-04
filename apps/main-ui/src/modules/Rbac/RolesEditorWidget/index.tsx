@@ -4,15 +4,11 @@ import TextArea from 'antd/lib/input/TextArea';
 import React, { FC, useEffect } from 'react';
 import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
-import {
-  CreateRoleAPI,
-  getRbacListAPI,
-  getRoleByIDAPI,
-} from '../../../api/rbac';
-import { CommonModal } from '../../../components';
-import { FormLabel } from '../../../components/FormLabel';
+import { CreateRoleAPI, getRbacListAPI, getRoleByIDAPI } from '../../../api';
+import { CommonModal, FormLabel } from '@components';
+import {} from '../../../components/FormLabel';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { IRoleRequest, NOTIFICATIONTYPE } from '../../../modal';
+import { IRoleRequest, NOTIFICATIONTYPE } from '@invyce/shared/types';
 import convertToRem from '../../../utils/convertToRem';
 
 const { Option } = Select;

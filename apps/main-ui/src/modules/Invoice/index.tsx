@@ -3,7 +3,7 @@ import fileInvoice from '@iconify-icons/la/file-invoice';
 import { Icon } from '@iconify/react';
 import styled from 'styled-components';
 
-import { Heading } from '../../components/Heading';
+import { Heading } from '@components';
 import { InvoiceList } from './InvoiceList';
 
 export const InvoiceContainer: FC = () => {

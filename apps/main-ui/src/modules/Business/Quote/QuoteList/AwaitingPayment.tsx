@@ -2,15 +2,14 @@
 import { FC, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { getAllContacts, getInvoiceListAPI } from '../../../../api';
-import { SmartFilter } from '../../../../components/SmartFilter';
-import { CommonTable } from '../../../../components/Table';
+import { SmartFilter, CommonTable } from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import {
   IInvoiceResponse,
   INVOICETYPE,
   ORDER_TYPE,
-} from '../../../../modal/invoice';
-import { ISupportedRoutes } from '../../../../modal/routing';
+  ISupportedRoutes,
+} from '@invyce/shared/types';
 import { CommonTopbar } from '../../../Invoice/InvoiceList/CommonTopbar';
 import DraftQuoteFilters from './QuotesFilters';
 

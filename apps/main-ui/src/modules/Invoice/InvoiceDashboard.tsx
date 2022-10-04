@@ -7,21 +7,21 @@ import { useQuery } from 'react-query';
 import styled from 'styled-components';
 import { invoiceDashboardDetailsAPI } from '../../api';
 
-import { Heading } from '../../components/Heading';
-import { P } from '../../components/Typography';
+import { Heading, P, Card } from '@components';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { IThemeProps } from '../../hooks/useTheme/themeColors';
-import { Color, ISupportedRoutes } from '../../modal';
-import { IInvoiceDashboardDetails } from '../../modal/invoice';
+import {
+  ISupportedRoutes,
+  IInvoiceDashboardDetails,
+} from '@invyce/shared/types';
 import convertToRem from '../../utils/convertToRem';
 import { AllInvoices } from './Allinvoices';
 import { DailySalesReportGraph } from './DailyInvoiceGraph';
 import { DraftInvoices } from './DraftInvoice';
 import { SummaryInvoice } from './SummaryInvoice';
-import { Card } from '../../components/Card';
 
 export const InvoiceDashboard: FC = () => {
-  const { routeHistory } = useGlobalContext();
+  const { routeHistory, Colors } = useGlobalContext();
   const { history } = routeHistory;
   /* React Hooks Here */
   /* Local States */

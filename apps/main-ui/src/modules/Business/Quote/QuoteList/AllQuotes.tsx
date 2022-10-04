@@ -7,23 +7,27 @@ import {
   getAllContacts,
   getInvoiceListAPI,
 } from '../../../../api';
-import { ConfirmModal } from '../../../../components/ConfirmModal';
-import { PurchaseListTopbar } from '../../../../components/PurchasesListTopbar';
-import { PERMISSIONS } from '../../../../components/Rbac/permissions';
-import { useRbac } from '../../../../components/Rbac/useRbac';
-import { SmartFilter } from '../../../../components/SmartFilter';
-import { CommonTable } from '../../../../components/Table';
+import {
+  ConfirmModal,
+  PurchaseListTopbar,
+  SmartFilter,
+  CommonTable,
+} from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import {
   IErrorMessages,
   IServerError,
   NOTIFICATIONTYPE,
-} from '../../../../modal';
-import { IInvoiceResponse, ORDER_TYPE } from '../../../../modal/invoice';
-import { ISupportedRoutes } from '../../../../modal/routing';
+  IInvoiceResponse,
+  ORDER_TYPE,
+  ISupportedRoutes,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import { PDFQuotesCols } from './commonCol';
 import { QuoteImport } from '../QuoteImport';
 import QuotesFilters from './QuotesFilters';
+import { PERMISSIONS } from '../../../../components/Rbac/permissions';
+import { useRbac } from '../../../../components/Rbac/useRbac';
 
 interface IProps {
   columns?: any[];
@@ -85,10 +89,10 @@ export const ALLQuotesList: FC<IProps> = ({ columns }) => {
       onSuccess: () => {
         [
           'invoices-quoutes',
-          'transactions',
-          'items-list',
-          'invoice-view',
-          'ledger-contact',
+          ReactQueryKeys?.TRANSACTION_KEYS,
+          ReactQueryKeys?.ITEMS_KEYS,
+          ReactQueryKeys.INVOICE_VIEW,
+          ReactQueryKeys.CONTACT_VIEW,
           'all-items',
         ].forEach((key) => {
           (queryCache.invalidateQueries as any)((q) => q.startsWith(`${key}`));

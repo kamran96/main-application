@@ -1,7 +1,7 @@
 import { Button } from 'antd';
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { Heading } from '../../../components/Heading';
+import { Heading } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { PermissionList } from '../PermissionsList';
 

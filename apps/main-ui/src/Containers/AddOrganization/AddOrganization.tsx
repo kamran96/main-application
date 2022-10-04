@@ -9,16 +9,11 @@ import {
   getOrganizations,
   changeOrganizationApi,
 } from '../../api/organizations';
-import { ButtonTag } from '../../components/ButtonTags';
-import { ConfirmModal } from '../../components/ConfirmModal';
-import { Heading } from '../../components/Heading';
-import { CommonTable } from '../../components/Table';
+import { ConfirmModal, Heading, AddOrganizationIcon } from '@components';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
 import { NOTIFICATIONTYPE } from '../../modal';
-import { BranchesContainer } from './Branches';
 import { OrganizationCard } from './OrganizationCard';
 import { AddNewOrganizationWrapper, AddOrganizationWrapper } from './styled';
-import { AddOrganizationIcon } from '../../components/Icons';
 
 export const OrganizationsList: FC = () => {
   const queryCache = useQueryClient();
@@ -33,7 +28,6 @@ export const OrganizationsList: FC = () => {
   });
   const [confirmModal, setConfirmModal] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [orgaizationActive, setOrganizationActive] = useState(0);
 
   const { mutate: mutateDeleteOrganizations, isLoading: deletingOrganization } =
     useMutation(deleteOrganizationAPI);

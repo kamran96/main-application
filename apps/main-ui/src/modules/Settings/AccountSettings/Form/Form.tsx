@@ -11,13 +11,11 @@ import {
   Checkbox,
   Switch,
 } from 'antd';
-import { FormLabel } from '../../../../components/FormLabel';
-import { Color, DivProps, IBaseAPIError, IErrorData } from '../../../../modal';
+import { FormLabel, ConfirmModal, BOLDTEXT, CommonModal } from '@components';
+import { DivProps, IBaseAPIError, IErrorData } from '@invyce/shared/types';
 import convertToRem from '../../../../utils/convertToRem';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
-import { ConfirmModal } from '../../../../components/ConfirmModal';
 import ReactInputVerificationCode from 'react-input-verification-code';
-import { BOLDTEXT } from '../../../../components/Para/BoldText';
 import { useMutation, useQuery } from 'react-query';
 import {
   ChangeAccountPreferencesAPI,
@@ -25,12 +23,12 @@ import {
   generateAuthenticator,
   updateAccountSetting,
   verifyAuthenticatorCode,
+  userCheckAPI,
 } from '../../../../api';
 import dayjs from 'dayjs';
 import { invycePersist } from '@invyce/invyce-persist';
 import { updateToken } from '../../../../utils/http';
-import { CommonModal } from '../../../../components';
-import { userCheckAPI } from '../../../../api/users';
+import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
 
 const defaultState = {
   email: false,
@@ -68,7 +66,7 @@ export const AccountsSettingsForm: FC = () => {
     twoStepAuth: false,
   });
   const [otpValue, setOtpValue] = useState('');
-  const { userDetails, refetchUser } = useGlobalContext();
+  const { userDetails, refetchUser, Colors } = useGlobalContext();
   const { email, twoFactorEnabled } = userDetails;
   const [twoFactorAuthModal, setTwoFactorAuthModal] = useState(false);
 
@@ -554,7 +552,7 @@ export const WrapperSettingsForm = styled.div`
     position: absolute;
     top: ${convertToRem(11)};
     right: ${convertToRem(10)};
-    color: ${Color.$PRIMARY};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
     font-size: ${convertToRem(12)};
     font-weight: 400;
     text-transform: capitalize;

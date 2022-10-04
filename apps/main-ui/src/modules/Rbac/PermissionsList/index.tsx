@@ -4,13 +4,10 @@ import { useQueryClient, useMutation, useQuery } from 'react-query';
 import styled from 'styled-components';
 import editSolid from '@iconify-icons/clarity/edit-solid';
 import deleteIcon from '@iconify/icons-carbon/delete';
-import { deletePermissionAPI, getPermissionsListAPI } from '../../../api/rbac';
-import { ButtonTag } from '../../../components/ButtonTags';
-import { CommonTable } from '../../../components/Table';
+import { deletePermissionAPI, getPermissionsListAPI } from '../../../api';
+import { ButtonTag, CommonTable, ConfirmModal } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { ISupportedRoutes } from '../../../modal';
-import { IPermissionsResponsse } from '../../../modal/rbac';
-import { ConfirmModal } from '../../../components/ConfirmModal';
+import { ISupportedRoutes, IPermissionsResponsse } from '@invyce/shared/types';
 
 export const PermissionList: FC = () => {
   const queryCache = useQueryClient();

@@ -1,22 +1,24 @@
 import React, { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Form, Row, Col, Input, Button, Select, InputNumber } from 'antd';
-import { FormLabel } from './../../../components/FormLabel/index';
-import { Heading } from '../../../components/Heading';
-import { Para } from './../../../components/Para/index';
+import { FormLabel, Heading, Para, EnterpriseWrapper } from '@components';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { create_update_contact, viewSingleContact } from '../../../api/Contact';
+import {
+  create_update_contact,
+  viewSingleContact,
+  getAllAccounts,
+  getBankAccounts,
+} from '../../../api';
 import {
   IContactTypes,
   ISupportedRoutes,
   NOTIFICATIONTYPE,
-} from '../../../modal';
+  IAccountsResult,
+  IOrganizationType,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
 import { AddressForm } from './addressForm';
-import { getAllAccounts, getBankAccounts } from '../../../api/accounts';
-import { IAccountsResult } from '../../../modal/accounts';
-import { EnterpriseWrapper } from '../../../components/EnterpriseWrapper';
-import { IOrganizationType } from '../../../modal/organization';
 import Checkbox from 'antd/lib/checkbox/Checkbox';
 import { useLocation } from 'react-router-dom';
 import en from 'world_countries_lists/data/en/world.json';
@@ -189,7 +191,6 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
 
   /* Async function to create and update a contact */
   const onFinish = async (values) => {
-
     let payload = {
       ...values,
       isNewRecord: true,
@@ -206,7 +207,11 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
 
     await mutateAddContact(payload, {
       onSuccess: () => {
-        [`contacts-list`, `all-contacts`, `transactions`].forEach((key) => {
+        [
+          `contacts-list`,
+          `all-contacts`,
+          ReactQueryKeys?.TRANSACTION_KEYS,
+        ].forEach((key) => {
           (queryCache.invalidateQueries as any)((q) => q.startsWith(key));
         });
         if (id) {
@@ -214,7 +219,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
             `contacts-list`,
             `all-contacts`,
             `contact-${id}`,
-            `transactions`,
+            ReactQueryKeys?.TRANSACTION_KEYS,
           ].forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q.startsWith(key));
           });

@@ -1,10 +1,9 @@
 import { Button } from 'antd';
 import React, { FC } from 'react';
 import styled from 'styled-components';
-
-import { Heading } from '../../../components/Heading';
+import { Heading } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { ISupportedRoutes } from '../../../modal/routing';
+import { ISupportedRoutes } from '@invyce/shared/types';
 import { QuoteList } from './QuoteList';
 
 export const QuotesContainer: FC = () => {

@@ -3,10 +3,9 @@ import { FC, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { BreadCrumbArea } from '../../../components/BreadCrumbArea';
-import { Heading } from '../../../components/Heading';
+import { BreadCrumbArea, Heading } from '@components';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { ISupportedRoutes } from '../../../modal/routing';
+import { ISupportedRoutes } from '@invyce/shared/types';
 import { InvoiceEditor } from './Editor';
 
 export const InvoiceEditorWidget: FC = () => {
@@ -16,7 +15,7 @@ export const InvoiceEditorWidget: FC = () => {
 
   return (
     <WrapperInvoiceWidget>
-      <Heading type='form'>New Invoice</Heading>
+      <Heading type="form">New Invoice</Heading>
       <BreadCrumbArea>
         <Breadcrumb>
           <Breadcrumb.Item>

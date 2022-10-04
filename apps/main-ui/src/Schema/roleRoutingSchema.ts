@@ -1,4 +1,4 @@
-import { ISupportedRoutes } from '../modal/routing';
+import { ISupportedRoutes } from '@invyce/shared/types';
 
 export enum IRouteValues {
   VIEW_INVOICE = 1001,

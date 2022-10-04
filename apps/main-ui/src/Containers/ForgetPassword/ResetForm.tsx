@@ -4,12 +4,12 @@ import { FC } from 'react';
 import styled from 'styled-components';
 import InvyceLog from '../../assets/invyceLogo.png';
 import ResetIllustration from '../../assets/resetPassword.png';
-import { HeadingTemplate1 } from '../../components/HeadingTemplates';
+import { HeadingTemplate1 } from '@components';
 import convertToRem from '../../utils/convertToRem';
 import { useMutation } from 'react-query';
 import { resetPasswordAPI } from '../../api';
 import { useGlobalContext } from '../../hooks/globalContext/globalContext';
-import { ISupportedRoutes, NOTIFICATIONTYPE } from '../../modal';
+import { ISupportedRoutes, NOTIFICATIONTYPE } from '@invyce/shared/types';
 
 export const ResetForm: FC = () => {
   const {

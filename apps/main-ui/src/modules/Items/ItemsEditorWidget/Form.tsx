@@ -19,18 +19,22 @@ import {
   createUpdateItem,
   fetchSingleItem,
   getAllCategories,
+  getAllAccounts,
+  validateItemCodeAPI,
 } from '../../../api';
-import { getAllAccounts } from '../../../api/accounts';
 import { FormLabel } from '../../../components/FormLabel';
 import { useGlobalContext } from '../../../hooks/globalContext/globalContext';
-import { NOTIFICATIONTYPE } from '../../../modal';
-import { IAccountsResult } from '../../../modal/accounts';
-import { IServerError } from '../../../modal/base';
-import { ICategory, IVariants } from '../../../modal/categories';
-import { ITEM_TYPE } from '../../../modal/items';
+import {
+  NOTIFICATIONTYPE,
+  IAccountsResult,
+  IServerError,
+  IVariants,
+  ICategory,
+  ITEM_TYPE,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import convertToRem from '../../../utils/convertToRem';
 import { DynamicForm } from './DynamicForm';
-import { validateItemCodeAPI } from '../../../api/Items';
 
 const { Option } = Select;
 
@@ -200,9 +204,11 @@ export const ItemsForm: FC = () => {
             NOTIFICATIONTYPE.SUCCESS,
             id ? 'Updated' : 'Created'
           );
-          ['item-id', 'items-list', 'all-items'].forEach((key) => {
-            (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
-          });
+          ['item-id', ReactQueryKeys?.ITEMS_KEYS, 'all-items'].forEach(
+            (key) => {
+              (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
+            }
+          );
           setItemsModalConfig(false, null);
           form.resetFields();
           setFormData({});
