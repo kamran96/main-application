@@ -27,7 +27,7 @@ pipeline {
         echo 'Starting test cases'
       '''    
     }
-  }  
+  }
     stage ('Artefact') {
       steps {
         sh '''
