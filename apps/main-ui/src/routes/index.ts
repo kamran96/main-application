@@ -55,7 +55,7 @@ import { CreditNoteEditorWidget } from '../modules/Invoice/CreditNoteWidget';
 import { DebitNoteEditorWidget } from '../modules/Invoice/DebitNoteEditorWidget';
 // import { Import } from '../components/Import';
 // import { JoinUser } from '../Containers/JoinUser';
-import { Import, JoinUser } from '@components';
+import { Import } from '@components';
 import { VerifyUser } from '../Containers/JoinUser/VerifyUser';
 import { CreditNoteList } from '../modules/Invoice/CreditNoteList';
 import { CreditNoteView } from '../modules/Invoice/CreditNoteList/View';
@@ -531,11 +531,11 @@ export const routes = (root = '/app'): RouteConfig[] => [
             component: OrganizationWidget,
             exact: true,
           },
-          {
-            path: `/page/join-user`,
-            component: JoinUser,
-            exact: true,
-          },
+          // {
+          //   path: `/page/join-user`,
+          //   component: JoinUser,
+          //   exact: true,
+          // },
           {
             path: `/page/rec`,
             component: TestComponents,

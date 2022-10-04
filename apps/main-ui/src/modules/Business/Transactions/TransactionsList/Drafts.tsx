@@ -288,7 +288,10 @@ const DRAFTTransactionsList: FC = () => {
         {result?.length > 0 && (
           <PDFDownloadLinkWrapper
             document={
-              <TransactionApprovePdf resultData={result} header={headerprops} />
+              <TransactionApprovePdf
+                resultData={result as any}
+                header={headerprops}
+              />
             }
           >
             <div className="flex alignCenter">
