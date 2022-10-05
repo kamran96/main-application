@@ -119,7 +119,7 @@ export enum LightColors {
   inputColor = `rgba(0, 0, 0, 0.85)`,
   inputColorBg = ``,
   antIcon = ``,
-  disabled = ``,
+  disabled = `#f5f5f5`,
   formLabel = `#4a4a4a`,
   primaryButtonBg = ``,
   primaryButtonColor = '',

@@ -23,6 +23,8 @@ import { IBaseAPIError, IServerError } from '../../modal/base';
 import { updateToken } from '../../utils/http';
 import phoneCodes from '../../utils/phoneCodes';
 
+const { MonthPicker } = DatePicker;
+
 const { Option } = Select;
 
 interface IProps {
@@ -347,11 +349,8 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
             </Col>
             <Col span={12}>
               <Form.Item name="financialEnding" label="Financial Year Ends">
-                <DatePicker
-                  style={{ width: '100%' }}
-                  size="middle"
-                  picker={'month'}
-                />
+                <MonthPicker placeholder="Month" format={'MMMM'} mode="month" />
+                <DatePicker format={'DD'} mode="date" />
               </Form.Item>
             </Col>
           </Row>

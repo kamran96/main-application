@@ -280,9 +280,9 @@ export const OrganizationWidget: FC = () => {
             <Col span={12}>
               <Form.Item name="financialEnding" label="Financial Year Ends">
                 <DatePicker
+                  mode={'year'}
                   style={{ width: '100%' }}
                   size="middle"
-                  picker={'month'}
                 />
               </Form.Item>
             </Col>
