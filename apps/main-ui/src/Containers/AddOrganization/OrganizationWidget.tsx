@@ -24,8 +24,14 @@ const { Option } = Select;
 
 export const OrganizationWidget: FC = () => {
   const queryCache = useQueryClient();
-  const { handleLogin, routeHistory, refetchUser, refetchPermissions } =
-    useGlobalContext();
+  const {
+    handleLogin,
+    routeHistory,
+    refetchUser,
+    refetchPermissions,
+    userDetails,
+  } = useGlobalContext();
+
   const { history } = routeHistory;
   const { mutate: mutateOrganization, isLoading } =
     useMutation(addOrganizationAPI);
@@ -158,7 +164,32 @@ export const OrganizationWidget: FC = () => {
             <Col span={12}>
               <Form.Item
                 name="email"
-                label="Organization Email"
+                label={
+                  <div
+                    className="flex alignCenter"
+                    style={{ margin: '-9px 0' }}
+                  >
+                    Email
+                    <div
+                      className="textRight ml-13 cursor"
+                      style={{
+                        position: 'absolute',
+                        left: '100%',
+                        width: '100%',
+                      }}
+                    >
+                      <Button
+                        type="link"
+                        size="middle"
+                        onClick={() =>
+                          form.setFieldsValue({ email: userDetails?.email })
+                        }
+                      >
+                        Same as primary email
+                      </Button>
+                    </div>
+                  </div>
+                }
                 rules={[{ required: true, message: 'Email is required!' }]}
               >
                 <Input
@@ -216,7 +247,7 @@ export const OrganizationWidget: FC = () => {
               </h3>
               <Seprator />
             </Col>
-            <Col span={12}>
+            {/* <Col span={12}>
               <Form.Item
                 name="country"
                 rules={[{ required: true }]}
@@ -252,7 +283,7 @@ export const OrganizationWidget: FC = () => {
                   })}
                 </Select>
               </Form.Item>
-            </Col>
+            </Col> */}
 
             <Col span={12}>
               <Form.Item name="city" label="City">
@@ -278,11 +309,12 @@ export const OrganizationWidget: FC = () => {
               <Seprator />
             </Col>
             <Col span={12}>
-              <Form.Item name="financialEnding" label="Financial Year Ends">
+              <Form.Item name="financialEnding" label="Ends Financial Year">
                 <DatePicker
                   style={{ width: '100%' }}
+                  format={'DD-MMMM'}
                   size="middle"
-                  picker={'month'}
+                  // picker={'month'}
                 />
               </Form.Item>
             </Col>

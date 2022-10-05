@@ -595,7 +595,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                     </p>
                   </Col>
                   <Col className="flex alignCenter" span={12}>
-                    <p className="bold">Items Discount</p>
+                    <p className="bold">Discount</p>
                   </Col>
                   <Col span={12}>
                     <p className="light textRight">
@@ -604,7 +604,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                         : moneyFormat(0)}
                     </p>
                   </Col>
-                  <Col className="flex alignCenter" span={12}>
+                  {/* <Col className="flex alignCenter" span={12}>
                     <p className="bold">Invoice Discount</p>
                   </Col>
                   <Col span={12}>
@@ -623,7 +623,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                         />
                       </Form.Item>
                     </div>
-                  </Col>
+                  </Col> */}
                   <Col span={24}>
                     <Seprator />
                   </Col>

@@ -260,8 +260,6 @@ h6 {
   color: #2b2b2b;
 }
 
-
-
 /* ant design overide */
 
 /* INPUT  */
@@ -302,8 +300,6 @@ input:-webkit-autofill:active {
 }
 
 /* Link */
-
-
 
 /* BUTTON */
 
@@ -427,7 +423,7 @@ input:-webkit-autofill:active {
   padding: 0 2px 2px 0 !important;
 }
 
-.isTagButton{
+.isTagButton {
   font-size: 13px;
   background-color: #7988ff54;
   padding: 3px 8px;
@@ -436,7 +432,7 @@ input:-webkit-autofill:active {
   cursor: pointer;
 }
 
-.isTagButton:hover{
+.isTagButton:hover {
   background-color: #7988ff;
-  color: #eee
+  color: #eee;
 }
