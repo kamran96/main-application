@@ -367,11 +367,51 @@ export class ContactService {
     }
   }
 
-  async Ledger(contactId: string, req: IRequest, query: IPage) {
+  async Ledger(contactId: string, req: IRequest, queryData: IPage) {
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
+    const {
+      page_size,
+      page_no,
+      query,
+      purpose,
+      type,
+      sort,
+      type: contactType,
+    } = queryData;
+    const ps: number = parseInt(page_size);
+    const pn: number = parseInt(page_no);
 
-    const { page_no, page_size, query: filters, type } = query;
+    const { sort_column, sort_order } = await Sorting(sort);
+
+    const myCustomLabels = {
+      docs: 'result',
+      totalDocs: 'total',
+      meta: 'pagination',
+      limit: 'page_size',
+      page: 'page_no',
+      nextPage: 'next',
+      prevPage: 'prev',
+      totalPages: 'total_pages',
+    };
+
+    const contacts = await this.contactModel
+      .find({
+        organizationId: req.user.organizationId,
+        status: 1,
+        contactType: type,
+      })
+      .sort({
+        id: 'ASC',
+      });
+
+    console.log(contacts);
+
+    const indexed = contacts.findIndex((i) => i.id === contactId);
+
+    console.log(indexed, contactId, 'what is index now');
+
+    // const { page_no, page_size, query: filters, type } = query;
     const contact = await this.contactModel.findById(contactId);
 
     if (type == PaymentModes.BILLS) {
@@ -384,8 +424,8 @@ export class ContactService {
         }
       );
 
-      if (filters) {
-        const filterData = Buffer.from(filters, 'base64').toString();
+      if (query) {
+        const filterData = Buffer.from(query, 'base64').toString();
         const data = JSON.parse(filterData);
 
         // const data = {
@@ -505,8 +545,8 @@ export class ContactService {
 
       const contact = await this.contactModel.findById(contactId);
 
-      if (filters) {
-        const filterData = Buffer.from(filters, 'base64').toString();
+      if (query) {
+        const filterData = Buffer.from(query, 'base64').toString();
         const data = JSON.parse(filterData);
 
         for (const i in data) {

@@ -43,8 +43,6 @@ export class ItemService {
       status: 1,
       organizationId: user.organizationId,
     });
-
-    console.log(items, 'is here');
     const indexed = items.findIndex((i) => i.id === id);
     const nextItem = items[indexed + 1]?.id || null;
     const prevItem = items[indexed - 1]?.id || null;

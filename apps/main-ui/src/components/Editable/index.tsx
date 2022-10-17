@@ -111,7 +111,6 @@ export const Editable: FC<IProps> = ({
                 onChange(val);
               }}
               placeholder={placeholder}
-              type={type}
               style={styles}
               size={size}
               autoFocus

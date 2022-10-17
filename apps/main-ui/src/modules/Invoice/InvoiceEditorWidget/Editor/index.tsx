@@ -156,6 +156,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
 
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
+
   const onFinish = async (value) => {
     const email =
       contactEmail || getContactById(value?.contactId)?.email || null;
@@ -595,7 +596,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                     </p>
                   </Col>
                   <Col className="flex alignCenter" span={12}>
-                    <p className="bold">Items Discount</p>
+                    <p className="bold">Discount</p>
                   </Col>
                   <Col span={12}>
                     <p className="light textRight">
@@ -604,7 +605,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                         : moneyFormat(0)}
                     </p>
                   </Col>
-                  <Col className="flex alignCenter" span={12}>
+                  {/* <Col className="flex alignCenter" span={12}>
                     <p className="bold">Invoice Discount</p>
                   </Col>
                   <Col span={12}>
@@ -623,7 +624,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                         />
                       </Form.Item>
                     </div>
-                  </Col>
+                  </Col> */}
                   <Col span={24}>
                     <Seprator />
                   </Col>
@@ -642,7 +643,8 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
               <div className="actions">
                 <Form.Item name="status" className="actions_control">
                   <Button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
                       ClearAll();
                     }}
                     size={'middle'}
@@ -657,7 +659,8 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                     disabled={invoiceCreating}
                     htmlType="submit"
                     size={'middle'}
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSubmitType(ISUBMITTYPE.DRAFT);
                       AntForm.setFieldsValue({
                         status: {
@@ -689,7 +692,8 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                           htmlType="submit"
                           size={'middle'}
                           type="primary"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.preventDefault();
                             setSubmitType(ISUBMITTYPE.APPROVE_PRINT);
                             AntForm.setFieldsValue({
                               status: {
@@ -718,7 +722,8 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                           }
                           size={'middle'}
                           type="primary"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.preventDefault();
                             setSubmitType(ISUBMITTYPE.ONLYAPPROVE);
                             AntForm.setFieldsValue({
                               status: {

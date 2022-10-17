@@ -343,6 +343,8 @@ const WrapperPermissionsLayout = styled.div`
       letter-spacing: 0.04em;
       text-transform: capitalize;
       font-weight: 500;
+      color: ${(props: IThemeProps) =>
+        props?.theme?.theme === 'light' ? '#272727' : '#FFFFFF99'};
     }
   }
 

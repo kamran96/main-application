@@ -1,4 +1,4 @@
-export default {
+const IndustriesList = {
   description: 'A list of all industries on LinkedIn, as of May 21, 2013',
   source: 'http://robertwdempsey.com/liindustries',
   industries: [
@@ -152,3 +152,5 @@ export default {
     'Writing & Editing',
   ],
 };
+
+export default IndustriesList;
