@@ -245,7 +245,6 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
       <div className=" _disable_print">
         <Form
           form={AntForm}
-          onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           onValuesChange={(changedField, allvalues) => {
             const _formData =
@@ -487,7 +486,8 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
               <div className="actions">
                 <Form.Item name="status" className="actions_control">
                   <Button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e?.preventDefault();
                       ClearAll();
                     }}
                     size={'middle'}
@@ -500,9 +500,10 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                       creatingInvoice && submitType === ISUBMITTYPE.DRAFT
                     }
                     disabled={creatingInvoice}
-                    htmlType="submit"
+                    // htmlType="submit"
                     size={'middle'}
-                    onClick={() => {
+                    onClick={(e) => {
+                      e?.preventDefault();
                       setSubmitType(ISUBMITTYPE.DRAFT);
                       AntForm.setFieldsValue({
                         status: {
@@ -510,6 +511,8 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                           print: false,
                         },
                       });
+                      const values = AntForm?.getFieldsValue();
+                      onFinish(values);
                     }}
                   >
                     Draft
@@ -523,10 +526,11 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                           creatingInvoice &&
                           submitType === ISUBMITTYPE.APPROVE_PRINT
                         }
-                        htmlType="submit"
+                        // htmlType="submit"
                         size={'middle'}
                         type="primary"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e?.preventDefault();
                           setSubmitType(ISUBMITTYPE.APPROVE_PRINT);
                           AntForm.setFieldsValue({
                             status: {
@@ -534,6 +538,8 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                               print: true,
                             },
                           });
+                          const values = AntForm?.getFieldsValue();
+                          onFinish(values);
                         }}
                       >
                         <span className="flex alignCenter ">
@@ -547,10 +553,11 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                           creatingInvoice &&
                           submitType === ISUBMITTYPE.ONLYAPPROVE
                         }
-                        htmlType="submit"
+                        // htmlType="submit"
                         size={'middle'}
                         type="primary"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e?.preventDefault();
                           setSubmitType(ISUBMITTYPE.ONLYAPPROVE);
                           AntForm.setFieldsValue({
                             status: {
@@ -558,6 +565,8 @@ const Editor: FC<IProps> = ({ type = 'credit-note', id, onSubmit }) => {
                               print: false,
                             },
                           });
+                          const values = AntForm?.getFieldsValue();
+                          onFinish(values);
                         }}
                       >
                         Approve

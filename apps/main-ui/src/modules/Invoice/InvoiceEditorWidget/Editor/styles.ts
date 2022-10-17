@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import convertToRem from '../../../../utils/convertToRem';
-import { ITheme, IThemeProps } from '../../../../hooks/useTheme/themeColors';
+import { IThemeProps } from '../../../../hooks/useTheme/themeColors';
 
 export const WrapperInvoiceForm = styled.div`
   margin: 0 0 ${convertToRem(20)} 0;

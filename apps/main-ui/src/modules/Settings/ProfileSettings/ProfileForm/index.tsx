@@ -97,7 +97,7 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
 
   return (
     <WrapperProfileForm>
-      <Form form={form} onFinish={onFinish} onFinishFailed={onFinishFailed}>
+      <Form form={form} onFinishFailed={onFinishFailed}>
         <Row gutter={24}>
           <Col span={20} offset={2}>
             <Row gutter={24}>
@@ -225,7 +225,11 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
                     <Button
                       loading={updatingProfile}
                       type="primary"
-                      htmlType="submit"
+                      // htmlType="submit"
+                      onClick={() => {
+                        const values = form?.getFieldsValue();
+                        onFinish(values);
+                      }}
                     >
                       Update
                     </Button>

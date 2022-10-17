@@ -162,8 +162,6 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
 
     const errors = handleCheckValidation(invoiceItems);
 
-    console.log(value, 'values', errors, 'errors');
-
     if (!errors.length) {
       const paymentData = { ...payment };
       delete paymentData.totalAmount;
@@ -284,6 +282,26 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     return filteredContact;
   };
 
+  const handleSubmit = (values) => {
+    const contact: IContact = getContactById(values?.contactId);
+    if (
+      contact?.balance >= contact?.creditLimitBlock ||
+      NetTotal > contact?.creditLimitBlock
+    ) {
+      notificationCallback(
+        NOTIFICATIONTYPE.WARNING,
+        'Contact has reached credit block limit, Invoice cannot be created'
+      );
+    } else if (
+      contact?.balance >= contact.creditLimit ||
+      (NetTotal > contact?.creditLimit && !bypassCreditLimit)
+    ) {
+      setCreditLimitModal({ visibility: true, contact: contact?.name });
+    } else {
+      onFinish(values);
+    }
+  };
+
   /* JSX  */
   return (
     <WrapperInvoiceForm>
@@ -306,25 +324,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
       <div className=" _disable_print">
         <Form
           form={AntForm}
-          onFinish={(values) => {
-            const contact: IContact = getContactById(values?.contactId);
-            if (
-              contact?.balance >= contact?.creditLimitBlock ||
-              NetTotal > contact?.creditLimitBlock
-            ) {
-              notificationCallback(
-                NOTIFICATIONTYPE.WARNING,
-                'Contact has reached credit block limit, Invoice cannot be created'
-              );
-            } else if (
-              contact?.balance >= contact.creditLimit ||
-              (NetTotal > contact?.creditLimit && !bypassCreditLimit)
-            ) {
-              setCreditLimitModal({ visibility: true, contact: contact?.name });
-            } else {
-              onFinish(values);
-            }
-          }}
+          // onFinish={}
           onFinishFailed={onFinishFailed}
           onValuesChange={(changedField, allvalues) => {
             const _formData =
@@ -655,7 +655,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                       invoiceCreating && submitType === ISUBMITTYPE.DRAFT
                     }
                     disabled={invoiceCreating}
-                    htmlType="submit"
+                    // htmlType="submit"
                     size={'middle'}
                     onClick={() => {
                       setSubmitType(ISUBMITTYPE.DRAFT);
@@ -665,6 +665,8 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                           print: false,
                         },
                       });
+                      const value = AntForm?.getFieldsValue();
+                      handleSubmit(value);
                     }}
                   >
                     {type === IInvoiceType.QUOTE ? 'Save' : 'Draft'}
@@ -686,7 +688,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                             invoiceCreating &&
                             submitType === ISUBMITTYPE.APPROVE_PRINT
                           }
-                          htmlType="submit"
+                          // htmlType="submit"
                           size={'middle'}
                           type="primary"
                           onClick={() => {
@@ -697,6 +699,8 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                                 print: true,
                               },
                             });
+                            const value = AntForm?.getFieldsValue();
+                            handleSubmit(value);
                           }}
                         >
                           <span className="flex alignCenter ">
@@ -710,12 +714,12 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                             invoiceCreating &&
                             submitType === ISUBMITTYPE.ONLYAPPROVE
                           }
-                          htmlType={
-                            getContactById(AntForm.getFieldValue('contactId'))
-                              ?.email
-                              ? 'submit'
-                              : 'button'
-                          }
+                          // htmlType={
+                          //   getContactById(AntForm.getFieldValue('contactId'))
+                          //     ?.email
+                          //     ? 'submit'
+                          //     : 'button'
+                          // }
                           size={'middle'}
                           type="primary"
                           onClick={() => {
@@ -726,6 +730,9 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                                 print: false,
                               },
                             });
+
+                            const value = AntForm?.getFieldsValue();
+                            handleSubmit(value);
 
                             const email = getContactById(
                               AntForm.getFieldValue('contactId')

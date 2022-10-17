@@ -80,7 +80,7 @@ const WrapperButtonTag = styled.div`
     &:hover {
       background: ${(props: IThemeProps) =>
         props?.theme?.colors?.$Secondary} !important;
-      color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE};
+      color: '#FFFFFF !important';
       span {
         color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE};
       }
