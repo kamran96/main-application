@@ -37,6 +37,9 @@ export const WrapperModalContent = styled.div<ModalWrapper>`
     transition: 0.4s ease-in-out;
     color: ${(props: IThemeProps) => props?.theme?.colors?.itmText};
   }
+  .rendertable {
+    overflow: auto;
+  }
   .TableWrapper {
     width: ${(props: any) => (props?.step === 3 ? '100%' : 0)};
     opacity: ${(props: any) => (props?.step === 3 ? 1 : 0)};

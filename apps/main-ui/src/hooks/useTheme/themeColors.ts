@@ -162,7 +162,7 @@ export enum LightColors {
 
 export enum DarkColors {
   $PRIMARY = '#e4e4e4',
-  $Secondary = '#000000',
+  $Secondary = '#ffffff',
   topbar = '#121212',
   $BLACK = '#e4e4e4',
   $LIGHT_BLACK = '#a0a0a0',

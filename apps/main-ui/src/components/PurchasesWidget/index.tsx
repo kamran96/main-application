@@ -309,7 +309,6 @@ const Editor: FC<IProps> = ({ type, id }) => {
       <div className=" _disable_print">
         <Form
           form={AntForm}
-          // onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           onValuesChange={(changedField, allvalues) => {
             const _formData =
@@ -651,7 +650,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
                       creatingInvoiceLoading && submitType === ISUBMITTYPE.DRAFT
                     }
                     disabled={creatingInvoiceLoading}
-                    htmlType="submit"
+                    // htmlType="submit"
                     size={'middle'}
                     onClick={() => {
                       setSubmitType(ISUBMITTYPE.DRAFT);
@@ -710,7 +709,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
                             creatingInvoiceLoading &&
                             submitType === ISUBMITTYPE.ONLYAPPROVE
                           }
-                          htmlType="submit"
+                          // htmlType="submit"
                           size={'middle'}
                           type="primary"
                           onClick={() => {

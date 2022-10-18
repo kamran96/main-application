@@ -105,7 +105,7 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
 
       setAllInvoicesRes({ ...resolvedData.data, result: newResult });
 
-      if (pagination.next === page + 1) {
+      if (pagination?.page_no < pagination?.total_pages) {
         queryCache?.prefetchQuery(
           [
             ReactQueryKeys?.INVOICES_KEYS,
