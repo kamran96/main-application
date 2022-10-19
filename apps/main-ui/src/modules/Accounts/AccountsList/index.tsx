@@ -67,23 +67,23 @@ export const AccountsList: FC<IProps> = ({ data }) => {
 
       setAccountConfig({ ...accountsConfig, ...obj });
 
-      const filterType = history.location.search.split('&');
-      const filterIdType = filterType[0];
-      const filterOrder = filterType[3]?.split('=')[1];
+      // const filterType = history.location.search.split('&');
+      // const filterIdType = filterType[0];
+      // const filterOrder = filterType[3]?.split('=')[1];
 
-      if (filterIdType?.includes('-')) {
-        const fieldName = filterIdType?.split('=')[1].split('-')[1];
-        setSortedInfo({
-          order: filterOrder,
-          columnKey: fieldName,
-        });
-      } else {
-        const fieldName = filterIdType?.split('=')[1];
-        setSortedInfo({
-          order: filterOrder,
-          columnKey: fieldName,
-        });
-      }
+      // if (filterIdType?.includes('-')) {
+      //   const fieldName = filterIdType?.split('=')[1].split('-')[1];
+      //   setSortedInfo({
+      //     order: filterOrder,
+      //     columnKey: fieldName,
+      //   });
+      // } else {
+      //   const fieldName = filterIdType?.split('=')[1];
+      //   setSortedInfo({
+      //     order: filterOrder,
+      //     columnKey: fieldName,
+      //   });
+      // }
     }
   }, [routeHistory]);
 
@@ -161,9 +161,9 @@ export const AccountsList: FC<IProps> = ({ data }) => {
 
       setResponse({ ...resolvedData.data, result: newResult });
 
-      if (pagination?.next === page + 1) {
+      if (pagination?.page_no < pagination?.total_pages) {
         queryCache?.prefetchQuery(
-          [ReactQueryKeys.ACCOUNTS_KEYS, page, sortid, page_size, query],
+          [ReactQueryKeys.ACCOUNTS_KEYS, page + 1, sortid, page_size, query],
           getAllAccountsAPI
         );
       }
@@ -330,6 +330,10 @@ export const AccountsList: FC<IProps> = ({ data }) => {
               ? `-${sorter.field}`
               : sorter.field,
         });
+        setSortedInfo({
+          order: sorter?.order,
+          columnKey: sorter?.columnKey,
+        });
         history.push(
           `/app${ISupportedRoutes.ACCOUNTS}?sortid=${
             sorter && sorter.order === 'descend'
@@ -347,6 +351,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
         page_size: pagination.pageSize,
         sortid: defaultSortedId,
       });
+      setSortedInfo(null);
       history.push(
         `/app${ISupportedRoutes.ACCOUNTS}?sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`
       );
