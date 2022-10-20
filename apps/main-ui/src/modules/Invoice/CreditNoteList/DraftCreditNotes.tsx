@@ -170,7 +170,7 @@ export const DraftCreditNotes: FC = () => {
     if (creditNoteListData?.data) {
       setCreditNoteResponse(creditNoteListData?.data);
 
-      if (creditNoteListData?.data?.pagination?.next === page + 1) {
+      if (pagination?.page_no < pagination?.total_pages) {
         queryCache?.prefetchQuery(
           [
             ReactQueryKeys?.CREDITNOTE_KEYS,

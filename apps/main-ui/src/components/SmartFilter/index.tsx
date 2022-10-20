@@ -451,28 +451,21 @@ export const ParentWrapper: any = styled.div`
   .ant-btn {
     background: ${(props: IThemeProps) => props?.theme?.colors?.buttonTagBg};
     color: ${(props: IThemeProps) => props?.theme?.colors?.buttonTagColor};
-    ${(props: IThemeProps) =>
-      props?.theme?.theme === 'dark' &&
-      `
-    border-color: ${props?.theme?.colors?.seprator};
-    
-    `}
+    border: none !important;
+
+    &:hover {
+      background: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
+      color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE};
+      .filter-icon {
+        color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE};
+      }
+    }
   }
   .filter-icon {
     font-size: ${convertToRem(24)};
     display: flex;
     align-items: center;
-    color: ${(props: any) =>
-      props.isFiltered
-        ? `${(props: IThemeProps) =>
-            props?.theme?.colors?.$PRIMARY};} !important`
-        : (props: IThemeProps) => props?.theme?.colors?.$GRAY};
-  }
-
-  &:hover {
-    .filter-icon {
-      color: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
-    }
+    color: ${(props: IThemeProps) => props?.theme?.colors?.buttonTagColor};
   }
 `;
 

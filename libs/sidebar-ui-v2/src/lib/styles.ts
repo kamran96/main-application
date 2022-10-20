@@ -43,7 +43,7 @@ const subMenuOpen = keyframes`
   `;
 const subMenuClose = keyframes`
   0%{
-    transform: translateY(0);
+    transform: translateY(10px);
     opacity: 1;
     visibility: visible;
     height: auto;

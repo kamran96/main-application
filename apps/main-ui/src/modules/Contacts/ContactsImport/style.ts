@@ -38,6 +38,9 @@ export const WrapperModalContent = styled.div<ModalWrapper>`
     color: ${(props: IThemeProps) => props?.theme?.colors?.itmText};
     /* height: 100vh; */
   }
+  .rendertable {
+    overflow: auto;
+  }
   .TableWrapper {
     width: ${(props: any) => (props?.step === 3 ? '100%' : 0)};
     opacity: ${(props: any) => (props?.step === 3 ? 1 : 0)};
@@ -46,7 +49,7 @@ export const WrapperModalContent = styled.div<ModalWrapper>`
       props?.step === 3 ? 'translateX(0)' : 'translateX(100%)'};
     transition: 0.4s ease-in-out;
     height: 67vh !important;
-    overflow-y: scroll;
+    overflow: auto !important;
 
     .CnfrmBtn {
       display: flex;

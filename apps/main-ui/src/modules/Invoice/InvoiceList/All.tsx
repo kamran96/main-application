@@ -131,9 +131,10 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
       result.forEach((item, index) => {
         newResult.push({ ...item, key: item.id });
       });
+      console.log(pagination, 'pagination');
 
       setAllInvoicesRes({ ...resolvedData.data, result: newResult });
-      if (pagination?.next === page + 1) {
+      if (pagination?.page_no < pagination?.total_pages) {
         queryCache?.prefetchQuery(
           [
             ReactQueryKeys?.INVOICES_KEYS,
