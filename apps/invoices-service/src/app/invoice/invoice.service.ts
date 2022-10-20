@@ -1336,6 +1336,22 @@ export class InvoiceService {
       relations: ['invoiceItems'],
     });
 
+    const allInvoices = await getCustomRepository(InvoiceRepository).find({
+      where: {
+        invoiceType: invoice.invoiceType,
+        status: invoice.status,
+        organizationId: req?.user?.organizationId,
+        branchId: req?.user?.branchId,
+      },
+    });
+
+    const currentIndex = allInvoices.findIndex(
+      (item) => item.id === invoice?.id
+    );
+
+    const nextItem = allInvoices[currentIndex + 1]?.id || null;
+    const prevItem = allInvoices[currentIndex - 1]?.id || null;
+
     const creditNote = await getCustomRepository(CreditNoteRepository)
       .createQueryBuilder()
       .where('"invoiceId" = :id', { id: invoiceId })
@@ -1431,7 +1447,9 @@ export class InvoiceService {
         };
       }
     }
-    return new_invoice ? new_invoice : invoice;
+    return new_invoice
+      ? { ...new_invoice, nextItem, prevItem }
+      : { ...invoice, nextItem, prevItem };
   }
 
   async GetInvoiceNumber(type: string, user: IBaseUser): Promise<string> {

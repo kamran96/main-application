@@ -379,21 +379,6 @@ export class ContactService {
       sort,
       type: contactType,
     } = queryData;
-    const ps: number = parseInt(page_size);
-    const pn: number = parseInt(page_no);
-
-    const { sort_column, sort_order } = await Sorting(sort);
-
-    const myCustomLabels = {
-      docs: 'result',
-      totalDocs: 'total',
-      meta: 'pagination',
-      limit: 'page_size',
-      page: 'page_no',
-      nextPage: 'next',
-      prevPage: 'prev',
-      totalPages: 'total_pages',
-    };
 
     const contacts = await this.contactModel
       .find({
@@ -405,11 +390,9 @@ export class ContactService {
         id: 'ASC',
       });
 
-    console.log(contacts);
-
     const indexed = contacts.findIndex((i) => i.id === contactId);
-
-    console.log(indexed, contactId, 'what is index now');
+    const nextItem = contacts[indexed + 1]?.id || null;
+    const prevItem = contacts[indexed - 1]?.id || null;
 
     // const { page_no, page_size, query: filters, type } = query;
     const contact = await this.contactModel.findById(contactId);
@@ -488,6 +471,8 @@ export class ContactService {
               openingBalance: openingBalance[0],
               result: newLedgerArray,
               contact,
+              nextItem,
+              prevItem,
             };
           }
         }
@@ -531,6 +516,8 @@ export class ContactService {
           pagination: payments.pagination,
           result: newLedgerArray,
           contact,
+          prevItem,
+          nextItem,
         };
       }
     } else if (type == PaymentModes.INVOICES) {
@@ -609,6 +596,8 @@ export class ContactService {
                     },
               result: newLedgerArray,
               contact,
+              prevItem,
+              nextItem,
             };
           }
         }
@@ -652,6 +641,8 @@ export class ContactService {
           pagination: payments.pagination,
           result: newLedgerArray,
           contact,
+          nextItem,
+          prevItem,
         };
       }
     }

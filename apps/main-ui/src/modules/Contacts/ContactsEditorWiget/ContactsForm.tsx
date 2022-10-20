@@ -190,7 +190,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
   /* HOOKS ENDS HERE */
 
   /* Async function to create and update a contact */
-  const onFinish = async (values) => {
+  const handleSubmit = async (values) => {
     let payload = {
       ...values,
       isNewRecord: true,
@@ -290,7 +290,7 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
             }
           }
         }}
-        onFinish={onFinish}
+        // onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
         <Row gutter={24}>
@@ -829,7 +829,14 @@ export const ContactsForm: FC<IProps> = ({ id }) => {
                 >
                   Cancel
                 </Button>
-                <Button loading={isLoading} type="primary" htmlType="submit">
+                <Button
+                  loading={isLoading}
+                  type="primary"
+                  onClick={() => {
+                    const value = form?.getFieldsValue();
+                    handleSubmit(value);
+                  }}
+                >
                   {id ? 'Update' : 'Create'}
                 </Button>
               </div>
