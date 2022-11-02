@@ -417,7 +417,7 @@ export class BillService {
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
 
-    const accountCodesArray = ['40001', '55002'];
+    const accountCodesArray = ['40001'];
     const { data: accounts } = await axios.post(
       Host('accounts', `accounts/account/codes`),
       {

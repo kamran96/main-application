@@ -19,4 +19,9 @@ export class AccountController {
   async IncomeStatment() {
     return await this.accountService.IncomeStatment();
   }
+
+  @Get('changes-in-equity')
+  async ChangesInEquity() {
+    return await this.accountService.ChangesInEquity();
+  }
 }

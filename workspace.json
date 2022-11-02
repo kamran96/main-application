@@ -888,7 +888,7 @@
             "buildTarget": "main-ui:build",
             "hmr": true,
             "host": "localhost",
-            "ssl": true,
+            "ssl": false,
             "sslKey": "./certs/localhost.key",
             "sslCert": "./certs/localhost.crt"
           },

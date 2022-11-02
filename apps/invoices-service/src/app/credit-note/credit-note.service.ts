@@ -230,7 +230,7 @@ export class CreditNoteService {
     if (!req || !req.cookies) return null;
     const token = req.cookies['access_token'];
 
-    const accountCodesArray = ['15004', '40001'];
+    const accountCodesArray = ['15002', '40001'];
     const { data: accounts } = await axios.post<IAccount[]>(
       Host('accounts', `accounts/account/codes`),
       {
@@ -413,7 +413,7 @@ export class CreditNoteService {
 
           if (updatedCreditNote.invoiceType === CreditNoteType.ACCRECCREDIT) {
             const credit = {
-              account_id: await accounts.find((i) => i.code === '15004').id,
+              account_id: await accounts.find((i) => i.code === '15002').id,
               amount: updatedCreditNote.netTotal,
             };
 
@@ -630,7 +630,7 @@ export class CreditNoteService {
 
         if (credit_note.invoiceType === CreditNoteType.ACCRECCREDIT) {
           const credit = {
-            account_id: await accounts.find((i) => i.code === '15004').id,
+            account_id: await accounts.find((i) => i.code === '15002').id,
             amount: dto.netTotal,
           };
 

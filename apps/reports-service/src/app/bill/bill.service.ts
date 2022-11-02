@@ -110,57 +110,123 @@ export class BillService {
 
   async AgedPayables(user) {
     const DB = await Arango();
-
-    const addOneDay = dayjs().add(1, 'day').format('YYYY-MM-DD');
-    const oneMonth = dayjs(addOneDay).add(1, 'month').format('YYYY-MM-DD');
-    const oneMonthToTwoMonths = dayjs(oneMonth)
-      .add(1, 'month')
+    const today = dayjs().format('YYYY-MM-DD');
+    const oneMonth = dayjs(today).subtract(1, 'month').format('YYYY-MM-DD');
+    const twoMonth = dayjs(oneMonth).subtract(1, 'month').format('YYYY-MM-DD');
+    const threemonth = dayjs(twoMonth)
+      .subtract(1, 'month')
       .format('YYYY-MM-DD');
-    const twoMonthToThreeMonths = dayjs(oneMonthToTwoMonths)
-      .add(1, 'month')
+    const fourmonth = dayjs(threemonth)
+      .subtract(1, 'month')
       .format('YYYY-MM-DD');
 
     const current = await DB.query({
       query: `
+        LET current = (
+          FOR i IN bills
+              FILTER i.dueDate >= '${today}'
+              and i.organizationId == @organizationId
+              COLLECT contact = i.contact.name,
+                  invoice = i.invoiceNumber,
+                  dueDate = i.dueDate
+              AGGREGATE balance = SUM(i.total)
+          RETURN {
+              contact,
+              dueDate,
+              invoice,
+              balance
+          }
+      )
+      
+      LET onemonth = (
+          FOR i IN bills
+              FILTER i.dueDate <= '${today}' and i.dueDate >= '${oneMonth}'
+              and i.organizationId == @organizationId
+              COLLECT contact = i.contact.name,
+                  invoice = i.invoiceNumber,
+                  dueDate = i.dueDate
+              AGGREGATE balance = SUM(i.total)
+          RETURN {
+              contact,
+              dueDate,
+              invoice,
+              balance
+          }
+      )
+      
+      LET twomonth = (
+          FOR i IN bills
+              FILTER i.dueDate <= '${oneMonth}' and i.dueDate >= '${twoMonth}'
+              and i.organizationId == @organizationId
+              COLLECT contact = i.contact.name,
+                  invoice = i.invoiceNumber,
+                  dueDate = i.dueDate
+              AGGREGATE balance = SUM(i.total)
+          RETURN {
+              contact,
+              dueDate,
+              invoice,
+              balance
+          }
+      )
+
+      LET threemonth = (
+        FOR i IN bills
+            FILTER i.dueDate <= '${twoMonth}' and i.dueDate >= '${threemonth}'
+            and i.organizationId == @organizationId
+            COLLECT contact = i.contact.name,
+                invoice = i.invoiceNumber,
+                dueDate = i.dueDate
+            AGGREGATE balance = SUM(i.total)
+        RETURN {
+            contact,
+            dueDate,
+            invoice,
+            balance
+        }
+    )
+
+    LET fourmonth = (
       FOR i IN bills
-        FILTER i.organizationId == @organizationId
-        COLLECT contact = i.contact.name,
+          FILTER i.dueDate <= '${threemonth}' and i.dueDate >= '${fourmonth}'
+          and i.organizationId == @organizationId
+          COLLECT contact = i.contact.name,
               invoice = i.invoiceNumber,
               dueDate = i.dueDate
           AGGREGATE balance = SUM(i.total)
-          RETURN {
-              "current": dueDate <= '${addOneDay}' ? {
-              contact,
-              invoice,
-              dueDate: DATE_FORMAT(dueDate, '%dd-%mmm-%yy'),
-              balance
-              } : {},
-              "oneMonth": dueDate >= '${addOneDay}' and dueDate <= '${oneMonth}' ? {
-              contact,
-              invoice,
-              dueDate: DATE_FORMAT(dueDate, '%dd-%mmm-%yy'),
-              balance
-              } : {},
-              "twoMonths": dueDate >= '${oneMonth}' and dueDate <= '${oneMonthToTwoMonths}' ? {
-                contact,
-              invoice,
-              dueDate: DATE_FORMAT(dueDate, '%dd-%mmm-%yy'),
-              balance
-              } : {},
-              "threeMonths": dueDate >= '${oneMonthToTwoMonths}' and dueDate <= '${twoMonthToThreeMonths}' ? {
-                contact,
-              invoice,
-              dueDate: DATE_FORMAT(dueDate, '%dd-%mmm-%yy'),
-              balance
-              } : {},
-              "overThreeMonths": dueDate >= '${twoMonthToThreeMonths}' ? {
-                contact,
-              invoice,
-              dueDate: DATE_FORMAT(dueDate, '%dd-%mmm-%yy'),
-              balance
-              } : {}
-          }
-      `,
+      RETURN {
+          contact,
+          dueDate,
+          invoice,
+          balance
+      }
+    )
+
+    LET older = (
+      FOR i IN bills
+          FILTER i.dueDate <= '${fourmonth}'
+          and i.organizationId == @organizationId
+          COLLECT contact = i.contact.name,
+              invoice = i.invoiceNumber,
+              dueDate = i.dueDate
+          AGGREGATE balance = SUM(i.total)
+      RETURN {
+          contact,
+          dueDate,
+          invoice,
+          balance
+      }
+    )
+      
+    RETURN {
+      Current: current,
+      "< 1 Month": onemonth,
+      "1 Month": twomonth,
+      "2 Month": threemonth,
+      "3 Month": fourmonth,
+      Older: older
+    }
+    `,
       bindVars: { organizationId: user.organizationId },
     });
 

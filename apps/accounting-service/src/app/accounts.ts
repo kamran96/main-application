@@ -29,9 +29,55 @@ export const primary = [
 export const secondary = [
   {
     name: 'Fixed Asset',
-    primary_account_id: '7',
     code: '10000',
-    accounts: [],
+    primary_account_id: '7',
+    accounts: [
+      {
+        name: 'Land',
+        code: '10001',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Building',
+        code: '10002',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Accumulated Depreciation-building',
+        code: '10003',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Equipment',
+        code: '10004',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Accumulated Depreciation-equipment',
+        code: '10005',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Vehicle',
+        code: '10006',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Accumulated Depreciation-vehicle',
+        code: '10007',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Furniture & Fixture',
+        code: '10008',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Accumulated Depreciation-furniture & Fixture',
+        code: '10009',
+        isSystemAccount: true,
+      },
+    ],
   },
   {
     name: 'Current Asset',
@@ -40,12 +86,11 @@ export const secondary = [
     accounts: [
       {
         name: 'Cash In Hand',
-        status: '1',
         code: '15001',
         isSystemAccount: true,
       },
       {
-        name: 'Bills Receivable',
+        name: 'Account Receivable',
         code: '15002',
         isSystemAccount: true,
       },
@@ -55,101 +100,19 @@ export const secondary = [
         isSystemAccount: true,
       },
       {
-        name: 'Cash Receiveable',
+        name: 'Inventory',
         code: '15004',
         isSystemAccount: true,
       },
       {
-        name: 'Inventory',
+        name: 'Prepaid Expense',
         code: '15005',
         isSystemAccount: true,
       },
     ],
   },
   {
-    name: 'Indirect Expense',
-    code: '25000',
-    primary_account_id: '11',
-    accounts: [
-      {
-        name: 'Office Expense',
-        code: '25001',
-        isSystemAccount: true,
-      },
-      {
-        name: 'Employees Salary',
-        code: '25002',
-        isSystemAccount: true,
-      },
-      {
-        name: 'Telephone Expense',
-        code: '25003',
-        isSystemAccount: true,
-      },
-      {
-        name: 'Depreciation',
-        code: '25004',
-        isSystemAccount: true,
-      },
-      {
-        name: 'Discount (Dr) / Discount Allowed',
-        code: '25005',
-        isSystemAccount: true,
-      },
-      {
-        name: 'Donation',
-        code: '25006',
-        isSystemAccount: true,
-      },
-      {
-        name: 'Electricity Expenses',
-        code: '25007',
-        isSystemAccount: true,
-      },
-      {
-        name: 'Export Duty',
-        code: '25008',
-        isSystemAccount: true,
-      },
-      {
-        name: 'Freight on Sale (Freight Outward)',
-        code: '25009',
-        isSystemAccount: true,
-      },
-      {
-        name: 'Freight Outward',
-        code: '25010',
-        isSystemAccount: true,
-      },
-      {
-        name: 'Interest (Dr.)',
-        code: '25011',
-        isSystemAccount: true,
-      },
-      {
-        name: 'Miscellaneous Expenses',
-        code: '25012',
-        isSystemAccount: true,
-      },
-      {
-        name: 'Office Expenses',
-        code: '25013',
-        isSystemAccount: true,
-      },
-      {
-        name: 'Printing & Advertisement',
-        code: '25014',
-        isSystemAccount: true,
-      },
-      {
-        name: 'Printing & Stationery',
-        code: '25015',
-        isSystemAccount: true,
-      },
-    ],
-  },
-  {
-    name: 'Direct Expense',
+    name: 'Expense',
     code: '20000',
     primary_account_id: '11',
     accounts: [
@@ -168,41 +131,196 @@ export const secondary = [
         code: '20003',
         isSystemAccount: true,
       },
+      {
+        name: 'Depreciation',
+        code: '20004',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Discount (Dr) / Discount Allowed',
+        code: '20005',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Donation',
+        code: '20006',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Electricity Expenses',
+        code: '20007',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Export Duty',
+        code: '20008',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Interest',
+        code: '20009',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Miscellaneous Expenses',
+        code: '20010',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Office Expenses',
+        code: '20011',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Stationery',
+        code: '20012',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Bank Charges',
+        code: '20013',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Bad Debts',
+        code: '20014',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Wages',
+        code: '20015',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Salaries',
+        code: '20016',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Utilities',
+        code: '20017',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Rent',
+        code: '20018',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Bonus and Employee Incentives',
+        code: '20019',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Insurance',
+        code: '20020',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Fuel',
+        code: '20021',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Repair & Maintainance',
+        code: '20022',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Telephone Charges',
+        code: '20023',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Supplies Expense',
+        code: '20024',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Meals & Entertainment',
+        code: '20025',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Travel Expenses',
+        code: '20026',
+        isSystemAccount: true,
+      },
     ],
   },
   {
-    name: 'Fixed Liability',
-    status: '1',
-    primary_account_id: '9',
+    name: 'Long-term Liability',
     code: '45000',
-    accounts: [],
+    primary_account_id: '9',
+    accounts: [
+      {
+        name: 'Bonds Payable',
+        code: '45001',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Long-term Debt',
+        code: '45002',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Deferred Revenue',
+        code: '45003',
+        isSystemAccount: true,
+      },
+    ],
   },
   {
     name: 'Current Liability',
-    primary_account_id: '9',
     code: '40000',
+    primary_account_id: '9',
     accounts: [
       {
-        name: 'Bills Payable',
+        name: 'Account Payable',
         code: '40001',
         isSystemAccount: true,
       },
       {
-        name: 'Capital',
+        name: 'Unearned Revenue',
         code: '40002',
         isSystemAccount: true,
       },
       {
-        name: 'Purchase Payable',
+        name: 'Current Portion of Longterm Debt',
         code: '40003',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Interest Payable',
+        code: '40004',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Salaries Payable',
+        code: '40005',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Taxes Payable',
+        code: '40006',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Accrued Payable',
+        code: '40007',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Dividend Payable',
+        code: '40008',
         isSystemAccount: true,
       },
     ],
   },
   {
-    name: 'Direct Income',
-    primary_account_id: '8',
+    name: 'Revenue',
     code: '50000',
+    primary_account_id: '8',
     accounts: [
       {
         name: 'Sales',
@@ -219,34 +337,53 @@ export const secondary = [
         code: '50003',
         isSystemAccount: true,
       },
-    ],
-  },
-  {
-    name: 'Indirect Income',
-    primary_account_id: '8',
-    code: '55000',
-    accounts: [
-      {
-        name: 'Commission (Cr.) / Commission Received',
-        code: '55001',
-        isSystemAccount: true,
-      },
       {
         name: 'Discount (Cr.) / Discount Received',
-        code: '55002',
+        code: '50004',
         isSystemAccount: true,
       },
       {
         name: 'Miscellaneous Income',
         isSystemAccount: true,
-        code: '55003',
+        code: '50005',
+      },
+      {
+        name: 'Investment Income',
+        isSystemAccount: true,
+        code: '50006',
+      },
+      {
+        name: 'Fess Earned',
+        isSystemAccount: true,
+        code: '50007',
+      },
+      {
+        name: 'Commission',
+        isSystemAccount: true,
+        code: '50008',
       },
     ],
   },
   {
-    name: "Owner's Equity",
-    primary_account_id: '10',
+    name: 'Equity',
     code: '30000',
-    accounts: [],
+    primary_account_id: '10',
+    accounts: [
+      {
+        name: 'Share Capital',
+        code: '30001',
+        isSystemAccount: true,
+      },
+      {
+        name: 'Retained Earnings',
+        code: '30002',
+        isSystemAccount: true,
+      },
+      {
+        name: 'General Reserves / Other Reserves',
+        code: '30003',
+        isSystemAccount: true,
+      },
+    ],
   },
 ];

@@ -116,4 +116,42 @@ export class AccountService {
 
     return result.all();
   }
+
+  async ChangesInEquity() {
+    const DB = await Arango();
+    const result = await DB.query(aql`
+    LET result = (
+        FOR i IN transactions
+            FILTER i.account.primaryAccount.name == 'equity'
+            COLLECT account = i.account.name,
+                id = i.account.id
+            AGGREGATE balance = SUM(i.amount)
+            RETURN {id, account: account, balance}
+    )
+
+    LET total_debits = (
+        FOR i IN transactions
+            FILTER i.transactionType == 10 && i.account.primaryAccount.name == 'equity'
+            COLLECT tt = i.transactionType
+            AGGREGATE balance = SUM(i.amount)
+            RETURN balance
+    )
+
+    LET total_credits = (
+        FOR i IN transactions
+            FILTER i.transactionType == 20 && i.account.primaryAccount.name == 'equity'
+            COLLECT tt = i.transactionType
+            AGGREGATE balance = SUM(i.amount)
+            RETURN balance
+    )
+
+    RETURN {
+        result,
+        total_debits,
+        total_credits,
+    }
+    `);
+
+    return result.all();
+  }
 }

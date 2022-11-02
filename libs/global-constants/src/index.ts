@@ -1,6 +1,7 @@
 export * from './lib/global-constants.module';
 import * as fs from 'fs';
 import axios from 'axios';
+import { Logger } from '@nestjs/common';
 
 export enum Integrations {
   XERO = 'XE',
@@ -87,7 +88,7 @@ export const MQ_HOST = () => {
   return process.env['NODE' + '_ENV'] === 'production' ||
     process.env['NODE' + '_ENV'] === 'staging'
     ? `amqp://${process.env.RABBIT_USERNAME}:${process.env.RABBIT_PASSWORD}@${process.env.RABBIT_HOST}:${process.env.RABBIT_PORT}`
-    : 'amqp://localhost:5672';
+    : `amqp://${process.env.RABBIT_USERNAME}:${process.env.RABBIT_PASSWORD}@${process.env.RABBIT_HOST}:${process.env.RABBIT_PORT}`;
 };
 
 export const ARANGO_DB_CONNECTION = () => {
