@@ -24,10 +24,10 @@ WORKDIR /home/node/app
 COPY --chown=node:node --from=build /app /home/node/app/node_modules
 COPY --chown=node:node --from=build /app/package-lock.json /home/node/app/package-lock.json
 COPY --chown=node:node ./dist/apps/payments-service /home/node/app
-COPY --chown=node:node --from=build /app/generate-ssl.sh /home/node/app/generate-ssl.sh
+# COPY --chown=node:node --from=build /app/generate-ssl.sh /home/node/app/generate-ssl.sh
 
-RUN chmod +x /home/node/app/generate-ssl.sh
-RUN cd /home/node/app/ && ./generate-ssl.sh
+# RUN chmod +x /home/node/app/generate-ssl.sh
+# RUN cd /home/node/app/ && ./generate-ssl.sh
 
 
 # nx has a bug (which isn't picking pg). once it's fixed, we can remove it.

@@ -26,8 +26,9 @@ COPY --chown=node:node --from=build /app/package-lock.json /home/node/app/packag
 COPY --chown=node:node ./dist/apps/users-service /home/node/app
 COPY --chown=node:node --from=build /app/generate-ssl.sh /home/node/app/generate-ssl.sh
 
-RUN chmod +x /home/node/app/generate-ssl.sh
-RUN cd /home/node/app/ && ./generate-ssl.sh
+# RUN if [ "$NODE_ENV" != "production" || "$NODE_ENV" != "staging" ];  then \
+#     RUN chmod +x /home/node/app/generate-ssl.sh \
+#     RUN cd /home/node/app/ && ./generate-ssl.sh; fi
 
 RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express --legacy-peer-deps
 
