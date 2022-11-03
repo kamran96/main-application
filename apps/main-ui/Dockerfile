@@ -3,7 +3,7 @@ FROM node:lts-alpine as build
 WORKDIR /app
 COPY ./nginx/nginx.conf .
 COPY ./dist/apps/main-ui .
-COPY ./ssl/generate-ssl.sh .
+# COPY ./ssl/generate-ssl.sh .
 
 FROM node:lts-alpine
 FROM nginx:alpine
@@ -25,10 +25,10 @@ COPY --from=build /app /usr/share/nginx/html
 
 # needed this to make React Router work properly 
 RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 # RUN chmod +x /usr/share/nginx/html/generate-ssl.sh
 # RUN cd /usr/share/nginx/html/ && ./generate-ssl.sh
-RUN rm /etc/nginx/conf.d/default.conf
-COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
 
 
 EXPOSE ${PORT}
