@@ -24,7 +24,7 @@ COPY --from=build /app /usr/share/nginx/html
 
 
 # needed this to make React Router work properly 
-# RUN rm /etc/nginx/conf.d/default.conf
+RUN rm /etc/nginx/conf.d/default.conf
 # RUN chmod +x /usr/share/nginx/html/generate-ssl.sh
 # RUN cd /usr/share/nginx/html/ && ./generate-ssl.sh
 RUN rm /etc/nginx/conf.d/default.conf
