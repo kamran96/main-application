@@ -88,7 +88,7 @@ export const Themes: IThemes = {
     $Primary2: `#1e5b9e`,
     layoutBg: `#efefef`,
     sidebarBg: '#ffff',
-    sidebarListActive: '#F6FAFF', //sidebar 
+    sidebarListActive: '#F6FAFF', //sidebar
     sidebarListActiveText: '#7988FF',
     sidebarDefaultText: 'rgba(62, 62, 60, 0.75)',
     tableRowHover: '#151515',
@@ -142,7 +142,7 @@ export const Themes: IThemes = {
     $Primary2: `#1e5b9e`,
     layoutBg: `#1B1B1B`,
     sidebarBg: '#1f1f1f', //sidebar
-    sidebarListActiveText: '#e4e4e4',
+    sidebarListActiveText: '#16324f',
     sidebarListActive: '#373737',
     sidebarDefaultText: `#C2C2C2`,
     tableRowHover: '#fafafa',

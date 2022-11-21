@@ -22,6 +22,11 @@ import { NOTIFICATIONTYPE } from '@invyce/shared/types';
 import { IBaseAPIError, IServerError } from '../../modal/base';
 import { updateToken } from '../../utils/http';
 import phoneCodes from '../../utils/phoneCodes';
+import industriesList from '../../utils/industriesList';
+import moment from 'moment';
+import { useState } from 'react';
+
+const { MonthPicker } = DatePicker;
 
 const { Option } = Select;
 
@@ -30,6 +35,9 @@ interface IProps {
 }
 
 export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerMode, setPickerMode] = useState<'date' | 'month'>('month');
+
   const queryCache = useQueryClient();
   const {
     mutate: mutateAddOrganization,
@@ -46,6 +54,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
     setUserDetails,
     handleLogin,
     refetchUser,
+    userDetails,
   } = useGlobalContext();
   const { id, visibility } = organizationModalConfig;
 
@@ -59,7 +68,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
   const errorResponse: IBaseAPIError = error;
 
   useEffect(() => {
-    if (data && data.data && data.data.result) {
+    if (data?.data?.result) {
       const { result } = data.data;
       form.setFieldsValue({
         ...result,
@@ -68,12 +77,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
         city: result?.address?.city,
         postalCode: result?.address?.postalCode,
       });
-    } else if (
-      errorResponse &&
-      errorResponse.response &&
-      errorResponse.response.data &&
-      errorResponse.response.data.message
-    ) {
+    } else if (errorResponse?.response?.data?.message) {
       const { message } = errorResponse.response.data;
       notificationCallback(NOTIFICATIONTYPE.ERROR, message);
     }
@@ -97,12 +101,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
         handleClose();
       },
       onError: (error: IServerError) => {
-        if (
-          error &&
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
+        if (error?.response?.data?.message) {
           const { message } = error.response.data;
           notificationCallback(NOTIFICATIONTYPE.ERROR, message);
         } else {
@@ -146,7 +145,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
   const prefixSelector = (
     <Form.Item name="prefix" noStyle>
       <Select
-        style={{ width: 120 }}
+        style={{ width: 100 }}
         showSearch
         filterOption={(input, option) => {
           return (
@@ -176,6 +175,11 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
       </Select>
     </Form.Item>
   );
+
+  function disabledYear(current) {
+    const customYear = '11-25';
+    return current && current > moment(customYear, 'MM-DD');
+  }
 
   return (
     <CommonModal
@@ -222,7 +226,32 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
             <Col span={12}>
               <Form.Item
                 name="email"
-                label="Email?"
+                label={
+                  <div
+                    className="flex alignCenter justifySpacebetween"
+                    style={{ margin: '-9px 0' }}
+                  >
+                    Email
+                    <div
+                      className="textRight ml-13 cursor"
+                      style={{
+                        position: 'absolute',
+                        left: '170px',
+                        width: '100%',
+                      }}
+                    >
+                      <Button
+                        type="link"
+                        size="middle"
+                        onClick={() =>
+                          form.setFieldsValue({ email: userDetails?.email })
+                        }
+                      >
+                        Same as primary email
+                      </Button>
+                    </div>
+                  </div>
+                }
                 rules={[{ required: true, message: 'Email is required!' }]}
               >
                 <Input
@@ -272,6 +301,33 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
                 />
               </Form.Item>
             </Col>
+            <Col span={12}>
+              <Form.Item name="organizationtype" label="Organization Type">
+                <Select
+                  size="middle"
+                  showSearch
+                  style={{ width: '100%' }}
+                  placeholder="Select Organization type"
+                  filterOption={(input, option) => {
+                    return option?.title
+                      ?.toLowerCase()
+                      .includes(input?.toLocaleLowerCase());
+                  }}
+                >
+                  {industriesList?.industries?.map((organization, index) => {
+                    return (
+                      <Option
+                        key={index}
+                        title={organization}
+                        value={`${organization}`}
+                      >
+                        <span>{organization}</span>
+                      </Option>
+                    );
+                  })}
+                </Select>
+              </Form.Item>
+            </Col>
           </Row>
           <Row gutter={24}>
             <Col span={24}>
@@ -280,7 +336,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
               </h3>
               <Seprator />
             </Col>
-            <Col span={12}>
+            {/* <Col span={12}>
               <Form.Item
                 name="country"
                 rules={[{ required: true }]}
@@ -320,7 +376,7 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
                   })}
                 </Select>
               </Form.Item>
-            </Col>
+            </Col> */}
 
             <Col span={12}>
               <Form.Item name="city" label="City">
@@ -346,11 +402,32 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
               <Seprator />
             </Col>
             <Col span={12}>
-              <Form.Item name="financialEnding" label="Financial Year Ends">
+              <Form.Item name="financialEnding" label="Ends Financial Year">
                 <DatePicker
+                  dropdownClassName={
+                    pickerMode === 'month' ? 'myCustomPicker' : 'normalPicker'
+                  }
+                  open={pickerOpen}
+                  onOpenChange={(op) => {
+                    if (op === false && pickerMode === 'month') {
+                      return;
+                    } else if (op === false && pickerMode === 'date') {
+                      setPickerOpen(op);
+                      setTimeout(() => {
+                        setPickerMode('month');
+                      }, 300);
+                    } else {
+                      setPickerOpen(op);
+                    }
+                  }}
+                  onChange={(value) => {
+                    setPickerMode('date');
+                    console.log(value);
+                  }}
+                  format={'DD-MMMM'}
                   style={{ width: '100%' }}
                   size="middle"
-                  picker={'month'}
+                  picker={pickerMode}
                 />
               </Form.Item>
             </Col>

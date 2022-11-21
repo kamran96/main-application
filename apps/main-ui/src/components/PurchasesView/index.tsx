@@ -39,7 +39,6 @@ import { PrintViewPurchaseWidget } from '../PurchasesWidget/PrintViewPurchaseWid
 import { totalDiscountInInvoice } from '../../utils/formulas';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { InvoicePDF } from '../PDFs';
-import DummyLogo from '../../assets/quickbook.png';
 import { plainToClass } from 'class-transformer';
 import { ISupportedRoutes } from '@invyce/shared/types';
 interface IProps {
@@ -386,6 +385,7 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
     email: organizationEmail,
     phoneNumber: organizationContact,
     website,
+    attachment,
   } = organization;
   const { city, country, postalCode } = organizationAddress;
 
@@ -398,7 +398,7 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
     organizationEmail,
     address: '',
     code: postalCode,
-    logo: DummyLogo,
+    logo: attachment?.path,
     website,
   };
 
@@ -687,7 +687,7 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
                     <th>Sub Total</th>
                     <td>{moneyFormat(response?.grossTotal)}</td>
                   </tr>
-                  {type !== IInvoiceType.PURCHASE_ORDER &&
+                  {/* {type !== IInvoiceType.PURCHASE_ORDER &&
                     type !== IInvoiceType.BILL &&
                     type !== IInvoiceType.CREDITNOTE &&
                     type !== IInvoiceType.DEBITNOTE && (
@@ -695,7 +695,7 @@ export const PurchasesView: FC<IProps> = ({ id, type, onApprove }) => {
                         <th>Invoice Discount</th>
                         <td>{response && moneyFormat(invoiceDiscount)}</td>
                       </tr>
-                    )}
+                    )} */}
                   <tr>
                     <th>Tax Rate</th>
                     <td>{response && moneyFormat(TotalTax)}</td>

@@ -48,9 +48,17 @@ interface IProps {
   children: ReactElement<any>;
   id?: number | string;
 }
+
+interface IOrderItem {
+  itemId: number | string;
+  quantity: number;
+  description: string;
+  index: number;
+  [key: string]: any;
+}
 export const PurchaseOrderWidgetManager: FC<IProps> = ({ children, id }) => {
   const [antForm] = Form.useForm();
-  const [state, setState] = useState([
+  const [state, setState] = useState<IOrderItem[]>([
     {
       itemId: null,
       quantity: 1,
@@ -131,9 +139,9 @@ export const PurchaseOrderWidgetManager: FC<IProps> = ({ children, id }) => {
     ]);
   };
 
-  useShortcut('i', handleAddRow);
-  useShortcut('b', removeRowFromLastIndex);
-  useShortcut('/', ClearAll);
+  useShortcut('command+i , ctrl+i', handleAddRow);
+  useShortcut('command+b , ctrl+b', removeRowFromLastIndex);
+  useShortcut('command+/ , ctrl+/', ClearAll);
 
   const { Colors } = useGlobalContext();
 
@@ -173,6 +181,16 @@ export const PurchaseOrderWidgetManager: FC<IProps> = ({ children, id }) => {
       render: (value, record, index) => {
         return (
           <EditableSelect
+            onClick={() => {
+              setState((prev) => {
+                const clone = [...prev];
+                clone[index] = {
+                  ...clone[index],
+                  rerender: Math.random() * 999,
+                };
+                return clone;
+              });
+            }}
             value={{
               value: value !== null ? value : '',
               label: `${

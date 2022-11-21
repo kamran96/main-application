@@ -104,6 +104,7 @@ export const CommonTable: FC<IProps> = ({
     email: organizationEmail,
     phoneNumber: organizationContact,
     website,
+    attachment,
   } = organization;
   const { city, country, postalCode } = organizationAddress;
 
@@ -238,7 +239,7 @@ export const CommonTable: FC<IProps> = ({
                       organizationEmail,
                       address: '',
                       code: postalCode,
-                      logo: DummyLogo,
+                      logo: organization?.attachment?.path,
                       website,
                     }}
                     data={tableData}
@@ -319,36 +320,38 @@ export const CommonTable: FC<IProps> = ({
   /* JSX */
   return (
     <>
-      <div className={'_visibleOnPrint'} ref={printRef}>
-        <PrintFormat>
-          <>
-            <div className="mb-30">
-              <PrintHeaderFormat hasbackgroundColor={true}>
-                <TableDivisions
-                  divisions={[
-                    {
-                      element: <TopbarLogoWithDetails />,
-                    },
-                    {
-                      element: <Addressbar />,
-                    },
-                  ]}
+      {hasPrint && (
+        <div className={'_visibleOnPrint'} ref={printRef}>
+          <PrintFormat>
+            <>
+              <div className="mb-30">
+                <PrintHeaderFormat hasbackgroundColor={true}>
+                  <TableDivisions
+                    divisions={[
+                      {
+                        element: <TopbarLogoWithDetails />,
+                      },
+                      {
+                        element: <Addressbar />,
+                      },
+                    ]}
+                  />
+                </PrintHeaderFormat>
+                <PrintTitle title={printTitle} />
+              </div>
+              <div className={'antd-table-print'}>
+                <Table
+                  pagination={pagination}
+                  columns={printColumns ? printColumns : columns}
+                  dataSource={[..._newData]}
+                  // loading
+                  {...printScrollconfig}
                 />
-              </PrintHeaderFormat>
-              <PrintTitle title={printTitle} />
-            </div>
-            <div className={'antd-table-print'}>
-              <Table
-                pagination={pagination}
-                columns={printColumns ? printColumns : columns}
-                dataSource={[..._newData]}
-                // loading
-                {...printScrollconfig}
-              />
-            </div>
-          </>
-        </PrintFormat>
-      </div>
+              </div>
+            </>
+          </PrintFormat>
+        </div>
+      )}
 
       <WrapperTable
         scrollabletable={themeScroll}

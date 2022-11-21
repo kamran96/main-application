@@ -3,6 +3,9 @@ import React, { FC, ReactElement } from 'react';
 import { BoldText } from '../Para/BoldText';
 import { P } from '../Typography';
 import './print.css';
+import './balancesheet.css';
+import './printTopbar.css';
+import './invoicesprint.css';
 
 interface IProps {
   children: ReactElement<any>;

@@ -110,7 +110,7 @@ const UserInviteModal2: FC = () => {
       okButtonProps={{ loading: false }}
     >
       <UserInviteModalWrapper>
-        <Form onFinish={onFinish} onFinishFailed={onFinishFailed}>
+        <Form form={form} onFinishFailed={onFinishFailed}>
           <FormLabel>Full Name</FormLabel>
           <Form.Item
             name="fullName"
@@ -212,7 +212,11 @@ const UserInviteModal2: FC = () => {
                 loading={invitingUser}
                 type="primary"
                 size="middle"
-                htmlType="submit"
+                // htmlType="submit"
+                onClick={() => {
+                  const values = form?.getFieldsValue();
+                  onFinish(values);
+                }}
               >
                 Add User
               </Button>

@@ -293,29 +293,44 @@ export class AuthService {
           },
         });
 
-      if (user?.profile?.attachmentId) {
-        const attachmentId = user?.profile?.attachmentId;
+      const profileAttachmentId = user?.profile?.attachmentId;
+      const organizationAttachmentId = user?.organization?.attachmentId;
 
+      if (profileAttachmentId || organizationAttachmentId) {
         if (!req || !req.cookies) return null;
         const token = req.cookies['access_token'];
+        const getAttachments = async (__id) => {
+          const request = {
+            url: Host('attachments', `attachments/attachment/${__id}`),
+            method: 'GET',
+            headers: {
+              cookie: `access_token=${token}`,
+            },
+          };
 
-        const request = {
-          url: Host('attachments', `attachments/attachment/${attachmentId}`),
-          method: 'GET',
-          headers: {
-            cookie: `access_token=${token}`,
-          },
+          const { data: attachment } = await axios(request as unknown);
+
+          return attachment;
         };
 
-        const { data: attachment } = await axios(request as unknown);
-        let new_obj = {};
+        const profileAttachment = profileAttachmentId
+          ? await getAttachments(profileAttachmentId)
+          : null;
+        const organizationAttachment = organizationAttachmentId
+          ? await getAttachments(organizationAttachmentId)
+          : null;
 
-        if (user?.profile?.attachmentId == attachment.id) {
-          new_obj = {
-            ...user.toObject(),
-            profile: { ...user.profile?.toObject(), attachment },
-          };
-        }
+        const new_obj = {
+          ...user.toObject(),
+          profile: {
+            ...user.profile?.toObject(),
+            attachment: profileAttachment,
+          },
+          organization: {
+            ...user.organization?.toObject(),
+            attachment: organizationAttachment,
+          },
+        };
 
         return new_obj;
       } else {

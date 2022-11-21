@@ -158,7 +158,7 @@ const Editor: FC<IProps> = ({ id }) => {
     antForm.setFieldsValue({ issueDate: dayjs(), dueDate: dayjs() });
   }, []);
 
-  const onFinish = async (value) => {
+  const handleSubmit = async (value) => {
     const invId = id && typeof id === 'string' ? parseInt(id) : id;
 
     let payload = {
@@ -171,6 +171,7 @@ const Editor: FC<IProps> = ({ id }) => {
         if (id) {
           delete item.item;
         }
+        delete item?.rerender;
         return { ...item, sequence: index };
       }),
     };
@@ -251,11 +252,7 @@ const Editor: FC<IProps> = ({ id }) => {
       <Card>
         <Row gutter={4}>
           <Col span={24}>
-            <Form
-              form={antForm}
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-            >
+            <Form form={antForm} onFinishFailed={onFinishFailed}>
               <div className="ref_header">
                 <Row gutter={24}>
                   <Col span={5} className="custom_col">
@@ -406,12 +403,14 @@ const Editor: FC<IProps> = ({ id }) => {
                         },
                       });
                       setStatus(2);
+                      const value = antForm?.getFieldsValue();
+                      handleSubmit(value);
                     }}
                     loading={creatingPurchaseOrder}
                     type="default"
                     size="middle"
                     className="mr-10"
-                    htmlType="submit"
+                    // htmlType="submit"
                   >
                     Save
                   </Button>
@@ -425,12 +424,14 @@ const Editor: FC<IProps> = ({ id }) => {
                         },
                       });
                       setStatus(2);
+                      const value = antForm?.getFieldsValue();
+                      handleSubmit(value);
                     }}
                     loading={creatingPurchaseOrder}
                     type="primary"
                     size="middle"
                     className="mr-10"
-                    htmlType="submit"
+                    // htmlType="submit"
                   >
                     Save & Print
                   </Button>

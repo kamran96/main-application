@@ -257,6 +257,7 @@ export const CompareDataModal: FC<IProps> = ({
 };
 
 export const CompareDataModalWrapper = styled.div`
+  overflow-y: auto;
   .CnfrmBtn {
     display: flex;
     justify-content: flex-end;

@@ -119,7 +119,7 @@ export enum LightColors {
   inputColor = `rgba(0, 0, 0, 0.85)`,
   inputColorBg = ``,
   antIcon = ``,
-  disabled = ``,
+  disabled = `#f5f5f5`,
   formLabel = `#4a4a4a`,
   primaryButtonBg = ``,
   primaryButtonColor = '',
@@ -162,7 +162,7 @@ export enum LightColors {
 
 export enum DarkColors {
   $PRIMARY = '#e4e4e4',
-  $Secondary = '#000000',
+  $Secondary = '#ffffff',
   topbar = '#121212',
   $BLACK = '#e4e4e4',
   $LIGHT_BLACK = '#a0a0a0',
@@ -178,7 +178,7 @@ export enum DarkColors {
   layoutBg = `#040B10;`,
   sidebarBg = '#0B1822',
   sidebarListActiveText = '#FFFFFF',
-  sidebarListActive = '#060E16',
+  sidebarListActive = '#16324f',
   sidebarDefaultText = ` #CED3DA;`,
   tableRowHover = '#fafafa',
   td = `#08131D`,

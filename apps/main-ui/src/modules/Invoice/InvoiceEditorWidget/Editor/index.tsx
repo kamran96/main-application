@@ -4,7 +4,11 @@ import Icon from '@iconify/react';
 import { EditableTable } from '@invyce/editable-table';
 import { IContact } from '@invyce/interfaces';
 import { invycePersist } from '@invyce/invyce-persist';
-import { IContactTypes, ReactQueryKeys } from '@invyce/shared/types';
+import {
+  IContactTypes,
+  QueryInvalidate,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import dayjs from 'dayjs';
@@ -156,13 +160,12 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
 
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
+
   const onFinish = async (value) => {
     const email =
       contactEmail || getContactById(value?.contactId)?.email || null;
 
     const errors = handleCheckValidation(invoiceItems);
-
-    console.log(value, 'values', errors, 'errors');
 
     if (!errors.length) {
       const paymentData = { ...payment };
@@ -181,6 +184,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
         isNewRecord: true,
 
         invoice_items: invoiceItems.map((item, index) => {
+          delete item?.rerender;
           return { ...item, sequence: index };
         }),
       };
@@ -210,14 +214,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
           /* this will clear invoice items, formdata and payment */
           refetchInvoiceNumber();
 
-          [
-            ReactQueryKeys?.INVOICES_KEYS,
-            ReactQueryKeys?.TRANSACTION_KEYS,
-            ReactQueryKeys?.ITEMS_KEYS,
-            ReactQueryKeys?.INVOICE_VIEW,
-            ReactQueryKeys.CONTACT_VIEW,
-            'all-items',
-          ].forEach((key) => {
+          QueryInvalidate.invoices.forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           });
           history.push(
@@ -243,16 +240,13 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     ClearAll();
     if (id) {
       queryCache.removeQueries(`${type}-${id}-view`);
-      let route: any = history.location.pathname.split('/');
+      const route = history.location.pathname.split('/');
       if (route.length > 3) {
         const removeIndex = route.length - 1;
         route.splice(removeIndex, 1);
-        route = route.join('/');
-      } else {
-        route = route.join('/');
       }
 
-      history.push(route);
+      history.push(route?.join('/'));
     }
   };
 
@@ -284,6 +278,26 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     return filteredContact;
   };
 
+  const handleSubmit = (values) => {
+    const contact: IContact = getContactById(values?.contactId);
+    if (
+      contact?.balance >= contact?.creditLimitBlock ||
+      NetTotal > contact?.creditLimitBlock
+    ) {
+      notificationCallback(
+        NOTIFICATIONTYPE.WARNING,
+        'Contact has reached credit block limit, Invoice cannot be created'
+      );
+    } else if (
+      contact?.balance >= contact.creditLimit ||
+      (NetTotal > contact?.creditLimit && !bypassCreditLimit)
+    ) {
+      setCreditLimitModal({ visibility: true, contact: contact?.name });
+    } else {
+      onFinish(values);
+    }
+  };
+
   /* JSX  */
   return (
     <WrapperInvoiceForm>
@@ -306,25 +320,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
       <div className=" _disable_print">
         <Form
           form={AntForm}
-          onFinish={(values) => {
-            const contact: IContact = getContactById(values?.contactId);
-            if (
-              contact?.balance >= contact?.creditLimitBlock ||
-              NetTotal > contact?.creditLimitBlock
-            ) {
-              notificationCallback(
-                NOTIFICATIONTYPE.WARNING,
-                'Contact has reached credit block limit, Invoice cannot be created'
-              );
-            } else if (
-              contact?.balance >= contact.creditLimit ||
-              (NetTotal > contact?.creditLimit && !bypassCreditLimit)
-            ) {
-              setCreditLimitModal({ visibility: true, contact: contact?.name });
-            } else {
-              onFinish(values);
-            }
-          }}
+          // onFinish={}
           onFinishFailed={onFinishFailed}
           onValuesChange={(changedField, allvalues) => {
             const _formData =
@@ -595,7 +591,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                     </p>
                   </Col>
                   <Col className="flex alignCenter" span={12}>
-                    <p className="bold">Items Discount</p>
+                    <p className="bold">Discount</p>
                   </Col>
                   <Col span={12}>
                     <p className="light textRight">
@@ -604,7 +600,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                         : moneyFormat(0)}
                     </p>
                   </Col>
-                  <Col className="flex alignCenter" span={12}>
+                  {/* <Col className="flex alignCenter" span={12}>
                     <p className="bold">Invoice Discount</p>
                   </Col>
                   <Col span={12}>
@@ -623,7 +619,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                         />
                       </Form.Item>
                     </div>
-                  </Col>
+                  </Col> */}
                   <Col span={24}>
                     <Seprator />
                   </Col>
@@ -642,7 +638,8 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
               <div className="actions">
                 <Form.Item name="status" className="actions_control">
                   <Button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
                       ClearAll();
                     }}
                     size={'middle'}
@@ -655,9 +652,10 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                       invoiceCreating && submitType === ISUBMITTYPE.DRAFT
                     }
                     disabled={invoiceCreating}
-                    htmlType="submit"
+                    // htmlType="submit"
                     size={'middle'}
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSubmitType(ISUBMITTYPE.DRAFT);
                       AntForm.setFieldsValue({
                         status: {
@@ -665,6 +663,8 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                           print: false,
                         },
                       });
+                      const value = AntForm?.getFieldsValue();
+                      handleSubmit(value);
                     }}
                   >
                     {type === IInvoiceType.QUOTE ? 'Save' : 'Draft'}
@@ -686,10 +686,11 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                             invoiceCreating &&
                             submitType === ISUBMITTYPE.APPROVE_PRINT
                           }
-                          htmlType="submit"
+                          // htmlType="submit"
                           size={'middle'}
                           type="primary"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.preventDefault();
                             setSubmitType(ISUBMITTYPE.APPROVE_PRINT);
                             AntForm.setFieldsValue({
                               status: {
@@ -697,6 +698,8 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                                 print: true,
                               },
                             });
+                            const value = AntForm?.getFieldsValue();
+                            handleSubmit(value);
                           }}
                         >
                           <span className="flex alignCenter ">
@@ -710,15 +713,16 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                             invoiceCreating &&
                             submitType === ISUBMITTYPE.ONLYAPPROVE
                           }
-                          htmlType={
-                            getContactById(AntForm.getFieldValue('contactId'))
-                              ?.email
-                              ? 'submit'
-                              : 'button'
-                          }
+                          // htmlType={
+                          //   getContactById(AntForm.getFieldValue('contactId'))
+                          //     ?.email
+                          //     ? 'submit'
+                          //     : 'button'
+                          // }
                           size={'middle'}
                           type="primary"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.preventDefault();
                             setSubmitType(ISUBMITTYPE.ONLYAPPROVE);
                             AntForm.setFieldsValue({
                               status: {
@@ -726,6 +730,9 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
                                 print: false,
                               },
                             });
+
+                            const value = AntForm?.getFieldsValue();
+                            handleSubmit(value);
 
                             const email = getContactById(
                               AntForm.getFieldValue('contactId')

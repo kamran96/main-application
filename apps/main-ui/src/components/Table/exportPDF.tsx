@@ -14,6 +14,7 @@ import { FC } from 'react';
 import { PDFICON } from '../Icons';
 import styled from 'styled-components';
 import { PdfDocument } from '../PDFs/PdfDocument';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
 
 const styles = StyleSheet.create({
   page: {
@@ -91,16 +92,16 @@ export const PreviewPDF: FC<IPDFProps> = (props) => {
 };
 
 const PDFDownloadLinkWrapper = styled(PDFDownloadLink)`
-  background: #e4e4e4;
+  background: ${(props: IThemeProps) => props?.theme?.colors?.buttonTagBg};
+  color: ${(props: IThemeProps) => props?.theme?.colors?.buttonTagColor};
   padding: 5px 5px;
   border-radius: 2px;
   margin-right: 8px;
-  color: #333333;
   border: none;
   outline: none;
   transition: 0.4s all ease-in-out;
   &:hover {
-    background: #143c69;
-    color: #ffff;
+    background: ${(props: IThemeProps) => props?.theme?.colors?.$PRIMARY};
+    color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE};
   }
 `;

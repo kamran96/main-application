@@ -1,0 +1,36 @@
+@media print{
+
+  /* CASH FLOW STATEMENT */
+
+  .cash_flow_table {
+    padding: 10px 30px 0 30px;
+  }
+  .cash_flow_table table {
+    width: 100%;
+  }
+
+  .cash_flow_table table thead tr {
+    background: #143c69;
+  }
+  .cash_flow_table table thead tr th {
+    text-transform: capitalize;
+    padding: 11px;
+    background: #838383;
+    color: #f7fbff;
+  }
+  .cash_flow_table table tbody tr td {
+    padding: 15px 10px;
+  }
+  .cash_flow_table table tbody tr td:last-child {
+    text-align: right;
+    width: 230px;
+    min-width: 230px;
+  }
+  .cash_flow_table table tbody tr:last-child td:last-child {
+    padding-top: 30px;
+  }
+  .cash_flow_table table tbody tr:last-child td:last-child p {
+    padding-top: 10px;
+    border-top: 1px solid #e1e1e1;
+  }
+}

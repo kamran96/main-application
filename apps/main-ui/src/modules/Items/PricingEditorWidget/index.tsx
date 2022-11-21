@@ -139,7 +139,7 @@ const PricingEditorWidget: FC = () => {
               >
                 <Input
                   disabled={data?.data?.result?.hasBills === true}
-                  placeholder={'eg: milk, match'}
+                  placeholder={'eg: 500'}
                   size="middle"
                   type="number"
                   autoComplete="off"
@@ -159,7 +159,7 @@ const PricingEditorWidget: FC = () => {
                 ]}
               >
                 <Input
-                  placeholder={'eg: milk, match'}
+                  placeholder={'eg: 700'}
                   size="middle"
                   type="number"
                   autoComplete="off"

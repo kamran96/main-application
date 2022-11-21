@@ -134,6 +134,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
 
   /* Async Function calls on submit of form to create invoice/Quote/Bills and Purchase Entry  */
   const RouteState: any = history?.location?.state;
+
   const onFinish = async (value) => {
     const errors = handleCheckValidation();
 
@@ -158,6 +159,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
         isNewRecord: true,
 
         invoice_items: invoiceItems.map((item, index) => {
+          delete item?.rerender;
           return { ...item, sequence: index };
         }),
       };
@@ -308,7 +310,6 @@ const Editor: FC<IProps> = ({ type, id }) => {
       <div className=" _disable_print">
         <Form
           form={AntForm}
-          onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           onValuesChange={(changedField, allvalues) => {
             const _formData =
@@ -650,7 +651,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
                       creatingInvoiceLoading && submitType === ISUBMITTYPE.DRAFT
                     }
                     disabled={creatingInvoiceLoading}
-                    htmlType="submit"
+                    // htmlType="submit"
                     size={'middle'}
                     onClick={() => {
                       setSubmitType(ISUBMITTYPE.DRAFT);
@@ -660,6 +661,8 @@ const Editor: FC<IProps> = ({ type, id }) => {
                           print: false,
                         },
                       });
+                      const values = AntForm?.getFieldsValue();
+                      onFinish(values);
                     }}
                   >
                     {type === IInvoiceType.QUOTE ? 'Save' : 'Draft'}
@@ -681,7 +684,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
                             creatingInvoiceLoading &&
                             submitType === ISUBMITTYPE.APPROVE_PRINT
                           }
-                          htmlType="submit"
+                          // htmlType="submit"
                           size={'middle'}
                           type="primary"
                           onClick={() => {
@@ -692,6 +695,8 @@ const Editor: FC<IProps> = ({ type, id }) => {
                                 print: true,
                               },
                             });
+                            const values = AntForm?.getFieldsValue();
+                            onFinish(values);
                           }}
                         >
                           <span className="flex alignCenter ">
@@ -705,7 +710,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
                             creatingInvoiceLoading &&
                             submitType === ISUBMITTYPE.ONLYAPPROVE
                           }
-                          htmlType="submit"
+                          // htmlType="submit"
                           size={'middle'}
                           type="primary"
                           onClick={() => {
@@ -716,6 +721,8 @@ const Editor: FC<IProps> = ({ type, id }) => {
                                 print: false,
                               },
                             });
+                            const values = AntForm?.getFieldsValue();
+                            onFinish(values);
                           }}
                         >
                           Approve

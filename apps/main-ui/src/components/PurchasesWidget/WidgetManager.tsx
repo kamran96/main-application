@@ -55,6 +55,10 @@ import { IPurchaseManagerProps } from './types';
 import { useHistory } from 'react-router-dom';
 import { plainToClass } from 'class-transformer';
 
+type items = typeof defaultItems;
+interface InvoiceItems extends items {
+  [key: string]: any;
+}
 interface IManagerContext {
   rowsErrors: number[];
   setRowsErrors: (payload: number[]) => void;
@@ -69,7 +73,7 @@ interface IManagerContext {
   NetTotal: number | string;
   invoiceDiscount: number | string;
   setInvoiceDiscount: (key: number) => void;
-  invoiceItems: typeof defaultItems[];
+  invoiceItems: InvoiceItems[];
   setInvoiceItems: (payload: typeof defaultItems[]) => void;
   invoiceStatus: number;
   setInvoiceStatus: (status: number) => void;
@@ -149,7 +153,11 @@ export const PurchaseManager: FC<IProps> = ({
 
   /* Component State Hooks */
   const [invoiceDiscount, setInvoiceDiscount] = useState(0);
-  const [invoiceItems, setInvoiceItems] = useState<any>([defaultItems]);
+  const [invoiceItems, setInvoiceItems] = useState<any>([
+    defaultItems,
+    defaultItems,
+    defaultItems,
+  ]);
   const [invoiceStatus, setInvoiceStatus] = useState(1);
   const [deleteIds, setDeleteIds] = useState([]);
   const [paymentReset, setPaymentReset] = useState(false);
@@ -473,6 +481,16 @@ export const PurchaseManager: FC<IProps> = ({
       render: (value, record, index) => {
         return (
           <EditableSelect
+            onClick={() => {
+              setInvoiceItems((prev) => {
+                const clone = [...prev];
+                clone[index] = {
+                  ...clone[index],
+                  rerender: Math.random() * 999,
+                };
+                return clone;
+              });
+            }}
             error={record?.errors?.includes('itemId')}
             className={`border-less-select ${index === invoiceItems.length - 1 ? 'scrollIntoView' : ''
               }`}
@@ -934,7 +952,8 @@ export const PurchaseManager: FC<IProps> = ({
   };
   const ClearAll = () => {
     AntForm.resetFields();
-    setInvoiceItems([{ ...defaultItems }]);
+
+    setInvoiceItems([defaultItems, defaultItems, defaultItems]);
     setPayment({ ...defaultPayment });
     AntForm.setFieldsValue({
       ...defaultFormData,
@@ -947,9 +966,9 @@ export const PurchaseManager: FC<IProps> = ({
     }, 200);
   };
 
-  useShortcut('i', handleAddRow);
-  useShortcut('b', removeRowFromLastIndex);
-  useShortcut('/', ClearAll);
+  useShortcut('command+i, ctrl+i', handleAddRow);
+  useShortcut('command+b,ctrl+b', removeRowFromLastIndex);
+  useShortcut('command+/, ctrl+/', ClearAll);
 
   const moveRow: any = useCallback(
     (dragIndex, hoverIndex) => {

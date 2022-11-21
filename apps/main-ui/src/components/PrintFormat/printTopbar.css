@@ -1,0 +1,114 @@
+@media print{
+     /* Print Header styles */
+  /* Used For all prints */
+  .print_header_area .header_company_logo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -ms-border-radius: 50%;
+    -o-border-radius: 50%;
+  }
+
+  .print_header_area {
+    padding: 30px;
+  }
+  .print_header_area.hasbg {
+    background: #f7fbff;
+    padding: 30px;
+  }
+  /* Used For all prints ends here */
+
+  /* ************* TOPBAR WITH LOGO DETAILS styles ********************** */
+  .topbar_logo_details_wrapper .logo {
+    display: flex;
+    align-items: flex-start;
+  }
+  .topbar_logo_details_wrapper .company_details {
+    padding: 0px 22px;
+  }
+  .topbar_logo_details_wrapper .company_details .company_name {
+    color: #143c69;
+    font-size: 25px;
+    margin: 0;
+    font-weight: 800;
+  }
+  .topbar_logo_details_wrapper .company_details p {
+    font-size: 16px;
+    line-height: 19px;
+    color: #6f6f84;
+    margin-bottom: 5px;
+  }
+
+  /* ************* TOPBAR WITH LOGO DETAILS ENDS HERE ********************** */
+
+  /* ************* ADDRESS BAR STYLES ********************** */
+  table.address_bar_table {
+    text-align: right;
+    width: 100%;
+  }
+  table.address_bar_table tr td p {
+    margin-bottom: 5px;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 19px;
+    text-align: right;
+    color: #6f6f84;
+  }
+  /* ************* ADDRESS BAR STYLES ENDS HERE ********************** */
+
+  /* ************* BLOCK DESIGN LOGO STYLES ********************** */
+  .BlockDesignLogo .company_name {
+    color: #143c69;
+    font-size: 25px;
+    margin: 0;
+    font-weight: 800;
+    margin-top: 5px;
+  }
+  /* ************* BLOCK DESIGN LOGO STYLES  ENDS HERE********************** */
+
+/* ********************COMMON PRINT HEADER ***************************** */
+  .common_print_header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 10px 0 !important;
+    border-bottom: 1px dashed #ededed !important;
+  }
+  .common_print_header .logo {
+    margin-right: 0.65rem !important;
+  }
+
+  .common_print_header .logo img {
+    width: 5rem !important;
+    height: 5rem !important;
+  }
+
+  .common_print_header .org_details .branch_name {
+    color: #9d9d9d !important;
+    font-weight: bold !important;
+    font-size: 0.8rem !important;
+  }
+  .common_print_header .organization_details table {
+    width: 16rem !important;
+  }
+  .common_print_header .organization_details table tr th {
+    padding-right: 0.5rem !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    font-size: 11px !important;
+  }
+  .common_print_header .organization_details table tr td {
+    font-size: 11px !important;
+    padding-left: 0.5rem !important;
+  }
+  .common_print_header .border_none,
+  th,
+  td {
+    border: none !important;
+  }
+
+  /* print header styles ends here */
+}

@@ -56,6 +56,7 @@ import defaultItems, {
 } from './defaultStates';
 import c from './keys';
 import { usePrevious } from '../../../../hooks/usePrevious';
+import hotkeys from 'hotkeys-js';
 
 export const PurchaseContext: any = createContext({});
 export const usePurchaseWidget: any = () => useContext(PurchaseContext);
@@ -119,6 +120,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
   /* Component State Hooks */
   const [invoiceDiscount, setInvoiceDiscount] = useState(0);
   const [invoiceItems, setInvoiceItems] = useState<any>([
+    { ...defaultItems, accountId: defaultAccount?.id },
+    { ...defaultItems, accountId: defaultAccount?.id },
     { ...defaultItems, accountId: defaultAccount?.id },
   ]);
   const [invoiceStatus, setInvoiceStatus] = useState(1);
@@ -442,6 +445,16 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
         render: (value, record, index) => {
           return (
             <EditableSelect
+              onClick={() => {
+                setInvoiceItems((prev) => {
+                  const clone = [...prev];
+                  clone[index] = {
+                    ...clone[index],
+                    rerender: Math.random() * 999,
+                  };
+                  return clone;
+                });
+              }}
               error={record?.errors?.includes('itemId')}
               className={`border-less-select ${
                 index === invoiceItems.length - 1 ? 'scrollIntoView' : ''
@@ -931,8 +944,8 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
   //     ele.lastElementChild.scrollIntoView();
   //   };
 
-  const handleAddRow = () => {
-    setInvoiceItems((prev) => {
+  const handleAddRow = async () => {
+    await setInvoiceItems((prev) => {
       const items = [...prev];
       items.push({
         ...defaultItems,
@@ -964,7 +977,11 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
   const ClearAll = () => {
     AntForm.resetFields();
     setInvoiceDiscount(0);
-    setInvoiceItems([{ ...defaultItems, accountId: defaultAccount?.id }]);
+    const _default = [];
+    for (let i = 0; i <= 2; i++) {
+      _default.push(defaultItems);
+    }
+    setInvoiceItems(_default);
     setPayment({ ...defaultPayment });
     AntForm.setFieldsValue({
       ...defaultFormData,
@@ -978,9 +995,11 @@ export const PurchaseManager: FC<IProps> = ({ children, type, id }) => {
     }, 200);
   };
 
-  useShortcut('i', handleAddRow);
-  useShortcut('b', removeRowFromLastIndex);
-  useShortcut('/', ClearAll);
+  // hotkeys('command+i', handleAddRow as any);
+
+  useShortcut('command+i, ctrl+i', handleAddRow);
+  useShortcut('command+b, ctrl+b', removeRowFromLastIndex);
+  useShortcut('command+/, ctrl+/', ClearAll);
 
   const moveRow: any = useCallback(
     (dragIndex, hoverIndex) => {

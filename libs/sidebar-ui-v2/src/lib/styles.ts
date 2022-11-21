@@ -43,7 +43,7 @@ const subMenuOpen = keyframes`
   `;
 const subMenuClose = keyframes`
   0%{
-    transform: translateY(0);
+    transform: translateY(10px);
     opacity: 1;
     visibility: visible;
     height: auto;
@@ -200,16 +200,18 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
         padding-left: 20px;
 
         li {
+          font-size: 12px;
           display: flex;
           justify-content: flex-start;
           align-items: center;
           transition: all 0.3s ease-in-out !important;
           border-radius: 5px;
-          padding: 4px 20px 4px 10px !important;
+          padding: 0px 20px 0px 10px !important;
           color: ${(props: IThemeProps) =>
             props?.theme?.theme === 'dark' ? '#fff' : '#334d6e'};
 
           a {
+            font-size: 12px;
           }
 
           &:hover {
@@ -247,7 +249,7 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
     }
 
     .route_list_item_parent {
-      padding: 6px 24px;
+      padding: 0px 24px;
       min-height: 34px;
       width: 100%;
       transition: 0.3s all ease-in-out;

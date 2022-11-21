@@ -367,11 +367,34 @@ export class ContactService {
     }
   }
 
-  async Ledger(contactId: string, req: IRequest, query: IPage) {
+  async Ledger(contactId: string, req: IRequest, queryData: IPage) {
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
+    const {
+      page_size,
+      page_no,
+      query,
+      purpose,
+      type,
+      sort,
+      type: contactType,
+    } = queryData;
 
-    const { page_no, page_size, query: filters, type } = query;
+    const contacts = await this.contactModel
+      .find({
+        organizationId: req.user.organizationId,
+        status: 1,
+        contactType: type,
+      })
+      .sort({
+        id: 'ASC',
+      });
+
+    const indexed = contacts.findIndex((i) => i.id === contactId);
+    const nextItem = contacts[indexed + 1]?.id || null;
+    const prevItem = contacts[indexed - 1]?.id || null;
+
+    // const { page_no, page_size, query: filters, type } = query;
     const contact = await this.contactModel.findById(contactId);
 
     if (type == PaymentModes.BILLS) {
@@ -384,8 +407,8 @@ export class ContactService {
         }
       );
 
-      if (filters) {
-        const filterData = Buffer.from(filters, 'base64').toString();
+      if (query) {
+        const filterData = Buffer.from(query, 'base64').toString();
         const data = JSON.parse(filterData);
 
         // const data = {
@@ -448,6 +471,8 @@ export class ContactService {
               openingBalance: openingBalance[0],
               result: newLedgerArray,
               contact,
+              nextItem,
+              prevItem,
             };
           }
         }
@@ -491,6 +516,8 @@ export class ContactService {
           pagination: payments.pagination,
           result: newLedgerArray,
           contact,
+          prevItem,
+          nextItem,
         };
       }
     } else if (type == PaymentModes.INVOICES) {
@@ -505,8 +532,8 @@ export class ContactService {
 
       const contact = await this.contactModel.findById(contactId);
 
-      if (filters) {
-        const filterData = Buffer.from(filters, 'base64').toString();
+      if (query) {
+        const filterData = Buffer.from(query, 'base64').toString();
         const data = JSON.parse(filterData);
 
         for (const i in data) {
@@ -569,6 +596,8 @@ export class ContactService {
                     },
               result: newLedgerArray,
               contact,
+              prevItem,
+              nextItem,
             };
           }
         }
@@ -612,6 +641,8 @@ export class ContactService {
           pagination: payments.pagination,
           result: newLedgerArray,
           contact,
+          nextItem,
+          prevItem,
         };
       }
     }

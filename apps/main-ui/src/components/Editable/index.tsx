@@ -8,6 +8,7 @@ import { P } from '../Typography';
 import { Select } from 'antd';
 import CSS from 'csstype';
 import { isString } from '../../utils/helperFunctions';
+import { IThemeProps } from '../../hooks/useTheme/themeColors';
 interface IProps {
   onChange?: (e: any) => void;
   size?: SizeType;
@@ -110,7 +111,6 @@ export const Editable: FC<IProps> = ({
                 onChange(val);
               }}
               placeholder={placeholder}
-              type={type}
               style={styles}
               size={size}
               autoFocus
@@ -252,7 +252,8 @@ export const WrapperEditable = styled.div<WrapperProps>`
     }
   }
   .rendered-text.disabled {
-    background: #d9d9d9 !important;
+    background: ${(props: IThemeProps) =>
+      props?.theme?.colors?.disabled} !important;
   }
 
   &:hover {

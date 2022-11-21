@@ -3,7 +3,7 @@ import { IUser } from '../../modal';
 
 export const TopbarLogoWithDetails = () => {
   const { userDetails } = useGlobalContext();
-  const _logo = userDetails?.profile?.attachment?.path;
+  const _logo = userDetails?.organization?.attachment?.path;
   const organizationName = userDetails?.organization?.name;
   return (
     <div className="topbar_logo_details_wrapper">
@@ -25,9 +25,9 @@ export const TopbarLogoWithDetails = () => {
             >
               {organizationName}
             </h2>
-            <p>{userDetails?.profile?.phoneNumber}</p>
-            <p>{userDetails?.profile?.email}</p>
-            <p>{userDetails?.profile?.website || ''}</p>
+            <p>{userDetails?.organization?.phoneNumber}</p>
+            <p>{userDetails?.organization?.email}</p>
+            <p>{userDetails?.organization?.website || ''}</p>
           </td>
         </tr>
       </table>

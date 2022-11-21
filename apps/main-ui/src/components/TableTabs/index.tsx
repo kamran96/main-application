@@ -65,14 +65,15 @@ const CustomizedTabs: any = styled(Tabs)`
   }
 
   .ant-tabs-tab {
+    border-width: 0px 0px 2px 0px !important;
+    border-color: transparent !important;
+    background-color: transparent !important;
     margin: 0 !important;
     font-style: normal;
     font-weight: normal;
     font-size: 0.8125rem;
     text-transform: uppercase;
-    border: none;
     box-sizing: border-box;
-    border: 1px solid ${({ theme }: IThemeProps) => theme?.colors?.stroke} !important;
     margin-right: 8px !important;
     padding: ${convertToRem(10)} ${convertToRem(28)};
     transition: 0.3s all ease-in-out;
@@ -80,24 +81,30 @@ const CustomizedTabs: any = styled(Tabs)`
       font-style: normal;
       font-weight: normal;
       font-size: ${convertToRem(13)};
-      color: ${(props: IThemeProps) => props?.theme?.colors?.$BLACK};
+      color: ${(props: IThemeProps) => props?.theme?.colors?.$LIGHT_BLACK};
     }
     &:hover {
-      border: 1px solid transparent !important;
-      background: ${(props: IThemeProps) =>
+      border-color: ${(props: IThemeProps) =>
         props?.theme?.colors?.tabBgActive} !important;
+      border-width: 0px 0px 2px 0px !important;
+      border-style: solid;
+
       .ant-tabs-tab-btn {
-        color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE};
+        color: ${(props: IThemeProps) => props?.theme?.colors?.tabBgActive};
       }
     }
   }
 
   .ant-tabs-tab-active {
-    background: ${(props: IThemeProps) =>
+    border-color: ${(props: IThemeProps) =>
       props?.theme?.colors?.tabBgActive} !important;
+    border-width: 0px 0px 2px 0px !important;
+    border-style: solid;
 
     .ant-tabs-tab-btn {
-      color: white !important;
+      color: ${(props: IThemeProps) =>
+        props?.theme?.colors?.tabBgActive} !important;
+      text-shadow: none;
     }
   }
 `;

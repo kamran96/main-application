@@ -1,10 +1,11 @@
 import { Document, Page, StyleSheet, View, Text } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
-import React, { FC, ReactNode } from 'react';
+import React, { FC, ReactNode, useRef } from 'react';
 
 interface IDocumentProps {
   children: ReactNode;
   generatedUser?: string;
+  ref?: any;
 }
 
 const styles = StyleSheet.create({
@@ -35,9 +36,10 @@ const styles = StyleSheet.create({
 export const PdfDocument: FC<IDocumentProps> = ({
   children,
   generatedUser,
+  ref,
 }) => {
   return (
-    <Document>
+    <Document ref={ref}>
       <Page size={'A4'} style={styles.page}>
         {children}
         <View fixed style={styles.pageNumbers}>

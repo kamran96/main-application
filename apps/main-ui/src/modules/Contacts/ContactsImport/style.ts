@@ -1,3 +1,4 @@
+import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 import styled from 'styled-components';
 
 type DivProps = JSX.IntrinsicElements['div'];
@@ -34,7 +35,11 @@ export const WrapperModalContent = styled.div<ModalWrapper>`
         ? 'translateX(-100%)'
         : 'translateX(100%)'};
     transition: 0.4s ease-in-out;
+    color: ${(props: IThemeProps) => props?.theme?.colors?.itmText};
     /* height: 100vh; */
+  }
+  .rendertable {
+    overflow: auto;
   }
   .TableWrapper {
     width: ${(props: any) => (props?.step === 3 ? '100%' : 0)};
@@ -44,7 +49,7 @@ export const WrapperModalContent = styled.div<ModalWrapper>`
       props?.step === 3 ? 'translateX(0)' : 'translateX(100%)'};
     transition: 0.4s ease-in-out;
     height: 67vh !important;
-    overflow-y: scroll;
+    overflow: auto !important;
 
     .CnfrmBtn {
       display: flex;
@@ -70,10 +75,10 @@ export const WrapperModalContent = styled.div<ModalWrapper>`
     align-items: center;
     justify-content: center;
     margin-bottom: 17px;
+    color: ${(props: IThemeProps) => props?.theme?.colors?.itmText};
     h2 {
       margin: 0px 0px 0px 10px;
       font: 500 18px/27px Poppins;
-      color: #101010;
     }
   }
   .modal-btns {
@@ -103,13 +108,13 @@ export const WrapperModalContent = styled.div<ModalWrapper>`
     justify-content: flex-start;
     align-items: center;
     flex-direction: column;
+    color: ${(props: IThemeProps) => props?.theme?.colors?.itmText};
     .download {
       margin: 0px 0px 44px 15px;
       display: flex;
       align-items: center;
       h4 {
         font: normal normal normal 13px/19px Poppins;
-        color: #000000;
         margin: 0px;
       }
       a {
@@ -138,9 +143,9 @@ export const WrapperModalContent = styled.div<ModalWrapper>`
     }
     .text {
       margin: 0px 0px 14px 15px;
+      color: ${(props: IThemeProps) => props?.theme?.colors?.itmText};
       p {
         font: normal 13px/21px Poppins;
-        color: #000000;
       }
     }
     button {

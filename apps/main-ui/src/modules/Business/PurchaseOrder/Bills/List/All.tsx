@@ -137,7 +137,7 @@ export const ALLBillsList: FC<IProps> = ({ columns, activeTab }) => {
       });
 
       setAllInvoicesRes({ ...resolvedData.data, result: newResult });
-      if (pagination?.next === page + 1) {
+      if (pagination?.page_no < pagination?.total_pages) {
         queryCache?.prefetchQuery(
           [
             ReactQueryKeys.BILL_KEYS,

@@ -30,10 +30,12 @@ const defaultSortedId = 'id';
 export const LedgerList: FC<IProps> = ({ id, type }) => {
   const accessor = type === IContactTypes.SUPPLIER ? 'bill' : 'invoice';
   const queryCache = useQueryClient();
-  const [{ pagination, result, contact }, setResponse] =
+  const [{ pagination, result, contact, nextItem, prevItem }, setResponse] =
     useState<IContactLedgerResponse>({
       pagination: {},
       result: [],
+      nextItem: '',
+      prevItem: '',
       opening_balance: null,
       contact: null,
     });
@@ -82,6 +84,7 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
 
       const contact_ledger: any =
         (resolvedResult.result && resolvedResult.getGeneratedResult()) || [];
+      console.log(resolvedData, 'resolveData');
       setResponse({
         ...resolvedResult,
         result: contact_ledger,
@@ -225,6 +228,14 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
     }
   };
 
+  const handleMutateApiConfig = (contactId) => {
+    history.push(
+      `/app${ISupportedRoutes.CONTACTS}/${id}?type=${
+        type === 1 ? 'customer' : 'supplier'
+      }`
+    );
+  };
+
   const renderCustomTopbar = () => {
     return (
       <div className="search flex alignCenter justifyFlexEnd pv-10 ">
@@ -239,6 +250,33 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
           formSchema={FilterSchema}
         />
       </div>
+    );
+  };
+
+  const customTopBar = () => {
+    return (
+      <>
+        <span
+          className="mr-10 isTagButton"
+          onClick={() => {
+            if (prevItem) {
+              handleMutateApiConfig(prevItem);
+            }
+          }}
+        >
+          Prev
+        </span>
+        <span
+          className="isTagButton"
+          onClick={() => {
+            if (nextItem) {
+              handleMutateApiConfig(nextItem);
+            }
+          }}
+        >
+          Next
+        </span>
+      </>
     );
   };
 
@@ -276,7 +314,7 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
           }}
           printTitle={`${contact?.name.toLocaleUpperCase()} Ledger`}
           size="middle"
-          customTopbar={<></>}
+          customTopbar={customTopBar()}
           hasPrint
           topbarRightPannel={renderCustomTopbar()}
           columns={columns}

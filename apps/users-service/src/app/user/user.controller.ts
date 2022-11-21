@@ -36,6 +36,7 @@ export class UserController {
     @Query() query: IPage
   ): Promise<IUserWithResponse> {
     const user = await this.userService.ListUsers(req.user, query);
+    console.log('this is check get');
 
     if (user) {
       return {
