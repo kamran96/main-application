@@ -815,9 +815,9 @@ export const PurchaseManager: FC<IProps> = ({ children, type = 'CN', id }) => {
     );
   };
 
-  useShortcut('i', handleAddRow);
-  useShortcut('b', removeRowFromLastIndex);
-  useShortcut('/', ClearAll);
+  useShortcut('command+i, ctrl+i', handleAddRow);
+  useShortcut('command+b, ctrl+b', removeRowFromLastIndex);
+  useShortcut('command+/, ctrl+/', ClearAll);
 
   return (
     <PurchaseContext.Provider

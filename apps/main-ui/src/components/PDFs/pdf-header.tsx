@@ -85,7 +85,7 @@ export const PDFHeader: FC<IPropsHeader> = ({
     <View>
       <View style={styles.headerWrapper}>
         <View style={styles.mainInfo}>
-          <Image style={styles.logo} src={logo} />
+          {logo && <Image style={styles.logo} src={logo} />}
           <View style={styles.titleArea}>
             <Text style={styles.title}>{organizationName}</Text>
             <View>

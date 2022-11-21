@@ -25,6 +25,7 @@ import PdfTable from './PDFTable';
 import { PdfDocument } from './PdfDocument';
 import { PDFHeader } from './pdf-header';
 import { PDFFontWrapper } from './PDFFontWrapper';
+import { useRef } from 'react';
 
 Font.register({
   family: 'Roboto Slab',
@@ -116,6 +117,7 @@ interface IProps {
     logo?: string;
   };
   reportGeneratedUser: string;
+  ref?: any;
 }
 
 export const InvoicePDF: FC<IProps> = ({
@@ -123,6 +125,7 @@ export const InvoicePDF: FC<IProps> = ({
   type,
   header,
   reportGeneratedUser,
+  ref,
 }) => {
   const columns = [
     {
@@ -192,7 +195,7 @@ export const InvoicePDF: FC<IProps> = ({
     0;
 
   return (
-    <PdfDocument generatedUser={reportGeneratedUser}>
+    <PdfDocument ref={ref} generatedUser={reportGeneratedUser}>
       <PDFFontWrapper>
         <PDFHeader {...header} />
         <View style={styles.dispatchedInfoWrapper}>

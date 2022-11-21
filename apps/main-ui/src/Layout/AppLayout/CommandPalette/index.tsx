@@ -1,19 +1,8 @@
-import bxUser from '@iconify-icons/bx/bx-user';
 import userRole from '@iconify-icons/carbon/user-role';
-import shoppingBag from '@iconify-icons/fe/shopping-bag';
 import arrowDown from '@iconify-icons/feather/arrow-down';
 import arrowUp from '@iconify-icons/feather/arrow-up';
-import bookOpen from '@iconify-icons/feather/book-open';
-import dollarSign from '@iconify-icons/feather/dollar-sign';
-import filePlus from '@iconify-icons/feather/file-plus';
-import fileText from '@iconify-icons/feather/file-text';
 import lockIcon from '@iconify-icons/feather/lock';
-import powerIcon from '@iconify-icons/feather/power';
-import settingsIcon from '@iconify-icons/feather/settings';
 import usersIcon from '@iconify-icons/feather/users';
-import shoppingCart from '@iconify-icons/icons8/shopping-cart';
-import fileInvoiceDollar from '@iconify-icons/la/file-invoice-dollar';
-import analyticsIcon from '@iconify-icons/uil/analytics';
 import Icon from '@iconify/react';
 import { ILoginActions } from '../../../hooks/globalContext/globalManager';
 import CommandPalette from 'react-command-palette';
@@ -25,6 +14,8 @@ import { IThemeProps } from '../../../hooks/useTheme/themeColors';
 import { DivProps, ISupportedRoutes } from '@invyce/shared/types';
 import CommandPlatteGlobalStyles from './commandPaletteGlobalStyles';
 import LogOut from '@iconify-icons/feather/log-out';
+import Sun from '@iconify-icons/feather/sun';
+import Moon from '@iconify-icons/feather/moon';
 import {
   DraftInvoice,
   CreateInvoice,
@@ -52,6 +43,7 @@ export const InvyceCmdPalette = () => {
     setPaymentsModalConfig,
     setRbacConfigModal,
     setAccountsModalConfig,
+    setTheme,
   } = useGlobalContext();
   const { history } = routeHistory;
 
@@ -353,6 +345,24 @@ export const InvyceCmdPalette = () => {
         handleLogin({ type: ILoginActions.LOGOUT });
       },
       icon: LogOut,
+      type: 'zz',
+      iconify: true,
+    },
+    {
+      name: 'Light Mode',
+      command: () => {
+        setTheme('light');
+      },
+      icon: Sun,
+      type: 'zz',
+      iconify: true,
+    },
+    {
+      name: 'Dark Mode',
+      command: () => {
+        setTheme('dark');
+      },
+      icon: Moon,
       type: 'zz',
       iconify: true,
     },

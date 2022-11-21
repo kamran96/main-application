@@ -159,6 +159,7 @@ const Editor: FC<IProps> = ({ type, id }) => {
         isNewRecord: true,
 
         invoice_items: invoiceItems.map((item, index) => {
+          delete item?.rerender;
           return { ...item, sequence: index };
         }),
       };

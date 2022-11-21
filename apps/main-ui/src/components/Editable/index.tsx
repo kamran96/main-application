@@ -394,8 +394,7 @@ const WrapperEditableSelect = styled.div<any>`
     color: #626262;
     padding: 8px 3px;
     display: block;
-    border: 1px solid ${({ error }): any =>
-      error ? '#ff940f' : 'transparent'};
+    border: 1px solid ${({ error }): any => (error ? '#ff940f' : 'transparent')};
     transition: 0.3s all ease-in-out;
     border-radius: 5px;
     text-overflow: ellipsis;
@@ -432,9 +431,6 @@ const WrapperEditableSelect = styled.div<any>`
     }
     .rendered-text {
       border: 1px solid #d9d9d9 !important;
-    }import { IThemeProps } from '../../hooks/useTheme/themeColors';
-import { IThemeProps } from '@invyce/shared/invyce-theme';
-import { SharedInvyceThemeProps } from '../../../../../libs/shared/invyce-theme/src/lib/shared-invyce-theme';
-
+    }
   }
 `;

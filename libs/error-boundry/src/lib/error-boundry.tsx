@@ -26,10 +26,10 @@ export class ErrorBoundary extends React.Component<IProps, IState> {
   }
 
   render() {
-    if (this.state.hasError && process.env.NODE_ENV === 'production') {
-      // You can render any custom fallback UI
-      return this?.props?.errorComponent;
-    }
+    // if (this.state.hasError && process.env.NODE_ENV === 'production') {
+    //   // You can render any custom fallback UI
+    //   return this?.props?.errorComponent;
+    // }
 
     return this.props.children;
   }

@@ -4,7 +4,11 @@ import Icon from '@iconify/react';
 import { EditableTable } from '@invyce/editable-table';
 import { IContact } from '@invyce/interfaces';
 import { invycePersist } from '@invyce/invyce-persist';
-import { IContactTypes, ReactQueryKeys } from '@invyce/shared/types';
+import {
+  IContactTypes,
+  QueryInvalidate,
+  ReactQueryKeys,
+} from '@invyce/shared/types';
 import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import dayjs from 'dayjs';
@@ -180,6 +184,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
         isNewRecord: true,
 
         invoice_items: invoiceItems.map((item, index) => {
+          delete item?.rerender;
           return { ...item, sequence: index };
         }),
       };
@@ -209,14 +214,7 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
           /* this will clear invoice items, formdata and payment */
           refetchInvoiceNumber();
 
-          [
-            ReactQueryKeys?.INVOICES_KEYS,
-            ReactQueryKeys?.TRANSACTION_KEYS,
-            ReactQueryKeys?.ITEMS_KEYS,
-            ReactQueryKeys?.INVOICE_VIEW,
-            ReactQueryKeys.CONTACT_VIEW,
-            'all-items',
-          ].forEach((key) => {
+          QueryInvalidate.invoices.forEach((key) => {
             (queryCache.invalidateQueries as any)((q) => q?.startsWith(key));
           });
           history.push(
@@ -242,16 +240,13 @@ const Editor: FC<IProps> = ({ type, id, onSubmit }) => {
     ClearAll();
     if (id) {
       queryCache.removeQueries(`${type}-${id}-view`);
-      let route: any = history.location.pathname.split('/');
+      const route = history.location.pathname.split('/');
       if (route.length > 3) {
         const removeIndex = route.length - 1;
         route.splice(removeIndex, 1);
-        route = route.join('/');
-      } else {
-        route = route.join('/');
       }
 
-      history.push(route);
+      history.push(route?.join('/'));
     }
   };
 

@@ -17,3 +17,14 @@ export enum ReactQueryKeys {
   PURCHASEORDERS_KEY = 'APP/PURCHASEORDER_KEY',
   BILL_KEYS = 'APP/BILL_KEY',
 }
+
+export const QueryInvalidate = {
+  invoices: [
+    ReactQueryKeys?.INVOICES_KEYS,
+    ReactQueryKeys?.TRANSACTION_KEYS,
+    ReactQueryKeys?.ITEMS_KEYS,
+    ReactQueryKeys?.INVOICE_VIEW,
+    ReactQueryKeys.CONTACT_VIEW,
+    'all-items',
+  ],
+};

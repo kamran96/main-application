@@ -1,0 +1,51 @@
+@media print{
+    .balancesheet-table-wrapper {
+        padding: 10px 34px 0 34px;
+      }
+      .balancesheet-table {
+        width: 100% !important;
+        border: 1px solid #e8e8e8 !important;
+      }
+    
+      .balancesheet-table thead tr th.main-title-head {
+        font-size: 12px !important;
+        padding: 10px 0 10px 10px !important;
+        color: #f7fbff !important;
+        text-transform: uppercase;
+        background-color: #838383;
+        border: 1px solid #e8e8e8 !important;
+      }
+    
+      .balancesheet-table tbody tr td:last-child {
+        border-right: none !important;
+      }
+    
+      .balancesheet-table tbody tr td {
+        border-right: 1px solid #e8e8e8 !important;
+        padding: 0px !important;
+      }
+    
+      .balancesheet-table tbody tr td table thead th {
+        border-right: 1px solid #e8e8e8 !important;
+        padding: 11px 20px !important;
+      }
+      .balancesheet-table tbody tr td table tbody td {
+        padding: 8px 0px 8px 22px !important;
+      }
+      .balancesheet-table tbody tr td table thead th:last-child {
+        border-right: none !important;
+      }
+    
+      .balancesheet-table tfoot tr td {
+        border-top: 1px solid #e8e8e8 !important;
+        border-right: 1px solid #e8e8e8 !important;
+        padding: 11px 20px !important;
+      }
+      .balancesheet-table tfoot tr td p {
+        font-size: 13px !important;
+      }
+    
+      .balancesheet-table tfoot tr td:last-child {
+        border-right: none !important;
+      }
+}

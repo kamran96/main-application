@@ -171,6 +171,7 @@ const Editor: FC<IProps> = ({ id }) => {
         if (id) {
           delete item.item;
         }
+        delete item?.rerender;
         return { ...item, sequence: index };
       }),
     };

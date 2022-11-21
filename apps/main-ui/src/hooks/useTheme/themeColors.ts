@@ -178,7 +178,7 @@ export enum DarkColors {
   layoutBg = `#040B10;`,
   sidebarBg = '#0B1822',
   sidebarListActiveText = '#FFFFFF',
-  sidebarListActive = '#060E16',
+  sidebarListActive = '#16324f',
   sidebarDefaultText = ` #CED3DA;`,
   tableRowHover = '#fafafa',
   td = `#08131D`,

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import hotkeys from 'hotkeys-js';
 
 export function useShortcut(key, cb) {
   const callbackRef = useRef(cb);
@@ -8,16 +9,9 @@ export function useShortcut(key, cb) {
   });
 
   useEffect(() => {
-    function handle(event) {
-      event.preventDefault();
-      event.stopPropagation();
-
-      if (event.ctrlKey && event.key === key) {
-        callbackRef.current(event);
-      }
-    }
-
-    document.addEventListener('keyup', handle);
-    return () => document.removeEventListener('keyup', handle);
+    hotkeys(key, (event) => {
+      callbackRef.current(event);
+      return false;
+    });
   }, [key]);
 }
