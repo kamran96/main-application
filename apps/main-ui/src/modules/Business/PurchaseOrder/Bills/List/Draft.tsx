@@ -142,7 +142,7 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
           page: pagination.current,
           page_size: pagination.pageSize,
         });
-        const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=draft&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}`;
+        const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=draft&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}`;
         history.push(route);
       } else {
         setAllInvoicesConfig({
@@ -160,9 +160,9 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field
-        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-          sorter.order
-        }&query=${query}`;
+        }&page=${pagination.current}&page_size=${
+          pagination.pageSize
+        }&filterOrder=${sorter?.order}&query=${query}`;
         history.push(route);
       }
     } else {
@@ -172,7 +172,7 @@ export const DraftBills: FC<IProps> = ({ columns }) => {
         page_size: pagination.pageSize,
         sortid: defaultSortedId,
       });
-      const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=draft&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=draft&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
       history.push(route);
     }
   };

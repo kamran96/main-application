@@ -66,26 +66,8 @@ export const AccountsList: FC<IProps> = ({ data }) => {
       });
 
       setAccountConfig({ ...accountsConfig, ...obj });
-
-      // const filterType = history.location.search.split('&');
-      // const filterIdType = filterType[0];
-      // const filterOrder = filterType[3]?.split('=')[1];
-
-      // if (filterIdType?.includes('-')) {
-      //   const fieldName = filterIdType?.split('=')[1].split('-')[1];
-      //   setSortedInfo({
-      //     order: filterOrder,
-      //     columnKey: fieldName,
-      //   });
-      // } else {
-      //   const fieldName = filterIdType?.split('=')[1];
-      //   setSortedInfo({
-      //     order: filterOrder,
-      //     columnKey: fieldName,
-      //   });
-      // }
     }
-  }, [routeHistory]);
+  }, []);
 
   /* Mutations */
   /* this mutation is used for deleting contacts against bunch of ids */
@@ -341,7 +323,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
               : sorter.field
           }&page=${pagination.current}&page_size=${
             pagination.pageSize
-          }&filter=${sorter.order}&query=${query}`
+          }&filterOrder=${sorter?.order}&query=${query}`
         );
       }
     } else {
@@ -353,7 +335,7 @@ export const AccountsList: FC<IProps> = ({ data }) => {
       });
       setSortedInfo(null);
       history.push(
-        `/app${ISupportedRoutes.ACCOUNTS}?sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`
+        `/app${ISupportedRoutes.ACCOUNTS}?sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`
       );
     }
   };

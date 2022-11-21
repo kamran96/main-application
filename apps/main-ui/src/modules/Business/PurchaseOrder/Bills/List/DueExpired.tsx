@@ -177,7 +177,7 @@ export const DueExpiredBills: FC<IProps> = ({ columns, activeTab }) => {
           page: pagination.current,
           page_size: pagination.pageSize,
         });
-        const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=due_expired&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+        const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=due_expired&sortid=null&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
         history.push(route);
       } else {
         setAllInvoicesConfig({
@@ -195,9 +195,9 @@ export const DueExpiredBills: FC<IProps> = ({ columns, activeTab }) => {
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field
-        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-          sorter.order
-        }&query=${query}`;
+        }&page=${pagination.current}&page_size=${
+          pagination.pageSize
+        }&filterOrder=${sorter?.order}&query=${query}`;
         history.push(route);
       }
     } else {
@@ -207,7 +207,7 @@ export const DueExpiredBills: FC<IProps> = ({ columns, activeTab }) => {
         page_size: pagination.pageSize,
         sortid: defaultSortedId,
       });
-      const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=due_expired&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=due_expired&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
       history.push(route);
     }
   };

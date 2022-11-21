@@ -160,30 +160,9 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
           page: pagination.current,
           page_size: pagination.pageSize,
         });
-        const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+        const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
         history.push(route);
       } else {
-        // if (sorter?.order === 'ascend') {
-        //   const userData = [...result].sort((a, b) => {
-        //     if (a[sorter?.field] > b[sorter?.field]) {
-        //       return 1;
-        //     } else {
-        //       return -1;
-        //     }
-        //   });
-
-        //   setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
-        // } else {
-        //   const userData = [...result].sort((a, b) => {
-        //     if (a[sorter?.field] < b[sorter?.field]) {
-        //       return 1;
-        //     } else {
-        //       return -1;
-        //     }
-        //   });
-
-        //   setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
-        // }
         setAllInvoicesConfig({
           ...allInvoicesConfig,
           page: pagination.current,
@@ -202,9 +181,9 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
             : sorter?.order === 'ascend'
             ? sorter.field
             : 'id'
-        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-          sorter?.order
-        }&query=${query}`;
+        }&page=${pagination.current}&page_size=${
+          pagination.pageSize
+        }&f&filterOrder=${sorter?.order}&query=${query}`;
         history.push(route);
       }
     } else {
@@ -215,7 +194,7 @@ export const DraftInvoiceList: FC<IProps> = ({ columns }) => {
         sortid: defaultSortId,
       });
 
-      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=draft&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter?.order}&query=${query}`;
+      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=draft&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
       history.push(route);
     }
   };

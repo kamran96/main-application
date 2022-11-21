@@ -181,7 +181,7 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
             page: pagination.current,
             page_size: pagination.pageSize,
           });
-          const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=awating_payment&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+          const route = `/app${ISupportedRoutes.PURCHASES}?tabIndex=awating_payment&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
           history.push(route);
         } else {
           setAllInvoicesConfig({
@@ -201,7 +201,7 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
               : sorter.field
           }&page=${pagination.current}&page_size=${
             pagination.pageSize
-          }&filter=${sorter.order}&query=${query}`;
+          }&filterOrder=${sorter?.order}&query=${query}`;
           history.push(route);
         }
       } else {
@@ -220,9 +220,9 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field
-        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-          sorter.order
-        }&query=${query}`;
+        }&page=${pagination.current}&page_size=${
+          pagination.pageSize
+        }&filterOrder=${sorter?.order}&query=${query}`;
         history.push(route);
       }
     } else {
@@ -232,7 +232,7 @@ export const AwaitingBillsList: FC<IProps> = ({ columns, activeTab }) => {
         page_size: pagination.pageSize,
         sortid: defaultSortedId,
       });
-      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=awating_payment&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=awating_payment&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
       history.push(route);
     }
   };

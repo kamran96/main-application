@@ -38,7 +38,6 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
 
   const onFinish = async (values) => {
     const payload = { ...values, attachmentId, userId: id };
-    console.log(values, 'value');
     await mutateUpdateProfile(payload, {
       onSuccess: () => {
         notificationCallback(NOTIFICATIONTYPE.SUCCESS, 'Updated Successfully');
@@ -54,7 +53,6 @@ export const ProfileForm: FC<IProps> = ({ id }) => {
   useEffect(() => {
     if (userDetails?.profile) {
       const { profile } = userDetails;
-      console.log(profile.prefix, 'profile');
       form.setFieldsValue({ ...profile, prefix: parseInt(profile?.prefix) });
       setAttachmentData(profile.attachment);
     }

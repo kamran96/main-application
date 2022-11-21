@@ -160,30 +160,9 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
           page: pagination.current,
           pageSize: pagination.pageSize,
         });
-        const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=awating_payment&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+        const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=awating_payment&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
         history.push(route);
       } else {
-        // if (sorter?.order === 'ascend') {
-        //   const userData = [...result].sort((a, b) => {
-        //     if (a[sorter?.field] > b[sorter?.field]) {
-        //       return 1;
-        //     } else {
-        //       return -1;
-        //     }
-        //   });
-
-        //   setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
-        // } else {
-        //   const userData = [...result].sort((a, b) => {
-        //     if (a[sorter?.field] < b[sorter?.field]) {
-        //       return 1;
-        //     } else {
-        //       return -1;
-        //     }
-        //   });
-
-        //   setAllInvoicesRes((prev) => ({ ...prev, result: userData }));
-        // }
         setAllInvoicesConfig({
           ...allInvoicesConfig,
           page: pagination.current,
@@ -205,7 +184,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
             : 'id'
         }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
           sorter?.order
-        }&query=${query}`;
+        }&filterOrder=${sorter?.order}&query=${query}`;
         history.push(route);
       }
     } else {
@@ -215,7 +194,7 @@ export const AwaitingtInvoiceList: FC<IProps> = ({ columns }) => {
         pageSize: pagination.pageSize,
         sortid: defaultSortId,
       });
-      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=awating_payment&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter?.order}&query=${query}`;
+      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=awating_payment&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
       history.push(route);
     }
   };

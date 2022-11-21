@@ -112,24 +112,6 @@ const DRAFTTransactionsList: FC = () => {
       });
 
       setTransactionsConfig({ ...transactionConfig, ...obj });
-
-      // const filterType = history.location.search.split('&');
-      // const filterIdType = filterType[1];
-      // const filterOrder = filterType[4]?.split('=')[1];
-
-      // if (filterIdType?.includes('-')) {
-      //   const fieldName = filterIdType?.split('=')[1].split('-')[1];
-      //   setSortedInfo({
-      //     order: filterOrder,
-      //     columnKey: fieldName,
-      //   });
-      // } else {
-      //   const fieldName = filterIdType?.split('=')[1];
-      //   setSortedInfo({
-      //     order: filterOrder,
-      //     columnKey: fieldName,
-      //   });
-      // }
     }
   }, []);
 
@@ -153,7 +135,7 @@ const DRAFTTransactionsList: FC = () => {
 
       setResponse({ ...resolvedData.data, result: newResult });
 
-      if (pagination?.next === page + 1) {
+      if (pagination?.page_no < pagination?.total_pages) {
         queryCache?.prefetchQuery([
           ReactQueryKeys.TRANSACTION_KEYS,
           page + 1,
@@ -323,57 +305,49 @@ const DRAFTTransactionsList: FC = () => {
   };
 
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
-    if (sorter.order === undefined) {
-      setTransactionsConfig({
-        ...transactionConfig,
-        sortid: null,
-        page: pagination.current,
-        page_size: pagination.pageSize,
-      });
-      const route = `/app${ISupportedRoutes.TRANSACTIONS}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}`;
-      history.push(route);
-    } else {
-      if (sorter?.order === 'ascend') {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] > b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+    if (sorter?.column) {
+      if (sorter.order === 'false') {
+        setTransactionsConfig({
+          ...transactionConfig,
+          sortid: defaultSorterId,
+          page: pagination.current,
+          page_size: pagination.pageSize,
         });
-        // setSortedInfo({
-        //   order: sorter?.order,
-        //   columnKey: sorter?.field
-        // })
-        setResponse((prev) => ({ ...prev, result: userData }));
+        const route = `/app${ISupportedRoutes.TRANSACTIONS}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}`;
+        history.push(route);
       } else {
-        const userData = [...result].sort((a, b) => {
-          if (a[sorter?.field] < b[sorter?.field]) {
-            return 1;
-          } else {
-            return -1;
-          }
+        setTransactionsConfig({
+          ...transactionConfig,
+          page: pagination.current,
+          page_size: pagination.pageSize,
+          sortid:
+            sorter && sorter.order === 'descend'
+              ? `-${sorter.field}`
+              : sorter.field,
         });
-        // setSortedInfo({
-        //   order: sorter?.order,
-        //   columnKey: sorter?.field
-        // })
-        setResponse((prev) => ({ ...prev, result: userData }));
+        setSortedInfo({
+          order: sorter?.order,
+          columnKey: sorter?.columnKey,
+        });
+
+        const route = `/app${
+          ISupportedRoutes.TRANSACTIONS
+        }?tabIndex=draft&sortid=${
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field
+        }&page=${pagination.current}&page_size=${pagination.pageSize}`;
+        history.push(route);
       }
+    } else {
       setTransactionsConfig({
         ...transactionConfig,
         page: pagination.current,
         page_size: pagination.pageSize,
-        sortid:
-          sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field,
+        sortid: defaultSorterId,
       });
-      const route = `/app${
-        ISupportedRoutes.TRANSACTIONS
-      }?tabIndex=draft&sortid=${
-        sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field
-      }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-        sorter.order
-      }`;
+      setSortedInfo(null);
+      const route = `/app${ISupportedRoutes.TRANSACTIONS}?tabIndex=approve&sortid=${defaultSorterId}&page=${pagination.current}&page_size=${pagination.pageSize}`;
       history.push(route);
     }
   };

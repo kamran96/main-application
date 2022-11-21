@@ -53,7 +53,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
   const { PdfCols, _exportableCols } = useCols();
 
   useEffect(() => {
-    if (routeHistory?.history?.location?.search) {
+    if (history?.location?.search) {
       let obj = {};
       const queryArr = history.location.search.split('?')[1].split('&');
       queryArr.forEach((item, index) => {
@@ -131,7 +131,6 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
       result.forEach((item, index) => {
         newResult.push({ ...item, key: item.id });
       });
-      console.log(pagination, 'pagination');
 
       setAllInvoicesRes({ ...resolvedData.data, result: newResult });
       if (pagination?.page_no < pagination?.total_pages) {
@@ -164,7 +163,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
           page_size: pagination.pageSize,
         });
 
-        const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+        const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
         history.push(route);
       } else {
         setAllInvoicesConfig({
@@ -174,19 +173,15 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
           sortid:
             sorter && sorter.order === 'descend'
               ? `-${sorter.field}`
-              : sorter?.order === 'asceend'
-              ? sorter.field
-              : 'id',
+              : sorter.field,
         });
         const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=${
-          sorter && sorter?.order === 'descend'
-            ? `-${sorter?.field}`
-            : sorter?.order === 'ascend'
-            ? sorter.field
-            : 'id'
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field
         }&page=${pagination.current}&page_size=${
           pagination.pageSize
-        }&query=${query}`;
+        }&filterOrder=${sorter?.order}&query=${query}`;
         history.push(route);
       }
     } else {
@@ -196,7 +191,7 @@ export const ALLInvoiceList: FC<IProps> = ({ columns }) => {
         page_size: pagination.pageSize,
         sortid: defaultSortId,
       });
-      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=all&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
       history.push(route);
     }
   };

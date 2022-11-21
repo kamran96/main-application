@@ -90,24 +90,6 @@ const APPROVETransactionList: FC = () => {
       });
 
       setTransactionsConfig({ ...transactionConfig, ...obj });
-
-      // const filterType = history.location.search.split('&');
-      // const filterIdType = filterType[1];
-      // const filterOrder = filterType[4]?.split('=')[1];
-
-      // if (filterIdType?.includes('-')) {
-      //   const fieldName = filterIdType?.split('=')[1].split('-')[1];
-      //   setSortedInfo({
-      //     order: filterOrder,
-      //     columnKey: fieldName,
-      //   });
-      // } else {
-      //   const fieldName = filterIdType?.split('=')[1];
-      //   setSortedInfo({
-      //     order: filterOrder,
-      //     columnKey: fieldName,
-      //   });
-      // }
     }
   }, []);
 
@@ -131,7 +113,7 @@ const APPROVETransactionList: FC = () => {
 
       setResponse({ ...resolvedData.data, result: newResult });
 
-      if (pagination?.next === page + 1) {
+      if (pagination?.page_no < pagination?.total_pages) {
         queryCache?.prefetchQuery(
           [
             ReactQueryKeys.TRANSACTION_KEYS,
@@ -256,15 +238,18 @@ const APPROVETransactionList: FC = () => {
     );
   };
 
+  console.log(s);
+
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
     if (sorter?.column) {
-      if (sorter.order === 'false') {
+      if (sorter?.order === false) {
         setTransactionsConfig({
           ...transactionConfig,
           sortid: defaultSorterId,
           page: pagination.current,
           page_size: pagination.pageSize,
         });
+
         const route = `/app${ISupportedRoutes.TRANSACTIONS}?tabIndex=approve&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}`;
         history.push(route);
       } else {
@@ -273,22 +258,29 @@ const APPROVETransactionList: FC = () => {
           page: pagination.current,
           page_size: pagination.pageSize,
           sortid:
-            sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field,
+            sorter.order === 'descend' ? `-${sorter.field}` : sorter.field,
+        });
+        setSortedInfo({
+          order: sorter.order,
+          columnKey: sorter.columnKey,
         });
         const route = `/app${
           ISupportedRoutes.TRANSACTIONS
         }?tabIndex=approve&sortid=${
-          sorter?.order === 'descend' ? `-${sorter?.field}` : sorter?.field
+          sorter && sorter.order === 'descend'
+            ? `-${sorter.field}`
+            : sorter.field
         }&page=${pagination.current}&page_size=${pagination.pageSize}`;
         history.push(route);
       }
     } else {
       setTransactionsConfig({
         ...transactionConfig,
+        sortid: defaultSorterId,
         page: pagination.current,
         page_size: pagination.pageSize,
-        sortid: defaultSorterId,
       });
+      setSortedInfo(null);
       const route = `/app${ISupportedRoutes.TRANSACTIONS}?tabIndex=approve&sortid=${defaultSorterId}&page=${pagination.current}&page_size=${pagination.pageSize}`;
       history.push(route);
     }

@@ -133,7 +133,7 @@ export const AprovedCreditNotes: FC = () => {
         );
       }
     }
-  }, [creditNoteListData]);
+  }, [creditNoteListData?.data]);
   /* COMPONENT DID UPDATE HERE */
 
   /* HOOKS ENDS HERE */
@@ -152,7 +152,7 @@ export const AprovedCreditNotes: FC = () => {
           sortid: defaultSortedId,
           pageSize: pagination.pageSize,
         });
-        const route = `/app${ISupportedRoutes.CREDIT_NOTES}?tabIndex=aproved&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+        const route = `/app${ISupportedRoutes.CREDIT_NOTES}?tabIndex=aproved&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
         history.push(route);
       } else {
         setCreditNoteConfig({
@@ -171,9 +171,9 @@ export const AprovedCreditNotes: FC = () => {
           sorter && sorter.order === 'descend'
             ? `-${sorter.field}`
             : sorter.field
-        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-          sorter.order
-        }&query=${query}`;
+        }&page=${pagination.current}&page_size=${
+          pagination.pageSize
+        }&&filterOrder=${sorter?.order}&query=${query}`;
         history.push(route);
       }
     } else {
@@ -184,7 +184,7 @@ export const AprovedCreditNotes: FC = () => {
         pageSize: pagination.pageSize,
       });
 
-      const route = `/app${ISupportedRoutes.CREDIT_NOTES}?tabIndex=aproved&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter.order}&query=${query}`;
+      const route = `/app${ISupportedRoutes.CREDIT_NOTES}?tabIndex=aproved&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
       history.push(route);
     }
   };

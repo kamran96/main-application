@@ -75,7 +75,6 @@ export const Suppliers: FC = () => {
   }, []);
 
   const handleContactsConfig = (pagination, filters, sorter: any, extra) => {
-    console.log(sorter, 'sorter');
     if (sorter?.column) {
       if (sorter.order === false) {
         history.push(

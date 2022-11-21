@@ -532,7 +532,6 @@ export const InvyceCmdPalette = () => {
         theme={theme}
         placeholder="Search in Invyce"
         filterSearchQuery={(inputVal) => {
-          console.log(inputVal, 'input value');
           return inputVal;
         }}
         onChange={(newValue) => {
