@@ -8,7 +8,6 @@ export const QuoteImport: FC = () => {
     <ButtonTag
       onClick={() => {
         setQuotes(true, 'quotes');
-        console.log('sadas yes');
       }}
       className="mr-10"
       size="middle"

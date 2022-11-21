@@ -290,7 +290,6 @@ export const GlobalManager: FC<IProps> = ({ children }) => {
   };
 
   const usePrefetchQuery = async (queryKey: any[], fn: () => void) => {
-    console.log(queryKey, fn, 'in manager');
     await queryCache.prefetchQuery(queryKey, fn);
   };
 

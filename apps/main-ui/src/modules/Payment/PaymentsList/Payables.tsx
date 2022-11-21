@@ -86,7 +86,7 @@ export const PaymentPaidList: FC = () => {
     if (resolvedData?.data?.result) {
       const { pagination } = resolvedData?.data;
       setPaymentResponse(resolvedData.data);
-      if (pagination?.next === page + 1) {
+      if (pagination?.page_no < pagination?.total_pages) {
         queryCache?.prefetchQuery(
           [
             ReactQueryKeys.PAYMENTS_KEYS,

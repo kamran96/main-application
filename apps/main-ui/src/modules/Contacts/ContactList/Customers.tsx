@@ -126,7 +126,7 @@ export const Customers: FC = () => {
 
   const handleContactsConfig = (pagination, filters, sorter: any, extra) => {
     if (sorter?.column) {
-      if (sorter?.order === false) {
+      if (sorter?.order === 'false') {
         setConfig({
           ...config,
           sortid: null,

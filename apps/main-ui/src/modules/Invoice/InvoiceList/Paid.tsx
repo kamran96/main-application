@@ -164,7 +164,7 @@ export const PaidtInvoiceList: FC<IProps> = ({ columns }) => {
           page: pagination.current,
           page_size: pagination.pageSize,
         });
-        const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=paid&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+        const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=paid&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
         history.push(route);
       } else {
         setAllInvoicesConfig({
@@ -185,9 +185,9 @@ export const PaidtInvoiceList: FC<IProps> = ({ columns }) => {
             : sorter?.order === 'ascend'
             ? sorter.field
             : 'id'
-        }&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${
-          sorter?.order
-        }&query=${query}`;
+        }&page=${pagination.current}&page_size=${
+          pagination.pageSize
+        }&filterOrder=${sorter?.order}&query=${query}`;
         history.push(route);
       }
     } else {
@@ -198,7 +198,7 @@ export const PaidtInvoiceList: FC<IProps> = ({ columns }) => {
         sortid: defaultSortId,
       });
 
-      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=paid&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter?.order}&query=${query}`;
+      const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=paid&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
       history.push(route);
     }
   };

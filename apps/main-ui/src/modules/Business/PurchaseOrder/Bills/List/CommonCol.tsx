@@ -32,7 +32,7 @@ export const useCols = () => {
         });
       }
     }
-  }, []);
+  }, [history?.location]);
 
   const PurchaseOrderColumns: ColumnsType<any> = [
     {

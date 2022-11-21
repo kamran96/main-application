@@ -294,7 +294,7 @@ export const OverDueInvoices: FC<IProps> = ({ columns }) => {
                 page: pagination.current,
                 page_size: pagination.pageSize,
               });
-              const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=due_expired&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+              const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=due_expired&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
               history.push(route);
             } else {
               setAllInvoicesConfig({
@@ -318,7 +318,7 @@ export const OverDueInvoices: FC<IProps> = ({ columns }) => {
                   : 'id'
               }&page=${pagination.current}&page_size=${
                 pagination.pageSize
-              }&filter=${sorter?.order}&query=${query}`;
+              }&filterOrder=${sorter?.order}&query=${query}`;
               history.push(route);
             }
           } else {
@@ -328,7 +328,7 @@ export const OverDueInvoices: FC<IProps> = ({ columns }) => {
               page_size: pagination.pageSize,
               sortid: defaultSortId,
             });
-            const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=due_expired&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&filter=${sorter?.order}&query=${query}`;
+            const route = `/app${ISupportedRoutes.INVOICES}?tabIndex=due_expired&sortid=${defaultSortId}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
             history.push(route);
           }
         }}

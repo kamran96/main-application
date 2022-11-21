@@ -58,7 +58,6 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
     pageSize: 10,
   });
 
-  console.log(allInvoicesConfig, 'what is it');
   const { page, query, sortid, pageSize } = allInvoicesConfig;
 
   const { pdfColsPO, _csvColumns } = useCols();
@@ -148,7 +147,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
           page: pagination.current,
           pageSize: pagination.pageSize,
         });
-        const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+        const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=draft&sortid=${sortid}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
         history.push(route);
       } else {
         setAllInvoicesConfig({
@@ -168,7 +167,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
             : sorter.field
         }&page=${pagination.current}&page_size=${
           pagination.pageSize
-        }&query=${query}`;
+        }&filterOrder=${sorter?.order}&query=${query}`;
         history.push(route);
       }
     } else {
@@ -178,7 +177,7 @@ export const DraftPurchaseOrdersList: FC<IProps> = ({ columns }) => {
         pageSize: pagination.pageSize,
         sortid: defaultSortedId,
       });
-      const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=draft&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&query=${query}`;
+      const route = `/app${ISupportedRoutes.PURCHASE_ORDER}?tabIndex=draft&sortid=${defaultSortedId}&page=${pagination.current}&page_size=${pagination.pageSize}&filterOrder=${sorter?.order}&query=${query}`;
       history.push(route);
     }
   };
