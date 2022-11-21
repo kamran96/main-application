@@ -238,8 +238,6 @@ const APPROVETransactionList: FC = () => {
     );
   };
 
-  console.log(s);
-
   const onChangePagination = (pagination, filters, sorter: any, extra) => {
     if (sorter?.column) {
       if (sorter?.order === false) {
