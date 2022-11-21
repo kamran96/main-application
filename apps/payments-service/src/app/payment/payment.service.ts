@@ -153,7 +153,7 @@ export class PaymentService {
       if (!req || !req.cookies) return null;
       const token = req?.cookies['access_token'];
 
-      const accountCodesArray = ['15001', '15004', '40001'];
+      const accountCodesArray = ['15001', '15002', '40001'];
       const { data: accounts } = await axios.post(
         Host('accounts', `accounts/account/codes`),
         {
@@ -311,7 +311,7 @@ export class PaymentService {
         const credits = [
           {
             amount: data.amount,
-            account_id: accounts.find((i) => i.code === '15004').id,
+            account_id: accounts.find((i) => i.code === '15002').id,
           },
         ];
         const debits = [

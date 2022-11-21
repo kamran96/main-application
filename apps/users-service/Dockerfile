@@ -3,11 +3,15 @@ FROM node:lts-alpine as build
 WORKDIR /app
 RUN touch /app/package-lock.json
 COPY ./dist/apps/users-service .
+COPY ./ssl/generate-ssl.sh .
 
 FROM node:lts-alpine
 
 # add dump-init to avoid nodejs as pid 1
-RUN apk add dumb-init
+RUN apk add dumb-init && apk add \
+    openssl \
+    bash
+
 ARG PORT
 ARG NODE_ENV
 USER node
@@ -20,6 +24,11 @@ WORKDIR /home/node/app
 COPY --chown=node:node --from=build /app /home/node/app/node_modules
 COPY --chown=node:node --from=build /app/package-lock.json /home/node/app/package-lock.json
 COPY --chown=node:node ./dist/apps/users-service /home/node/app
+COPY --chown=node:node --from=build /app/generate-ssl.sh /home/node/app/generate-ssl.sh
+
+# RUN if [ "$NODE_ENV" != "production" || "$NODE_ENV" != "staging" ];  then \
+#     RUN chmod +x /home/node/app/generate-ssl.sh \
+#     RUN cd /home/node/app/ && ./generate-ssl.sh; fi
 
 RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express --legacy-peer-deps
 

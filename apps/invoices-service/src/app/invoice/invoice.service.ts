@@ -466,7 +466,7 @@ export class InvoiceService {
     if (!req || !req.cookies) return null;
     const token = req?.cookies['access_token'];
 
-    const accountCodesArray = ['15004', '20002', '50001'];
+    const accountCodesArray = ['15002', '20002', '50001'];
     const { data: accounts } = await axios.post(
       Host('accounts', 'accounts/account/codes'),
       {
@@ -604,7 +604,7 @@ export class InvoiceService {
 
           const debitsArray = [];
           const debit = {
-            account_id: await accounts.find((i) => i.code === '15004').id,
+            account_id: await accounts.find((i) => i.code === '15002').id,
             amount: dto.netTotal,
           };
           if (dto?.discount > 0) {
@@ -804,7 +804,7 @@ export class InvoiceService {
 
         const debitsArray = [];
         const debit = {
-          account_id: await accounts.find((i) => i.code === '15004').id,
+          account_id: await accounts.find((i) => i.code === '15002').id,
           amount: dto.netTotal,
         };
         if (dto?.discount > 0) {

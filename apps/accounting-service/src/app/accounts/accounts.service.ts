@@ -7,7 +7,7 @@ import {
   TransactionRepository,
 } from '../repositories';
 import * as moment from 'moment';
-import { getCustomRepository, ILike, In, Not, Raw } from 'typeorm';
+import { getCustomRepository, In, Not, Raw } from 'typeorm';
 import { Sorting } from '@invyce/sorting';
 import { Integrations, Entries } from '@invyce/global-constants';
 import {
@@ -19,7 +19,12 @@ import {
   ISecondaryAccount,
 } from '@invyce/interfaces';
 import { AccountDto, AccountIdsDto } from '../dto/account.dto';
-import { PrimaryAccounts, TransactionItems, Transactions } from '../entities';
+import {
+  PrimaryAccounts,
+  SecondaryAccounts,
+  TransactionItems,
+  Transactions,
+} from '../entities';
 
 @Injectable()
 export class AccountsService {
@@ -770,13 +775,29 @@ export class AccountsService {
       }
     } else {
       try {
+        const primaryAccount = await getCustomRepository(
+          PrimaryAccountRepository
+        )
+          .createQueryBuilder('pa')
+          .where((qb) => {
+            const subQuery = qb
+              .subQuery()
+              .select('"primaryAccountId"')
+              .from(SecondaryAccounts, 'sa')
+              .where('sa.id = :secondaryAccountId')
+              .getQuery();
+            return 'pa.id IN' + subQuery;
+          })
+          .setParameter('secondaryAccountId', accountDto.secondaryAccountId)
+          .getOne();
+
         // we need to create new account
         const account = await accountRepository.save({
           name: accountDto.name,
           description: accountDto.description,
           code: accountDto.code,
           secondaryAccountId: accountDto.secondaryAccountId,
-          primaryAccountId: accountDto.primaryAccountId,
+          primaryAccountId: accountDto.primaryAccountId || primaryAccount.id,
           taxRate: accountDto.taxRate,
           isSystemAccount: false,
           // branchId: accountDto.branchId,
