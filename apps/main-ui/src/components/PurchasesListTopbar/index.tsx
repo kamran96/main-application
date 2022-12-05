@@ -120,7 +120,7 @@ export const PurchaseListTopbar: FC<IProps> = ({
   );
 };
 const WrapperPurchaseTopbar = styled.div`
-  padding: 24px 0;
+  padding: 12px 0;
 
   ._quick_access {
     button {

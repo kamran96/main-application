@@ -8,7 +8,13 @@ import React, { FC, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
 import { getAccountLedger } from '../../../../api/accounts';
-import { Loader, BoldText, SmartFilter, CommonTable } from '@components';
+import {
+  Loader,
+  BoldText,
+  SmartFilter,
+  CommonTable,
+  TableCard,
+} from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import {
   IAccountLederResponse,
@@ -201,37 +207,39 @@ export const AccountsLedgerList: FC<IProps> = ({ id, accountName }) => {
     });
 
   return (
-    <WrapperAccountLedger>
-      {isLoading ? (
-        <div className="loading-wrapper flex alignCenter justifyCenter">
-          <Loader />
-        </div>
-      ) : (
-        <CommonTable
-          pdfExportable={{
-            columns: pdfCols,
-          }}
-          printTitle={`Ledger Report: ${accountName}`}
-          size="middle"
-          hasPrint
-          onChange={handleTableChange}
-          customTopbar={<></>}
-          topbarRightPannel={renderTableTopbarRight()}
-          data={result}
-          columns={columns}
-          totalItems={pagination.total}
-          pagination={{
-            showSizeChanger: true,
-            pageSizeOptions: [...pageSizeOptions],
-            pageSize: pagination && pagination.page_size + 1,
-            position: ['bottomRight'],
-            current: pagination.page_no,
-            total: pagination && pagination.total,
-          }}
-          hasfooter={true}
-        />
-      )}
-    </WrapperAccountLedger>
+    <TableCard>
+      <WrapperAccountLedger>
+        {isLoading ? (
+          <div className="loading-wrapper flex alignCenter justifyCenter">
+            <Loader />
+          </div>
+        ) : (
+          <CommonTable
+            pdfExportable={{
+              columns: pdfCols,
+            }}
+            printTitle={`Ledger Report: ${accountName}`}
+            size="middle"
+            hasPrint
+            onChange={handleTableChange}
+            customTopbar={<></>}
+            topbarRightPannel={renderTableTopbarRight()}
+            data={result}
+            columns={columns}
+            totalItems={pagination.total}
+            pagination={{
+              showSizeChanger: true,
+              pageSizeOptions: [...pageSizeOptions],
+              pageSize: pagination && pagination.page_size + 1,
+              position: ['bottomRight'],
+              current: pagination.page_no,
+              total: pagination && pagination.total,
+            }}
+            hasfooter={true}
+          />
+        )}
+      </WrapperAccountLedger>
+    </TableCard>
   );
 };
 

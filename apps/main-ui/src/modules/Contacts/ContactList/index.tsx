@@ -44,11 +44,7 @@ export const ContactList: FC = () => {
   const RenderButton = () => {
     return (
       <Rbac permission={PERMISSIONS.CONTACTS_CREATE}>
-        <Button
-          style={{ background: '#1E75F1' }}
-          className="ml-10"
-          type="primary"
-        >
+        <Button className="ml-10" type="primary">
           <Link
             to={{
               pathname: `/app${ISupportedRoutes.CREATE_CONTACT}`,

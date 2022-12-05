@@ -28,6 +28,7 @@ import { PERMISSIONS } from '../../../components/Rbac/permissions';
 import moneyFormat from '../../../utils/moneyFormat';
 import { pdfCols } from './pdfCols';
 import ContactsImport from '../ContactsImport';
+import { NavLink } from '@components';
 
 export const Suppliers: FC = () => {
   /* HOOKS */
@@ -182,12 +183,12 @@ export const Suppliers: FC = () => {
       sorter: true,
       sortOrder: sortedInfo?.columnKey === 'name' && sortedInfo?.order,
       render: (data, row, index) => (
-        <Link
+        <NavLink
           className="contact-name"
           to={`/app${ISupportedRoutes.CONTACTS}/${row.id}?type=supplier`}
         >
           {data}
-        </Link>
+        </NavLink>
       ),
     },
     {

@@ -21,18 +21,18 @@ export const AccountsLedger: FC = () => {
     }
   }, [routeHistory]);
 
-  const { data } = useQuery([`all-accounts`, 'ALL'], getAllAccounts);
-  const result: IAccountsResult[] =
-    (data && data.data && data.data.result) || [];
+  // const { data } = useQuery([`all-accounts`, 'ALL'], getAllAccounts);
+  // const result: IAccountsResult[] =
+  //   (data && data.data && data.data.result) || [];
 
-  const getAccountById = (id: number | string) => {
-    if (result) {
-      const [filtered] = result.filter((item) => item.id === id);
-      return filtered;
-    } else {
-      return null;
-    }
-  };
+  // const getAccountById = (id: number | string) => {
+  //   if (result) {
+  //     const [filtered] = result.filter((item) => item.id === id);
+  //     return filtered;
+  //   } else {
+  //     return null;
+  //   }
+  // };
 
   return (
     <>
@@ -44,14 +44,14 @@ export const AccountsLedger: FC = () => {
           <Breadcrumb.Item>Account Ledger</Breadcrumb.Item>
         </Breadcrumb>
       </BreadCrumbArea>
-      <div className="pv-10">
+      {/* <div className="">
         <Heading type="table">
           {result?.length > 0 ? getAccountById(id)?.name : ''}
         </Heading>
-      </div>
+      </div> */}
       <AccountsLedgerList
         id={id}
-        accountName={result?.length > 0 ? getAccountById(id)?.name : ''}
+        // accountName={result?.length > 0 ? getAccountById(id)?.name : ''}
       />
     </>
   );

@@ -8,6 +8,7 @@ import { ISupportedRoutes } from '@invyce/shared/types';
 import moneyFormat from '../../../utils/moneyFormat';
 import { useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { NavLink } from '@components';
 
 export const useCols = () => {
   const [sortedInfo, setSortedInfo] = useState(null);
@@ -43,9 +44,9 @@ export const useCols = () => {
       sorter: true,
       sortOrder: sortedInfo?.columnKey === 'invoiceNumber' && sortedInfo?.order,
       render: (data, row, index) => (
-        <Link to={`/app${ISupportedRoutes.INVOICES_VIEW}/${row.id}`}>
+        <NavLink to={`/app${ISupportedRoutes.INVOICES_VIEW}/${row.id}`}>
           {data}
-        </Link>
+        </NavLink>
       ),
     },
     {
@@ -63,11 +64,11 @@ export const useCols = () => {
       sortOrder: sortedInfo?.columnKey === 'contact' && sortedInfo?.order,
       render: (contact, row, index) => {
         return contact ? (
-          <Link
+          <NavLink
             to={`${ISupportedRoutes.DASHBOARD_LAYOUT}${ISupportedRoutes.CONTACTS}/${contact?.id}?type="customer"`} //row to contact id
           >
             {contact.name}
-          </Link>
+          </NavLink>
         ) : (
           '-'
         );

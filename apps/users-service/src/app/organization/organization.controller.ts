@@ -43,6 +43,21 @@ export class OrganizationController {
     }
   }
 
+  @Get('/currencies')
+  @UseGuards(GlobalAuthGuard)
+  async getCurrencies(@Req() req: IRequest) {
+    try {
+      const currencies = await this.organizationService.GetCurrencies(req);
+      return {
+        message: 'Currencies fetched successfully',
+        status: true,
+        result: currencies,
+      };
+    } catch (err) {
+      return err;
+    }
+  }
+
   @Post()
   @UseGuards(GlobalAuthGuard)
   async create(

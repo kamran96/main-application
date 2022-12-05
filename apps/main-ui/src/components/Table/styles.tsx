@@ -14,6 +14,7 @@ export const WrapperTable = styled.div`
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+    padding: 10px 0;
 
     /* padding: 0 ${convertToRem(10)}; */
   }

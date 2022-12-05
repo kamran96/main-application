@@ -27,6 +27,7 @@ import moneyFormat from '../../../utils/moneyFormat';
 import ContactsImport from '../ContactsImport';
 import { useHistory } from 'react-router-dom';
 import { pdfCols } from './pdfCols';
+import { NavLink } from '@components';
 
 const defaultSortId = 'id';
 
@@ -187,12 +188,12 @@ export const Customers: FC = () => {
       sorter: true,
       sortOrder: sortedInfo?.columnKey === 'name' && sortedInfo?.order,
       render: (data, row, index) => (
-        <Link
+        <NavLink
           className="contact-name"
           to={`/app${ISupportedRoutes.CONTACTS}/${row.id}?type=customer`}
         >
           {data}
-        </Link>
+        </NavLink>
       ),
     },
     {
@@ -270,7 +271,7 @@ export const Customers: FC = () => {
   /* this function is passed as a prop in the contact table */
   const renderCustomTopbar = () => {
     return (
-      <div className="contacts_search pv-10">
+      <div className="contacts_search ">
         <div className="options_actions">
           <div className="edit">
             <Rbac permission={PERMISSIONS.CONTACTS_CREATE}>

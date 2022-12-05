@@ -25,6 +25,7 @@ import phoneCodes from '../../utils/phoneCodes';
 import industriesList from '../../utils/industriesList';
 import moment from 'moment';
 import { useState } from 'react';
+import { getCurrenciesAPI } from '../../api/organizations';
 
 const { MonthPicker } = DatePicker;
 
@@ -66,6 +67,9 @@ export const AddOrganizationForm: FC<IProps> = ({ initialState }) => {
     }
   );
   const errorResponse: IBaseAPIError = error;
+
+  const { data: currenciesData } = useQuery(['currencies'], getCurrenciesAPI);
+  console.log(currenciesData, 'currenceis');
 
   useEffect(() => {
     if (data?.data?.result) {

@@ -90,6 +90,12 @@ export class OrganizationService {
     }
   }
 
+  async GetCurrencies(req) {
+    if (!req || !req.cookies) return null;
+    const currencies = await this.currencyModel.find();
+    return currencies;
+  }
+
   async CreateOrUpdateOrganization(
     organizationDto: OrganizationDto,
     req: IRequest,

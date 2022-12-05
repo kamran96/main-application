@@ -84,12 +84,38 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
 
       const contact_ledger: any =
         (resolvedResult.result && resolvedResult.getGeneratedResult()) || [];
-      console.log(resolvedData, 'resolveData');
       setResponse({
         ...resolvedResult,
         result: contact_ledger,
         contact: resolvedData?.data?.contact,
       });
+
+      if (resolvedData?.data?.nextItem) {
+        queryCache.prefetchQuery(
+          [
+            ReactQueryKeys?.CONTACT_VIEW,
+            resolvedData?.data?.nextItem,
+            type === IContactTypes.CUSTOMER ? 1 : 2,
+            '',
+            20,
+            1,
+          ],
+          getContactLedger
+        );
+      }
+      if (resolvedData?.data?.prevItem) {
+        queryCache.prefetchQuery(
+          [
+            ReactQueryKeys?.CONTACT_VIEW,
+            resolvedData?.data?.prevItem,
+            type === IContactTypes.CUSTOMER ? 1 : 2,
+            '',
+            20,
+            1,
+          ],
+          getContactLedger
+        );
+      }
     }
   }, [resolvedData]);
 
@@ -230,7 +256,7 @@ export const LedgerList: FC<IProps> = ({ id, type }) => {
 
   const handleMutateApiConfig = (contactId) => {
     history.push(
-      `/app${ISupportedRoutes.CONTACTS}/${id}?type=${
+      `/app${ISupportedRoutes.CONTACTS}/${contactId}?type=${
         type === 1 ? 'customer' : 'supplier'
       }`
     );

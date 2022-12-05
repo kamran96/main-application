@@ -20,3 +20,6 @@ export const getOrganizationByIdAPI = ({ queryKey }: QueryKey) => {
   const id: number = queryKey[1];
   return http.get(`/users/organization/${id}`);
 };
+
+export const getCurrenciesAPI = () =>
+  http.get('/users/organization/currencies');

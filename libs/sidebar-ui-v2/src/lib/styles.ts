@@ -50,21 +50,7 @@ const subMenuClose = keyframes`
     display: none;
     padding: 10px 10px 10px 30px;
   }
-  /* 50%{
-    opacity: 0;
-    visibility: hidden;
-  }
-  70%{
-    display: none;
-  }
-  100% {
-    transform: translateY(-200px);
-    display: none;
-    opacity: 0;
-    visibility: hidden;
-    height: 0px;
-    padding: 0px 10px 0px 25px;
-  } */
+
   `;
 
 export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
@@ -236,11 +222,11 @@ export const SidebarWrapper = styled.aside<ISidebarWrapperProps>`
       z-index: 1;
     }
     .close-anchor {
-      animation-name: ${subMenuClose};
+      /* animation-name: ${subMenuClose};
       animation-duration: 0.34s;
-      animation-iteration-count: linear;
+      animation-iteration-count: linear; */
       margin-top: -10px;
-      transition: 0.34s all ease-in-out;
+      /* transition: 0.34s all ease-in-out; */
       padding: 0px 10px 0px 30px;
       height: 0px;
       visibility: hidden;

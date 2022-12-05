@@ -53,7 +53,6 @@ export const TableTabs: FC<IProps> = ({
 const CustomizedTabs: any = styled(Tabs)`
   .ant-tabs-nav {
     /* border-bottom: 2px dashed #e4e4e4; */
-    padding-bottom: 12px;
   }
 
   .ant-tabs-top > .ant-tabs-nav::before,

@@ -143,6 +143,35 @@ export const SidebarUi: FC<SidebarUiProps> = ({
     });
   };
 
+  const getActiveNavAncor = () => {
+    const { pathname } = history.location;
+    let indexed = -1;
+    for (let index = 0; index <= routes.nestedRoutes.length; index++) {
+      const item = routes.nestedRoutes[index];
+      if (item?.route?.includes(pathname)) {
+        indexed = index;
+        break;
+      } else if (item?.children?.length) {
+        for (let ch = 0; ch <= item?.children?.length; ch++) {
+          const childItem = item.children[ch];
+          if (childItem?.route && childItem?.route?.includes(pathname)) {
+            indexed = index;
+            break;
+          }
+        }
+      }
+    }
+    return indexed;
+  };
+
+  useEffect(() => {
+    if (getActiveNavAncor() > -1) {
+      setOpenNavAncorIndex(getActiveNavAncor());
+    }
+  }, []);
+
+  console.log(getActiveNavAncor(), 'route index');
+
   return (
     <SidebarWrapper toggle={sidebarOpen}>
       <div className="toggle">
@@ -208,6 +237,9 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                       <MenuPopOver route={parent} />
                     ) : !parent?.children?.length ? (
                       <li
+                        onClick={() => {
+                          setOpenNavAncorIndex(null);
+                        }}
                         onMouseOver={async () => {
                           if (
                             parent?.queryKey?.length &&
@@ -244,7 +276,10 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                       <li>
                         <div
                           className={`route_list_item_parent sub_route_parent flex alignCenter justifySpaceBetween pointer mv-6 ${
-                            index === openNavAncorIndex ? 'active_route' : ''
+                            index === openNavAncorIndex ||
+                            getActiveNavAncor() === index
+                              ? 'active_route'
+                              : ''
                           }`}
                           onClick={(e) => handleShowSubMenu(e, index)}
                         >
@@ -321,6 +356,9 @@ export const SidebarUi: FC<SidebarUiProps> = ({
                 {routes?.singleEntity?.map((singleEntryRoute, index) => {
                   return (
                     <li
+                      onClick={() => {
+                        setOpenNavAncorIndex(null);
+                      }}
                       key={index}
                       className={`route_list_item flex alignCenter pointer mv-4 
                     ${
