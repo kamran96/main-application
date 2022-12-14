@@ -2,7 +2,6 @@ import printIcon from '@iconify-icons/bytesize/print';
 import {
   ExportTableButton,
   IExportFieldButtonProps,
-  // Table,
 } from 'ant-table-extensions';
 import { Table, Skeleton } from 'antd';
 import { ColumnsType } from 'antd/es/table';
@@ -191,128 +190,129 @@ export const CommonTable: FC<IProps> = ({
 
   /* **************** JSX RETURNING FUNCTIONS **************** */
 
-  const renderTable = () => {
+  const renderTopbar = () => {
     return (
-      <>
-        {customTopbar && (
-          <div className={`table_top flex alignCenter ${className}`}>
-            <div className={`flex-1 mr-1`}>{customTopbar}</div>
-            <div className="flex alignCenter">
-              {exportable && (
-                <div
-                  className={`mr-10 flex alignCenter _exportable_button mb-3 ${
-                    _exportableProps?.disabled ? 'disabled ' : ''
-                  }`}
-                >
-                  <ExportTableButton {..._exportableProps}>
-                    Export to CSV
-                  </ExportTableButton>
-                </div>
-              )}
-              {/* {hasImport && (
-                  <ButtonTag
-                  className="mr-10"
-                    onClick={onPrint}
-                    title="Import"
-                    size="middle"
-                    icon={downloadIcon}
-                  />
-                )} */}
-              {hasPrint && (
-                <ButtonTag
-                  className="mr-10"
-                  onClick={onPrint}
-                  title="Print"
-                  size="middle"
-                  icon={printIcon}
-                />
-              )}
-              {!!pdfExportable && tableData?.length > 0 && (
-                <Suspense fallback={null}>
-                  <TablePDF
-                    Header={{
-                      organizationName,
-                      city,
-                      country,
-                      title: printTitle,
-                      organizationContact,
-                      organizationEmail,
-                      address: '',
-                      code: postalCode,
-                      logo: organization?.attachment?.path,
-                      website,
-                    }}
-                    data={tableData}
-                    columns={
-                      typeof pdfExportable === 'boolean'
-                        ? printColumns
-                        : pdfExportable.columns
-                    }
-                  />
-                </Suspense>
-                // <ButtonTag
-                //   onClick={onPDF}
-                //   className="mr-10"
-                //   ghost
-                //   title="Download PDF"
-                //   size="middle"
-                //   customizeIcon={<PDFICON className="flex alignCenter mr-10" />}
-                // />
-              )}
-              {topbarRightPannel}
+      <div className={`table_top flex alignCenter ${className}`}>
+        <div className={`flex-1 mr-1`}>{customTopbar}</div>
+        <div className="flex alignCenter">
+          {exportable && (
+            <div
+              className={`mr-10 flex alignCenter _exportable_button mb-3 ${
+                _exportableProps?.disabled ? 'disabled ' : ''
+              }`}
+            >
+              <ExportTableButton {..._exportableProps}>
+                Export to CSV
+              </ExportTableButton>
             </div>
-          </div>
-        )}
-        {enableRowSelection ? (
-          <Table
-            // scroll={rest.scroll ? rest.scroll : themeScroll ? scrollConfig : {}}
-            rowSelection={{
-              type: 'checkbox',
-              ...rest.rowSelection,
-              onChange: (selectedRowKeys, selectedRows) => {
-                onSelectRow({ selectedRows, selectedRowKeys });
-              },
-            }}
-            pagination={pagination}
-            columns={tableColumns}
-            dataSource={tableData}
-            loading={false}
-            rowKey={(record: any) => record?.id}
-            {...rest}
+          )}
+          {/* {hasImport && (
+          <ButtonTag
+          className="mr-10"
+            onClick={onPrint}
+            title="Import"
+            size="middle"
+            icon={downloadIcon}
           />
-        ) : (
-          <Table
-            // scroll={rest.scroll ? rest.scroll : themeScroll ? scrollConfig : {}}
-            // title={'hello world'}
-            pagination={pagination}
-            columns={tableColumns}
-            dataSource={tableData}
-            loading={false}
-            rowKey={(record: any) => record?.id}
-            // exportable
-            // loading
-            {...rest}
-          />
-        )}
+        )} */}
+          {hasPrint && (
+            <ButtonTag
+              className="mr-10"
+              onClick={onPrint}
+              title="Print"
+              size="middle"
+              icon={printIcon}
+            />
+          )}
+          {!!pdfExportable && tableData?.length > 0 && (
+            <Suspense fallback={null}>
+              <TablePDF
+                Header={{
+                  organizationName,
+                  city,
+                  country,
+                  title: printTitle,
+                  organizationContact,
+                  organizationEmail,
+                  address: '',
+                  code: postalCode,
+                  logo: organization?.attachment?.path,
+                  website,
+                }}
+                data={tableData}
+                columns={
+                  typeof pdfExportable === 'boolean'
+                    ? printColumns
+                    : pdfExportable.columns
+                }
+              />
+            </Suspense>
+            // <ButtonTag
+            //   onClick={onPDF}
+            //   className="mr-10"
+            //   ghost
+            //   title="Download PDF"
+            //   size="middle"
+            //   customizeIcon={<PDFICON className="flex alignCenter mr-10" />}
+            // />
+          )}
+          {topbarRightPannel}
+        </div>
+      </div>
+    );
+  };
 
-        {hasfooter && (
-          <div className="ant-table ant-table-default footer-border">
-            <table>
-              <thead className="ant-table-thead footer">
-                <tr>
-                  <td>
-                    {renderFooter ? (
-                      <>{renderFooter}</>
-                    ) : (
-                      <p className="total_count">{totalItems} Total Items</p>
-                    )}
-                  </td>
-                </tr>
-              </thead>
-            </table>
-          </div>
-        )}
-      </>
+  const Footer = () => {
+    return (
+      <div className="ant-table ant-table-default footer-border">
+        <table>
+          <thead className="ant-table-thead footer">
+            <tr>
+              <td>
+                {renderFooter ? (
+                  <>{renderFooter}</>
+                ) : (
+                  <p className="total_count">{totalItems} Total Items</p>
+                )}
+              </td>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    );
+  };
+
+  const renderTable = () => {
+    return enableRowSelection ? (
+      <Table
+        // scroll={rest.scroll ? rest.scroll : themeScroll ? scrollConfig : {}}
+        rowSelection={{
+          type: 'checkbox',
+          ...rest.rowSelection,
+          onChange: (selectedRowKeys, selectedRows) => {
+            onSelectRow({ selectedRows, selectedRowKeys });
+          },
+        }}
+        pagination={pagination}
+        columns={tableColumns}
+        dataSource={tableData}
+        loading={false}
+        rowKey={(record: any) => record?.id}
+        {...rest}
+      />
+    ) : (
+      <Table
+        // scroll={rest.scroll ? rest.scroll : themeScroll ? scrollConfig : {}}
+        // title={'hello world'}
+        pagination={pagination}
+        columns={tableColumns}
+        dataSource={tableData}
+        loading={false}
+        rowKey={(record: any) => record?.id}
+        // exportable
+        // loading
+        {...rest}
+      />
     );
   };
   /* **************** JSX RETURNING FUNCTIONS ENDS HERE **************** */
@@ -359,9 +359,19 @@ export const CommonTable: FC<IProps> = ({
         pagination={pagination ? true : false}
       >
         {tableType === 'default' ? (
-          <DefaultWrapper>{renderTable()}</DefaultWrapper>
+          <DefaultWrapper>
+            <>
+              {customTopbar ? renderTopbar() : null}
+              {renderTable()}
+              {hasfooter ? Footer() : null}
+            </>
+          </DefaultWrapper>
         ) : (
-          renderTable()
+          <>
+            {customTopbar ? renderTopbar() : null}
+            {renderTable()}
+            {hasfooter ? Footer() : null}
+          </>
         )}
       </WrapperTable>
     </>

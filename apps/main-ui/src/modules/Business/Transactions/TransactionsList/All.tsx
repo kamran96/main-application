@@ -9,7 +9,6 @@ import {
   CommonTable,
   TransactionApprovePdf,
   PDFICON,
-  TransactionItem,
 } from '@components';
 import { useGlobalContext } from '../../../../hooks/globalContext/globalContext';
 import {
@@ -21,17 +20,19 @@ import {
 } from '@invyce/shared/types';
 import moneyFormat from '../../../../utils/moneyFormat';
 import { WrapperTransactionCustomBar, WrapperTransactionsList } from './styles';
-import { TransactionItemTable } from './TransactionItemsTable';
 import transactionsFilterSchema from './transactionsFilterSchema';
-import { PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import DUMMYLOGO from '../../../../assets/quickbook.png';
 import styled from 'styled-components';
+import { Drawer } from 'antd';
+import { TransactionDetail } from './Details';
 
-import { TransactionImport } from '../importTransactions';
 const defaultSorterId = 'id';
+
 const APPROVETransactionList: FC = () => {
   const [sortedInfo, setSortedInfo] = useState(null);
   const [filterBar, setFilterbar] = useState<boolean>(false);
+  const [selectedRow, setSelectedRow] = useState(null);
   const [{ result, pagination }, setResponse] = useState<IResponseTransactions>(
     {
       result: [],
@@ -159,6 +160,7 @@ const APPROVETransactionList: FC = () => {
       key: 'ref',
       sorter: true,
       sortOrder: sortedInfo?.columnKey === 'ref' && sortedInfo?.order,
+      render: (data, row, index) => data,
     },
     {
       title: 'Date',
@@ -298,36 +300,44 @@ const APPROVETransactionList: FC = () => {
   return (
     <WrapperTransactionsList>
       <CommonTable
-        expandable={{
-          expandedRowRender: (record, index) => {
-            return (
-              <>
-                <PDFDownloadLink
-                  document={
-                    <TransactionItem header={headerprops} resultData={record} />
-                  }
-                >
-                  <div className="flex alignCenter">
-                    <PDFICON className="flex alignCenter mr-5" />
-
-                    <span> Download PDF</span>
-                  </div>
-                </PDFDownloadLink>
-                <br />
-                <TransactionItemTable
-                  allAccounts={accountsResponse}
-                  data={record.transactionItems}
-                />
-              </>
-            );
-          },
+        onRow={(data) => {
+          return {
+            onClick: () => {
+              setSelectedRow(data);
+            },
+          };
         }}
+        // expandable={{
+        //   expandedRowRender: (record, index) => {
+        //     return (
+        //       <>
+        //         <PDFDownloadLink
+        //           document={
+        //             <TransactionItem header={headerprops} resultData={record} />
+        //           }
+        //         >
+        //           <div className="flex alignCenter">
+        //             <PDFICON className="flex alignCenter mr-5" />
+
+        //             <span> Download PDF</span>
+        //           </div>
+        //         </PDFDownloadLink>
+        //         <br />
+        //         <TransactionItemTable
+        //           allAccounts={accountsResponse}
+        //           data={record.transactionItems}
+        //         />
+        //       </>
+        //     );
+        //   },
+        // }}
         customTopbar={renderCustomTopbar()}
         data={result}
         columns={columns}
         loading={isLoading}
         onChange={onChangePagination}
         totalItems={pagination?.total}
+        enableRowSelection
         pagination={{
           pageSize: pagination?.page_size,
           position: ['bottomRight'],
@@ -341,6 +351,11 @@ const APPROVETransactionList: FC = () => {
           ],
         }}
         hasfooter={true}
+      />
+      <TransactionDetail
+        onClose={() => setSelectedRow(null)}
+        visible={!!selectedRow}
+        data={selectedRow}
       />
     </WrapperTransactionsList>
   );

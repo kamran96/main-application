@@ -21,7 +21,6 @@ export const WrapperTransactionsList = styled.div`
 `;
 
 export const WrapperTransactionCustomBar = styled.div`
-  padding: 10px 0;
   display: flex;
   justify-content: flex-end;
   .search_bar {

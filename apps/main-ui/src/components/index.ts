@@ -70,3 +70,4 @@ export * from './Typography';
 export * from './UploadAtachment';
 export * from './VerificationModal';
 export * from './NavLink';
+export * from './ArrowButton';
