@@ -66,7 +66,7 @@ const WrapperButtonTag = styled.div`
     border: none;
     ._icon_button {
       position: relative;
-      top: -2px;
+      top: 0px;
       margin-right: 5px;
     }
   }
@@ -81,6 +81,9 @@ const WrapperButtonTag = styled.div`
       background: ${(props: IThemeProps) =>
         props?.theme?.colors?.$Secondary} !important;
       color: '#FFFFFF !important';
+      ._icon_button {
+        color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE};
+      }
       span {
         color: ${(props: IThemeProps) => props?.theme?.colors?.$WHITE};
       }
